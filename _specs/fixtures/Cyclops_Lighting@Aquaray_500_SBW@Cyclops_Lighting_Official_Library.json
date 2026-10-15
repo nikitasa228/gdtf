@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 103386300.0,
   "luminousFluxLm": 318000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 28.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -46,7 +46,7 @@
     "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 3.0,
     "max": 21.2
@@ -106,7 +106,7 @@
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "estimated",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -130,18 +130,21 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "estimated",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF"
+  ],
+  "_refs": [
+    "https://www.cyclopslighting.com/product/aquaray-500sbw-cmy-outdoor-spot-beam-wash-moving-head/"
   ]
 }

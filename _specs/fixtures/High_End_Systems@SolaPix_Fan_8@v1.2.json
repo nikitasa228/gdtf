@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 320.0,
+  "powerConsumptionW": 413,
   "maxLuminousIntensityCd": 924800.0,
   "luminousFluxLm": 6400.0,
   "noiseLevelDb": null,
@@ -108,10 +108,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -154,5 +154,8 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "'Fan' is the product name (fan-shaped pixel head), not an air fan."
+  ],
+  "_refs": [
+    "https://shop.bmisupply.com/Resources/en/ItemDocuments/3924001/updated-SolaPix_Fan8_Datasheet_revB.pdf"
   ]
 }

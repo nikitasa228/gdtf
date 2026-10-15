@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 220,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -113,7 +113,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
@@ -136,13 +136,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
     "powerSupplyType",
@@ -151,5 +151,8 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.coemar.com/wp-content/uploads/2018/10/Datasheet-LEDko-FullSpectrum-6-HD-ENG.pdf"
   ]
 }

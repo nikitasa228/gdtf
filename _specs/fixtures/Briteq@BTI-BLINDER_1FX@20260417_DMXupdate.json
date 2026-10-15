@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 61.0,
+  "powerConsumptionW": 75,
   "maxLuminousIntensityCd": 9800.0,
   "luminousFluxLm": 5300.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 2.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -112,7 +112,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
@@ -139,13 +139,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "estimated",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType",
     "colorTemperatureK"
   ],
@@ -153,5 +153,8 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://briteq-lighting.com/bti-blinder1-fx"
   ]
 }

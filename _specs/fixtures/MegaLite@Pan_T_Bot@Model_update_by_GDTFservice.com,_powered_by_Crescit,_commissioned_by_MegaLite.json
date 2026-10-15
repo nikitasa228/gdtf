@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 590,
   "maxLuminousIntensityCd": 1222600.0,
   "luminousFluxLm": 2573550.0,
   "noiseLevelDb": null,
@@ -132,7 +132,6 @@
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
     "powerSupplyType"
   ],
@@ -140,5 +139,8 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power 53100 W invalid."
+  ],
+  "_refs": [
+    "https://proadv.com/mega-lite-pan-t-bot/"
   ]
 }

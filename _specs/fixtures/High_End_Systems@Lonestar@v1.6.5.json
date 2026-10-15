@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 615,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -111,7 +111,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -142,6 +142,7 @@
     "lightSourceType": "manual",
     "lensType": "manual",
     "powerSupplyType": "estimated",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -150,10 +151,12 @@
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://proadv.com/high-end-systems-lonestar/"
+  ]
 }

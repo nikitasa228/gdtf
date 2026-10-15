@@ -6,7 +6,7 @@
   "gdtfName": "BTI-BLIZZARD WASH2",
   "longName": "BTI-BLIZZARD WASH2",
   "shortName": "BLIZ W2",
-  "description": "Briteq BTI-BLIZZARD WASH2: LED wash, with RGBLCMY colour mixing, colour wheel, IP65 rated.",
+  "description": "Briteq BTI-BLIZZARD WASH2: moving-head LED wash, with RGBLCMY colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Briteq",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1000,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -35,8 +35,8 @@
   "powerConnectorOut": null,
   "powerSupplyType": null,
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -50,7 +50,7 @@
   "beamAngleDeg": null,
   "fieldAngleDeg": null,
   "zoom": true,
-  "lensType": null,
+  "lensType": "Wash",
   "goboWheels": [],
   "goboSlots": 0,
   "framingShutters": false,
@@ -109,7 +109,7 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -134,25 +134,28 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "estimated",
+    "powerConsumptionW": "manual",
+    "panRangeDeg": "estimated",
+    "tiltRangeDeg": "estimated",
+    "lensType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
     "powerSupplyType",
-    "panRangeDeg",
-    "tiltRangeDeg",
     "beamAngleDeg",
-    "lensType",
     "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "GDTF wheel slots counted as gobos; category corrected to wash."
+  ],
+  "_refs": [
+    "https://briteq-lighting.com/bti-blizzard-wash2"
   ]
 }

@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 430,
   "maxLuminousIntensityCd": 2560400.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 16.44,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -139,18 +139,21 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF"
+  ],
+  "_refs": [
+    "https://www.cyclopslighting.com/product/sparkly-300b-8400k-beam-moving-head/"
   ]
 }

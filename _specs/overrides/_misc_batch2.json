@@ -1,396 +1,44 @@
 {
- "Ayrton@Bora@V2.3_Add_RDM_Personality.gdtf": {
-  "category": "PROFILE",
-  "controlSignal": [
-   "DMX512",
-   "RDM",
-   "Ethernet (Art-Net/sACN)",
-   "Wireless DMX (CRMX/W-DMX)"
-  ],
-  "lightSourceType": "LED",
-  "lensType": "Spot",
-  "_estimated": [
-   "controlSignal"
-  ]
- },
- "Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf": {
-  "category": "WASH BEAM",
-  "subType": "Matrix panel (infinite pan/tilt)",
-  "powerConsumptionW": null,
-  "infinitePan": true,
-  "infiniteTilt": true,
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "controlSignal": [
-   "DMX512",
-   "RDM",
-   "Ethernet (Art-Net/sACN)"
-  ],
-  "colorTemperatureK": null,
-  "_estimated": [
-   "mains",
-   "powerSupplyType",
-   "controlSignal"
-  ],
-  "_notes": "GDTF power 10 W invalid, removed."
- },
- "Ayrton@Naja@V1.0_First_Release.gdtf": {
-  "category": "BSW",
-  "description": "Ayrton Naja: LED moving head with beam / spot functions, 0.6-21 deg zoom, CMY, large gobo complement and prisms.",
-  "_estimated": [
-   "description",
-   "category"
-  ]
- },
- "Ayrton@Rivale_Wash@V1.8_Correct_Gobo_Value.gdtf": {
-  "category": "WASH",
-  "subType": "Framing wash",
-  "_notes": "Wash with integrated framing shutters."
- },
- "Ayrton@Zonda_3_FX@V1.81_Corrected_Factory_Tilt.gdtf": {
-  "category": "WASH BEAM",
-  "infinitePan": true,
-  "infiniteTilt": true,
-  "description": "Ayrton Zonda 3 FX: compact LED wash-beam moving head with RGBW pixel-mapped emitters, 3-50 deg zoom and continuous pan/tilt.",
-  "_estimated": [
-   "description"
-  ]
- },
- "BOS_Lighting@Amadeus_H300@V003.gdtf": {
-  "category": "BSW",
-  "mains": "100-240",
-  "lightSourceType": "LED",
-  "_estimated": [
-   "mains",
-   "lightSourceType"
-  ]
- },
- "BOS_Lighting@P-7_HEX@V001.gdtf": {
-  "category": "PAR",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Brighter@Pixel_Strobe@Pixel_Strobe.gdtf": {
-  "description": "Brighter Pixel Strobe: LED strobe / wash panel with pixel-controllable RGBW zones.",
-  "_estimated": [
-   "description"
-  ]
- },
- "Brighter@Profile_180_CTO@Profile_180_CTO.gdtf": {
-  "lensType": "Ellipsoidal (Profile)",
-  "framingShutters": true,
-  "framingShutterBlades": 4,
-  "description": "Brighter Profile 180 CTO: 180 W tunable-white LED ellipsoidal profile with manual framing shutters.",
-  "_estimated": [
-   "description",
-   "framingShutters",
-   "framingShutterBlades"
-  ]
- },
- "Brighter@Smart_Hybrid_280_Pro@Smart_Hybrid_280_Pro.gdtf": {
-  "description": "Brighter Smart Hybrid 280 Pro: LED beam/spot/wash hybrid moving head, 4-40 deg zoom, gobo and prism effects.",
-  "_estimated": [
-   "description"
-  ]
- },
- "Briteq@BT-FOG1500@20240710.gdtf": {
-  "category": "FOG",
-  "mains": "220-240/50",
-  "powerConsumptionW": 1500,
-  "powerSupplyType": "Schuko",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Briteq@BT-Orbit@20240227_MisDat.gdtf": {
-  "category": "WASH",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Briteq@BT-THEATRE_250EZ_Mk2@20240220.gdtf": {
-  "category": "WASH",
-  "subType": "Fresnel / PC",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Briteq@BT-THEATRE_400TW@20240220.gdtf": {
-  "category": "WASH",
-  "subType": "Fresnel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Briteq@BTI-BLINDER_1FX@20260417_DMXupdate.gdtf": {
-  "category": "BLINDER",
-  "mains": "100-240",
-  "ipRating": "IP65",
-  "_estimated": [
-   "mains",
-   "ipRating"
-  ]
- },
- "Briteq@BTI-BLIZZARD_WASH2@20250714.gdtf": {
-  "category": "WASH",
-  "lightSourceType": "LED",
-  "mains": "100-240",
-  "ipRating": "IP65",
-  "_estimated": [
-   "lightSourceType",
-   "mains",
-   "ipRating"
-  ],
-  "_notes": "GDTF wheel slots counted as gobos; category corrected to wash.",
-  "goboSlots": 0,
-  "goboWheels": []
- },
- "Briteq@BTX-Hawk@20240227_MisDat.gdtf": {
-  "category": "SPOT",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "CKC_Lighting@Aurora_Profile_V8@Aurora_Profile_V8_Standard.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "CKC_Lighting@CYC_M@Revision.gdtf": {
-  "category": "LED BAR",
-  "subType": "Cyclorama",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Coemar_Lighting@LEDko_FullSpectrum_6_HD-R@rev.06_290424.gdtf": {
-  "category": "PROFILE",
-  "lightSourceType": "LED",
-  "lensType": "Ellipsoidal (Profile)",
-  "framingShutters": true,
-  "framingShutterBlades": 4,
-  "mains": "100-240",
-  "_estimated": [
-   "mains",
-   "framingShutters",
-   "framingShutterBlades"
-  ]
- },
- "Coemar_Lighting@LEDko_FullSpectrum_6_HD_Studio_Plus@rev.10_29042024.gdtf": {
-  "category": "PROFILE",
-  "lightSourceType": "LED",
-  "lensType": "Ellipsoidal (Profile)",
-  "framingShutters": true,
-  "framingShutterBlades": 4,
-  "mains": "100-240",
-  "_estimated": [
-   "mains",
-   "framingShutters",
-   "framingShutterBlades"
-  ]
- },
- "Coemar_Lighting@Romeo_700_FS6_HD_Theater@rev.07_29042024.gdtf": {
-  "category": "WASH",
-  "subType": "Fresnel / PC",
-  "lightSourceType": "LED",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Cyclops_Lighting@Aquaray_500_SBW@Cyclops_Lighting_Official_Library.gdtf": {
-  "category": "BSW",
-  "lightSourceType": "LED",
-  "ipRating": "IP66",
-  "mains": "100-240",
-  "_estimated": [
-   "lightSourceType",
-   "ipRating",
-   "mains"
-  ]
- },
- "Cyclops_Lighting@CPX-412OB_II@Created_By_Cyclops_Lighting.gdtf": {
-  "category": "WASH",
-  "lightSourceType": "LED",
-  "mains": "100-240",
-  "_estimated": [
-   "lightSourceType",
-   "mains"
-  ]
- },
- "Cyclops_Lighting@Sparkly_300B@Cyclops_Lighting_Official_Library.gdtf": {
-  "category": "BEAM",
-  "lightSourceType": "Discharge Lamp",
-  "mains": "100-240",
-  "_estimated": [
-   "lightSourceType",
-   "mains"
-  ]
- },
- "Cyclops_Lighting@Sparkly_440B@Cyclops_Lighting_Official_Library.gdtf": {
-  "category": "BEAM",
-  "lightSourceType": "Discharge Lamp",
-  "mains": "100-240",
-  "_estimated": [
-   "lightSourceType",
-   "mains"
-  ]
- },
- "Cyclops_Lighting@Sparkly_Wash_7@Cyclops_Lighting_Official_Library.gdtf": {
-  "category": "WASH",
-  "lightSourceType": "LED",
-  "mains": "100-240",
-  "_estimated": [
-   "lightSourceType",
-   "mains"
-  ]
- },
- "DLW@DLW_L1240C4_LC@Offical.gdtf": {
-  "category": "LED BAR",
-  "panRangeDeg": 0,
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "Tilt-only bar; GDTF power 40 W implausible for 12 x 40 W, removed."
- },
- "DLW@DREAM_400C7_BRIGHT@Offical.gdtf": {
-  "category": "WASH",
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF power 50 W implausible, removed."
- },
- "DLW@DREAM_L1000_SPOT@Offical.gdtf": {
-  "category": "SPOT",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "DLW@DREAM_L1400P_FLAG@L1400P_FLAG.gdtf": {
-  "category": "PROFILE",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "DTS_Lighting@Raptor@rel1.0.gdtf": {
-  "category": "BSW",
-  "_notes": "DTS Raptor FPR: discharge hybrid (beam/spot) with framing-free optics."
- },
- "Flash@EVENT_WASH_FX_300@FLASH_v2.gdtf": {
-  "category": "WASH",
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF power 8040 W invalid; GDTF 'gobo' count is pixel-effect macros."
- },
- "Flash@LED_MOVING_HEAD_19x15W_BIG_EYE@FLASH_v2.gdtf": {
-  "category": "WASH BEAM",
-  "powerConsumptionW": 300,
-  "mains": "100-240",
-  "_estimated": [
-   "powerConsumptionW",
-   "mains"
-  ],
-  "_notes": "19 x 15 W B-Eye style; GDTF power 3400 W invalid."
- },
- "flashPRO@LED_Fresnel_Lantern_COB_300W_RGBWAUV_Mk2_P8100001@flashPRO_v1.gdtf": {
-  "category": "WASH",
-  "subType": "Fresnel",
-  "lensType": "Fresnel"
- },
- "flashPRO@LedBar_L1810_45@FLASH_v1.gdtf": {
-  "powerConsumptionW": 180,
-  "_estimated": [
-   "powerConsumptionW"
-  ],
-  "_notes": "18 x 10 W; GDTF power 1200 W invalid."
- },
- "flashPRO@OCTO_Sunbar_4x30W_4w1_COB_RGBW_4_sections_Mk2_P7300005@flashPRO_v1_inverted_pixels.gdtf": {
-  "powerConsumptionW": 120,
-  "_estimated": [
-   "powerConsumptionW"
-  ],
-  "_notes": "4 x 30 W; GDTF power 770 W invalid."
- },
- "GLP@JDC_1@20250711_JDC1_byRG_prelim05.gdtf": {
-  "category": "STROBE",
-  "panRangeDeg": 0,
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "controlSignal": [
-   "DMX512",
-   "RDM",
-   "Ethernet (Art-Net/sACN)"
-  ],
-  "ipRating": "IP65",
-  "description": "GLP JDC1: hybrid LED strobe with a white strobe tube and RGB pixel plates, 185 deg tilt.",
-  "_estimated": [
-   "mains",
-   "powerSupplyType",
-   "controlSignal",
-   "description"
-  ],
-  "_notes": "GDTF power 3545 W invalid, removed."
- },
- "GLP@JDC_Line_1000@20250404_JDCLine1000_byRG_prelimV1.gdtf": {
-  "category": "STROBE",
-  "subType": "Strobe bar",
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "ipRating": "IP65",
-  "_estimated": [
-   "mains",
-   "powerSupplyType",
-   "ipRating"
-  ],
-  "_notes": "GDTF power 5920 W invalid, removed."
- },
- "GTD_lighting@GTD-1500_N_Profiile@20221031.gdtf": {
-  "category": "PROFILE",
-  "mains": "100-240",
-  "lightSourceType": "LED",
-  "description": "GTD-1500 N Profile: high-power LED profile moving head with CMY, gobos, prism and frost.",
-  "_estimated": [
-   "mains",
-   "lightSourceType",
-   "description"
-  ]
- },
- "GTD_lighting@GTD-F11_N_BSWP@F11_N_BSWP.gdtf": {
-  "category": "BSW",
-  "mains": "100-240",
-  "description": "GTD-F11 N BSWP: beam/spot/wash/profile hybrid moving head with CMY, gobos, prism and frost.",
-  "_estimated": [
-   "mains",
-   "description"
-  ]
- },
- "GTD_lighting@GTD-F3_N_Beam@20221020.gdtf": {
-  "category": "BEAM",
-  "mains": "100-240",
-  "description": "GTD-F3 N Beam: beam moving head with gobos, prism and frost.",
-  "_estimated": [
-   "mains",
-   "description"
-  ]
- }
+ "Ayrton@Bora@V2.3_Add_RDM_Personality.gdtf": {"category": "PROFILE", "controlSignal": ["DMX512", "RDM", "Ethernet (Art-Net/sACN)", "Wireless DMX (CRMX/W-DMX)"], "lightSourceType": "LED", "lensType": "Spot", "_estimated": ["controlSignal"]},
+ "Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf": {"category": "WASH BEAM", "subType": "Matrix panel (infinite pan/tilt)", "powerConsumptionW": 600, "infinitePan": true, "infiniteTilt": true, "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "controlSignal": ["DMX512", "RDM", "Ethernet (Art-Net/sACN)"], "colorTemperatureK": null, "_estimated": ["controlSignal", "mains", "powerSupplyType"], "_notes": "GDTF power 10 W invalid, removed.", "weightKg": 20.0, "_refs": ["https://www.ayrton.eu/wp-content/uploads/2014/06/MagicPanel-602-12162014.pdf"]},
+ "Ayrton@Naja@V1.0_First_Release.gdtf": {"category": "BSW", "description": "Ayrton Naja: LED moving head with beam / spot functions, 0.6-21 deg zoom, CMY, large gobo complement and prisms.", "_estimated": ["description", "category"]},
+ "Ayrton@Rivale_Wash@V1.8_Correct_Gobo_Value.gdtf": {"category": "WASH", "subType": "Framing wash", "_notes": "Wash with integrated framing shutters."},
+ "Ayrton@Zonda_3_FX@V1.81_Corrected_Factory_Tilt.gdtf": {"category": "WASH BEAM", "infinitePan": true, "infiniteTilt": true, "description": "Ayrton Zonda 3 FX: compact LED wash-beam moving head with RGBW pixel-mapped emitters, 3-50 deg zoom and continuous pan/tilt.", "_estimated": ["description"]},
+ "BOS_Lighting@Amadeus_H300@V003.gdtf": {"category": "BSW", "mains": "100-240", "lightSourceType": "LED", "_estimated": ["mains", "lightSourceType"]},
+ "BOS_Lighting@P-7_HEX@V001.gdtf": {"category": "PAR", "mains": "100-240", "_estimated": ["mains"]},
+ "Brighter@Pixel_Strobe@Pixel_Strobe.gdtf": {"description": "Brighter Pixel Strobe: LED strobe / wash panel with pixel-controllable RGBW zones.", "_estimated": ["description"]},
+ "Brighter@Profile_180_CTO@Profile_180_CTO.gdtf": {"lensType": "Ellipsoidal (Profile)", "framingShutters": true, "framingShutterBlades": 4, "description": "Brighter Profile 180 CTO: 180 W tunable-white LED ellipsoidal profile with manual framing shutters.", "_estimated": ["description", "framingShutters", "framingShutterBlades"]},
+ "Brighter@Smart_Hybrid_280_Pro@Smart_Hybrid_280_Pro.gdtf": {"description": "Brighter Smart Hybrid 280 Pro: LED beam/spot/wash hybrid moving head, 4-40 deg zoom, gobo and prism effects.", "_estimated": ["description"]},
+ "Briteq@BT-FOG1500@20240710.gdtf": {"category": "FOG", "mains": "220-240/50", "powerConsumptionW": 1500, "powerSupplyType": "Schuko", "_estimated": ["mains", "powerSupplyType"]},
+ "Briteq@BT-Orbit@20240227_MisDat.gdtf": {"category": "WASH", "mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 290, "weightKg": 9.2, "_refs": ["https://briteq-lighting.com/bt-orbit"]},
+ "Briteq@BT-THEATRE_250EZ_Mk2@20240220.gdtf": {"category": "WASH", "subType": "Fresnel / PC", "mains": "100-240", "_estimated": ["mains"]},
+ "Briteq@BT-THEATRE_400TW@20240220.gdtf": {"category": "WASH", "subType": "Fresnel", "mains": "100-240", "_estimated": ["mains"]},
+ "Briteq@BTI-BLINDER_1FX@20260417_DMXupdate.gdtf": {"category": "BLINDER", "mains": "100-240", "ipRating": "IP65", "_estimated": ["ipRating", "mains"], "powerConsumptionW": 75, "weightKg": 2.0, "_refs": ["https://briteq-lighting.com/bti-blinder1-fx"]},
+ "Briteq@BTI-BLIZZARD_WASH2@20250714.gdtf": {"category": "WASH", "lightSourceType": "LED", "mains": "100-240", "ipRating": "IP65", "_estimated": ["ipRating", "lightSourceType", "mains", "panRangeDeg", "tiltRangeDeg"], "_notes": "GDTF wheel slots counted as gobos; category corrected to wash.", "goboSlots": 0, "goboWheels": [], "powerConsumptionW": 1000, "weightKg": 22.3, "panRangeDeg": 540, "tiltRangeDeg": 270, "lensType": "Wash", "_refs": ["https://briteq-lighting.com/bti-blizzard-wash2"]},
+ "Briteq@BTX-Hawk@20240227_MisDat.gdtf": {"category": "SPOT", "mains": "100-240", "_estimated": ["mains"]},
+ "CKC_Lighting@Aurora_Profile_V8@Aurora_Profile_V8_Standard.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "CKC_Lighting@CYC_M@Revision.gdtf": {"category": "LED BAR", "subType": "Cyclorama", "mains": "100-240", "_estimated": ["mains"]},
+ "Coemar_Lighting@LEDko_FullSpectrum_6_HD-R@rev.06_290424.gdtf": {"category": "PROFILE", "lightSourceType": "LED", "lensType": "Ellipsoidal (Profile)", "framingShutters": true, "framingShutterBlades": 4, "mains": "100-240", "_estimated": ["framingShutterBlades", "framingShutters", "mains"], "powerConsumptionW": 220, "weightKg": 6.0, "_refs": ["https://www.coemar.com/wp-content/uploads/2018/10/Datasheet-LEDko-FullSpectrum-6-HD-ENG.pdf"]},
+ "Coemar_Lighting@LEDko_FullSpectrum_6_HD_Studio_Plus@rev.10_29042024.gdtf": {"category": "PROFILE", "lightSourceType": "LED", "lensType": "Ellipsoidal (Profile)", "framingShutters": true, "framingShutterBlades": 4, "mains": "100-240", "_estimated": ["framingShutterBlades", "framingShutters", "mains"], "powerConsumptionW": 220, "weightKg": 5.7, "_refs": ["https://www.coemar.com/wp-content/uploads/2022/07/LEDko-FullSpectrum-6-HD-Studio-Datasheet-vrs.-1.0_R.pdf"]},
+ "Coemar_Lighting@Romeo_700_FS6_HD_Theater@rev.07_29042024.gdtf": {"category": "WASH", "subType": "Fresnel / PC", "lightSourceType": "LED", "mains": "100-240", "_estimated": ["mains"]},
+ "Cyclops_Lighting@Aquaray_500_SBW@Cyclops_Lighting_Official_Library.gdtf": {"category": "BSW", "lightSourceType": "Discharge Lamp", "ipRating": "IP66", "mains": "100-240", "_estimated": ["ipRating", "mains"], "powerConsumptionW": 600, "weightKg": 28.0, "_refs": ["https://www.cyclopslighting.com/product/aquaray-500sbw-cmy-outdoor-spot-beam-wash-moving-head/"]},
+ "Cyclops_Lighting@CPX-412OB_II@Created_By_Cyclops_Lighting.gdtf": {"category": "WASH", "lightSourceType": "LED", "mains": "100-240", "_estimated": ["lightSourceType", "mains"]},
+ "Cyclops_Lighting@Sparkly_300B@Cyclops_Lighting_Official_Library.gdtf": {"category": "BEAM", "lightSourceType": "Discharge Lamp", "mains": "100-240", "_estimated": ["lightSourceType", "mains"], "powerConsumptionW": 430, "weightKg": 16.44, "_refs": ["https://www.cyclopslighting.com/product/sparkly-300b-8400k-beam-moving-head/"]},
+ "Cyclops_Lighting@Sparkly_440B@Cyclops_Lighting_Official_Library.gdtf": {"category": "BEAM", "lightSourceType": "Discharge Lamp", "mains": "100-240", "_estimated": ["lightSourceType", "mains", "powerConsumptionW"], "powerConsumptionW": 560, "weightKg": 20.0, "_notes": "400 W lamp; mains draw estimated.", "_refs": ["https://www.cyclopslighting.com/product/sparkly-440b/"]},
+ "Cyclops_Lighting@Sparkly_Wash_7@Cyclops_Lighting_Official_Library.gdtf": {"category": "WASH", "lightSourceType": "LED", "mains": "100-240", "_estimated": ["lightSourceType", "mains"]},
+ "DLW@DLW_L1240C4_LC@Offical.gdtf": {"category": "LED BAR", "panRangeDeg": 0, "powerConsumptionW": 530, "mains": "100-240", "_estimated": ["mains"], "_notes": "Tilt-only bar; GDTF power 40 W implausible for 12 x 40 W, removed.", "weightKg": 20.5, "_refs": ["https://www.dlwlighting.com/moving-head-lights/effect-lights/led-strip-stage-lighting.html"]},
+ "DLW@DREAM_400C7_BRIGHT@Offical.gdtf": {"category": "WASH", "powerConsumptionW": null, "mains": "100-240", "_estimated": ["mains"], "_notes": "GDTF power 50 W implausible, removed."},
+ "DLW@DREAM_L1000_SPOT@Offical.gdtf": {"category": "SPOT", "mains": "100-240", "_estimated": ["mains"]},
+ "DLW@DREAM_L1400P_FLAG@L1400P_FLAG.gdtf": {"category": "PROFILE", "mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 1650, "weightKg": 49.0, "_refs": ["https://www.dlwlighting.com/eol-products/1400w-stage-lighting.html"]},
+ "DTS_Lighting@Raptor@rel1.0.gdtf": {"category": "BSW", "_notes": "DTS Raptor FPR: discharge hybrid (beam/spot) with framing-free optics."},
+ "Flash@EVENT_WASH_FX_300@FLASH_v2.gdtf": {"category": "WASH", "powerConsumptionW": null, "mains": "100-240", "_estimated": ["mains"], "_notes": "GDTF power 8040 W invalid; GDTF 'gobo' count is pixel-effect macros."},
+ "Flash@LED_MOVING_HEAD_19x15W_BIG_EYE@FLASH_v2.gdtf": {"category": "WASH BEAM", "powerConsumptionW": 300, "mains": "100-240", "_estimated": ["powerConsumptionW", "mains"], "_notes": "19 x 15 W B-Eye style; GDTF power 3400 W invalid."},
+ "flashPRO@LED_Fresnel_Lantern_COB_300W_RGBWAUV_Mk2_P8100001@flashPRO_v1.gdtf": {"category": "WASH", "subType": "Fresnel", "lensType": "Fresnel"},
+ "flashPRO@LedBar_L1810_45@FLASH_v1.gdtf": {"powerConsumptionW": 180, "_estimated": ["powerConsumptionW"], "_notes": "18 x 10 W; GDTF power 1200 W invalid."},
+ "flashPRO@OCTO_Sunbar_4x30W_4w1_COB_RGBW_4_sections_Mk2_P7300005@flashPRO_v1_inverted_pixels.gdtf": {"powerConsumptionW": 120, "_estimated": ["powerConsumptionW"], "_notes": "4 x 30 W; GDTF power 770 W invalid."},
+ "GLP@JDC_1@20250711_JDC1_byRG_prelim05.gdtf": {"category": "STROBE", "panRangeDeg": 0, "powerConsumptionW": 1200, "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "controlSignal": ["DMX512", "RDM", "Ethernet (Art-Net/sACN)"], "ipRating": "IP65", "description": "GLP JDC1: hybrid LED strobe with a white strobe tube and RGB pixel plates, 185 deg tilt.", "_estimated": ["controlSignal", "description", "mains", "powerSupplyType"], "_notes": "GDTF power 3545 W invalid, removed.", "_refs": ["https://www.tsllighting.com/equipment/static-intelligent-fixtures/static-effect/glp-jdc1/"]},
+ "GLP@JDC_Line_1000@20250404_JDCLine1000_byRG_prelimV1.gdtf": {"category": "STROBE", "subType": "Strobe bar", "powerConsumptionW": 1400, "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "ipRating": "IP65", "_estimated": ["ipRating", "mains", "powerSupplyType"], "_notes": "GDTF power 5920 W invalid, removed.", "_refs": ["https://www.germanlightproducts.com/wp-content/uploads/2020/05/GLP-JDC-Line-1000-Quick-Start-Safety-Manual-EN-Rev-20220317-01.pdf"]},
+ "GTD_lighting@GTD-1500_N_Profiile@20221031.gdtf": {"category": "PROFILE", "mains": "100-240", "lightSourceType": "LED", "description": "GTD-1500 N Profile: high-power LED profile moving head with CMY, gobos, prism and frost.", "_estimated": ["mains", "lightSourceType", "description"]},
+ "GTD_lighting@GTD-F11_N_BSWP@F11_N_BSWP.gdtf": {"category": "BSW", "mains": "100-240", "description": "GTD-F11 N BSWP: beam/spot/wash/profile hybrid moving head with CMY, gobos, prism and frost.", "_estimated": ["mains", "description"]},
+ "GTD_lighting@GTD-F3_N_Beam@20221020.gdtf": {"category": "BEAM", "mains": "100-240", "description": "GTD-F3 N Beam: beam moving head with gobos, prism and frost.", "_estimated": ["mains", "description"]}
 }

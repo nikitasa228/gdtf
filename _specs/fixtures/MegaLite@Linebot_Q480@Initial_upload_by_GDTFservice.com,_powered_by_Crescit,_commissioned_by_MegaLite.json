@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 590,
   "maxLuminousIntensityCd": 39013700.0,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -126,7 +126,6 @@
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
     "powerSupplyType",
     "colorTemperatureK"
@@ -135,5 +134,8 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power 7080 W invalid."
+  ],
+  "_refs": [
+    "https://www.mega.lighting/linebotq480"
   ]
 }

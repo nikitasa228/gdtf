@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1040.0,
+  "powerConsumptionW": 1350,
   "maxLuminousIntensityCd": 41600.0,
   "luminousFluxLm": 35000.0,
   "noiseLevelDb": null,
-  "weightKg": 16.5,
+  "weightKg": 16.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -122,10 +122,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -163,6 +163,10 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "1350 W boost mode, 440 W constant."
+  ],
+  "_refs": [
+    "https://roxxlight.com/cluster-blinder/"
   ]
 }

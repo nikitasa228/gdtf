@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 560,
   "maxLuminousIntensityCd": 26094900.0,
   "luminousFluxLm": 321000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 20.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -143,18 +143,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "estimated",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Weight is 0 in GDTF"
+    "Weight is 0 in GDTF",
+    "400 W lamp; mains draw estimated."
+  ],
+  "_refs": [
+    "https://www.cyclopslighting.com/product/sparkly-440b/"
   ]
 }

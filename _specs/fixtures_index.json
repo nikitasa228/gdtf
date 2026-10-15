@@ -26850,7 +26850,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 20300.0,
   "luminousFluxLm": 390.0,
   "noiseLevelDb": null,
@@ -26926,7 +26926,7 @@
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -26964,7 +26964,6 @@
    "powerConnectorOut": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
    "colorTemperatureK"
   ],
@@ -26972,6 +26971,9 @@
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF power 10 W invalid, removed."
+  ],
+  "_refs": [
+   "https://www.ayrton.eu/wp-content/uploads/2014/06/MagicPanel-602-12162014.pdf"
   ]
  },
  {
@@ -38317,11 +38319,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 290,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": 9.0,
+  "weightKg": 9.2,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -38389,7 +38391,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -38417,13 +38419,13 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "powerSupplyType"
@@ -38431,6 +38433,9 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://briteq-lighting.com/bt-orbit"
   ]
  },
  {
@@ -38779,11 +38784,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 61.0,
+  "powerConsumptionW": 75,
   "maxLuminousIntensityCd": 9800.0,
   "luminousFluxLm": 5300.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 2.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -38865,7 +38870,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "motorizedPanTilt": "gdtf-derived",
@@ -38892,13 +38897,13 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "ipRating": "estimated",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType",
    "colorTemperatureK"
   ],
@@ -38906,6 +38911,9 @@
   "_issues": [
    "Weight is 0 in GDTF",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://briteq-lighting.com/bti-blinder1-fx"
   ]
  },
  {
@@ -38916,7 +38924,7 @@
   "gdtfName": "BTI-BLIZZARD WASH2",
   "longName": "BTI-BLIZZARD WASH2",
   "shortName": "BLIZ W2",
-  "description": "Briteq BTI-BLIZZARD WASH2: LED wash, with RGBLCMY colour mixing, colour wheel, IP65 rated.",
+  "description": "Briteq BTI-BLIZZARD WASH2: moving-head LED wash, with RGBLCMY colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Briteq",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -38936,7 +38944,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1000,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -38945,8 +38953,8 @@
   "powerConnectorOut": null,
   "powerSupplyType": null,
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -38960,7 +38968,7 @@
   "beamAngleDeg": null,
   "fieldAngleDeg": null,
   "zoom": true,
-  "lensType": null,
+  "lensType": "Wash",
   "goboWheels": [],
   "goboSlots": 0,
   "framingShutters": false,
@@ -39019,7 +39027,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
@@ -39044,26 +39052,29 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "ipRating": "estimated",
+   "powerConsumptionW": "manual",
+   "panRangeDeg": "estimated",
+   "tiltRangeDeg": "estimated",
+   "lensType": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "powerSupplyType",
-   "panRangeDeg",
-   "tiltRangeDeg",
    "beamAngleDeg",
-   "lensType",
    "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "GDTF wheel slots counted as gobos; category corrected to wash."
+  ],
+  "_refs": [
+   "https://briteq-lighting.com/bti-blizzard-wash2"
   ]
  },
  {
@@ -40618,7 +40629,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 2935900.0,
   "luminousFluxLm": 100280.0,
   "noiseLevelDb": null,
@@ -40742,7 +40753,7 @@
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -40774,14 +40785,16 @@
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
    "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "GDTF power 45850 W invalid; 'gobo' wheels are effect macros."
+   "220 W wash, 380 W strobe peak."
+  ],
+  "_refs": [
+   "https://www.clf-lighting.com/product/ledbar-eff/"
   ]
  },
  {
@@ -41927,11 +41940,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 800.0,
+  "powerConsumptionW": 800,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 20000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 27.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -42001,7 +42014,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "gdtf",
+   "powerConsumptionW": "manual",
    "luminousFluxLm": "estimated",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
@@ -42037,19 +42050,22 @@
    "lensType": "manual",
    "ipRating": "manual",
    "description": "manual",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
    "maxLuminousIntensityCd",
-   "noiseLevelDb",
-   "weightKg"
+   "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://www.clf-lighting.com/product/poseidon-wash-xl/"
   ]
  },
  {
@@ -42230,7 +42246,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 816,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -42330,7 +42346,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -42360,12 +42376,12 @@
    "pixelCount": "gdtf-derived",
    "panRangeDeg": "manual",
    "description": "manual",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "beamAngleDeg"
@@ -42373,6 +42389,9 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://www.clf-lighting.com/product/sera/"
   ]
  },
  {
@@ -42403,7 +42422,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 816,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -42503,7 +42522,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -42527,18 +42546,18 @@
    "iris": "gdtf-derived",
    "focus": "gdtf-derived",
    "animationWheel": "gdtf-derived",
-   "batteryPowered": "gdtf-derived",
+   "batteryPowered": "manual",
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "panRangeDeg": "manual",
    "description": "manual",
+   "powerConsumptionW": "estimated",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "beamAngleDeg"
@@ -42546,6 +42565,9 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://www.clf-lighting.com/product/sera/"
   ]
  },
  {
@@ -50935,7 +50957,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 187,
   "maxLuminousIntensityCd": 3200.0,
   "luminousFluxLm": 10092.0,
   "noiseLevelDb": null,
@@ -51086,6 +51108,7 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "powerSupplyType": "estimated",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -51093,11 +51116,13 @@
    "powerConnectorOut": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://chauvetprofessional.com/product/onair-panel-1-ip/"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -51127,7 +51152,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 372,
   "maxLuminousIntensityCd": 7000.0,
   "luminousFluxLm": 22508.0,
   "noiseLevelDb": null,
@@ -51250,7 +51275,7 @@
    "category": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "manual",
@@ -51278,6 +51303,7 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "powerSupplyType": "estimated",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -51285,11 +51311,13 @@
    "powerConnectorOut": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://www.chauvetprofessional.com/products/onair-ip-panel-2/"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -51319,11 +51347,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 760.0,
+  "powerConsumptionW": 450,
   "maxLuminousIntensityCd": 957300.0,
   "luminousFluxLm": 5234.0,
   "noiseLevelDb": null,
-  "weightKg": 20.7,
+  "weightKg": 14.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -51394,10 +51422,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -51439,6 +51467,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.cpl.tech/wp-content/uploads/2018/10/Clay-Paky-A-leda-B-EYE-K10-User-Guide.pdf"
   ]
  },
  {
@@ -51469,11 +51500,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1480.0,
+  "powerConsumptionW": 750,
   "maxLuminousIntensityCd": 1613200.0,
   "luminousFluxLm": 10194.0,
   "noiseLevelDb": null,
-  "weightKg": 27.5,
+  "weightKg": 21.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -51552,10 +51583,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -51597,6 +51628,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.claypaky.it/products/a-leda-b-eye-k20/"
   ]
  },
  {
@@ -52111,11 +52145,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 280.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 4352700.0,
   "luminousFluxLm": 23800.0,
   "noiseLevelDb": null,
-  "weightKg": 7.4,
+  "weightKg": 7.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -52196,10 +52230,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -52239,6 +52273,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.claypaky.it/products/minib-parled-aqua/"
   ]
  },
  {
@@ -53264,7 +53301,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 220,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -53351,7 +53388,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "manual",
@@ -53374,13 +53411,13 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "powerSupplyType",
@@ -53389,6 +53426,9 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://www.coemar.com/wp-content/uploads/2018/10/Datasheet-LEDko-FullSpectrum-6-HD-ENG.pdf"
   ]
  },
  {
@@ -53419,11 +53459,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 220,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": 6.0,
+  "weightKg": 5.7,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -53506,7 +53546,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "manual",
@@ -53529,13 +53569,13 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "powerSupplyType",
@@ -53544,6 +53584,9 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://www.coemar.com/wp-content/uploads/2022/07/LEDko-FullSpectrum-6-HD-Studio-Datasheet-vrs.-1.0_R.pdf"
   ]
  },
  {
@@ -53728,11 +53771,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 103386300.0,
   "luminousFluxLm": 318000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 28.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -53748,7 +53791,7 @@
    "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
    "min": 3.0,
    "max": 21.2
@@ -53808,7 +53851,7 @@
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
-   "lightSourceType": "estimated",
+   "lightSourceType": "manual",
    "beamAngleDeg": "gdtf-derived",
    "fieldAngleDeg": "gdtf",
    "zoom": "gdtf-derived",
@@ -53832,19 +53875,22 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "ipRating": "estimated",
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF"
+  ],
+  "_refs": [
+   "https://www.cyclopslighting.com/product/aquaray-500sbw-cmy-outdoor-spot-beam-wash-moving-head/"
   ]
  },
  {
@@ -54019,11 +54065,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 430,
   "maxLuminousIntensityCd": 2560400.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 16.44,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -54132,19 +54178,22 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF"
+  ],
+  "_refs": [
+   "https://www.cyclopslighting.com/product/sparkly-300b-8400k-beam-moving-head/"
   ]
  },
  {
@@ -54175,11 +54224,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 560,
   "maxLuminousIntensityCd": 26094900.0,
   "luminousFluxLm": 321000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 20.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -54292,19 +54341,23 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "powerConsumptionW": "estimated",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
-   "Weight is 0 in GDTF"
+   "Weight is 0 in GDTF",
+   "400 W lamp; mains draw estimated."
+  ],
+  "_refs": [
+   "https://www.cyclopslighting.com/product/sparkly-440b/"
   ]
  },
  {
@@ -54478,7 +54531,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 530,
   "maxLuminousIntensityCd": 96200.0,
   "luminousFluxLm": 666.0,
   "noiseLevelDb": null,
@@ -54554,7 +54607,7 @@
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
@@ -54587,7 +54640,6 @@
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
    "powerSupplyType"
   ],
@@ -54595,6 +54647,9 @@
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "Tilt-only bar; GDTF power 40 W implausible for 12 x 40 W, removed."
+  ],
+  "_refs": [
+   "https://www.dlwlighting.com/moving-head-lights/effect-lights/led-strip-stage-lighting.html"
   ]
  },
  {
@@ -54949,7 +55004,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1600.0,
+  "powerConsumptionW": 1650,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 50000.0,
   "noiseLevelDb": null,
@@ -55041,9 +55096,9 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -55088,6 +55143,9 @@
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.dlwlighting.com/eol-products/1400w-stage-lighting.html"
   ]
  },
  {
@@ -76062,7 +76120,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1200,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 41700.0,
   "noiseLevelDb": null,
@@ -76183,7 +76241,6 @@
    "powerConnectorOut": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "beamAngleDeg"
@@ -76193,6 +76250,9 @@
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF power 3545 W invalid, removed."
+  ],
+  "_refs": [
+   "https://www.tsllighting.com/equipment/static-intelligent-fixtures/static-effect/glp-jdc1/"
   ]
  },
  {
@@ -76223,7 +76283,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1400,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 1010500.0,
   "noiseLevelDb": null,
@@ -76346,7 +76406,6 @@
    "powerConnectorOut": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "beamAngleDeg"
@@ -76356,6 +76415,9 @@
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF power 5920 W invalid, removed."
+  ],
+  "_refs": [
+   "https://www.germanlightproducts.com/wp-content/uploads/2020/05/GLP-JDC-Line-1000-Quick-Start-Safety-Manual-EN-Rev-20220317-01.pdf"
   ]
  },
  {
@@ -85895,7 +85957,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1260.0,
+  "powerConsumptionW": 667,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 43395.0,
   "noiseLevelDb": null,
@@ -85985,9 +86047,9 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -86029,7 +86091,11 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "2.9 A @ 230 V."
+  ],
+  "_refs": [
+   "https://www.lsionline.com/featured-articles/hes-gigapix-and-megapix/"
   ]
  },
  {
@@ -86060,7 +86126,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 615,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -86145,7 +86211,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -86176,6 +86242,7 @@
    "lightSourceType": "manual",
    "lensType": "manual",
    "powerSupplyType": "estimated",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -86184,12 +86251,14 @@
    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://proadv.com/high-end-systems-lonestar/"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -86219,7 +86288,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1080.0,
+  "powerConsumptionW": 437,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -86309,8 +86378,8 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -86352,7 +86421,11 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "1.9 A @ 230 V."
+  ],
+  "_refs": [
+   "https://www.lsionline.com/featured-articles/hes-gigapix-and-megapix/"
   ]
  },
  {
@@ -86383,7 +86456,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 320.0,
+  "powerConsumptionW": 413,
   "maxLuminousIntensityCd": 924800.0,
   "luminousFluxLm": 6400.0,
   "noiseLevelDb": null,
@@ -86465,10 +86538,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -86511,6 +86584,9 @@
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "'Fan' is the product name (fan-shaped pixel head), not an air fan."
+  ],
+  "_refs": [
+   "https://shop.bmisupply.com/Resources/en/ItemDocuments/3924001/updated-SolaPix_Fan8_Datasheet_revB.pdf"
   ]
  },
  {
@@ -108993,7 +109069,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 180.0,
+  "powerConsumptionW": 60,
   "maxLuminousIntensityCd": 175700.0,
   "luminousFluxLm": 6000.0,
   "noiseLevelDb": null,
@@ -109073,10 +109149,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -109115,6 +109191,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.litepanels.com/en/product/studio-x2-bi-color-60w/"
   ]
  },
  {
@@ -109145,7 +109224,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 100,
   "maxLuminousIntensityCd": 610600.0,
   "luminousFluxLm": 13350.0,
   "noiseLevelDb": null,
@@ -109233,10 +109312,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -109275,6 +109354,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.litepanels.com/en/product/studio-x3-bi-color-100w/"
   ]
  },
  {
@@ -109305,7 +109387,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 150,
   "maxLuminousIntensityCd": 390900.0,
   "luminousFluxLm": 13350.0,
   "noiseLevelDb": null,
@@ -109393,10 +109475,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -109435,6 +109517,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.litepanels.com/en/product/studio-x4-bi-color-150w/"
   ]
  },
  {
@@ -109465,7 +109550,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 600.0,
+  "powerConsumptionW": 200,
   "maxLuminousIntensityCd": 152800.0,
   "luminousFluxLm": 13350.0,
   "noiseLevelDb": null,
@@ -109553,10 +109638,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -109595,6 +109680,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.litepanels.com/en/product/studio-x5-bi-color-200w-pole-us/"
   ]
  },
  {
@@ -109625,11 +109713,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 900.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 173800.0,
   "luminousFluxLm": 13350.0,
   "noiseLevelDb": null,
-  "weightKg": 13.8,
+  "weightKg": 12.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -109713,10 +109801,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -109755,6 +109843,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.litepanels.com/en/product/studio-x6-bi-color-300w/"
   ]
  },
  {
@@ -109785,7 +109876,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1050.0,
+  "powerConsumptionW": 360,
   "maxLuminousIntensityCd": 173800.0,
   "luminousFluxLm": 13350.0,
   "noiseLevelDb": null,
@@ -109873,10 +109964,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -109915,6 +110006,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.litepanels.com/en/product/studio-x7-bi-color-360w/"
   ]
  },
  {
@@ -110961,11 +111055,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 90.0,
+  "powerConsumptionW": 120,
   "maxLuminousIntensityCd": 45600.0,
   "luminousFluxLm": 3500.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 6.1,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -111038,7 +111132,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "motorizedPanTilt": "gdtf-derived",
@@ -111070,13 +111164,13 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType",
    "colorTemperatureK"
   ],
@@ -111084,6 +111178,9 @@
   "_issues": [
    "Weight is 0 in GDTF",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.masquesonido.com/moviled-spot-100.html"
   ]
  },
  {
@@ -111114,11 +111211,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 72.0,
+  "powerConsumptionW": 140,
   "maxLuminousIntensityCd": 5500.0,
   "luminousFluxLm": 3000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 2.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -111181,7 +111278,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
@@ -111208,13 +111305,13 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
+   "weightKg": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType",
    "colorTemperatureK"
   ],
@@ -111222,6 +111319,9 @@
   "_issues": [
    "Weight is 0 in GDTF",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://open-fixture-library.org/mark/superbat-led-72"
   ]
  },
  {
@@ -127409,7 +127509,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 590,
   "maxLuminousIntensityCd": 39013700.0,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -127509,7 +127609,6 @@
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
    "powerSupplyType",
    "colorTemperatureK"
@@ -127518,6 +127617,9 @@
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF power 7080 W invalid."
+  ],
+  "_refs": [
+   "https://www.mega.lighting/linebotq480"
   ]
  },
  {
@@ -127548,7 +127650,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 590,
   "maxLuminousIntensityCd": 1222600.0,
   "luminousFluxLm": 2573550.0,
   "noiseLevelDb": null,
@@ -127654,7 +127756,6 @@
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb",
    "powerSupplyType"
   ],
@@ -127662,6 +127763,9 @@
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF power 53100 W invalid."
+  ],
+  "_refs": [
+   "https://proadv.com/mega-lite-pan-t-bot/"
   ]
  },
  {
@@ -159857,11 +159961,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 600.0,
+  "powerConsumptionW": 620,
   "maxLuminousIntensityCd": 16600.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": null,
-  "weightKg": 16.5,
+  "weightKg": 10.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -159989,10 +160093,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -160030,7 +160134,11 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "620 W boost mode, 220 W constant."
+  ],
+  "_refs": [
+   "https://roxxlight.com/wp-content/uploads/2024/09/roxx-data-sheet-cluster-B2-FC-rev04.pdf"
   ]
  },
  {
@@ -160061,7 +160169,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 520.0,
+  "powerConsumptionW": 650,
   "maxLuminousIntensityCd": 24700.0,
   "luminousFluxLm": 20800.0,
   "noiseLevelDb": null,
@@ -160153,10 +160261,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -160194,7 +160302,11 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "650 W boost mode, 220 W constant."
+  ],
+  "_refs": [
+   "https://roxxlight.com/wp-content/uploads/2024/09/roxx-data-sheet-cluster-B2-W-rev04.pdf"
   ]
  },
  {
@@ -160225,11 +160337,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1200.0,
+  "powerConsumptionW": 1250,
   "maxLuminousIntensityCd": 33300.0,
   "luminousFluxLm": 28000.0,
   "noiseLevelDb": null,
-  "weightKg": 16.5,
+  "weightKg": 16.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -160361,10 +160473,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -160402,7 +160514,11 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "1250 W boost mode, 400 W constant."
+  ],
+  "_refs": [
+   "https://www.ambersphere.com/product/cluster-b4-fc/"
   ]
  },
  {
@@ -160433,11 +160549,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1040.0,
+  "powerConsumptionW": 1350,
   "maxLuminousIntensityCd": 41600.0,
   "luminousFluxLm": 35000.0,
   "noiseLevelDb": null,
-  "weightKg": 16.5,
+  "weightKg": 16.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -160529,10 +160645,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -160570,7 +160686,11 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "1350 W boost mode, 440 W constant."
+  ],
+  "_refs": [
+   "https://roxxlight.com/cluster-blinder/"
   ]
  },
  {
@@ -177337,17 +177457,17 @@
   ],
   "voltageRangeV": {
    "min": 100.0,
-   "max": 240.0
+   "max": 277.0
   },
   "frequencyRangeHz": {
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 630,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 14.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -177478,15 +177598,15 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "ipRating": "estimated",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated"
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
-   "weightKg",
    "powerSupplyType",
    "beamAngleDeg",
    "colorTemperatureK"
@@ -177495,6 +177615,9 @@
   "_issues": [
    "Weight is 0 in GDTF",
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://www.sgmlighting.com/products/p%C2%B76"
   ]
  },
  {
@@ -177525,11 +177648,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 630,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": 15.5,
+  "weightKg": 13.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -177616,7 +177739,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -177641,12 +177764,12 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "ipRating": "estimated",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "powerSupplyType",
@@ -177655,6 +177778,9 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+   "https://staticlightcompany.com/wp-content/uploads/2022/10/SGM-Q8-SPECIFICATION-SHEET.pdf"
   ]
  },
  {
@@ -179526,7 +179652,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1000,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -179566,7 +179692,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": 0.0,
@@ -179598,7 +179724,7 @@
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
    "powerConsumptionW": "manual",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -179620,12 +179746,12 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "powerSupplyType",
@@ -179637,6 +179763,9 @@
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF power 102 W implausible, removed."
+  ],
+  "_refs": [
+   "https://www.highlite.com/en/brands/40351-titan-strobe-1000-fx.html"
   ]
  },
  {
@@ -183376,7 +183505,7 @@
   "maxLuminousIntensityCd": 50100.0,
   "luminousFluxLm": 6700.0,
   "noiseLevelDb": null,
-  "weightKg": 12.5,
+  "weightKg": 23.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -183465,7 +183594,7 @@
    "powerConsumptionW": "estimated",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -183503,6 +183632,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://djdeals.com/vari-lite-aurora-12-full-color-rgbalc-led-strip/"
   ]
  },
  {
@@ -183533,11 +183665,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 820.0,
+  "powerConsumptionW": 820,
   "maxLuminousIntensityCd": 73467900.0,
   "luminousFluxLm": 1230000.0,
   "noiseLevelDb": null,
-  "weightKg": 31.0,
+  "weightKg": 32.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -183624,10 +183756,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -183671,6 +183803,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.vari-lite.com/b-dam/vari-lite/products/vl2600-wash/guides-and-manuals/vl2600-series_user-manual.pdf"
   ]
  },
  {
@@ -183701,7 +183836,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 820.0,
+  "powerConsumptionW": 820,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -183771,8 +183906,8 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -183816,6 +183951,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.vari-lite.com/b-dam/vari-lite/products/vl2600-wash/guides-and-manuals/vl2600-series_user-manual.pdf"
   ]
  },
  {
@@ -183846,11 +183984,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1505.0,
+  "powerConsumptionW": 1505,
   "maxLuminousIntensityCd": 214165600.0,
   "luminousFluxLm": 2213800.0,
   "noiseLevelDb": null,
-  "weightKg": 47.6,
+  "weightKg": 48.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -183941,10 +184079,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -183990,6 +184128,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://vari-lite.s3.eu-west-1.amazonaws.com/datasheets/VL3600-PROFILE-IP.pdf"
   ]
  },
  {
@@ -184020,11 +184161,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1336.0,
+  "powerConsumptionW": 1320,
   "maxLuminousIntensityCd": 20388700.0,
   "luminousFluxLm": 445800.0,
   "noiseLevelDb": null,
-  "weightKg": 23.5,
+  "weightKg": 24.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -184106,10 +184247,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -184151,6 +184292,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://vari-lite.s3.eu-west-1.amazonaws.com/datasheets/vl5led-wash.pdf"
   ]
  },
  {

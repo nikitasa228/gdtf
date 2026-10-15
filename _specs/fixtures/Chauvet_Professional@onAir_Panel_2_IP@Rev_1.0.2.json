@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 372,
   "maxLuminousIntensityCd": 7000.0,
   "luminousFluxLm": 22508.0,
   "noiseLevelDb": null,
@@ -149,7 +149,7 @@
     "category": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
@@ -177,6 +177,7 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "estimated",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -184,9 +185,11 @@
     "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/onair-ip-panel-2/"
+  ]
 }

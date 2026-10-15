@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1200,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 41700.0,
   "noiseLevelDb": null,
@@ -147,7 +147,6 @@
     "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
     "beamAngleDeg"
@@ -157,5 +156,8 @@
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power 3545 W invalid, removed."
+  ],
+  "_refs": [
+    "https://www.tsllighting.com/equipment/static-intelligent-fixtures/static-effect/glp-jdc1/"
   ]
 }

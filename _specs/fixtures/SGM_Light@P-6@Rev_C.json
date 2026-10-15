@@ -20,17 +20,17 @@
   ],
   "voltageRangeV": {
     "min": 100.0,
-    "max": 240.0
+    "max": 277.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 630,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 14.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -161,15 +161,15 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "ipRating": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType",
     "beamAngleDeg",
     "colorTemperatureK"
@@ -178,5 +178,8 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.sgmlighting.com/products/p%C2%B76"
   ]
 }

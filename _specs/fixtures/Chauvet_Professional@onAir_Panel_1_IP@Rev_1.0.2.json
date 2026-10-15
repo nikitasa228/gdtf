@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 187,
   "maxLuminousIntensityCd": 3200.0,
   "luminousFluxLm": 10092.0,
   "noiseLevelDb": null,
@@ -177,6 +177,7 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "estimated",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -184,9 +185,11 @@
     "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://chauvetprofessional.com/product/onair-panel-1-ip/"
+  ]
 }

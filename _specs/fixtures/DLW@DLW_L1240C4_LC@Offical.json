@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 530,
   "maxLuminousIntensityCd": 96200.0,
   "luminousFluxLm": 666.0,
   "noiseLevelDb": null,
@@ -102,7 +102,7 @@
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -135,7 +135,6 @@
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
     "powerSupplyType"
   ],
@@ -143,5 +142,8 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Tilt-only bar; GDTF power 40 W implausible for 12 x 40 W, removed."
+  ],
+  "_refs": [
+    "https://www.dlwlighting.com/moving-head-lights/effect-lights/led-strip-stage-lighting.html"
   ]
 }

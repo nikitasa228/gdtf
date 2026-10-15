@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1600.0,
+  "powerConsumptionW": 1650,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 50000.0,
   "noiseLevelDb": null,
@@ -118,9 +118,9 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -165,5 +165,8 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.dlwlighting.com/eol-products/1400w-stage-lighting.html"
   ]
 }

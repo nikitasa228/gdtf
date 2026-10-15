@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 600.0,
+  "powerConsumptionW": 620,
   "maxLuminousIntensityCd": 16600.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": null,
-  "weightKg": 16.5,
+  "weightKg": 10.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -158,10 +158,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -199,6 +199,10 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "620 W boost mode, 220 W constant."
+  ],
+  "_refs": [
+    "https://roxxlight.com/wp-content/uploads/2024/09/roxx-data-sheet-cluster-B2-FC-rev04.pdf"
   ]
 }

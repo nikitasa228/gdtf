@@ -30,7 +30,7 @@
   "maxLuminousIntensityCd": 50100.0,
   "luminousFluxLm": 6700.0,
   "noiseLevelDb": null,
-  "weightKg": 12.5,
+  "weightKg": 23.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -119,7 +119,7 @@
     "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -157,5 +157,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://djdeals.com/vari-lite-aurora-12-full-color-rgbalc-led-strip/"
   ]
 }

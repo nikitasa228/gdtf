@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 2935900.0,
   "luminousFluxLm": 100280.0,
   "noiseLevelDb": null,
@@ -150,7 +150,7 @@
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -182,13 +182,15 @@
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
     "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 45850 W invalid; 'gobo' wheels are effect macros."
+    "220 W wash, 380 W strobe peak."
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/ledbar-eff/"
   ]
 }
