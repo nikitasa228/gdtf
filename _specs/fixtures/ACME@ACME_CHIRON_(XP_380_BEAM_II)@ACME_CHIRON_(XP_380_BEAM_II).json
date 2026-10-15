@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 18000000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 22150000,
+  "luminousFluxLm": 8700,
   "noiseLevelDb": 47,
   "weightKg": 21.2,
   "powerConnectorIn": "powerCON TRUE1",
@@ -146,23 +146,26 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
     "weightKg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Discontinued-product page; lux/IP from CHIRON Specification Sheet. Spec sheet table is internally inconsistent (886,000 lx @5 m = 22 Mcd, but 480,000 @10 m and 120,000 @20 m = 48 Mcd).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=3087",
     "https://www.acmelighting.com/Info/productdetail/cat_id/246/id/3602"
   ]
 }

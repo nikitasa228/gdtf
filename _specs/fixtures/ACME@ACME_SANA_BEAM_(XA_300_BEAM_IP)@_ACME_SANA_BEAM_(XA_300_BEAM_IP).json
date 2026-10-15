@@ -169,7 +169,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF weight 5.6 kg contradicts spec sheet (23.8 kg). Noise 48 dB(A) @1 m in Auto mode."
+    "GDTF weight 5.6 kg contradicts spec sheet (23.8 kg). Noise 48 dB(A) @1 m in Auto mode. Pan/tilt infinite (continuous). Noise 48 dB(A) @1 m Auto mode from Specification Sheet."
   ],
   "_refs": [
     "https://en.acmelighting.com/item/SANA-BEAM"

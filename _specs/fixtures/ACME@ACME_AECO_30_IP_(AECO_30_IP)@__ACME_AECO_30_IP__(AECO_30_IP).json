@@ -23,7 +23,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 2265,
-  "maxLuminousIntensityCd": 7900000.0,
+  "maxLuminousIntensityCd": 2540000,
   "luminousFluxLm": 43000,
   "noiseLevelDb": 48,
   "weightKg": 52.5,
@@ -161,18 +161,19 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Lux from AECO 30 IP Leaflet.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-30-IP"

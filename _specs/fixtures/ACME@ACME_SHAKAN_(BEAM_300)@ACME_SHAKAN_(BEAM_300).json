@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 280.0,
-  "maxLuminousIntensityCd": 820000.0,
-  "luminousFluxLm": 7000.0,
-  "noiseLevelDb": 38,
+  "powerConsumptionW": 330,
+  "maxLuminousIntensityCd": 920000.0,
+  "luminousFluxLm": 7900,
+  "noiseLevelDb": 43,
   "weightKg": 14.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -130,10 +130,9 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -163,21 +162,25 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
+    "Discontinued-product page; lux/IP from SHAKAN Specification Sheet (consistent ~48 Mcd). Differs strongly from current record (280 W, 5 deg, 0.82 Mcd).",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=6552"
   ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "ULTRA BLINDER IP (BL 200 IP)",
   "longName": "ULTRA BLINDER IP (BL 200 IP)",
   "shortName": "(BL 200 IP)",
-  "description": "ACME ULTRA BLINDER IP (BL 200 IP): LED blinder, with 49 deg beam, RGBA+WW colour mixing, colour wheel, IP65 rated.",
+  "description": "ACME ULTRA BLINDER IP (BL 200 IP): LED blinder, with 49 deg beam, RGBA+WW colour mixing, colour wheel, IP66 rated.",
   "manufacturer": "ACME",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 30.0,
-  "maxLuminousIntensityCd": 1500.0,
-  "luminousFluxLm": null,
-  "noiseLevelDb": 30,
+  "powerConsumptionW": 235,
+  "maxLuminousIntensityCd": 22600,
+  "luminousFluxLm": 14700,
+  "noiseLevelDb": 35,
   "weightKg": 8.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -137,11 +137,11 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -169,14 +169,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "ipRating": "estimated",
+    "ipRating": "manual",
+    "luminousFluxLm": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Lux from leaflet (WW, 49 deg, 2 m). Current record (30 W) is wrong.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/item/ULTRA-BLINDER-IP"
   ]
 }

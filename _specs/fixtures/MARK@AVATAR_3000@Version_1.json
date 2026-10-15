@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 740.0,
-  "maxLuminousIntensityCd": 13000.0,
+  "maxLuminousIntensityCd": 15000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 40,
   "weightKg": 8.3,
@@ -45,7 +45,7 @@
     "DMX512"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 82.0,
     "max": 82.0

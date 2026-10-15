@@ -159,25 +159,26 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "weightKg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "XP-20R = 20R (440 W) discharge lamp; discontinued, no spec sheet found.",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
+    "XP-20R = 20R (440 W) discharge lamp; discontinued, no spec sheet found. Discontinued-product page. Beam from user manual H: 2-7 deg beam mode, 5-32 spot, 8-70 wash. IP20 from manual.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=373",
     "https://en.acmelighting.com/Info/productdetail/cat_id/16/id/373"
   ]
 }

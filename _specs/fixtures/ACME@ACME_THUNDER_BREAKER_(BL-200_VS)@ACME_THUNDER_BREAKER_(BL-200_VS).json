@@ -137,9 +137,11 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Discontinued-product page.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=5589",
     "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5589"
   ]
 }

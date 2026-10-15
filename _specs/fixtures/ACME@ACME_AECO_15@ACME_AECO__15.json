@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 1555,
-  "maxLuminousIntensityCd": 3900000.0,
+  "maxLuminousIntensityCd": 2047600,
   "luminousFluxLm": 33500,
   "noiseLevelDb": 48,
-  "weightKg": 43.0,
+  "weightKg": 43,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -124,6 +124,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -165,13 +166,13 @@
     "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Lux from AECO 15 Leaflet (5 deg, 5 m).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-15"

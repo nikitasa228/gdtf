@@ -179,7 +179,7 @@
    "max": 60.0
   },
   "powerConsumptionW": 75,
-  "maxLuminousIntensityCd": 680000.0,
+  "maxLuminousIntensityCd": 262500,
   "luminousFluxLm": null,
   "noiseLevelDb": 30,
   "weightKg": 1.9,
@@ -281,25 +281,26 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
+   "ipRating": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
-   "24 V DC pixel bar fed by the PIXEL POWER 8 supply (530 W, up to 8 units).",
+   "24 V DC pixel bar fed by the PIXEL POWER 8 supply (530 W, up to 8 units). Values for PIXEL 100 head (DC 24 V from PIXEL POWER 8; power unit: 180-240 V, 530 W, 3.2 kg). Lux and IP20 from user manual D.",
    "GDTF luminous flux 176000 lm is implausible for 75 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=5890",
    "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5890"
   ]
  },
@@ -332,10 +333,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 1555,
-  "maxLuminousIntensityCd": 3900000.0,
+  "maxLuminousIntensityCd": 2047600,
   "luminousFluxLm": 33500,
   "noiseLevelDb": 48,
-  "weightKg": 43.0,
+  "weightKg": 43,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -429,6 +430,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "maxLuminousIntensityCd": "manual",
    "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
@@ -470,13 +472,13 @@
    "supportedPowerNetworks": "manual",
    "framingShutterType": "gdtf-derived",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Lux from AECO 15 Leaflet (5 deg, 5 m).",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
    "https://en.acmelighting.com/item/AECO-15"
@@ -514,7 +516,7 @@
   "maxLuminousIntensityCd": 2100000,
   "luminousFluxLm": 36000,
   "noiseLevelDb": 48,
-  "weightKg": 47.0,
+  "weightKg": 47,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -660,6 +662,7 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
+   "Lux and TRUE1 wording from AECO 20 Leaflet.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -691,7 +694,7 @@
    "max": 60.0
   },
   "powerConsumptionW": 2265,
-  "maxLuminousIntensityCd": 7900000.0,
+  "maxLuminousIntensityCd": 2540000,
   "luminousFluxLm": 43000,
   "noiseLevelDb": 48,
   "weightKg": 52.5,
@@ -829,18 +832,19 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "framingShutterType": "gdtf-derived",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Lux from AECO 30 IP Leaflet.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
    "https://en.acmelighting.com/item/AECO-30-IP"
@@ -1192,6 +1196,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+   "Discharge lamp, 6,700K. Lux from ARES Leaflet (first listed distance 10 m).",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -1378,14 +1383,14 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 535.0,
-  "maxLuminousIntensityCd": 2800000.0,
-  "luminousFluxLm": 6000.0,
+  "powerConsumptionW": 535,
+  "maxLuminousIntensityCd": 21500000,
+  "luminousFluxLm": 7700,
   "noiseLevelDb": 47,
-  "weightKg": 30.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 30,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -1470,10 +1475,10 @@
    "description": "gdtf-derived",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "maxLuminousIntensityCd": "estimated",
-   "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "maxLuminousIntensityCd": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -1504,21 +1509,24 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
-   "powerSupplyType": "estimated",
-   "ipRating": "estimated",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
-   "powerConnectorIn": "estimated",
-   "powerConnectorOut": "estimated",
+   "powerSupplyType": "manual",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Discontinued-product page. Lux/IP65 from CETUS Specification Sheet; 860,000 lx @5 m (~21.5 Mcd) agrees with 15/20 m values; the current 2.8 Mcd record looks too low. Lamp 7,800K.",
    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=3867"
   ]
  },
  {
@@ -1550,8 +1558,8 @@
    "max": 60.0
   },
   "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 18000000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 22150000,
+  "luminousFluxLm": 8700,
   "noiseLevelDb": 47,
   "weightKg": 21.2,
   "powerConnectorIn": "powerCON TRUE1",
@@ -1669,23 +1677,26 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
    "weightKg": "manual",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "luminousFluxLm": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "Discontinued-product page; lux/IP from CHIRON Specification Sheet. Spec sheet table is internally inconsistent (886,000 lx @5 m = 22 Mcd, but 480,000 @10 m and 120,000 @20 m = 48 Mcd).",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=3087",
    "https://www.acmelighting.com/Info/productdetail/cat_id/246/id/3602"
   ]
  },
@@ -1875,7 +1886,7 @@
   "maxLuminousIntensityCd": 4300000.0,
   "luminousFluxLm": 18000.0,
   "noiseLevelDb": 43,
-  "weightKg": 17.0,
+  "weightKg": 17,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -1975,26 +1986,27 @@
    "pixelCount": "gdtf-derived",
    "powerConsumptionW": "manual",
    "weightKg": "manual",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "fullName": "gdtf-derived",
    "powerSupplyType": "estimated",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
    "maxLuminousIntensityCd": "estimated",
    "colorTemperatureK": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "Tilt-only LED bar (no pan).",
-   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+   "Tilt-only LED bar (no pan). Discontinued-product page; IP20 from user manual M.",
+   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=1812",
    "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=1812"
   ]
  },
@@ -2026,10 +2038,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 280.0,
+  "powerConsumptionW": 335,
   "maxLuminousIntensityCd": 52000.0,
   "luminousFluxLm": 11000.0,
-  "noiseLevelDb": 35,
+  "noiseLevelDb": 25,
   "weightKg": 13.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -2102,7 +2114,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
@@ -2129,24 +2141,26 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "powerSupplyType": "manual",
+   "noiseLevelDb": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
    "framingShutterType": "gdtf-derived",
    "fullName": "gdtf-derived",
-   "powerSupplyType": "estimated",
-   "powerConnectorIn": "estimated",
-   "powerConnectorOut": "estimated",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
-   "noiseLevelDb": "estimated"
+   "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "D2550 = 25-50 deg zoom lens tube; manual framing shutters (not DMX).",
-   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "The official page/leaflet covers the ELLIPSOIDAL 300 (E-300 CW/WW) with fixed lens tubes 5-70 deg; no D2550 (25-50 deg zoom) variant is listed, so only body values are given (335 W matches GDTF description). Noise stated as 'under 25 dB @ 1 m' (leaflet). Weight depends on lens (9.1-10 kg), omitted.",
+   "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+   "https://en.acmelighting.com/item/ELLIPSOIDAL-300-CW"
   ]
  },
  {
@@ -2182,9 +2196,9 @@
   "luminousFluxLm": null,
   "noiseLevelDb": 40,
   "weightKg": 13.3,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -2323,7 +2337,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Two zones: RGBW wash 102 deg, cool-white strobe 3.5 deg.",
+   "Two zones: RGBW wash 102 deg, cool-white strobe 3.5 deg. Beam: CW section 3.5 deg, RGBW section 102 deg. Lux from LIGHTNING Leaflet (3.5 deg CW, 2 m; table not inverse-square, near-field). CW 6,300K.",
    "GDTF luminous flux 3.15e+06 lm is implausible for 1610 W and was dropped",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
@@ -2360,13 +2374,13 @@
    "max": 60.0
   },
   "powerConsumptionW": 910,
-  "maxLuminousIntensityCd": 6200000.0,
+  "maxLuminousIntensityCd": 3250000,
   "luminousFluxLm": 26000,
   "noiseLevelDb": 48,
   "weightKg": 32.5,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 260.0,
@@ -2461,6 +2475,7 @@
    "description": "gdtf-derived",
    "manufacturer": "gdtf",
    "category": "manual",
+   "maxLuminousIntensityCd": "manual",
    "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
@@ -2503,14 +2518,13 @@
    "powerConnectorOut": "manual",
    "framingShutterType": "gdtf-derived",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF weight 46.5 kg contradicts spec sheet (32.5 kg).",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "GDTF weight 46.5 kg contradicts spec sheet (32.5 kg). Lux from MANA PROFILE Leaflet. Page gives fixture CCT 7,000K; CTO range not captured.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
    "https://en.acmelighting.com/item/MANA-PROFILE"
@@ -2545,10 +2559,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 375,
-  "maxLuminousIntensityCd": 3700000.0,
+  "maxLuminousIntensityCd": 23750000,
   "luminousFluxLm": 5000.0,
   "noiseLevelDb": 47,
-  "weightKg": 18.0,
+  "weightKg": 18,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -2633,6 +2647,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "maxLuminousIntensityCd": "manual",
    "luminousFluxLm": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -2673,14 +2688,14 @@
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Lux from ORION Leaflet; table inconsistent (950,000 @5 m = 24 Mcd vs 502,000 @10 m = 50 Mcd). Lamp 8,000K.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
    "https://en.acmelighting.com/item/ORION"
@@ -2857,7 +2872,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF weight 5.6 kg contradicts spec sheet (23.8 kg). Noise 48 dB(A) @1 m in Auto mode."
+   "GDTF weight 5.6 kg contradicts spec sheet (23.8 kg). Noise 48 dB(A) @1 m in Auto mode. Pan/tilt infinite (continuous). Noise 48 dB(A) @1 m Auto mode from Specification Sheet."
   ],
   "_refs": [
    "https://en.acmelighting.com/item/SANA-BEAM"
@@ -2891,10 +2906,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 280.0,
-  "maxLuminousIntensityCd": 820000.0,
-  "luminousFluxLm": 7000.0,
-  "noiseLevelDb": 38,
+  "powerConsumptionW": 330,
+  "maxLuminousIntensityCd": 920000.0,
+  "luminousFluxLm": 7900,
+  "noiseLevelDb": 43,
   "weightKg": 14.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -2995,10 +3010,9 @@
    "description": "gdtf-derived",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "maxLuminousIntensityCd": "estimated",
-   "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -3028,22 +3042,26 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "fullName": "gdtf-derived",
    "powerSupplyType": "estimated",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
+   "maxLuminousIntensityCd": "estimated",
    "colorTemperatureK": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
+   "Discontinued-product page; lux/IP from SHAKAN Specification Sheet (consistent ~48 Mcd). Differs strongly from current record (280 W, 5 deg, 0.82 Mcd).",
+   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=6552"
   ]
  },
  {
@@ -3385,25 +3403,26 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "weightKg": "manual",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "fullName": "gdtf-derived",
    "powerSupplyType": "estimated",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
    "colorTemperatureK": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "XP-20R = 20R (440 W) discharge lamp; discontinued, no spec sheet found.",
-   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
+   "XP-20R = 20R (440 W) discharge lamp; discontinued, no spec sheet found. Discontinued-product page. Beam from user manual H: 2-7 deg beam mode, 5-32 spot, 8-70 wash. IP20 from manual.",
+   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=193&id=373",
    "https://en.acmelighting.com/Info/productdetail/cat_id/16/id/373"
   ]
  },
@@ -3415,7 +3434,7 @@
   "gdtfName": "ACME STAGE PAR COLOUR (BL-100 RGBW)",
   "longName": "STAGE PAR COLOUR (BL-100 RGBW)",
   "shortName": "BL-100 RGBW",
-  "description": "ACME STAGE PAR COLOUR (BL-100 RGBW): LED PAR, with 37 deg beam, RGBW colour mixing, colour wheel.",
+  "description": "ACME STAGE PAR COLOUR (BL-100 RGBW): LED PAR, with 37 deg beam, RGBW colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "ACME",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -3435,14 +3454,14 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 100.0,
+  "powerConsumptionW": 125,
   "maxLuminousIntensityCd": 2200.0,
   "luminousFluxLm": 1000.0,
   "noiseLevelDb": 30,
-  "weightKg": 4.2,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "weightKg": 3.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -3481,7 +3500,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": 0.0,
@@ -3511,7 +3530,7 @@
    "description": "gdtf-derived",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
@@ -3537,24 +3556,27 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "weightKg": "manual",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "fullName": "gdtf-derived",
-   "weightKg": "estimated",
    "powerSupplyType": "estimated",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
    "colorTemperatureK": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
+   "Discontinued-product page (BL-100 RGBW). Weight 3.5 kg on page, 4.2 kg in user manual F. IP65 from user manual.",
+   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=3910"
   ]
  },
  {
@@ -3586,10 +3608,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 1155,
-  "maxLuminousIntensityCd": 8600000.0,
+  "maxLuminousIntensityCd": 637500,
   "luminousFluxLm": 23000,
   "noiseLevelDb": 48,
-  "weightKg": 24.0,
+  "weightKg": 24,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -3711,18 +3733,18 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
-   "Tilt-only bar.",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Tilt-only bar. cct is the span of the strip sections (WW 2,600-2,900K, CW 6,000-7,000K); main light 6,300K. Lux from leaflet (2.8 deg, 5 m).",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
    "https://en.acmelighting.com/item/SUPER-DOTLINE"
@@ -3756,11 +3778,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 440.0,
-  "maxLuminousIntensityCd": 1300000.0,
-  "luminousFluxLm": 7060.0,
-  "noiseLevelDb": 43,
-  "weightKg": 34.0,
+  "powerConsumptionW": 1600,
+  "maxLuminousIntensityCd": 3090400,
+  "luminousFluxLm": 19500,
+  "noiseLevelDb": 48,
+  "weightKg": 34,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -3852,9 +3874,9 @@
    "description": "gdtf-derived",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -3885,22 +3907,25 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
    "powerSupplyType": "estimated",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "Official THETA page (model code CM 1000ZF); GDTF says THETA FX (CM 1000 Z) 1600W. Beam section 3 deg fixed (4,000 lm), wash zoom 4-51 deg (19,500 lm; flux given is wash). Lux from leaflet (3 deg beam, 5 m). Current record 440 W is wrong.",
+   "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
+  ],
+  "_refs": [
+   "https://en.acmelighting.com/item/THETA"
   ]
  },
  {
@@ -4042,9 +4067,11 @@
   "_notApplicable": [],
   "_issues": [
    "Beam angle equals the GDTF default (25°) - probably not filled in",
+   "Discontinued-product page.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+   "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=5589",
    "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5589"
   ]
  },
@@ -4077,10 +4104,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 375,
-  "maxLuminousIntensityCd": 2200000.0,
+  "maxLuminousIntensityCd": 23750000,
   "luminousFluxLm": 3000.0,
   "noiseLevelDb": 47,
-  "weightKg": 18.0,
+  "weightKg": 18,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -4162,6 +4189,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "maxLuminousIntensityCd": "manual",
    "luminousFluxLm": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -4201,14 +4229,13 @@
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Same fixture as ACME ORION (XP-260 BEAM).",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Same fixture as ACME ORION (XP-260 BEAM). XP-260 BEAM is the model code of ACME ORION; same official page. Lux from ORION Leaflet (table inconsistent, see ORION).",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
    "https://en.acmelighting.com/item/ORION"
@@ -4222,7 +4249,7 @@
   "gdtfName": "ULTRA BLINDER IP (BL 200 IP)",
   "longName": "ULTRA BLINDER IP (BL 200 IP)",
   "shortName": "(BL 200 IP)",
-  "description": "ACME ULTRA BLINDER IP (BL 200 IP): LED blinder, with 49 deg beam, RGBA+WW colour mixing, colour wheel, IP65 rated.",
+  "description": "ACME ULTRA BLINDER IP (BL 200 IP): LED blinder, with 49 deg beam, RGBA+WW colour mixing, colour wheel, IP66 rated.",
   "manufacturer": "ACME",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -4242,10 +4269,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 30.0,
-  "maxLuminousIntensityCd": 1500.0,
-  "luminousFluxLm": null,
-  "noiseLevelDb": 30,
+  "powerConsumptionW": 235,
+  "maxLuminousIntensityCd": 22600,
+  "luminousFluxLm": 14700,
+  "noiseLevelDb": 35,
   "weightKg": 8.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -4291,7 +4318,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -10.0,
@@ -4353,11 +4380,11 @@
    "description": "gdtf-derived",
    "manufacturer": "gdtf",
    "category": "manual",
-   "supportedPowerNetworks": "gdtf-derived",
-   "voltageRangeV": "gdtf",
-   "frequencyRangeHz": "gdtf",
-   "powerConsumptionW": "gdtf",
-   "weightKg": "gdtf",
+   "supportedPowerNetworks": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -4385,15 +4412,20 @@
    "operatingTemperatureC": "gdtf",
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
-   "ipRating": "estimated",
+   "ipRating": "manual",
+   "luminousFluxLm": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Lux from leaflet (WW, 49 deg, 2 m). Current record (30 W) is wrong.",
+   "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+   "https://en.acmelighting.com/item/ULTRA-BLINDER-IP"
   ]
  },
  {
@@ -33995,7 +34027,7 @@
   "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 10241000.0,
   "luminousFluxLm": 10100.0,
-  "noiseLevelDb": 43,
+  "noiseLevelDb": 47,
   "weightKg": 22.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -34014,7 +34046,7 @@
   "dataConnectors": [
    "XLR3"
   ],
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
    "min": 1.0,
    "max": 1.0
@@ -55275,7 +55307,7 @@
   "maxLuminousIntensityCd": 47000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
-  "weightKg": 9.0,
+  "weightKg": 8.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -55769,7 +55801,7 @@
   "maxLuminousIntensityCd": 240000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 9.0,
+  "weightKg": 8.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -77477,7 +77509,7 @@
   "maxLuminousIntensityCd": 2300000.0,
   "luminousFluxLm": 12787.0,
   "noiseLevelDb": 43,
-  "weightKg": 27.4,
+  "weightKg": 27.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -87492,7 +87524,7 @@
   "maxLuminousIntensityCd": 26000000.0,
   "luminousFluxLm": 35000.0,
   "noiseLevelDb": 48,
-  "weightKg": 46.0,
+  "weightKg": 46.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -104772,7 +104804,7 @@
   "gdtfName": "IPL1940Pro",
   "longName": "IPL1940Pro",
   "shortName": "IPL1940Pro",
-  "description": "LIGHT SKY IPL1940Pro: moving-head LED wash, with 10-60 deg zoom, IP66 rated.",
+  "description": "LIGHT SKY IPL1940Pro: moving-head Discharge Lamp wash, with 10-60 deg zoom, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -104795,7 +104827,7 @@
   "powerConsumptionW": 800.0,
   "maxLuminousIntensityCd": 280000.0,
   "luminousFluxLm": 9653.0,
-  "noiseLevelDb": 48,
+  "noiseLevelDb": 47,
   "weightKg": 29.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -104812,7 +104844,7 @@
    "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
    "min": 10.0,
    "max": 60.0
@@ -112853,7 +112885,7 @@
    "max": 60.0
   },
   "powerConsumptionW": 740.0,
-  "maxLuminousIntensityCd": 13000.0,
+  "maxLuminousIntensityCd": 15000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 40,
   "weightKg": 8.3,
@@ -112871,7 +112903,7 @@
    "DMX512"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
    "min": 82.0,
    "max": 82.0
@@ -131670,7 +131702,7 @@
   "maxLuminousIntensityCd": 4800.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 9.0,
+  "weightKg": 8.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -131811,7 +131843,7 @@
   "maxLuminousIntensityCd": 4800.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 9.0,
+  "weightKg": 8.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -187568,7 +187600,7 @@
   "maxLuminousIntensityCd": 9700.0,
   "luminousFluxLm": 10500.0,
   "noiseLevelDb": 35,
-  "weightKg": 9.0,
+  "weightKg": 8.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -188467,7 +188499,7 @@
   "maxLuminousIntensityCd": 35000.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": 35,
-  "weightKg": 8.2,
+  "weightKg": 8.3,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -188620,7 +188652,7 @@
   "maxLuminousIntensityCd": 5500.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": 35,
-  "weightKg": 6.5,
+  "weightKg": 6.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -188764,7 +188796,7 @@
   "maxLuminousIntensityCd": 5000.0,
   "luminousFluxLm": 7300.0,
   "noiseLevelDb": 35,
-  "weightKg": 6.5,
+  "weightKg": 6.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",

@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 1155,
-  "maxLuminousIntensityCd": 8600000.0,
+  "maxLuminousIntensityCd": 637500,
   "luminousFluxLm": 23000,
   "noiseLevelDb": 48,
-  "weightKg": 24.0,
+  "weightKg": 24,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -152,18 +152,18 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Tilt-only bar.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Tilt-only bar. cct is the span of the strip sections (WW 2,600-2,900K, CW 6,000-7,000K); main light 6,300K. Lux from leaflet (2.8 deg, 5 m).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/SUPER-DOTLINE"

@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 75,
-  "maxLuminousIntensityCd": 680000.0,
+  "maxLuminousIntensityCd": 262500,
   "luminousFluxLm": null,
   "noiseLevelDb": 30,
   "weightKg": 1.9,
@@ -129,25 +129,26 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "24 V DC pixel bar fed by the PIXEL POWER 8 supply (530 W, up to 8 units).",
+    "24 V DC pixel bar fed by the PIXEL POWER 8 supply (530 W, up to 8 units). Values for PIXEL 100 head (DC 24 V from PIXEL POWER 8; power unit: 180-240 V, 530 W, 3.2 kg). Lux and IP20 from user manual D.",
     "GDTF luminous flux 176000 lm is implausible for 75 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=5890",
     "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5890"
   ]
 }
