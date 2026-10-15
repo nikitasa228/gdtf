@@ -10,6 +10,8 @@
   "manufacturer": "CLF Lighting",
   "category": "BLINDER",
   "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -17,17 +19,17 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 110.0,
+    "min": 100.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 2000.0,
+  "powerConsumptionW": 400,
   "maxLuminousIntensityCd": 72000.0,
   "luminousFluxLm": 49000.0,
-  "noiseLevelDb": 40,
+  "noiseLevelDb": 35,
   "weightKg": 8.25,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -114,15 +116,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -148,15 +150,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "400 W nominal at 230 V (standby 8.3 W). No beam/lux published.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/apollo/"
   ]
 }

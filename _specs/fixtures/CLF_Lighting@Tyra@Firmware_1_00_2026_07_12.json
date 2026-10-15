@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 30.0,
-  "maxLuminousIntensityCd": 760.0,
+  "powerConsumptionW": 385,
+  "maxLuminousIntensityCd": 9400,
   "luminousFluxLm": 2000.0,
-  "noiseLevelDb": 30,
-  "weightKg": 0.9,
+  "noiseLevelDb": 35,
+  "weightKg": 4.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -118,14 +118,14 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -153,16 +153,20 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "description": "manual",
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "weightKg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Typical-value estimates (no published data): weightKg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "385 W total, 310 W continuous. 50 deg beam / 87 deg field.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/tyra/"
   ]
 }

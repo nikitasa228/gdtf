@@ -10,18 +10,23 @@
   "manufacturer": "PRstage",
   "category": "OTHER",
   "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 220.0,
+    "min": 100.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
-    "max": 50.0
+    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 4400,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -64,7 +69,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -104,7 +109,7 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "estimated",
     "powerSupplyType": "estimated",
     "motorizedPanTilt": "gdtf-derived",
@@ -130,11 +135,13 @@
     "subType": "manual",
     "lightSourceType": "manual",
     "maxLoadW": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "powerConsumptionW": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorOut": "estimated",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -142,6 +149,10 @@
     "powerConsumptionW"
   ],
   "_issues": [
-    "4-channel dimmer pack, 20 A total (about 4600 W of connected load at 230 V); its own consumption is negligible."
+    "4400 W is the stated maximum consumption, i.e. the load capacity (10 A/channel, 20 A total). It is not the device's own draw.",
+    "Typical-value estimates (no published data): ipRating"
+  ],
+  "_refs": [
+    "https://prstage.pro/prstage-dimmer-pack-4/"
   ]
 }

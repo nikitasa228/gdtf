@@ -10,25 +10,28 @@
   "manufacturer": "PRstage",
   "category": "HAZE",
   "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 220.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
-    "max": 50.0
+    "max": 60.0
   },
-  "powerConsumptionW": 1500,
+  "powerConsumptionW": 650,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 50,
   "weightKg": 15.3,
-  "powerConnectorIn": "Schuko",
+  "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
-  "powerSupplyType": "Schuko",
+  "powerSupplyType": "powerCON",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -82,7 +85,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "zoom": "gdtf-derived",
@@ -102,13 +105,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
@@ -116,6 +119,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "Page: 550 W heater, 650 W consumption. The manual says 1600 W, which looks copied from the FOG 1500 text. The GDTF description says 1500 W.",
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/haze-tour-1500-oil/"
   ]
 }

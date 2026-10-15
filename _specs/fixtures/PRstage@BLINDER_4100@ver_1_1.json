@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 13000.0,
+  "powerConsumptionW": 200,
+  "maxLuminousIntensityCd": 6700.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
-  "weightKg": 11.5,
+  "weightKg": 5.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -102,7 +102,7 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -127,24 +127,27 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "weightKg": "estimated",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF luminous flux 100000 lm is implausible for 400 W and was dropped",
-    "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Page states 200 W (4 x 50 W COB). The GDTF description says 400 W. No weight or CCT published.",
+    "GDTF luminous flux 100000 lm is implausible for 200 W and was dropped",
+    "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/prstage-blinder4100-led-cob-light/"
   ]
 }

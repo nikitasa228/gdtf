@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 240,
-  "maxLuminousIntensityCd": 8800.0,
+  "powerConsumptionW": 270,
+  "maxLuminousIntensityCd": 31000,
   "luminousFluxLm": 6000.0,
   "noiseLevelDb": 35,
   "weightKg": 2.8,
@@ -99,10 +99,10 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -127,9 +127,9 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
@@ -140,8 +140,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "24 x 10 W; GDTF power 375 W invalid.",
+    "Lux 1240 @5 m (25 deg) comes from the manual.",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/led-par-prstage-par2410led-2410w/"
   ]
 }

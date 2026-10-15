@@ -6,7 +6,7 @@
   "gdtfName": "Poseidon Laser Beam XS",
   "longName": "Poseidon Laser Beam XS",
   "shortName": "Laser Beam XS",
-  "description": "CLF Lighting Poseidon Laser Beam XS: moving-head Laser beam, with 1.1 deg beam, CMY colour mixing, colour wheel, 17 gobos, prism, frost, IP66 rated.",
+  "description": "CLF Lighting Poseidon Laser Beam XS: moving-head Laser beam, with 1.1 deg beam, CMY colour mixing, colour wheel, 17 gobos, prism, frost, IP65 rated.",
   "manufacturer": "CLF Lighting",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 233.0,
+  "powerConsumptionW": 233,
   "maxLuminousIntensityCd": 6700000.0,
   "luminousFluxLm": 9200.0,
   "noiseLevelDb": 38,
   "weightKg": 16.1,
   "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 266.0,
@@ -90,7 +90,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP66",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -105,23 +105,23 @@
   "pixelCount": 1,
   "fullName": "CLF Lighting Poseidon Laser Beam XS",
   "gdtfDescription": "Small",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -162,5 +162,8 @@
   "_issues": [
     "Laser-phosphor light source.",
     "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/poseidon-laser-beam-xs/"
   ]
 }

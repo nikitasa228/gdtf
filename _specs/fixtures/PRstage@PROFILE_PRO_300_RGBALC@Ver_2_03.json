@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 300.0,
-  "maxLuminousIntensityCd": 140000.0,
+  "powerConsumptionW": 350,
+  "maxLuminousIntensityCd": 187500,
   "luminousFluxLm": 10889.0,
   "noiseLevelDb": 35,
-  "weightKg": 8.87,
+  "weightKg": 12.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -94,10 +94,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -122,9 +122,9 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
@@ -136,7 +136,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Manual zoom 15-38 deg. Lux 7500 @5 m (15 deg) and CTO 2000-10000 K come from the manual.",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/prstage-led-profile-pro-300mz-rgbcal/"
   ]
 }

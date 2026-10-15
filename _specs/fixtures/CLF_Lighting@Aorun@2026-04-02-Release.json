@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": 11000000.0,
+  "powerConsumptionW": 450,
+  "maxLuminousIntensityCd": 38000000,
   "luminousFluxLm": null,
   "noiseLevelDb": 47,
   "weightKg": 18.8,
@@ -36,7 +36,7 @@
   "powerSupplyType": "powerCON LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 259.0,
+  "tiltRangeDeg": 250,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -123,17 +123,18 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -162,15 +163,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "GDTF luminous flux 380000 lm is implausible for 450 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/aorun/"
   ]
 }

@@ -10,25 +10,28 @@
   "manufacturer": "PRstage",
   "category": "FOG",
   "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 220.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
-    "max": 50.0
+    "max": 60.0
   },
   "powerConsumptionW": 3000,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 60,
-  "weightKg": 39.0,
-  "powerConnectorIn": "CEE 16A",
+  "weightKg": 32,
+  "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
-  "powerSupplyType": "CEE 16A",
+  "powerSupplyType": "powerCON",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -83,7 +86,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "zoom": "gdtf-derived",
@@ -104,13 +107,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "powerConsumptionW": "estimated",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
@@ -119,5 +122,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/low-fog-3000/"
   ]
 }

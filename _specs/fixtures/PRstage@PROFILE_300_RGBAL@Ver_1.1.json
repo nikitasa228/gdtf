@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 350,
   "maxLuminousIntensityCd": 140000.0,
   "luminousFluxLm": 10889.0,
   "noiseLevelDb": 35,
-  "weightKg": 10.9,
+  "weightKg": 11,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -98,10 +98,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -126,9 +126,9 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
@@ -140,7 +140,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "The manual gives 10.9 kg and CTO 2000-8000 K. Its lux text (6400 @5 m) is identical to the Fresnel 300 manual, so it is not used.",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/prstage-led-profile-300mz-rgbal/"
   ]
 }

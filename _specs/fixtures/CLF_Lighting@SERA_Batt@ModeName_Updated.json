@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 816,
-  "maxLuminousIntensityCd": 27000.0,
+  "powerConsumptionW": 243,
+  "maxLuminousIntensityCd": 93000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": 40,
-  "weightKg": 13.0,
+  "noiseLevelDb": 35,
+  "weightKg": 10.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -50,8 +50,8 @@
   ],
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 60.0,
-    "max": 60.0
+    "min": 17.5,
+    "max": 17.5
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -160,23 +160,25 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "description": "manual",
-    "powerConsumptionW": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "powerConsumptionW": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
     "fullName": "gdtf-derived",
-    "beamAngleDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Battery fixture; 17.5 deg beam / 31.4 deg field.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.clf-lighting.com/product/sera-batt/",
     "https://www.clf-lighting.com/product/sera/"
   ]
 }

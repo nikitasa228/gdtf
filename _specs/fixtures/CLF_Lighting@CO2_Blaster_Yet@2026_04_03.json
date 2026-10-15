@@ -22,11 +22,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 3100.0,
+  "powerConsumptionW": 3100,
   "maxLuminousIntensityCd": 3600000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 60,
-  "weightKg": 33.0,
+  "weightKg": 33,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -95,11 +95,11 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -137,6 +137,10 @@
     "colorTemperatureK"
   ],
   "_issues": [
+    "Product is named 'CO2 Blaster Jet' on the site. 33 kg N.W. (37 kg G.W.).",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/co2-blaster-jet/"
   ]
 }
