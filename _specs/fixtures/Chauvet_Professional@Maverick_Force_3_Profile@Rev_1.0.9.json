@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1320,
+  "powerConsumptionW": 1260,
   "maxLuminousIntensityCd": 3264600,
-  "luminousFluxLm": 40906.0,
+  "luminousFluxLm": 40906,
   "noiseLevelDb": 39.8,
   "weightKg": 38.2,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -122,7 +122,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -167,7 +167,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Page: 1320 W @120 V, 1260 W @230 V (UM Rev6 says 1229 W @120 V / 1200 W @230 V). CCT = at-full value."
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-3-profile/"
   ]

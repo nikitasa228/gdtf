@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 187,
-  "maxLuminousIntensityCd": 3200.0,
-  "luminousFluxLm": 10092.0,
-  "noiseLevelDb": 35,
+  "powerConsumptionW": 180,
+  "maxLuminousIntensityCd": 4100,
+  "luminousFluxLm": 10092,
+  "noiseLevelDb": 8.5,
   "weightKg": 12.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -149,9 +149,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
@@ -180,18 +180,18 @@
     "subType": "manual",
     "powerSupplyType": "estimated",
     "powerConsumptionW": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "www URL serves a PDF (acoustic report); HTML spec page is at chauvetprofessional.com/product/onair-panel-1-ip/. Noise 'Auto' 8.5 dB(A) from Salford acoustic report (page labels are scrambled). Page claims fanless but UM says fan-assisted convection with fan modes, so no _cooling. Power 187 W max @208 V; 180 W @230 V."
   ],
   "_refs": [
     "https://chauvetprofessional.com/product/onair-panel-1-ip/"

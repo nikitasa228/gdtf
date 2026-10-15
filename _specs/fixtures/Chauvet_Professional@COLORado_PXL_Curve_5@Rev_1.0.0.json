@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1136,
+  "powerConsumptionW": 1113,
   "maxLuminousIntensityCd": 451600,
-  "luminousFluxLm": 84344.0,
+  "luminousFluxLm": 42172,
   "noiseLevelDb": 48,
   "weightKg": 32.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -36,7 +36,7 @@
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 60.0,
-  "tiltRangeDeg": 190.0,
+  "tiltRangeDeg": 200,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -112,11 +112,11 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -156,6 +156,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "Lumens 42,172 (GDTF 84,344 is exactly double). Tilt 200 deg per page (GDTF 190). Power 1136 W @120 V; 1113 W @230 V.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [

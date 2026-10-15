@@ -28,15 +28,15 @@
   },
   "powerConsumptionW": 470,
   "maxLuminousIntensityCd": 1500000.0,
-  "luminousFluxLm": 13000.0,
+  "luminousFluxLm": 13000,
   "noiseLevelDb": 43,
   "weightKg": 19.7,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -132,13 +132,13 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -179,9 +179,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "Spec table says pan 540°, marketing text says 630° pan; table value used. Zoom 5-50° from product text (table gives beam 5°). CCT is the fixed 6,800 K of the cold white LED.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/rental/moving-lights/spot-moving-heads/28489/azor-s2",
     "https://adamhall.com/shop/en/brands/azor-s2"
   ]
 }

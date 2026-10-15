@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1720,
+  "powerConsumptionW": 1680,
   "maxLuminousIntensityCd": 4060200,
-  "luminousFluxLm": 61373.0,
-  "noiseLevelDb": 48,
+  "luminousFluxLm": 78300,
+  "noiseLevelDb": 52.3,
   "weightKg": 45.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -100,7 +100,7 @@
   "pixelCount": 1,
   "subType": "Framing wash",
   "fullName": "Chauvet Professional Maverick Storm 4 SoloWash",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -109,7 +109,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -143,19 +143,19 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Noise (Auto 52.3 dB(A)) from UM Rev5 https://chauvetprofessional.com/wp-content/uploads/2023/10/Maverick_Storm_4_SoloWash_UM_Rev5.pdf (UM also lists power output). Lumens 78,300 (GDTF 61,373). Power 1720 W @120 V; 1680 W @230 V. CCT = at-full value."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-storm-4-solowash/"

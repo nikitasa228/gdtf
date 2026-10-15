@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 250,
-  "maxLuminousIntensityCd": 12000.0,
-  "luminousFluxLm": 14236.0,
+  "maxLuminousIntensityCd": 57700,
+  "luminousFluxLm": 7119,
   "noiseLevelDb": 35,
-  "weightKg": 14.0,
+  "weightKg": 13.83,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP55",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -333,7 +333,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -360,24 +360,25 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 500 W double-counted.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "GDTF power 500 W double-counted. AC input 100-240 VAC, 3.8 A, 250 W. Weight with Fresnel lens and barndoor (16.32 kg incl. yoke and yokebases). Lux at 5500 K, 15°. No CCT range published (only CRI range 3200-6500 K).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/leofresnel/specs/",
     "https://astera-led.com/casting-light-on-our-new-fresnel-range/"
   ]
 }

@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 329,
+  "powerConsumptionW": 323,
   "maxLuminousIntensityCd": 18200,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 20251,
   "noiseLevelDb": 35,
   "weightKg": 8.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -148,6 +148,7 @@
     "weightKg": "manual",
     "powerSupplyType": "manual",
     "beamAngleDeg": "manual",
+    "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
@@ -163,6 +164,7 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Lux is beam section alone (combined 605 lux); lumens combined (beam alone 23,736). Beam angles asymmetric (beam 77.7x54.7 deg, plate 84.6x73.6 deg) so omitted. Power 329 W @120 V (UM: 365 W @100 V); 323 W @230 V.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [

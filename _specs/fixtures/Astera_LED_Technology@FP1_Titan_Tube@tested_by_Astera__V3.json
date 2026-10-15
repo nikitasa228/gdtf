@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 48,
-  "maxLuminousIntensityCd": 350.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 785,
+  "luminousFluxLm": 2900,
   "noiseLevelDb": 30,
   "weightKg": 1.35,
   "powerConnectorIn": "DC Jack",
@@ -752,6 +752,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -783,20 +784,20 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Battery up to 20 h; IP65 with FP1-SP. GDTF power 4876 W invalid.",
-    "GDTF luminous flux 307400 lm is implausible for 48 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/titan/specs/",
     "https://astera-led.com/goto/titan_tube_datasheet"
   ]
 }

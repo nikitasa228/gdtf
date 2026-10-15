@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 610,
+  "powerConsumptionW": 575,
   "maxLuminousIntensityCd": 145800,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 25198,
   "noiseLevelDb": 25.2,
   "weightKg": 22.3,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -455,6 +455,7 @@
     "weightKg": "manual",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
+    "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
@@ -468,7 +469,8 @@
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Fixed 16.7 deg beam; 40.7 deg only with CYC diffusion. Power 610 W max @100 V; 575 W @230 V."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/colorado-solo-bar-6/"

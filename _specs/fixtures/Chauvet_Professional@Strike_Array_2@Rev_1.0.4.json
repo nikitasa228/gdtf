@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 130,
+  "powerConsumptionW": 129,
   "maxLuminousIntensityCd": 9000,
   "luminousFluxLm": 9288.0,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 0,
   "weightKg": 8.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -148,18 +148,18 @@
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Fan-free (passive cooling): silent. Warm white + amber; CCT = at-full value. Power 130 W max @240 V; 129 W @230 V. Cooling 'Convection' per UM Rev7. No lumens or noise published."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/strike-array-2/"

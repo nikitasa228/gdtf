@@ -23,12 +23,12 @@
     "max": 264.0
   },
   "frequencyRangeHz": {
-    "min": 47.0,
-    "max": 63.0
+    "min": 50.0,
+    "max": 60.0
   },
   "powerConsumptionW": 45,
-  "maxLuminousIntensityCd": 49000.0,
-  "luminousFluxLm": 2826.0,
+  "maxLuminousIntensityCd": 20600,
+  "luminousFluxLm": 1413,
   "noiseLevelDb": 30,
   "weightKg": 3.4,
   "powerConnectorIn": "powerCON TRUE1",
@@ -213,15 +213,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "dataConnectors": "gdtf-derived",
@@ -249,17 +249,18 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 460 W invalid.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "GDTF power 460 W invalid. No wattage published for mains input: AC input 90-264 VAC, 1.2 A @115 VAC / 1.0 A @230 VAC; Total LED power 45 W. powerConsumptionW omitted. Lux at 5500 K @ 2 m.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/ax5-triplepar/specs/",
     "https://uk.panavision.com/lighting/lighting-products/heads/product-detail/xonoga5-ax5-triplepar"
   ]
 }

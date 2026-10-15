@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 800,
   "maxLuminousIntensityCd": 1800000.0,
-  "luminousFluxLm": 22000.0,
+  "luminousFluxLm": 22000,
   "noiseLevelDb": 48,
   "weightKg": 27.8,
   "powerConnectorIn": "powerCON TRUE1",
@@ -36,7 +36,7 @@
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -126,14 +126,14 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -174,9 +174,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "Page URL slug is opus-sp5 but page title/content is OPUS SP5+. Zoom 6-42° from product text.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/rental/moving-lights/profile-moving-heads/29239/opus-sp5",
     "https://adamhall.com/shop/en/brands/opus-sp5"
   ]
 }

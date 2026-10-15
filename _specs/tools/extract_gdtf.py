@@ -556,7 +556,8 @@ def expand_override(ov):
                       [lbl for lbl, vv, ff in POWER_NETWORKS if lo <= vv <= hi and fl <= ff <= fh] or None)
     lx = ov.pop("lux", None)
     if lx:
-        ov.setdefault("maxLuminousIntensityCd", round(lx[0] * lx[1] ** 2, -2))
+        cd = lx[0] * lx[1] ** 2
+        ov.setdefault("maxLuminousIntensityCd", round(cd, -2) if cd >= 1000 else round(cd, 1))
     b = ov.pop("beam", None)
     if b is not None:
         b = b if isinstance(b, list) else [b, b]

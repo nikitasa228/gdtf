@@ -28,9 +28,9 @@
   },
   "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 2400.0,
-  "luminousFluxLm": 10661,
+  "luminousFluxLm": 10660,
   "noiseLevelDb": 35,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -175,6 +175,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/rental/outdoor-lighting/outdoor-lights/19856/zenit-w300",
     "https://adamhall.com/shop/en/brands/zenit-w300"
   ]
 }

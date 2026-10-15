@@ -27,7 +27,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 800.0,
+  "powerConsumptionW": 800,
   "maxLuminousIntensityCd": 150000.0,
   "luminousFluxLm": 5000.0,
   "noiseLevelDb": 48,
@@ -16407,7 +16407,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 699,
+  "powerConsumptionW": 697,
   "maxLuminousIntensityCd": 11000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 43,
@@ -19257,10 +19257,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 250,
-  "maxLuminousIntensityCd": 12000.0,
-  "luminousFluxLm": 14236.0,
+  "maxLuminousIntensityCd": 57700,
+  "luminousFluxLm": 7119,
   "noiseLevelDb": 35,
-  "weightKg": 14.0,
+  "weightKg": 13.83,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -19304,7 +19304,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP55",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": 0.0,
@@ -19563,7 +19563,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -19590,24 +19590,25 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
-   "powerSupplyType": "estimated",
+   "powerSupplyType": "manual",
+   "ipRating": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
-   "powerConnectorIn": "estimated",
-   "powerConnectorOut": "estimated",
+   "maxLuminousIntensityCd": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 500 W double-counted.",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "GDTF power 500 W double-counted. AC input 100-240 VAC, 3.8 A, 250 W. Weight with Fresnel lens and barndoor (16.32 kg incl. yoke and yokebases). Lux at 5500 K, 15°. No CCT range published (only CRI range 3200-6500 K).",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/leofresnel/specs/",
    "https://astera-led.com/casting-light-on-our-new-fresnel-range/"
   ]
  },
@@ -19640,13 +19641,13 @@
    "max": 60.0
   },
   "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 4000.0,
-  "luminousFluxLm": 4860.0,
+  "maxLuminousIntensityCd": 38200,
+  "luminousFluxLm": 2847,
   "noiseLevelDb": 30,
-  "weightKg": 4.5,
-  "powerConnectorIn": "powerCON TRUE1",
+  "weightKg": 4.637,
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -19687,7 +19688,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP55",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": 0.0,
@@ -19946,7 +19947,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -19973,23 +19974,25 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
-   "powerSupplyType": "estimated",
+   "powerSupplyType": "manual",
+   "ipRating": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
-   "powerConnectorIn": "estimated",
-   "powerConnectorOut": "estimated",
+   "maxLuminousIntensityCd": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "Power consumption (max.) 80 W; DC input only (24 VDC). IP55 only with PB15-PLG / PWB cables. Weight with Fresnel lens and barndoor. Lux at 5500 K, 15°.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/plutofresnel/specs/",
    "https://astera-led.com/casting-light-on-our-new-fresnel-range/"
   ]
  },
@@ -20021,9 +20024,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 55000.0,
-  "luminousFluxLm": 307400.0,
+  "powerConsumptionW": 24,
+  "maxLuminousIntensityCd": 255,
+  "luminousFluxLm": 725,
   "noiseLevelDb": 30,
   "weightKg": 1.0,
   "powerConnectorIn": "DC Jack",
@@ -20747,8 +20750,8 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "estimated",
-   "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
    "lightSourceType": "manual",
@@ -20775,21 +20778,25 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "powerSupplyType": "manual",
-   "ipRating": "estimated",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Battery powered; mains via external charger/PSU. GDTF power 4876 W invalid.",
-   "Typical-value estimates (no published data): powerConsumptionW, maxLuminousIntensityCd, noiseLevelDb"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Battery tube. Power = DC input 48 VDC x 0.5 A (charger PSU: 100-240 VAC, 0.4 A input; https://astera-led.com/products/power-supply-for-ax1/). Total LED power 28 W, LED power draw 16 W. IP65 only with SiliconeCap.",
+   "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+   "https://astera-led.com/products/ax1-pixeltube/specs/"
   ]
  },
  {
@@ -20820,14 +20827,14 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 21000.0,
-  "luminousFluxLm": null,
+  "powerConsumptionW": 104,
+  "maxLuminousIntensityCd": 22100,
+  "luminousFluxLm": 4530,
   "noiseLevelDb": 30,
   "weightKg": 7.4,
-  "powerConnectorIn": "XLR5 / powerCON TRUE1",
-  "powerConnectorOut": "XLR5 / powerCON TRUE1",
-  "powerSupplyType": "XLR5 LINK",
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -21544,14 +21551,15 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "supportedPowerNetworks": "gdtf-derived",
-   "voltageRangeV": "gdtf",
-   "frequencyRangeHz": "gdtf",
+   "supportedPowerNetworks": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
    "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
    "lightSourceType": "manual",
@@ -21577,18 +21585,18 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "ipRating": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Battery up to 20 h. GDTF power 5824 W invalid.",
-   "GDTF luminous flux 236380 lm is implausible for 80 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Battery up to 20 h. GDTF power 5824 W invalid. AC input 96-264 VAC, 2 A, 104 W (AX2-100 column). Lux at 3200 K.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/ax2-pixelbar/specs/",
    "https://astera-led.com/wp-content/uploads/Datasheet_AX2_PixelBar_V1-1.pdf"
   ]
  },
@@ -21620,9 +21628,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 40,
-  "maxLuminousIntensityCd": 11000.0,
-  "luminousFluxLm": null,
+  "powerConsumptionW": 49,
+  "maxLuminousIntensityCd": 11100,
+  "luminousFluxLm": 2265,
   "noiseLevelDb": 30,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -22346,14 +22354,15 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "supportedPowerNetworks": "gdtf-derived",
-   "voltageRangeV": "gdtf",
-   "frequencyRangeHz": "gdtf",
+   "supportedPowerNetworks": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
    "powerConsumptionW": "manual",
-   "weightKg": "gdtf",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
    "dataConnectors": "gdtf-derived",
@@ -22380,18 +22389,18 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "ipRating": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 1372 W invalid.",
-   "GDTF luminous flux 86970 lm is implausible for 40 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "GDTF power 1372 W invalid. AC input 96-264 VAC, 2 A, 49 W (AX2-50 column). Lux at 3200 K. Current record 40 W = LED power draw.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/ax2-pixelbar/specs/",
    "https://astera-led.com/wp-content/uploads/Datasheet_AX2_PixelBar_V1-1.pdf"
   ]
  },
@@ -22424,8 +22433,8 @@
    "max": 60.0
   },
   "powerConsumptionW": 15,
-  "maxLuminousIntensityCd": 15000.0,
-  "luminousFluxLm": 860.0,
+  "maxLuminousIntensityCd": 5200,
+  "luminousFluxLm": 430,
   "noiseLevelDb": 30,
   "weightKg": 0.68,
   "powerConnectorIn": "DC Jack",
@@ -22608,9 +22617,9 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "voltageRangeV": "estimated",
+   "voltageRangeV": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -22640,18 +22649,19 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/ax3-lightdrop/specs/",
    "https://www.panavision.com/lighting/lighting-products/heads/product-detail/xonffa5-ax3-lightdrop"
   ]
  },
@@ -22680,12 +22690,12 @@
    "max": 264.0
   },
   "frequencyRangeHz": {
-   "min": 47.0,
-   "max": 63.0
+   "min": 50.0,
+   "max": 60.0
   },
   "powerConsumptionW": 45,
-  "maxLuminousIntensityCd": 49000.0,
-  "luminousFluxLm": 2826.0,
+  "maxLuminousIntensityCd": 20600,
+  "luminousFluxLm": 1413,
   "noiseLevelDb": 30,
   "weightKg": 3.4,
   "powerConnectorIn": "powerCON TRUE1",
@@ -22870,15 +22880,15 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "supportedPowerNetworks": "gdtf-derived",
-   "voltageRangeV": "gdtf",
-   "frequencyRangeHz": "gdtf",
+   "supportedPowerNetworks": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
    "dataConnectors": "gdtf-derived",
@@ -22906,17 +22916,18 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "ipRating": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 460 W invalid.",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "GDTF power 460 W invalid. No wattage published for mains input: AC input 90-264 VAC, 1.2 A @115 VAC / 1.0 A @230 VAC; Total LED power 45 W. powerConsumptionW omitted. Lux at 5500 K @ 2 m.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/ax5-triplepar/specs/",
    "https://uk.panavision.com/lighting/lighting-products/heads/product-detail/xonoga5-ax5-triplepar"
   ]
  },
@@ -22949,8 +22960,8 @@
    "max": 60.0
   },
   "powerConsumptionW": 110,
-  "maxLuminousIntensityCd": 110000.0,
-  "luminousFluxLm": 6428.0,
+  "maxLuminousIntensityCd": 47100,
+  "luminousFluxLm": 3214,
   "noiseLevelDb": 30,
   "weightKg": 5.66,
   "powerConnectorIn": "powerCON TRUE1",
@@ -23139,11 +23150,11 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
    "dataConnectors": "gdtf-derived",
@@ -23171,16 +23182,18 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "ipRating": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "AC input 100-240 VAC, 2.3 A/115 V, 1.1 A/230 V, 110 W. Lux at 3200 K.",
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/ax9-powerpar/specs/",
    "https://astera-led.com/wp-content/uploads/Datasheet_AX9-PowerPar_V4.pdf"
   ]
  },
@@ -23213,8 +23226,8 @@
    "max": 60.0
   },
   "powerConsumptionW": 48,
-  "maxLuminousIntensityCd": 350.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 785,
+  "luminousFluxLm": 2900,
   "noiseLevelDb": 30,
   "weightKg": 1.35,
   "powerConnectorIn": "DC Jack",
@@ -23938,6 +23951,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -23969,20 +23983,20 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Battery up to 20 h; IP65 with FP1-SP. GDTF power 4876 W invalid.",
-   "GDTF luminous flux 307400 lm is implausible for 48 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/titan/specs/",
    "https://astera-led.com/goto/titan_tube_datasheet"
   ]
  },
@@ -24015,10 +24029,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 36,
-  "maxLuminousIntensityCd": 260.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 393,
+  "luminousFluxLm": 1340,
   "noiseLevelDb": 30,
-  "weightKg": 0.77,
+  "weightKg": 0.765,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
@@ -24740,6 +24754,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -24771,19 +24786,19 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF luminous flux 50115 lm is implausible for 36 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/helios-tube/specs/",
    "https://astera-led.com/zh/products/helios-tube/specs/"
   ]
  },
@@ -24816,8 +24831,8 @@
    "max": 60.0
   },
   "powerConsumptionW": 92,
-  "maxLuminousIntensityCd": 660.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 1600,
+  "luminousFluxLm": 5800,
   "noiseLevelDb": 30,
   "weightKg": 2.9,
   "powerConnectorIn": "DC Jack",
@@ -25541,6 +25556,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -25572,19 +25588,19 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF luminous flux 475600 lm is implausible for 92 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/hyperion-tube/specs/",
    "https://astera-led.com/wp-content/uploads/Datasheet_Hyperion_Tube_V4-1.pdf"
   ]
  },
@@ -25617,13 +25633,13 @@
    "max": 60.0
   },
   "powerConsumptionW": 28.0,
-  "maxLuminousIntensityCd": 230.0,
-  "luminousFluxLm": 1500.0,
+  "maxLuminousIntensityCd": 124,
+  "luminousFluxLm": 750,
   "noiseLevelDb": 30,
   "weightKg": 0.24,
-  "powerConnectorIn": "E27 lamp socket",
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "E27 lamp socket",
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -25663,7 +25679,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP44",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": 0.0,
@@ -25801,10 +25817,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "voltageRangeV": "estimated",
+   "voltageRangeV": "manual",
    "powerConsumptionW": "estimated",
-   "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
@@ -25832,19 +25848,23 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "ipRating": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "No mains wattage published (Total LED power 14 W, LED power draw 10 W; DC input 5-18 VDC 2.1 A). Mains range for E27/BC version (E26: 100-120 VAC). IP44 when on AC with FP5-SP cover, IP20 via DC socket.",
+   "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+   "https://astera-led.com/products/nyx-bulb/specs/"
   ]
  },
  {
@@ -25876,10 +25896,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 25,
-  "maxLuminousIntensityCd": 6700.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 516,
+  "luminousFluxLm": 1298,
   "noiseLevelDb": 30,
-  "weightKg": 0.6,
+  "weightKg": 0.604,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
@@ -26601,6 +26621,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -26632,19 +26653,19 @@
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF luminous flux 48562 lm is implausible for 25 W and was dropped",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/hydrapanel/specs/",
    "https://proav.co.uk/lighting/astera-hydrapanel"
   ]
  },
@@ -26660,24 +26681,27 @@
   "manufacturer": "Astera LED Technology",
   "category": "WASH",
   "supportedPowerNetworks": [
+   "100 V - 50 Hz",
+   "100 V - 60 Hz",
    "110/120 V - 60 Hz",
+   "110/120 V - 50 Hz",
    "220/230 V - 50 Hz",
    "220/230 V - 60 Hz",
    "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-   "min": 120.0,
+   "min": 100.0,
    "max": 240.0
   },
   "frequencyRangeHz": {
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 8.0,
-  "maxLuminousIntensityCd": 46.0,
-  "luminousFluxLm": 308.0,
+  "powerConsumptionW": 4.25,
+  "maxLuminousIntensityCd": 19.6,
+  "luminousFluxLm": 160,
   "noiseLevelDb": 30,
-  "weightKg": 0.08,
+  "weightKg": 0.081,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
@@ -26720,7 +26744,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP44",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": 0.0,
@@ -26858,12 +26882,12 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "supportedPowerNetworks": "gdtf-derived",
-   "voltageRangeV": "gdtf",
-   "frequencyRangeHz": "gdtf",
-   "powerConsumptionW": "gdtf",
-   "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "supportedPowerNetworks": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
    "motorizedPanTilt": "gdtf-derived",
@@ -26891,15 +26915,19 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
+   "ipRating": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "Power consumption (max.) 4.25 W. Photometrics with dome, 5500 K. Mains range for E27/B22 version (E26: 100-120 VAC). IP44 depending on socket used.",
+   "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+   "https://astera-led.com/products/lunabulb/specs/"
   ]
  },
  {
@@ -26930,14 +26958,14 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 15,
-  "maxLuminousIntensityCd": 4800,
-  "luminousFluxLm": 950.0,
+  "powerConsumptionW": 20,
+  "maxLuminousIntensityCd": 7100,
+  "luminousFluxLm": 475,
   "noiseLevelDb": 30,
   "weightKg": 1.12,
-  "powerConnectorIn": "DC Jack / PWB-CAB Connector",
-  "powerConnectorOut": "PWB-CAB Connector",
-  "powerSupplyType": "DC Jack LINK",
+  "powerConnectorIn": "DC Jack",
+  "powerConnectorOut": null,
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -27108,7 +27136,7 @@
   "pixelCount": 2,
   "subType": "Battery uplight",
   "fullName": "Astera LED Technology PB15 PixelBrick",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
    "longName": "gdtf",
    "shortName": "gdtf",
@@ -27117,11 +27145,11 @@
    "category": "manual",
    "voltageRangeV": "estimated",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "manual",
    "lightSourceType": "manual",
@@ -27157,9 +27185,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+   "Power consumption (max.) 20 W. Battery fixture. Lux at 3200 K. IP65 only with PB15-PLG or PWB cables.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://astera-led.com/products/pixelbrick/specs/",
    "https://lsionline.com/news/pl-s-2022-astera-highlights-latest-innovations"
   ]
  },
@@ -33965,7 +33995,7 @@
   "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 10241000.0,
   "luminousFluxLm": 10100.0,
-  "noiseLevelDb": 47,
+  "noiseLevelDb": 43,
   "weightKg": 22.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -33984,7 +34014,7 @@
   "dataConnectors": [
    "XLR3"
   ],
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
    "min": 1.0,
    "max": 1.0
@@ -41181,7 +41211,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 16000.0,
   "luminousFluxLm": 72981.0,
   "noiseLevelDb": 38,
@@ -41638,7 +41668,7 @@
   "fixtureTypeId": "86A02BB4-E327-4650-8DC6-422C7310B390",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LED BAR EFF",
-  "longName": "LEDBAR EFF",
+  "longName": "Lighting LEDBAR EFF",
   "shortName": "LedBarEFF",
   "description": "CLF LEDBAR EFF: RGBWA+WW LED effect bar.",
   "manufacturer": "CLF Lighting",
@@ -41776,7 +41806,7 @@
    }
   ],
   "pixelCount": 246,
-  "fullName": "CLF Lighting LEDBAR EFF",
+  "fullName": "CLF Lighting Lighting LEDBAR EFF",
   "powerLinkable": true,
   "_source": {
    "longName": "gdtf",
@@ -41999,7 +42029,7 @@
   "fixtureTypeId": "AB74CFF6-37EF-40BA-A579-D1867CFE75B1",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Orion",
-  "longName": "Orion",
+  "longName": "Lighting Orion",
   "shortName": "Orion",
   "description": "CLF Orion: discharge-lamp beam/spot/wash hybrid with CMY, gobos, prisms and 3-42 deg zoom.",
   "manufacturer": "CLF Lighting",
@@ -42111,7 +42141,7 @@
    }
   ],
   "pixelCount": 1,
-  "fullName": "CLF Lighting Orion",
+  "fullName": "CLF Lighting Lighting Orion",
   "powerLinkable": true,
   "_source": {
    "longName": "gdtf",
@@ -44813,15 +44843,15 @@
   },
   "powerConsumptionW": 470,
   "maxLuminousIntensityCd": 1500000.0,
-  "luminousFluxLm": 13000.0,
+  "luminousFluxLm": 13000,
   "noiseLevelDb": 43,
   "weightKg": 19.7,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -44917,13 +44947,13 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -44964,9 +44994,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+   "Spec table says pan 540°, marketing text says 630° pan; table value used. Zoom 5-50° from product text (table gives beam 5°). CCT is the fixed 6,800 K of the cold white LED.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/spot-moving-heads/28489/azor-s2",
    "https://adamhall.com/shop/en/brands/azor-s2"
   ]
  },
@@ -44999,16 +45031,16 @@
    "max": 60.0
   },
   "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 4200000.0,
-  "luminousFluxLm": 13000.0,
+  "maxLuminousIntensityCd": 3700000.0,
+  "luminousFluxLm": 11326,
   "noiseLevelDb": 43,
-  "weightKg": 24.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 24,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "panRangeDeg": 630,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -45099,13 +45131,13 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
-   "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "panRangeDeg": "manual",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -45151,6 +45183,7 @@
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/profile-moving-heads/30571/azor-sp2",
    "https://adamhall.com/shop/en/brands/azor-sp2"
   ]
  },
@@ -45182,17 +45215,17 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 4200000.0,
-  "luminousFluxLm": 13000.0,
+  "powerConsumptionW": 560,
+  "maxLuminousIntensityCd": 3600000.0,
+  "luminousFluxLm": 11100,
   "noiseLevelDb": 43,
-  "weightKg": 25.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 25,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "panRangeDeg": 630,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -45282,14 +45315,14 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
-   "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "panRangeDeg": "manual",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -45331,9 +45364,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "Power assumed equal to indoor AZOR SP2.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/spot-moving-heads/31240/azor-sp2-ip"
   ]
  },
  {
@@ -45365,16 +45400,16 @@
    "max": 60.0
   },
   "powerConsumptionW": 503,
-  "maxLuminousIntensityCd": 2500000.0,
-  "luminousFluxLm": 13900.0,
+  "maxLuminousIntensityCd": 660000.0,
+  "luminousFluxLm": 3600,
   "noiseLevelDb": 40,
   "weightKg": 8.6,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "panRangeDeg": 630,
+  "tiltRangeDeg": 250,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -45469,14 +45504,14 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
-   "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "panRangeDeg": "manual",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -45517,6 +45552,7 @@
    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/wash-moving-heads/30572/azor-w2",
    "https://adamhall.com/shop/en/brands/azor-w2"
   ]
  },
@@ -45550,7 +45586,7 @@
   },
   "powerConsumptionW": 800,
   "maxLuminousIntensityCd": 1800000.0,
-  "luminousFluxLm": 22000.0,
+  "luminousFluxLm": 22000,
   "noiseLevelDb": 48,
   "weightKg": 27.8,
   "powerConnectorIn": "powerCON TRUE1",
@@ -45558,7 +45594,7 @@
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -45648,14 +45684,14 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -45696,9 +45732,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+   "Page URL slug is opus-sp5 but page title/content is OPUS SP5+. Zoom 6-42° from product text.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/profile-moving-heads/29239/opus-sp5",
    "https://adamhall.com/shop/en/brands/opus-sp5"
   ]
  },
@@ -45734,10 +45772,10 @@
   "maxLuminousIntensityCd": 132000000,
   "luminousFluxLm": 33000.0,
   "noiseLevelDb": 43,
-  "weightKg": 32.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 32,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -45915,6 +45953,7 @@
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/beam-moving-heads/30734/oron-h2",
    "https://adamhall.com/shop/en/brands/oron-h2"
   ]
  },
@@ -45947,16 +45986,16 @@
    "max": 60.0
   },
   "powerConsumptionW": 350,
-  "maxLuminousIntensityCd": 220000.0,
-  "luminousFluxLm": 1200.0,
+  "maxLuminousIntensityCd": 500000,
+  "luminousFluxLm": 4000,
   "noiseLevelDb": 43,
-  "weightKg": 11.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 11,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "panRangeDeg": 630,
+  "tiltRangeDeg": 240,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -46056,14 +46095,14 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
-   "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "panRangeDeg": "manual",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -46094,17 +46133,18 @@
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
+   "maxLuminousIntensityCd": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
    "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "GDTF power 41 W invalid.",
-   "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+   "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/moving-lights/wash-moving-heads/30745/otos-w3",
    "https://adamhall.com/shop/en/brands/otos-w3"
   ]
  },
@@ -46138,7 +46178,7 @@
   },
   "powerConsumptionW": 620,
   "maxLuminousIntensityCd": 1900000.0,
-  "luminousFluxLm": 16000.0,
+  "luminousFluxLm": 16000,
   "noiseLevelDb": 40,
   "weightKg": 20.9,
   "powerConnectorIn": "powerCON TRUE1",
@@ -46270,7 +46310,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
@@ -46318,6 +46358,7 @@
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/theatre-broadcast/static-lighting/profiler/31282/p6",
    "https://adamhall.com/shop/en/brands/p6"
   ]
  },
@@ -46350,13 +46391,13 @@
    "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": 7500.0,
-  "luminousFluxLm": 1600.0,
+  "maxLuminousIntensityCd": 31000.0,
+  "luminousFluxLm": 6500,
   "noiseLevelDb": 0,
-  "weightKg": 12.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 12,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -46480,7 +46521,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
@@ -46522,10 +46563,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Fanless (0 dB). GDTF power 10 W invalid.",
+   "Fanless (0 dB). GDTF power 10 W invalid. Beam 25° / field 42° without filter (filters for 55°/70° are accessories).",
    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/dj-musicians/outdoor-lighting/outdoor-lights/29369/pixbar-400-ip-g2",
    "https://adamhall.com/shop/en/brands/pixbar-400-ip-g2"
   ]
  },
@@ -46557,11 +46599,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 8200.0,
-  "luminousFluxLm": 1600.0,
-  "noiseLevelDb": 30,
-  "weightKg": 3.0,
+  "powerConsumptionW": 133,
+  "maxLuminousIntensityCd": 31000.0,
+  "luminousFluxLm": 6000,
+  "noiseLevelDb": 0,
+  "weightKg": 5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -46699,13 +46741,12 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "maxLuminousIntensityCd": "estimated",
-   "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "manualTiltRangeDeg": "gdtf-derived",
    "controlSignal": "gdtf-derived",
@@ -46733,18 +46774,22 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
+   "ipRating": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "fullName": "gdtf-derived",
-   "ipRating": "estimated",
-   "noiseLevelDb": "estimated"
+   "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "GDTF power 10 W invalid, removed.",
-   "Typical-value estimates (no published data): powerConsumptionW, ipRating, noiseLevelDb"
+   "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/static-lighting/bars/31099/root-bar-6"
   ]
  },
  {
@@ -46775,11 +46820,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 6600.0,
-  "luminousFluxLm": 11600.0,
-  "noiseLevelDb": 30,
-  "weightKg": 3.0,
+  "powerConsumptionW": 135,
+  "maxLuminousIntensityCd": 3000.0,
+  "luminousFluxLm": 5200,
+  "noiseLevelDb": 0,
+  "weightKg": 5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -46889,12 +46934,12 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
-   "powerConnectorIn": "gdtf-derived",
-   "powerConnectorOut": "gdtf-derived",
-   "powerSupplyType": "gdtf-derived",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
+   "powerConnectorIn": "manual",
+   "powerConnectorOut": "manual",
+   "powerSupplyType": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "manualTiltRangeDeg": "gdtf-derived",
    "controlSignal": "gdtf-derived",
@@ -46922,19 +46967,22 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "subType": "manual",
+   "ipRating": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "fullName": "gdtf-derived",
-   "maxLuminousIntensityCd": "estimated",
-   "ipRating": "estimated",
-   "noiseLevelDb": "estimated"
+   "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
    "GDTF power invalid, removed.",
-   "Typical-value estimates (no published data): powerConsumptionW, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+   "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/static-lighting/bars/31100/root-bar-smd"
   ]
  },
  {
@@ -46967,9 +47015,9 @@
   },
   "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 2400.0,
-  "luminousFluxLm": 10661,
+  "luminousFluxLm": 10660,
   "noiseLevelDb": 35,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -47114,6 +47162,7 @@
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/outdoor-lighting/outdoor-lights/19856/zenit-w300",
    "https://adamhall.com/shop/en/brands/zenit-w300"
   ]
  },
@@ -47145,14 +47194,14 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 300,
-  "maxLuminousIntensityCd": 5300.0,
-  "luminousFluxLm": 24000.0,
+  "powerConsumptionW": 265,
+  "maxLuminousIntensityCd": 4500.0,
+  "luminousFluxLm": 20000,
   "noiseLevelDb": 35,
-  "weightKg": 8.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 8,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -47237,9 +47286,9 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "luminousFluxLm": "gdtf",
-   "weightKg": "estimated",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "powerSupplyType": "manual",
@@ -47281,9 +47330,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "Assumed equal to ZENIT W300.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+   "https://www.cameolight.com/en/solutions/dj-musicians/outdoor-lighting/outdoor-lights/30337/zenit-w300-tw"
   ]
  },
  {
@@ -47315,10 +47366,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 265,
-  "maxLuminousIntensityCd": 3000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 4800.0,
+  "luminousFluxLm": 17000,
   "noiseLevelDb": 35,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -47439,6 +47490,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
@@ -47481,10 +47533,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF luminous flux 124000 lm is implausible for 265 W and was dropped",
+   "Beam is asymmetric: 118° (hor.) x 105° (vert.), field 157° x 146°; horizontal value used.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/static-lighting/floodlights/30723/zenit-w300-smd",
    "https://adamhall.com/shop/en/brands/zenit-w300-smd"
   ]
  },
@@ -47517,10 +47570,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 565,
-  "maxLuminousIntensityCd": 220000.0,
-  "luminousFluxLm": 24000.0,
+  "maxLuminousIntensityCd": 190000.0,
+  "luminousFluxLm": 21000,
   "noiseLevelDb": 35,
-  "weightKg": 13.0,
+  "weightKg": 13,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -47618,7 +47671,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
@@ -47664,6 +47717,7 @@
    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/rental/outdoor-lighting/outdoor-lights/18383/zenit-w600",
    "https://adamhall.com/shop/en/brands/zenit-w600"
   ]
  },
@@ -47696,10 +47750,10 @@
    "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": 160000.0,
-  "luminousFluxLm": 24000.0,
+  "maxLuminousIntensityCd": 44000.0,
+  "luminousFluxLm": 6600,
   "noiseLevelDb": 0,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -47795,7 +47849,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
@@ -47837,10 +47891,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Convection cooled (silent).",
+   "Convection cooled (silent). Fan-free (passive cooling): silent. Battery-powered; 180 W is the rated mains power.",
    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+   "https://www.cameolight.com/en/solutions/theatre-broadcast/battery-powered-lights/19855/zenit-b200",
    "https://adamhall.com/shop/en/brands/zenit-b200"
   ]
  },
@@ -47872,9 +47927,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 422,
+  "powerConsumptionW": 407,
   "maxLuminousIntensityCd": 302700,
-  "luminousFluxLm": 3503.0,
+  "luminousFluxLm": 3503,
   "noiseLevelDb": 43,
   "weightKg": 11.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -47979,7 +48034,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -48020,6 +48075,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+   "Power 422 W max (100/120 V); 407 W @230 V. No noise or CCT range published.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -48054,9 +48110,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 790,
+  "powerConsumptionW": 768,
   "maxLuminousIntensityCd": 685400,
-  "luminousFluxLm": 8959.0,
+  "luminousFluxLm": 8959,
   "noiseLevelDb": 43,
   "weightKg": 20.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -48169,7 +48225,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -48210,7 +48266,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 45 W invalid.",
+   "GDTF power 45 W invalid. Power 790 W @120 V (UM: 835 W @100 V); 768 W @230 V. Lux at 5.7 deg.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -48245,9 +48301,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 790,
+  "powerConsumptionW": 768,
   "maxLuminousIntensityCd": 968200,
-  "luminousFluxLm": 5807.0,
+  "luminousFluxLm": 5807,
   "noiseLevelDb": 29.7,
   "weightKg": 34.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -48364,7 +48420,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -48405,7 +48461,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 45 W invalid."
+   "GDTF power 45 W invalid. Power 790 W @120 V; 768 W @230 V."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/colorado-pxl-curve-12/"
@@ -48439,9 +48495,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 200.0,
+  "powerConsumptionW": 277,
   "maxLuminousIntensityCd": 444600,
-  "luminousFluxLm": 7130.0,
+  "luminousFluxLm": 4630,
   "noiseLevelDb": 38,
   "weightKg": 6.8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -48524,9 +48580,9 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
-   "luminousFluxLm": "estimated",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -48557,9 +48613,9 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
@@ -48569,7 +48625,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Product page has no electrical section: power (277 W @230 V, 285 W max @100 V), 100-240 V, IP65, CCT 2700-19,000 K taken from User Manual Rev3 https://chauvetprofessional.com/wp-content/uploads/2026/01/COLORado_PXL_Curve_1_UM_Rev3.pdf (UM also says 7.1 kg, 5,921 lm, zoom 3.2-145.1 deg; page values used). GDTF 200 W is too low.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -48604,9 +48660,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1136,
+  "powerConsumptionW": 1113,
   "maxLuminousIntensityCd": 451600,
-  "luminousFluxLm": 84344.0,
+  "luminousFluxLm": 42172,
   "noiseLevelDb": 48,
   "weightKg": 32.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -48614,7 +48670,7 @@
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 60.0,
-  "tiltRangeDeg": 190.0,
+  "tiltRangeDeg": 200,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -48690,11 +48746,11 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -48734,6 +48790,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+   "Lumens 42,172 (GDTF 84,344 is exactly double). Tilt 200 deg per page (GDTF 190). Power 1136 W @120 V; 1113 W @230 V.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -48768,9 +48825,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 110,
+  "powerConsumptionW": 105,
   "maxLuminousIntensityCd": 21800,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 4285,
   "noiseLevelDb": 8.9,
   "weightKg": 6.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -49005,6 +49062,7 @@
    "weightKg": "manual",
    "noiseLevelDb": "manual",
    "powerSupplyType": "manual",
+   "luminousFluxLm": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
@@ -49019,7 +49077,7 @@
   "_issues": [
    "Weight is 0 in GDTF",
    "Beam angle equals the GDTF default (25°) - probably not filled in",
-   "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters."
+   "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters. Fixed 16.5 deg beam; 27.3 deg only with CYC diffusion accessory. Power 110 W max @100 V; 105 W @230 V. Cooling 'Convection' per UM Rev3."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/colorado-solo-bar-1/"
@@ -49053,9 +49111,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 610,
+  "powerConsumptionW": 575,
   "maxLuminousIntensityCd": 145800,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 25198,
   "noiseLevelDb": 25.2,
   "weightKg": 22.3,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -49482,6 +49540,7 @@
    "weightKg": "manual",
    "noiseLevelDb": "manual",
    "powerSupplyType": "manual",
+   "luminousFluxLm": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
@@ -49495,7 +49554,8 @@
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "Beam angle equals the GDTF default (25°) - probably not filled in"
+   "Beam angle equals the GDTF default (25°) - probably not filled in",
+   "Fixed 16.7 deg beam; 40.7 deg only with CYC diffusion. Power 610 W max @100 V; 575 W @230 V."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/colorado-solo-bar-6/"
@@ -49529,10 +49589,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 740,
+  "powerConsumptionW": 696,
   "maxLuminousIntensityCd": 39800,
-  "luminousFluxLm": 72981.0,
-  "noiseLevelDb": 43,
+  "luminousFluxLm": 71620,
+  "noiseLevelDb": 0,
   "weightKg": 12.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
@@ -49634,7 +49694,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -49665,19 +49725,19 @@
    "pixelCount": "gdtf-derived",
    "powerConsumptionW": "manual",
    "powerSupplyType": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "Fan-free (passive cooling): silent. Values for combined plate+beam. Beam angles are asymmetric (combined 98x57 deg, plate 123 deg) so beam omitted. Power 740 W max @120 V; 696 W @230 V. Power out + 'Convection' cooling from UM Rev15."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/color-strike-m/"
@@ -49711,10 +49771,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 620,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 1033900,
-  "luminousFluxLm": 9183.0,
-  "noiseLevelDb": 43,
+  "luminousFluxLm": 9183,
+  "noiseLevelDb": 44.7,
   "weightKg": 13.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -49823,7 +49883,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -49855,19 +49915,18 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "ipRating": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 45 W invalid.",
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "GDTF power 45 W invalid. No IP rating stated on page or UM (UM forbids outdoor use, so likely IP20). Noise (Auto 44.7 dB(A)) from UM Rev7 https://chauvetprofessional.com/wp-content/uploads/2023/06/Maverick_Force_2_BeamWash_UM_Rev7.pdf. Power 620 W @120 V; 600 W @230 V."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-force-2-beamwash/"
@@ -49901,9 +49960,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 800,
+  "powerConsumptionW": 754,
   "maxLuminousIntensityCd": 1296600,
-  "luminousFluxLm": 20856.0,
+  "luminousFluxLm": 20856,
   "noiseLevelDb": 43.1,
   "weightKg": 26.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -49993,7 +50052,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -50038,7 +50097,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+   "CCT is the at-full value of the white source. Power 800 W max @100 V; 754 W @230 V. Lux at 7 deg."
+  ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-force-2-profile/"
   ]
@@ -50071,9 +50132,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 660,
+  "powerConsumptionW": 641,
   "maxLuminousIntensityCd": 2284000,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 30967,
   "noiseLevelDb": 36.6,
   "weightKg": 24.2,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -50192,6 +50253,7 @@
    "noiseLevelDb": "manual",
    "powerSupplyType": "manual",
    "ipRating": "manual",
+   "luminousFluxLm": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
@@ -50204,7 +50266,8 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Weight is 0 in GDTF"
+   "Weight is 0 in GDTF",
+   "Power 660 W @120 V; 641 W @230 V."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-force-2-solowash/"
@@ -50238,9 +50301,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1320,
+  "powerConsumptionW": 1260,
   "maxLuminousIntensityCd": 3264600,
-  "luminousFluxLm": 40906.0,
+  "luminousFluxLm": 40906,
   "noiseLevelDb": 39.8,
   "weightKg": 38.2,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -50334,7 +50397,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -50379,7 +50442,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+   "Page: 1320 W @120 V, 1260 W @230 V (UM Rev6 says 1229 W @120 V / 1200 W @230 V). CCT = at-full value."
+  ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-force-3-profile/"
   ]
@@ -50412,9 +50477,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 554,
+  "powerConsumptionW": 521,
   "maxLuminousIntensityCd": 1550100,
-  "luminousFluxLm": 14407.0,
+  "luminousFluxLm": 14407,
   "noiseLevelDb": 33.6,
   "weightKg": 21.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -50504,7 +50569,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -50548,7 +50613,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+   "Power 554 W max @100 V; 521 W @230 V. CCT = at-full value."
+  ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-force-s-spot/"
   ]
@@ -50581,9 +50648,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 325,
+  "powerConsumptionW": 321,
   "maxLuminousIntensityCd": 482600,
-  "luminousFluxLm": 3500.0,
+  "luminousFluxLm": 3500,
   "noiseLevelDb": 43,
   "weightKg": 14.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -50591,7 +50658,7 @@
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 260.0,
+  "tiltRangeDeg": 270,
   "infinitePan": true,
   "infiniteTilt": true,
   "manualPanRangeDeg": null,
@@ -50692,7 +50759,7 @@
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
-   "tiltRangeDeg": "gdtf-derived",
+   "tiltRangeDeg": "manual",
    "infinitePan": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
    "controlSignal": "manual",
@@ -50732,7 +50799,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 75 W invalid.",
+   "GDTF power 75 W invalid. Lumens = center pixel 1,100 + outer ring 2,400 output (sum). Lux is center pixel at 2.7 deg (center+ring total 11,267 lux @5 m). Pan/tilt also selectable infinite. Power 325 W @120 V; 321 W @230 V. No noise published.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -50767,9 +50834,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 800,
+  "powerConsumptionW": 763,
   "maxLuminousIntensityCd": 1798300,
-  "luminousFluxLm": 28534.0,
+  "luminousFluxLm": 28534,
   "noiseLevelDb": 41.9,
   "weightKg": 30.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -50859,7 +50926,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -50904,7 +50971,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+   "Power 800 W @120 V; 763 W @230 V. Lux at 6.3 deg. CCT = at-full value."
+  ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-storm-2-profile/"
   ]
@@ -50937,9 +51006,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1478,
+  "powerConsumptionW": 1442,
   "maxLuminousIntensityCd": 1533400,
-  "luminousFluxLm": 1362.0,
+  "luminousFluxLm": 18594,
   "noiseLevelDb": 38.2,
   "weightKg": 37.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -51060,7 +51129,7 @@
    "manufacturer": "gdtf",
    "category": "manual",
    "powerConsumptionW": "manual",
-   "luminousFluxLm": "estimated",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -51104,7 +51173,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF power 90 W invalid."
+   "GDTF power 90 W invalid. Output lumens 18,594 (GDTF 1,362 is far off). Power 1478 W @120 V; 1442 W @230 V. Lux at 3.3 deg."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-storm-3-beamwash/"
@@ -51138,9 +51207,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1780,
+  "powerConsumptionW": 1760,
   "maxLuminousIntensityCd": 3179000,
-  "luminousFluxLm": 60756.0,
+  "luminousFluxLm": 60756,
   "noiseLevelDb": 43.3,
   "weightKg": 50.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -51234,7 +51303,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -51280,7 +51349,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "GDTF weight 46.5 kg contradicts spec sheet (50.6 kg)."
+   "GDTF weight 46.5 kg contradicts spec sheet (50.6 kg). Power 1780 W @120 V (UM: 1892 W @100 V); 1760 W @230 V. CCT = at-full value."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-storm-4-profile/"
@@ -51314,14 +51383,14 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1720,
+  "powerConsumptionW": 1680,
   "maxLuminousIntensityCd": 4060200,
-  "luminousFluxLm": 61373.0,
-  "noiseLevelDb": 48,
+  "luminousFluxLm": 78300,
+  "noiseLevelDb": 52.3,
   "weightKg": 45.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -51388,7 +51457,7 @@
   "pixelCount": 1,
   "subType": "Framing wash",
   "fullName": "Chauvet Professional Maverick Storm 4 SoloWash",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
    "longName": "gdtf",
    "shortName": "gdtf",
@@ -51397,7 +51466,7 @@
    "category": "manual",
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "manual",
-   "luminousFluxLm": "gdtf",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -51431,19 +51500,19 @@
    "pixelCount": "gdtf-derived",
    "subType": "manual",
    "powerSupplyType": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
    "framingShutterType": "gdtf-derived",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "Noise (Auto 52.3 dB(A)) from UM Rev5 https://chauvetprofessional.com/wp-content/uploads/2023/10/Maverick_Storm_4_SoloWash_UM_Rev5.pdf (UM also lists power output). Lumens 78,300 (GDTF 61,373). Power 1720 W @120 V; 1680 W @230 V. CCT = at-full value."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/maverick-storm-4-solowash/"
@@ -51477,9 +51546,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 422,
+  "powerConsumptionW": 411,
   "maxLuminousIntensityCd": 46801400,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 30878,
   "noiseLevelDb": 37.9,
   "weightKg": 15.6,
   "powerConnectorIn": "powerCON",
@@ -51603,6 +51672,7 @@
    "noiseLevelDb": "manual",
    "powerSupplyType": "manual",
    "ipRating": "manual",
+   "luminousFluxLm": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
@@ -51614,7 +51684,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "300 W Ushio NSL lamp."
+   "300 W Ushio NSL lamp. 300 W Ushio NSL discharge lamp. Power 422 W max @100 V; 411 W @230 V. CCT = at-full value."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/rogue-r3-beam/"
@@ -51648,10 +51718,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 247,
+  "powerConsumptionW": 245,
   "maxLuminousIntensityCd": 17100,
   "luminousFluxLm": 18008.0,
-  "noiseLevelDb": 35,
+  "noiseLevelDb": 0,
   "weightKg": 13.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -51770,18 +51840,18 @@
    "pixelCount": "gdtf-derived",
    "powerConsumptionW": "manual",
    "powerSupplyType": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "Fan-free (passive cooling): silent. Warm white + amber; CCT = at-full value. Power 247 W max @240 V; 245 W @230 V. Cooling 'Convection' per UM Rev7. No lumens or noise published."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/strike-array-4/"
@@ -51815,10 +51885,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 130,
+  "powerConsumptionW": 129,
   "maxLuminousIntensityCd": 9000,
   "luminousFluxLm": 9288.0,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 0,
   "weightKg": 8.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -51937,18 +52007,18 @@
    "pixelCount": "gdtf-derived",
    "powerConsumptionW": "manual",
    "powerSupplyType": "manual",
+   "noiseLevelDb": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
    "powerConnectorIn": "manual",
    "powerConnectorOut": "manual",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "Fan-free (passive cooling): silent. Warm white + amber; CCT = at-full value. Power 130 W max @240 V; 129 W @230 V. Cooling 'Convection' per UM Rev7. No lumens or noise published."
   ],
   "_refs": [
    "https://www.chauvetprofessional.com/products/strike-array-2/"
@@ -51982,9 +52052,9 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 329,
+  "powerConsumptionW": 323,
   "maxLuminousIntensityCd": 18200,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 20251,
   "noiseLevelDb": 35,
   "weightKg": 8.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -52104,6 +52174,7 @@
    "weightKg": "manual",
    "powerSupplyType": "manual",
    "beamAngleDeg": "manual",
+   "luminousFluxLm": "manual",
    "voltageRangeV": "manual",
    "frequencyRangeHz": "manual",
    "supportedPowerNetworks": "manual",
@@ -52119,6 +52190,7 @@
   "_issues": [
    "Weight is 0 in GDTF",
    "Beam angle equals the GDTF default (25°) - probably not filled in",
+   "Lux is beam section alone (combined 605 lux); lumens combined (beam alone 23,736). Beam angles asymmetric (beam 77.7x54.7 deg, plate 84.6x73.6 deg) so omitted. Power 329 W @120 V (UM: 365 W @100 V); 323 W @230 V.",
    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
@@ -52153,10 +52225,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 187,
-  "maxLuminousIntensityCd": 3200.0,
-  "luminousFluxLm": 10092.0,
-  "noiseLevelDb": 35,
+  "powerConsumptionW": 180,
+  "maxLuminousIntensityCd": 4100,
+  "luminousFluxLm": 10092,
+  "noiseLevelDb": 8.5,
   "weightKg": 12.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -52276,9 +52348,9 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "maxLuminousIntensityCd": "estimated",
-   "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "maxLuminousIntensityCd": "manual",
+   "luminousFluxLm": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "manual",
@@ -52307,18 +52379,18 @@
    "subType": "manual",
    "powerSupplyType": "estimated",
    "powerConsumptionW": "manual",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "noiseLevelDb": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "www URL serves a PDF (acoustic report); HTML spec page is at chauvetprofessional.com/product/onair-panel-1-ip/. Noise 'Auto' 8.5 dB(A) from Salford acoustic report (page labels are scrambled). Page claims fanless but UM says fan-assisted convection with fan modes, so no _cooling. Power 187 W max @208 V; 180 W @230 V."
   ],
   "_refs": [
    "https://chauvetprofessional.com/product/onair-panel-1-ip/"
@@ -52352,10 +52424,10 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 372,
-  "maxLuminousIntensityCd": 7000.0,
-  "luminousFluxLm": 22508.0,
-  "noiseLevelDb": 35,
+  "powerConsumptionW": 370,
+  "maxLuminousIntensityCd": 8700,
+  "luminousFluxLm": 22508,
+  "noiseLevelDb": 7.8,
   "weightKg": 17.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -52475,8 +52547,8 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "maxLuminousIntensityCd": "estimated",
-   "luminousFluxLm": "gdtf",
+   "maxLuminousIntensityCd": "manual",
+   "luminousFluxLm": "manual",
    "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
@@ -52506,20 +52578,21 @@
    "subType": "manual",
    "powerSupplyType": "estimated",
    "powerConsumptionW": "manual",
-   "voltageRangeV": "estimated",
-   "frequencyRangeHz": "estimated",
-   "supportedPowerNetworks": "estimated",
+   "noiseLevelDb": "manual",
+   "voltageRangeV": "manual",
+   "frequencyRangeHz": "manual",
+   "supportedPowerNetworks": "manual",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
-   "fullName": "gdtf-derived",
-   "noiseLevelDb": "estimated"
+   "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-   "Typical-value estimates (no published data): noiseLevelDb"
+   "HTML spec page at chauvetprofessional.com/product/onair-panel-2-ip/. Power 372 W max @120 V; 370 W @230 V."
   ],
   "_refs": [
+   "https://chauvetprofessional.com/product/onair-panel-2-ip/",
    "https://www.chauvetprofessional.com/products/onair-ip-panel-2/"
   ]
  },
@@ -54878,8 +54951,8 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 45000.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 47000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
   "weightKg": 20.0,
@@ -55198,11 +55271,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 45000.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 47000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
-  "weightKg": 8.6,
+  "weightKg": 9.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -55692,11 +55765,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 230000.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 240000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 8.6,
+  "weightKg": 9.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -55999,7 +56072,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
+  "powerConsumptionW": 250,
   "maxLuminousIntensityCd": 2200.0,
   "luminousFluxLm": 1500.0,
   "noiseLevelDb": 35,
@@ -77558,8 +77631,8 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 1100000.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 1200000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
   "weightKg": 27.5,
@@ -87419,7 +87492,7 @@
   "maxLuminousIntensityCd": 26000000.0,
   "luminousFluxLm": 35000.0,
   "noiseLevelDb": 48,
-  "weightKg": 45.9,
+  "weightKg": 46.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -87918,7 +87991,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 699,
+  "powerConsumptionW": 697,
   "maxLuminousIntensityCd": 3800.0,
   "luminousFluxLm": 10000.0,
   "noiseLevelDb": 40,
@@ -88743,8 +88816,8 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 45000.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 47000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
   "weightKg": 20.0,
@@ -104699,7 +104772,7 @@
   "gdtfName": "IPL1940Pro",
   "longName": "IPL1940Pro",
   "shortName": "IPL1940Pro",
-  "description": "LIGHT SKY IPL1940Pro: moving-head Discharge Lamp wash, with 10-60 deg zoom, IP66 rated.",
+  "description": "LIGHT SKY IPL1940Pro: moving-head LED wash, with 10-60 deg zoom, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -104722,7 +104795,7 @@
   "powerConsumptionW": 800.0,
   "maxLuminousIntensityCd": 280000.0,
   "luminousFluxLm": 9653.0,
-  "noiseLevelDb": 47,
+  "noiseLevelDb": 48,
   "weightKg": 29.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -104739,7 +104812,7 @@
    "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
    "min": 10.0,
    "max": 60.0
@@ -110789,11 +110862,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 335.0,
+  "powerConsumptionW": 332.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 43,
-  "weightKg": 12.7,
+  "weightKg": 12.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -112780,7 +112853,7 @@
    "max": 60.0
   },
   "powerConsumptionW": 740.0,
-  "maxLuminousIntensityCd": 15000.0,
+  "maxLuminousIntensityCd": 13000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 40,
   "weightKg": 8.3,
@@ -112798,7 +112871,7 @@
    "DMX512"
   ],
   "dataConnectors": null,
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
    "min": 82.0,
    "max": 82.0
@@ -131432,7 +131505,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 860.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
@@ -131593,11 +131666,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 4600.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 4800.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 8.6,
+  "weightKg": 9.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -131734,11 +131807,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 4600.0,
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 4800.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 8.6,
+  "weightKg": 9.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -133289,7 +133362,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 240.0,
+  "powerConsumptionW": 250,
   "maxLuminousIntensityCd": 130000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
@@ -133706,7 +133779,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 10000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 30,
@@ -135004,7 +135077,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 1100000.0,
   "luminousFluxLm": 181550.0,
   "noiseLevelDb": 30,
@@ -152302,7 +152375,7 @@
    "max": 60.0
   },
   "powerConsumptionW": 30.0,
-  "maxLuminousIntensityCd": 700.0,
+  "maxLuminousIntensityCd": 675.0,
   "luminousFluxLm": 151.0,
   "noiseLevelDb": 0,
   "weightKg": 2.52,
@@ -183937,7 +184010,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 699,
+  "powerConsumptionW": 697,
   "maxLuminousIntensityCd": 34000.0,
   "luminousFluxLm": 124788.0,
   "noiseLevelDb": 40,

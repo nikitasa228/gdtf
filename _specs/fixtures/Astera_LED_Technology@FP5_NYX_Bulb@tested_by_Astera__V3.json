@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 28.0,
-  "maxLuminousIntensityCd": 230.0,
-  "luminousFluxLm": 1500.0,
+  "maxLuminousIntensityCd": 124,
+  "luminousFluxLm": 750,
   "noiseLevelDb": 30,
   "weightKg": 0.24,
-  "powerConnectorIn": "E27 lamp socket",
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "E27 lamp socket",
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP44",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -211,10 +211,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "voltageRangeV": "estimated",
+    "voltageRangeV": "manual",
     "powerConsumptionW": "estimated",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -242,18 +242,22 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "No mains wattage published (Total LED power 14 W, LED power draw 10 W; DC input 5-18 VDC 2.1 A). Mains range for E27/BC version (E26: 100-120 VAC). IP44 when on AC with FP5-SP cover, IP20 via DC socket.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://astera-led.com/products/nyx-bulb/specs/"
   ]
 }

@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 265,
-  "maxLuminousIntensityCd": 3000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 4800.0,
+  "luminousFluxLm": 17000,
   "noiseLevelDb": 35,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -151,6 +151,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
@@ -193,10 +194,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF luminous flux 124000 lm is implausible for 265 W and was dropped",
+    "Beam is asymmetric: 118° (hor.) x 105° (vert.), field 157° x 146°; horizontal value used.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/rental/static-lighting/floodlights/30723/zenit-w300-smd",
     "https://adamhall.com/shop/en/brands/zenit-w300-smd"
   ]
 }

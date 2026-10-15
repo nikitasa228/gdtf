@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 620,
   "maxLuminousIntensityCd": 1900000.0,
-  "luminousFluxLm": 16000.0,
+  "luminousFluxLm": 16000,
   "noiseLevelDb": 40,
   "weightKg": 20.9,
   "powerConnectorIn": "powerCON TRUE1",
@@ -160,7 +160,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -208,6 +208,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/theatre-broadcast/static-lighting/profiler/31282/p6",
     "https://adamhall.com/shop/en/brands/p6"
   ]
 }

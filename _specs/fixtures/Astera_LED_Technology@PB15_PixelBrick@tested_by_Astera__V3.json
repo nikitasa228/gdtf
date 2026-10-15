@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 15,
-  "maxLuminousIntensityCd": 4800,
-  "luminousFluxLm": 950.0,
+  "powerConsumptionW": 20,
+  "maxLuminousIntensityCd": 7100,
+  "luminousFluxLm": 475,
   "noiseLevelDb": 30,
   "weightKg": 1.12,
-  "powerConnectorIn": "DC Jack / PWB-CAB Connector",
-  "powerConnectorOut": "PWB-CAB Connector",
-  "powerSupplyType": "DC Jack LINK",
+  "powerConnectorIn": "DC Jack",
+  "powerConnectorOut": null,
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -204,7 +204,7 @@
   "pixelCount": 2,
   "subType": "Battery uplight",
   "fullName": "Astera LED Technology PB15 PixelBrick",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -213,11 +213,11 @@
     "category": "manual",
     "voltageRangeV": "estimated",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
@@ -253,9 +253,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "Power consumption (max.) 20 W. Battery fixture. Lux at 3200 K. IP65 only with PB15-PLG or PWB cables.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/pixelbrick/specs/",
     "https://lsionline.com/news/pl-s-2022-astera-highlights-latest-innovations"
   ]
 }

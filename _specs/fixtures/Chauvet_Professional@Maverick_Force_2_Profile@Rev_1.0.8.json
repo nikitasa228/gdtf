@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 800,
+  "powerConsumptionW": 754,
   "maxLuminousIntensityCd": 1296600,
-  "luminousFluxLm": 20856.0,
+  "luminousFluxLm": 20856,
   "noiseLevelDb": 43.1,
   "weightKg": 26.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -118,7 +118,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -163,7 +163,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "CCT is the at-full value of the white source. Power 800 W max @100 V; 754 W @230 V. Lux at 7 deg."
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-2-profile/"
   ]

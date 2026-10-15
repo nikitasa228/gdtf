@@ -30,10 +30,10 @@
   "maxLuminousIntensityCd": 132000000,
   "luminousFluxLm": 33000.0,
   "noiseLevelDb": 43,
-  "weightKg": 32.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "weightKg": 32,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -211,6 +211,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/rental/moving-lights/beam-moving-heads/30734/oron-h2",
     "https://adamhall.com/shop/en/brands/oron-h2"
   ]
 }

@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 372,
-  "maxLuminousIntensityCd": 7000.0,
-  "luminousFluxLm": 22508.0,
-  "noiseLevelDb": 35,
+  "powerConsumptionW": 370,
+  "maxLuminousIntensityCd": 8700,
+  "luminousFluxLm": 22508,
+  "noiseLevelDb": 7.8,
   "weightKg": 17.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -149,8 +149,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -180,20 +180,21 @@
     "subType": "manual",
     "powerSupplyType": "estimated",
     "powerConsumptionW": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "HTML spec page at chauvetprofessional.com/product/onair-panel-2-ip/. Power 372 W max @120 V; 370 W @230 V."
   ],
   "_refs": [
+    "https://chauvetprofessional.com/product/onair-panel-2-ip/",
     "https://www.chauvetprofessional.com/products/onair-ip-panel-2/"
   ]
 }

@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 660,
+  "powerConsumptionW": 641,
   "maxLuminousIntensityCd": 2284000,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 30967,
   "noiseLevelDb": 36.6,
   "weightKg": 24.2,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -147,6 +147,7 @@
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
     "ipRating": "manual",
+    "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
@@ -159,7 +160,8 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Weight is 0 in GDTF"
+    "Weight is 0 in GDTF",
+    "Power 660 W @120 V; 641 W @230 V."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-2-solowash/"

@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 740,
+  "powerConsumptionW": 696,
   "maxLuminousIntensityCd": 39800,
-  "luminousFluxLm": 72981.0,
-  "noiseLevelDb": 43,
+  "luminousFluxLm": 71620,
+  "noiseLevelDb": 0,
   "weightKg": 12.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
@@ -131,7 +131,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -162,19 +162,19 @@
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Fan-free (passive cooling): silent. Values for combined plate+beam. Beam angles are asymmetric (combined 98x57 deg, plate 123 deg) so beam omitted. Power 740 W max @120 V; 696 W @230 V. Power out + 'Convection' cooling from UM Rev15."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/color-strike-m/"

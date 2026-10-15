@@ -10,24 +10,27 @@
   "manufacturer": "Astera LED Technology",
   "category": "WASH",
   "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 120.0,
+    "min": 100.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 8.0,
-  "maxLuminousIntensityCd": 46.0,
-  "luminousFluxLm": 308.0,
+  "powerConsumptionW": 4.25,
+  "maxLuminousIntensityCd": 19.6,
+  "luminousFluxLm": 160,
   "noiseLevelDb": 30,
-  "weightKg": 0.08,
+  "weightKg": 0.081,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
@@ -70,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP44",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -208,12 +211,12 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -241,14 +244,18 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Power consumption (max.) 4.25 W. Photometrics with dome, 5500 K. Mains range for E27/B22 version (E26: 100-120 VAC). IP44 depending on socket used.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://astera-led.com/products/lunabulb/specs/"
   ]
 }

@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 92,
-  "maxLuminousIntensityCd": 660.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 1600,
+  "luminousFluxLm": 5800,
   "noiseLevelDb": 30,
   "weightKg": 2.9,
   "powerConnectorIn": "DC Jack",
@@ -752,6 +752,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -783,19 +784,19 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF luminous flux 475600 lm is implausible for 92 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/hyperion-tube/specs/",
     "https://astera-led.com/wp-content/uploads/Datasheet_Hyperion_Tube_V4-1.pdf"
   ]
 }

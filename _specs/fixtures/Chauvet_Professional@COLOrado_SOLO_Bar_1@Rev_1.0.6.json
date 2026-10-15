@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 110,
+  "powerConsumptionW": 105,
   "maxLuminousIntensityCd": 21800,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 4285,
   "noiseLevelDb": 8.9,
   "weightKg": 6.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -263,6 +263,7 @@
     "weightKg": "manual",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
+    "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
@@ -277,7 +278,7 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters."
+    "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters. Fixed 16.5 deg beam; 27.3 deg only with CYC diffusion accessory. Power 110 W max @100 V; 105 W @230 V. Cooling 'Convection' per UM Rev3."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/colorado-solo-bar-1/"

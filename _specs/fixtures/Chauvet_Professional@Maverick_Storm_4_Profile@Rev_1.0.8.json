@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1780,
+  "powerConsumptionW": 1760,
   "maxLuminousIntensityCd": 3179000,
-  "luminousFluxLm": 60756.0,
+  "luminousFluxLm": 60756,
   "noiseLevelDb": 43.3,
   "weightKg": 50.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -122,7 +122,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -168,7 +168,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF weight 46.5 kg contradicts spec sheet (50.6 kg)."
+    "GDTF weight 46.5 kg contradicts spec sheet (50.6 kg). Power 1780 W @120 V (UM: 1892 W @100 V); 1760 W @230 V. CCT = at-full value."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-storm-4-profile/"

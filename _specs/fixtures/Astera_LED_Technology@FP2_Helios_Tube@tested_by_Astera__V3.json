@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 36,
-  "maxLuminousIntensityCd": 260.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 393,
+  "luminousFluxLm": 1340,
   "noiseLevelDb": 30,
-  "weightKg": 0.77,
+  "weightKg": 0.765,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
@@ -752,6 +752,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -783,19 +784,19 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF luminous flux 50115 lm is implausible for 36 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/helios-tube/specs/",
     "https://astera-led.com/zh/products/helios-tube/specs/"
   ]
 }

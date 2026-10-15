@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1478,
+  "powerConsumptionW": 1442,
   "maxLuminousIntensityCd": 1533400,
-  "luminousFluxLm": 1362.0,
+  "luminousFluxLm": 18594,
   "noiseLevelDb": 38.2,
   "weightKg": 37.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -149,7 +149,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -193,7 +193,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 90 W invalid."
+    "GDTF power 90 W invalid. Output lumens 18,594 (GDTF 1,362 is far off). Power 1478 W @120 V; 1442 W @230 V. Lux at 3.3 deg."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-storm-3-beamwash/"

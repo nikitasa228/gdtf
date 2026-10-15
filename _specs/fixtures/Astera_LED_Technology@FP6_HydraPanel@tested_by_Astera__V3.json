@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 25,
-  "maxLuminousIntensityCd": 6700.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 516,
+  "luminousFluxLm": 1298,
   "noiseLevelDb": 30,
-  "weightKg": 0.6,
+  "weightKg": 0.604,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
@@ -752,6 +752,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -783,19 +784,19 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF luminous flux 48562 lm is implausible for 25 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/hydrapanel/specs/",
     "https://proav.co.uk/lighting/astera-hydrapanel"
   ]
 }

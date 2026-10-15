@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 800,
+  "powerConsumptionW": 763,
   "maxLuminousIntensityCd": 1798300,
-  "luminousFluxLm": 28534.0,
+  "luminousFluxLm": 28534,
   "noiseLevelDb": 41.9,
   "weightKg": 30.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -118,7 +118,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -163,7 +163,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Power 800 W @120 V; 763 W @230 V. Lux at 6.3 deg. CCT = at-full value."
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-storm-2-profile/"
   ]

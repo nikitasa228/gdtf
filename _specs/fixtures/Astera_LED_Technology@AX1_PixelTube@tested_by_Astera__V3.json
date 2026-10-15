@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 55000.0,
-  "luminousFluxLm": 307400.0,
+  "powerConsumptionW": 24,
+  "maxLuminousIntensityCd": 255,
+  "luminousFluxLm": 725,
   "noiseLevelDb": 30,
   "weightKg": 1.0,
   "powerConnectorIn": "DC Jack",
@@ -752,8 +752,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
@@ -780,20 +780,24 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
-    "ipRating": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Battery powered; mains via external charger/PSU. GDTF power 4876 W invalid.",
-    "Typical-value estimates (no published data): powerConsumptionW, maxLuminousIntensityCd, noiseLevelDb"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Battery tube. Power = DC input 48 VDC x 0.5 A (charger PSU: 100-240 VAC, 0.4 A input; https://astera-led.com/products/power-supply-for-ax1/). Total LED power 28 W, LED power draw 16 W. IP65 only with SiliconeCap.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://astera-led.com/products/ax1-pixeltube/specs/"
   ]
 }

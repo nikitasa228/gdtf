@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": 160000.0,
-  "luminousFluxLm": 24000.0,
+  "maxLuminousIntensityCd": 44000.0,
+  "luminousFluxLm": 6600,
   "noiseLevelDb": 0,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -126,7 +126,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
@@ -168,10 +168,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Convection cooled (silent).",
+    "Convection cooled (silent). Fan-free (passive cooling): silent. Battery-powered; 180 W is the rated mains power.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/theatre-broadcast/battery-powered-lights/19855/zenit-b200",
     "https://adamhall.com/shop/en/brands/zenit-b200"
   ]
 }

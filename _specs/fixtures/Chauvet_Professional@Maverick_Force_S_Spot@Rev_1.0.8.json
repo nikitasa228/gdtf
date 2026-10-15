@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 554,
+  "powerConsumptionW": 521,
   "maxLuminousIntensityCd": 1550100,
-  "luminousFluxLm": 14407.0,
+  "luminousFluxLm": 14407,
   "noiseLevelDb": 33.6,
   "weightKg": 21.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -118,7 +118,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -162,7 +162,9 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Power 554 W max @100 V; 521 W @230 V. CCT = at-full value."
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-s-spot/"
   ]

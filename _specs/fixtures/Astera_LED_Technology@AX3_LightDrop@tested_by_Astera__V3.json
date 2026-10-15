@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 15,
-  "maxLuminousIntensityCd": 15000.0,
-  "luminousFluxLm": 860.0,
+  "maxLuminousIntensityCd": 5200,
+  "luminousFluxLm": 430,
   "noiseLevelDb": 30,
   "weightKg": 0.68,
   "powerConnectorIn": "DC Jack",
@@ -211,9 +211,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "voltageRangeV": "estimated",
+    "voltageRangeV": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -243,18 +243,19 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/ax3-lightdrop/specs/",
     "https://www.panavision.com/lighting/lighting-products/heads/product-detail/xonffa5-ax3-lightdrop"
   ]
 }

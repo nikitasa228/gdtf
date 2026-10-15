@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 620,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 1033900,
-  "luminousFluxLm": 9183.0,
-  "noiseLevelDb": 43,
+  "luminousFluxLm": 9183,
+  "noiseLevelDb": 44.7,
   "weightKg": 13.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -138,7 +138,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -170,19 +170,18 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
     "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 45 W invalid.",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "GDTF power 45 W invalid. No IP rating stated on page or UM (UM forbids outdoor use, so likely IP20). Noise (Auto 44.7 dB(A)) from UM Rev7 https://chauvetprofessional.com/wp-content/uploads/2023/06/Maverick_Force_2_BeamWash_UM_Rev7.pdf. Power 620 W @120 V; 600 W @230 V."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-2-beamwash/"
