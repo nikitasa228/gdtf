@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Encore_Profile_Pro_Color@2024-26-03_Release.gdtf",
+  "fixtureTypeId": "06493172-FD2F-4A3C-995A-C89601CC57DC",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Encore Profile Pro Color",
+  "longName": "Encore Profile Pro Color",
+  "shortName": "EncPrfProClr",
+  "description": "The Encore Profile Pro Color Ellipsoidal features a 250W RGBWAL (Red, Green, Blue, White, Amber, Lime) LED engine. With the lime-infused LED, this fixture produces a hugh gamut of colors with a high CRI, plus it has tunable white color temperature control from 2400K to 9000K. A variety of high definition lens are available to customize output and create precision designed optics that deliver excellent sharpness and an even field of light.",
+  "manufacturer": "ADJ",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 250,
+  "maxLuminousIntensityCd": 401400.0,
+  "luminousFluxLm": 6000,
+  "noiseLevelDb": null,
+  "weightKg": 9.1,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 14.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 23.0,
+  "zoom": false,
+  "lensType": "Ellipsoidal (Profile)",
+  "goboWheels": [],
+  "goboSlots": 1,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWAL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 9000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "16CH",
+      "channels": 16
+    },
+    {
+      "name": "14CH",
+      "channels": 14
+    },
+    {
+      "name": "13CH",
+      "channels": 13
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "4CH",
+      "channels": 4
+    },
+    {
+      "name": "2CH",
+      "channels": 2
+    }
+  ],
+  "pixelCount": 5,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "manual",
+    "lensType": "manual",
+    "goboSlots": "estimated",
+    "framingShutters": "estimated",
+    "framingShutterBlades": "estimated",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Interchangeable lens tubes 14/19/26/36/50 deg or 15-30 / 25-50 zoom; manual shutters and gobo slot. GDTF power 922 W contradicts spec sheet (250 W)."
+  ],
+  "_refs": [
+    "https://www.adj.com/encore-profile-pro-color"
+  ]
+}

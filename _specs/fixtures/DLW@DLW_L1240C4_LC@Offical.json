@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "file": "DLW@DLW_L1240C4_LC@Offical.gdtf",
+  "fixtureTypeId": "6CAB3E10-CEED-4098-BAD3-824CF080B5DF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "DLW L1240C4 LC",
+  "longName": "DLW L1240C4 LC",
+  "shortName": "DLW L1240C4 LC",
+  "description": "40WX12 4IN1 RGBW.",
+  "manufacturer": "DLW",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 96200.0,
+  "luminousFluxLm": 666.0,
+  "noiseLevelDb": null,
+  "weightKg": 20.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 210.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.5,
+    "max": 40.0
+  },
+  "fieldAngleDeg": 5.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "17Ch",
+      "channels": 17
+    },
+    {
+      "name": "57Ch",
+      "channels": 13
+    },
+    {
+      "name": "Pixel",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Tilt-only bar; GDTF power 40 W implausible for 12 x 40 W, removed."
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "EK_Lights@H1@V1-01.gdtf",
+  "fixtureTypeId": "C8434719-4DE9-4AC1-9D2A-D73FE437668F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "H1",
+  "longName": "H1",
+  "shortName": "H1",
+  "description": "EK HI 480BSW",
+  "manufacturer": "EK Lights",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 650.0,
+  "maxLuminousIntensityCd": 18136000.0,
+  "luminousFluxLm": 30000.0,
+  "noiseLevelDb": null,
+  "weightKg": 25.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.2,
+    "max": 42.0
+  },
+  "fieldAngleDeg": 42.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Color2",
+      "slots": 5,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo1",
+      "slots": 19,
+      "rotating": false
+    },
+    {
+      "wheel": "Gobo2",
+      "slots": 8,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 32,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4-Circular",
+      "facets": null
+    },
+    {
+      "name": "8-Circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "31CH",
+      "channels": 31
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

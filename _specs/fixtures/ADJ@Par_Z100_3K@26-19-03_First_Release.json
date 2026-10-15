@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Par_Z100_3K@26-19-03_First_Release.gdtf",
+  "fixtureTypeId": "83334F11-4282-4EF5-A957-DE4C7A922F42",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Par Z100 3K",
+  "longName": "ADJ Par Z100 3K",
+  "shortName": "ParZ1003K",
+  "description": "The Par Z100 3K is a modern LED twist to the traditional halogen Par Can. It is powered by a potent 100W warm white C.O.B. (Chip On Board) LED with a color temperature of 3000K. Its output is comparable to a 1000W halogen sealed beam Par. It is equipped with 5 different beam angle options that may be changed by hand. Locking Power In/Out allows for the fixture to be daisy chained, while 5-pin DMX control offers a variable strobe rate and 5 different dimming curve options.",
+  "manufacturer": "ADJ",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 115,
+  "maxLuminousIntensityCd": 23300.0,
+  "luminousFluxLm": 7135.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.6,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.0,
+    "max": 30.0
+  },
+  "fieldAngleDeg": 30.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 3000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "4CH",
+      "channels": 4
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "2CH",
+      "channels": 2
+    },
+    {
+      "name": "1CH",
+      "channels": 1
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "manual",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "LED (COB), not halogen as GDTF states; manual zoom."
+  ],
+  "_refs": [
+    "https://www.adj.com/par-z100-3k"
+  ]
+}

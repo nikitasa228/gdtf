@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Martin_Professional@Exterior_Linear_Pro_Cove_QUAD_1ft@20260823NoMeas.gdtf",
+  "fixtureTypeId": "F00F13F3-1D80-493C-82DA-4A4B9B3126CA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Exterior Linear Pro Cove QUAD 1ft",
+  "longName": "Exterior Linear Pro Cove QUAD 1ft",
+  "shortName": "EXTLinProCoQUAD 1ft",
+  "description": "Official Martin Professional File",
+  "manufacturer": "Martin Professional",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 12.0,
+  "maxLuminousIntensityCd": 200.0,
+  "luminousFluxLm": 600.0,
+  "noiseLevelDb": null,
+  "weightKg": 0.85,
+  "powerConnectorIn": "Martin proprietary (P3/PDE)",
+  "powerConnectorOut": "Martin proprietary (P3/PDE)",
+  "powerSupplyType": "Martin proprietary (P3/PDE) LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 100.0,
+    "max": 100.0
+  },
+  "fieldAngleDeg": 120.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1000.0,
+    "max": 12850.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -30.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1 Segment",
+      "channels": 3
+    },
+    {
+      "name": "Standard",
+      "channels": 6
+    },
+    {
+      "name": "2 Segment",
+      "channels": 6
+    },
+    {
+      "name": "Raw",
+      "channels": 4
+    },
+    {
+      "name": "Ext 2 Segment",
+      "channels": 12
+    },
+    {
+      "name": "Ext Standard",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 8,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

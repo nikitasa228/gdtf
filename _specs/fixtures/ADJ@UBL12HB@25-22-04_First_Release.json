@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@UBL12HB@25-22-04_First_Release.gdtf",
+  "fixtureTypeId": "68647D62-0265-443E-A8F1-06CB8D748BA8",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "UBL12HB",
+  "longName": "UBL12HB",
+  "shortName": "UBL12HB",
+  "description": "Expanding on the success of the UBL12H, the innovative UBL12HB is a battery-operated, 1-meter linear LED wash luminaire. It features a lime-enhanced HEX LED with twelve (12) 20-Watt LEDs in Red, Green, Blue, Amber, Lime, and UV. The addition of the lime chip delivers superior color rendering with a CRI exceeding 90 and offers adjustable white light ranging from 2,300K to 9,900K.",
+  "manufacturer": "ADJ",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 50,
+  "maxLuminousIntensityCd": 40600.0,
+  "luminousFluxLm": 4000.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.8,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 17.0,
+    "max": 17.0
+  },
+  "fieldAngleDeg": 17.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBAL+UV",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2300.0,
+    "max": 9900.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "6ch",
+      "channels": 6
+    },
+    {
+      "name": "11ch",
+      "channels": 11
+    },
+    {
+      "name": "13ch",
+      "channels": 13
+    },
+    {
+      "name": "16ch",
+      "channels": 16
+    },
+    {
+      "name": "36ch",
+      "channels": 6
+    },
+    {
+      "name": "43ch",
+      "channels": 43
+    },
+    {
+      "name": "46ch",
+      "channels": 46
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Battery-powered version."
+  ],
+  "_refs": [
+    "https://www.adj.com/products/ubl12hb"
+  ]
+}

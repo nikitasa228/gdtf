@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0",
+  "file": "GLP@JDC_Line_1000@20250404_JDCLine1000_byRG_prelimV1.gdtf",
+  "fixtureTypeId": "935170CD-6BEB-443F-84B8-EEC744652C29",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "JDC Line 1000",
+  "longName": "GLP JDC Line 1000",
+  "shortName": "JDCLine1000",
+  "description": "The JDC Line 1000 consists of two sections: Srtob Module A and Strobe Module B / two Times JDC Line 500 !",
+  "manufacturer": "GLP",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 1010500.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+CW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 RGBW Strobe (32ch)",
+      "channels": 22
+    },
+    {
+      "name": "Mode 2 W Strobe + RGB Strobe (68ch)",
+      "channels": 40
+    },
+    {
+      "name": "Mode 3 W Strobe RGB Pixel (168ch)",
+      "channels": 90
+    },
+    {
+      "name": "Mode 4 W + RGB Strobe + W Pixel (94ch)",
+      "channels": 53
+    },
+    {
+      "name": "Mode 5 Multipix (196ch)",
+      "channels": 104
+    },
+    {
+      "name": "Mode 6 Multipix Advanced (316ch)",
+      "channels": 164
+    },
+    {
+      "name": "Mode 7 Multipix Quadpix (76ch)",
+      "channels": 44
+    }
+  ],
+  "pixelCount": 15,
+  "subType": "Strobe bar",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 5920 W invalid, removed."
+  ]
+}

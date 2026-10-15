@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@Lumipix15IP@Rev_12_-_Added_Snap_Feature.gdtf",
+  "fixtureTypeId": "8835C60A-FD77-40A8-A3A1-210DEE237656",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Lumipix15IP",
+  "longName": "Lumipix15IP",
+  "shortName": "LP15IP",
+  "description": "Lumipix 15IP is a tour-ready LED pixel batten conceived to be fully versatile and perform outdoor, delivering advanced brightness and colour mixing by offering individual pixel control of each cell. The robust die-cast aluminium structure with omega quick lock socket on the bracket and the waterproof power and signal connector make Lumipix 15IP suitable for the most demanding environments.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 173.0,
+  "maxLuminousIntensityCd": 65900.0,
+  "luminousFluxLm": 5760.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.6,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": 320.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 16.0,
+    "max": 16.0
+  },
+  "fieldAngleDeg": 31.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4ch",
+      "channels": 4
+    },
+    {
+      "name": "6ch",
+      "channels": 6
+    },
+    {
+      "name": "10ch",
+      "channels": 10
+    },
+    {
+      "name": "60ch",
+      "channels": 4
+    },
+    {
+      "name": "65ch",
+      "channels": 65
+    }
+  ],
+  "pixelCount": 16,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "panRangeDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

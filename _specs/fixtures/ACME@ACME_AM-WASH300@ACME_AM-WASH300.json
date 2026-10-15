@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_AM-WASH300@ACME_AM-WASH300.gdtf",
+  "fixtureTypeId": "24C67FBF-1FA1-4D6B-AE51-8086E9408794",
+  "gdtfDataVersion": "1.0",
+  "gdtfName": "ACME AM-WASH300",
+  "longName": "AM-WASH300",
+  "shortName": "AM-WASH300",
+  "description": "ACME AM-WASH300 15W*19PCS",
+  "manufacturer": "ACME",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 190.0,
+  "maxLuminousIntensityCd": 333800.0,
+  "luminousFluxLm": 11400.0,
+  "noiseLevelDb": null,
+  "weightKg": null,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 220.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 10.0,
+    "max": 60.0
+  },
+  "fieldAngleDeg": 1.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": null,
+  "dmxModes": [
+    {
+      "name": "Mode 1 14DMX",
+      "channels": 14
+    },
+    {
+      "name": "Mode 2 11DMX",
+      "channels": 11
+    },
+    {
+      "name": "Mode 3 15DMX",
+      "channels": 15
+    },
+    {
+      "name": "Mode 4 14DMX",
+      "channels": 14
+    }
+  ],
+  "pixelCount": 19,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "estimated",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "weightKg",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Discontinued; no spec sheet found."
+  ]
+}

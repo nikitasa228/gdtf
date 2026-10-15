@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_iPointe@2025-11-07__Personality_RDM_number_revision.gdtf",
+  "fixtureTypeId": "A7A87C68-F9CA-4894-B307-78B7838006C9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin iPointe",
+  "longName": "Robin iPointe",
+  "shortName": "iPointe",
+  "description": "Robe’s brand new IP65 rated iPointe combines innovative ingress protection with the spectacular effect features of the MegaPointe - the best product on the market in its category.",
+  "manufacturer": "Robe Lighting",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 550.0,
+  "maxLuminousIntensityCd": 10500800.0,
+  "luminousFluxLm": 11628.0,
+  "noiseLevelDb": null,
+  "weightKg": 38.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 265.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 1.8,
+    "max": 42.0
+  },
+  "fieldAngleDeg": 42.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "RotatingGoboWheel",
+      "slots": 9,
+      "rotating": true
+    },
+    {
+      "wheel": "StaticGoboWheel",
+      "slots": 14,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 23,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 3200.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "P01 (6F Linear)",
+      "facets": null
+    },
+    {
+      "name": "P02 (Cylindrical)",
+      "facets": null
+    },
+    {
+      "name": "P03 (8F Circular)",
+      "facets": null
+    },
+    {
+      "name": "P01 (6F Linear)",
+      "facets": null
+    },
+    {
+      "name": "P02 (32F Multifacet)",
+      "facets": null
+    },
+    {
+      "name": "P03 (8F Circular)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 3,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 35.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - Standard 16 - bit",
+      "channels": 39
+    },
+    {
+      "name": "Mode 2 - Reduced 8 - bit",
+      "channels": 34
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "1.0",
+  "file": "flashPRO@OCTO_Sunbar_4x30W_4w1_COB_RGBW_4_sections_Mk2_P7300005@flashPRO_v1_inverted_pixels.gdtf",
+  "fixtureTypeId": "E564D738-BAB6-4430-B4EE-644B1A60FC71",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "OCTO Sunbar 4x30W 4w1 COB RGBW 4 sections Mk2 P7300005",
+  "longName": "OCTO Sunbar 4x30W 4w1 COB RGBW",
+  "shortName": "OCTO Sunbar",
+  "description": "OCTO Sunbar 4x30W 4w1 COB RGBW 4 sections Mk2 P7300005\nFlashPRO - a new line of high-quality lighting lamps of Polish production. A common source makes it extremely easy to work with devices from the entire series.",
+  "manufacturer": "flashPRO",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 245.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 120,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 10400.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.3,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2200.0,
+    "max": 9000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Classic-6",
+      "channels": 6
+    },
+    {
+      "name": "Classic-8",
+      "channels": 8
+    },
+    {
+      "name": "M-Control-10",
+      "channels": 10
+    },
+    {
+      "name": "Pro-6",
+      "channels": 6
+    },
+    {
+      "name": "Pro-7",
+      "channels": 7
+    },
+    {
+      "name": "RGB",
+      "channels": 3
+    },
+    {
+      "name": "RGBW",
+      "channels": 4
+    },
+    {
+      "name": "RGB 16bit",
+      "channels": 6
+    },
+    {
+      "name": "RGBW 16bit",
+      "channels": 8
+    },
+    {
+      "name": "Flash A-DMX",
+      "channels": 8
+    },
+    {
+      "name": "Classic-18",
+      "channels": 6
+    },
+    {
+      "name": "4xClassic-6",
+      "channels": 6
+    },
+    {
+      "name": "M-Control-22",
+      "channels": 22
+    },
+    {
+      "name": "M-Control-28",
+      "channels": 28
+    },
+    {
+      "name": "Pro-19",
+      "channels": 19
+    },
+    {
+      "name": "Pro-28",
+      "channels": 7
+    },
+    {
+      "name": "4xRGB",
+      "channels": 3
+    },
+    {
+      "name": "4xRGBW",
+      "channels": 4
+    },
+    {
+      "name": "4xRGB 16bit",
+      "channels": 6
+    },
+    {
+      "name": "4xRGBW 16bit",
+      "channels": 8
+    },
+    {
+      "name": "4xFlash A-DMX",
+      "channels": 32
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "4 x 30 W; GDTF power 770 W invalid."
+  ]
+}

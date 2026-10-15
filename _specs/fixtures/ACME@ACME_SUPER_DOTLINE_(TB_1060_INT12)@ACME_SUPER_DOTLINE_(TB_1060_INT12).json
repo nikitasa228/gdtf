@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_SUPER_DOTLINE_(TB_1060_INT12)@ACME_SUPER_DOTLINE_(TB_1060_INT12).gdtf",
+  "fixtureTypeId": "49938845-8AAF-40BF-9464-8EAD30EC81C4",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME SUPER DOTLINE (TB 1060 INT12)",
+  "longName": "ACME SUPER DOTLINE (TB 1060 INT12)",
+  "shortName": "TB 1060 INT12",
+  "description": "ACME SUPER DOTLINE(TB 1060 NIT12)12*60W LED",
+  "manufacturer": "ACME",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1155,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 23000,
+  "noiseLevelDb": null,
+  "weightKg": 24.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 202,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.8,
+    "max": 31.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW+WW+CW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2600.0,
+    "max": 7000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 168 DMX",
+      "channels": 8
+    },
+    {
+      "name": "Mode 2 108 DMX",
+      "channels": 8
+    },
+    {
+      "name": "Mode 3 99 DMX",
+      "channels": 99
+    },
+    {
+      "name": "Mode 4 27 DMX",
+      "channels": 27
+    },
+    {
+      "name": "Mode 5 17 DMX",
+      "channels": 17
+    },
+    {
+      "name": "Mode 6 8+DMX",
+      "channels": 8
+    },
+    {
+      "name": "Mode 7 21DMX",
+      "channels": 21
+    }
+  ],
+  "pixelCount": 42,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "tiltRangeDeg": "manual",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "panRangeDeg": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Tilt-only bar."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/item/SUPER-DOTLINE"
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@COLORado_PXL_Curve_5@Rev_1.0.0.gdtf",
+  "fixtureTypeId": "0F6DB711-9810-43C8-9813-40FC6A2B2925",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "COLORado PXL Curve 5",
+  "longName": "COLORado PXL Curve 5",
+  "shortName": "COLORadoPXLCurve5",
+  "description": "This is a versatile, IP65-rated moving wash luminaire featuring five individually controlled pixels in a unique, arced housing for dynamic visual effects.\n\nIts rugged, all-weather design empowers lighting designers to create immersive, sweeping color washes for concerts, corporate events, and theatrical productions.",
+  "manufacturer": "Chauvet Professional",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1136,
+  "maxLuminousIntensityCd": 451600,
+  "luminousFluxLm": 84344.0,
+  "noiseLevelDb": null,
+  "weightKg": 32.4,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 60.0,
+  "tiltRangeDeg": 190.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 8.3,
+    "max": 155.1
+  },
+  "fieldAngleDeg": 115.8,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW+WW+CW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Advanced",
+      "channels": 355
+    },
+    {
+      "name": "Standard",
+      "channels": 195
+    },
+    {
+      "name": "Basic High Resolution",
+      "channels": 155
+    },
+    {
+      "name": "Basic Raw",
+      "channels": 195
+    },
+    {
+      "name": "Basic",
+      "channels": 120
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/colorado-pxl-curve-5/"
+  ]
+}

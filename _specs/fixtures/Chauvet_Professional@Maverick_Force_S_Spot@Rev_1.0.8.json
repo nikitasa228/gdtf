@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_Force_S_Spot@Rev_1.0.8.gdtf",
+  "fixtureTypeId": "F437E38F-7993-44CB-B230-52D85CB60D25",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick Force S Spot",
+  "longName": "Maverick Force S Spot",
+  "shortName": "MaverickForceSSpot",
+  "description": "Maverick Force S Spot is ideal for small to medium multi-faceted projects in need of seamless color-mixing, advanced optics, and control options in a lightweight frame, well under 50 lbs. The compact unit features a smart optical system that maximizes the output of 14,000 lumens and provides high-quality color-mixing with a CTB filter. An 8-slot color wheel is also added with split-color combinations in mind. Maverick Force S features a speedy effects engine that includes motorized iris, frost, focus, a 5-facet prism, and wide zoom ranging from 4deg to 43deg. Additionally, custom gobos created in collaboration with leading designers can be stacked on top of one another for dynamic effects. That is a lot packed in a small frame standing just over 2 ft tall. Control as you see fit with DMX, sACN, Art-Net or W-DMX.",
+  "manufacturer": "Chauvet Professional",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 554,
+  "maxLuminousIntensityCd": 1550100,
+  "luminousFluxLm": 14407.0,
+  "noiseLevelDb": 33.6,
+  "weightKg": 21.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.8,
+    "max": 43.4
+  },
+  "fieldAngleDeg": 40.4,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "STATIC GOBO",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 3200.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "5-Facet Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -30.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "29Ch Mode",
+      "channels": 29
+    },
+    {
+      "name": "22Ch Mode",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-force-s-spot/"
+  ]
+}

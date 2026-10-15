@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Flash@EVENT_WASH_FX_300@FLASH_v2.gdtf",
+  "fixtureTypeId": "5F18D376-71DF-46D6-BFAD-1D58AB21A0D9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EVENT WASH FX 300",
+  "longName": "EVENT WASH FX 300",
+  "shortName": "WASH FX 300",
+  "description": "F7100810",
+  "manufacturer": "Flash",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 27.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 200.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 46.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "Shapes",
+      "slots": 63,
+      "rotating": true
+    },
+    {
+      "wheel": "Background shapes",
+      "slots": 17,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 80,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "STAND - 21ch",
+      "channels": 21
+    },
+    {
+      "name": "SHAPES - 35ch",
+      "channels": 35
+    },
+    {
+      "name": "RINGS - 38ch",
+      "channels": 38
+    },
+    {
+      "name": "ST1px - 78ch - standard + pixel engine RGB",
+      "channels": 24
+    },
+    {
+      "name": "ST2px - 97ch - standard + pixel engine RGBW",
+      "channels": 25
+    },
+    {
+      "name": "SH1px - 92ch - shapes + pixel engine RGB",
+      "channels": 38
+    },
+    {
+      "name": "SH2px 111ch - shapes + pixel engine RGBW",
+      "channels": 39
+    },
+    {
+      "name": "R1px - 95ch - rings + pixel engine RGB",
+      "channels": 41
+    },
+    {
+      "name": "R2px - 114ch - rings + pixel engine RGBW",
+      "channels": 42
+    }
+  ],
+  "pixelCount": 9,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 8040 W invalid; GDTF 'gobo' count is pixel-effect macros."
+  ]
+}

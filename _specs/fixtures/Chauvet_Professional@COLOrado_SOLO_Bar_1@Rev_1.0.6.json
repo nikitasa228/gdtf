@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@COLOrado_SOLO_Bar_1@Rev_1.0.6.gdtf",
+  "fixtureTypeId": "1DFC2E13-E686-406E-93A4-7BF996B43D8B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "COLOrado SOLO Bar 1",
+  "longName": "COLORado Solo Bar 1",
+  "shortName": "CSB1",
+  "description": "COLORado Solo Bar 1 is a 4-cell IP65-rated RGBwWL LED batten that produces a full range of color and perfect whites from a fixture offering LDs the flexibility to easily create beautiful whites with RGBwW or take control of all five colors in the full RGBwWL array. COLORado Solo Bar 1 seamlessly combines homogenized squares for phenomenal end-to-end direct-view pixel-mapped looks, with the high output and long throw to perform equally well as a cyc, footlight, or traditional batten down light. Its advanced IP65 design brings lighter weight and all-weather durability together in one fixture at home both on the road and in permanent installations. A selection of beam shaping filters is included to broaden the choice of projection effects. Control is via DMX, ArtNet or sACN. With improved and simplified rigging options, virtually silent operation, and flawless performance live or on camera, COLORado Solo Bar 1 brings new versatility to touring, festivals, televised and theatrical productions.",
+  "manufacturer": "Chauvet Professional",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 110,
+  "maxLuminousIntensityCd": 21800,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 8.9,
+  "weightKg": 6.1,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 16.5,
+    "max": 27.3
+  },
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "4 Cell RGBWL Full - 67ch",
+      "channels": 67
+    },
+    {
+      "name": "2 Cell RGBWL Full - 35ch",
+      "channels": 35
+    },
+    {
+      "name": "1 Cell RGBWL Full - 19ch",
+      "channels": 19
+    },
+    {
+      "name": "4 Cell RGBWL Ext - 39ch",
+      "channels": 39
+    },
+    {
+      "name": "2 Cell RGBWL Ext - 21ch",
+      "channels": 21
+    },
+    {
+      "name": "1 Cell RGBWL Ext - 12ch",
+      "channels": 12
+    },
+    {
+      "name": "4 Cell RGBWL 16-bit - 40ch",
+      "channels": 40
+    },
+    {
+      "name": "2 Cell RGBWL 16-bit - 20ch",
+      "channels": 20
+    },
+    {
+      "name": "1 Cell RGBWL 16-bit - 10ch",
+      "channels": 10
+    },
+    {
+      "name": "4 Cell RGBWL - 20ch",
+      "channels": 20
+    },
+    {
+      "name": "2 Cell RGBWL - 10ch",
+      "channels": 10
+    },
+    {
+      "name": "1 Cell RGBWL - 5ch",
+      "channels": 5
+    },
+    {
+      "name": "4 Cell RGBW ext - 35ch",
+      "channels": 35
+    },
+    {
+      "name": "2 Cell RGBW Ext - 19ch",
+      "channels": 19
+    },
+    {
+      "name": "1 Cell RGBW Ext",
+      "channels": 11
+    },
+    {
+      "name": "4 Cell RGBW - 16ch",
+      "channels": 16
+    },
+    {
+      "name": "2 Cell RGBW - 8ch",
+      "channels": 8
+    },
+    {
+      "name": "1 Cell RGBW - 4ch",
+      "channels": 4
+    },
+    {
+      "name": "4 Cell RGB Ext - 31ch",
+      "channels": 31
+    },
+    {
+      "name": "2 Cell RGB Ext - 17ch",
+      "channels": 17
+    },
+    {
+      "name": "1 Cell RGB Ext - 10ch",
+      "channels": 10
+    },
+    {
+      "name": "4 Cell RGB - 12ch",
+      "channels": 12
+    },
+    {
+      "name": "2 Cell RGB -6ch",
+      "channels": 6
+    },
+    {
+      "name": "1 Cell RGB - 3ch",
+      "channels": 3
+    },
+    {
+      "name": "4 Cell HSV - 13ch",
+      "channels": 13
+    },
+    {
+      "name": "2 Cell HSV - 7ch",
+      "channels": 7
+    },
+    {
+      "name": "1 Cell HSV - 4ch",
+      "channels": 4
+    },
+    {
+      "name": "4 Cell CCT - 13ch",
+      "channels": 13
+    },
+    {
+      "name": "2 Cell CCT - 7ch",
+      "channels": 7
+    },
+    {
+      "name": "1 Cell CCT - 4ch",
+      "channels": 4
+    },
+    {
+      "name": "4 Cell XY Ext - 33ch",
+      "channels": 33
+    },
+    {
+      "name": "2 Cell XY Ext - 17ch",
+      "channels": 17
+    },
+    {
+      "name": "1 Cell XY Ext - 9ch",
+      "channels": 9
+    },
+    {
+      "name": "4 Cell XY - 13ch",
+      "channels": 13
+    },
+    {
+      "name": "2 Cell XY - 7ch",
+      "channels": 7
+    },
+    {
+      "name": "1 Cell XY - 4ch",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "zoom": "manual",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "beamAngleDeg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Weight is 0 in GDTF",
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters."
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/colorado-solo-bar-1/"
+  ]
+}

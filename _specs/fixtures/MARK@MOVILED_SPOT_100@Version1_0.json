@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "MARK@MOVILED_SPOT_100@Version1_0.gdtf",
+  "fixtureTypeId": "E707DDEA-B7E3-48BB-818E-36170FDA1E44",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MOVILED SPOT 100",
+  "longName": "MOVILED SPOT 100",
+  "shortName": "MoviledSpo",
+  "description": "80W LED Spot with RGB Ring",
+  "manufacturer": "MARK",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 90.0,
+  "maxLuminousIntensityCd": 45600.0,
+  "luminousFluxLm": 3500.0,
+  "noiseLevelDb": null,
+  "weightKg": null,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 15.0
+  },
+  "fieldAngleDeg": 25.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 9,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prisma 3",
+      "facets": null
+    }
+  ],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "14CH",
+      "channels": 14
+    },
+    {
+      "name": "12 CH",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "weightKg",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Weight is 0 in GDTF",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

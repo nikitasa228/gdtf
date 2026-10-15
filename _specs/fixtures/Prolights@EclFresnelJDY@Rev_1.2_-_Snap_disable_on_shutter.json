@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclFresnelJDY@Rev_1.2_-_Snap_disable_on_shutter.gdtf",
+  "fixtureTypeId": "5CCDFAF0-31D8-4137-A488-CF19683C051B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclFresnelJDY",
+  "longName": "EclFresnelJDY",
+  "shortName": "EclFRJDY",
+  "description": "EclFresnel Jr is the LED replacement for a standard tungsten 650 W Fresnel. Featuring the output characteristics of the traditional Fresnel, with beam control from functional barn doors and a powerful source that focuses on outstanding colour rendering. The EclFresnel Jr adds all the advantages of LED to the Fresnel.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 70.0,
+  "maxLuminousIntensityCd": 72800.0,
+  "luminousFluxLm": 5587.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 47.0
+  },
+  "fieldAngleDeg": 48.9,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 5600.0,
+    "max": 5600.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "2ch_2",
+      "channels": 2
+    },
+    {
+      "name": "3ch",
+      "channels": 3
+    },
+    {
+      "name": "5ch",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

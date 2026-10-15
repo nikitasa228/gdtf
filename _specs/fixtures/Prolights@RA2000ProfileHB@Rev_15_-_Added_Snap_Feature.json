@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@RA2000ProfileHB@Rev_15_-_Added_Snap_Feature.gdtf",
+  "fixtureTypeId": "20836A0F-B70F-4BDA-8F52-4069A58ED944",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "RA2000ProfileHB",
+  "longName": "RA2000ProfileHB",
+  "shortName": "RA2000HB",
+  "description": "The Ra 2000ProfileHB is the high-flux variant of the Ra 2000Profile designed for touring applications, offering the same footprint and feature set, but engineered around an LED source, which scores 40% higher intensity with lower colour rendering.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 540.0,
+  "maxLuminousIntensityCd": 864400.0,
+  "luminousFluxLm": 18900.0,
+  "noiseLevelDb": null,
+  "weightKg": 35.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 8.0,
+    "max": 42.0
+  },
+  "fieldAngleDeg": 20.9,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 7,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 6300.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 50.0
+  },
+  "dmxModes": [
+    {
+      "name": "38ch",
+      "channels": 38
+    },
+    {
+      "name": "39ch",
+      "channels": 39
+    },
+    {
+      "name": "40ch",
+      "channels": 40
+    },
+    {
+      "name": "41ch",
+      "channels": 41
+    },
+    {
+      "name": "42ch",
+      "channels": 42
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

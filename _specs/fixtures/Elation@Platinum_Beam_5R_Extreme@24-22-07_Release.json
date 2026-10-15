@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Platinum_Beam_5R_Extreme@24-22-07_Release.gdtf",
+  "fixtureTypeId": "7190B9A9-5722-453A-A479-1BCF73DA5C7C",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Platinum Beam 5R Extreme",
+  "longName": "Platinum Beam 5R Extreme",
+  "shortName": "PlatBeam5rExt",
+  "description": "The Platinum Beam 5R EXTREME™ features the 189W Platinum 5R lamp, a 3° sharp pin spot beam, 8 facet rotating prism and frost effects, super fast 16 bit 3-phase pan/tilt motors, strobe (1-18 fps), dimming 0-100%, and focus, (12) colors including UV, CTO, CTB, and white, (8) metal rotating, indexing, interchangeable gobos, flicker free operation for TV and FILM, internal EWDMX wireless DMX receiver, remote device management protocol support, 3pin and 5pin DMX in/out and power in connections, (6) button touch control panel, 350W max power consumption, and a multi-voltage universal auto switching power supply (120-240v).",
+  "manufacturer": "Elation",
+  "category": "BEAM",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 189.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 20.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 248.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 11.9,
+    "max": 11.9
+  },
+  "fieldAngleDeg": 13.1,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo Wheel 1",
+      "slots": 10,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 10,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extend",
+      "channels": 18
+    },
+    {
+      "name": "Stnd",
+      "channels": 14
+    },
+    {
+      "name": "Basic",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

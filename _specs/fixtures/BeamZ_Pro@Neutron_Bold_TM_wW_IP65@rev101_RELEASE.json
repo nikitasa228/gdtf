@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@Neutron_Bold_TM_wW_IP65@rev101_RELEASE.gdtf",
+  "fixtureTypeId": "6D9E800D-6472-4CD8-B102-CD8CCA05116A",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Neutron Bold TM wW IP65",
+  "longName": "NeutronBold TM",
+  "shortName": "NeutronBoldTM",
+  "description": "rev101 RELEASE Edit: edited Geometry /DMX Mode RDM links\n\nHybrid Strobe / Wash / Pixel :: 1 x 600 W warmWhite + Amber Shift / 72 x 1 W RGB / IP65 / linkable housing",
+  "manufacturer": "BeamZ Pro",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": 8700.0,
+  "luminousFluxLm": 16100.0,
+  "noiseLevelDb": null,
+  "weightKg": 13.3,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 240.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 75.0,
+    "max": 75.0
+  },
+  "fieldAngleDeg": 90.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "231 Ch 1+72 cell Extended + Virtual Dimmer",
+      "channels": 231
+    },
+    {
+      "name": "231 Ch 1+72 cell Extended",
+      "channels": 231
+    },
+    {
+      "name": "220 Ch 1+72 cell + Virtual Dimmer",
+      "channels": 7
+    },
+    {
+      "name": "220 Ch 1+72 cell",
+      "channels": 7
+    },
+    {
+      "name": "18 Ch Extended",
+      "channels": 18
+    },
+    {
+      "name": "15 Ch Standard",
+      "channels": 15
+    },
+    {
+      "name": "11 Ch Basic",
+      "channels": 11
+    },
+    {
+      "name": "9 Ch Simple",
+      "channels": 9
+    },
+    {
+      "name": "4 Ch",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "Outdoor flood",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "powerSupplyType": "estimated",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

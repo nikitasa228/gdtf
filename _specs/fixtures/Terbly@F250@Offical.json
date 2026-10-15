@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Terbly@F250@Offical.gdtf",
+  "fixtureTypeId": "31B72143-C4E3-4ED7-A9FD-66DFA0B5E4D6",
+  "gdtfDataVersion": "1.0",
+  "gdtfName": "F250",
+  "longName": "Terbly F250",
+  "shortName": "F250",
+  "description": "250W LED Fresnel, and manual Yoke & Zoom",
+  "manufacturer": "Terbly",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 250.0,
+  "maxLuminousIntensityCd": 9700.0,
+  "luminousFluxLm": 10500.0,
+  "noiseLevelDb": null,
+  "weightKg": null,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 57.0,
+    "max": 57.0
+  },
+  "fieldAngleDeg": 72.0,
+  "zoom": false,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 6000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": null,
+  "dmxModes": [
+    {
+      "name": "7Channel",
+      "channels": 7
+    },
+    {
+      "name": "3Channel",
+      "channels": 3
+    },
+    {
+      "name": "2Channel",
+      "channels": 2
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Fresnel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "weightKg",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

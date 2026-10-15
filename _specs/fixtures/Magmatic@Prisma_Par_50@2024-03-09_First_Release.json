@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Magmatic@Prisma_Par_50@2024-03-09_First_Release.gdtf",
+  "fixtureTypeId": "F36981A3-ADAF-44A9-B025-69D22DF07F66",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Prisma Par 50",
+  "longName": "Prisma Par 50",
+  "shortName": "PrsmP50",
+  "description": "PRISMA PAR 50™ is an exterior IP65 rated UV wash par luminaire that produces 365nm peak true UV output with zero visible light, and an impressive 50 degree wide beam angle from the large internal LED reflector. Features includes a user friendly digital 2.5 inch LCD touch screen control panel, intuitive DMX-512 and RDM control, dual adjustable mounting yokes, a durable aluminum housing, and IP65 DMX 5pin XLR and locking power in/out connections.",
+  "manufacturer": "Magmatic",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 32.0,
+  "maxLuminousIntensityCd": 113500.0,
+  "luminousFluxLm": 1900.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.2,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 7.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "2CH",
+      "channels": 2
+    },
+    {
+      "name": "1CH",
+      "channels": 1
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

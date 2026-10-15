@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "1.0",
+  "file": "CLF_Lighting@LED_BAR_EFF@V1.00.gdtf",
+  "fixtureTypeId": "86A02BB4-E327-4650-8DC6-422C7310B390",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LED BAR EFF",
+  "longName": "CLF Lighting LEDBAR EFF",
+  "shortName": "LedBarEFF",
+  "description": "CLF LEDBAR EFF: RGBWA+WW LED effect bar.",
+  "manufacturer": "CLF Lighting",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 2935900.0,
+  "luminousFluxLm": 100280.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.7,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 10.0,
+    "max": 10.0
+  },
+  "fieldAngleDeg": 10.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+WW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "163CH-Pure pixel+",
+      "channels": 163
+    },
+    {
+      "name": "157CH-Pure pixel",
+      "channels": 157
+    },
+    {
+      "name": "115CH-Pixel 12 sect",
+      "channels": 115
+    },
+    {
+      "name": "61CH-6 section+",
+      "channels": 61
+    },
+    {
+      "name": "57CH-6 section",
+      "channels": 57
+    },
+    {
+      "name": "43CH-4 section+",
+      "channels": 43
+    },
+    {
+      "name": "39CH-4 section",
+      "channels": 39
+    },
+    {
+      "name": "34CH-3 section+",
+      "channels": 34
+    },
+    {
+      "name": "31CH-3 section",
+      "channels": 31
+    },
+    {
+      "name": "25CH-2 section+",
+      "channels": 25
+    },
+    {
+      "name": "21CH-2 section",
+      "channels": 21
+    },
+    {
+      "name": "12CH-1 section",
+      "channels": 12
+    },
+    {
+      "name": "38CH-Macro+Backgr",
+      "channels": 38
+    },
+    {
+      "name": "30CH-FullMacro",
+      "channels": 30
+    },
+    {
+      "name": "23CH-Simple + Macro",
+      "channels": 23
+    }
+  ],
+  "pixelCount": 246,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "manual",
+    "goboSlots": "manual",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "description": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 45850 W invalid; 'gobo' wheels are effect macros."
+  ]
+}

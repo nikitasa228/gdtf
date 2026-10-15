@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Martin_Professional@Exterior_Dot-HP_Pro@20260621.gdtf",
+  "fixtureTypeId": "FAABA045-95D4-4B3C-9684-FCC418177F6E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Exterior Dot-HP Pro",
+  "longName": "Exterior Dot-HP Pro",
+  "shortName": "EXTDotHPPro",
+  "description": "Official Martin Professional File",
+  "manufacturer": "Martin Professional",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": {
+    "min": 48.0,
+    "max": 48.0
+  },
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 6.0,
+  "maxLuminousIntensityCd": 0.0,
+  "luminousFluxLm": 18.0,
+  "noiseLevelDb": null,
+  "weightKg": 0.4,
+  "powerConnectorIn": "Martin proprietary (P3/PDE)",
+  "powerConnectorOut": "Martin proprietary (P3/PDE)",
+  "powerSupplyType": "Martin proprietary (P3/PDE) LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 114.0,
+    "max": 114.0
+  },
+  "fieldAngleDeg": 151.0,
+  "zoom": false,
+  "lensType": null,
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 12850.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -30.0,
+    "max": 55.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard",
+      "channels": 6
+    },
+    {
+      "name": "Extended",
+      "channels": 12
+    },
+    {
+      "name": "Direct",
+      "channels": 4
+    },
+    {
+      "name": "RGB",
+      "channels": 3
+    },
+    {
+      "name": "PixelMap",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Architectural RGBW dot / flood",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "voltageRangeV": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [
+    "lensType",
+    "noiseLevelDb",
+    "supportedPowerNetworks"
+  ],
+  "_issues": [
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+  ]
+}

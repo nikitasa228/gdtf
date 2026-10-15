@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADB@Klemantis_AS1000@CP_FW_1_4_526.gdtf",
+  "fixtureTypeId": "199AF1E8-B73B-48EE-B24C-1B9DB97183A7",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Klemantis AS1000",
+  "longName": "Klemantis AS1000",
+  "shortName": "Klem1000",
+  "description": "The ADB Klematis HCR is an asymmetric cyc light based on a six-colour LED module, which uses cutting-edge HCR (High Color Rendering) LED technology to deliver a wide selection of colors from bold hues to pastel shades. Thanks to an innovative algorithm, the unit is capable of achieving a stable CRI of over 97, as well as an impressive tunable white light ranging from 2500K to 8000K.",
+  "manufacturer": "ADB",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 250.0,
+  "maxLuminousIntensityCd": 2500.0,
+  "luminousFluxLm": 3055.0,
+  "noiseLevelDb": 24.5,
+  "weightKg": 5.89,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 49.0,
+    "max": 108.0
+  },
+  "fieldAngleDeg": 108.0,
+  "zoom": false,
+  "lensType": "Asymmetric (Cyc)",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALCI",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic RGB",
+      "channels": 15
+    },
+    {
+      "name": "Basic CMY",
+      "channels": 15
+    },
+    {
+      "name": "Basic HSV",
+      "channels": 15
+    },
+    {
+      "name": "Extended RGB",
+      "channels": 23
+    },
+    {
+      "name": "Extended CMY",
+      "channels": 23
+    },
+    {
+      "name": "Extended HSV",
+      "channels": 23
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Cyclorama (asymmetric)",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "estimated",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Asymmetric optic 49 deg (H) x 108 deg (V). Noise 24.5 dB(A) @1 m in fan mode."
+  ],
+  "_refs": [
+    "https://goknight.com/content/documentation/KlemantisAS1000_Datasheet_05.2021.pdf",
+    "https://www.claypaky.it/products/klemantis-1000/"
+  ]
+}

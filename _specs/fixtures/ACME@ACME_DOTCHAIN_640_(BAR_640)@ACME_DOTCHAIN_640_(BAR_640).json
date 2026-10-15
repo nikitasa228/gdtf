@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_DOTCHAIN_640_(BAR_640)@ACME_DOTCHAIN_640_(BAR_640).gdtf",
+  "fixtureTypeId": "8CF94641-D7C3-430E-A8DD-4CE90973903E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME DOTCHAIN 640 (BAR 640)",
+  "longName": "DOTCHAIN 640(BAR 640)",
+  "shortName": "(BAR 640)",
+  "description": "ACME DOTCHAIN 640(BAR 640)6*40w",
+  "manufacturer": "ACME",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 40.0,
+  "maxLuminousIntensityCd": 1463000.0,
+  "luminousFluxLm": 2000.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 2.0
+  },
+  "fieldAngleDeg": 2.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode1 26DMX",
+      "channels": 4
+    },
+    {
+      "name": "Mode2 10DMX",
+      "channels": 10
+    },
+    {
+      "name": "Mode 3 8DMX",
+      "channels": 8
+    },
+    {
+      "name": "Mode 4 6DMX",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

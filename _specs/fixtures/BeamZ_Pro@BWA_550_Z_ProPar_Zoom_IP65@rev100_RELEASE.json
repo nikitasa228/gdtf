@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@BWA_550_Z_ProPar_Zoom_IP65@rev100_RELEASE.gdtf",
+  "fixtureTypeId": "E71E9C34-1BA2-4DF3-BF69-1E870245709B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "BWA 550 Z ProPar Zoom IP65",
+  "longName": "BWA550zProPar",
+  "shortName": "BWA550z",
+  "description": "LED Wash light :: IP65 / 15 x 19 W LED RGBW / zoom 2 - 25 degrees",
+  "manufacturer": "BeamZ Pro",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 30.0,
+  "maxLuminousIntensityCd": 4681500.0,
+  "luminousFluxLm": 6400.0,
+  "noiseLevelDb": null,
+  "weightKg": 9.4,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 25.0
+  },
+  "fieldAngleDeg": 30.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA+CW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "22 Ch + Virtual Dimmer",
+      "channels": 22
+    },
+    {
+      "name": "22 Ch",
+      "channels": 22
+    },
+    {
+      "name": "11 Ch",
+      "channels": 11
+    }
+  ],
+  "pixelCount": 5,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,281 @@
+{
+ "JB-Lighting@M18_Profile@V_1.20.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@M18_Profile_MA@V_1.01.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P10_Profile_MA_HC@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P10_Profile_MA_HP@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P10_Profile_MA_WW@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Profile_HC@V_1.26.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Profile_HP@V_1.29.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Profile_MA_HC@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Profile_MA_HP@V_1.03.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Profile_MA_WW@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Profile_WW@V_1.24.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Spot_HC@V_1.18.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Spot_HP@V_1.19.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Spot_WW@V_1.18.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P12_Wash_HC@V_1.22.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P12_Wash_HP@V_1.22.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P12_Wash_MA_HC@V_1.01.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P12_Wash_MA_HP@V_1.01.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P12_Wash_MA_WW@V_1.01.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P12_Wash_WW@V_1.22.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P18_MK2_Profile_HC@V_1.16.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_HP@V_1.18.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_MA_HC@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_MA_HP@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_MA_WW@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_S_HC@V_1.06.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_S_HP@V_1.06.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_S_MA_HC@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_S_MA_HP@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_S_MA_WW@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_S_WW@V_1.06.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_MK2_Profile_WW@V_1.15.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_Profile_HP@V_1.09.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_Profile_WW@V_1.08.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P18_Wash_HC@V_1.04.gdtf": {
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P18_Wash_HP@V_1.05.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P18_Wash_WW@V_1.05.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "JB-Lighting@P5_Beamspot_HP@V_2_00.gdtf": {
+  "category": "BSW"
+ },
+ "JB-Lighting@P7@V_1.21.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "JB-Lighting@P9_Beamspot_HP@V_1.10.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "category": "BSW"
+ },
+ "JB-Lighting@Sparx10@V_1.08.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "powerConsumptionW": null,
+  "lightSourceType": "LED",
+  "_notes": "GDTF beam-sum power invalid, removed."
+ },
+ "JB-Lighting@Sparx18@V_1.39.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "powerConsumptionW": null,
+  "lightSourceType": "LED",
+  "_notes": "GDTF beam-sum power invalid, removed."
+ },
+ "JB-Lighting@Sparx30@V_1.02.gdtf": {
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ],
+  "powerConsumptionW": null,
+  "lightSourceType": "LED",
+  "_notes": "GDTF beam-sum power invalid, removed."
+ }
+}

@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@KL_Batten_48@26-14-05_Release.gdtf",
+  "fixtureTypeId": "E94FC86F-36A5-4F41-BD9F-609E66922734",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "KL Batten 48",
+  "longName": "KL Batten 48",
+  "shortName": "KLBAT48",
+  "description": "Perfect for the grandest stage and the great outdoors, the powerful KL BATTEN 48 delivers over 46,500 lumens of smooth, even light. The RGBMA LED engine and its homogeneous beam produces natural, full-spectrum light, with a high CRI that looks good on stage and in the studio.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 19.6,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 62.0,
+    "max": 62.0
+  },
+  "fieldAngleDeg": 79.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBAL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer 1CH",
+      "channels": 1
+    },
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    },
+    {
+      "name": "RGBA",
+      "channels": 4
+    },
+    {
+      "name": "Dimmer/ CCT 4CH",
+      "channels": 4
+    },
+    {
+      "name": "HSI 3CH",
+      "channels": 3
+    },
+    {
+      "name": "HSIC 6CH",
+      "channels": 6
+    },
+    {
+      "name": "RGBMA 10CH",
+      "channels": 10
+    },
+    {
+      "name": "Standard 14ch",
+      "channels": 14
+    },
+    {
+      "name": "Extended 22ch",
+      "channels": 22
+    },
+    {
+      "name": "xy Extended 16CH",
+      "channels": 16
+    },
+    {
+      "name": "RGB 2 Cell 6CH",
+      "channels": 6
+    },
+    {
+      "name": "RGBA 2 Cell 8CH",
+      "channels": 8
+    },
+    {
+      "name": "HSI 2 Cell 6CH",
+      "channels": 6
+    },
+    {
+      "name": "RGBMA 2 Cell 20CH",
+      "channels": 20
+    },
+    {
+      "name": "Standard 2 Cell 20CH",
+      "channels": 20
+    },
+    {
+      "name": "Extended 2 Cell 35CH",
+      "channels": 35
+    },
+    {
+      "name": "RGB 4 Cell 12CH",
+      "channels": 12
+    },
+    {
+      "name": "RGBA 4 Cell 16CH",
+      "channels": 16
+    },
+    {
+      "name": "HSI 4 Cell 12CH",
+      "channels": 12
+    },
+    {
+      "name": "RGBMA 4 Cell 40CH",
+      "channels": 40
+    },
+    {
+      "name": "Standard 4 Cell 32CH",
+      "channels": 32
+    },
+    {
+      "name": "Extended 4 Cell 61",
+      "channels": 61
+    },
+    {
+      "name": "RGB 8 Cell 24CH",
+      "channels": 24
+    },
+    {
+      "name": "HSI 8 Cell 24CH",
+      "channels": 24
+    },
+    {
+      "name": "Extended 8 Cell 113CH",
+      "channels": 113
+    },
+    {
+      "name": "HSI 16 Cell 48CH",
+      "channels": 48
+    },
+    {
+      "name": "Standard 16 Cell 104CH",
+      "channels": 104
+    },
+    {
+      "name": "Extended 16 Cell 217ch",
+      "channels": 217
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

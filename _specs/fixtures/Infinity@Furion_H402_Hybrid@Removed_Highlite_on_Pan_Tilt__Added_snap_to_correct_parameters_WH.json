@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Furion_H402_Hybrid@Removed_Highlite_on_Pan_Tilt__Added_snap_to_correct_parameters_WH.gdtf",
+  "fixtureTypeId": "FAFD1BC8-7FDE-11EF-84D4-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Furion H402 Hybrid",
+  "longName": "Furion H402 Hybrid",
+  "shortName": "Furion H402 Hybrid",
+  "description": "Furion H402 Hybrid is a highly adaptable moving head that combines beam, spot and wash effects in a single light fixture that is capable of illuminating the grandest of stages. Equipped with a 420 W discharge lamp, its optical prowess allows smooth transitions between a narrow 1.6deg beam and a wide 41.7deg spot for ultimate flexibility. Its beam diffuser ensures even light distribution without hotspots, making it perfect for concerts, theatrical productions, live events and more.\n\nWith 13 vibrant colors plus open, 2 gobo wheels and 2 prisms, this lighting marvel offers endless creative possibilities to the most imaginative of light designers. Its rotating gobo wheel with 9 gobos and its static gobo wheel with 16 gobos conjure enchanting visual effects, while its rotating 6-facet linear and 8-facet circular prisms cast mesmerizing light creations.\n\nComprehensive control options include basic, advanced and customized DMX modes, CRMX, W-DMX, Art-Net, sACN and RDM. Power Pro True inputs and outputs add power-linking possibilities.\n\nA sturdy yet lightweight housing forged from magnesium and aluminum means durability and minimal maintenance. Its IP65 rating makes it dust-tight and water-resistant, ideal for use in both indoor and outdoor situations.\n\nAn exceptional all-in-one lighting solution, the Furion H402 Hybrid’s excellence as a beam, a spot and a wash, combined with its seamless movements, robust design and array of built-in effects make it a force to be reckoned with.",
+  "manufacturer": "Infinity",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 26.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 1.6,
+    "max": 41.7
+  },
+  "fieldAngleDeg": 41.7,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO",
+      "slots": 9,
+      "rotating": true
+    },
+    {
+      "wheel": "STATIC GOBO",
+      "slots": 16,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 25,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "8-Facet Prism",
+      "facets": null
+    },
+    {
+      "name": "6 Facet Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic",
+      "channels": 20
+    },
+    {
+      "name": "Advanced",
+      "channels": 27
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Platinum_FLX@24-11-06_Release.gdtf",
+  "fixtureTypeId": "859C72DA-C30A-4D5E-8D85-701ED0231388",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Platinum FLX",
+  "longName": "Platinum FLX",
+  "shortName": "PlatFlx",
+  "description": "The award winning Platinum FLX™ is an innovative full featured patent pending design 3-in-1 luminaire which can be utilized as a beam, spot, or wash fixture, featuring the brand new Philips™ MSD Platinum 20R 470W 80CRI lamp, 7,800K, 23,000 total lumens delivering comparable output to 1,200W fixtures, 1.8° to 18° zoom in beam mode and 2.9° to 25° zoom in spot mode, 6° - 42° zoomable wash / frost effect, full CMY color mixing plus linear CTO color correction, 10 dichroic colors including UV, CTB, plus white (open), 8 rotating-interchangeable and 6 static-stamped gobos, 6-way linear and 8-facet rotating prisms, bi-directional animation wash frost effects, DMX, RDM (Remote Device Management), Art-NET and sACN support, 5pin DMX, RJ45 Ethernet, and power connections, (6) button control full color 180° reversible menu display, 740W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 470.0,
+  "maxLuminousIntensityCd": 1869700.0,
+  "luminousFluxLm": 23000.0,
+  "noiseLevelDb": null,
+  "weightKg": 34.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 248.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 42.0
+  },
+  "fieldAngleDeg": 24.5,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo Wheel 1",
+      "slots": 10,
+      "rotating": true
+    },
+    {
+      "wheel": "Static Wheel 2",
+      "slots": 6,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7800.0,
+    "max": 7800.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extend",
+      "channels": 37
+    },
+    {
+      "name": "Stand",
+      "channels": 26
+    },
+    {
+      "name": "Basic",
+      "channels": 24
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

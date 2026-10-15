@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_T3_Profile@2026-08-21_Prism_empty_wheel_slots_revision.gdtf",
+  "fixtureTypeId": "ED4307C7-1AC9-497E-8FE6-7E4C2F92BB06",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin T3 Profile",
+  "longName": "Robin T3 Profile™",
+  "shortName": "T3 Profile",
+  "description": "T3 Profile\nBuilding on the success of the acclaimed Robe T-Series, the T3 ProfileTM elevates high-power multispectral performance to the ultimate level. Designed for long-throw applications, it delivers unparalleled output, light quality and precise colour control. \nDelivering over 31.250 lumens (integrating sphere) from its 1.400W MSLTM (Multi-Spectral-Light) LED engine, the T3 ProfileTM stays true to its theatrical heritage. Excelling at nuanced colour work, it offers user selectable CMY, RGB or individual colour emitter control for advanced users. \nColour features include a DataSwatchTM virtual colour library; factory calibrated whites; extensive 2.700K to 8.000K CCT range; lamp selectable tungsten emulation; and MCETM multicoloured effects directly from the LED engine. The virtually controlled CRI of 80-95+ delivers perfect colour rendition and flawless skin tones.",
+  "manufacturer": "Robe Lighting",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1700.0,
+  "maxLuminousIntensityCd": 2023100.0,
+  "luminousFluxLm": 30111.0,
+  "noiseLevelDb": null,
+  "weightKg": 45.6,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 263.6,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.6,
+    "max": 63.7
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo1 - static",
+      "slots": 8,
+      "rotating": false
+    },
+    {
+      "wheel": "Gobo2",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism1 6Finear",
+      "facets": null
+    },
+    {
+      "name": "Prism2 6F circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - CMY",
+      "channels": 52
+    },
+    {
+      "name": "Mode 1 - RGB",
+      "channels": 52
+    },
+    {
+      "name": "Mode 2 - Reduced CMY",
+      "channels": 37
+    },
+    {
+      "name": "Mode 2 - Reduced RGB",
+      "channels": 37
+    },
+    {
+      "name": "Mode 3 - RGBALG",
+      "channels": 56
+    },
+    {
+      "name": "Mode 4 - Enhanced gobo control",
+      "channels": 57
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

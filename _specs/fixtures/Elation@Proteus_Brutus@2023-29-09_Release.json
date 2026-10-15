@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proteus_Brutus@2023-29-09_Release.gdtf",
+  "fixtureTypeId": "B9DFF544-A098-4400-A4A4-5E7BE8FE4E17",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proteus Brutus",
+  "longName": "Proteus Brutus",
+  "shortName": "Proteus Brutus",
+  "description": "The PROTEUS BRUTUS™ an extremely bright IP65 rated LED Wash FX fixture offering high intensity wash and effects qualities in any environment.\nProviding up to 75.000 lumens from its custom designed 1200W Peak Field LED engine the Proteus Brutus is the ideal fixture for any outdoor application requiring superior output, bright and powerful wash, quiet operation as well as stunning colors and effects.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1200.0,
+  "maxLuminousIntensityCd": 9287200.0,
+  "luminousFluxLm": 96000.0,
+  "noiseLevelDb": null,
+  "weightKg": 50.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 263.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.5,
+    "max": 55.0
+  },
+  "fieldAngleDeg": 22.5,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 6,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7000.0,
+    "max": 7000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Framing Extended Pan540",
+      "channels": 56
+    },
+    {
+      "name": "Framing Standard Pan540",
+      "channels": 34
+    },
+    {
+      "name": "Extended Pan540",
+      "channels": 36
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 25
+    },
+    {
+      "name": "Framing Extended Mode Pan630",
+      "channels": 56
+    },
+    {
+      "name": "Framing Standard Pan630",
+      "channels": 34
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 36
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 25
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

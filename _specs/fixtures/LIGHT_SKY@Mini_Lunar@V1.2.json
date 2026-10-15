@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0",
+  "file": "LIGHT_SKY@Mini_Lunar@V1.2.gdtf",
+  "fixtureTypeId": "FFBCBABE-F721-49B9-AB99-FF1C24B4FB86",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MINI LUNAR",
+  "longName": "MINI LUNAR",
+  "shortName": "MINI LUNAR",
+  "description": "LIGHT SKY MINI LUNAR: moving-head Discharge Lamp beam, with 1.8 deg beam, colour wheel, 14 gobos, prism, frost.",
+  "manufacturer": "LIGHT SKY",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 300.0,
+  "maxLuminousIntensityCd": 338648100.0,
+  "luminousFluxLm": 375000.0,
+  "noiseLevelDb": null,
+  "weightKg": 15.4,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 1.8,
+    "max": 1.8
+  },
+  "fieldAngleDeg": 1.8,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo",
+      "slots": 14,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7300.0,
+    "max": 7300.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 8",
+      "facets": null
+    },
+    {
+      "name": "Prism 24",
+      "facets": null
+    },
+    {
+      "name": "Prism 1+2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 16CH Plus",
+      "channels": 16
+    },
+    {
+      "name": "Mode 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Mode 14CH",
+      "channels": 14
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "description": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

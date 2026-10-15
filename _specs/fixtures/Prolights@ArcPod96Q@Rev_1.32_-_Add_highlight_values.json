@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@ArcPod96Q@Rev_1.32_-_Add_highlight_values.gdtf",
+  "fixtureTypeId": "326B38CA-C1D1-4A72-B247-A3B0D47E5DC5",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ArcPod96Q",
+  "longName": "ArcPod96Q",
+  "shortName": "ArcPod96Q",
+  "description": "ArcPod 96Q is a two-headed bright outdoor wash light, designed for large scale outdoor installations and long throw projection. Equipped with 96x10W RGBW/FC LEDs, delivering a superior colour mixing and extreme brightness with two different optics on each head (10° top and 15° bottom). Despite its bright output, it was designed with a slim size, and offers a wide range of optics selection that can be customised or change to different options on each single head. This makes the ArcPod 96Q an indispensable architectural lighting fixtures for larger setups.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 2194.0,
+  "maxLuminousIntensityCd": 1995100.0,
+  "luminousFluxLm": 93262.0,
+  "noiseLevelDb": null,
+  "weightKg": 27.0,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": "Schuko",
+  "powerSupplyType": "Schuko LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 11.7,
+    "max": 11.7
+  },
+  "fieldAngleDeg": 19.8,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "8ch",
+      "channels": 8
+    },
+    {
+      "name": "10ch",
+      "channels": 10
+    },
+    {
+      "name": "14ch",
+      "channels": 14
+    },
+    {
+      "name": "20ch",
+      "channels": 20
+    },
+    {
+      "name": "34ch",
+      "channels": 34
+    },
+    {
+      "name": "44ch",
+      "channels": 44
+    }
+  ],
+  "pixelCount": 12,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

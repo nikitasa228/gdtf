@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Stryker_Spot@24-17-09_First_Release.gdtf",
+  "fixtureTypeId": "D498452A-B30D-49B9-B294-BE27D34FD5E8",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Stryker Spot",
+  "longName": "Eliminator Stryker Spot",
+  "shortName": "Strkerspot",
+  "description": "Powered by an efficient 100W LED light engine, the Eliminator Lighting Stryker Beam is a dedicated beam moving head designed to create dazzling aerial effects. This fast and punchy fixture offers a full complement of beam-shaping tools, allowing it to be used to generate a wide variety of engaging looks.",
+  "manufacturer": "ADJ (Eliminator Lighting)",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 100.0,
+  "maxLuminousIntensityCd": 57800.0,
+  "luminousFluxLm": 1600.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 210.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.0,
+    "max": 14.0
+  },
+  "fieldAngleDeg": 13.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 9,
+      "rotating": false
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 15,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 10000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open Prism",
+      "facets": null
+    },
+    {
+      "name": "Prism 6 circular",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 4 Linear",
+      "facets": null
+    },
+    {
+      "name": "CW",
+      "facets": null
+    },
+    {
+      "name": "Stop",
+      "facets": null
+    },
+    {
+      "name": "CCW",
+      "facets": null
+    }
+  ],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "18Ch",
+      "channels": 18
+    },
+    {
+      "name": "16Ch",
+      "channels": 16
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "manual",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

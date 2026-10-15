@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Focus_Profile@25-13-11_Release.gdtf",
+  "fixtureTypeId": "F56C9EA1-99B9-4F65-A853-B7064E88ADDB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Focus Profile",
+  "longName": "Focus Profile",
+  "shortName": "FocProf",
+  "description": "The brightest and most feature-rich Focus Series fixture to date, the Focus Profile is a professional caliber automated profile luminaire designed for theatrical, concert touring and event production applications. It features a potent 400W LED engine, with a native color temperature of 6,700K and a CRI in excess of 70, coupled with an exhaustive collection of beam-shaping tools. These include four, independently controllable, rotating framing shutter blades, which can be used to precisely shape the light output. The unit offers full CMY color mixing together with variable CTO color temperature control (2700K to 6700K) and an additional color wheel loaded with 6 dichroic filters comprised of four primaries together with CTB and CRI filters. Two separate GOBO wheels feature 7 replaceable, indexed-rotating GOBOs, and 8 static GOBOs, respectively, while two bi-directional rotating prisms (3-facet and 4-facet) allow for the creation of a wide variety of aerial effects. Motorized focus, iris and zoom (7 – 45°) together with a replaceable (medium) frost filter and an animation wheel complete the lineup of features offered by this powerful and versatile luminaire.",
+  "manufacturer": "ADJ",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 560,
+  "maxLuminousIntensityCd": 1108200,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 49,
+  "weightKg": 27.75,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.3,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1 (Rotation)",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2 (Fixed)",
+      "slots": 8,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 15,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6700.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1 (3 facet)",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 (4-facet)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -25.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Mode 51ch",
+      "channels": 51
+    },
+    {
+      "name": "Standard Mode 40ch",
+      "channels": 40
+    },
+    {
+      "name": "Basic Mode 36ch",
+      "channels": 36
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Noise measured at 3 ft (0.9 m)."
+  ],
+  "_refs": [
+    "https://www.adj.com/focus-profile"
+  ]
+}

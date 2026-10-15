@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Hydro_Profile@2023-14-02_First_Release.gdtf",
+  "fixtureTypeId": "8563BB4B-77F7-481D-817E-71698E43E983",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Hydro Profile",
+  "longName": "Hydro Profile",
+  "shortName": "HydPro",
+  "description": "The Hydro Profile is ADJ’s first weatherproof moving head profile fixture, which combines a potent 660-Watt cool white LED light engine with an impressive 25,000+ Lumens, and an expansive feature set to deliver a truly powerful and versatile luminaire. It is part of ADJ’s Hydro Series of robust IP65-rated moving heads, which are all designed for a demanding life on the road. They can be used outdoors in any weather as well as for indoor productions where they are protected against everything from dust and smoke residue to spilt drinks and humidity.",
+  "manufacturer": "ADJ",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1088,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 25000,
+  "noiseLevelDb": null,
+  "weightKg": 38.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Animation Wheel",
+      "slots": 1,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 1 (Rotation)",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2 (Fixed)",
+      "slots": 8,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "6 Linear Prism",
+      "facets": null
+    },
+    {
+      "name": "4 Facet Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Mode 57ch",
+      "channels": 57
+    },
+    {
+      "name": "Standard Mode 50ch",
+      "channels": 50
+    },
+    {
+      "name": "Basic Mode 36ch",
+      "channels": 36
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "estimated",
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "GDTF weight 84.9 is in lbs, not kg (38.5 kg)."
+  ],
+  "_refs": [
+    "https://www.adj.com/hydro-profile"
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Chorus_Line_16@2023-13-06_First_Release.gdtf",
+  "fixtureTypeId": "B6ECFC0B-2F25-4F08-AF3E-9733F126D082",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Chorus Line 16",
+  "longName": "Chorus Line 16",
+  "shortName": "ChrsL16",
+  "description": "CHORUS LINE 16™ is a 16 pixel bar wash luminaire featuring 40W 4-in-1 RGBW LEDs, motorized 4° to 40° zoom and 220° tilt movement, full pixel control, 2,700K - 7,000K adjustable linear color temperature, 64 color presets and 14 unique color macros, electronic strobe and 16-bit variable dimming curve modes, adjustable LED refresh rate frequency and gamma brightness for flicker free operation for TV and FILM, DMX, RDM, Kling-NET, and Art-NET protocol support, DMX, RJ45 ethernet, and Locking Power Cable in/out connections, 4 button LCD control panel display, dual quick-lock omega bracket rigging, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1280.0,
+  "maxLuminousIntensityCd": 17556900.0,
+  "luminousFluxLm": 96000.0,
+  "noiseLevelDb": null,
+  "weightKg": 11.3,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": 220.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.0,
+    "max": 40.0
+  },
+  "fieldAngleDeg": 25.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 7000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard",
+      "channels": 18
+    },
+    {
+      "name": "Extend",
+      "channels": 78
+    },
+    {
+      "name": "Basic",
+      "channels": 16
+    }
+  ],
+  "pixelCount": 32,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

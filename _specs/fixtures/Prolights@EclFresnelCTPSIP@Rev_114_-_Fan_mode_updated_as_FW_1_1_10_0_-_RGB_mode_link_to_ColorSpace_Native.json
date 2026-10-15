@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclFresnelCTPSIP@Rev_114_-_Fan_mode_updated_as_FW_1_1_10_0_-_RGB_mode_link_to_ColorSpace_Native.gdtf",
+  "fixtureTypeId": "7BC04B90-EBA3-40FA-BFE3-2D88A8882FF2",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclFresnelCTPSIP",
+  "longName": "EclFresnelCTPSIP",
+  "shortName": "FRCTPSIP",
+  "description": "EclFresnel CT+SIP is a 200W LED Fresnel, engineered with a new 6 colours light source and a 150mm / 6'' glass Fresnel lens. Being IP65 rated, the unit is both water and dust resistant ensuring safe application in any set or extreme locations, keeping lightweight and not scaling up in sizes.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 200.0,
+  "maxLuminousIntensityCd": 23300.0,
+  "luminousFluxLm": 3333.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.6,
+  "powerConnectorIn": "DC Jack / powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "DC Jack LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 20.5,
+    "max": 20.5
+  },
+  "fieldAngleDeg": 37.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALC",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 1850.0,
+    "max": 20000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "UNO_1ch",
+      "channels": 1
+    },
+    {
+      "name": "DUO_2ch",
+      "channels": 2
+    },
+    {
+      "name": "Basic_4ch",
+      "channels": 4
+    },
+    {
+      "name": "Basic2_5ch",
+      "channels": 5
+    },
+    {
+      "name": "Standard_11ch",
+      "channels": 11
+    },
+    {
+      "name": "M2 - CCT 16bit_11ch",
+      "channels": 11
+    },
+    {
+      "name": "M3 - RGB 8 bit_11ch",
+      "channels": 11
+    },
+    {
+      "name": "M4 - RGB 16bit_15ch",
+      "channels": 15
+    },
+    {
+      "name": "M8 - XY 16bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M15 - CCT + RGB 8bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M16 - CCT + RGB 16bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M16 - CCT + RGB + FX 16bit_29ch",
+      "channels": 29
+    },
+    {
+      "name": "M17 - CCT + RGB + GEL 8bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M18 - CCT + RGB + GEL 16bit_25ch",
+      "channels": 25
+    },
+    {
+      "name": "M28 - CCT + XY 16bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M30 - CCT + XY + GEL 16bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M35 - RAW 8bit_12ch",
+      "channels": 12
+    },
+    {
+      "name": "M36 - RAW 16bit_19ch",
+      "channels": 19
+    },
+    {
+      "name": "M37 - CCT + RAW 16bit_24ch",
+      "channels": 24
+    },
+    {
+      "name": "M101 - PixelMapperMode_3ch",
+      "channels": 3
+    },
+    {
+      "name": "M2 - CCT 16bit + ColorCorrection_20ch",
+      "channels": 20
+    },
+    {
+      "name": "M3 - RGB 8 bit + ColorCorrection_20ch",
+      "channels": 20
+    },
+    {
+      "name": "M4 - RGB 16bit + ColorCorrection_24ch",
+      "channels": 24
+    },
+    {
+      "name": "M8 - XY 16bit + ColorCorrection_26ch",
+      "channels": 26
+    },
+    {
+      "name": "M15 - CCT + RGB 8bit + ColorCorrection_26ch",
+      "channels": 26
+    },
+    {
+      "name": "M16 - CCT + RGB 16bit + ColorCorrection_30ch",
+      "channels": 30
+    },
+    {
+      "name": "M17 - CCT + RGB + GEL 8bit + ColorCorrection_30ch",
+      "channels": 30
+    },
+    {
+      "name": "M18 - CCT + RGB + GEL 16bit + ColorCorrection_34ch",
+      "channels": 34
+    },
+    {
+      "name": "M28 - CCT + XY 16bit + ColorCorrection_26ch",
+      "channels": 26
+    },
+    {
+      "name": "M30 - CCT + XY + GEL 16bit + ColorCorrection_30ch",
+      "channels": 30
+    },
+    {
+      "name": "Multimode 8bit Dual_25ch",
+      "channels": 25
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

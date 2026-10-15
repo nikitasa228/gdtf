@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proteus_Rayzor_Blade_L@25-04-03_Release.gdtf",
+  "fixtureTypeId": "8AE1D56A-89FA-4904-B7C8-9FF5DE17195A",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proteus Rayzor Blade L",
+  "longName": "Proteus Rayzor Blade L",
+  "shortName": "Proteus Rayzor Blade L",
+  "description": "The PROTEUS RAYZOR BLADE L™ is a striking visual combination of Linear Wash, high intensity Strobe Lines and SparkLED FX inside a compact IP65 linear fixture design. Envisioned to provide the designer infinite creative control of powerful colors and high-powered strobe effects from a single unit it allows unlimited placement in any outdoor and indoor environment. Protected from dust and water ingress the Rayzor Blade L is part of Elation’s industry leading Proteus Range of outdoor luminaires.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 33.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": null,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 40.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 2950.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "STANDARD 28CH",
+      "channels": 17
+    },
+    {
+      "name": "PIXEL 76CH",
+      "channels": 17
+    },
+    {
+      "name": "PIXEL PLUS CH140",
+      "channels": 71
+    },
+    {
+      "name": "PIXEL COMP 108CH",
+      "channels": 108
+    },
+    {
+      "name": "PIXEL SPARK LED 120CH",
+      "channels": 108
+    },
+    {
+      "name": "EXTENDED 188CH",
+      "channels": 140
+    }
+  ],
+  "pixelCount": 8,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

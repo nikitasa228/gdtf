@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Paragon_S@25-07-07_Release.gdtf",
+  "fixtureTypeId": "FC46C397-768F-473A-A9FB-D8B853DDB8AC",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Paragon S",
+  "longName": "Paragon S",
+  "shortName": "Prgn S",
+  "description": "The PARAGON S™ is the ideal fixture for various applications requiring superior output, bright and powerful beams, quiet operation, precise gobos, colors, and framing cuts. With a custom-designed variable, the CRI LED engine provides up to 20500 lumens output (at CRI 80), providing exceptional output and true-to-life color accuracy control.\n\nUtilizing variable CRI technology, the PARAGON S™ utilizes Elation’s TruTone empowering designers to effortlessly balance light output and color accuracy to meet the specific demands of each scene or show. Its seamless adjustability from CRI 70 to CRI 93 ensures accurate and vivid color fidelity, with infinite control over the underlying white spectrum for enhanced mixed tones.\n\nThe PARAGON S™ offers a powerful FX package, including seven rotating glass gobos, nine fixed metal gobos, a fully interchangeable animation wheel, dual prisms, dual frost effects, and a high-speed iris. The animation wheel can be swapped for custom designs or an optional seven-gobo position disc for customization. Its 240-degree indexable framing system ensures precision with full-blackout shutter cuts, while its dynamic zoom range of 5° to 50° makes it a standout performer on any stage.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 550.0,
+  "maxLuminousIntensityCd": 1872800.0,
+  "luminousFluxLm": 16000.0,
+  "noiseLevelDb": null,
+  "weightKg": 23.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 263.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 18.1,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 9,
+      "rotating": false
+    },
+    {
+      "wheel": "Gobo Wheel 3",
+      "slots": 6,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 22,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2600.0,
+    "max": 6500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4 Facet Linear",
+      "facets": null
+    },
+    {
+      "name": "4 Facet Circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard",
+      "channels": 41
+    },
+    {
+      "name": "Extended",
+      "channels": 64
+    },
+    {
+      "name": "Standard Fixed Gobo",
+      "channels": 41
+    },
+    {
+      "name": "Extended Fixed Gobo",
+      "channels": 64
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

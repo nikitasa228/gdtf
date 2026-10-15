@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_BMFL_FollowSpot@2026-03-27_Color_macro_open_slot_revision.gdtf",
+  "fixtureTypeId": "3011BF1D-1705-4D79-A5C9-945418E8E776",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin BMFL FollowSpot",
+  "longName": "Robin BMFL FollowSpot",
+  "shortName": "BMFL FollowSpot",
+  "description": "Created specifically for follow-spot operation, this custom modified version of BMFL comes with specific features to provide both motorised movement and manual operation with follow-spot handles.",
+  "manufacturer": "Robe Lighting",
+  "category": "FOLLOW SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 2000.0,
+  "maxLuminousIntensityCd": 4655200.0,
+  "luminousFluxLm": 39770.0,
+  "noiseLevelDb": null,
+  "weightKg": 35.0,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 55.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 3,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - Standard 16 bit",
+      "channels": 33
+    },
+    {
+      "name": "Mode 2 - Reduced 8 bit",
+      "channels": 27
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

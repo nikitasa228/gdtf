@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Coemar_Lighting@Romeo_700_FS6_HD_Theater@rev.07_29042024.gdtf",
+  "fixtureTypeId": "2F11D20C-CB15-4238-92F4-21951E0811C9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Romeo 700 FS6 HD Theater",
+  "longName": "Romeo 700 FS6 HD Theater",
+  "shortName": "Romeo 700 FullSpectrum 6 HD Studio Plus",
+  "description": "Fast LED retrofitting for Robert Juliat 700 series moulders, with 6 RGBCLA colours, with light output comparable to halogen lamps.\n- LED Source: RGBCLA COB LED (Red, Green, Blue, Cyan, Lime, Amber) - Color mixing with hue and saturation control\n- CCT Range: 2.700 K → 10.000 K\n- Color Rendition Average: CRI > 95, TLCI > 95\n- Green-Magenta adjustment: Continuously adjustable from full minus-green to full plus-green\n- Dimming: 8 or 16 bit, 5 selectable curves: Exponential, Logarithmic, Linear, Halo and Standard\n- Dimming Smooth Selection: Fast, Slow and Very Slow\n- Strobe: Electronic strobe, synchronized, random, pulse effect\n- Camera flicker control/Hz range: Yes: 20.000 Hz\n- Calibrated Cob: Yes\n- L80 Rating: 50.000 Hours\n- Voltage Input: 90-240 V, 50/60 Hz, auto-sensing\n- Power Consumption: 350 W Maximum\n- Power Connection: In and Out PowerCON TRUE1 Top\n- Data Connection: In and Out DMX 5 pin locking XLR connectors\n- Fan (controllable): Yes, 4 different settings: Silent, Studio, Auto, DMX regulated\n- Protocols: DMX-512, RDM (Remote Device Management)\n- RDM configuration: Yes\n- DMX Channels: 16 / 7 / 1 / Studio / RGB / Fine RGB / Sunrise Mode\n- Display: Graphic OLED with on-board selector for quick setting\n- Software Upload: Through DMX input (With RDM inteface code AC10011A001)",
+  "manufacturer": "Coemar Lighting",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 20.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": null,
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALI",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "16 channels",
+      "channels": 16
+    },
+    {
+      "name": "7 channels",
+      "channels": 7
+    },
+    {
+      "name": "1 channel",
+      "channels": 1
+    },
+    {
+      "name": "Studio mode",
+      "channels": 7
+    },
+    {
+      "name": "RGB mode",
+      "channels": 9
+    },
+    {
+      "name": "fine RGB mode",
+      "channels": 12
+    },
+    {
+      "name": "SUNRISE mode",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 0,
+  "subType": "Fresnel / PC",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "lightSourceType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "lensType"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

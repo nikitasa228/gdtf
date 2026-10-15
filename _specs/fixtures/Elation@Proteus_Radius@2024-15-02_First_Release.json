@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proteus_Radius@2024-15-02_First_Release.gdtf",
+  "fixtureTypeId": "B3107BAA-9C6A-4CAE-8E0E-086B2DF0FF8D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proteus Radius",
+  "longName": "Proteus Radius",
+  "shortName": "ProRad",
+  "description": "The PROTEUS RADIUS is a compact IP66 High Intensity Beam FX fixture. \nUtilizing an efficient 100W Solid State Phosphor-Converted (SSPC) light engine the fixture projects narrow intense beams with incredible power at long distances. \nIncredibly fast 360 Degree of Movement on both axis allow impactful beam animations, while the CMY color mix, gobos, prisms and frost options allow the designer to compose an endless array of stunning aerial effects.",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 100.0,
+  "maxLuminousIntensityCd": 7899900.0,
+  "luminousFluxLm": 2700.0,
+  "noiseLevelDb": null,
+  "weightKg": 19.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 540.0,
+  "infinitePan": true,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 1.0,
+    "max": 1.0
+  },
+  "fieldAngleDeg": 1.8,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 15,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 24,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 39,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1",
+      "facets": null
+    },
+    {
+      "name": "Prism 2",
+      "facets": null
+    },
+    {
+      "name": "Prism 3",
+      "facets": null
+    },
+    {
+      "name": "Prism 4",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540 Tilt270",
+      "channels": 36
+    },
+    {
+      "name": "Extended Pan630 Tilt 270",
+      "channels": 36
+    },
+    {
+      "name": "Extended Pan540 Tilt540",
+      "channels": 36
+    },
+    {
+      "name": "Extended Pan630 Tilt540",
+      "channels": 36
+    },
+    {
+      "name": "Standard Pan540 Tilt270",
+      "channels": 26
+    },
+    {
+      "name": "Standard Pan630 Tilt270",
+      "channels": 26
+    },
+    {
+      "name": "Standard Pan540 Tilt540",
+      "channels": 26
+    },
+    {
+      "name": "Standard Pan630 Tilt540",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

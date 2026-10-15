@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_Force_2_SoloWash@Rev_1.0.8.gdtf",
+  "fixtureTypeId": "BD9BB42C-212A-4DA3-8837-19F12D257C77",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick Force 2 SoloWash",
+  "longName": "Maverick Force 2 SoloWash",
+  "shortName": "MF2SW",
+  "description": "Maverick Force 2 SoloWash is a powerful single source 480W LED wash engineered to meet lighting designer demand for classic stage wash looks with the modern features LDs expect: CMY + CTO color mixing system offering a wide color palette, independent color wheel with CRI and CTB filters, expansive 8:1 zoom, rotating gobo wheel with interchangeable geometric gobos, linear 5-facet prism, and frost. Housed in a compact and lightweight design and calibrated to match the colors of other Force fixtures in the rig. Take control with DMX, RDM, sACN, Art-Net, or W-DMX.",
+  "manufacturer": "Chauvet Professional",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 660,
+  "maxLuminousIntensityCd": 2284000,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 36.6,
+  "weightKg": 24.2,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.3,
+    "max": 55.7
+  },
+  "fieldAngleDeg": 30.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 7,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3007.0,
+    "max": 7308.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "5-Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Advanced 27ch",
+      "channels": 27
+    },
+    {
+      "name": "Basic 21ch",
+      "channels": 21
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Framing wash",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "weightKg": "manual",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "colorTemperatureK": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Weight is 0 in GDTF",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-force-2-solowash/"
+  ]
+}

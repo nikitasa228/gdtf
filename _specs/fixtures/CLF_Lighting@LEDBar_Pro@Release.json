@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "CLF_Lighting@LEDBar_Pro@Release.gdtf",
+  "fixtureTypeId": "FB488EE8-C758-440E-837E-72BABF9286E5",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LEDBar Pro",
+  "longName": "LEDBar Pro",
+  "shortName": "LEDBar Pro",
+  "description": "CLF LEDBar Pro: RGBW LED bar with pixel effects.",
+  "manufacturer": "CLF Lighting",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 60.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 10.2,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "4 Channel",
+      "channels": 4
+    },
+    {
+      "name": "6 Channel",
+      "channels": 6
+    },
+    {
+      "name": "11 Channel",
+      "channels": 11
+    },
+    {
+      "name": "12 channel",
+      "channels": 12
+    },
+    {
+      "name": "18 channel",
+      "channels": 8
+    },
+    {
+      "name": "40 Channel",
+      "channels": 4
+    },
+    {
+      "name": "47 Channel",
+      "channels": 47
+    }
+  ],
+  "pixelCount": 3,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "manual",
+    "goboSlots": "manual",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "description": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF 'gobo' wheels are pixel-effect macros."
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@pixelPATT@2026-02-19__3D_model_update.gdtf",
+  "fixtureTypeId": "41A5C4F0-9C42-4068-BEE8-4478B2283F98",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "pixelPATT",
+  "longName": "pixelPATT™",
+  "shortName": "pixelPATT",
+  "description": "Joining Robe’s line of retro style lighting products is pixelPATT, the latest addition to the PATT family. In spite of its eye catching retro design, pixelPATT is based on modern LED pixel controlled technology.\n\nFor full data (consuption, voltage etc.) please add PATT Driver.",
+  "manufacturer": "Robe Lighting",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 210.0,
+  "maxLuminousIntensityCd": 400.0,
+  "luminousFluxLm": 480.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 58.0,
+    "max": 58.0
+  },
+  "fieldAngleDeg": 90.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - Wash",
+      "channels": 13
+    },
+    {
+      "name": "Mode 2 - Pattern",
+      "channels": 32
+    },
+    {
+      "name": "Mode 3 - Pixel RGB",
+      "channels": 44
+    },
+    {
+      "name": "Mode 4 - Pixel RGBW",
+      "channels": 27
+    },
+    {
+      "name": "Mode 5 - Pattern full RGB",
+      "channels": 70
+    },
+    {
+      "name": "Mode 6 - Pattern full RGBW",
+      "channels": 40
+    },
+    {
+      "name": "Mode 7 - Pixel RGBW only",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "Retro LED",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "voltageRangeV": "estimated",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

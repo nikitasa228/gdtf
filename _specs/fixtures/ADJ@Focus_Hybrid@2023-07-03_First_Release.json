@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Focus_Hybrid@2023-07-03_First_Release.gdtf",
+  "fixtureTypeId": "E42C9D9E-6CC8-4EDA-A81F-63BA87D70CA0",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Focus Hybrid",
+  "longName": "Focus Hybrid",
+  "shortName": "FocHyb",
+  "description": "Offering an efficient 200W LED light source combined with an extensive feature set, the ADJ Focus Hybrid is a versatile moving head luminaire. It can function interchangeably as a spot, wash or beam fixture, making it ideal for rental and event production applications as well as for installation in venues that require a moving light which can deliver a high degree of flexibility. It features motorized zoom and focus, two GOBO wheels, an independent color wheel, two rotating prisms and a replaceable frost filter.",
+  "manufacturer": "ADJ",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 335,
+  "maxLuminousIntensityCd": 1435800,
+  "luminousFluxLm": 41000.0,
+  "noiseLevelDb": 43.2,
+  "weightKg": 14.1,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 24.0
+  },
+  "fieldAngleDeg": 24.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1 (Rotation)",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2 (Fixed)",
+      "slots": 15,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 23,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7500.0,
+    "max": 7500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1 (8-facet circular)",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 (6-facet linear)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -25.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Mode 25ch Pan540",
+      "channels": 25
+    },
+    {
+      "name": "Extended Mode 25ch Pan630",
+      "channels": 25
+    },
+    {
+      "name": "Standard Mode 23ch Pan540",
+      "channels": 23
+    },
+    {
+      "name": "Standard Mode 23ch Pan630",
+      "channels": 23
+    },
+    {
+      "name": "Basic Mode 19ch Pan540",
+      "channels": 19
+    },
+    {
+      "name": "Basic Mode 19ch Pan630",
+      "channels": 19
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Noise measured at 3 ft (0.9 m)."
+  ],
+  "_refs": [
+    "https://www.adj.com/focus-hybrid"
+  ]
+}

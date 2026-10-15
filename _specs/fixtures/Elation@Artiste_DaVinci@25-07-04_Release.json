@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Artiste_DaVinci@25-07-04_Release.gdtf",
+  "fixtureTypeId": "4C5B977E-8F28-486D-B57C-FACC6736ED3A",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Artiste DaVinci",
+  "longName": "Artiste DaVinci",
+  "shortName": "ArtDVinci",
+  "description": "The Artiste DaVinci™ features a new 270W LED Cool White LED engine with advanced optics delivering over 12,000 total lumens, ultra wide 6° to 48° zoom, full CMY color mixing and linear CTO color correction, 7 dichroic colors including CTB and Violet, 6 rotating glass and 9 static-stamped metal interchangeable gobos, 3-facet and linear rotating prisms, frost filter, full 360° bi-directional animation wheel, motorized iris, focus, and auto-focus, variable dimming curve modes, high speed electronic shutter and strobe, hibernation mode, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation's E-FLY™ internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, power in/out connections, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 270.0,
+  "maxLuminousIntensityCd": 975500.0,
+  "luminousFluxLm": 12000.0,
+  "noiseLevelDb": null,
+  "weightKg": 25.4,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 48.0
+  },
+  "fieldAngleDeg": 46.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 6,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo wheel 2",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 15,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 7000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "3-Facet Circular Prism",
+      "facets": null
+    },
+    {
+      "name": "4-Facet Linear Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540",
+      "channels": 40
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 28
+    },
+    {
+      "name": "Basic Pan540",
+      "channels": 26
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 40
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 28
+    },
+    {
+      "name": "Basic Pan630",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

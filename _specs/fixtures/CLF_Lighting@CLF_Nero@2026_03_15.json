@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "1.0",
+  "file": "CLF_Lighting@CLF_Nero@2026_03_15.gdtf",
+  "fixtureTypeId": "0CDA3E84-5540-42F4-9200-0A31619121AF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "CLF Nero",
+  "longName": "Nero",
+  "shortName": "Nero",
+  "description": "Waterproof Tilt Strobe",
+  "manufacturer": "CLF Lighting",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 72981.0,
+  "noiseLevelDb": null,
+  "weightKg": 13.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 123.0,
+    "max": 123.0
+  },
+  "fieldAngleDeg": 160.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "97Ch Mode",
+      "channels": 97
+    },
+    {
+      "name": "74Ch Mode",
+      "channels": 74
+    },
+    {
+      "name": "47Ch Mode",
+      "channels": 47
+    },
+    {
+      "name": "30Ch Mode",
+      "channels": 30
+    },
+    {
+      "name": "24Ch Mode",
+      "channels": 24
+    },
+    {
+      "name": "13Ch Mode",
+      "channels": 13
+    },
+    {
+      "name": "11Ch Mode",
+      "channels": 11
+    },
+    {
+      "name": "8Ch Mode",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "lensType": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

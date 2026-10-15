@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Encore_FR_Pro_WW@25-04-04_First_Release.gdtf",
+  "fixtureTypeId": "54E18045-8ECC-4BD9-905B-14EF6E23ED1B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Encore FR Pro WW",
+  "longName": "Encore FR Pro WW",
+  "shortName": "EncFRPrWW",
+  "description": "The ADJ Lighting Encore FR Pro WW is a professional grade Fresnel fixture with a 7-inch lens designed for key light, as a fill light and as a back light. It offers a potent 200W warm white LED \n \nThe Encore FR Pro Color has a motorized zoom (beam angle of 10~46°), a CRI rating of 97.2 with an output of more than 12,000 Lumens. There are an abundant of on-board features such as 4 DMX control modes, 4 Dim Curves, 6 Dim Modes and adjustable refresh rates.\n \nThe fixture has DMX-512 and RDM protocols, a USB service port, a 4-Button control panel LCD menu display, 2 rotary controls for Zoom en Dimmer 3 & 5-pin DMX In/Out sockets and locking power In/Out to daisy chain power from one fixture to another. \n \nA rotating 8-leaf barn door, gel frame and power cord are included with the fixture.",
+  "manufacturer": "ADJ",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 200.0,
+  "maxLuminousIntensityCd": 214500.0,
+  "luminousFluxLm": 5936.0,
+  "noiseLevelDb": null,
+  "weightKg": 9.9,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.0,
+    "max": 37.0
+  },
+  "fieldAngleDeg": 59.0,
+  "zoom": true,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "2CH",
+      "channels": 2
+    },
+    {
+      "name": "4CH",
+      "channels": 4
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "8CH",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Fresnel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

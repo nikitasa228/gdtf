@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Pendant@24-23-12_Release.gdtf",
+  "fixtureTypeId": "EAEFD663-A342-480D-BA2E-B1C27D5D83BA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze Pendant",
+  "longName": "Fuze Pendant",
+  "shortName": "FuzPdnt",
+  "description": "The FUZE PENDANT™ provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 11,000 lumens, the FUZE PENDANT is ideal for large areas and high-ceiling applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 258.0,
+  "maxLuminousIntensityCd": 19200.0,
+  "luminousFluxLm": 13142.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.2,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 45.0,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer 1CH",
+      "channels": 1
+    },
+    {
+      "name": "Color 4CH",
+      "channels": 4
+    },
+    {
+      "name": "RGBWL 5CH",
+      "channels": 5
+    },
+    {
+      "name": "16bit 10CH",
+      "channels": 10
+    },
+    {
+      "name": "Standard 10CH",
+      "channels": 10
+    },
+    {
+      "name": "Extended 17CH",
+      "channels": 17
+    },
+    {
+      "name": "HSI 4CH",
+      "channels": 4
+    },
+    {
+      "name": "HSI 9CH",
+      "channels": 9
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

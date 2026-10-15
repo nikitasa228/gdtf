@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@HalupixDUO@Rev_055_-_Geometry_updated_-_RDM_Personality_IDs_added.gdtf",
+  "fixtureTypeId": "327C173C-F1E0-4280-B86B-70A3DF8ACF93",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "HalupixDUO",
+  "longName": "HalupixDUO",
+  "shortName": "HDUO",
+  "description": "The HaluPix DUO is an advanced hybrid LED tile that seamlessly integrates lighting and video capabilities into a modular design. This dual-source unit offers high-power, long-throw white pixels alongside high-brightness video and strobe features, with full pixel-level control. This integration facilitates diverse and dynamic lighting setups, suitable for a variety of professional stage and TV applications.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1788.0,
+  "maxLuminousIntensityCd": 9600.0,
+  "luminousFluxLm": 40323.0,
+  "noiseLevelDb": null,
+  "weightKg": 16.3,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 116.0,
+    "max": 116.0
+  },
+  "fieldAngleDeg": 154.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_12ch",
+      "channels": 12
+    },
+    {
+      "name": "Basic_12ch+Beam_49ch",
+      "channels": 13
+    },
+    {
+      "name": "Basic_12ch+Beam16bit_98ch",
+      "channels": 14
+    },
+    {
+      "name": "Standard_21ch",
+      "channels": 21
+    },
+    {
+      "name": "Standard_21ch+Beam_49ch",
+      "channels": 22
+    },
+    {
+      "name": "Standard_21ch+Beam16bit_98ch",
+      "channels": 23
+    },
+    {
+      "name": "FX1_28ch",
+      "channels": 28
+    },
+    {
+      "name": "FX1_28ch+Beam_49ch",
+      "channels": 29
+    },
+    {
+      "name": "FX1_28ch+Beam16bit_98ch",
+      "channels": 30
+    },
+    {
+      "name": "FX2_32ch",
+      "channels": 32
+    },
+    {
+      "name": "FX2_32ch+Beam_49ch",
+      "channels": 33
+    },
+    {
+      "name": "FX2_32ch+Beam_98ch",
+      "channels": 34
+    },
+    {
+      "name": "FX3_39ch",
+      "channels": 39
+    },
+    {
+      "name": "FX3_39ch+Beam_49ch",
+      "channels": 40
+    },
+    {
+      "name": "FX3_39ch+Beam16bit_98ch",
+      "channels": 41
+    },
+    {
+      "name": "Extended_42ch",
+      "channels": 42
+    },
+    {
+      "name": "Extended_42ch+Beam_49ch",
+      "channels": 43
+    },
+    {
+      "name": "Extended_42ch+Beam16bit_98ch",
+      "channels": 44
+    },
+    {
+      "name": "49S",
+      "channels": 4
+    },
+    {
+      "name": "PIXELS_1764ch",
+      "channels": 4
+    },
+    {
+      "name": "PIXELS+BEAM_1813ch",
+      "channels": 1765
+    },
+    {
+      "name": "Basic Sectors_256ch",
+      "channels": 256
+    },
+    {
+      "name": "49 Beam",
+      "channels": 1
+    },
+    {
+      "name": "49 Beam_Strobe_50ch",
+      "channels": 50
+    },
+    {
+      "name": "49 Beam 16bit_98ch",
+      "channels": 2
+    },
+    {
+      "name": "PIXELS_RGB_1323ch_3Breaks",
+      "channels": 3
+    },
+    {
+      "name": "PIXELS_RGB + BEAMS_1372ch_3Breaks",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 7,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Magmatic@SIDEWINDER@25-27-06_First_Release.gdtf",
+  "fixtureTypeId": "F7881C6F-DAC6-46A8-A470-CD2C3A6B13F6",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Sidewinder",
+  "longName": "Magmatic Sidewinder",
+  "shortName": "Sidewinder",
+  "description": "SIDEWINDER 1450W HIGH VELOCITY CO2 SIMULATOR\n\nSIDEWINDER is a professional-grade lighting solution. Equipped with an easy to use onboard LCD touch screen control panel, intuitive DMX-512, RDM control, durable aluminum housing, and optional wired and wireless remote control options. 50,000 cu.ft per minute Four, 8-second 20-ft bursts 180° multi position fog burst 22, 3#160; watt RGBA LED's (Red X5 Green X6 Blue X6 Amber X5) Use of LEDs even without the use of Fog Durable, tour-ready, aluminum housing#160;.",
+  "manufacturer": "Magmatic",
+  "category": "FOG",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 66.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 6600.0,
+  "noiseLevelDb": null,
+  "weightKg": 13.4,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1-CH",
+      "channels": 1
+    },
+    {
+      "name": "4-CH",
+      "channels": 4
+    },
+    {
+      "name": "7-CH",
+      "channels": 7
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Fog jet with LED illumination",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [
+    "maxLuminousIntensityCd",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

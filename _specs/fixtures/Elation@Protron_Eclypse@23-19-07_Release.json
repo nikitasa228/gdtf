@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Protron_Eclypse@23-19-07_Release.gdtf",
+  "fixtureTypeId": "6853D903-431F-49E4-8927-9D9A19294080",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "PROTRON ECLYPSE",
+  "longName": "PROTRON ECLYPSe",
+  "shortName": "PrtnEclypse",
+  "description": "The PROTRON ECLYPSE™ is a versatile high powered 1000W air cooled IPX4 outdoor rated color blinder, strobe, wash luminaire. Features include (96) 10W CREE RGBW 4-in-1 LEDs, 31° beam / 63° field angles, 27,000+ total lumen output, brilliant eye candy effects, selectable pixel mapping zones, strobe intensity, duration, rate, and FX control, super high speed (1-25fps) adjustable strobe, DMX, RDM, Kling-NET, and Art-NET protocol support, 8/16 bit RGB and RGBW smooth color mixing modes, adjustable/removable yoke bracket with 3-position holes, interlocking system for multiple unit matrix designs, IP65 3/5pin DMX, RJ45 ethernet, IP65 Locking power in/out connections, 4-button control pane with OLED menu display, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 580.0,
+  "maxLuminousIntensityCd": 4797000.0,
+  "luminousFluxLm": 1566000.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.1,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 31.0,
+    "max": 31.0
+  },
+  "fieldAngleDeg": 63.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "RGB",
+      "channels": 3
+    },
+    {
+      "name": "RGB 16bit",
+      "channels": 6
+    },
+    {
+      "name": "RGBW",
+      "channels": 4
+    },
+    {
+      "name": "RGBW 16bit",
+      "channels": 8
+    },
+    {
+      "name": "Strobe",
+      "channels": 4
+    },
+    {
+      "name": "1",
+      "channels": 13
+    },
+    {
+      "name": "2V",
+      "channels": 17
+    },
+    {
+      "name": "2H",
+      "channels": 17
+    },
+    {
+      "name": "3",
+      "channels": 21
+    },
+    {
+      "name": "4",
+      "channels": 25
+    },
+    {
+      "name": "4A",
+      "channels": 25
+    },
+    {
+      "name": "6",
+      "channels": 33
+    },
+    {
+      "name": "6A",
+      "channels": 33
+    },
+    {
+      "name": "6H",
+      "channels": 33
+    },
+    {
+      "name": "12",
+      "channels": 57
+    },
+    {
+      "name": "12A",
+      "channels": 57
+    },
+    {
+      "name": "F1",
+      "channels": 12
+    },
+    {
+      "name": "F2V",
+      "channels": 16
+    },
+    {
+      "name": "F2H",
+      "channels": 16
+    },
+    {
+      "name": "F3",
+      "channels": 20
+    },
+    {
+      "name": "F4",
+      "channels": 24
+    },
+    {
+      "name": "F6V",
+      "channels": 32
+    },
+    {
+      "name": "F6H",
+      "channels": 32
+    },
+    {
+      "name": "F12",
+      "channels": 56
+    }
+  ],
+  "pixelCount": 58,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

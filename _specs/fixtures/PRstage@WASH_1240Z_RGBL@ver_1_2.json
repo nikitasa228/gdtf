@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0",
+  "file": "PRstage@WASH_1240Z_RGBL@ver_1_2.gdtf",
+  "fixtureTypeId": "6421ECF0-8DC2-4430-9EDA-77169C5960C1",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "WASH 1240Z RGBL",
+  "longName": "WASH 1240Z RGBL",
+  "shortName": "1240Z RGBL",
+  "description": "With 12x40W(RGBL) LEDs, variable motorized zoom (3.5 – 45 degrees), and individual \npixel control, capable of creating a kaleidoscope effect. It not only has a beam zoom wash\n visual effect but also has built-in various macro function effects.",
+  "manufacturer": "PRstage",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 640.0,
+  "maxLuminousIntensityCd": 1342900.0,
+  "luminousFluxLm": 5622.0,
+  "noiseLevelDb": null,
+  "weightKg": 9.5,
+  "powerConnectorIn": "powerCON / powerCON TRUE1",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 210.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.5,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 60.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - CH16",
+      "channels": 16
+    },
+    {
+      "name": "Mode 2 - CH21",
+      "channels": 21
+    }
+  ],
+  "pixelCount": 12,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

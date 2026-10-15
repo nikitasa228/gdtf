@@ -1,0 +1,310 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ARRI@SkyPanel_S360C@DMX_v4.4_13_Jan_2021.gdtf",
+  "fixtureTypeId": "076B8125-3E7A-4310-BE6C-A64D7034C43A",
+  "gdtfDataVersion": "1.1",
+  "gdtfName": "SkyPanel S360C",
+  "longName": "ARRI SkyPanel S360C",
+  "shortName": "S360C",
+  "description": "SkyPanel S360-C RGBW Soft Light with ECC",
+  "manufacturer": "ARRI",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1600,
+  "maxLuminousIntensityCd": 72500.0,
+  "luminousFluxLm": 250000.0,
+  "noiseLevelDb": null,
+  "weightKg": 41.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 105.0,
+    "max": 105.0
+  },
+  "fieldAngleDeg": 104.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1400.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 CCT+RGBW 8Bit",
+      "channels": 12
+    },
+    {
+      "name": "Mode 1 CCT+RGBW ECC 8Bit",
+      "channels": 20
+    },
+    {
+      "name": "Mode 2 - CCT 8Bit",
+      "channels": 7
+    },
+    {
+      "name": "Mode 2 - CCT ECC 8Bit",
+      "channels": 15
+    },
+    {
+      "name": "Mode 3 - CCT+HSI 8Bit",
+      "channels": 10
+    },
+    {
+      "name": "Mode 3 - CCT+HSI ECC 8Bit",
+      "channels": 18
+    },
+    {
+      "name": "Mode 4 - RGBW 8Bit",
+      "channels": 9
+    },
+    {
+      "name": "Mode 4 - RGBW ECC 8Bit",
+      "channels": 17
+    },
+    {
+      "name": "Mode 5- HSI 8Bit",
+      "channels": 7
+    },
+    {
+      "name": "Mode 5- HSI ECC 8Bit",
+      "channels": 15
+    },
+    {
+      "name": "Mode 6 - CCT+RGBW 16Bit",
+      "channels": 20
+    },
+    {
+      "name": "Mode 6 - CCT+RGBW ECC 16Bit",
+      "channels": 36
+    },
+    {
+      "name": "Mode 7 - CCT 16Bit",
+      "channels": 10
+    },
+    {
+      "name": "Mode 7 - CCT ECC 16Bit",
+      "channels": 26
+    },
+    {
+      "name": "Mode 8 - CCT+HSI 16Bit",
+      "channels": 16
+    },
+    {
+      "name": "Mode 8 - CCT+HSI ECC 16Bit",
+      "channels": 32
+    },
+    {
+      "name": "Mode 9 - RGBW 16Bit",
+      "channels": 14
+    },
+    {
+      "name": "Mode 9 - RGBW ECC 16Bit",
+      "channels": 30
+    },
+    {
+      "name": "Mode 10 - HSI 16Bit",
+      "channels": 10
+    },
+    {
+      "name": "Mode 10 - HSI ECC 16Bit",
+      "channels": 26
+    },
+    {
+      "name": "Mode 16 - Gels 8Bit",
+      "channels": 17
+    },
+    {
+      "name": "Mode 16 - Gels ECC 8Bit",
+      "channels": 25
+    },
+    {
+      "name": "Mode 17 - Gels 16Bit",
+      "channels": 19
+    },
+    {
+      "name": "Mode 17 - Gels ECC 16Bit",
+      "channels": 35
+    },
+    {
+      "name": "Mode 18 - XY 8Bit",
+      "channels": 11
+    },
+    {
+      "name": "Mode 18 - XY ECC 8Bit",
+      "channels": 19
+    },
+    {
+      "name": "Mode 19 - XY 16Bit",
+      "channels": 17
+    },
+    {
+      "name": "Mode 19 - XY ECC 16Bit",
+      "channels": 33
+    },
+    {
+      "name": "Mode 20 - Source Match 8Bit",
+      "channels": 10
+    },
+    {
+      "name": "Mode 20 - Source Match ECC 8Bit",
+      "channels": 18
+    },
+    {
+      "name": "Mode 21 - Source Match 16Bit",
+      "channels": 12
+    },
+    {
+      "name": "Mode 21 - Source Match ECC 16Bit",
+      "channels": 28
+    },
+    {
+      "name": "Mode 22 - Effects 8Bit",
+      "channels": 13
+    },
+    {
+      "name": "Mode 22 - Effects ECC 8Bit",
+      "channels": 21
+    },
+    {
+      "name": "Mode 23 - Effects 16Bit",
+      "channels": 21
+    },
+    {
+      "name": "Mode 23 - Effects ECC 16Bit",
+      "channels": 37
+    },
+    {
+      "name": "Mode 24 - LE CCT+RGBW 8Bit",
+      "channels": 97
+    },
+    {
+      "name": "Mode 25 - LE CCT+RGBW 16Bit",
+      "channels": 193
+    },
+    {
+      "name": "Mode 26 - LE HSI 8Bit",
+      "channels": 37
+    },
+    {
+      "name": "Mode 27- LE HSI 16Bit",
+      "channels": 73
+    },
+    {
+      "name": "Mode 28 - LE XY 8Bit",
+      "channels": 37
+    },
+    {
+      "name": "Mode 29 - LE XY 16Bit",
+      "channels": 73
+    },
+    {
+      "name": "Mode 30 - Ultimate 8Bit",
+      "channels": 24
+    },
+    {
+      "name": "Mode 30 - Ultimate ECC 8Bit",
+      "channels": 32
+    }
+  ],
+  "pixelCount": 3,
+  "subType": "Soft light panel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "External PSU 10.7 kg. GDTF power 3125 W invalid."
+  ],
+  "_refs": [
+    "https://bpm-media.imgbolt.de/media/pdf/9b/27/32/EN_ARRI_SkyPanel_S360-C_Datasheet.pdf"
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_SHAKAN_(BEAM_300)@ACME_SHAKAN_(BEAM_300).gdtf",
+  "fixtureTypeId": "2DE4CBC5-709A-47AB-AD67-54C09330040E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME SHAKAN (BEAM 300)",
+  "longName": "SHAKAN (BEAM 300)",
+  "shortName": "SHAKAN (BEAM 300)",
+  "description": "ACME SHAKAN (BEAM 300)300W",
+  "manufacturer": "ACME",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 280.0,
+  "maxLuminousIntensityCd": 819400.0,
+  "luminousFluxLm": 7000.0,
+  "noiseLevelDb": null,
+  "weightKg": 14.9,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 5.0
+  },
+  "fieldAngleDeg": 8.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo 1",
+      "slots": 16,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open 1",
+      "facets": null
+    },
+    {
+      "name": "Prism 1",
+      "facets": null
+    },
+    {
+      "name": "Prism 2",
+      "facets": null
+    },
+    {
+      "name": "Prism 3",
+      "facets": null
+    },
+    {
+      "name": "Frost",
+      "facets": null
+    },
+    {
+      "name": "Prism 4",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 15 DMX",
+      "channels": 15
+    },
+    {
+      "name": "Mode 2 12 DMX",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

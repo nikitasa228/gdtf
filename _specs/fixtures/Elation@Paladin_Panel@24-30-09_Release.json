@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Paladin_Panel@24-30-09_Release.gdtf",
+  "fixtureTypeId": "9C8AF4BB-9C5B-4DAF-8CE8-678D3F219429",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Paladin Panel",
+  "longName": "Paladin Panel",
+  "shortName": "PalPnl",
+  "description": "The PALADIN PANEL™ is a compact and powerful outdoor floodlight for a wide variety of applications. Using 50x15W RGBW cells it provides a total output of up to 20,000 lumens. Certified to IP65 it features a rugged design with a solid build quality, eliminating the need to worry about dust and water ingress. IP rated connections make it an ideal product to illuminate large areas of any outdoor event with vibrant and powerful colors. It can be operated standing on the floor or be hung in any orientation using the provided omega brackets. Available cell control and strobe features make the PALADIN PANEL also a versatile effects fixture or audience blinder.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 65800.0,
+  "luminousFluxLm": 14000.0,
+  "noiseLevelDb": null,
+  "weightKg": 15.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Ext-Cells 88CH",
+      "channels": 88
+    },
+    {
+      "name": "Cells Dim 82CH",
+      "channels": 82
+    },
+    {
+      "name": "Cells 80CH",
+      "channels": 80
+    },
+    {
+      "name": "HSI-Cell 38CH",
+      "channels": 38
+    },
+    {
+      "name": "HSI-Ext 10CH",
+      "channels": 10
+    },
+    {
+      "name": "HSI 4CH",
+      "channels": 4
+    },
+    {
+      "name": "Extended 16CH",
+      "channels": 16
+    },
+    {
+      "name": "16bit Dim 10CH",
+      "channels": 10
+    },
+    {
+      "name": "16bit 8CH",
+      "channels": 8
+    },
+    {
+      "name": "8bit 4CH",
+      "channels": 4
+    },
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 10,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

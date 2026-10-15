@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Martin_Professional@MAC_Viper_Wash_DX@20230516NoMeas.gdtf",
+  "fixtureTypeId": "21086CA1-DEFC-457C-AAD9-76A990CBB0A3",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MAC Viper Wash DX",
+  "longName": "MAC Viper Wash DX",
+  "shortName": "MACVipWasDX",
+  "description": "Official Martin Professional File (no measurements)",
+  "manufacturer": "Martin Professional",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 120.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1225.0,
+  "maxLuminousIntensityCd": 530400.0,
+  "luminousFluxLm": 33000.0,
+  "noiseLevelDb": null,
+  "weightKg": 34.1,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 268.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 13.5,
+    "max": 59.0
+  },
+  "fieldAngleDeg": 50.2,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 6000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic",
+      "channels": 18
+    },
+    {
+      "name": "Extended",
+      "channels": 24
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

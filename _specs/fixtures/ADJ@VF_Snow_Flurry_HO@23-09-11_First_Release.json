@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@VF_Snow_Flurry_HO@23-09-11_First_Release.gdtf",
+  "fixtureTypeId": "404402EA-1132-42FB-B7D9-9450427DAC03",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "VF Snow Flurry HO",
+  "longName": "VF Snow Flurry HO",
+  "shortName": "VFSnowHO",
+  "description": "The VF Flurry is a highly efficient, 1250W Snow Machine. It has a spray distance of 2-5 meters. Features include: Low/High volume selection switch, low snow fluid shut off to protect the pump, snow fluid level indicator, 2.3 Liter internal snow fluid tank, and an On/Off switch on the rear panel. The VF Flurry uses water based snow fluid.\nADJ recommends SNOW GAL, snow juice that been specially formulated for ADJ snow machines.",
+  "manufacturer": "ADJ",
+  "category": "OTHER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1250,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 8.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": null,
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": null,
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1 Ch",
+      "channels": 1
+    }
+  ],
+  "pixelCount": 0,
+  "subType": "Snow machine",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "zoom": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerConsumptionW": "manual",
+    "lightSourceType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [],
+  "_refs": [
+    "https://www.adj.com/products/vf-snow-flurry-ho"
+  ]
+}

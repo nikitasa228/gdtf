@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ULTRA_BLINDER_IP_(BL_200_IP)@V1.30.gdtf",
+  "fixtureTypeId": "B4B01E4A-9140-4EA3-B8C4-79CC48DAEA7B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ULTRA BLINDER IP (BL 200 IP)",
+  "longName": "ULTRA BLINDER IP (BL 200 IP)",
+  "shortName": "(BL 200 IP)",
+  "description": "ACME ULTRA BLINDER IP (BL 200 IP ) 200W",
+  "manufacturer": "ACME",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 30.0,
+  "maxLuminousIntensityCd": 24700.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 8.2,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 49.0,
+    "max": 49.0
+  },
+  "fieldAngleDeg": 82.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA+WW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 9CH",
+      "channels": 9
+    },
+    {
+      "name": "Mode 2 11CH",
+      "channels": 11
+    },
+    {
+      "name": "Mode 3 14 CH",
+      "channels": 14
+    },
+    {
+      "name": "Mode 4 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Mode 5 1CH (WW)",
+      "channels": 1
+    },
+    {
+      "name": "Mode 6 2CH (WW)",
+      "channels": 2
+    },
+    {
+      "name": "Mode 7 4CH (WW)",
+      "channels": 4
+    },
+    {
+      "name": "Mode 8 6CH (WW)",
+      "channels": 6
+    },
+    {
+      "name": "Mode 9 6CH (RGBW)",
+      "channels": 6
+    },
+    {
+      "name": "Mode 10 7CH (RGBW)",
+      "channels": 7
+    },
+    {
+      "name": "Mode 11 10CH (RGBW)",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "ipRating": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Vintage_Bar@25-09-09_Release.gdtf",
+  "fixtureTypeId": "2F98ADFE-71A9-4515-ADB2-80CA4A7722A3",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Vintage Bar",
+  "longName": "Vintage Bar",
+  "shortName": "Vintage Bar FX",
+  "description": "Vintage Bar combines a retro amber blinder effect with vibrant RGBL background LEDs, offering rich multi-color eye candy effects and smooth dimming. With advanced strobe, pixel control, and versatile connectivity, it’s perfect for creative stage and event lighting setups.",
+  "manufacturer": "ADJ",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 230.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 780,
+  "maxLuminousIntensityCd": 16200,
+  "luminousFluxLm": 6732.0,
+  "noiseLevelDb": null,
+  "weightKg": 19.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 140.0,
+    "max": 140.0
+  },
+  "fieldAngleDeg": 160,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBAL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 2000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "100CH",
+      "channels": 100
+    },
+    {
+      "name": "93CH",
+      "channels": 93
+    },
+    {
+      "name": "91CH",
+      "channels": 91
+    },
+    {
+      "name": "84CH",
+      "channels": 8
+    },
+    {
+      "name": "21CH",
+      "channels": 21
+    },
+    {
+      "name": "17CH",
+      "channels": 17
+    },
+    {
+      "name": "11CH",
+      "channels": 11
+    },
+    {
+      "name": "7CH",
+      "channels": 7
+    },
+    {
+      "name": "5CH",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "4 x 150 W amber COB + RGBL pixels. GDTF power 39 W invalid."
+  ],
+  "_refs": [
+    "https://www.adj.com/products/vintage-bar"
+  ]
+}

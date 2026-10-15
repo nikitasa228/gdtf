@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Brother_Brother_and_Sons@Area_48_-_Color@REV1.gdtf",
+  "fixtureTypeId": "A9EA6597-A1AB-4BD9-94FC-5C6DC8B48659",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Area 48 - Color",
+  "longName": "Area 48 - Color",
+  "shortName": "Area48C",
+  "description": "Area 48 Color: soft-light LED panel with full-colour (RGB + warm/cool white) mixing for film and TV.",
+  "manufacturer": "Brother Brother and Sons",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 162.0,
+  "maxLuminousIntensityCd": 3100.0,
+  "luminousFluxLm": 10798.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 60.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 105.3,
+    "max": 105.3
+  },
+  "fieldAngleDeg": 105.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW+CW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2430.0,
+    "max": 9550.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "FULL 8-bit",
+      "channels": 6
+    },
+    {
+      "name": "FULL 8-bit - Strobe ON",
+      "channels": 8
+    },
+    {
+      "name": "FULL 8-bit - Effects ON",
+      "channels": 13
+    },
+    {
+      "name": "FULL 8-bit - Strobe/Effects ON",
+      "channels": 15
+    },
+    {
+      "name": "FULL 16-bit",
+      "channels": 12
+    },
+    {
+      "name": "FULL 16-bit - Strobe ON",
+      "channels": 14
+    },
+    {
+      "name": "FULL 16-bit - Effects ON",
+      "channels": 19
+    },
+    {
+      "name": "FULL 16-bit - Strobe/Effects ON",
+      "channels": 21
+    },
+    {
+      "name": "CCT 8-bit",
+      "channels": 3
+    },
+    {
+      "name": "CCT 8-bit - Strobe ON",
+      "channels": 5
+    },
+    {
+      "name": "CCT 8-bit - Effects ON",
+      "channels": 10
+    },
+    {
+      "name": "CCT 8-bit - Strobe/Effects ON",
+      "channels": 12
+    },
+    {
+      "name": "CCT 16-bit",
+      "channels": 6
+    },
+    {
+      "name": "CCT 16-bit - Strobe ON",
+      "channels": 8
+    },
+    {
+      "name": "CCT 16-bit - Effects ON",
+      "channels": 13
+    },
+    {
+      "name": "CCT 16-bit - Strobe/Effects ON",
+      "channels": 15
+    },
+    {
+      "name": "CCT+ 8-bit",
+      "channels": 7
+    },
+    {
+      "name": "CCT+ 8-bit - Strobe ON",
+      "channels": 9
+    },
+    {
+      "name": "CCT+ 8-bit - Effects ON",
+      "channels": 14
+    },
+    {
+      "name": "CCT+ 8-bit - Strobe/Effects ON",
+      "channels": 16
+    },
+    {
+      "name": "CCT+ 16-bit",
+      "channels": 14
+    },
+    {
+      "name": "CCT+ 16-bit - Strobe ON",
+      "channels": 16
+    },
+    {
+      "name": "CCT+ 16-bit - Effects ON",
+      "channels": 21
+    },
+    {
+      "name": "CCT+ 16-bit - Strobe/Effects ON",
+      "channels": 23
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Soft light panel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "description": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_MANA_PROFILE_(XA_600_BSWF_IP)@ACME_MANA_PROFILE_(XA_600_BSWF_IP).gdtf",
+  "fixtureTypeId": "5B7E4C4D-BB0A-478B-BFCC-58D021C7671D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME MANA PROFILE (XA 600 BSWF IP)",
+  "longName": "ACME MANA PROFILE(XA 600 BSWF IP)",
+  "shortName": "MANA PROFILE(XA 600 BSWF IP)",
+  "description": "ACME MANA PROFILE(XA 600 BSWF IP)",
+  "manufacturer": "ACME",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 910,
+  "maxLuminousIntensityCd": 1910900.0,
+  "luminousFluxLm": 26000,
+  "noiseLevelDb": null,
+  "weightKg": 32.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.5,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "GOBO1",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "GOBO2",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 17,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 7000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism1",
+      "facets": null
+    },
+    {
+      "name": "Prism2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard 40 DMX",
+      "channels": 40
+    },
+    {
+      "name": "Spot 31 DMX",
+      "channels": 31
+    },
+    {
+      "name": "Framing 31 DMX",
+      "channels": 31
+    },
+    {
+      "name": "Wash 22 DMX",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "GDTF weight 46.5 kg contradicts spec sheet (32.5 kg)."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/item/MANA-PROFILE"
+  ]
+}

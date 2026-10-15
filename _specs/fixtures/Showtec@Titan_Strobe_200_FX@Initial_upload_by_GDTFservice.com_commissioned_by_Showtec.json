@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Titan_Strobe_200_FX@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "85A010A3-99B1-11F0-BA60-42010A37C005",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Titan Strobe 200 FX",
+  "longName": "Titan Strobe 200 FX",
+  "shortName": "Titan Strobe 200 FX",
+  "description": "Titan Strobe 200 FX has a cold white 200-watt COB LED in the centre surrounded by two rings of 12 individually controllable 2-watt RGBW LEDs. This allows it to produce powerful strobe effects complemented by bright colours. The Fresnel lens ensures a wide beam angle. The Titan Strobe 200 FX can be controlled by DMX. It also has RDM and can run in Master or Slave mode, as well as having a stand-alone mode with several built-in programs.\n\nWith a robust, IP65-rated housing, this versatile light fixture brings powerful strobe and colourful lighting effects to all sorts of indoor and outdoor events. Installation is quick and easy thanks to the included quick-lock bracket and a 12.5 mm hole for attaching the fixture to a clamp.",
+  "manufacturer": "Showtec",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 610.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 59760.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Strobe 4Ch",
+      "channels": 4
+    },
+    {
+      "name": "Basic 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "FX 11Ch",
+      "channels": 11
+    },
+    {
+      "name": "Sectional 52Ch",
+      "channels": 4
+    },
+    {
+      "name": "Sectional 100Ch",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 8,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

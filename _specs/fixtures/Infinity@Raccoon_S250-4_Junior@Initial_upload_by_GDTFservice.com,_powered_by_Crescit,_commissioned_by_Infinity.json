@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Raccoon_S250-4_Junior@Initial_upload_by_GDTFservice.com,_powered_by_Crescit,_commissioned_by_Infinity.gdtf",
+  "fixtureTypeId": "A64EB089-C69B-11F0-B388-42010A37C006",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Raccoon S250-4 Junior",
+  "longName": "Raccoon S250-4 Junior",
+  "shortName": "RaccoonS2504Junior",
+  "description": "Raccoon S250-4 Junior is a powerful strobe/wash combination fixture with a motorized tilt function and a beam angle of 130 degrees. The 252 RGBW LEDs deliver wash effects of over 14,000 lumens and can be controlled in 6 sections with 42 LEDs each. The white light from the RGBW LEDs has a CRI of 92, which is very high for a product of this type.\n\nThe strobe effect is created by a row of 21 ultra-bright CW LEDs, which can be controlled in 3 separate sections. Combined with the RGBW LEDs, the Raccoon S250/4 Junior is capable of delivering a constant output of almost 20,800 lumens and a strobe output of over 55,000 lumens! The strobe LEDs, that have a special lens to optimize the output angle, are positioned in a vertical line in the centre of the fixture in between the wash LEDs.\n\nIn continuous output mode, the strobe LEDs alone deliver almost 12,000 lumens. The LEDs are soldered onto a black PCB, so the strobes are inconspicuous when switched off. The cooling fans can be set to a slow mode to keep them whisper quiet. The housing is IP65-rated and suitable for temporary outdoor use. Other optional accessories include a top hat, a barndoor and a range of diffusers.",
+  "manufacturer": "Infinity",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 44.0,
+  "maxLuminousIntensityCd": 51700.0,
+  "luminousFluxLm": 221444.0,
+  "noiseLevelDb": null,
+  "weightKg": 14.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 117.0,
+    "max": 117.0
+  },
+  "fieldAngleDeg": 130.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "5Ch Mode",
+      "channels": 5
+    },
+    {
+      "name": "14Ch Mode",
+      "channels": 14
+    },
+    {
+      "name": "22Ch1 Mode",
+      "channels": 22
+    },
+    {
+      "name": "22Ch2 Mode",
+      "channels": 22
+    },
+    {
+      "name": "31Ch Mode",
+      "channels": 31
+    },
+    {
+      "name": "44Ch Mode",
+      "channels": 44
+    }
+  ],
+  "pixelCount": 4,
+  "subType": "Architectural flood",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

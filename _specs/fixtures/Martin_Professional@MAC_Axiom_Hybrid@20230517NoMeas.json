@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Martin_Professional@MAC_Axiom_Hybrid@20230517NoMeas.gdtf",
+  "fixtureTypeId": "A01F4253-1D30-4B66-8C48-A8B087A69187",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MAC Axiom Hybrid",
+  "longName": "MAC Axiom Hybrid",
+  "shortName": "MACAxiHyb",
+  "description": "Official Martin Professional File (no measurements)",
+  "manufacturer": "Martin Professional",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 11703700.0,
+  "luminousFluxLm": 16000.0,
+  "noiseLevelDb": null,
+  "weightKg": 24.8,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 44.0
+  },
+  "fieldAngleDeg": 51.8,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 9,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 21,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 30,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 7000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "3 Facet Prism Behind",
+      "facets": null
+    },
+    {
+      "name": "8 Facet Prism Behind",
+      "facets": null
+    },
+    {
+      "name": "3 Facet Prism Before",
+      "facets": null
+    },
+    {
+      "name": "8 Facet Prism Before",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic",
+      "channels": 23
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

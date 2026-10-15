@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@Nuke_2_IP65@rev100c_EDIT_Repaired_Virtual_Dimmer_Relation.gdtf",
+  "fixtureTypeId": "68CB946B-DA62-456C-8A64-026DF40B373E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Nuke 2 IP65",
+  "longName": "Nuke2",
+  "shortName": "Nuke2",
+  "description": "rev100c repaired single cell Virtual Dimmer Relation error that caused green pixel 30 to remain on in green edited DMX modes RDM versions\n\nMotorized Hybrid Strobe/Wash/PixelMap :: IP65 / 96 x 9 x 0.5 W RGB / 12 x 40 W 6500K / Tilt 180 degree",
+  "manufacturer": "BeamZ Pro",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 72981.0,
+  "noiseLevelDb": null,
+  "weightKg": 21.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 123.0,
+    "max": 123.0
+  },
+  "fieldAngleDeg": 160.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "324 Channel",
+      "channels": 324
+    },
+    {
+      "name": "324 Channel + VIRTUAL DIMMERS",
+      "channels": 324
+    },
+    {
+      "name": "310 Channel",
+      "channels": 310
+    },
+    {
+      "name": "310 Channel + VIRTUAL DIMMERS",
+      "channels": 310
+    },
+    {
+      "name": "132 Channel",
+      "channels": 132
+    },
+    {
+      "name": "132 Channel + VIRTUAL DIMMERS",
+      "channels": 132
+    },
+    {
+      "name": "84 Channel",
+      "channels": 84
+    },
+    {
+      "name": "84 Channel + VIRTUAL DIMMERS",
+      "channels": 84
+    },
+    {
+      "name": "23 Channel",
+      "channels": 23
+    },
+    {
+      "name": "13 Channel",
+      "channels": 13
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

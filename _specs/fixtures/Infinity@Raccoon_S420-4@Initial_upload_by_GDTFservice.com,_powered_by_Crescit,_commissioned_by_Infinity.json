@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Raccoon_S420-4@Initial_upload_by_GDTFservice.com,_powered_by_Crescit,_commissioned_by_Infinity.gdtf",
+  "fixtureTypeId": "D07B9EEF-8EDD-4752-9776-A4A574634025",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Raccoon S420-4",
+  "longName": "Raccoon S420-4",
+  "shortName": "RaccoonS420-4",
+  "description": "Raccoon S420-4 is a very powerful strobe/wash combination fixture with a beam angle of 110 degrees. It has ten individually controllable sections with 42 RGBW LEDs each that deliver wash effects of up to 30,400 lumens when combined. The white part of the RGBW LEDs has a CRI of 92, which is very high for a product of this type.\n\nThe strobe effect is created by a row of 35 ultra-bright CW LEDs, each capable of strobing at 20 W for a total of 700 W of LED strobe power (over 70,000 lumens)! The strobe LEDs have a special lens to optimise the output angle. The LEDs are positioned in a line in the centre of the fixture in between the wash LEDs. They can be used in continuous output mode, but are tuned down to 12 W (over 54,200 lumens) in this mode for thermal reasons.\n\nThe LEDs are soldered onto a black PCB, so the strobes are inconspicuous when switched off. The cooling fans can be set to a slow mode to keep them whisper quiet. With the optional L bracket, the IP65-rated housing can be mounted vertically or at an angle, while still being balanced (no torque force on the mount). Other optional accessories include a top hat, a barndoor and a range of diffusers.",
+  "manufacturer": "Infinity",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 144000.0,
+  "noiseLevelDb": null,
+  "weightKg": 17.8,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 126.8,
+    "max": 126.8
+  },
+  "fieldAngleDeg": 140.9,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Strobe Mode",
+      "channels": 4
+    },
+    {
+      "name": "Basic Mode",
+      "channels": 13
+    },
+    {
+      "name": "Basic FX Mode",
+      "channels": 23
+    },
+    {
+      "name": "Helix Mode",
+      "channels": 28
+    },
+    {
+      "name": "Raw Mode",
+      "channels": 46
+    },
+    {
+      "name": "Full Mode",
+      "channels": 59
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "Architectural flood",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

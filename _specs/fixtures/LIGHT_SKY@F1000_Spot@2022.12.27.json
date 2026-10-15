@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "file": "LIGHT_SKY@F1000_Spot@2022.12.27.gdtf",
+  "fixtureTypeId": "3326EA0F-1813-4961-A1E0-2783881D884C",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "F1000 Spot",
+  "longName": "F1000 Spot",
+  "shortName": "F1000 Spot",
+  "description": "LIGHT SKY F1000 Spot: moving-head Discharge Lamp spot, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 17 gobos, prism, frost.",
+  "manufacturer": "LIGHT SKY",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 5368400.0,
+  "luminousFluxLm": 77500.0,
+  "noiseLevelDb": null,
+  "weightKg": 37.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 6.5,
+    "max": 44.0
+  },
+  "fieldAngleDeg": 44.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo 1",
+      "slots": 5,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo 2",
+      "slots": 6,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo 3",
+      "slots": 6,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 17,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 6000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4 Facet Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "34CH",
+      "channels": 34
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "description": "gdtf-derived"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

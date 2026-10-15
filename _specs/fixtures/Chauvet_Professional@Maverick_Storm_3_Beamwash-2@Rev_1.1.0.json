@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_Storm_3_Beamwash-2@Rev_1.1.0.gdtf",
+  "fixtureTypeId": "5141970C-711E-445C-8F74-9BA7B51D2545",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick Storm 3 Beamwash-2",
+  "longName": "Maverick Storm 3 Beamwash-2",
+  "shortName": "MS3BW-2",
+  "description": "Maverick Storm 3 BeamWash creates new possibilities with two zones of zoom control. Both zones independently zoom from 4.6deg to 53.6deg allowing for beam and wash combinations from a single fixture. A 16-lens outer zone and 12-lens inner zone combine to deliver a massive 19,062 lumens of output from 28x45W RGBW LEDs. Built-in macros with foreground and background control easily generate stunning pixel eye candy. A unique lens design delivers excellent color blending, tight aerial beam effects and visual impact live or on camera. Dual mode operation enables pixel-mapped eye candy to run under ArtNet/sACN control with separate assignment of motorized functions to DMX. Housed in an advanced IP65-rated alloy body, Maverick Storm 3 BeamWash is built with the durability and versatility to perform in any venue, indoors or out.",
+  "manufacturer": "Chauvet Professional",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1478,
+  "maxLuminousIntensityCd": 1533400,
+  "luminousFluxLm": 1362.0,
+  "noiseLevelDb": 38.2,
+  "weightKg": 37.4,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.9,
+    "max": 53.8
+  },
+  "fieldAngleDeg": 47.7,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 19000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Single Control: Full Pixel 424ch",
+      "channels": 424
+    },
+    {
+      "name": "Single Control: Tour 416ch",
+      "channels": 416
+    },
+    {
+      "name": "Single Control: Advanced 336ch",
+      "channels": 336
+    },
+    {
+      "name": "Single Control: Standard 180ch",
+      "channels": 180
+    },
+    {
+      "name": "Single Control: Basic3 38ch",
+      "channels": 38
+    },
+    {
+      "name": "Single Control: Basic2 38ch",
+      "channels": 38
+    },
+    {
+      "name": "Single Control: Basic 32ch",
+      "channels": 32
+    },
+    {
+      "name": "Single Control: Busk 20ch",
+      "channels": 20
+    },
+    {
+      "name": "Dual Movement Mode: Advanced 46ch",
+      "channels": 46
+    },
+    {
+      "name": "Dual Movement Mode: Standard 35ch",
+      "channels": 35
+    },
+    {
+      "name": "Dual Movement Mode: Basic 12ch",
+      "channels": 12
+    },
+    {
+      "name": "Dual Control Pixel: Advanced 296ch",
+      "channels": 296
+    },
+    {
+      "name": "Dual Control Pixel: Standard 148ch",
+      "channels": 148
+    },
+    {
+      "name": "Dual Control Pixel: Basic 120ch",
+      "channels": 120
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 90 W invalid."
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-storm-3-beamwash/"
+  ]
+}

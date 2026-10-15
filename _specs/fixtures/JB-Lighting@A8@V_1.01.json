@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "JB-Lighting@A8@V_1.01.gdtf",
+  "fixtureTypeId": "F562A2ED-536A-4D98-A75F-BDD1F2036810",
+  "gdtfDataVersion": "1.1",
+  "gdtfName": "A8",
+  "longName": "A8",
+  "shortName": "A8",
+  "description": "A8",
+  "manufacturer": "JB-Lighting",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 110.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 500.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 92000.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.5,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 433.6,
+  "tiltRangeDeg": 333.3,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 8.0,
+    "max": 48.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard 8Bit S8 (18)",
+      "channels": 18
+    },
+    {
+      "name": "Standard 16Bit S16 (22)",
+      "channels": 22
+    },
+    {
+      "name": "Compressed 8 Bit C8 (15)",
+      "channels": 15
+    },
+    {
+      "name": "Compressed 16Bit C16 (19)",
+      "channels": 19
+    }
+  ],
+  "pixelCount": 3,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

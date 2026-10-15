@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Protege_XM@26-07-01_Release.gdtf",
+  "fixtureTypeId": "9E18F588-63EE-4011-B1A0-9A2F1B02DD16",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Protege XM",
+  "longName": "Protégé XM",
+  "shortName": "PrtgXM",
+  "description": "The Protégé XM’s advanced color system includes disc-based CMY color mixing, complemented by two color wheels, each loaded with nine vibrant dichroic filters, including a 2700K CTO filter for warm white output. Creative flexibility is enhanced further through dual rotating GOBO wheels – each featuring seven high-definition, replaceable glass GOBOs—allowing for intricate layered textures and dynamic mid-air effects. Its extensive effects engine features dual 6-facet prisms (linear and circular), which can be overlaid for complex refraction patterns, as well as two variable frost filters for smooth diffusion and an animation wheel for evolving motion graphics.",
+  "manufacturer": "ADJ",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 675,
+  "maxLuminousIntensityCd": 3242200.0,
+  "luminousFluxLm": 18000,
+  "noiseLevelDb": null,
+  "weightKg": 22.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": true,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.8,
+    "max": 44.0
+  },
+  "fieldAngleDeg": 60.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1",
+      "facets": null
+    },
+    {
+      "name": "Prism 2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended",
+      "channels": 43
+    },
+    {
+      "name": "Standard",
+      "channels": 35
+    },
+    {
+      "name": "Basic",
+      "channels": 29
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.adj.com/products/protege-xm"
+  ]
+}

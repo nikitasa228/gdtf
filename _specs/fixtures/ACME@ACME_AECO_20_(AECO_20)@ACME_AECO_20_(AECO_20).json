@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_AECO_20_(AECO_20)@ACME_AECO_20_(AECO_20).gdtf",
+  "fixtureTypeId": "B5479C3F-E2B6-44F1-BC22-77423A0AD6EB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME AECO 20 (AECO 20)",
+  "longName": "ACME AECO 20 (AECO 20)",
+  "shortName": "AECO 20",
+  "description": "ACME AECO 20 1400W LED",
+  "manufacturer": "ACME",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1580,
+  "maxLuminousIntensityCd": 2100000,
+  "luminousFluxLm": 36000,
+  "noiseLevelDb": null,
+  "weightKg": 47.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "GOBO1",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "GOBO2",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism1",
+      "facets": null
+    },
+    {
+      "name": "Prism2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 37 DMX",
+      "channels": 37
+    },
+    {
+      "name": "Mode 2 28 DMX",
+      "channels": 28
+    },
+    {
+      "name": "Mode 3 31 DMX",
+      "channels": 31
+    },
+    {
+      "name": "Mode 4 22 DMX",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "luminousFluxLm": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/item/AECO-20"
+  ]
+}

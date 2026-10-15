@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_CETUS_(XP-380_BEAM_IP)@ACME_CETUS__(XP-380_BEAM_IP).gdtf",
+  "fixtureTypeId": "54501797-B673-489D-B0E8-74FB88FF2F03",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME CETUS (XP-380 BEAM IP)",
+  "longName": "ACME CETUS (XP-380 BEAM IP)",
+  "shortName": "CETUS (XP-380 BEAM IP)",
+  "description": "ACME CETUS (XP-380 BEAM IP) 380W",
+  "manufacturer": "ACME",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 535.0,
+  "maxLuminousIntensityCd": 2808900.0,
+  "luminousFluxLm": 6000.0,
+  "noiseLevelDb": null,
+  "weightKg": 30.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 2.5,
+    "max": 2.5
+  },
+  "fieldAngleDeg": 15.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "Gobo1",
+      "slots": 11,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 11,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7800.0,
+    "max": 7800.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1",
+      "facets": null
+    },
+    {
+      "name": "Open 1",
+      "facets": null
+    },
+    {
+      "name": "Prism 2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 2 18 DMX",
+      "channels": 18
+    },
+    {
+      "name": "Mode 1 16DMX",
+      "channels": 16
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

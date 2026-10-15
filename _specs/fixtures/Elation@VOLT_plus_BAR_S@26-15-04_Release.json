@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@VOLT_plus_BAR_S@26-15-04_Release.gdtf",
+  "fixtureTypeId": "7098C74A-CF12-4678-9519-AB874DC72E01",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "VOLT plus BAR S",
+  "longName": "VOLT+ BAR S",
+  "shortName": "VOLT+BrS",
+  "description": "The VOLT+ BAR S is the next evolution in creative LED batten solutions, now featuring a high-performance battery system for ultimate flexibility. Combining the latest in LED color technology with the freedom of wireless operation, this fixture empowers designers to push creative boundaries without the constraints of power cables.\nBuilding on the success of Elation’s SIX+ BAR S and L, the VOLT+ BAR S offers the same high output, expanded color spectrum, and a superior quality of light. Equipped with powerful 20W RGB+Lime+Amber+UV LEDs and boasting an impressive CRI of 90.9, this fixture delivers stunning, high-fidelity color rendering with beautifully homogenized output. Its advanced optical system ensures even light distribution, while the proprietary RGBLA+UV engine produces exceptional whites and vibrant primaries with no color fringing. The extra-large 50 mm lenses make it ideal for direct view applications, while individual cell control opens up a world of design possibilities.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 140.0,
+  "maxLuminousIntensityCd": 33200.0,
+  "luminousFluxLm": 3962.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.75,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 18.7,
+    "max": 18.7
+  },
+  "fieldAngleDeg": 33.1,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1CH",
+      "channels": 1
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "9CH",
+      "channels": 9
+    },
+    {
+      "name": "14CH",
+      "channels": 14
+    },
+    {
+      "name": "17 ch-A",
+      "channels": 17
+    },
+    {
+      "name": "17 ch-B",
+      "channels": 17
+    },
+    {
+      "name": "23 ch-A",
+      "channels": 23
+    },
+    {
+      "name": "23 ch-B",
+      "channels": 23
+    },
+    {
+      "name": "35CH",
+      "channels": 35
+    },
+    {
+      "name": "47CH",
+      "channels": 47
+    },
+    {
+      "name": "83CH",
+      "channels": 83
+    },
+    {
+      "name": "36CH",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 14,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Litepanels@LitePanels_Studio_X5@1.0.01_-_Initial_Public_release.gdtf",
+  "fixtureTypeId": "1926F5CF-C601-402C-9D66-3B23004B33CA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LitePanels Studio X5",
+  "longName": "LitePanels Studio X5",
+  "shortName": "Studio X5",
+  "description": "The Studio X5 Bi-Color 200W has a 10” lens with a wide spot-to-flood beam angle range of 16°-70°. With a maximum output of 11,704 lux at 10ft/3m (spot 5,600K), its output at 3,200K is similar to a 1KW traditional tungsten Fresnel. Advanced thermal management ensures 50,000+ hours of LED engine life, while individual burn-in and calibration tests ensure quality and consistency.",
+  "manufacturer": "Litepanels",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 152800.0,
+  "luminousFluxLm": 13350.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 16.0,
+    "max": 16.0
+  },
+  "fieldAngleDeg": 70.0,
+  "zoom": false,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "8 Bit Tungsten",
+      "channels": 1
+    },
+    {
+      "name": "16 Bit Tungsten",
+      "channels": 2
+    },
+    {
+      "name": "8 Bit Daylight",
+      "channels": 1
+    },
+    {
+      "name": "16 Bit Daylight",
+      "channels": 2
+    },
+    {
+      "name": "8 Bit BiColor",
+      "channels": 2
+    },
+    {
+      "name": "16 Bit BiColor",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 3,
+  "subType": "Fresnel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

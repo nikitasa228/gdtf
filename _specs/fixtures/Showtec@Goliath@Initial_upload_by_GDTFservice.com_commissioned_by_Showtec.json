@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Goliath@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "6DE07FCD-2BC1-11F0-AFEE-42010A37C004",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Goliath",
+  "longName": "Goliath",
+  "shortName": "Goliath",
+  "description": "Goliath is a retro light effect that combines a powerful 300 W warm white LED with built-in 20 W amber LED, along with a dual RGB LED ring and central RGB LEDs. The 20 W amber and 300 W warm white LED replicate the classic tungsten dimming effect, delivering a nostalgic retro feel. Depending on the selected mode, the warm white and amber LEDs can be controlled separately or as a single 'tungsten channel'.\n\nBehind the central circular plate there are 24 RGB LEDs that illuminate the centre of the reflector. Surrounding this, a large circle of 120 RGB LEDs lights up the reflector’s edges. A second ring of 120 RGB LEDs at the outer edge faces forward. Each RGB LEDs can be controlled individually, offering nearly infinite effect possibilities.\n\nThe Goliath supports multiple control modes, including DMX, Art-Net, sACN, RDM, master/slave and manual modes, with several personalities ranging from 4 to 793 channels. It features a double bracket for both hanging and standing installations. Additionally, quick-lock mounting points on the back allow for easy attachment to a truss using the included brackets. A Schuko to Power Pro True cable is included.",
+  "manufacturer": "Showtec",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 325.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 12.5,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA+WW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4Ch RGBW Mode",
+      "channels": 4
+    },
+    {
+      "name": "5Ch RAW Mode",
+      "channels": 5
+    },
+    {
+      "name": "13Ch Basic Mode",
+      "channels": 13
+    },
+    {
+      "name": "19Ch Extended Mode",
+      "channels": 19
+    },
+    {
+      "name": "793Ch Extended Mode",
+      "channels": 793
+    }
+  ],
+  "pixelCount": 4,
+  "subType": "Retro LED blinder",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

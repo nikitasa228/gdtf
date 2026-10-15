@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_LedPOINTE@2026-10-08_Beam_properties_updated.gdtf",
+  "fixtureTypeId": "7DD0F0B0-6D12-4440-85CC-EC5B299AF485",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin LedPOINTE",
+  "longName": "Robin LedPOINTE®",
+  "shortName": "LedPOINTE",
+  "description": "Now is the perfect time to transition from traditional discharge lamp based all-in-one luminaires to energy efficient, long lasting, low maintenance LED fixtures. Our LedPOINTE® is effect packed, with all the features, innovation and superior performance you would expect to see from Robe, delivering a stand-out experience in LED Spot, Beam, Wash and FX technology.\nLedPOINTE® is equipped with the advanced TE™ 280W XP (Xtra Performance) White LED TRANSFERABLE ENGINE, delivering an impressive 160.000 lx at 5 m distance. With an L70 rating of 50.000 hours, this high-performance engine offers exceptional durability—meaning you won’t need to worry about replacements anytime soon.\nDesigned for versatility and eye-catching visuals, LedPOINTE® features a 150mm front lens with a 2:1 beam hot-spot ratio and a flexible 1.8° - 44° zoom range, making it ideal for all applications. \nYou’ll enjoy fast, smooth fixture movement with continuous pan rotation, and with our patented EMS™ (Electronic Motion Stabilizer) software, you’ll achieve instant stopping precision, eliminating any unwanted shake or hysteresis.\nColour control is seamless with the CMY colour mixing system, allowing easy blending from delicate pastels to deep saturates. A colour wheel contains 13 dichroic colours. The onboard DataSwatch™ library provides instant access to your favourite colours and the most used calibrated whites - 2.700K, 3.200K, 4.200K, 5.600K and 8.000K are included for faster programming, letting you quickly adapt to the needs of any performance.\nLedPOINTE® is built to impress, with an extensive effect array, including two gobo wheels. The first with 9 rotating, indexable and rotating gobos. The second static wheel contains another 11 gobos. All are selected for maximum impact and in-air effect capability.\nTwo MagFrost™ magnetic paddle fast-change frosts with standard light 1° and medium 5° are included. Other MagFrost™ options are available.\nTwo Prism wheels add to the effect availability. Featuring the Robe patented stackable MLP™ Multi-Level Prism system, there are two wheels. The first has a 6-facet linear and 18-facet radial independently controlled prisms with bi-directional speed control. For a show-stopping experience, the patented SpektraBeam™ effects engine, on the second prism wheel, creates intense splintered beams with vivid colours that will mesmerize audiences. 8-facet radial prism is added on the second wheel for more visual effects.\nWith L3™ (Low Light Linearity) dimming, Cpulse™ Pulse Width Modulation control and AirLOC™ (Less Optical Cleaning) technology greatly reducing the level of particles drawn over optics to increase performance and time spent between cleaning, you have all the extra technologies that sets the LedPOINTE® apart from the rest. \nAll these features, technologies and effects packaged into a compact 21 kg housing make LedPOINTE® the ultimate choice for LED all-in-one fixtures.",
+  "manufacturer": "Robe Lighting",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": 9178700.0,
+  "luminousFluxLm": 10164.0,
+  "noiseLevelDb": null,
+  "weightKg": 21.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": true,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 1.8,
+    "max": 44.0
+  },
+  "fieldAngleDeg": 47.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "RotatingGoboWheel",
+      "slots": 9,
+      "rotating": true
+    },
+    {
+      "wheel": "StaticGoboWheel",
+      "slots": 11,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 20,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "P01 - 18F circular",
+      "facets": null
+    },
+    {
+      "name": "P02 - 6F Linear",
+      "facets": null
+    },
+    {
+      "name": "P01 - 6F MC linear",
+      "facets": null
+    },
+    {
+      "name": "P02 - 8F circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 3,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - Standard 16 - bit",
+      "channels": 39
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

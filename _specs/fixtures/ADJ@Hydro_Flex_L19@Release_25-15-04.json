@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Hydro_Flex_L19@Release_25-15-04.gdtf",
+  "fixtureTypeId": "59C7E377-DAEA-4B5C-9B3F-F1E5DD6601DF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Hydro Flex L19",
+  "longName": "Hydro Flex L19",
+  "shortName": "HydFlex19",
+  "description": "Hydro Flex L19 is an IP65-rated 1,140W professional moving head wash fixture with nineteen 60W RGBL LEDs with individual pixel control, tunable white color temperature control (2,700K – 10,000K), motorized zoom and includes Aria X2 wireless management system built-in. With a rugged IP65-rated case design, a potent LED engine, and a wealth of professional-grade features, the Hydro Flex L19 is a great solution for outdoor or indoor stage environments.",
+  "manufacturer": "ADJ",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400,
+  "maxLuminousIntensityCd": 1360000,
+  "luminousFluxLm": 11580.0,
+  "noiseLevelDb": null,
+  "weightKg": 27.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 250.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 38.0
+  },
+  "fieldAngleDeg": 56.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "22 CH",
+      "channels": 22
+    },
+    {
+      "name": "31 CH STD",
+      "channels": 31
+    },
+    {
+      "name": "40 CH",
+      "channels": 40
+    },
+    {
+      "name": "104 CH",
+      "channels": 104
+    },
+    {
+      "name": "31 CH STD RGBW",
+      "channels": 31
+    },
+    {
+      "name": "31 CH STD CMY",
+      "channels": 31
+    },
+    {
+      "name": "34 CH",
+      "channels": 34
+    }
+  ],
+  "pixelCount": 20,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.adj.com/hydro-flex-l19"
+  ]
+}

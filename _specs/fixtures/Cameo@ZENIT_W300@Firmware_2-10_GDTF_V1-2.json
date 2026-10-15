@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Cameo@ZENIT_W300@Firmware_2-10_GDTF_V1-2.gdtf",
+  "fixtureTypeId": "AD3F4252-9902-4BB6-BF51-25BA65D754C7",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ZENIT W300",
+  "longName": "ZENIT W300 (CLZW300)",
+  "shortName": "W300",
+  "description": "Outdoor Wash Light - RGBW-Version",
+  "manufacturer": "Cameo",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 300,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 10661,
+  "noiseLevelDb": null,
+  "weightKg": 8.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 170.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 120.0,
+    "max": 120.0
+  },
+  "fieldAngleDeg": 160.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 7000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "2 CH CCT Factory- Calibrated",
+      "channels": 2
+    },
+    {
+      "name": "3 CH Color Presets",
+      "channels": 3
+    },
+    {
+      "name": "3 CH Factory- Calibrated 8 Bit",
+      "channels": 3
+    },
+    {
+      "name": "4 CH User- Calibrated 8 Bit",
+      "channels": 4
+    },
+    {
+      "name": "6 CH Factory- Calibrated 16 Bit",
+      "channels": 6
+    },
+    {
+      "name": "8 CH User- Calibrated 16 Bit",
+      "channels": 8
+    },
+    {
+      "name": "10 CH Full Area- Access 8 Bit",
+      "channels": 10
+    },
+    {
+      "name": "15 CH Full Area- Access 16 Bit",
+      "channels": 15
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Outdoor flood",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "ipRating": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF weight 3 kg / power 600 W contradict spec sheet."
+  ],
+  "_refs": [
+    "https://adamhall.com/shop/en/brands/zenit-w300"
+  ]
+}

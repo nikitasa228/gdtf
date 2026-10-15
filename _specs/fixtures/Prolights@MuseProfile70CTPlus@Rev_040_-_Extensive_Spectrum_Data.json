@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@MuseProfile70CTPlus@Rev_040_-_Extensive_Spectrum_Data.gdtf",
+  "fixtureTypeId": "3F2E8495-DC65-4D1B-8047-DE5740D6C55C",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MuseProfile70CTPlus",
+  "longName": "MuseProfile70CTPlus",
+  "shortName": "MUSE70P",
+  "description": "1000W 6-colour LED source with additive mixing, delivering >21,000 lm.\nOutstanding colour rendering: CRI up to Ra 99, R9 97, TLCI 97.\nSpektraOs ecosystem with ultra-wide CCT 2,200K-15,000K, Tint correction, and advanced control modes (RGB / CMY / XY / RAW / Gel & Tungsten Emulation).\nFull effects package: physical colours wheel, 2 rotating gobo wheels, 4-blade framing system (full curtain), animation wheel, linear frost filter, motorized iris, absolute encode.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1300.0,
+  "maxLuminousIntensityCd": 1771800.0,
+  "luminousFluxLm": 21075.0,
+  "noiseLevelDb": null,
+  "weightKg": 33.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.9,
+    "max": 49.7
+  },
+  "fieldAngleDeg": 19.9,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "RG1",
+      "slots": 6,
+      "rotating": true
+    },
+    {
+      "wheel": "RG2",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 12,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2200.0,
+    "max": 15000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4F Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_CTC",
+      "channels": 43
+    },
+    {
+      "name": "Standard_RGB",
+      "channels": 49
+    },
+    {
+      "name": "Standard_CMY",
+      "channels": 49
+    },
+    {
+      "name": "Advanced_xy",
+      "channels": 49
+    },
+    {
+      "name": "RAW",
+      "channels": 54
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

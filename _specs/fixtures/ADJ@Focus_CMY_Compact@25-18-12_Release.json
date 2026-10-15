@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Focus_CMY_Compact@25-18-12_Release.gdtf",
+  "fixtureTypeId": "87353883-FAE5-4AB0-894D-2A215C0F7E46",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Focus CMY Compact",
+  "longName": "Focus CMY Compact",
+  "shortName": "FocusCMY",
+  "description": "Delivering best-in-class power and versatility, the ADJ Focus CMY Compact is an automated luminaire capable of functioning interchangeably as a beam, spot or wash. Powered by a 400-watt LED engine it delivers output of up to 14,500 lumens. An extensive suite of beam shaping tools begins with full CMY + CTO color mixing and also includes two GOBO wheels, two rotating prisms, two frost filters, and Aria X2 wireless, as well as motorized zoom (3°~52°) and focus. All of this is packed into a compact and robust fixture that weighs less than 45 lbs. (20kg).",
+  "manufacturer": "ADJ",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 450,
+  "maxLuminousIntensityCd": 5201800.0,
+  "luminousFluxLm": 15800,
+  "noiseLevelDb": null,
+  "weightKg": 20.2,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.0,
+    "max": 52.0
+  },
+  "fieldAngleDeg": 55.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "Static Gobo",
+      "slots": 10,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 8500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open Prism",
+      "facets": null
+    },
+    {
+      "name": "Prism 1 (6 Facet Linear)",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 (4 Facet Square)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540",
+      "channels": 40
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 31
+    },
+    {
+      "name": "Basic Pan540",
+      "channels": 26
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 40
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 31
+    },
+    {
+      "name": "Basic Pan630",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.adj.com/products/focus-cmy-compact"
+  ]
+}

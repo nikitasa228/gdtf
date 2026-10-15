@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclProfileCTPlusHP@Rev_037_-_RAW_photometrics_updated_-_Control_Channel_updated_as_FW_1_1_02_0.gdtf",
+  "fixtureTypeId": "252777D1-187E-48A8-85C4-894625E8AF9D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclProfileCTPlusHP",
+  "longName": "EclProfileCTPlusHP",
+  "shortName": "EclCT+HP",
+  "description": "The EclProfile CT+HP, a more powerful variant of the iconic PROLIGHTS LED ellipsoidals, boasting 400 Watts of fixture power, effectively doubling the lumen output and furtherly elevating color rendering while maintaining the same 6-colors LED sources. The LED source is controlled and calibrated by the advanced Spektra Os for unparalleled performance.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 430.0,
+  "maxLuminousIntensityCd": 47700.0,
+  "luminousFluxLm": 10466.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.9,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.4,
+    "max": 25.4
+  },
+  "fieldAngleDeg": 27.5,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo",
+      "slots": 1,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 1,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALC",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1850.0,
+    "max": 20000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": true,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "IRGB_4ch",
+      "channels": 4
+    },
+    {
+      "name": "Standard",
+      "channels": 11
+    },
+    {
+      "name": "Extended_Legacy_12ch",
+      "channels": 12
+    },
+    {
+      "name": "M2 - CCT 16bit_11ch",
+      "channels": 11
+    },
+    {
+      "name": "M4 - RGB 16bit_15ch",
+      "channels": 15
+    },
+    {
+      "name": "M8 - XY 16bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M16 - CCT + RGB 16bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M18 - CCT + RGB + GEL 16bit_25ch",
+      "channels": 25
+    },
+    {
+      "name": "M28 - CCT + XY 16bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M30 - CCT + XY + GEL 16bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M36 - RAW_16bit",
+      "channels": 19
+    },
+    {
+      "name": "M37 - CCT + RAW_16bit",
+      "channels": 24
+    },
+    {
+      "name": "M38 - CCT + GEL + RAW 16bit_28ch",
+      "channels": 28
+    },
+    {
+      "name": "Multimode 8bit",
+      "channels": 19
+    },
+    {
+      "name": "Multimode 16bit",
+      "channels": 22
+    },
+    {
+      "name": "GoboRotation Control",
+      "channels": 2
+    },
+    {
+      "name": "IrisModule Control",
+      "channels": 2
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

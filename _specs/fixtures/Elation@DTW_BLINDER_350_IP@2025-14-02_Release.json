@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@DTW_BLINDER_350_IP@2025-14-02_Release.gdtf",
+  "fixtureTypeId": "5A6CDA26-79DE-4560-84C1-73600E0F7027",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "DTW BLINDER 350 IP",
+  "longName": "DTW BLINDER 350 IP",
+  "shortName": "DTW350",
+  "description": "The IP65 rated DTW Blinder 350 IP™ features (2) high powered 175W 2-in-1 Warm White / Amber COB LEDs, 65° wide beam angle, full color temperature range control plus independent Dim-to-Warm channel control (1,800K - 3,200K), easily attachable 15° narrow beam filters (included), pixel control, manual adjustable pan focus, variable dimming curve modes, strobe effects, flicker free operation for TV and Film, RDM (Remote Device Management), IP rated DMX and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, integrated yoke and side mounting brackets, and a multi-voltage universal auto switching power supply (100-250v).",
+  "manufacturer": "Elation",
+  "category": "BLINDER",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 28500.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 8.2,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Tungsten Lamp",
+  "beamAngleDeg": {
+    "min": 65.0,
+    "max": 65.0
+  },
+  "fieldAngleDeg": 65.0,
+  "zoom": false,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 1800.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "01CH",
+      "channels": 1
+    },
+    {
+      "name": "Standard",
+      "channels": 7
+    },
+    {
+      "name": "Extended",
+      "channels": 9
+    },
+    {
+      "name": "2CH",
+      "channels": 2
+    },
+    {
+      "name": "2Cell",
+      "channels": 2
+    },
+    {
+      "name": "2WA",
+      "channels": 4
+    },
+    {
+      "name": "Basic",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

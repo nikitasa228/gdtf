@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0",
+  "file": "PRstage@PROFILE_300_RGBAL@Ver_1.1.gdtf",
+  "fixtureTypeId": "B092625C-67F3-44E8-9B94-6698945BE61E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "PROFILE 300 RGBAL",
+  "longName": "PROFILE 300 RGBAL",
+  "shortName": "PR300AL",
+  "description": "PRstage.pro. Profile PROFILE PRO 300 RGBAL with 15-50 Degree lens tube Official File",
+  "manufacturer": "PRstage",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 300.0,
+  "maxLuminousIntensityCd": 141800.0,
+  "luminousFluxLm": 10889.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.9,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 15.0
+  },
+  "fieldAngleDeg": 15.0,
+  "zoom": false,
+  "lensType": "Ellipsoidal (Profile)",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBAL",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - 10CH",
+      "channels": 10
+    },
+    {
+      "name": "Mode 2 - 5 CH",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "estimated",
+    "framingShutterBlades": "estimated",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

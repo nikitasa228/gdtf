@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@DOT_BAR_Pix1_IP65@rev_100_RELEASE.gdtf",
+  "fixtureTypeId": "F30DE2E8-BE16-405A-B4B8-7A2B274831B5",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "DOT BAR Pix1 IP65",
+  "longName": "DotBar Pix1",
+  "shortName": "DotBarPix1",
+  "description": "Hybrid Strobe / Wash LED Batten :: IP-65 / 384 x 0.5 W LED RGB (12 zone x 8 x 3 RGB) / 96 x 1 W cW 6500K 12 zone x 8 x 3 cW) / 46 x 58 degree beam angle / pixel zone control",
+  "manufacturer": "BeamZ Pro",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 304.0,
+  "maxLuminousIntensityCd": 28800.0,
+  "luminousFluxLm": 24200.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 50.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 105.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "96 Ch + Virtual Dimmer 36 zone",
+      "channels": 96
+    },
+    {
+      "name": "52 Ch + Virtual Dimmer 18 Zone",
+      "channels": 52
+    },
+    {
+      "name": "38 Ch + Virtual Dimmer 12 Zone",
+      "channels": 38
+    },
+    {
+      "name": "24 Ch + Virtual Dimmer 6 Zone",
+      "channels": 24
+    },
+    {
+      "name": "13 Ch Single",
+      "channels": 13
+    },
+    {
+      "name": "3 Ch Single Strobe",
+      "channels": 3
+    },
+    {
+      "name": "96 Ch RAW 36 zone",
+      "channels": 96
+    },
+    {
+      "name": "52 Ch RAW 18 Zone",
+      "channels": 52
+    },
+    {
+      "name": "38 Ch RAW 12 Zone",
+      "channels": 38
+    },
+    {
+      "name": "24 Ch RAW 6 Zone",
+      "channels": 24
+    },
+    {
+      "name": "96 Ch 36 zone",
+      "channels": 96
+    }
+  ],
+  "pixelCount": 5,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

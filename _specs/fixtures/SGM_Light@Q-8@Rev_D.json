@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "SGM_Light@Q-8@Rev_D.gdtf",
+  "fixtureTypeId": "71CE7798-00A8-46F0-8852-8299C44A5CC2",
+  "gdtfDataVersion": "1.1",
+  "gdtfName": "Q-8",
+  "longName": "Q-8",
+  "shortName": "Q-8",
+  "description": "The Q-8 combines the compact size and low power consumption of the Q-7 series, the ergonomy of the Q-10, and the powerful strobe / blinder of the G-7 BeaSt in 2 separated linear arrays. This high-TLCI DualSource luminaire features RGBW mixing, pixel-mapping control, 110º and 84° spread angles, and all the benefits of magnetic easy-fit filter frames. It is a waterproof studio light for close distances, a strobe effect for touring, and a direct view fixture in a lightweight and robust design: the definitive mid-size flood/blinder.",
+  "manufacturer": "SGM Light",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 15.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 5600.0,
+    "max": 5600.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "10 Channel Strobe",
+      "channels": 10
+    },
+    {
+      "name": "12 Channel Simplified",
+      "channels": 12
+    },
+    {
+      "name": "27 Channel Standard",
+      "channels": 27
+    },
+    {
+      "name": "34 Channel Standard +",
+      "channels": 34
+    },
+    {
+      "name": "41 Channel Extended",
+      "channels": 41
+    },
+    {
+      "name": "52 Channel Extended +",
+      "channels": 52
+    },
+    {
+      "name": "36 Channel Studio",
+      "channels": 36
+    },
+    {
+      "name": "12 Channel RGB Only",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 12,
+  "subType": "Wash / blinder / strobe",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

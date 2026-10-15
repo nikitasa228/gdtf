@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@ArcPod48Q@Rev_1.9_-_Add_highlight_values.gdtf",
+  "fixtureTypeId": "B855CE95-3428-4781-BAD7-856D3B0052CA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ArcPod48Q",
+  "longName": "ArcPod48Q",
+  "shortName": "ArcPod48Q",
+  "description": "ArcPod 48Q is a compact high-power exterior wash light featuring an outstanding brightness of 23'000 lumens. It is equipped with 48x10W RGBW / FC LEDs, delivering a limitless reproduction of colours and whites. ArcPod 48Q is designed slim and fanless, and it's completed by a wide selection of available optics, making the ArcPod 48Q an incredibly flexible and versatile device for any outdoor install.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1391.0,
+  "maxLuminousIntensityCd": 797900.0,
+  "luminousFluxLm": 61272.0,
+  "noiseLevelDb": null,
+  "weightKg": 14.0,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": "Schuko",
+  "powerSupplyType": "Schuko LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": 130.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 15.0
+  },
+  "fieldAngleDeg": 27.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "5ch",
+      "channels": 5
+    },
+    {
+      "name": "7ch",
+      "channels": 7
+    },
+    {
+      "name": "10ch",
+      "channels": 10
+    },
+    {
+      "name": "17ch",
+      "channels": 17
+    },
+    {
+      "name": "22ch",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "panRangeDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

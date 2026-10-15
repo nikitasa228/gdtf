@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "AML_Lighting@AL-Q4IP_Vibrant_800W_IP@V003.gdtf",
+  "fixtureTypeId": "E6DAB6BF-0E88-4509-B032-A421AB6982AE",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "AL-Q4IP Vibrant 800W IP",
+  "longName": "AL-Q4IP Vibrant 800W IP",
+  "shortName": "AL-Q4IP",
+  "description": "AL-Q4IP Vibrant 800W IP",
+  "manufacturer": "AML Lighting",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 22.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWL",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 1800.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "15CH",
+      "channels": 15
+    },
+    {
+      "name": "27CH",
+      "channels": 27
+    },
+    {
+      "name": "47CH",
+      "channels": 35
+    },
+    {
+      "name": "87CH",
+      "channels": 55
+    },
+    {
+      "name": "255CH",
+      "channels": 115
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "estimated",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "No public spec sheet found; tilt-only IP LED fixture."
+  ]
+}

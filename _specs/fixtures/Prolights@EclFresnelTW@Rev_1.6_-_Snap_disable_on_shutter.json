@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclFresnelTW@Rev_1.6_-_Snap_disable_on_shutter.gdtf",
+  "fixtureTypeId": "639688A6-31E8-4C0B-84A1-F086E0986340",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclFresnelTW",
+  "longName": "EclFresnelTW",
+  "shortName": "ECLFRTW",
+  "description": "EclFresnel TW is an advanced LED replacement of traditional 1.000 W Fresnel lamps. Offering 6 colour mixing, delivering high precision reproduction of the white spectrum from 2.800 K to 10.000 K with high CRI and an extensive colour reproduction.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 260.0,
+  "maxLuminousIntensityCd": 75300.0,
+  "luminousFluxLm": 7426.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 17.0,
+    "max": 57.0
+  },
+  "fieldAngleDeg": 25.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALI",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "5ch1",
+      "channels": 5
+    },
+    {
+      "name": "5ch2",
+      "channels": 5
+    },
+    {
+      "name": "7ch1",
+      "channels": 7
+    },
+    {
+      "name": "7ch2",
+      "channels": 7
+    },
+    {
+      "name": "8ch",
+      "channels": 8
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    },
+    {
+      "name": "12ch",
+      "channels": 12
+    },
+    {
+      "name": "13ch",
+      "channels": 13
+    },
+    {
+      "name": "16ch",
+      "channels": 16
+    },
+    {
+      "name": "19ch",
+      "channels": 19
+    },
+    {
+      "name": "21ch",
+      "channels": 21
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

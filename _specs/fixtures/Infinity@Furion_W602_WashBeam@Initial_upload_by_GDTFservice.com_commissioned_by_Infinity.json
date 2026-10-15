@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Furion_W602_WashBeam@Initial_upload_by_GDTFservice.com_commissioned_by_Infinity.gdtf",
+  "fixtureTypeId": "A5872F65-8089-11EF-9970-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Furion W602 WashBeam",
+  "longName": "Furion W602 WashBeam",
+  "shortName": "Furion W602 WashBeam",
+  "description": "Furion W602 WashBeam is a fearsomely powerful, yet lightweight, IP65-rated moving head that excels in both beam and wash applications. Armed with 19 x 45 W RGBW flat-field LEDs, it is capable of unleashing a torrent of color that morphs seamlessly from a concentrated 3deg beam to a wide reaching 34.1deg wash, thanks to its motorized zoom. This makes it suitable for larger concerts, theatrical\nproductions, live events and more.\n\nIts 19 ultra-bright LEDs, with full pixel mapping capabilities, allow the creation of intricate, mesmerizing pixel displays with easy programming possibilities provided by the built-in LED macros. Precise, customizable color temperatures come from its intelligent white mode with user-calibrated 7500 K output and the CTC channel that offers stepless white light between 2700 K and 7500 K.\n\nThe 16-bit dimming capability provides smooth, calibrated dimming effects, enhancing the quality of lighting transitions. For environments requiring minimal noise, the studio mode offers whisper-quiet fan operation ensuring discreet performance. Adjustable PWM frequencies guarantee uncompromised quality in filming situations too.\n\nWith comprehensive control options, both novice and seasoned light masters can tame the potent power of the W602 WashBeam. Options include basic, advanced and customized DMX modes, CRMX, W-DMX, Art-Net, sACN and RDM. Power Pro True inputs and outputs add power-linking possibilities too. Its housing, forged from magnesium and aluminum, is strong and lightweight, ensuring both durability and minimal maintenance. The IP65 rating guarantees that the fixture is dust-tight and protected against water, making it suitable for both indoor and outdoor use.\n\nThe Furion W602's ability to produce everything from a narrow beam to wide wash, coupled with its robust design, powerful performance, seamless movements and built-in pixel-mapping capabilities make it a first-class, flexible lighting solution.",
+  "manufacturer": "Infinity",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 3624400.0,
+  "luminousFluxLm": 11148.0,
+  "noiseLevelDb": null,
+  "weightKg": 23.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.0,
+    "max": 44.2
+  },
+  "fieldAngleDeg": 44.2,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic",
+      "channels": 19
+    },
+    {
+      "name": "Pixel",
+      "channels": 96
+    },
+    {
+      "name": "Advanced",
+      "channels": 179
+    },
+    {
+      "name": "DMX+Arnet",
+      "channels": 90
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 45 W invalid, removed."
+  ]
+}

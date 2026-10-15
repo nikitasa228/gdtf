@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Profile_CW@First_Release_2024-11-12.gdtf",
+  "fixtureTypeId": "04372B77-71F8-4B71-AD4D-BD413695126A",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze Profile CW",
+  "longName": "Fuze Profile CW",
+  "shortName": "FzProCW",
+  "description": "The FUZE PROFILE CW™ is an automated LED framing fixture designed for trade show, stages, television and a wide array of AV event applications. The 91CRI 380W White LED engine ensures accurate color reproduction while delivering a powerful output of 11,000 lumens. Designed to illuminate objects like exhibits and banners, texture areas and key light persons with its flat field and accurate framing it has many practical applications where a fully automated ellipsoidal fixture is required. A rotating gobo wheel of breakups,two color wheels featuring solid colors and correction filters plus and Iris round out its comprehensive feature set.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 380.0,
+  "maxLuminousIntensityCd": 669000.0,
+  "luminousFluxLm": 11200.0,
+  "noiseLevelDb": null,
+  "weightKg": 23.3,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 42.0
+  },
+  "fieldAngleDeg": 46.8,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 7,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540",
+      "channels": 40
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 40
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 26
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@ArcShineM18FC_8@Rev_0.95.gdtf",
+  "fixtureTypeId": "F971DDB2-FF83-4876-8043-B13EFE54B3C5",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ArcShineM18FC_8",
+  "longName": "ArcShineM18FC_8",
+  "shortName": "ASM18FC",
+  "description": "The ArcShine M18FC and ArcShine M9FC are a series of linear LED fixtures, designed for interior and exterior applications (IP67) such as flood lighting, wall washing and accent lighting. There are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 4W each, with RGB + Warm White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 5700.0,
+  "luminousFluxLm": 125.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.9,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 8.0,
+    "max": 8.0
+  },
+  "fieldAngleDeg": 22.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP67",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "5ch",
+      "channels": 5
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    },
+    {
+      "name": "12ch",
+      "channels": 12
+    },
+    {
+      "name": "14ch",
+      "channels": 14
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "panRangeDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Seven_Batten_42@2024-20-02_First_Release.gdtf",
+  "fixtureTypeId": "06EC7CEE-75C8-48AF-AC44-73CE22BC28A5",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Seven Batten 42",
+  "longName": "Seven Batten 42",
+  "shortName": "SEVBAT42",
+  "description": "The SEVEN BATTEN 42™ is a seven color 3.5 foot (1m) long batten wash luminaire with (36) 25W 7-in-1 RGBAW + Lime + UV (395nm) LEDs. Features include individual hue, saturation, and intensity control, special RGB SEVEN 3 channel mode (RGB + dynamic white, amber, lime, and UV), 6 pixel mapping zones with pixel flip mode, smooth color mixing, 12 internal programs with speed and fade control, 64 unique 7-color macros, selectable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX Art-Net, Kling-Net, and RDM (Remote Device Management) protocol support, 3/5pin DMX, RJ45 ethernet, and Locking Power Cable in/out connections, dual 220° manual tilt adjustable mounting brackets, OLED menu display with a 4-button control panel, a multi-voltage universal auto switching power supply (100-240v), a rugged powder coated die-cast aluminum exterior, and an integrated gel / frost filter slot.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 900.0,
+  "maxLuminousIntensityCd": 107500.0,
+  "luminousFluxLm": 14658.0,
+  "noiseLevelDb": null,
+  "weightKg": 17.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 20.0,
+    "max": 20.0
+  },
+  "fieldAngleDeg": 39.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+BG+UV",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    },
+    {
+      "name": "RGBSeven 3CH",
+      "channels": 3
+    },
+    {
+      "name": "8Bit 7CH",
+      "channels": 7
+    },
+    {
+      "name": "16Bit 14CH",
+      "channels": 14
+    },
+    {
+      "name": "16bit + Dim 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Ext 15CH",
+      "channels": 15
+    },
+    {
+      "name": "Cells 42CH",
+      "channels": 42
+    },
+    {
+      "name": "Cells Dim 44CH",
+      "channels": 44
+    },
+    {
+      "name": "Ext Cells 50CH",
+      "channels": 50
+    },
+    {
+      "name": "HSI 4CH",
+      "channels": 4
+    },
+    {
+      "name": "HSI Mast 10CH",
+      "channels": 10
+    },
+    {
+      "name": "HSI Cell 26CH",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

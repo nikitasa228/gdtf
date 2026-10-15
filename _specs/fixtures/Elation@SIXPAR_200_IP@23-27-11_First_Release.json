@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@SIXPAR_200_IP@23-27-11_First_Release.gdtf",
+  "fixtureTypeId": "0AFC3A3E-BED6-4E8B-BC11-6388A47E4CA0",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "SIXPAR 200 IP",
+  "longName": "SIXPAR 200 IP",
+  "shortName": "SIXPAR200IP",
+  "description": "The new IP65 rated SIXPAR 200IP™ features (12) 12W 6-IN-1 RGBAW+UV LEDs, 15° beam and 25° field angles, electronic strobe and dimming (0-100%), 5 variable dimming curve modes, dual yoke / floor stand, multiple unit power linking, RDM (remote device management), rugged die-cast aluminum exterior, flicker free operation for TV and FILM, 150W max power consumption, and a multi-voltage universal auto switching power supply (110-250v).",
+  "manufacturer": "Elation",
+  "category": "PAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 144.0,
+  "maxLuminousIntensityCd": 43600.0,
+  "luminousFluxLm": 3350.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 15.0
+  },
+  "fieldAngleDeg": 25.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+UV",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "12 CH",
+      "channels": 12
+    },
+    {
+      "name": "8 CH",
+      "channels": 8
+    },
+    {
+      "name": "7 CH",
+      "channels": 7
+    },
+    {
+      "name": "6 CH",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

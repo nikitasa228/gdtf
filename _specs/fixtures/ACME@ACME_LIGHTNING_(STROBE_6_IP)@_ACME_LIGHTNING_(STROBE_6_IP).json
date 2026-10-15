@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_LIGHTNING_(STROBE_6_IP)@_ACME_LIGHTNING_(STROBE_6_IP).gdtf",
+  "fixtureTypeId": "2C3B403E-2C82-4704-AC20-7F735C20B2DA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME LIGHTNING (STROBE 6 IP)",
+  "longName": "ACME LIGHTNING (STROBE 6 IP)",
+  "shortName": "STROBE 6 IP",
+  "description": "ACME LIGHTNING (STROBE 6 IP)",
+  "manufacturer": "ACME",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1610,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 3150000.0,
+  "noiseLevelDb": null,
+  "weightKg": 13.3,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.5,
+    "max": 102.0
+  },
+  "fieldAngleDeg": 1.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6300.0,
+    "max": 6300.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 10DMX",
+      "channels": 10
+    },
+    {
+      "name": "Mode 2 17DMX",
+      "channels": 17
+    },
+    {
+      "name": "Mode 3 24DMX",
+      "channels": 24
+    },
+    {
+      "name": "Mode 4 21DMX",
+      "channels": 21
+    },
+    {
+      "name": "Mode 5 26DMX",
+      "channels": 26
+    },
+    {
+      "name": "Mode 6 36DMX",
+      "channels": 36
+    },
+    {
+      "name": "Mode 8 61DMX",
+      "channels": 61
+    },
+    {
+      "name": "Mode 7 41DMX",
+      "channels": 41
+    },
+    {
+      "name": "Mode 9 150DMX",
+      "channels": 150
+    },
+    {
+      "name": "Mode 10 158DMX",
+      "channels": 158
+    }
+  ],
+  "pixelCount": 420,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "manual",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Two zones: RGBW wash 102 deg, cool-white strobe 3.5 deg."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/item/LIGHTNING"
+  ]
+}

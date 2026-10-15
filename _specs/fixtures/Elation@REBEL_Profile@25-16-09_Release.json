@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@REBEL_Profile@25-16-09_Release.gdtf",
+  "fixtureTypeId": "45847D98-2B51-4A31-922C-C337A5995154",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "REBEL Profile",
+  "longName": "REBEL Profile",
+  "shortName": "RblPrf",
+  "description": "The REBEL Profile™ combines power and versatility in a compact IP65-rated design, perfect for indoor and outdoor applications. Its Peak Field 500W 6,500K LED engine produces a dazzling 22,000 lumens, delivering high-intensity beams, sharp projections, and dynamic mid-air effects.\nA full-featured graphics suite includes 15 glass gobos, a complete animation wheel, dual prisms, dual frost, and a high-speed iris. \nThe indexable framing system ensures precise control with blackout shutter cuts, while a zoom range of 3.5° to 51° enhances its flexibility.Housing 18 carefully designed gobos and a 4.5° to 38° zoom, the FUZE SFX can create stunning mid-air FX as easily as precise image projections. The SFX allows for even stage washes utilizing its variable frost filter while a wide array of beautiful colors is possible from a seamless CMY color-mixing system plus color wheel. Dual independent rotating and overlaying prisms plus a fast iris round out the comprehensive feature set.\nA truly remarkable compact powerhouse for any application, the FUZE SFX is sure to create amazing effects, outstanding projections and beautiful bright washes on any stage.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 500.0,
+  "maxLuminousIntensityCd": 5255000.0,
+  "luminousFluxLm": 22000.0,
+  "noiseLevelDb": null,
+  "weightKg": 29.9,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": true,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.5,
+    "max": 51.0
+  },
+  "fieldAngleDeg": 51.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Fixed Gobo",
+      "slots": 8,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 15,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1 (4 Circular)",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 (6 Linear)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended",
+      "channels": 58
+    },
+    {
+      "name": "Standard",
+      "channels": 42
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

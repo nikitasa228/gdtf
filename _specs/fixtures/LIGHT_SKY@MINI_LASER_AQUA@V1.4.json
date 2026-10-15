@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1.0",
+  "file": "LIGHT_SKY@MINI_LASER_AQUA@V1.4.gdtf",
+  "fixtureTypeId": "0AD4AB3E-A199-4E11-BBB3-A24D995DF9CF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MINI LASER AQUA",
+  "longName": "MINI LASER AQUA",
+  "shortName": "MINI LASER",
+  "description": "LIGHT SKY MINI LASER AQUA: moving-head Laser beam (laser-source beam), with 1.1 deg beam, CMY colour mixing, colour wheel, 18 gobos, prism, frost, IP65 rated.",
+  "manufacturer": "LIGHT SKY",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 100.0,
+  "maxLuminousIntensityCd": 846329400.0,
+  "luminousFluxLm": 350000.0,
+  "noiseLevelDb": null,
+  "weightKg": 13.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Laser",
+  "beamAngleDeg": {
+    "min": 1.1,
+    "max": 1.1
+  },
+  "fieldAngleDeg": 1.1,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo",
+      "slots": 18,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7800.0,
+    "max": 7800.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "White",
+      "facets": null
+    },
+    {
+      "name": "Prism",
+      "facets": null
+    },
+    {
+      "name": "Prism 2",
+      "facets": null
+    },
+    {
+      "name": "Prism 1+2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "19CH",
+      "channels": 19
+    },
+    {
+      "name": "17CH",
+      "channels": 17
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Laser-source beam",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "subType": "manual",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "description": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

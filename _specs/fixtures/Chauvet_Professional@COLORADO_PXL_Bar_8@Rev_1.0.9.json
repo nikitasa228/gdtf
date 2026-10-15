@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@COLORADO_PXL_Bar_8@Rev_1.0.9.gdtf",
+  "fixtureTypeId": "35886040-D05F-11EC-9A42-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "COLORADO PXL Bar 8",
+  "longName": "COLORado PXL Bar 8",
+  "shortName": "Colpxlbar8",
+  "description": "COLORado PXL Bar 8 is a motorized, outdoor-ready tilting batten with capabilities to zoom for tight and wide pixel-mappable looks. This bright, moving pixel bar also features seamless edge-to-edge mounting and includes virtual gobo and movement macros with separate foreground and background color control for more design options than ever before. Slotted Omega brackets make it quick and easy to hang the fixture on truss. The COLORado PXL Bar 8 can also be positioned on the ground, which allows for a variety of different light angles. The power is in your hands and the possibilities are endless!",
+  "manufacturer": "Chauvet Professional",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 422,
+  "maxLuminousIntensityCd": 302700,
+  "luminousFluxLm": 3503.0,
+  "noiseLevelDb": null,
+  "weightKg": 11.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 200.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.6,
+    "max": 47.3
+  },
+  "fieldAngleDeg": 42.7,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 19000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Single Control: Basic Mode (19ch)",
+      "channels": 19
+    },
+    {
+      "name": "Single Control: Standard Mode (51ch)",
+      "channels": 51
+    },
+    {
+      "name": "Single Control: Advanced Mode (89ch)",
+      "channels": 89
+    },
+    {
+      "name": "Single Control: Tour Mode (105ch)",
+      "channels": 105
+    },
+    {
+      "name": "Dual Control Movement: Basic (7ch)",
+      "channels": 7
+    },
+    {
+      "name": "Dual Control Movement: Standard (19ch)",
+      "channels": 19
+    },
+    {
+      "name": "Dual Control Movement: Advanced (25ch)",
+      "channels": 25
+    },
+    {
+      "name": "Dual Control Pixels:Basic (24ch)",
+      "channels": 24
+    },
+    {
+      "name": "Dual Control Pixels:Standard (32ch)",
+      "channels": 32
+    },
+    {
+      "name": "Dual Control Pixels : Advanced Mode (64ch)",
+      "channels": 64
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/colorado-pxl-bar-8/"
+  ]
+}

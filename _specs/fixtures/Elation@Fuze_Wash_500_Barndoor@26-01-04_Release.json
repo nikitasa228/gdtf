@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Wash_500_Barndoor@26-01-04_Release.gdtf",
+  "fixtureTypeId": "B9F02319-4E16-4E5A-B72C-6937EAB96AA9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze Wash 500 Barndoor",
+  "longName": "Fuze Wash 500 Barndoor",
+  "shortName": "FuzW500BN",
+  "description": "The FUZE WASH 500™ is a powerful automated LED Fresnel wash fixture designed for theater, television, events and a wide array of other precision lighting applications. A High-CRI engine utilizes a 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction while delivering a powerful output of up to 17,000 lumens and maximum CRI of 92. Virtual color temperature, Magenta / Green adjustment plus CMY or RGB emulation provide the designer with immediate access to the impressive LED color array.\nThe FUZE WASH 500 is designed for any application where an automated Fresnel fixture with outstanding and impactful colors, a wide zoom range and a soft field is required. An optional indexable ovalizer lens and a fully automated barn door system is available for additional remote beam control.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 500.0,
+  "maxLuminousIntensityCd": 497700.0,
+  "luminousFluxLm": 17000.0,
+  "noiseLevelDb": null,
+  "weightKg": 18.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 250.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 10.0,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 64.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard Pan540",
+      "channels": 21
+    },
+    {
+      "name": "Extended Pan540",
+      "channels": 30
+    },
+    {
+      "name": "CMY Pan540",
+      "channels": 19
+    },
+    {
+      "name": "CMY Extended Pan540",
+      "channels": 26
+    },
+    {
+      "name": "RGB Pan540",
+      "channels": 20
+    },
+    {
+      "name": "RGB Extended Pan540",
+      "channels": 26
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 21
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 30
+    },
+    {
+      "name": "CMY Pan630",
+      "channels": 19
+    },
+    {
+      "name": "CMY Extended Pan630",
+      "channels": 26
+    },
+    {
+      "name": "RGB Pan630",
+      "channels": 20
+    },
+    {
+      "name": "RGB Extended Pan630",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

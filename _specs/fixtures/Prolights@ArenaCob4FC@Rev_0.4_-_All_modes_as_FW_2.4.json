@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@ArenaCob4FC@Rev_0.4_-_All_modes_as_FW_2.4.gdtf",
+  "fixtureTypeId": "E34256AE-2463-4E0E-98F9-2A6376918C12",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ArenaCob4FC",
+  "longName": "ArenaCob4FC",
+  "shortName": "ARCOB4FC",
+  "description": "ArenaCob 4FC is a full colour LED replacement for a traditional 4 cell DWE blinder. Each of the individually controllable 75 W RGBW cells deliver a consistent, powerful punch that has been designed to perform in even the largest environments",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 460.0,
+  "maxLuminousIntensityCd": 5400.0,
+  "luminousFluxLm": 1348.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 27.0,
+    "max": 27.0
+  },
+  "fieldAngleDeg": 47.5,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Halo_1ch",
+      "channels": 1
+    },
+    {
+      "name": "Halo_4ch",
+      "channels": 1
+    },
+    {
+      "name": "Standard_STD 4ch",
+      "channels": 4
+    },
+    {
+      "name": "Standard_STD 6ch",
+      "channels": 6
+    },
+    {
+      "name": "Standard - STD 15ch",
+      "channels": 15
+    },
+    {
+      "name": "Standard_STD 16ch",
+      "channels": 16
+    },
+    {
+      "name": "Extended_EXT 16ch",
+      "channels": 4
+    },
+    {
+      "name": "Extended_EXT 21ch",
+      "channels": 21
+    },
+    {
+      "name": "Extended_EXT 27ch",
+      "channels": 27
+    },
+    {
+      "name": "Extended_EXT 28ch",
+      "channels": 28
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

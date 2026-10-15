@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Jolt_Panel_FX2@25-13-05_Release.gdtf",
+  "fixtureTypeId": "C77EAAD3-BC25-4E2F-9BA2-AB8EA34E89F7",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Jolt Panel FX2",
+  "longName": "Jolt Panel FX2",
+  "shortName": "JPanelFX2",
+  "description": "The Jolt Panel FX2 provides lighting designers with the creative potential of generating strikingly bright white strobe flashes, vibrant color washes, and animated ‘eye candy’ chase effects ideal for concert productions, festival stages and rental houses, as well as for permanent installation in large nightclubs.",
+  "manufacturer": "ADJ",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 235,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 24000.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.2,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 73.0,
+    "max": 73.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6900.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "6ch",
+      "channels": 6
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    },
+    {
+      "name": "13ch",
+      "channels": 13
+    },
+    {
+      "name": "18ch",
+      "channels": 18
+    },
+    {
+      "name": "20CH",
+      "channels": 20
+    },
+    {
+      "name": "36ch",
+      "channels": 36
+    },
+    {
+      "name": "41ch",
+      "channels": 41
+    },
+    {
+      "name": "43CH",
+      "channels": 43
+    },
+    {
+      "name": "51ch",
+      "channels": 51
+    },
+    {
+      "name": "81ch",
+      "channels": 81
+    },
+    {
+      "name": "83CH",
+      "channels": 83
+    },
+    {
+      "name": "126ch",
+      "channels": 3
+    },
+    {
+      "name": "141ch",
+      "channels": 141
+    },
+    {
+      "name": "143CH",
+      "channels": 143
+    }
+  ],
+  "pixelCount": 10,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.adj.com/jolt-panel-fx2"
+  ]
+}

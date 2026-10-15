@@ -1,0 +1,372 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Astera_LED_Technology@AF80_PlutoFresnel@tested_by_Astera__V3.gdtf",
+  "fixtureTypeId": "066C1555-F5C2-4A1F-B3C5-9856A08256BB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "AF80 PlutoFresnel",
+  "longName": "AF80 PlutoFresnel",
+  "shortName": "PlutoFresnel",
+  "description": "Astera’s PlutoFresnel is an exceptional solution for film, studio, and event lighting. PlutoFresnel boasts an impressive output comparable to a traditional 300 W Tungsten Fresnel. With a beam angle of 15° to 60° without color fringing, wireless and wired DMX control, these lights offer impressive performance while consuming only 80 W. Easy to mount and adjust with removable handles and YokeBases, they enhance creativity and productivity on any set.",
+  "manufacturer": "Astera LED Technology",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 80,
+  "maxLuminousIntensityCd": 4000.0,
+  "luminousFluxLm": 4860.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 60.0,
+    "max": 60.0
+  },
+  "fieldAngleDeg": 90.0,
+  "zoom": true,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1750.0,
+    "max": 9910.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1: RGB",
+      "channels": 3
+    },
+    {
+      "name": "2: RGBW",
+      "channels": 4
+    },
+    {
+      "name": "3: RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "4: DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "5: DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "6: DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "7: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "8: RGBS",
+      "channels": 4
+    },
+    {
+      "name": "9: RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "10: RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "11: DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "12: DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "13: DIM RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "14: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "15: Effect Mode Fix",
+      "channels": 13
+    },
+    {
+      "name": "16: Effect Mode RGB",
+      "channels": 12
+    },
+    {
+      "name": "89: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "90: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "91: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "92: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "93: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "94: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "95: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "96: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "97: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "137: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "144: RGB FAN",
+      "channels": 4
+    },
+    {
+      "name": "145 RGBW FAN",
+      "channels": 5
+    },
+    {
+      "name": "146: RGBAW FAN",
+      "channels": 6
+    },
+    {
+      "name": "147: DIM RGB FAN",
+      "channels": 5
+    },
+    {
+      "name": "148: DIM RGBW FAN",
+      "channels": 6
+    },
+    {
+      "name": "149: DIM RGBAW FAN",
+      "channels": 7
+    },
+    {
+      "name": "150: RGB CCT DIM IND FAN",
+      "channels": 7
+    },
+    {
+      "name": "151: D CCT GM CRO RGB FAN",
+      "channels": 8
+    },
+    {
+      "name": "152: D CCT GM HUE SAT FAN",
+      "channels": 6
+    },
+    {
+      "name": "153: D16 CCT GM C RGB FAN",
+      "channels": 9
+    },
+    {
+      "name": "154: D16 CCT GM H SAT FAN",
+      "channels": 8
+    },
+    {
+      "name": "155: D16 X Y FAN",
+      "channels": 7
+    },
+    {
+      "name": "156: RGBS FAN",
+      "channels": 5
+    },
+    {
+      "name": "157: RGBWS FAN",
+      "channels": 6
+    },
+    {
+      "name": "158: RGBAWS FAN",
+      "channels": 7
+    },
+    {
+      "name": "159: DIM RGBS FAN",
+      "channels": 6
+    },
+    {
+      "name": "160: DIM RGBWS FAN",
+      "channels": 7
+    },
+    {
+      "name": "161: DIM RGBAWS FAN",
+      "channels": 8
+    },
+    {
+      "name": "162: RGB CCT DIM IND S FAN",
+      "channels": 8
+    },
+    {
+      "name": "163: D CCT GM CRO RGB S FAN",
+      "channels": 9
+    },
+    {
+      "name": "164: D CCT GM HUE SAT S FAN",
+      "channels": 7
+    },
+    {
+      "name": "165: D16 CCT GM C RGB S FAN",
+      "channels": 10
+    },
+    {
+      "name": "166: D16 CCT GM H SAT S FAN",
+      "channels": 9
+    },
+    {
+      "name": "167: D16 X Y S FAN",
+      "channels": 8
+    },
+    {
+      "name": "168: D CCT GM CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "169: D16 CCT GM CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "170: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "171: D16 CCT GM C CRO XY S",
+      "channels": 10
+    },
+    {
+      "name": "172: D CCT GM CRO XY FAN",
+      "channels": 9
+    },
+    {
+      "name": "173: D16 CCT GM CRO XY FAN",
+      "channels": 10
+    },
+    {
+      "name": "174: D CCT GM CRO XY S FAN",
+      "channels": 10
+    },
+    {
+      "name": "175: D16 CCT GM CRO XY S FAN",
+      "channels": 11
+    },
+    {
+      "name": "176: EFFECT MODE FIX FAN",
+      "channels": 14
+    },
+    {
+      "name": "177: EFFECT MODE RGB FAN",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "Fresnel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "manual",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://astera-led.com/casting-light-on-our-new-fresnel-range/"
+  ]
+}

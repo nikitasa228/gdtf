@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Stage_Blinder_200_Blaze@Initial_upload_by_GDTFservice_powered_by_Q2Q_Technologies.gdtf",
+  "fixtureTypeId": "4BED2BD5-2A3E-11F0-AFEE-42010A37C004",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Stage Blinder 200 Blaze",
+  "longName": "Stage Blinder 200 Blaze",
+  "shortName": "StageBlinder200Blaze",
+  "description": "Stage Blinder 200 Blaze is a powerful 200-watt LED blinder that uses a warm white COB LED of 3000 K with a CRI of >92. It has uniquely integrated amber LEDs for mimicking a tungsten dim effect and RGB LEDs for a blaze effect. It can be controlled via DMX/RDM, but also has manual, master/slave and auto modes. The OLED display provides useful feedback on the settings.\n\nIt has silent convection cooling, making it suitable for noise-sensitive environments. The robust aluminum housing is IP65-rated and comes with a mounting bracket.",
+  "manufacturer": "Showtec",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 200.0,
+  "maxLuminousIntensityCd": 28200.0,
+  "luminousFluxLm": 15618.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 40.5,
+    "max": 40.5
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 3000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Tungsten 1Ch",
+      "channels": 1
+    },
+    {
+      "name": "Basic 4Ch",
+      "channels": 4
+    },
+    {
+      "name": "Basic Strobe 5Ch",
+      "channels": 5
+    },
+    {
+      "name": "Custom 5Ch",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

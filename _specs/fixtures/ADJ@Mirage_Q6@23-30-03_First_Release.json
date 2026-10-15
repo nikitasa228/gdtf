@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Mirage_Q6@23-30-03_First_Release.gdtf",
+  "fixtureTypeId": "2F32EF01-D6AE-4B7B-B15A-D7B89B8DB81D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Mirage Q6",
+  "longName": "Mirage Q6",
+  "shortName": "Mirage",
+  "description": "The ADJ Lighting Mirage Q6 PAK is an all-in-one event up lighting system with six (6) IP65 rated, for outdoor or indoor use, battery powered fixtures and a durable flight case with an on-board battery charging solution.\n\nEach Mirage Q6 IP fixture is powered by four (4) 10W RGBA LEDs that produce a 11-degree beam angle. The fixture is IP65 rated and is waterproof; suitable for temporary use outdoors with protection against the elements (rain, snow, dust and sand). Built-in WiFLY EXR wireless DMX allows for the fixtures to communicate with a lighting controller, also with WiFLY EXR wireless DMX, up to 2,500 feet (700M) away.\n\nIdeal for wall washing, Mirage Q6 IP fixtures are all fitted with an integral carry handle and built-in feet which mean they can simply be dropped in place and are ready to go. They also feature a built-in kickstand which allows the beam to be easily angled inwards towards a wall if required. This creates a more intense wash and minimizes light spill onto the ceiling above.\n\nEach fixture has an alarm system with on/off controls. If someone picks up the fixture with the alarm system on, the fixture will make a beeping sound and strobe in red.\n\nThe robust battery will operate up to 40 hours on a single color (20 hours changing colors). The battery charge time is 7 hours.",
+  "manufacturer": "ADJ",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 40.0,
+  "maxLuminousIntensityCd": 958600.0,
+  "luminousFluxLm": 39612.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 11.0,
+    "max": 11.0
+  },
+  "fieldAngleDeg": 11.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 9900.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4-Channel Mode",
+      "channels": 4
+    },
+    {
+      "name": "6-Channel Mode",
+      "channels": 6
+    },
+    {
+      "name": "7-Channel Mode",
+      "channels": 7
+    },
+    {
+      "name": "8-Channel Mode",
+      "channels": 8
+    },
+    {
+      "name": "9A-Channel Mode",
+      "channels": 9
+    },
+    {
+      "name": "9B-Channel Mode",
+      "channels": 9
+    },
+    {
+      "name": "10-Channel Mode",
+      "channels": 10
+    },
+    {
+      "name": "11-Channel Mode",
+      "channels": 11
+    },
+    {
+      "name": "12-Channel Mode",
+      "channels": 12
+    },
+    {
+      "name": "15-Channel Mode",
+      "channels": 15
+    },
+    {
+      "name": "18-Channel Mode",
+      "channels": 18
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Briteq@BTI-BLIZZARD_WASH2@20250714.gdtf",
+  "fixtureTypeId": "A33508FC-E884-4B8C-8A6F-A966F8CAB044",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "BTI-BLIZZARD WASH2",
+  "longName": "BTI-BLIZZARD WASH2",
+  "shortName": "BLIZ W2",
+  "description": "Briteq BTI-BLIZZARD WASH2: LED wash, with RGBLCMY colour mixing, colour wheel, IP65 rated.",
+  "manufacturer": "Briteq",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 22.3,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": null,
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBLCMY",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "TR16",
+      "channels": 38
+    },
+    {
+      "name": "Tour",
+      "channels": 31
+    },
+    {
+      "name": "SSP",
+      "channels": 26
+    },
+    {
+      "name": "CMY",
+      "channels": 32
+    },
+    {
+      "name": "HSIC",
+      "channels": 32
+    },
+    {
+      "name": "PIXEL",
+      "channels": 100
+    },
+    {
+      "name": "PXL RGBL",
+      "channels": 79
+    }
+  ],
+  "pixelCount": 5,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "gdtf",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "estimated",
+    "zoom": "gdtf-derived",
+    "goboWheels": "manual",
+    "goboSlots": "manual",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "description": "gdtf-derived"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "lensType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "GDTF wheel slots counted as gobos; category corrected to wash."
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@COLORado_PXL_Curve_12@Rev_1.1.4.gdtf",
+  "fixtureTypeId": "2BA1638D-D44F-11ED-A52A-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "COLORado PXL Curve 12",
+  "longName": "COLORado PXL Curve 12",
+  "shortName": "coloradopxl12curve",
+  "description": "COLORado PXL Curve 12 is a fully pixel-mappable motorized IP65-rated RGBW LED batten with individual control of zoom, tilt and color across twelve independent heads. Basic and advanced operating modes and an extensive library of pre-built effects that includes virtual gobos, movement macros, and foreground/background color control make creating complex and volumetric looks easy. Seamless edge-to-edge mounting maintains pixel pitch between fixtures helping to make runway effects consistent. COLORado PXL Curve 12 speaks DMX, sACN, Art-Net, Kling-Net and RDM.",
+  "manufacturer": "Chauvet Professional",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 790,
+  "maxLuminousIntensityCd": 968200,
+  "luminousFluxLm": 5807.0,
+  "noiseLevelDb": 29.7,
+  "weightKg": 34.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 200.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.7,
+    "max": 36.3
+  },
+  "fieldAngleDeg": 9.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 19000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Single Control: Basic 20Ch",
+      "channels": 20
+    },
+    {
+      "name": "Single Control: Basic2 53Ch",
+      "channels": 53
+    },
+    {
+      "name": "Single Control: Standard 101Ch",
+      "channels": 101
+    },
+    {
+      "name": "Single Control: Advanced 155Ch",
+      "channels": 155
+    },
+    {
+      "name": "Single Control: Advanced2 169Ch",
+      "channels": 169
+    },
+    {
+      "name": "Single Control: Tour 179Ch",
+      "channels": 179
+    },
+    {
+      "name": "Single Control: Full PXL 169Ch",
+      "channels": 169
+    },
+    {
+      "name": "Dual Control-Movement: Basic 41Ch",
+      "channels": 41
+    },
+    {
+      "name": "Dual Control-Movement: Standard 53Ch",
+      "channels": 53
+    },
+    {
+      "name": "Dual Control-Movement: Advanced 59Ch",
+      "channels": 59
+    },
+    {
+      "name": "Dual Control-Pixel: Basic 36Ch",
+      "channels": 36
+    },
+    {
+      "name": "Dual Control-Pixel: Standard 48Ch",
+      "channels": 48
+    },
+    {
+      "name": "Dual Control-Pixel: Advanced 96Ch",
+      "channels": 96
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 45 W invalid."
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/colorado-pxl-curve-12/"
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Rogue_R3_Beam@Beta_1.0.1.gdtf",
+  "fixtureTypeId": "A8B10BFE-E79E-49F3-B447-135853399B08",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Rogue R3 Beam",
+  "longName": "Rogue R3 Beam",
+  "shortName": "RogueR3Beam",
+  "description": "Rogue R3 Beam is the light cannon of the Rogue series, outputting over 208,000 lux at 15 meters from its 300 W Ushio NSL lamp. This fully-featured beam can be focused down to 0.8° degrees for extremely focused aerial effects alongside motorized frost and focus options. A color wheel equipped with 14 colors complimented by a gobo wheel with 17 gobos give you a wealth of dynamic effects, and both wheels are fully scrollable at variable speeds. Additionally, the unit features individually overlapping 8 and 24-facet prisms for an endless supply of creative beam looks. The unit is equipped with RDM and DMX protocols and features multiple control personalities.",
+  "manufacturer": "Chauvet Professional",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 422,
+  "maxLuminousIntensityCd": 46801400,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 37.9,
+  "weightKg": 15.6,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 0.8,
+    "max": 0.8
+  },
+  "fieldAngleDeg": 5.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "STATIC GOBO",
+      "slots": 18,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism",
+      "facets": null
+    },
+    {
+      "name": "No Func",
+      "facets": null
+    },
+    {
+      "name": "Prism Insert",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "19Ch Mode",
+      "channels": 19
+    },
+    {
+      "name": "16Ch Mode",
+      "channels": 16
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "300 W Ushio NSL lamp."
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/rogue-r3-beam/"
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Par_Z175@24-21-06_First_Release.gdtf",
+  "fixtureTypeId": "C316F4EF-4280-4A66-9871-F64E87E050FC",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "FUZE PAR Z175",
+  "longName": "FUZE PAR Z175",
+  "shortName": "FuzPrZ175",
+  "description": "The FUZE PAR Z175™ is a single source par with zoom. Featuring a 175W RGBW COB LED engine, 8° to 35° motorized zoom, an advanced cooling system, smooth RGBW color mixing, 64 color presets and 14 unique color macros, electronic strobe and 16-bit variable dimming curve modes, flicker free operation for TV and FILM, 3/5pin DMX and Locking Power Cable in/out connections, (4) button LCD control display panel, integrated dual rigging yokes, and a multi-voltage universal auto switching power supply (100-240v). Gel frame and barn doors included.",
+  "manufacturer": "Elation",
+  "category": "PAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 175.0,
+  "maxLuminousIntensityCd": 895900.0,
+  "luminousFluxLm": 15000.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 55.0
+  },
+  "fieldAngleDeg": 14.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4CH RGBW",
+      "channels": 4
+    },
+    {
+      "name": "5CH RGBW",
+      "channels": 5
+    },
+    {
+      "name": "5CH2 HSI",
+      "channels": 5
+    },
+    {
+      "name": "6CH HIS+",
+      "channels": 6
+    },
+    {
+      "name": "7CH RGBW",
+      "channels": 7
+    },
+    {
+      "name": "8CH sRGBWI",
+      "channels": 8
+    },
+    {
+      "name": "8CH2 RGBW",
+      "channels": 8
+    },
+    {
+      "name": "8CH3 RGBW",
+      "channels": 8
+    },
+    {
+      "name": "9CH RGBW",
+      "channels": 9
+    },
+    {
+      "name": "10CH RGBW",
+      "channels": 10
+    },
+    {
+      "name": "10CH2 RGBW",
+      "channels": 10
+    },
+    {
+      "name": "11CH RGBW",
+      "channels": 11
+    },
+    {
+      "name": "11CH2 16Bit",
+      "channels": 11
+    },
+    {
+      "name": "11CH3 HSI",
+      "channels": 11
+    },
+    {
+      "name": "12CH 16Bit",
+      "channels": 12
+    },
+    {
+      "name": "13CH sRGBWI",
+      "channels": 13
+    },
+    {
+      "name": "14CH RGBW",
+      "channels": 14
+    },
+    {
+      "name": "15CH RGBW",
+      "channels": 15
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

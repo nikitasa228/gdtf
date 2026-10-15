@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Strike_Array_2@Rev_1.0.4.gdtf",
+  "fixtureTypeId": "0ABEE9A7-AEE0-4A5F-B65C-4FFA062A1288",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Strike Array 2",
+  "longName": "Strike Array 2",
+  "shortName": "StrikeArray2",
+  "description": "Strike Array 2 is an outdoor-ready audience blinder powered by two intense 100 W warm white LEDs housed in independently focusable pods. An emulated \"amber shift\" warms the color temperature of the light as it dims to deliver a classic tungsten look. Its variable PWM and high CRI make it ideal for broadcast applications. Thanks to a custom interlocking system CHAUVET Professional has developed, STRIKE Array 2 can be interconnected with multiple Array units for scalable design configurations without any tools. Omega-Bracket locks are also installed both on the yoke and the back of the IP65 blinder to give you a streamlined truss mounting process.",
+  "manufacturer": "Chauvet Professional",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 130,
+  "maxLuminousIntensityCd": 9000,
+  "luminousFluxLm": 9288.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 60.3,
+    "max": 60.3
+  },
+  "fieldAngleDeg": 99.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2792.0,
+    "max": 2792.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch Mode",
+      "channels": 1
+    },
+    {
+      "name": "2Ch Mode",
+      "channels": 2
+    },
+    {
+      "name": "3Ch Mode",
+      "channels": 3
+    },
+    {
+      "name": "4Ch Mode",
+      "channels": 4
+    },
+    {
+      "name": "5Ch Mode",
+      "channels": 5
+    },
+    {
+      "name": "8Ch Mode",
+      "channels": 8
+    },
+    {
+      "name": "9Ch Mode",
+      "channels": 9
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/strike-array-2/"
+  ]
+}

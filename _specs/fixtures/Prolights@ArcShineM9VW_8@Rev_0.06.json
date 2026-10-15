@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@ArcShineM9VW_8@Rev_0.06.gdtf",
+  "fixtureTypeId": "EE022E9B-13E6-4E88-BD6E-3F75B93E311D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ArcShineM9VW_8",
+  "longName": "ArcShineM9VW_8",
+  "shortName": "ASM9VW_8",
+  "description": "The ArcShine M18VW and ArcShine M9VW are a series of linear LED fixtures, designed for interior and exterior applications (IP66) such as flood lighting, wall washing and accent lighting.\nThere are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 4W each, with Variable White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings. \nOptic: 8° lenses capable of delivering multiple angles with optional holographic filters.\nOptional holographic symmetric and elliptical filters available: 20°, 40°, 60°, 10°x60°, 30°x60°.\nThe ArcShine range has an on-board power supply and DMX/RDM control. The 100 cm version is controllable in two sections.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 9000.0,
+  "luminousFluxLm": 273.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.4,
+    "max": 9.4
+  },
+  "fieldAngleDeg": 22.3,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "3ch",
+      "channels": 3
+    },
+    {
+      "name": "4ch",
+      "channels": 4
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

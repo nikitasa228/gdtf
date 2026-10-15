@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Cuepix_Blinder_WW2@2023-26-06_First_Release.gdtf",
+  "fixtureTypeId": "24921E11-5786-4C84-B977-F3E0A514165F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Cuepix Blinder WW2",
+  "longName": "Cuepix Blinder WW2",
+  "shortName": "CuepixWW2",
+  "description": "The CUEPIX Blinder WW2™ features (2) long life 100W Warm White 3,200K COB LEDs, a 60° beam angle, RDM (Remote Device Management), individual control of each COB module including manual pan focus, variable and selectable dimming curves, strobe effects, flicker free operation for TV and Film, 3pin and 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 4 button control panel, integrated rigging bracket, and a multi-voltage universal auto switching power supply (100-250v).",
+  "manufacturer": "Elation",
+  "category": "BLINDER",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": 19600.0,
+  "luminousFluxLm": 23600.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.1,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 60.0,
+    "max": 60.0
+  },
+  "fieldAngleDeg": 80.0,
+  "zoom": false,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "01 CH",
+      "channels": 1
+    },
+    {
+      "name": "2 CH",
+      "channels": 2
+    },
+    {
+      "name": "3 CH",
+      "channels": 3
+    },
+    {
+      "name": "4 CH",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

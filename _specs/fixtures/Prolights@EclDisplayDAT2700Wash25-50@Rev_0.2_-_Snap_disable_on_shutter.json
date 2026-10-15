@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclDisplayDAT2700Wash25-50@Rev_0.2_-_Snap_disable_on_shutter.gdtf",
+  "fixtureTypeId": "E9C9637E-45DB-4692-AD0B-8BAEA3D8D26F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclDisplayDAT2700Wash25-50",
+  "longName": "EclDisplayDAT2700Wash25-50",
+  "shortName": "EclDisDAT2700W25-50",
+  "description": "EclDisplay is a range of revolutionary and flexible LED fixtures designed for galleries, commercials and any public venue where an advanced but classy fixture, with several control options, sources and optic variants available to precisely meet any application.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 33.0,
+  "maxLuminousIntensityCd": 6800.0,
+  "luminousFluxLm": 1454.0,
+  "noiseLevelDb": null,
+  "weightKg": 1.5,
+  "powerConnectorIn": "DIN3 (low-voltage DC)",
+  "powerConnectorOut": null,
+  "powerSupplyType": "DIN3 (low-voltage DC)",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 280.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 55.8,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 2800.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Uno_1ch",
+      "channels": 1
+    },
+    {
+      "name": "Basic_2ch",
+      "channels": 2
+    },
+    {
+      "name": "Standard_3ch",
+      "channels": 3
+    },
+    {
+      "name": "Extended_4ch",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

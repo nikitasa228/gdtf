@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Frost_FX_Bar_RGBW@24-02-10_First_Release.gdtf",
+  "fixtureTypeId": "2FB905EE-4C59-4E94-A647-EF663DE4E4EB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Frost FX Bar RGBW",
+  "longName": "Eliminator Lighting Frost FX Bar RGBW",
+  "shortName": "FrstFxBrRGBW",
+  "description": "The Eliminator Lighting Frost FX BAR RGBW is a 1-meter LED linear wash fixture that chases colors and creates breathtaking effects. Includes 14x 3W RGBW LEDs for beam effects + 84x 5050 RGB (3-IN-1) SMD LEDs for glowing effect. Use horizontally or vertically for unique effects for stages, bars, lounges, clubs, bands and mobile entertainers.",
+  "manufacturer": "ADJ (Eliminator Lighting)",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 18900.0,
+  "luminousFluxLm": 3113.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.3,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 22.0,
+    "max": 22.0
+  },
+  "fieldAngleDeg": 19.8,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2300.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "3ch",
+      "channels": 3
+    },
+    {
+      "name": "7ch",
+      "channels": 7
+    },
+    {
+      "name": "11ch",
+      "channels": 11
+    },
+    {
+      "name": "18ch",
+      "channels": 18
+    },
+    {
+      "name": "102ch",
+      "channels": 102
+    },
+    {
+      "name": "107ch",
+      "channels": 107
+    },
+    {
+      "name": "111ch",
+      "channels": 111
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "manual",
+    "category": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

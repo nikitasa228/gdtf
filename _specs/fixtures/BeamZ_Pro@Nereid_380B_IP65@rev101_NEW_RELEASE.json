@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@Nereid_380B_IP65@rev101_NEW_RELEASE.gdtf",
+  "fixtureTypeId": "1FC776CA-4AA1-4D07-AE6D-E670AA0BB31E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Nereid 380B IP65",
+  "longName": "Nereid380B IP65",
+  "shortName": "Nereid380B",
+  "description": "rev101 NEW RELEASE improved Geometry, DMX mapping, Channel Sets\n\nMoving Head Beam :: IP65 / MSD 18R 8000K 380W / 1 x fixed colorwheel 14 + open / 1 x fixed gobowheel 17 + open ( incl. 3 x beam reducer / 5 x multicolor glass ) / 2 x rotating circular Prism ( 1 x 12-face / 1 x 8 + 16 face ) / Effect Ring 40 x SMD LED RGB",
+  "manufacturer": "BeamZ Pro",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": 29551400.0,
+  "luminousFluxLm": 10100.0,
+  "noiseLevelDb": null,
+  "weightKg": 22.1,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 1.0,
+    "max": 1.0
+  },
+  "fieldAngleDeg": 1.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 18,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Wheel Slot 0 Open",
+      "facets": null
+    },
+    {
+      "name": "Wheel Slot 1 12-face Circular",
+      "facets": null
+    },
+    {
+      "name": "Wheel Slot 0 Open",
+      "facets": null
+    },
+    {
+      "name": "Wheel Slot 1 8+16-face Circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "18 CH",
+      "channels": 18
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

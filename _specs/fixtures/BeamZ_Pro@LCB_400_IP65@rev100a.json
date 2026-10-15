@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@LCB_400_IP65@rev100a.gdtf",
+  "fixtureTypeId": "912B04E0-4A00-4727-8BCE-5FE5A683DE99",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LCB 400 IP65",
+  "longName": "LCB400IP",
+  "shortName": "LCB400",
+  "description": "Hybrid LED Batten :: IP65 / 36 x 14 x SMD LED RGB / 84 x LED Amber / 168 x LED CoolWhite / Electronic Frost",
+  "manufacturer": "BeamZ Pro",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 13021400.0,
+  "luminousFluxLm": 36468000.0,
+  "noiseLevelDb": null,
+  "weightKg": 9.8,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 93.1,
+    "max": 93.1
+  },
+  "fieldAngleDeg": 127.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4 Ch 1Pix",
+      "channels": 4
+    },
+    {
+      "name": "6 Channel",
+      "channels": 6
+    },
+    {
+      "name": "6 Channel + VIRTUAL DIMMER",
+      "channels": 6
+    },
+    {
+      "name": "7 Channel",
+      "channels": 7
+    },
+    {
+      "name": "12 Channel + VIRTUAL DIMMER",
+      "channels": 12
+    },
+    {
+      "name": "15 Channel",
+      "channels": 15
+    },
+    {
+      "name": "35 Channel + VIRTUAL DIMMER",
+      "channels": 35
+    },
+    {
+      "name": "45 Channel + VIRTUAL DIMMER",
+      "channels": 45
+    },
+    {
+      "name": "75 Channel",
+      "channels": 75
+    },
+    {
+      "name": "75 Channel + VIRTUAL DIMMER",
+      "channels": 75
+    },
+    {
+      "name": "159 Channel + VIRTUAL DIMMER",
+      "channels": 160
+    }
+  ],
+  "pixelCount": 5086,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power value implausible, removed."
+  ]
+}

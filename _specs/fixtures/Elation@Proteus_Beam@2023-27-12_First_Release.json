@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proteus_Beam@2023-27-12_First_Release.gdtf",
+  "fixtureTypeId": "F8EF8DCC-1190-4DF6-8587-659B03BFF1C4",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proteus Beam",
+  "longName": "Proteus Beam",
+  "shortName": "ProBeam",
+  "description": "PROTEUS BEAM™ is an IP65 rated moving head beam luminaire with the Philips™ MSD Platinum 14R 80CRI 7,800K lamp producing over 12,000 total lumens. Features include an advanced optical system producing a precise 2.5° beam aperture, a revolutionary internal thermal cooling system, full CMY color mixing, 13 dichroic colors including CTB, CTO, and UV, 8 rotating interchangeable metal and 13 static-stamped metal gobos, 5 and 32 facet rotating prisms, frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM, Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 etherCON in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "BEAM",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 280.0,
+  "maxLuminousIntensityCd": 4944000.0,
+  "luminousFluxLm": 136800.0,
+  "noiseLevelDb": null,
+  "weightKg": 35.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 9.0,
+    "max": 9.0
+  },
+  "fieldAngleDeg": 12.4,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 10,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 13,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 23,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7800.0,
+    "max": 7800.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "5 Linear Prism",
+      "facets": null
+    },
+    {
+      "name": "32 Circular Prism",
+      "facets": null
+    },
+    {
+      "name": "5-FACET + 32-FACET PRISMS",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extend Pan540",
+      "channels": 30
+    },
+    {
+      "name": "Stand Pan540",
+      "channels": 21
+    },
+    {
+      "name": "Basic Pan540",
+      "channels": 19
+    },
+    {
+      "name": "Extend Pan630",
+      "channels": 30
+    },
+    {
+      "name": "Stand Pan630",
+      "channels": 21
+    },
+    {
+      "name": "Basic Pan630",
+      "channels": 19
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

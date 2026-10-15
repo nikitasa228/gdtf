@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@ArcSpotMVW@Rev_0.4_-_Emitters_Spectrum_added.gdtf",
+  "fixtureTypeId": "90F70112-73BB-48D4-937B-F369C649674D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ArcSpotMVW",
+  "longName": "ArcSpotMVW",
+  "shortName": "ASMVW",
+  "description": "The ArcSpot series offers a range of IP66-rated dynamic luminaires, designed for exterior lighting of landscapes, trees, architectural features, and facades. This series provides a variety of fixture sizes and accessories, enabling precise targeting of the desired light intensity and quality for any application.\nAmong the series, the ArcSpot MVW stands out as medium sized round spot. It is equipped with 19x 4W Variable White LED source, delivering 10° beam angle with a fixture output of 4100 lumens.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 80.0,
+  "maxLuminousIntensityCd": 82200.0,
+  "luminousFluxLm": 3216.0,
+  "noiseLevelDb": null,
+  "weightKg": 2.7,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 10.7,
+    "max": 10.7
+  },
+  "fieldAngleDeg": 15.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "3ch",
+      "channels": 3
+    },
+    {
+      "name": "4ch_1",
+      "channels": 4
+    },
+    {
+      "name": "4ch_2",
+      "channels": 4
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

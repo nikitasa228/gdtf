@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@LEDForce_7_RGBW@2023-03-10__Geometry_axis_revision__Wiring_object_revision.gdtf",
+  "fixtureTypeId": "AE92BE76-BDDA-4432-BDAA-06AD46F01BF3",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LEDForce 7 RGBW",
+  "longName": "LEDForce 7™ RGBW",
+  "shortName": "LEDForce 7",
+  "description": "GDTF info: 3D model does not match 100% physical appearance of the light. Proportions of 3D model are correct.\n\nThe LEDForce 7 RGB and LEDForce 7 RGBW are new compact TriColor and Quadcolor LED based Par Can fixtures in sturdy high-impact aluminum body equipped with 7 x 3 Watt Tri Color RGB LEDs and 7 x5 Watt Quad Color RGBW LEDs. Fitted with LED control display for easy setting up and with double hanging brackets – for truss mounting and floor standing. Powerful Tri-color and Quad-color LEDs will amaze you with bright saturated colors with no multicolor shadows. Special driving technology ensures flicker free operation while maintaining long 50.000 hours of LED‘s life time.",
+  "manufacturer": "Robe Lighting",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 90.0,
+    "max": 260.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 38.0,
+  "maxLuminousIntensityCd": 200.0,
+  "luminousFluxLm": 33.0,
+  "noiseLevelDb": null,
+  "weightKg": 1.9,
+  "powerConnectorIn": "Fixed Cable",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Fixed Cable",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 RGBW",
+      "channels": 4
+    },
+    {
+      "name": "Mode 2 RGBW + dim + strobe",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

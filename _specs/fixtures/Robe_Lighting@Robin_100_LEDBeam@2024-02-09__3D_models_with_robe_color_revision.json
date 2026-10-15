@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_100_LEDBeam@2024-02-09__3D_models_with_robe_color_revision.gdtf",
+  "fixtureTypeId": "F74CAC5F-1BEA-4195-8B75-F9E466A0B802",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin 100 LEDBeam",
+  "longName": "Robin 100 LEDBeam",
+  "shortName": "100 LEDBeam",
+  "description": "A highly optimized motorised control produces speedy pan and tilt movement, three LED zones allow the creation of various colour chases, and the extra punchy 7 degree beam angle can be amplified with fast strobing.",
+  "manufacturer": "Robe Lighting",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 200.0,
+  "maxLuminousIntensityCd": 192300.0,
+  "luminousFluxLm": 3219.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.5,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 450.0,
+  "tiltRangeDeg": 300.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 7.0
+  },
+  "fieldAngleDeg": 15.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 15500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 Three LED Zones 16bit",
+      "channels": 35
+    },
+    {
+      "name": "Mode 2 Beam light 16bit",
+      "channels": 19
+    },
+    {
+      "name": "Mode 3 Beam light 8bit",
+      "channels": 14
+    },
+    {
+      "name": "Mode 4 Macro colors 8bit",
+      "channels": 9
+    },
+    {
+      "name": "Mode 5 Three LED Zones at the end 16bit",
+      "channels": 35
+    },
+    {
+      "name": "Mode 6 Compatible with LW600 mode 1",
+      "channels": 37
+    }
+  ],
+  "pixelCount": 3,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

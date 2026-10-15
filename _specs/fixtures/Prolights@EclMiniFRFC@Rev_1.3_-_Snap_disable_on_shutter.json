@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclMiniFRFC@Rev_1.3_-_Snap_disable_on_shutter.gdtf",
+  "fixtureTypeId": "1DB102AB-7994-4732-9949-39FE4FED2C80",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclMiniFRFC",
+  "longName": "EclMiniFresnelFC",
+  "shortName": "EclMiniFRFC",
+  "description": "EclMiniFresnel FC is an advanced LED replacement for the traditional 300W Fresnel lamps. Offering 4 colour mixing, delivering high precision reproduction of the white spectrum from 2.800 K to 8.000 K with extensive colour reproduction. The optical system harnesses the power of a 70W custom LED with 4 colours to create an even projection, beautiful colours and precise whites. Featuring HD dimming and tuning from 2.800 K to 8.000 K version, the EclMiniFresnel FC delivers the performance and quality of output demanded from this level of light.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 24.0,
+  "maxLuminousIntensityCd": 1700.0,
+  "luminousFluxLm": 330.0,
+  "noiseLevelDb": null,
+  "weightKg": 2.25,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Schuko",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 24.0,
+    "max": 82.0
+  },
+  "fieldAngleDeg": 79.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Theater_1ch",
+      "channels": 1
+    },
+    {
+      "name": "Theater_2ch",
+      "channels": 2
+    },
+    {
+      "name": "Theater_3ch",
+      "channels": 3
+    },
+    {
+      "name": "Theater_4ch",
+      "channels": 4
+    },
+    {
+      "name": "Theater_5ch",
+      "channels": 5
+    },
+    {
+      "name": "Theater_9ch",
+      "channels": 9
+    },
+    {
+      "name": "Theater_14ch",
+      "channels": 14
+    },
+    {
+      "name": "Theater_17ch",
+      "channels": 17
+    },
+    {
+      "name": "Tour_4ch",
+      "channels": 4
+    },
+    {
+      "name": "Tour_6ch",
+      "channels": 6
+    },
+    {
+      "name": "Tour_7ch",
+      "channels": 7
+    },
+    {
+      "name": "Tour_9ch",
+      "channels": 9
+    },
+    {
+      "name": "Tour_12ch",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

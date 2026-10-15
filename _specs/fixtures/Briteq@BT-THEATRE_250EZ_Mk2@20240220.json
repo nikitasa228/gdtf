@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Briteq@BT-THEATRE_250EZ_Mk2@20240220.gdtf",
+  "fixtureTypeId": "467F56A4-EB89-4793-9063-018E52D77FD1",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "BT-THEATRE 250EZ Mk2",
+  "longName": "BT-Theatre 250EZ",
+  "shortName": "Theatre 250EZ",
+  "description": "Very powerful 250Watt LED theater spot with electronic 14° to 54° zoom and excellent very low noise cooling.",
+  "manufacturer": "Briteq",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 250.0,
+  "maxLuminousIntensityCd": 372800.0,
+  "luminousFluxLm": 24941.0,
+  "noiseLevelDb": null,
+  "weightKg": 9.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 14.0,
+    "max": 54.0
+  },
+  "fieldAngleDeg": 24.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch Dim 8bit",
+      "channels": 1
+    },
+    {
+      "name": "2Ch D+F 8bit",
+      "channels": 2
+    },
+    {
+      "name": "2Ch D+S 8bit",
+      "channels": 2
+    },
+    {
+      "name": "3Ch D+S+F 8bit",
+      "channels": 3
+    },
+    {
+      "name": "2Ch Dim 16bit",
+      "channels": 2
+    },
+    {
+      "name": "3Ch D+S 16bit",
+      "channels": 3
+    },
+    {
+      "name": "4Ch D+S+F 16bit",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Fresnel / PC",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

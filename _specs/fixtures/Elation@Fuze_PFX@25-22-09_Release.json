@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_PFX@25-22-09_Release.gdtf",
+  "fixtureTypeId": "3C267D18-DF63-45F1-AF98-93420641EC99",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze PFX",
+  "longName": "Fuze PFX",
+  "shortName": "FuzePFX",
+  "description": "The FUZE PFX™ is a unique LED Framing FX fixture designed for a variety of applications requiring a compact and powerful multi-purpose luminaire. The PFX is capable of projecting tight beams, precise framing and wide washes using a highly efficient optical design while providing over 15000 lumens of output from its 400W white LED engine.\nA truly remarkable compact powerhouse for any application, the FUZE SFX is sure to create amazing effects, outstanding projections and beautiful bright washes on any stage.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 400.0,
+  "maxLuminousIntensityCd": 9103200.0,
+  "luminousFluxLm": 28000.0,
+  "noiseLevelDb": null,
+  "weightKg": 22.7,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.0,
+    "max": 53.0
+  },
+  "fieldAngleDeg": 53.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Fixed Gobo",
+      "slots": 11,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 2700.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1 Circular",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 Linear",
+      "facets": null
+    },
+    {
+      "name": "Prism 1 and 2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended",
+      "channels": 55
+    },
+    {
+      "name": "Standard",
+      "channels": 38
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

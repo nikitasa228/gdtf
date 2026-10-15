@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ROXX@Neo_Mini@RX_A_27062025.gdtf",
+  "fixtureTypeId": "B8564A89-F598-4ADF-B02D-7AF4B89F14F7",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Neo Mini",
+  "longName": "Neo Mini",
+  "shortName": "Neo Mini",
+  "description": "ROXX Neo Mini: compact full-colour (RGBL) LED spotlight.",
+  "manufacturer": "ROXX",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 644.0,
+  "maxLuminousIntensityCd": 805300.0,
+  "luminousFluxLm": 22780.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.1,
+    "max": 9.1
+  },
+  "fieldAngleDeg": 17.2,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -40.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "CCT Mode (3 CH)",
+      "channels": 3
+    },
+    {
+      "name": "RGB Mode (3 CH)",
+      "channels": 3
+    },
+    {
+      "name": "RGB Mode (6 CH)",
+      "channels": 6
+    },
+    {
+      "name": "RGB Mode (8 CH)",
+      "channels": 8
+    },
+    {
+      "name": "RGB Mode (11 CH)",
+      "channels": 11
+    },
+    {
+      "name": "RGB Mode (15 CH)",
+      "channels": 15
+    },
+    {
+      "name": "Direct Mode (4 CH)",
+      "channels": 4
+    },
+    {
+      "name": "Direct Mode (8 CH)",
+      "channels": 8
+    },
+    {
+      "name": "Direct Mode (9 CH)",
+      "channels": 9
+    },
+    {
+      "name": "Direct Mode (12 CH)",
+      "channels": 12
+    },
+    {
+      "name": "Direct Mode (17 CH)",
+      "channels": 17
+    },
+    {
+      "name": "HSI Mode (10 CH)",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "description": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

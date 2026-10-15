@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "1.0",
+  "file": "GTD_lighting@GTD-F11_N_BSWP@F11_N_BSWP.gdtf",
+  "fixtureTypeId": "3CD962EB-60FB-4505-81C1-F394B6F281DE",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "GTD-F11 N BSWP",
+  "longName": "GTD-F11 N BSWP",
+  "shortName": "F11 N BSWP",
+  "description": "GTD-F11 N BSWP: beam/spot/wash/profile hybrid moving head with CMY, gobos, prism and frost.",
+  "manufacturer": "GTD lighting",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400.0,
+  "maxLuminousIntensityCd": 102405700.0,
+  "luminousFluxLm": 35000.0,
+  "noiseLevelDb": null,
+  "weightKg": 39.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 1.0,
+    "max": 1.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Fixed Gobo",
+      "slots": 7,
+      "rotating": false
+    },
+    {
+      "wheel": "Rotate gobo",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 13,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4 - facet prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -25.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "EXtended 54 DMX",
+      "channels": 54
+    },
+    {
+      "name": "Standard 37 DMX",
+      "channels": 37
+    },
+    {
+      "name": "Basic 35 DMX",
+      "channels": 35
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "description": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

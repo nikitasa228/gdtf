@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0",
+  "file": "SGM_Light@P-6@Rev_C.gdtf",
+  "fixtureTypeId": "747A88B8-2C09-4929-B35A-69AE85F55690",
+  "gdtfDataVersion": "1.1",
+  "gdtfName": "P-6",
+  "longName": "P-6",
+  "shortName": "P-6",
+  "description": "The P-6 combines the compact size and low power consumption of the P-5 series with the unique optical design and ergonomy of the P-10. This all-in-one LED luminaire features pixel-mapping control, long-throw capabilities with native 10º front lens, and all the benefits of magnetic easy-fit filter frames. It is a wash light, a strobe, and a blinder in a lightweight and robust design: a must-have multi-purpose LED fixture.",
+  "manufacturer": "SGM Light",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": null,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "4 Channel RAW",
+      "channels": 4
+    },
+    {
+      "name": "6 Channel RAW",
+      "channels": 6
+    },
+    {
+      "name": "6 Channel CTC",
+      "channels": 6
+    },
+    {
+      "name": "8 Channel RAW",
+      "channels": 8
+    },
+    {
+      "name": "9 Channel Strobe",
+      "channels": 9
+    },
+    {
+      "name": "10 Channel CTC",
+      "channels": 10
+    },
+    {
+      "name": "6x RGB",
+      "channels": 18
+    },
+    {
+      "name": "21 Channel CTC",
+      "channels": 21
+    },
+    {
+      "name": "24 Channel Strobe",
+      "channels": 24
+    },
+    {
+      "name": "26 Channel Strobe",
+      "channels": 26
+    },
+    {
+      "name": "27 Channel RAW",
+      "channels": 27
+    },
+    {
+      "name": "21 Channel Studio",
+      "channels": 21
+    },
+    {
+      "name": "40 Channel CTC",
+      "channels": 40
+    },
+    {
+      "name": "66 Channel Studio",
+      "channels": 66
+    }
+  ],
+  "pixelCount": 7,
+  "subType": "Wash / strobe",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "ipRating": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "weightKg",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Weight is 0 in GDTF",
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

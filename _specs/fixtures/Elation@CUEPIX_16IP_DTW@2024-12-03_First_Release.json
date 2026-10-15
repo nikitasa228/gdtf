@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@CUEPIX_16IP_DTW@2024-12-03_First_Release.gdtf",
+  "fixtureTypeId": "1AF9A53D-1BA6-4ADB-ADCA-33AA52206CF6",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "CUEPIX 16IP DTW",
+  "longName": "CUEPIX 16IP DTW",
+  "shortName": "CuePix16IPDTW",
+  "description": "The CUEPIX 16IP DTW™ is a powerful IP65 outdoor rated effect panel luminaire that features a 4x4 array of 16x40W DTW COB LEDs, full pixel control and 16-bit dimming, variable dimming curve modes, high speed electronic shutter and strobe, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, no fans for noise-sensitive applications, DMX, RDM (Remote Device Management), Kling-NET, and Art-NET protocol support, IP65 rated locking 5pin XLR DMX, RJ45 ethernet, and power in/out connections, full color 180° reversible LCD control panel, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1280.0,
+  "maxLuminousIntensityCd": 111000.0,
+  "luminousFluxLm": 20000.0,
+  "noiseLevelDb": null,
+  "weightKg": 15.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 23.0,
+    "max": 23.0
+  },
+  "fieldAngleDeg": 42.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch",
+      "channels": 1
+    },
+    {
+      "name": "2Ch",
+      "channels": 2
+    },
+    {
+      "name": "Basic",
+      "channels": 7
+    },
+    {
+      "name": "Cells 8bit Amber/White",
+      "channels": 32
+    },
+    {
+      "name": "Cells 8bit DTW",
+      "channels": 16
+    },
+    {
+      "name": "Cells 16bit",
+      "channels": 64
+    },
+    {
+      "name": "Cells 16bit DTW",
+      "channels": 32
+    },
+    {
+      "name": "Ext 4 Cell DTW Option",
+      "channels": 13
+    },
+    {
+      "name": "Ext ALL DTW option",
+      "channels": 37
+    }
+  ],
+  "pixelCount": 32,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

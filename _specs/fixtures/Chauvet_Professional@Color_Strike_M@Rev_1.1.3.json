@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Color_Strike_M@Rev_1.1.3.gdtf",
+  "fixtureTypeId": "AA476C50-FE73-437F-9B4C-1B3A77164525",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Color Strike M",
+  "longName": "Color Strike M",
+  "shortName": "ColorStrikeM",
+  "description": "Color STRIKE M is an IP65 rated strobe/blinder with two ultra-bright, white light tube elements surrounded by an electrifying, color-mixing, and pixel-mappable face. This versatile strobe light can double as a wash fixture with 180deg tilt range to throw bright saturated color wherever you need. The IP65 casing protects the fixture from any environmental factors or weather and has two omega-bracket attachments so you can mount the fixture horizontally or vertically without any hassle. Multiple programming personalities give you a varying amount of control from simple set ups with a multitude of built-in effects, or wider control options to take advantage of the pixel-mappable zones: 14 in the RGB face and 28 in the two tube elements. Built-in alignment pins insure perfectly straight linear arrays to create massive arrangements. DMX, Art-net, and sACN control. All LEDs feature 16-bit dimming for smooth fades and Pulse Width Modulation for on-camera use.",
+  "manufacturer": "Chauvet Professional",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 740,
+  "maxLuminousIntensityCd": 39800,
+  "luminousFluxLm": 72981.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.1,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 57.0,
+    "max": 123.0
+  },
+  "fieldAngleDeg": 138.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "97Ch Mode",
+      "channels": 97
+    },
+    {
+      "name": "74Ch Mode",
+      "channels": 74
+    },
+    {
+      "name": "68Ch Mode",
+      "channels": 68
+    },
+    {
+      "name": "47Ch Mode",
+      "channels": 47
+    },
+    {
+      "name": "30Ch Mode",
+      "channels": 30
+    },
+    {
+      "name": "24Ch Mode",
+      "channels": 24
+    },
+    {
+      "name": "13Ch Mode",
+      "channels": 13
+    },
+    {
+      "name": "11Ch Mode",
+      "channels": 11
+    },
+    {
+      "name": "8Ch Mode",
+      "channels": 8
+    },
+    {
+      "name": "96Ch Mode",
+      "channels": 96
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/color-strike-m/"
+  ]
+}

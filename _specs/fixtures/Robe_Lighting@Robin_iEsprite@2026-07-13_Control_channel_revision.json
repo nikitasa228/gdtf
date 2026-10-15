@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_iEsprite@2026-07-13_Control_channel_revision.gdtf",
+  "fixtureTypeId": "A5095440-DC81-47FB-B32E-BB51D8D46883",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin iEsprite",
+  "longName": "Robin iESPRITE®",
+  "shortName": "iESPRITE",
+  "description": "The IP65-rated version of one Robe’s most popular products, the iESPRITE®, delivers consistent, hassle-free performance without needing complex maintenance whatever the weather or atmospheric conditions!\nThis and all other Robe iSeries fixtures dramatically reduce the stress and complications associated with outdoor lighting!\nThe IP65-rated iESPRITE® combines Robe’s latest protection technology with the very in-demand ESPRITE® product maintaining identical aesthetics, output and features enabling seamless integration between the two different models if desired!\nThe ingenious ingress protection system is specifically designed to facilitate standard maintenance and preparation procedures – e.g., TRANSFERABLE ENGINE exchange and gobo replacement – on site and without any additional tools.\nTo maintain a consistently high lumen output, water, dirt, dust, haze, and smoke are repelled from the front lens with Robe’s unique ParCoat™ hydrophobic, oleophobic-resistant coating which allows easy cleaning / removal without scratching or damage.",
+  "manufacturer": "Robe Lighting",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 950.0,
+  "maxLuminousIntensityCd": 3160400.0,
+  "luminousFluxLm": 27000.0,
+  "noiseLevelDb": null,
+  "weightKg": 34.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 263.6,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "StaticGoboWheel",
+      "slots": 10,
+      "rotating": false
+    },
+    {
+      "wheel": "RotatingGoboWheel",
+      "slots": 8,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 6500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open/hole",
+      "facets": null
+    },
+    {
+      "name": "Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 3,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -50.0,
+    "max": 50.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - Standard 16 bit",
+      "channels": 49
+    },
+    {
+      "name": "Mode 2 - Reduced 8 bit",
+      "channels": 42
+    },
+    {
+      "name": "Mode 3 - Standard 16 bit + green corre",
+      "channels": 50
+    },
+    {
+      "name": "Mode 4 - Reduced 8 bit + green corre",
+      "channels": 43
+    },
+    {
+      "name": "Mode 5 - Enhanced gobo control",
+      "channels": 51
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

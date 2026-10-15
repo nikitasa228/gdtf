@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclProfileFWIPVW_26@Rev_006_-_Accessories_modes_added_-_Geometry_reduced.gdtf",
+  "fixtureTypeId": "94E934B6-B24F-474C-8AFF-56FF6B435F16",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclProfileFWIPVW_26",
+  "longName": "EclProfileFWIPVW_26",
+  "shortName": "EclFWIPVW_26",
+  "description": "EclProfile FW IP VW is the IP Full White version of the new generation of Ecl Profile LED ellipsoidals with Variable White source variants. The EclProfile FW IP VW has been engineered in the same housing and optical design of the colour mixing versions and for those users who require higher brightness and quality on a specific white point, offering a superior evenness and crisp focus of the new EclProfile range, or simply prefer to operate LED fixtures in a classical way. The LED source for both versions has been selected to achieve the finest quality of whites, having high scores of CRI, R9 and TM30 and being ideal for applications like corporate events, advertising, exhibitions, among others.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 265.0,
+  "maxLuminousIntensityCd": 46100.0,
+  "luminousFluxLm": 7951.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.3,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 22.5,
+    "max": 22.5
+  },
+  "fieldAngleDeg": 27.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo",
+      "slots": 1,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 1,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 5600.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": true,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch_Uno",
+      "channels": 1
+    },
+    {
+      "name": "2ch_Duo",
+      "channels": 2
+    },
+    {
+      "name": "3ch_Basic",
+      "channels": 4
+    },
+    {
+      "name": "5ch_Standard",
+      "channels": 5
+    },
+    {
+      "name": "11ch_Extended",
+      "channels": 11
+    },
+    {
+      "name": "6ch_Direct8bit",
+      "channels": 6
+    },
+    {
+      "name": "8ch_Direct16bit",
+      "channels": 8
+    },
+    {
+      "name": "3ch_Uno+Gobo",
+      "channels": 3
+    },
+    {
+      "name": "4ch_Duo+Gobo",
+      "channels": 4
+    },
+    {
+      "name": "6ch_Basic+Gobo",
+      "channels": 6
+    },
+    {
+      "name": "7ch_Standard+Gobo",
+      "channels": 7
+    },
+    {
+      "name": "13ch_Extended+Gobo",
+      "channels": 13
+    },
+    {
+      "name": "8Ch_Direct8bit+Gobo",
+      "channels": 8
+    },
+    {
+      "name": "10Ch_Direct16bit+Gobo",
+      "channels": 10
+    },
+    {
+      "name": "Gobo_Dual",
+      "channels": 2
+    },
+    {
+      "name": "Iris",
+      "channels": 2
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

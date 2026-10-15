@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@SIX_plus_BAR_S@24-24-07_Release.gdtf",
+  "fixtureTypeId": "2923F3CF-0869-47CC-A805-D19AE6C95BD8",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "SIX plus BAR S",
+  "longName": "SIX+ BAR S",
+  "shortName": "SIX+BrS",
+  "description": "Unleash the full potential of LED batten lighting and ignite your creative spark with the new SIX+ BAR S! \nThe SIX+ BAR S represents an innovative line of creative LED batten solutions that harmonizes the latest in LED color technology with versatile design for greater artistic expression. An upgrade of Elation’s beloved SixBar 500, the SIX+ BAR S raises the bar with more output, a broader color spectrum and an overall superior quality of light. \nEquipped with 20W RGB+Lime+Amber+UV LEDs and boasting an impressive CRI of 93, the SIX+ BAR S offers a stunning array of colors, ensuring a beautifully homogenized wash of light with high-quality color reproduction. Its meticulously engineered optical system ensures even light distribution, and the proprietary RGBLA+UV engine delivers high-fidelity whites and intense primaries with no color fringing. Extra-large 50 mm lenses make it ideal for direct view applications and individual cell control opens up for a myriad of design possibilities.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 240.0,
+  "maxLuminousIntensityCd": 57000.0,
+  "luminousFluxLm": 6792.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.75,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 18.7,
+    "max": 18.7
+  },
+  "fieldAngleDeg": 33.1,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "43CH",
+      "channels": 43
+    },
+    {
+      "name": "39CH",
+      "channels": 39
+    },
+    {
+      "name": "36CH",
+      "channels": 36
+    },
+    {
+      "name": "18CH",
+      "channels": 18
+    },
+    {
+      "name": "13CH",
+      "channels": 13
+    },
+    {
+      "name": "11CH",
+      "channels": 11
+    },
+    {
+      "name": "7CH",
+      "channels": 7
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "Dimmer 1CH",
+      "channels": 1
+    },
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    },
+    {
+      "name": "Color 6CH",
+      "channels": 6
+    },
+    {
+      "name": "Color and Dimmer 9CH",
+      "channels": 9
+    },
+    {
+      "name": "CMY 13CH",
+      "channels": 13
+    },
+    {
+      "name": "CMY Extended 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Standard 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Extended 22CH",
+      "channels": 22
+    },
+    {
+      "name": "2 Cell Standard 22CH",
+      "channels": 22
+    },
+    {
+      "name": "2 Cell Extended 34CH",
+      "channels": 34
+    },
+    {
+      "name": "Raw 6 Cell 36CH",
+      "channels": 36
+    },
+    {
+      "name": "6 Cell Standard 46CH",
+      "channels": 46
+    },
+    {
+      "name": "6 Cell Extended 82CH",
+      "channels": 82
+    }
+  ],
+  "pixelCount": 24,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

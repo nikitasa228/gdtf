@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Hydro_Wash_X19@First_Release_26-03-03.gdtf",
+  "fixtureTypeId": "1E5B8B8B-A77C-4366-AB06-7B1202C200AD",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Hydro Wash X19",
+  "longName": "Hydro Wash X19",
+  "shortName": "HydWshX19",
+  "description": "The ADJ Hydro Wash X19 is an IP65 rated 760W professional moving head wash fixture with nineteen 40W RGBW (4-IN-1) LEDs.\nWith robust construction and IP65-ratings, the Hydro Wash X19 is designed for both indoor or outdoor use. Its durable metal casing protects it from dust, sand, moisture and liquids, making it ideal for use in all situations from dusty deserts in California to rainy fields in England. Perfect for festivals and outdoor events, as well as installation in open-air clubs and other outside entertainment spaces where wash lighting is a must. This groundbreaking fixture offer an extended operational life and reduced maintenance requirement due to its long-life LED and sealed casing design.",
+  "manufacturer": "ADJ",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 990,
+  "maxLuminousIntensityCd": 32100.0,
+  "luminousFluxLm": 7500,
+  "noiseLevelDb": null,
+  "weightKg": 24.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 265.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 40.0
+  },
+  "fieldAngleDeg": 26.6,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "16CH",
+      "channels": 16
+    },
+    {
+      "name": "20CH",
+      "channels": 20
+    },
+    {
+      "name": "26CH",
+      "channels": 26
+    },
+    {
+      "name": "30CH",
+      "channels": 30
+    },
+    {
+      "name": "88CH",
+      "channels": 88
+    },
+    {
+      "name": "90CH",
+      "channels": 90
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 40 W invalid (spec sheet: 990 W max)."
+  ],
+  "_refs": [
+    "https://www.adj.com/hydro-wash-x19"
+  ]
+}

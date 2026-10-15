@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Pulse_Bar_S@26-22-09_Release.gdtf",
+  "fixtureTypeId": "E1B582DA-5EB8-46D0-B926-DCE89AA43520",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Pulse Bar S",
+  "longName": "Pulse Bar S",
+  "shortName": "PulsbrS",
+  "description": "The PULSE BAR S Includes a library of customizable RGB and CW strobe effects along with variable dimming modes and curves for quick programming. \nWrapped in a durable, fully IP65-rated housing, the PULSE BAR S is suitable for any environment, indoors or outdoors, and its marine grade coating adds additional protection for harsher environments- even coastal locations.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 3093.0,
+  "maxLuminousIntensityCd": 44000.0,
+  "luminousFluxLm": 67565.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.2,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 68.0,
+    "max": 68.0
+  },
+  "fieldAngleDeg": 112.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+CW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Xenon Strobe 3CH",
+      "channels": 3
+    },
+    {
+      "name": "Simple Strobe 11CH",
+      "channels": 11
+    },
+    {
+      "name": "Strobe FX 22CH",
+      "channels": 22
+    },
+    {
+      "name": "Large Pixels 34CH",
+      "channels": 14
+    },
+    {
+      "name": "Simple Pixel 52CH",
+      "channels": 12
+    },
+    {
+      "name": "Basic Full Control 77CH",
+      "channels": 22
+    },
+    {
+      "name": "Raw Mode 110CH",
+      "channels": 3
+    },
+    {
+      "name": "Pixel Focus 124CH",
+      "channels": 14
+    },
+    {
+      "name": "Full Control 132CH",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 12,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

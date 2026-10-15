@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@MiniEclWDTU_19@Rev_0.2_-_React_to_master_added.gdtf",
+  "fixtureTypeId": "FB297A4C-7D40-44B8-9E0B-614CE85E25B4",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MiniEclWDTU_19",
+  "longName": "MiniEclWDTU_19",
+  "shortName": "MECLWDTU_19",
+  "description": "EclMiniProfile WDMX is a new concept of mini LED ellipsoidal. Showcasing a stylish design, ease of use, precise optics, sharp image projection and bright even projection all in a compact housing that is just a quarter of the size of traditional ellipsoidals. EclMiniProfile WDMX comes with a built-in Wireless DMX (WDMX) module for cable-free operation, extending the possible applications of this light. Designed for applications in commercial installtions, museums, restaurant, churches, educational theatres, and any other installation where size is an important factor. Available in Tungsten and Daylight versions, EclMiniProfile WDMX performs even field projection, high CRI at any level of brightness and linear dimmer over the entire ramp.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 28.0,
+  "maxLuminousIntensityCd": 5600.0,
+  "luminousFluxLm": 563.0,
+  "noiseLevelDb": null,
+  "weightKg": 1.0,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Schuko",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 17.2,
+    "max": 17.2
+  },
+  "fieldAngleDeg": 20.8,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 3000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "5ch",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

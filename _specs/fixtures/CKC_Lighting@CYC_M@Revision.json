@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "file": "CKC_Lighting@CYC_M@Revision.gdtf",
+  "fixtureTypeId": "4DFFDA49-2AF7-4EA4-9FE0-39DEE4B9EEB4",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "CYC M",
+  "longName": "CYC M",
+  "shortName": "CYC M",
+  "description": "CKC Lighting CYC M: LED bar (cyclorama), with 111 deg beam, CMY colour mixing, colour wheel.",
+  "manufacturer": "CKC Lighting",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 180.0,
+  "maxLuminousIntensityCd": 1500.0,
+  "luminousFluxLm": 6000.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 111.0,
+    "max": 111.0
+  },
+  "fieldAngleDeg": 155.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch Dimm",
+      "channels": 1
+    },
+    {
+      "name": "RGB 4Ch",
+      "channels": 4
+    },
+    {
+      "name": "CCT 4Ch",
+      "channels": 4
+    },
+    {
+      "name": "4Ch HSI",
+      "channels": 4
+    },
+    {
+      "name": "HSI EXT 12Ch",
+      "channels": 12
+    },
+    {
+      "name": "CMY 11Ch",
+      "channels": 11
+    },
+    {
+      "name": "CMY Ext 16Ch",
+      "channels": 16
+    },
+    {
+      "name": "Std 13Ch",
+      "channels": 13
+    },
+    {
+      "name": "Ext 20Ch",
+      "channels": 20
+    },
+    {
+      "name": "Std 2 Zone 19Ch",
+      "channels": 19
+    },
+    {
+      "name": "Ext 2 Zone 32Ch",
+      "channels": 32
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "Cyclorama",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "description": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

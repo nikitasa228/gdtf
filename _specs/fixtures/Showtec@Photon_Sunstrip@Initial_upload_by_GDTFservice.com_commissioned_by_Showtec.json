@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Photon_Sunstrip@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "54D5741F-1E0D-11F1-8D75-42010A37C007",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Photon Sunstrip",
+  "longName": "Photon Sunstrip",
+  "shortName": "PhotonSunstrip",
+  "description": "Photon Sunstrip is an IP65-rated LED bar with 10 individually controllable 20-watt white/amber/red LEDs that make it possible to create powerful, dynamic, colourful light effects with convincing tungsten simulation at indoor and outdoor events. Precise low-end dimming also makes the Photon Sunstrip ideal for applications that require excellent control over brightness. The bar has a horizontal beam angle of 46° and a vertical beam angle of 33°, which can be changed using one of the optional beam shapers. Adding the optional 6x6 Hatch Cover gives the Photon Sunstrip the look of a more traditional Active Sunstrip. Control options include DMX (+ RDM) and Auto modes, as well as manual control via the OLED display and buttons. The Photon Sunstrip is equipped with Power Pro True and 5-pin XLR inputs and outputs.\n\nThe bar features two innovative sliding parts on the underside of the housing that make it easy to work around truss bracings during installation, while the two standard brackets included can be used for hanging the bar or positioning it on the floor. An optional fixed bracket is available for those who want to hang or stack the bar closer to the truss. For vertical hanging and stacking, the optional Vertical Bracket and Baseplate is the way to go.",
+  "manufacturer": "Showtec",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 14100.0,
+  "luminousFluxLm": 5203.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 33.0,
+    "max": 33.0
+  },
+  "fieldAngleDeg": 46.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RA+WW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch Mode",
+      "channels": 1
+    },
+    {
+      "name": "2Ch Mode",
+      "channels": 2
+    },
+    {
+      "name": "5Ch Mode",
+      "channels": 5
+    },
+    {
+      "name": "10Ch Mode",
+      "channels": 10
+    },
+    {
+      "name": "14Ch Mode",
+      "channels": 14
+    },
+    {
+      "name": "36Ch Mode",
+      "channels": 36
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Sunstrip (retro)",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 20 W implausible, removed."
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Titan_Strobe_FLEX_FX@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "2C8E6E82-2A4D-11F0-AFEE-42010A37C004",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Titan Strobe FLEX FX",
+  "longName": "Titan Strobe FLEX FX",
+  "shortName": "TitanStrobeFLEXFX",
+  "description": "Titan Strobe FLEX FX is a set of 8 high-power LED strobes and a dedicated controller. Each individual pod has a powerful cold white 100-watt COB LED for strobing and a ring of 12 individually controllable 2-watt RGBW LEDs. The integrated RGBW LEDs allow you to create unique full-color LED ring effects. The powerful LED light source combined with a strobe functionality allows you to use the Titan Strobe FLEX FX as a strobe light with bright color effects. It uses a Fresnel lens to create the optimum beam angle. The light effect can be controlled via DMX/RDM, Art-Net, sACN and Master/Slave, but can also run in stand-alone mode with several built-in programs.\n\nThe strobe pods have a special mounting bracket with 4 holes at a 45-degree angle, so you don’t have to detach the pod from it to drill through the holes to mount it. The bracket also has a 12.5 mm hole, while the controller has two 12.5 mm holes and an M10 threaded insert for attaching a clamp. You can also attach a quick lock bracket to the controller and pods. The pods and controller have a robust IP65-rated aluminum enclosure and are ready for outdoor shows. Dedicated 4x 2.5 m and 4x 5 m cables with control signals and power are included. Additional dedicated cables of various lengths are available separately (maximum length allowed: 30 m).",
+  "manufacturer": "Showtec",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 612.0,
+  "maxLuminousIntensityCd": 156600.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 1.61,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 47.7,
+    "max": 47.7
+  },
+  "fieldAngleDeg": 53.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Strobe All 4Ch",
+      "channels": 4
+    },
+    {
+      "name": "Basic All 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "FX All 11Ch",
+      "channels": 11
+    },
+    {
+      "name": "Strobe POD 32Ch",
+      "channels": 32
+    },
+    {
+      "name": "Pixel All 52Ch",
+      "channels": 52
+    },
+    {
+      "name": "Basic POD 64Ch",
+      "channels": 60
+    },
+    {
+      "name": "FX POD 88Ch",
+      "channels": 81
+    },
+    {
+      "name": "Pixel POD 416Ch",
+      "channels": 368
+    }
+  ],
+  "pixelCount": 12,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

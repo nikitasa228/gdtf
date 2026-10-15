@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Coemar_Lighting@LEDko_FullSpectrum_6_HD-R@rev.06_290424.gdtf",
+  "fixtureTypeId": "8043C1EA-8628-4ECB-964F-DC83096637AE",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LEDko FullSpectrum 6 HD-R",
+  "longName": "F114U000A - LEDko FullSpectrum 6 HD-R",
+  "shortName": "LEDko FullSpectrum 6 HD-R",
+  "description": "LED Ellipsoidal\n• 20-bit color mixing through 6 colors: Red, Green, Blue, Cyan, Lime, Amber\n• All whites from 2700 to 10.000 K with CRI>95\n• 16 bit dimming electronics with 4 selectable curves (exponential,\nlogarithmic, linear and halo) digitally processed at 20 bit\n• Flicker-free operation\n• Fan setting with 4 different options (low, studio, auto, DMX regulated)\n• PowerCon True 1 In & out panel mounted connectors\n• XLR 5 Pin DMX In & out panel mounted connectors\n• Remote Device Management (RDM)\n• Max power consumption: 220 W\n• Built In Power Supply 90-250V 50/60Hz Autosensing\n• 2 mt. detachable Blue POWERCON True1 power cable with bare ends\n• Size: 362x214x210 mm (without optic)\n• Weight (with Profile zoom 15°-35° optic): 11 kg\n• Weight (with lens tube 19° optic): 9.5 kg",
+  "manufacturer": "Coemar Lighting",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 6.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Ellipsoidal (Profile)",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALI",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "16 channels",
+      "channels": 16
+    },
+    {
+      "name": "7 channels",
+      "channels": 7
+    },
+    {
+      "name": "1 channel",
+      "channels": 1
+    },
+    {
+      "name": "Studio mode",
+      "channels": 7
+    },
+    {
+      "name": "RGB mode",
+      "channels": 9
+    },
+    {
+      "name": "fine RGB mode",
+      "channels": 12
+    },
+    {
+      "name": "SUNRISE mode",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "estimated",
+    "framingShutterBlades": "estimated",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

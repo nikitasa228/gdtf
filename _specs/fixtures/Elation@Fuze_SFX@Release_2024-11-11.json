@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_SFX@Release_2024-11-11.gdtf",
+  "fixtureTypeId": "265D7A8B-1403-41C5-95E2-55DD922A3209",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze SFX",
+  "longName": "Fuze SFX",
+  "shortName": "FuzeSFX",
+  "description": "The FUZE SFX™ is a new concept LED Spot FX fixture designed for a variety of applications requiring a compact and powerful multi-purpose luminaire. The SFX is capable of projecting tight beams to wide washes using a highly efficient optical design while providing over 12,000 lumens of output from its 300W white LED engine.\nHousing 18 carefully designed gobos and a 4.5° to 38° zoom, the FUZE SFX can create stunning mid-air FX as easily as precise image projections. The SFX allows for even stage washes utilizing its variable frost filter while a wide array of beautiful colors is possible from a seamless CMY color-mixing system plus color wheel. Dual independent rotating and overlaying prisms plus a fast iris round out the comprehensive feature set.\nA truly remarkable compact powerhouse for any application, the FUZE SFX is sure to create amazing effects, outstanding projections and beautiful bright washes on any stage.",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 300.0,
+  "maxLuminousIntensityCd": 1753600.0,
+  "luminousFluxLm": 12135.0,
+  "noiseLevelDb": null,
+  "weightKg": 19.3,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.5,
+    "max": 38.0
+  },
+  "fieldAngleDeg": 42.2,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "Fixed Gobo",
+      "slots": 10,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6600.0,
+    "max": 6600.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "6-Facet Linear Prism",
+      "facets": null
+    },
+    {
+      "name": "6-Facet Round Prism",
+      "facets": null
+    },
+    {
+      "name": "Prism 1 and 2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard Pan540",
+      "channels": 31
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 31
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

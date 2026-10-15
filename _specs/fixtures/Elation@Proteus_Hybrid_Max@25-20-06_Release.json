@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proteus_Hybrid_Max@25-20-06_Release.gdtf",
+  "fixtureTypeId": "797D1A4C-0486-4FDD-85C0-D0163C01BC9D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proteus Hybrid Max",
+  "longName": "Proteus Hybrid Max",
+  "shortName": "ProHybrdMx",
+  "description": "The PROTEUS HYBRID MAX™ combines high output and long lamp life in a feature packed compact IP66 Hybrid fixture. PROTEUS HYBRID MAX is the Extreme Output Hybrid featuring the innovative Philips MSD Platinum FLEX 500 lamp.\n\n\nRated at 550W and up to 4,000 hours smart lamp life the HYBRID MAX includes CMY and variable CTO plus a full complement of projection and effects options. \nFour prisms on two planes, dual frosts plus dual gobo wheel and three tracks of animation patterns round out the comprehensive FX package in a compact and lightweight housing. For extra impact the fixture features a fast continuous pan rotation. \nDelivering 22,000 lumens from its large 170mm front aperture, the PROTEUS HYBRID MAX has a crisp output for extremely powerful beams, sharp gobos and bright washes, making it a flexible fixture for almost any application, while providing an excellent return on investment.",
+  "manufacturer": "Elation",
+  "category": "BSW",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 550.0,
+  "maxLuminousIntensityCd": 19867400.0,
+  "luminousFluxLm": 22000.0,
+  "noiseLevelDb": null,
+  "weightKg": 34.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 253.0,
+  "infinitePan": true,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 1.8,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 12.4,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 10,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 16,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 26,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7800.0,
+    "max": 7800.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "8 Circular Prism",
+      "facets": null
+    },
+    {
+      "name": "6 Linear Prism",
+      "facets": null
+    },
+    {
+      "name": "16 Circular Prism",
+      "facets": null
+    },
+    {
+      "name": "4 Linear Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540",
+      "channels": 43
+    },
+    {
+      "name": "Extended Pan360",
+      "channels": 43
+    },
+    {
+      "name": "Standard Pan360",
+      "channels": 32
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 32
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

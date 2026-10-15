@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ETC@S4_Series_3_Lustr_X8_50Deg@v1.3.0.gdtf",
+  "fixtureTypeId": "9A83A495-C506-4D26-B2B7-2ED0753CBE1D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "S4 Series 3 Lustr X8 50Deg",
+  "longName": "Source Four LED Series 3 Lustr X8 50 Degree",
+  "shortName": "S4 Lustr X8 50Deg",
+  "description": "Electronic Theatre Controls Inc. Source Four LED Series 3 Lustr X8 with 50 Degree XDLT lens tube Official File",
+  "manufacturer": "ETC",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 307,
+  "maxLuminousIntensityCd": 12900.0,
+  "luminousFluxLm": 10889,
+  "noiseLevelDb": 34,
+  "weightKg": 8.87,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 50.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Ellipsoidal (Profile)",
+  "goboWheels": [],
+  "goboSlots": 1,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALC",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Direct",
+      "channels": 12
+    },
+    {
+      "name": "Expanded",
+      "channels": 11
+    },
+    {
+      "name": "Studio",
+      "channels": 7
+    },
+    {
+      "name": "3ch RGB",
+      "channels": 3
+    },
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "HSIC",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "manual",
+    "lensType": "manual",
+    "goboSlots": "manual",
+    "framingShutters": "manual",
+    "framingShutterBlades": "manual",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Manual shutters and gobo slot. GDTF says tungsten lamp - it is an LED engine. Noise 34 dB(A) avg @1 m."
+  ],
+  "_refs": [
+    "https://www.fullcompass.com/prod/599947-etc-source-four-led-series-3-s4-led-series-3-light-engine-only-lustr-x8-black",
+    "https://goknight.com/content/documentation/S4LEDS3LS Spec Sheet.pdf"
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_Storm_2_Profile@Rev_1.0.8.gdtf",
+  "fixtureTypeId": "EA4195AE-6C8D-4F27-84F6-E7E4D15FE51B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick Storm 2 Profile",
+  "longName": "Maverick Storm 2 Profile",
+  "shortName": "MS2P",
+  "description": "Maverick Storm 2 Profile fits a full armory of features into the lightest midsized IP65 moving profile in its division. Drafted to fill designer demand for a double-duty compact powerhouse that combines the latest Maverick series technical achievements with the durability and versatility to perform indoors and out. Sculpt its 28,00 lumens of output with an exquisitely sharp framing shutter system, zoom down to a slicing 5.5 degree beam, and freely create with a wheelhouse that includes variable CMY + CTO color mixing, color wheel with CRI and CTB filters, static and rotating gobo wheels, five-facet prism, iris, and frost. This Maverick weathers the storm and welcomes the sunshine with SunShield technology that comes on with complete protection of all internal optical components whenever the fixture powers down.",
+  "manufacturer": "Chauvet Professional",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 800,
+  "maxLuminousIntensityCd": 1798300,
+  "luminousFluxLm": 28534.0,
+  "noiseLevelDb": 41.9,
+  "weightKg": 30.4,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.5,
+    "max": 58.6
+  },
+  "fieldAngleDeg": 54.7,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "STATIC GOBO",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6983.0,
+    "max": 6983.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism Effect",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "48Ch Mode",
+      "channels": 48
+    },
+    {
+      "name": "32Ch Mode",
+      "channels": 32
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-storm-2-profile/"
+  ]
+}

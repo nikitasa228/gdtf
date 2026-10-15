@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@KL_Core_IP@25-25-03_First_Release.gdtf",
+  "fixtureTypeId": "D4DDF530-6DD6-4987-939E-2C020CEFE21E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "KL Core IP",
+  "longName": "KL Core IP",
+  "shortName": "KLCoreIP",
+  "description": "The KL CORE IP LED engine offers nearly endless functionality in a rugged and adaptable design. Central to the performance of the device is its high-output, 400W Full-Spectrum LED that is capable of delivering over 15,000 lumens of output. \nThe KL CORE IP’s fully homogenized light source makes it incredibly adaptable. For ellipsoidal applications, the fixture can be paired with an optional KL CORE IP Shutter Barrel and used with any of the IP67-sealed lens tubes, functioning as a traditional LED ellipsoidal.",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 460.0,
+  "maxLuminousIntensityCd": 201900.0,
+  "luminousFluxLm": 3380.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 7.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel",
+      "slots": 1,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 1,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP67",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer 1CH",
+      "channels": 1
+    },
+    {
+      "name": "Dimmer/ CCT 4CH",
+      "channels": 4
+    },
+    {
+      "name": "Dim/CCT/ Color 6CH",
+      "channels": 6
+    },
+    {
+      "name": "RGBMA 10CH",
+      "channels": 10
+    },
+    {
+      "name": "Standard 11CH",
+      "channels": 11
+    },
+    {
+      "name": "Extended 19CH",
+      "channels": 19
+    },
+    {
+      "name": "CMY 9CH",
+      "channels": 9
+    },
+    {
+      "name": "CMY Extended 15CH",
+      "channels": 15
+    },
+    {
+      "name": "xy Extended 13CH",
+      "channels": 13
+    },
+    {
+      "name": "Dimmer 1CH(+2 Gobo)",
+      "channels": 3
+    },
+    {
+      "name": "Dimmer/ CCT 4CH(+2 Gobo)",
+      "channels": 6
+    },
+    {
+      "name": "Dim/CCT/ Color 6CH(+2 Gobo)",
+      "channels": 8
+    },
+    {
+      "name": "RGBMA 10CH(+2 Gobo)",
+      "channels": 12
+    },
+    {
+      "name": "Standard 11CH(+2 Gobo)",
+      "channels": 13
+    },
+    {
+      "name": "Extended 19CH(+2 Gobo)",
+      "channels": 21
+    },
+    {
+      "name": "CMY 9CH(+2 Gobo)",
+      "channels": 11
+    },
+    {
+      "name": "CMY Extended 15CH(+2 Gobo)",
+      "channels": 17
+    },
+    {
+      "name": "xy Extended 13CH(+2 Gobo)",
+      "channels": 15
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "1.0",
+  "file": "PRstage@Dimmer_Pack_4@Ver_1_02.gdtf",
+  "fixtureTypeId": "FA7BD9E6-121C-43EC-86B1-20F53B2C6145",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Dimmer Pack 4",
+  "longName": "Dimmer Pack 4",
+  "shortName": "DP4",
+  "description": "Compact Dimmer Pack 4 with 20A",
+  "manufacturer": "PRstage",
+  "category": "OTHER",
+  "supportedPowerNetworks": [
+    "220/230 V - 50 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 220.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 50.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 2.74,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Schuko",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": null,
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": null,
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - 4CH DM4",
+      "channels": 4
+    },
+    {
+      "name": "Mode 2 - 4CH DM4-MFP",
+      "channels": 4
+    },
+    {
+      "name": "Mode 3 - DM4-MFP",
+      "channels": 8
+    },
+    {
+      "name": "Mode 4 - SW4",
+      "channels": 4
+    },
+    {
+      "name": "Mode 5 - SW4-M",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 0,
+  "subType": "4-channel dimmer pack",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "estimated",
+    "powerSupplyType": "estimated",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "lightSourceType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW"
+  ],
+  "_notApplicable": [
+    "lensType",
+    "noiseLevelDb"
+  ],
+  "_issues": []
+}

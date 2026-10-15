@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@KL_Fresnel_6@23-05-09_First_Release.gdtf",
+  "fixtureTypeId": "092FE1FA-9D7C-470D-8E30-EE49C0A8F1AB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "KL Fresnel 6",
+  "longName": "KL Fresnel 6",
+  "shortName": "KLFrsnl6",
+  "description": "KL FRESNEL 6™ is a 150W 3,000K >95CRI Warm White LED fresnel, producing over 6,500 total lumen output, on par with compatible tungsten halogen models. Features include manual and DMX control, 15° to 38° wide manual zoom, manual and DMX controlled dimmer and shutter, dimmer and zoom rotary dials, smooth 16-bit selectable dimming modes and curves, LED refresh rate frequency adjustment for flicker free operation for TV and FILM, removable barn doors (included), RDM (remote device management) protocol support, 3/5pin DMX and IP65 Locking Power Cable in/out connections, 4 button control panel, LCD menu display, multiple unit power linking, a universal auto switching power supply (100-240v), gel frame and rotating bar doors (included), and a 3 clamp position adjustable mounting yoke.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 150.0,
+  "maxLuminousIntensityCd": 13300.0,
+  "luminousFluxLm": 6500.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.9,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 38.0,
+    "max": 38.0
+  },
+  "fieldAngleDeg": 51.8,
+  "zoom": false,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 3000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer",
+      "channels": 1
+    },
+    {
+      "name": "Dimmer 16bit",
+      "channels": 2
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "Standard",
+      "channels": 4
+    },
+    {
+      "name": "Extended",
+      "channels": 5
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

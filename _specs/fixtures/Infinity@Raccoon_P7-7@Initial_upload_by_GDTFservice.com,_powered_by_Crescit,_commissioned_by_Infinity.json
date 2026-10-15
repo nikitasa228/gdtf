@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Raccoon_P7-7@Initial_upload_by_GDTFservice.com,_powered_by_Crescit,_commissioned_by_Infinity.gdtf",
+  "fixtureTypeId": "F835EADA-50BB-419A-A849-1F8476AB62B9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Raccoon P7-7",
+  "longName": "Raccoon P7-7",
+  "shortName": "RacoonP7-7",
+  "description": "Raccoon P7-7 is a very high-CRI, high-brightness, IP65-rated Par can, intended for applications where both quality and brightness are of high importance, especially exhibitions, museums, and situations that demand a high quality of light. It has 7 extremely accurate LEDs that have seven colours each: red, green, PC green, blue, royal blue, PC amber and cyan. You can switch between maximum brightness and maximum colour quality (high CRI) mode.\n\nThe fixture offers top-of-the-line control options. The core-technology of the Raccoon series is the calibrated XY colour engine, which guarantees outstanding colour quality and stability. With the embedded XY technology, it doesn’t matter which XY-capable fixtures you mix, their colours will always match! The calibrated internal controller ensures an exceptionally stable colour output at every temperature of the LEDs and every brightness setting, without any visible colour shift when dimming. We use the same calibration standards as the Infinity Signature series, so both fixtures are highly consistent in colour. Five different internal dimmer curves are available through the easy-to-use menu system, including a Tungsten shift simulation that works even with a colour filter applied! It can take care of CCT, RGB, and Lee filters internally.\n\nBesides XY mode, control through regular DMX, RDM, Manual, and Master/slave is also possible. The PWM frequency is adjustable between 640 Hz and 25 kHz, ensuring flicker-free camera images. Basic settings, like PWM and dimmer curve, can be copied among Raccoon fixtures in the same network to guarantee identical behaviour. Sturdy 5P XLR DMX and Power Pro True power connectors ensure reliable connections and IP65 compliance. With its stylish housing and accessories like barndoors, a top hat, filter frames, and diffusion filters, the Raccoon series poses an ultra-flexible competitor for high-end par cans.",
+  "manufacturer": "Infinity",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 25.0,
+  "maxLuminousIntensityCd": 79300.0,
+  "luminousFluxLm": 4932.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 13.5,
+    "max": 13.5
+  },
+  "fieldAngleDeg": 15.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer 1Ch",
+      "channels": 1
+    },
+    {
+      "name": "Pixel 3Ch",
+      "channels": 3
+    },
+    {
+      "name": "Basic 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "XY 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "RGB 12Ch",
+      "channels": 12
+    },
+    {
+      "name": "CMY 12Ch",
+      "channels": 12
+    },
+    {
+      "name": "HSI 10Ch",
+      "channels": 10
+    },
+    {
+      "name": "Raw 14Ch",
+      "channels": 14
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Architectural / outdoor",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

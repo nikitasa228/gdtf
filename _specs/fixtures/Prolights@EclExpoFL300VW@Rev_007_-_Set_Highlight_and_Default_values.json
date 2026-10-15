@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclExpoFL300VW@Rev_007_-_Set_Highlight_and_Default_values.gdtf",
+  "fixtureTypeId": "FA97A6E5-3ECB-4CEF-859C-5ED175AE82E7",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclExpoFL300VW",
+  "longName": "EclExpoFL300VW",
+  "shortName": "EXFL300VW",
+  "description": "The EclExpo Flood300VW is a variable white LED Floodlight, designed for exhibitions and showrooms, as a high-quality LED replacement of traditional tungsten, CDM or HMI asymmetric luminaires.\nThe EclExpo Flood300VW has a 300W LED source, with variable white ranging from 2,700K to 6,500K, and an outstanding lumen output with high-scoring CRI levels (>95), TM-30, R9. Combined with a reflector, it has a wide asymmetric beam angle of 100° (Horizontal) x 60° (Vertical) of indirect light emission.\nThis unit is incredibly user-friendly, using remote control via DMX and RDM (XLR 5p in & through) or intuitive stand-alone operation through an on-board display and two rotatory knobs CCT and dimmer settings.\nIts unique design and performance set a new standard for exhibition floodlights.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 300.0,
+  "maxLuminousIntensityCd": 8300.0,
+  "luminousFluxLm": 13044.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 68.8,
+    "max": 68.8
+  },
+  "fieldAngleDeg": 126.1,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "UNO",
+      "channels": 1
+    },
+    {
+      "name": "DUO",
+      "channels": 2
+    },
+    {
+      "name": "Standard",
+      "channels": 5
+    },
+    {
+      "name": "Basic",
+      "channels": 3
+    },
+    {
+      "name": "Extended",
+      "channels": 11
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Photon_Strobe@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "60EFA734-1DC3-11F1-8D75-42010A37C007",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Photon Strobe",
+  "longName": "Photon Strobe",
+  "shortName": "PhotonStrobe",
+  "description": "Photon Strobe is an IP65-rated LED bar with 448x 1.5 W RGBM LEDs and 224x 3 CW LEDs that make it possible to create powerful, dynamic, colourful strobe effects at indoor and outdoor events. With 32 RGBM and 16 CW sections, elaborate patterns and effects are possible. Control options include DMX (+ RDM) and Auto modes, as well as manual control via the OLED display and buttons. The Photon Strobe is equipped with Power Pro True and 5-pin XLR inputs and outputs.\n\nThe bar features two innovative sliding parts on the underside of the housing that make it easy to work around truss bracings during installation, while the two standard brackets included can be used for hanging the bar or positioning it on the floor. An optional fixed bracket is available for those who want to hang or stack the bar closer to the truss. For vertical hanging and stacking, the optional Vertical Bracket and Baseplate is the way to go.",
+  "manufacturer": "Showtec",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 33700.0,
+  "luminousFluxLm": 124788.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 108.0,
+    "max": 108.0
+  },
+  "fieldAngleDeg": 120.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 9000.0,
+    "max": 9000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4Ch Mode",
+      "channels": 4
+    },
+    {
+      "name": "13Ch Mode",
+      "channels": 13
+    },
+    {
+      "name": "34Ch Mode",
+      "channels": 34
+    },
+    {
+      "name": "73Ch Mode",
+      "channels": 73
+    },
+    {
+      "name": "145Ch Mode",
+      "channels": 145
+    },
+    {
+      "name": "158Ch Mode",
+      "channels": 158
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 14 W implausible, removed."
+  ]
+}

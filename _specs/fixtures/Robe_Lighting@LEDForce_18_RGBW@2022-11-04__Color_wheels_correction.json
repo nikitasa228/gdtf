@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@LEDForce_18_RGBW@2022-11-04__Color_wheels_correction.gdtf",
+  "fixtureTypeId": "69C31FC8-932B-4C7D-B1D8-CDDE0B2A7B2C",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LEDForce 18 RGBW",
+  "longName": "LEDForce 18™ RGBW",
+  "shortName": "LEDForce 18",
+  "description": "GDTF info: 3D model does not match 100% physical appearance of the light. Proportions of 3D model are correct. \n\nLEDForce 18 RGB and LEDForce 18 RGBW Par Cans will blind you with powerful light output of 18 x 3IN1 RGB LED or 18 x 4IN1 RGBW LED multichip New Tri-color and Quad-color LED technology. Superior color mixing with no multicolor shadows and extremely bright beam of 25°beam angle will please any lighting professional. Die cast aluminum casting with double hanging brackets – for truss mounting and floor standing allows mounting in any position. Gel frame included as standard and optional 10° lens kit available upon demand.",
+  "manufacturer": "Robe Lighting",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 90.0,
+    "max": 260.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 95.0,
+  "maxLuminousIntensityCd": 200.0,
+  "luminousFluxLm": 33.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.9,
+  "powerConnectorIn": "IEC C14",
+  "powerConnectorOut": null,
+  "powerSupplyType": "IEC C14",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 RGBW",
+      "channels": 4
+    },
+    {
+      "name": "Mode 2 RGBW + dim + strobe",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

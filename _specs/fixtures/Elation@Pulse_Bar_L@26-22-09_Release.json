@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Pulse_Bar_L@26-22-09_Release.gdtf",
+  "fixtureTypeId": "FD9098ED-6CCC-4F6B-8DA1-00DA88AC3528",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Pulse Bar L",
+  "longName": "Pulse Bar L",
+  "shortName": "PulsbrL",
+  "description": "Ignite excitement and get the crowd pumping with the new Pulse Bar L! The first in an innovative Pulse line of strobe lights, the Pulse Bar is a highly impactful strobe and visual effect bar that injects dynamism and spark into any performance!\nMeasuring a meter in length, the Pulse Bar L incorporates 960 1.5W RGB LEDs distributed across 40 zones along its perimeter. Additionally, it features a central strobe line equipped with 400 5W cool-white LEDs across 40 zones, complemented by 160 1.5W RGB LEDs arranged in 20 zones at its core.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 3380.0,
+  "maxLuminousIntensityCd": 106400.0,
+  "luminousFluxLm": 163223.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.25,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 68.0,
+    "max": 68.0
+  },
+  "fieldAngleDeg": 112.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+CW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Xenon Strobe 3CH",
+      "channels": 3
+    },
+    {
+      "name": "Simple Strobe 11CH",
+      "channels": 11
+    },
+    {
+      "name": "Strobe FX 22CH",
+      "channels": 22
+    },
+    {
+      "name": "Large Pixels 52CH",
+      "channels": 14
+    },
+    {
+      "name": "Simple Pixel 92CH",
+      "channels": 12
+    },
+    {
+      "name": "Pixel Focus 234CH",
+      "channels": 17
+    },
+    {
+      "name": "Basic Full Control 132CH",
+      "channels": 22
+    },
+    {
+      "name": "Raw Mode 220CH",
+      "channels": 3
+    },
+    {
+      "name": "Full Control 242CH",
+      "channels": 25
+    }
+  ],
+  "pixelCount": 26,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

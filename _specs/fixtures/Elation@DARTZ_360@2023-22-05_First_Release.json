@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@DARTZ_360@2023-22-05_First_Release.gdtf",
+  "fixtureTypeId": "58F6904D-7E61-49B3-BF24-DB70C25B7151",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Dartz 360",
+  "longName": "Dartz 360",
+  "shortName": "Dartz360",
+  "description": "The DARTZ 360™ is a unique, compact, narrow beam luminaire featuring a new patent pending single source 50W RGB LED engine producing an impressive 3° aperture, amazing high output level, and smooth color-mixed effects that can be used in a variety of applications requiring no minimum safe project distance as with typical discharge lamp beam fixtures, fast and precise 16-bit continuous 360° pan and tilt rotation, 14 static-stamped metal gobos, 6-facet linear and 8-facet independent rotating prisms, 0-100% linear frost filter for wash effects, high speed electronic shutter and strobe, electronic dimming and variable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX, RDM (Remote Device Management), Kling-Net, Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, 5pin XLR, RJ45 ethernet, and Locking Power Cable in/out connections, full color 180° reversible menu display with multi-button control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 50.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 29562.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.7,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": true,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Fixed Gobo",
+      "slots": 14,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "8-FACET PRISM 1",
+      "facets": null
+    },
+    {
+      "name": "6-FACET PRISM 2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extend Pan540",
+      "channels": 25
+    },
+    {
+      "name": "Stand Pan540",
+      "channels": 22
+    },
+    {
+      "name": "Basic Pan540",
+      "channels": 19
+    },
+    {
+      "name": "Extend Pan630",
+      "channels": 25
+    },
+    {
+      "name": "Stand Pan630",
+      "channels": 22
+    },
+    {
+      "name": "Basic Pan630",
+      "channels": 19
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@MosaicoL@Rev_19_-_Gobo_Images_review.gdtf",
+  "fixtureTypeId": "885F7666-C2AD-4311-99A1-234C4C63BE01",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "MosaicoL",
+  "longName": "MosaicoL",
+  "shortName": "MOS_L",
+  "description": "The Mosaico L is a bright outdoor LED image projector, designed for long-range image, textures and logo projections.\nBuilt in a durable IP66 die-cast housing, the Mosaico L offers a phenomenal output of 11,700 lumens and an extensive set of features including a rotating animation wheel, 7 interchangeable gobos, and motorized framing shutters that precisely focus within a certain projection area.\nIt has an exceptional zoom range, from 7° to 49°, making it versatile in both near-field and long-throw installations, or even for static and animated facade building lighting.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 300.0,
+  "maxLuminousIntensityCd": 697200.0,
+  "luminousFluxLm": 11672.0,
+  "noiseLevelDb": null,
+  "weightKg": 25.0,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": "Schuko",
+  "powerSupplyType": "Schuko LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": 280.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 49.0
+  },
+  "fieldAngleDeg": 22.2,
+  "zoom": true,
+  "lensType": "Ellipsoidal (Profile)",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 7,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 3200.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_22ch",
+      "channels": 22
+    },
+    {
+      "name": "Standard_32ch",
+      "channels": 32
+    },
+    {
+      "name": "Extended_43ch",
+      "channels": 43
+    },
+    {
+      "name": "Scene Record_23ch",
+      "channels": 23
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

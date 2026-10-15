@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Rayzor_760@2023-15-08_Release.gdtf",
+  "fixtureTypeId": "77DD8047-5413-4E27-B43E-E66B6FF8BC87",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Rayzor 760",
+  "longName": "Rayzor 760",
+  "shortName": "Ray760",
+  "description": "The Rayzor 760™ is a compact yet extremely powerful Wash Effects fixture featuring Elation’s unique SparkLED™ system and fast continuous Pan and Tilt motion. With its wide zoom range from 5° to 77° it provides intense and well-defined mid-air beams at over 8,000 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
+  "manufacturer": "Elation",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1118.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 11615.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.2,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": true,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 40.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 2950.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended 360Pan/Tilt",
+      "channels": 52
+    },
+    {
+      "name": "Pixels 360Pan/Tilt",
+      "channels": 52
+    },
+    {
+      "name": "Standard 360Pan/Tilt",
+      "channels": 23
+    },
+    {
+      "name": "SparkLED",
+      "channels": 1
+    },
+    {
+      "name": "Extended 540Pan/270Tilt",
+      "channels": 52
+    },
+    {
+      "name": "Pixels 540Pan/270Tilt",
+      "channels": 52
+    },
+    {
+      "name": "Standard 540Pan/270Tilt",
+      "channels": 23
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

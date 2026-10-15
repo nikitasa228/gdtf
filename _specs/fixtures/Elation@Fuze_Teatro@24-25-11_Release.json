@@ -1,0 +1,182 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Teatro@24-25-11_Release.gdtf",
+  "fixtureTypeId": "4AE4F77B-D67D-4F0C-A9E2-094D40EB6550",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze Teatro",
+  "longName": "Fuze Teatro",
+  "shortName": "FzTeatro",
+  "description": "The FUZE TEATRO™ is a silent fanless full spectrum automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications.\nThe 92 CRI engine utilizes an 480W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of up to 15,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY or RGB emulation provide the designer with immediate access to the impressive LED color array.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 480.0,
+  "maxLuminousIntensityCd": 895900.0,
+  "luminousFluxLm": 15000.0,
+  "noiseLevelDb": null,
+  "weightKg": 36.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 44.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 6,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 12,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1",
+      "facets": null
+    },
+    {
+      "name": "Prism 2",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Std Pan540",
+      "channels": 42
+    },
+    {
+      "name": "Ext Pan540",
+      "channels": 61
+    },
+    {
+      "name": "RGB Pan540",
+      "channels": 40
+    },
+    {
+      "name": "RGB Ext Pan540",
+      "channels": 57
+    },
+    {
+      "name": "CMY Pan540",
+      "channels": 40
+    },
+    {
+      "name": "CMY Ext Pan540",
+      "channels": 57
+    },
+    {
+      "name": "Std Pan630",
+      "channels": 42
+    },
+    {
+      "name": "Ext Pan630",
+      "channels": 61
+    },
+    {
+      "name": "RGB Pan630",
+      "channels": 40
+    },
+    {
+      "name": "RGB Ext Pan630",
+      "channels": 57
+    },
+    {
+      "name": "CMY Pan630",
+      "channels": 40
+    },
+    {
+      "name": "CMY Ext Pan630",
+      "channels": 57
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

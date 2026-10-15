@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_Tdot5_Profile@2026-08-28_Attribute_fix.gdtf",
+  "fixtureTypeId": "A3F97DB0-A2F7-47CB-9BDF-7034740DD29F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin Tdot5 Profile",
+  "longName": "Robin T.5 Profile",
+  "shortName": "T.5 Profile",
+  "description": "T.5 Profile™\nCan a classic be miniaturized without compromising performance? Introducing the T.5 Profile™ — the latest member of the Robe T-Series, offering all the features loved by theatre and broadcast professionals in a more compact form.\nIn response to high demand for a smaller version of the renowned T1 Profile™, the T.5 Profile™ delivers the same top-tier performance, from advanced controls to its powerful, nuanced output.\nPowered by a 350W MSL™ Multi-Spectral light source, the T.5 Profile™ delivers rich, precise colour with an impressive 7.500 lm output and a seamless CCT range of 2.700-8.000K, extendable up to 10.000K. You’ll also enjoy virtual CRI control (80-95) and linear green content adjustment, giving you total control over every shade.\nBeam control is razor-sharp thanks to our patented Plano4 FC™ system, featuring four independent shutter planes and 120-degree module rotation. Each blade offers full curtain ability, providing precision and increased flexibility.\nDespite its smaller size, the T.5 is packed with familiar features, including a 5°-55° zoom range for shorter throws, a rotatable and indexable gobo wheel with replaceable gobos, iris, animation wheel, and interchangeable MagFrost™ filters for visual effects. The multi-6-facet prism further enhances dynamic imagery.\nDesigned for the most noise-sensitive environments, the T.5 incorporates innovative noise-reduction technology, comprehensive fan control, and our Robe AirLOC™ system, which keeps key components cool while reducing surface airflow noise and minimizing the need for frequent optical cleaning.\nTechnologies like Cpulse™ flicker-free management, EMS™ stabilization, and onboard RCC™ colour calibration ensure flawless performance, whether in the spotlight or on camera.\nWith the T.5 Profile, you get the power, control, and versatility of the T1, now in a lighter, more agile design.",
+  "manufacturer": "Robe Lighting",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 480.0,
+  "maxLuminousIntensityCd": 877900.0,
+  "luminousFluxLm": 7500.0,
+  "noiseLevelDb": null,
+  "weightKg": 20.8,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 264.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 55.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo1",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 7,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "6F Circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 3,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - CMY",
+      "channels": 49
+    },
+    {
+      "name": "Mode 1 - RGB",
+      "channels": 49
+    },
+    {
+      "name": "Mode 2 - Reduced CMY",
+      "channels": 33
+    },
+    {
+      "name": "Mode 2 - Reduced RGB",
+      "channels": 33
+    },
+    {
+      "name": "Mode 3 - RGBAL",
+      "channels": 53
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

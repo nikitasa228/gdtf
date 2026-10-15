@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Litepanels@Gemini_1x1_Soft@1.0.01_-_Initial_Public_Release.gdtf",
+  "fixtureTypeId": "2319CD84-61C3-4AE6-830C-E5284BF9A4AB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Gemini 1x1 Soft",
+  "longName": "LitePanels Gemini 1x1 Soft",
+  "shortName": "Gemini 1x1 Soft",
+  "description": "Power your imagination to create the extraordinary on screen. With an incredibly bright output of over 3000 lux @10ft/3m, Gemini 1x1 Hard delivers the brightest and most accurate 1x1 light ever. Blast through a silk, build layers of diffusion or bounce light off a board, with precision control of hue, saturation, intensity, gels and effects, Gemini 1x1 Hard gives you the power to control and create your own extraordinary.",
+  "manufacturer": "Litepanels",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 200,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 3000.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.0,
+  "powerConnectorIn": "IEC C14",
+  "powerConnectorOut": null,
+  "powerSupplyType": "IEC C14",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 93.0,
+    "max": 93.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "CCT 8-Bit",
+      "channels": 6
+    },
+    {
+      "name": "HSI - 8 Bit",
+      "channels": 6
+    },
+    {
+      "name": "Gel Mode Mode 1 - 8 Bit",
+      "channels": 6
+    },
+    {
+      "name": "Gel Mode 2 - 8 Bit",
+      "channels": 7
+    },
+    {
+      "name": "RGBW Mode - 8 Bit",
+      "channels": 8
+    },
+    {
+      "name": "Effects Mode - 8 Bit",
+      "channels": 9
+    },
+    {
+      "name": "Presets Trigger Mode - 8 Bit",
+      "channels": 5
+    },
+    {
+      "name": "CCT/HSI Mode Fixed - 8 Bit",
+      "channels": 10
+    },
+    {
+      "name": "CCT/RGBW Mode Fixed - 8 Bit",
+      "channels": 12
+    },
+    {
+      "name": "CCT 16-Bit",
+      "channels": 8
+    },
+    {
+      "name": "HSI - 16 Bit",
+      "channels": 8
+    },
+    {
+      "name": "Gel Mode Mode 1 - 16 Bit",
+      "channels": 8
+    },
+    {
+      "name": "Gel Mode 2 - 16 Bit",
+      "channels": 8
+    },
+    {
+      "name": "RGBW Mode - 16 Bit",
+      "channels": 14
+    },
+    {
+      "name": "Effects Mode - 16 Bit",
+      "channels": 16
+    },
+    {
+      "name": "Presets Trigger Mode - 16 Bit",
+      "channels": 7
+    },
+    {
+      "name": "CCT/HSI Mode Fixed - 16 Bit",
+      "channels": 16
+    },
+    {
+      "name": "CCT/RGBW Mode Fixed - 16 Bit",
+      "channels": 20
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Soft light panel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "estimated",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

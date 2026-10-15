@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Clay_Paky@Aleda_B-EYE_K10@ClayPaky_Ofweficial_File_Fw_Ver_2_25_005.gdtf",
+  "fixtureTypeId": "BF9967F2-4FC4-4BC7-9C1B-2CA2A15EF507",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Aleda B-EYE K10",
+  "longName": "Aleda B-EYE K10",
+  "shortName": "bEye k10",
+  "description": "The B-EYE has revolutionized the way we think of LED show lighting. Its innovative optical unit enhances the uniformity and efficiency of the light output. The rotating front lens and the possibility to control each single LED individually have made spectacular kaleidoscopic projections and charming eye candy effects possible. A sophisticated effect engine has made it easier to routinely use macro effects, which would otherwise be difficult to program. These technological innovations make the B-EYE a versatile product: it is a high-performance LED wash light, a perfect beam light, and a spectacular visual effect projector all in one. It has won several awards and been copied by countless manufacturers over the years.\n\nToday Claypaky offers HY B-EYE, that is TWICE MORE POWERFUL and bright than B-EYE. It even offers more VERSATILITY and more INTERACTIVITY with the media servers (Kling-Net protocol included), it is very SILENT while featuring the same size and same control mode as the B-EYE.",
+  "manufacturer": "Clay Paky",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 760.0,
+  "maxLuminousIntensityCd": 957300.0,
+  "luminousFluxLm": 5234.0,
+  "noiseLevelDb": null,
+  "weightKg": 20.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 210.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.0,
+    "max": 60.0
+  },
+  "fieldAngleDeg": 60.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Shapes",
+      "channels": 35
+    },
+    {
+      "name": "Standard",
+      "channels": 21
+    }
+  ],
+  "pixelCount": 19,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@WW_Profile_HP_IP@24-26-03_First_Release.gdtf",
+  "fixtureTypeId": "01D9B609-7F10-44F8-B225-047356117DCF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "WW Profile HP IP",
+  "longName": "WW Profile HP IP",
+  "shortName": "WWProfHPIP",
+  "description": "The IP65 rated WW Profile HP IP™ ellipsoidal features a High Power 130W Warm White 3,000K LED engine producing >91CRI and 10,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, supports B size metal gobos (gobo holder not included) and an optional IP65 rated DMX controlled dual gobo rotator (sold separately), manual focus, DMX controlled electronic strobe, 16bit dimming and selectable dimming curve modes, flicker free operation for TV and FILM, adjustable refresh frequency and gamma brightness, IP rated 5pin DMX and IP65 Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 390.0,
+  "maxLuminousIntensityCd": 390700.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 8.8,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 15.0
+  },
+  "fieldAngleDeg": 19.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel",
+      "slots": 1,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 1,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 3000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1CH",
+      "channels": 1
+    },
+    {
+      "name": "8CH",
+      "channels": 8
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 3,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

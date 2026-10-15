@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Hydro_Beam_CMY@Release_26-23-06.gdtf",
+  "fixtureTypeId": "020D9D11-EB85-4965-88FE-D97DF1032FF2",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Hydro Beam CMY",
+  "longName": "Hydro Beam CMY",
+  "shortName": "HydHyb",
+  "description": "Offering power, precision and reliability, the Hydro Beam CMY is a versatile IP65-rated automated beam luminaire. Harnessing the power of an OSRAM Sirius HRI 310W PRO discharge lamp, focused through precision-engineered optics and projected from a high-quality glass lens, it generates a razor-sharp 2-degree beam. An extensive feature set is headlined by CMY color mixing and also includes 17 static GOBOS, two rotating prisms, a frost filter, and integrated Aria X2 wireless DMX control and remote fixture management. Featuring lightning-fast movement, this robust fixture is designed to create impressive aerial effects for large indoor as well as outdoor events.",
+  "manufacturer": "ADJ",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 450,
+  "maxLuminousIntensityCd": 10240800.0,
+  "luminousFluxLm": 14000.0,
+  "noiseLevelDb": null,
+  "weightKg": 25.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 2.0,
+    "max": 2.0
+  },
+  "fieldAngleDeg": 1.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1 (Fixed)",
+      "slots": 17,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 17,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7200.0,
+    "max": 7200.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 1 (8 Circular)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "24Ch",
+      "channels": 24
+    },
+    {
+      "name": "20Ch",
+      "channels": 20
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Osram Sirius HRI 310 W lamp."
+  ],
+  "_refs": [
+    "https://www.adj.com/hydro-beam-cmy"
+  ]
+}

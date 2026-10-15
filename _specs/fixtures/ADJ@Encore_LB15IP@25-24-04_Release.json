@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Encore_LB15IP@25-24-04_Release.gdtf",
+  "fixtureTypeId": "D91273EB-DC07-4B93-A73E-24F395EE363F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Encore LB15IP",
+  "longName": "Encore LB15IP",
+  "shortName": "EncrLB15IP",
+  "description": "Offering a tough metal construction and IP65 ‘weatherproof’ rating, the Encore LB15IP is a linear LED wash fixture designed for rental, event production and concert production applications. It features 15 x 20-Watt quad color RGBL (Red, Green, Blue and Lime) LEDs which offer a huge variety of color options, including white light with a variable color temperature of 2700K to 7000K, and a high CRI. Each of the LEDs can be controlled independently and has a tight beam angle of 11-degrees with the option to change the beam to 25-degrees with the supplied frost filter.",
+  "manufacturer": "ADJ",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 198,
+  "maxLuminousIntensityCd": 3800.0,
+  "luminousFluxLm": 5982,
+  "noiseLevelDb": null,
+  "weightKg": 8.85,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 11.0,
+    "max": 11.0
+  },
+  "fieldAngleDeg": 23.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 7000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "4CH",
+      "channels": 4
+    },
+    {
+      "name": "7CH",
+      "channels": 7
+    },
+    {
+      "name": "8CH",
+      "channels": 8
+    },
+    {
+      "name": "13CH",
+      "channels": 13
+    },
+    {
+      "name": "16CH",
+      "channels": 16
+    },
+    {
+      "name": "60CH",
+      "channels": 4
+    },
+    {
+      "name": "72CH",
+      "channels": 72
+    },
+    {
+      "name": "63CH",
+      "channels": 63
+    },
+    {
+      "name": "69CH",
+      "channels": 69
+    },
+    {
+      "name": "120CH",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF weight 4.1 kg contradicts spec sheet (8.85 kg)."
+  ],
+  "_refs": [
+    "https://www.adj.com/encore-lb15ip"
+  ]
+}

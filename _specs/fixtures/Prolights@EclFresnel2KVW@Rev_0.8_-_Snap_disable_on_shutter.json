@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclFresnel2KVW@Rev_0.8_-_Snap_disable_on_shutter.gdtf",
+  "fixtureTypeId": "200B8063-449D-417B-8BBA-C31092223175",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclFresnel2KVW",
+  "longName": "EclFresnel2kVW",
+  "shortName": "EclFR2KVW",
+  "description": "The EclFresnel 2KVW is a powerful LED Fresnel lamp, designed as a replacement for a 2,000W fixture, with a bright and high-quality variable-white light, from 2,700K to 5,600K, using a 500W LED source. \nThis is the perfect luminaire for those applications requiring high-quality white rendering, such as in TV studios, galleries, and virtual productions, with high CRI (>96), TLCI (>96), TM-30 and R9.\nThe EclFresnel 2KVW has a manual zoom range from 15° to 79,5°, with precise focusing, and an 8-leaf barndoor (included).\nThis fixture has an intuitive user interface with rotatory knobs. It also has stand-alone settings, PowerCon True in & through connections and XLR in & through, offering an incredible user experience and easy setup.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 450.0,
+  "maxLuminousIntensityCd": 329500.0,
+  "luminousFluxLm": 25303.0,
+  "noiseLevelDb": null,
+  "weightKg": 17.2,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 47.0
+  },
+  "fieldAngleDeg": 45.2,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 5600.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "UNO_1Ch",
+      "channels": 1
+    },
+    {
+      "name": "DUO_2Ch",
+      "channels": 2
+    },
+    {
+      "name": "Basic_3ch",
+      "channels": 3
+    },
+    {
+      "name": "Standard_5ch",
+      "channels": 5
+    },
+    {
+      "name": "Extended_11ch",
+      "channels": 11
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

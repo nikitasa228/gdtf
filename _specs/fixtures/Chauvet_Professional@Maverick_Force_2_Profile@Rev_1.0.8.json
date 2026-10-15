@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_Force_2_Profile@Rev_1.0.8.gdtf",
+  "fixtureTypeId": "F2344D0E-7EF0-4253-A54E-68DA36FA1F63",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick Force 2 Profile",
+  "longName": "Maverick Force 2 Profile",
+  "shortName": "MaverickForce2Prof",
+  "description": "Maverick Force 2 Profile is a lightweight, tour-grade moving head with a big presence. The powerful unit features an output of over 20,000 lumens and an artillery of speedy effects housed in a deceptively compact frame, under 60lbs. Maverick Force 2 Profile features CMY + CTO color-mixing, a color wheel with a CTB and CRI option, and an extensive zoom range of 7 to over 50 degrees that maintains a flat field of focus even when fully wide. A custom-built framing system containing 4 dual axis shutters with a 120-degree field of rotation, motorized iris, focus, zoom, and frost capabilities, alongside a 5-facet rotating prism give an abundance of tools for beam shaping. Two rotating glass gobo wheels featuring gobos created in collaboration with leading designers can be stacked on top of one another for dynamic effects. Control as you see fit with DMX, sACN, Art-Net or W-DMX.",
+  "manufacturer": "Chauvet Professional",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 800,
+  "maxLuminousIntensityCd": 1296600,
+  "luminousFluxLm": 20856.0,
+  "noiseLevelDb": 43.1,
+  "weightKg": 26.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.8,
+    "max": 55.9
+  },
+  "fieldAngleDeg": 54.9,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO 1",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "ROTATING GOBO 2",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 7055.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "50Ch Mode",
+      "channels": 50
+    },
+    {
+      "name": "33Ch Mode",
+      "channels": 33
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-force-2-profile/"
+  ]
+}

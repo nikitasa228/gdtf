@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "1.0",
+  "file": "PRstage@LED_BAR_424_RGBUV@Ver1.6.gdtf",
+  "fixtureTypeId": "0E2630B6-3DB9-4B8C-A86A-E19AA81DA7B6",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LED BAR 424 RGBUV",
+  "longName": "LED BAR 424 RGBUV",
+  "shortName": "BAR 424 RGBUV",
+  "description": "PRSTAGE LED BAR 424RGBUV is a high-output linear LED fixture featuring 42 multi-chip 4 W LEDs (Red, Green, Blue, UV at 395 nm) with RGBUV mixing, offering over 16 million color variations and long LED lifespan (~50,000 h).\n\nThe fixture delivers smooth 0–100% linear dimming, a wide 60° beam angle, and an adjustable electronic strobe ranging from 1 to 20 flashes per second. Cooling is actively managed (the fan can be disabled via the menu), and built-in thermal protection enhances longevity.\nIts versatile control includes DMX512, sound activation, auto-run programs, and a Master-Slave mode. Available channel modes are 8, and 32 DMX channels. It offers 3-pin XLR DMX In/Out, an LCD display with four navigation buttons, and includes two adjustable barn doors plus a matte plastic diffuser for beam shaping.\n\nPowered via PowerCON (input + through output) from AC 90–240 V (50/60 Hz), it consumes up to 200 W. The robust metal housing measures 610 × 88 × 150 mm and weighs just 3.2 kg",
+  "manufacturer": "PRstage",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 3.45,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+UV",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode1",
+      "channels": 8
+    },
+    {
+      "name": "Mode2",
+      "channels": 32
+    }
+  ],
+  "pixelCount": 7,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 1096 W invalid, removed."
+  ]
+}

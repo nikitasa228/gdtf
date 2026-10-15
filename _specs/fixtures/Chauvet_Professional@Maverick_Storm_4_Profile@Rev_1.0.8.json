@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_Storm_4_Profile@Rev_1.0.8.gdtf",
+  "fixtureTypeId": "B4A4D031-66BC-41FF-ACF2-7B628B37CA89",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick Storm 4 Profile",
+  "longName": "Maverick Storm 4 Profile",
+  "shortName": "MaverickStorm4Prof",
+  "description": "Maverick Storm 4 Profile brings indomitable long throw performance to even the largest venues. Its ambitious design launches over 60,000 lumens across incredible distances with commanding brightness. Built to outshine, this Maverick brings more to your show than its long throw. Master the art of domination with a sophisticated variable CMY+CTO system that delivers fantastic color rendering. Double down on crisp gobos to create complex looks with two rotating gobo wheels, two prisms, two frost filters, and an animation wheel to add even more texture. Sharp shutter framing, smooth iris and 8.5:1 zoom complete a Maverick that delivers key light and high energy kinetic effects, in an advanced IP65 alloy body that carries SunShield tech inside to protect optical components from any solar ingress through its audacious 188mm front lens.",
+  "manufacturer": "Chauvet Professional",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1780,
+  "maxLuminousIntensityCd": 3179000,
+  "luminousFluxLm": 60756.0,
+  "noiseLevelDb": 43.3,
+  "weightKg": 50.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.4,
+    "max": 58.3
+  },
+  "fieldAngleDeg": 54.1,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO 1",
+      "slots": 6,
+      "rotating": true
+    },
+    {
+      "wheel": "ROTATING GOBO 2",
+      "slots": 6,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 12,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6895.0,
+    "max": 6895.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism Effect",
+      "facets": null
+    },
+    {
+      "name": "Prism Effect",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "55Ch Mode",
+      "channels": 55
+    },
+    {
+      "name": "38Ch Mode",
+      "channels": 38
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF weight 46.5 kg contradicts spec sheet (50.6 kg)."
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-storm-4-profile/"
+  ]
+}

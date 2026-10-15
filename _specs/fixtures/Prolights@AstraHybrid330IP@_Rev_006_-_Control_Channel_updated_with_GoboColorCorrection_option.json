@@ -1,0 +1,145 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@AstraHybrid330IP@_Rev_006_-_Control_Channel_updated_with_GoboColorCorrection_option.gdtf",
+  "fixtureTypeId": "3E888F63-A455-44CD-9DF1-DFE2CD5DA078",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "AstraHybrid330IP",
+  "longName": "AstraHybrid330IP",
+  "shortName": "ASHYB330IP",
+  "description": "The Astra Hybrid330IP is a versatile, compact moving light, suitable for both indoor and outdoor settings, thanks to its IP65 rating.\nEquipped with a 330W LED, this lightweight unit weighs only 25 kg. It offers a comprehensive range of features and visual effects, making it ideal for stages of various sizes. Its advanced optical system, featuring a 140 mm front lens, provides a zoom range from 3° to 50°, enabling both intense beam and spotlight functionalities.\nKey features of the Astra Hybrid330IP include linear CMY color mixing, three color wheels, an animation wheel, dual overlapping prisms, a frost effect, and two gobo wheels.",
+  "manufacturer": "Prolights",
+  "category": "BSW",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 330.0,
+  "maxLuminousIntensityCd": 3568500.0,
+  "luminousFluxLm": 10976.0,
+  "noiseLevelDb": null,
+  "weightKg": 25.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.0,
+    "max": 52.0
+  },
+  "fieldAngleDeg": 15.1,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "Fixed Gobo",
+      "slots": 11,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 19,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 3200.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Linear Prism",
+      "facets": null
+    },
+    {
+      "name": "Circular Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard",
+      "channels": 29
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

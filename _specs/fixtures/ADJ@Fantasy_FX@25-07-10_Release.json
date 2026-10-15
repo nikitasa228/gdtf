@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Fantasy_FX@25-07-10_Release.gdtf",
+  "fixtureTypeId": "275ABB3A-CE59-48CA-970E-24BA6AF223FE",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fantasy FX",
+  "longName": "Fantasy FX",
+  "shortName": "Fantasy FX",
+  "description": "The Eliminator Lighting Fantasy FX is a versatile dual-effect fixture combining a 40W RGBW center beam with a circular halo of 288 RGB SMD LEDs. Compact and lightweight, it features 128 programs, DMX control, 0–100% dimming, and up to 20 strobe flashes per second—perfect for DJs, nightclubs, and fun centers. Energize any event with vibrant, imaginative lighting!",
+  "manufacturer": "ADJ",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 265.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 100,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 880.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.1,
+  "powerConnectorIn": "IEC C14",
+  "powerConnectorOut": "IEC C14",
+  "powerSupplyType": "IEC C14 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 140.0,
+    "max": 140.0
+  },
+  "fieldAngleDeg": 150.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2300.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "152CH",
+      "channels": 152
+    },
+    {
+      "name": "16CH",
+      "channels": 16
+    },
+    {
+      "name": "7CH",
+      "channels": 7
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "LED effect",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.adj.com/fantasy-fx"
+  ]
+}

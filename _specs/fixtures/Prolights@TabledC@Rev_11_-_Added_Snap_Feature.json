@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@TabledC@Rev_11_-_Added_Snap_Feature.gdtf",
+  "fixtureTypeId": "E9D2367A-E386-4F3A-B96C-DF4E3E2A4C53",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "TabledC",
+  "longName": "TabledC",
+  "shortName": "TabledC",
+  "description": "Tabled C is an ingenious product which offers beautiful table lighting for events whilst keeping the atmosphere of the room. Based on a stunning aesthetic design, it is not only a stylish centerpiece but fast to deploy and easy to use. With local control and wireless DMX, it can either act as a standalone table light or be part of a spectacular event lighting package.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 24.0,
+  "maxLuminousIntensityCd": 100.0,
+  "luminousFluxLm": 96.0,
+  "noiseLevelDb": null,
+  "weightKg": 1.18,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 45.0,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 55.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_4ch",
+      "channels": 4
+    },
+    {
+      "name": "STD_7ch",
+      "channels": 7
+    },
+    {
+      "name": "EXT_10ch",
+      "channels": 10
+    },
+    {
+      "name": "ADV_12ch",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

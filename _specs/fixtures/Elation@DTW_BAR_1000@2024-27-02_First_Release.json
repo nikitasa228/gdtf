@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@DTW_BAR_1000@2024-27-02_First_Release.gdtf",
+  "fixtureTypeId": "7E2640E0-6850-4562-82EA-49CC1E0983A2",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "DTW BAR 1000",
+  "longName": "DTW BAR 1000",
+  "shortName": "DTW1000",
+  "description": "The DTW BAR 1000™ features (12) 10W multi-chip Cool White / Warm White / Amber LEDs, 20° beam 40° field angles, selectable dim-to-warm control, cool white, warm white, and amber color mixing, full pixel and 1,600K - 6,500K color temperature control, variable 16-bit dimming curve modes, selectable color and program macros, strobe and chase effects, DMX, RDM, KlingNet, and Art-Net protocol support, DMX, RJ45, and Locking Power in/out connections, LCD menu display with 4 button control panel, integrated dual rigging brackets, multiple unit power linking, rugged die-cast aluminum exterior, included frost filter and glare shield, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1800.0,
+  "maxLuminousIntensityCd": 19400.0,
+  "luminousFluxLm": 2640.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.4,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 20.0,
+    "max": 20.0
+  },
+  "fieldAngleDeg": 40.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "Tunable White (CW/WW)",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1600.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1CH",
+      "channels": 1
+    },
+    {
+      "name": "2CH",
+      "channels": 2
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "5CH",
+      "channels": 5
+    },
+    {
+      "name": "7CH",
+      "channels": 7
+    },
+    {
+      "name": "10CH",
+      "channels": 10
+    },
+    {
+      "name": "12CH",
+      "channels": 12
+    },
+    {
+      "name": "15CH",
+      "channels": 15
+    },
+    {
+      "name": "36CH",
+      "channels": 36
+    },
+    {
+      "name": "41CH",
+      "channels": 41
+    },
+    {
+      "name": "45CH",
+      "channels": 45
+    },
+    {
+      "name": "20CH",
+      "channels": 20
+    },
+    {
+      "name": "72CH",
+      "channels": 72
+    }
+  ],
+  "pixelCount": 12,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

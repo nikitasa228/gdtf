@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@DisplayCobTRWDFC_60@Rev_1.03_-_Snap_disable_on_shutter.gdtf",
+  "fixtureTypeId": "050A16FB-372F-4BDC-A803-1B9C511F9D8D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "DisplayCobTRWDFC_60",
+  "longName": "DisplayCobTRWDFC_60",
+  "shortName": "DCOB_TRWDFC_60",
+  "description": "DisplayCob TRWDFC is a track mounted 60 W RGB / FC COB spotlight, designed with electronic and user interface on board being able to be implemented with any existing lighting track easily. The on board Wireless DMX receiver allow users to control this luminaire without any cable, so it doesn't need a specific track with data wirings, or it can be hanged without its track adaptor, anywhere using the onboard bracket and controlling via wired DMX protocol. DisplayCob TRWDFC optical systems is composed by a powerful 60 W COB LED source and a parabolic reflector, with swappable lenses allowing a beam angle from 15° up to 60° for a perfect focusing. DisplayCob TRWDFC features are an ideal solution to add dynamics and creativity in any installations such as commercials, hotels, restaurants and art galleries.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 60.0,
+  "maxLuminousIntensityCd": 1400.0,
+  "luminousFluxLm": 1726.0,
+  "noiseLevelDb": null,
+  "weightKg": 1.85,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 60.0,
+    "max": 60.0
+  },
+  "fieldAngleDeg": 80.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "3ch",
+      "channels": 3
+    },
+    {
+      "name": "5ch",
+      "channels": 5
+    },
+    {
+      "name": "8ch",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

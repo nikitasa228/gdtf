@@ -1,0 +1,549 @@
+{
+ "LIGHT_SKY@8800-C42@V1.1.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@AQUABEAM400_LL-E@V1.8.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@AQUABEAM400_LL@V1.7.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@C42@V1.0.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@DOPHINE_SMART@V1.2.gdtf": {
+  "category": "BEAM",
+  "colorMixing": "CMY"
+ },
+ "LIGHT_SKY@F1000Prifile@2022.12.26.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F1000_Spot@2022.12.27.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F1700Prifile@2022.12.14.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F230II@V2.6.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F330II@V2.7.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F350II@V2.8.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F400BSW@V1.1.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@F420BSW@2022.7.18.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@HS880@V1.4.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@IP1940DII@V1.0.gdtf": {
+  "ipRating": "IP65",
+  "_estimated": [
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IP2021Profile@V1.5.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IP3500@V1.7.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "ipRating": "IP65",
+  "_notes": "GDTF has no pan/tilt channels for this file.",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IP3500BSW@V1.6.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IP4000LL@V1.6.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IP4000Laser@V1.7.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "subType": "Laser-source beam",
+  "lightSourceType": "Laser",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IP520@2024.1.3.gdtf": {
+  "mains": "100-240",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL1015_WASH@2022.11.11.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "powerConsumptionW": null,
+  "_notes": "GDTF beam-sum power implausible, removed.",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL1215@V1.2.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "powerConsumptionW": null,
+  "_notes": "GDTF beam-sum power implausible, removed.",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL1215_II@V1.0.gdtf": {
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL1940Pro@2022.11.5.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL300@V1.2.gdtf": {
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "ipRating": "IP65",
+  "_estimated": [
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL6103@V1.3.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL61W3@V1.2.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL715@V1.2.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL715P@V1.3.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@IPL7215@2022.7.22.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "lightSourceType": "LED",
+  "ipRating": "IP65",
+  "powerConsumptionW": null,
+  "_notes": "GDTF beam-sum power implausible, removed.",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@LUNAR_BEAM@V2.7.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@LUNAR_MAX@V2.8.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@Lunar_BSW@V1.2.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@M1915Q4@2022.7.22.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@MAMBA@V1.6.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConsumptionW": null,
+  "_notes": "GDTF beam-sum power implausible, removed.",
+  "category": "LED BAR",
+  "panRangeDeg": 0,
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@MINI_LASER_AQUA@V1.4.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "subType": "Laser-source beam",
+  "lightSourceType": "Laser",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@Mini_Lunar@V1.2.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@PL1215_II@V1.1.gdtf": {
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@PL1915@V1.1.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@PL6103@V1.3.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@PL61W3@V1.1.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "ipRating": "IP65",
+  "category": "PAR",
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "ipRating"
+  ]
+ },
+ "LIGHT_SKY@Pearl_wash@V1.1.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConsumptionW": null,
+  "_notes": "GDTF beam-sum power implausible, removed.",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SCOPE_BEAM@V1.7.gdtf": {
+  "mains": "100-240",
+  "category": "BEAM",
+  "colorMixing": "None",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "LIGHT_SKY@SHARK400@V2.0.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SHARK400BSW@V1.9.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SHARK450@V1.9.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SHARK450BSW@V1.8.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SHARK_LASER@V1.9.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "subType": "Laser-source beam",
+  "lightSourceType": "Laser",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SHARK_LASER_(Economic)@V1.9.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "subType": "Laser-source beam",
+  "lightSourceType": "Laser",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@SUPER_SHARK_BEAM@V1.9.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "category": "BEAM",
+  "colorMixing": "CMY",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@Shark_Profile@V1.7.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@Super_Scope@V1.3.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@TX1920-HC@V1.2.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@TX1920Zoom@V1.1.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ },
+ "LIGHT_SKY@TX1940_Zoom@V1.6.gdtf": {
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConsumptionW": null,
+  "_notes": "GDTF beam-sum power implausible, removed.",
+  "_estimated": [
+   "mains",
+   "powerSupplyType"
+  ]
+ }
+}

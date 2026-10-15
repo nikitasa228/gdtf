@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Strike_Bolt_1C@Rev_1.0.3.gdtf",
+  "fixtureTypeId": "F94F3AE7-79C6-11EE-99B7-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Strike Bolt 1C",
+  "longName": "Strike Bolt 1C",
+  "shortName": "Strike Bolt 1C",
+  "description": "STRIKE Bolt 1C is an intense IP65-rated strobe featuring integrated Smart Frost that enables this first-of-its-kind fixture to shift instantly from powerful strobe bursts to smooth color block effects. Its proprietary Tool-Free Stacking streamlines interconnecting STRIKE Bolt 1C with STRIKE Array fixtures in stackable configurations to create unique blinder/strobe arrays. Multiple hanging points, end-to-end connections, and floor feet provide maximum rigging versatility. Its included stealth filter can be attached to make the fixture nearly disappear for on-camera use. STRIKE Bolt 1C delivers a classic strobe look with modern performance ideal for concert and touring, festivals and event productions in any environment, live or broadcast, indoors or out.",
+  "manufacturer": "Chauvet Professional",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 329,
+  "maxLuminousIntensityCd": 18200,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 8.7,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 54.7,
+    "max": 84.6
+  },
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 5692.0,
+    "max": 5692.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "10Ch Mode",
+      "channels": 10
+    },
+    {
+      "name": "11Ch Mode",
+      "channels": 11
+    },
+    {
+      "name": "13Ch Mode",
+      "channels": 13
+    },
+    {
+      "name": "17Ch Mode",
+      "channels": 17
+    },
+    {
+      "name": "20Ch Mode",
+      "channels": 20
+    },
+    {
+      "name": "25ch Mode",
+      "channels": 25
+    },
+    {
+      "name": "27Ch Mode",
+      "channels": 27
+    },
+    {
+      "name": "40Ch Mode",
+      "channels": 40
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "powerSupplyType": "manual",
+    "beamAngleDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "colorTemperatureK": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Weight is 0 in GDTF",
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/strike-bolt-1c/"
+  ]
+}

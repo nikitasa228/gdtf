@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Paragon_LT@25-12-08_Release.gdtf",
+  "fixtureTypeId": "5FC30388-ABFF-4ED5-B9C6-FC0D1AB66DEF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Paragon LT",
+  "longName": "Paragon LT",
+  "shortName": "PrgnLT",
+  "description": "The PARAGON LT™ is a powerful IP54-rated LED profile fixture offering outstanding projection and beam qualities. Fully sealed from dust and moisture it is an ideal fixture for any show or temporary outdoor events.\n\nProviding up to 5000 lumens output from its custom-designed Variable CRI LED engine, the PARAGON LT is the ideal fixture for a variety of application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1300.0,
+  "maxLuminousIntensityCd": 9619100.0,
+  "luminousFluxLm": 50000.0,
+  "noiseLevelDb": null,
+  "weightKg": 43.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 263.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.9,
+    "max": 45.0
+  },
+  "fieldAngleDeg": 48.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 3",
+      "slots": 5,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 19,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 2700.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4 Facet Linear",
+      "facets": null
+    },
+    {
+      "name": "4 Facet Circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP54",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard",
+      "channels": 44
+    },
+    {
+      "name": "Extended",
+      "channels": 67
+    },
+    {
+      "name": "RGB Standard",
+      "channels": 47
+    },
+    {
+      "name": "RGB Extended",
+      "channels": 73
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Pulse_Panel_FX@26-23-07_Release.gdtf",
+  "fixtureTypeId": "22C26041-D6CE-41CF-8EE1-DCA453418245",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Pulse Panel FX",
+  "longName": "Pulse Panel FX",
+  "shortName": "PulsPnlFX",
+  "description": "PULSE PANEL FX! A highly versatile and expressive fixture in the innovative Pulse line of strobe lights, the PULSE PANEL FX adds a burst of dynamism and inspiration to any show!\nDesigners have asked for effect lights that are more than a one-trick pony and the PULSE PANEL FX delivers with multi-functionality as a powerful strobe, bright blinder, high-output wash light or creative eye candy effect all in one.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1611.0,
+  "maxLuminousIntensityCd": 145100.0,
+  "luminousFluxLm": 222618.0,
+  "noiseLevelDb": null,
+  "weightKg": 17.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": true,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 68.0,
+    "max": 68.0
+  },
+  "fieldAngleDeg": 112.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Strobe FX 27CH",
+      "channels": 27
+    },
+    {
+      "name": "Simple Strobe 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Xenon Strobe 8CH",
+      "channels": 8
+    },
+    {
+      "name": "Large Pixel 50CH",
+      "channels": 50
+    },
+    {
+      "name": "Basic Full Control- No Pan 90CH",
+      "channels": 72
+    },
+    {
+      "name": "Basic Full Control 93CH",
+      "channels": 75
+    },
+    {
+      "name": "Simple Pixel Pro 65CH",
+      "channels": 65
+    },
+    {
+      "name": "Simple Pixel Pro No Pan 62CH",
+      "channels": 62
+    },
+    {
+      "name": "Pixel Focus 175CH",
+      "channels": 19
+    },
+    {
+      "name": "LED Panel 156CH",
+      "channels": 3
+    },
+    {
+      "name": "Raw Mode 161CH",
+      "channels": 5
+    },
+    {
+      "name": "Full Control 183CH",
+      "channels": 27
+    }
+  ],
+  "pixelCount": 32,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

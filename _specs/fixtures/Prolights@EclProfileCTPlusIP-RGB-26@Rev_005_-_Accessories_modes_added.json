@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclProfileCTPlusIP-RGB-26@Rev_005_-_Accessories_modes_added.gdtf",
+  "fixtureTypeId": "134667F3-824E-4B53-97FE-57353EC5B1AE",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclProfileCTPlusIP-RGB-26",
+  "longName": "EclProfileCTPlusIP-RGB-26",
+  "shortName": "EclCT+IP_RGB26",
+  "description": "EclProfile CT+IP is a tuneable white and Full Spectrum IP LED ellipsoidal designed for exterior applications such as touring, theme parks, cruise ships, and any outdoor event where a multipurpose and high-quality static fixture is required. EclProfile CT+IP uses the same 6 colour LED source than its indoor version, achieving a 30% higher lumen output as it's equipped with a bigger power-supply and heat sink",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 270.0,
+  "maxLuminousIntensityCd": 30000.0,
+  "luminousFluxLm": 6681.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.9,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.6,
+    "max": 25.6
+  },
+  "fieldAngleDeg": 30.5,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo",
+      "slots": 1,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 1,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": true,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch_Uno",
+      "channels": 1
+    },
+    {
+      "name": "2ch_Duo",
+      "channels": 2
+    },
+    {
+      "name": "4ch_Basic_RGB",
+      "channels": 4
+    },
+    {
+      "name": "9ch_Standard_RGB",
+      "channels": 9
+    },
+    {
+      "name": "12ch_Extended_RGB",
+      "channels": 12
+    },
+    {
+      "name": "3ch_Uno+Gobo",
+      "channels": 3
+    },
+    {
+      "name": "4ch_Duo+Gobo",
+      "channels": 4
+    },
+    {
+      "name": "6Ch_BasicRGB+Gobo",
+      "channels": 6
+    },
+    {
+      "name": "11ch_StandarRGB+Gobo",
+      "channels": 11
+    },
+    {
+      "name": "13ch_ExtendedRGB+Gobo",
+      "channels": 14
+    },
+    {
+      "name": "Gobo_Dual",
+      "channels": 2
+    },
+    {
+      "name": "Iris",
+      "channels": 2
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Artiste_Van_Gogh@25-26-07_Release.gdtf",
+  "fixtureTypeId": "D7803886-3DB9-4FE7-B06D-D2C793BFF207",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Artiste Van Gogh",
+  "longName": "Artiste Van Gogh",
+  "shortName": "ArtVanGogh",
+  "description": "The Artiste Van Gogh™ is a compact powerful framing Wash fixture with outstanding light quality. It is an ideal partner to the Profile fixtures in Elation’s Artiste fixture range.\nProviding up to 16.000 total lumens from its efficient 380W 6,500K LED engine allows the fixture to be utilized in many applications. Due to its high 91 color rendering index and its whisper quiet operation it is ideally suited for Television, Theater and Corporate Events, or any application where powerful and even coverage is desired. Illuminating objects and people with precise color reproduction is the perfect application for the Artiste Van Gogh. A 16bit CMY color system with a seamless CTO filter offers the designer a wide color range from subtle pastels to vibrant primaries. A seven position color wheel is provided for additional effects and includes a dedicated UV filter.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 380.0,
+  "maxLuminousIntensityCd": 2225000.0,
+  "luminousFluxLm": 23000.0,
+  "noiseLevelDb": null,
+  "weightKg": 28.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.5,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 68.2,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540",
+      "channels": 36
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 22
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 36
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 22
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

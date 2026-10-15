@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Pixel_Bar_120IP@25-06-02_Release.gdtf",
+  "fixtureTypeId": "2D694476-0415-4A00-AD1B-284A047C759D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Pixel Bar 120IP",
+  "longName": "Pixel Bar 120IP",
+  "shortName": "PixBr120",
+  "description": "The PIXEL BAR 120IP™ is an outdoor IP65 rated LED pixel bar featuring (120) tri-color RGB SMD LEDs with a 16mm pixel pitch, a refresh rate of 44,000Hz for flicker free operation for broadcast TV and FILM applications, and measures 2 meter (6.6 feet) in length. Each pixel bar is housed in a lightweight IP65 rated aluminum housing featuring magnetic end caps which allow seamless end-to-end pixel spacing, an integrated adjustable mounting bracket, a safety cable loop, and includes square and rounded frosted lens attachments.",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 2.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "120x1",
+      "channels": 3
+    },
+    {
+      "name": "60x2",
+      "channels": 3
+    },
+    {
+      "name": "30x4",
+      "channels": 3
+    },
+    {
+      "name": "15x8",
+      "channels": 3
+    },
+    {
+      "name": "12x10",
+      "channels": 3
+    },
+    {
+      "name": "2x60",
+      "channels": 6
+    },
+    {
+      "name": "4x30",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 5,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "powerConsumptionW",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

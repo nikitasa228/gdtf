@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@Maverick_MK_Pyxis@Rev_1.0.8.gdtf",
+  "fixtureTypeId": "CE469220-B2D2-44AC-9A44-A914662EA2EB",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Maverick MK Pyxis",
+  "longName": "Maverick MK Pyxis",
+  "shortName": "MaverickMKPyxis",
+  "description": "Maverick MK Pyxis empowers your creativity by giving you an endless array of incredible eye-candy looks with its epic beam and wash effects, wide zoom range, continuous 360° pan and tilt movement and awesome aerial and pixel-mapping effects. This revolutionary and compact moving head features a ring of nine 15 W RGBW LEDs with a zoom range of 7° to 45° and built in color macros and gobos, as well as a punchy 60 W RGBW LED serving as a center pixel with a 3° beam angle. Choose from DMX, sACN, Art-Net, or W-DMX for control.",
+  "manufacturer": "Chauvet Professional",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 325,
+  "maxLuminousIntensityCd": 482600,
+  "luminousFluxLm": 3500.0,
+  "noiseLevelDb": null,
+  "weightKg": 14.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": true,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.9,
+    "max": 58.4
+  },
+  "fieldAngleDeg": 4.5,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Single Control: Tour 131Ch",
+      "channels": 131
+    },
+    {
+      "name": "Single Control: Advanced 113Ch",
+      "channels": 113
+    },
+    {
+      "name": "Single Control: Standard 66Ch",
+      "channels": 66
+    },
+    {
+      "name": "Single Control: Basic 26Ch",
+      "channels": 26
+    },
+    {
+      "name": "Dual Control Movement: Advanced 41Ch",
+      "channels": 41
+    },
+    {
+      "name": "Dual Control Movement: Standard 30Ch",
+      "channels": 30
+    },
+    {
+      "name": "Dual Control Movement: Basic 13Ch",
+      "channels": 13
+    },
+    {
+      "name": "Dual Control Pixels: Advanced 80Ch",
+      "channels": 80
+    },
+    {
+      "name": "Dual Control Pixels: Standard 40Ch",
+      "channels": 40
+    },
+    {
+      "name": "Dual Control Pixels: Basic 30Ch",
+      "channels": 30
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power 75 W invalid."
+  ],
+  "_refs": [
+    "https://www.chauvetprofessional.com/products/maverick-mk-pyxis/"
+  ]
+}

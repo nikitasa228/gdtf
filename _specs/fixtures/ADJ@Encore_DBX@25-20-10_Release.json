@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Encore_DBX@25-20-10_Release.gdtf",
+  "fixtureTypeId": "9CC29C8A-FD35-4088-ABA2-C88BC3776FE6",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Encore DBX",
+  "longName": "Encore DBX",
+  "shortName": "EncDBX",
+  "description": "Encore DBX is a dynamic effect fixture featuring a 5-color LED dual-lens blinder/strobe and RGB background LEDs for stunning visual effects. Powered by two 150W RGBAW LEDs, it offers flexible control, variable white color temperatures, and rugged IP65-rated durability.",
+  "manufacturer": "ADJ",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 347,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 11465,
+  "noiseLevelDb": null,
+  "weightKg": 11.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 65.7,
+    "max": 65.7
+  },
+  "fieldAngleDeg": 90.9,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch",
+      "channels": 1
+    },
+    {
+      "name": "2A Ch",
+      "channels": 2
+    },
+    {
+      "name": "2B Ch",
+      "channels": 1
+    },
+    {
+      "name": "4Ch",
+      "channels": 2
+    },
+    {
+      "name": "5Ch",
+      "channels": 5
+    },
+    {
+      "name": "8Ch",
+      "channels": 8
+    },
+    {
+      "name": "10Ch",
+      "channels": 10
+    },
+    {
+      "name": "11Ch",
+      "channels": 11
+    },
+    {
+      "name": "12 Ch A",
+      "channels": 12
+    },
+    {
+      "name": "12 Ch B",
+      "channels": 12
+    },
+    {
+      "name": "16Ch",
+      "channels": 16
+    },
+    {
+      "name": "18Ch",
+      "channels": 18
+    },
+    {
+      "name": "19Ch",
+      "channels": 19
+    },
+    {
+      "name": "21Ch",
+      "channels": 21
+    },
+    {
+      "name": "22Ch",
+      "channels": 22
+    },
+    {
+      "name": "25Ch",
+      "channels": 25
+    },
+    {
+      "name": "26Ch",
+      "channels": 26
+    },
+    {
+      "name": "29Ch",
+      "channels": 29
+    },
+    {
+      "name": "31Ch",
+      "channels": 31
+    },
+    {
+      "name": "35Ch",
+      "channels": 35
+    },
+    {
+      "name": "41Ch",
+      "channels": 41
+    },
+    {
+      "name": "40Ch",
+      "channels": 40
+    },
+    {
+      "name": "34Ch",
+      "channels": 34
+    },
+    {
+      "name": "24Ch",
+      "channels": 24
+    },
+    {
+      "name": "18BCh",
+      "channels": 18
+    },
+    {
+      "name": "13Ch",
+      "channels": 13
+    }
+  ],
+  "pixelCount": 7,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "fieldAngleDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Dual-lens blinder/strobe; GDTF power 4185 W is invalid."
+  ],
+  "_refs": [
+    "https://www.adj.com/encore-dbx"
+  ]
+}

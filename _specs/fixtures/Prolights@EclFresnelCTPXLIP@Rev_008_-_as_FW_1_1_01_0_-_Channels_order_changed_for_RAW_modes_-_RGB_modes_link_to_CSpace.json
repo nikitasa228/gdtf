@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclFresnelCTPXLIP@Rev_008_-_as_FW_1_1_01_0_-_Channels_order_changed_for_RAW_modes_-_RGB_modes_link_to_CSpace.gdtf",
+  "fixtureTypeId": "1E681753-77F7-4BDF-950D-E6FA2576467A",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclFresnelCTPXLIP",
+  "longName": "EclFresnelCTPXLIP",
+  "shortName": "EclFRXL",
+  "description": "IP65 1200W Fresnel with 6 color LED source, 300mm-12''glass lens, zoom 10-90°\nThe EclFresnel CT+ XLIP stands out as a bright IP65-rated Fresnel hard source, crafted to replace traditional 5K Tungsten and 2.5K HMI lighting in film sets and large-scale indoor and outdoor setups. At the heart of this fixture is a robust 1500W (driven @1200 W) LED source, featuring 6 color emitters.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1200.0,
+  "maxLuminousIntensityCd": 134500.0,
+  "luminousFluxLm": 30000.0,
+  "noiseLevelDb": null,
+  "weightKg": 27.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.6,
+    "max": 25.6
+  },
+  "fieldAngleDeg": 27.5,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALC",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 1850.0,
+    "max": 20000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Uno_1ch",
+      "channels": 1
+    },
+    {
+      "name": "Duo_2ch",
+      "channels": 2
+    },
+    {
+      "name": "IRGB_4ch",
+      "channels": 4
+    },
+    {
+      "name": "Standard",
+      "channels": 11
+    },
+    {
+      "name": "Multimode 8bit",
+      "channels": 19
+    },
+    {
+      "name": "Multimode 16bit",
+      "channels": 22
+    },
+    {
+      "name": "M2 - CCT 16bit_11ch",
+      "channels": 11
+    },
+    {
+      "name": "M4 - RGB 16bit_15ch",
+      "channels": 15
+    },
+    {
+      "name": "M8 - XY 16bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M16 - CCT + RGB 16bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M18 - CCT + RGB + GEL 16bit_25ch",
+      "channels": 25
+    },
+    {
+      "name": "M28 - CCT + XY 16bit_17ch",
+      "channels": 17
+    },
+    {
+      "name": "M30 - CCT + XY + GEL 16bit_21ch",
+      "channels": 21
+    },
+    {
+      "name": "M36 - RAW_16bit",
+      "channels": 19
+    },
+    {
+      "name": "M37 - CCT + RAW_16bit",
+      "channels": 24
+    },
+    {
+      "name": "M38 - CCT + GEL + RAW 16bit_28ch",
+      "channels": 28
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

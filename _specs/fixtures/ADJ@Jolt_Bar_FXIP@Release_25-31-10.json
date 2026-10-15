@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Jolt_Bar_FXIP@Release_25-31-10.gdtf",
+  "fixtureTypeId": "A96AD072-73CD-4385-89BC-AE138636CBA8",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Jolt Bar FXIP",
+  "longName": "Jolt Bar FXIP",
+  "shortName": "JBarFXIP",
+  "description": "The Jolt Bar FXIP is an IP65-rated professional linear LED fixture that delivers Lighting Designers huge output as well as the creative potential of brilliant bright white strobe/blinder LEDs combined with multi-colored chase effects in one versatile unit. It is a highly flexible fixture that can be used to create a wide variety of effects ideal for concert productions, festival stages and other largescale events.",
+  "manufacturer": "ADJ",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 214,
+  "maxLuminousIntensityCd": 18500.0,
+  "luminousFluxLm": 78200.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.7,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 76.6,
+    "max": 76.6
+  },
+  "fieldAngleDeg": 110.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6900.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "9CH",
+      "channels": 9
+    },
+    {
+      "name": "13CH",
+      "channels": 13
+    },
+    {
+      "name": "16CH",
+      "channels": 3
+    },
+    {
+      "name": "18CH",
+      "channels": 18
+    },
+    {
+      "name": "20CH",
+      "channels": 20
+    },
+    {
+      "name": "32CH",
+      "channels": 3
+    },
+    {
+      "name": "34CH",
+      "channels": 26
+    },
+    {
+      "name": "38CH",
+      "channels": 38
+    },
+    {
+      "name": "43CH",
+      "channels": 43
+    },
+    {
+      "name": "45CH",
+      "channels": 45
+    },
+    {
+      "name": "64CH",
+      "channels": 3
+    },
+    {
+      "name": "78CH",
+      "channels": 78
+    },
+    {
+      "name": "80CH",
+      "channels": 80
+    },
+    {
+      "name": "112CH",
+      "channels": 3
+    },
+    {
+      "name": "127CH",
+      "channels": 127
+    },
+    {
+      "name": "129CH",
+      "channels": 129
+    },
+    {
+      "name": "50 CH",
+      "channels": 50
+    },
+    {
+      "name": "78B CH",
+      "channels": 78
+    },
+    {
+      "name": "38B CH",
+      "channels": 38
+    }
+  ],
+  "pixelCount": 18,
+  "subType": "Strobe bar",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.adj.com/jolt-bar-fxip"
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclProfileCTPlusRGB19@Rev_14_-_Added_Snap_Feature.gdtf",
+  "fixtureTypeId": "8F48D3E4-5E05-457E-9288-1DA2EBE90693",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclProfileCTPlusRGB19",
+  "longName": "EclProfileCTPlusRGB19",
+  "shortName": "EclCT+_RGB19",
+  "description": "EclProfile CT+ is a high quality, six colour mixing LED ellipsoidal. Designed to reach the finest quality of light for white tones and colour spectrum, its custom LED array and powerful on-board colour control allows to reach bright and high quality whites, up to 97 of CRI, keeping a consistent output and ensuring a total control of the light. The wide feature set includes special theatrical functions such as tungsten emulation on dimming, colour gels, virtual CTO and studio functions, such as +/- green green correction on linear white CTC.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 270.0,
+  "maxLuminousIntensityCd": 41500.0,
+  "luminousFluxLm": 5380.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.9,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 19.5,
+    "max": 19.5
+  },
+  "fieldAngleDeg": 23.4,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch_Uno",
+      "channels": 1
+    },
+    {
+      "name": "2ch_Duo",
+      "channels": 2
+    },
+    {
+      "name": "4ch_Basic_RGB",
+      "channels": 4
+    },
+    {
+      "name": "9ch_Standard_RGB",
+      "channels": 9
+    },
+    {
+      "name": "12ch_Extended_RGB",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

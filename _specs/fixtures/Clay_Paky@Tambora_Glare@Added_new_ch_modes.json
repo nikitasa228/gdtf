@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Clay_Paky@Tambora_Glare@Added_new_ch_modes.gdtf",
+  "fixtureTypeId": "C0737ECB-79EC-4024-8128-AB1BC6C1FC2E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Tambora Glare",
+  "longName": "Tambora Glare",
+  "shortName": "TambGlare",
+  "description": "Lighting design is about atmosphere, emotion, and storytelling. Tambora Glare is the new powerful hybrid bar that combines intense brightness, precise color mixing, and stunning motion graphics. With single-pixel mapping, each LED is individually controllable, while its high-output blinder effect enhances any show. Lightweight, modular, and perfect for both indoor and outdoor use, Tambora Glare merges vintage soul with modern technology!",
+  "manufacturer": "Clay Paky",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 480,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 19874,
+  "noiseLevelDb": 38.2,
+  "weightKg": 13.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 22.0,
+    "max": 120.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+WW+CW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Advanced",
+      "channels": 52
+    },
+    {
+      "name": "Standard",
+      "channels": 41
+    },
+    {
+      "name": "Basic",
+      "channels": 19
+    },
+    {
+      "name": "Pixels RGBA",
+      "channels": 4
+    },
+    {
+      "name": "Single Cell 100ch",
+      "channels": 51
+    },
+    {
+      "name": "Double Cell 50ch",
+      "channels": 1
+    },
+    {
+      "name": "Basic+RGBA+DoubleCell",
+      "channels": 60
+    },
+    {
+      "name": "Basic+RGBA+SingleCell",
+      "channels": 110
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "manual",
+    "beamAngleDeg": "manual",
+    "luminousFluxLm": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "RGBA zone 22 deg, white strobe 120 deg."
+  ],
+  "_refs": [
+    "https://www.claypaky.it/products/tambora-glare/"
+  ]
+}

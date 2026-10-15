@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Spectra_Wash@Initial_upload_by_GDTFservice_powered_by_Q2Q_Technologies.gdtf",
+  "fixtureTypeId": "3D848E36-2B0C-11F0-AFEE-42010A37C004",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Spectra Wash",
+  "longName": "Spectra Wash",
+  "shortName": "SpectraWash",
+  "description": "Spectra Wash is a 1-metre-long, IP65-rated wash bar for temporary outdoor use. It has 16 20W RGBW LEDs to create powerful and colorful flash and wash effects. Each individual LED can be controlled via DMX. It has a narrow 12deg beam angle and uses natural convection for cooling, making it completely silent. The optionally available beam shapers enable you to change the beam angle to 15deg, 20deg or 10deg x 40deg.\n\nThe Spectra Wash runs stand-alone with multiple built-in presets and effects, in master/slave mode and in 3-, 4-, 6-, 11-, 23-, 32-, 64- and 71-channel DMX mode with RDM support. The quick lock system allows you to easily connect multiple units in horizontal or vertical direction, or suspend the LED bar horizontally under a truss. For vertical mounting the optional Vertical Bracket for Showtec Spectra series is required. With the optional Base Plate for Showtec Spectra series and one Vertical Bracket you can stack up to two Spectra fixtures vertically on the stage floor. It is also possible to stack two LED bars or attach them to the Showtec Spectra Strobe using the quick lock system. Two quick lock brackets and a Power Pro True cable are included. Barndoors are available as an option.",
+  "manufacturer": "Showtec",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 345.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 9.8,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 10.8,
+    "max": 10.8
+  },
+  "fieldAngleDeg": 12.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "3Ch Mode",
+      "channels": 3
+    },
+    {
+      "name": "4Ch Mode",
+      "channels": 4
+    },
+    {
+      "name": "6Ch Mode",
+      "channels": 6
+    },
+    {
+      "name": "11Ch Mode",
+      "channels": 11
+    },
+    {
+      "name": "23Ch Mode",
+      "channels": 23
+    },
+    {
+      "name": "32Ch Mode",
+      "channels": 32
+    },
+    {
+      "name": "64Ch Mode",
+      "channels": 64
+    },
+    {
+      "name": "71Ch Mode",
+      "channels": 71
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@SOL_I_Blinder@26-26-03_Release.gdtf",
+  "fixtureTypeId": "15A6DEB9-F6E8-4F43-8E0D-494EC17CF158",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "SOL I Blinder",
+  "longName": "SŌL I Blinder",
+  "shortName": "SOLBlnd",
+  "description": "Inspired by the radiant sun, the SŌL I Blinder is the first in a new groundbreaking series of creative LED blinder and effects solutions that seamlessly marries cutting-edge technology with artistic ingenuity. \nWith its sleek and modern aesthetic, SŌL I Blinder seamlessly integrates into any stage or event setting, offering limitless creative potential. What sets SŌL apart is its ingenious modular design, offering endless possibilities for configuration and arrangement. Using simple fixture interconnects, threaded adapters, mounts and yoke accessories, designers can effortlessly link SŌL I Blinder to other fixtures or devices, exponentially expanding creative options for unique shapes and arrays. Use it as a single-cell, 2- or 4-cell blinder or connect even more fixtures together for a versatile effects panel that is perfect for eye-candy looks. Create linear blinder arrays, single or multi-unit pendants, custom shapes, and more. The possibilities are endless! \nMultiple lens options, coupled with a host of accessories, enhance the fixture's potential even further. An optional Bowens mount adaptor ring allows for a number of Bowens mount accessories to be attached to the front of the fixture for even more aesthetic options and creative impact. Add to that a variety of mounting options and designers are empowered with the flexibility to craft unique visual experiences tailored to each performance or event. \nThe SŌL I Blinder boasts a remarkable spectrum of colors from a 250W RGB+Lime+Amber+White LED engine with 93+ CRI for high-quality color reproduction. The proprietary RGBLAW engine delivers exceptionally bright, high-fidelity whites while offering a full color range that takes LED blinder color to the next level.",
+  "manufacturer": "Elation",
+  "category": "BLINDER",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 250.0,
+  "maxLuminousIntensityCd": 8800.0,
+  "luminousFluxLm": 8000.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 52.0,
+    "max": 52.0
+  },
+  "fieldAngleDeg": 95.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWALCMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1600.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer 1CH",
+      "channels": 1
+    },
+    {
+      "name": "Dimmer and CCT 2CH",
+      "channels": 2
+    },
+    {
+      "name": "Dimmer/ Strobe/CCT 3CH",
+      "channels": 3
+    },
+    {
+      "name": "IRGB 4CH",
+      "channels": 4
+    },
+    {
+      "name": "Raw Color 6CH",
+      "channels": 6
+    },
+    {
+      "name": "Std 13CH",
+      "channels": 13
+    },
+    {
+      "name": "Ext 21CH",
+      "channels": 21
+    },
+    {
+      "name": "RGB 10CH",
+      "channels": 10
+    },
+    {
+      "name": "RGB ext 15CH",
+      "channels": 15
+    },
+    {
+      "name": "CMY 10CH",
+      "channels": 10
+    },
+    {
+      "name": "CMY Ext 15CH",
+      "channels": 15
+    },
+    {
+      "name": "Dim/CCT/Color Picker 7CH",
+      "channels": 7
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

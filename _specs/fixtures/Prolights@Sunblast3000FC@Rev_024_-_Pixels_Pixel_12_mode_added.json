@@ -1,0 +1,207 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@Sunblast3000FC@Rev_024_-_Pixels_Pixel_12_mode_added.gdtf",
+  "fixtureTypeId": "2DF26EE3-19E0-4167-9F02-240FF766D662",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Sunblast3000FC",
+  "longName": "Sunblast3000FC",
+  "shortName": "S3000FC",
+  "description": "Sunblast 3000FC is an exceptionally powerful IP65 graphic strobe, blinder and flood. Available in white or full colour versions and designed to deliver simply staggering light levels, this versatile fixture can provide an unbelievable punch over a huge area.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 6156.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 130483.0,
+  "noiseLevelDb": null,
+  "weightKg": 14.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 120.0,
+    "max": 120.0
+  },
+  "fieldAngleDeg": 155.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_Static",
+      "channels": 4
+    },
+    {
+      "name": "Basic_Strobe",
+      "channels": 4
+    },
+    {
+      "name": "Basic_Pixel",
+      "channels": 4
+    },
+    {
+      "name": "Basic_RGBW_Strobe",
+      "channels": 8
+    },
+    {
+      "name": "Basic_16_Static",
+      "channels": 8
+    },
+    {
+      "name": "Basic_16_Strobe",
+      "channels": 5
+    },
+    {
+      "name": "Basic_16_Pixel_16",
+      "channels": 8
+    },
+    {
+      "name": "Basic_16_RGBW_Strobe",
+      "channels": 13
+    },
+    {
+      "name": "Advanced_1",
+      "channels": 15
+    },
+    {
+      "name": "Advanced_ 2",
+      "channels": 15
+    },
+    {
+      "name": "Advanced_ 2_ArtNet+DMX",
+      "channels": 15
+    },
+    {
+      "name": "Advanced_ 3",
+      "channels": 27
+    },
+    {
+      "name": "NADV1_16bit_ArtNet+DMX",
+      "channels": 26
+    },
+    {
+      "name": "NADV2_16bit_ArtNet+DMX",
+      "channels": 26
+    },
+    {
+      "name": "NADV3_16bit_ArtNet+DMX",
+      "channels": 26
+    },
+    {
+      "name": "NADV4_16bit_ArtNet+DMX",
+      "channels": 35
+    },
+    {
+      "name": "NADV1_16bit_DMX",
+      "channels": 25
+    },
+    {
+      "name": "NADV2_16bit_DMX",
+      "channels": 25
+    },
+    {
+      "name": "NADV3_16bit_DMX",
+      "channels": 25
+    },
+    {
+      "name": "NADV4_16bit_DMX",
+      "channels": 410
+    },
+    {
+      "name": "PixelsPixels_48ch_SingleProtocol",
+      "channels": 8
+    },
+    {
+      "name": "PixelsPixels_12ch_SingleProtocol",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "panRangeDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

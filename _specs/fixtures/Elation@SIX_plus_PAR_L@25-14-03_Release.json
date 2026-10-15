@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@SIX_plus_PAR_L@25-14-03_Release.gdtf",
+  "fixtureTypeId": "4E9BB895-303C-4597-97EB-F9AEE7294D41",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "SIX plus PAR L",
+  "longName": "SIX+ PAR L",
+  "shortName": "SIXPARL",
+  "description": "The SIX+ PAR L is a compact and rugged LED fixture that features (14) 20W RGBLA+UV LED’s, which produce an ultra-wide color spectrum and high quality of light. The optical system has been carefully engineered to offer an even distribution of light and color homogenization within the beam. This fixture has been designed to offer ultimate flexibility, use it indoors or out, it’s IP65 rating can handle any environment. The fanless cooling system ensures silent operation allowing it to be installed in the most noise sensitive environments. \nWith a six color LED array, the SIX+ PAR L is able to offer outstanding color rendering capabilities with a high CRI of 87. This, paired with its remotely variably LED refresh frequency allows it to be easily integrated into any TV and Film application. \nTo expand the control capabilities on the SIX+ PAR L, precise color temperature control via a dedicated variable CCT control channel has been integrated. Programming a six-color LED fixture can be complicated so, a CMY emulation mode has been added for users that are more familiar with that color mixing system. Furthermore, an integrated library of calibrated color presets that match the most popular gel filters has been included.",
+  "manufacturer": "Elation",
+  "category": "PAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 216.0,
+  "maxLuminousIntensityCd": 91200.0,
+  "luminousFluxLm": 7000.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.6,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 15.0
+  },
+  "fieldAngleDeg": 25.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "12 CH",
+      "channels": 12
+    },
+    {
+      "name": "8 CH",
+      "channels": 8
+    },
+    {
+      "name": "7 CH",
+      "channels": 7
+    },
+    {
+      "name": "6 CH",
+      "channels": 6
+    },
+    {
+      "name": "Dim 1CH",
+      "channels": 1
+    },
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    },
+    {
+      "name": "RGB Ext 9CH",
+      "channels": 9
+    },
+    {
+      "name": "Color & Dim 9CH",
+      "channels": 9
+    },
+    {
+      "name": "Color 6CH",
+      "channels": 6
+    },
+    {
+      "name": "CMY 11CH",
+      "channels": 11
+    },
+    {
+      "name": "CMY 14CH Ext",
+      "channels": 14
+    },
+    {
+      "name": "Std 14CH",
+      "channels": 14
+    },
+    {
+      "name": "Ext 20CH",
+      "channels": 20
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

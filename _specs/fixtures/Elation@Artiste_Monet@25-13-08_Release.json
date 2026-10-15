@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Artiste_Monet@25-13-08_Release.gdtf",
+  "fixtureTypeId": "309521E9-22D8-46F1-8BE2-C311428FE5C9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Artiste Monet",
+  "longName": "Artiste Monet",
+  "shortName": "Artiste Monet",
+  "description": "The award winning Artiste Monet™ is an extremely bright fully featured LEDProfile fixture offering outstanding projection quality and a wide color mixing gamut through its variable SpectraColor engine.\nProviding up to 45,000 lumens from its efficient 950W 6,500K LED engine the Monet is the ideal fixture for any application requiring superior output, bright and powerful beams, quiet operation as well as stunningly precise gobos and colors. Monet integrates Elation's new SpectraColor system which offers traditional CMY mixing but adds a variable RGB color mix for rich saturated primaries. In combination with the variable CTO the Monet allows for colors that were previously impossible to achieve, from theatrical pastels to the most vibrant red or blues ever produced by a color mixing system. The wide color gamut of the Artiste Monet achieved by seven color mixing flags with 16bit precision provides artistic possibilities that are truly inspiring. The fixed color wheel offers UV and High CRI options to round out the amazing color range of the fixture.",
+  "manufacturer": "Elation",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 3384400.0,
+  "luminousFluxLm": 74000.0,
+  "noiseLevelDb": null,
+  "weightKg": 42.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 244.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 8.0,
+    "max": 56.0
+  },
+  "fieldAngleDeg": 51.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobos",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Fixed Gobos",
+      "slots": 7,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open Prism",
+      "facets": null
+    },
+    {
+      "name": "4-Facet Circular Prism",
+      "facets": null
+    },
+    {
+      "name": "4-Facet Linear Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended",
+      "channels": 67
+    },
+    {
+      "name": "Standard",
+      "channels": 40
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "powerConsumptionW",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

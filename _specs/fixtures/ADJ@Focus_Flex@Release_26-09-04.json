@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Focus_Flex@Release_26-09-04.gdtf",
+  "fixtureTypeId": "8E2FB153-88E3-4A36-BF9D-03ADE7497EDA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Focus Flex",
+  "longName": "Focus Flex",
+  "shortName": "FcsFlex",
+  "description": "The Focus Flex offers lighting designers the creative flexibility of generating vibrant washes, punchy beams, and eye-catching pixel effects from one compact and quick automated luminaire. Powered by an array of seven potent 40-Watt 4-in-1 RGBW color mixing LEDs, each of which can be controlled independently, it offers a motorized zoom function providing the versatility of a variable field angle of between 6 and 57-degrees. With a variety of DMX mode options appropriate to different applications, it offers virtual CMY color mixing and virtual foreground and background color wheel control as well as a choice of seven different DMX modes.",
+  "manufacturer": "ADJ",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 90.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 340,
+  "maxLuminousIntensityCd": 378500,
+  "luminousFluxLm": 30000.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 265.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.0,
+    "max": 35.0
+  },
+  "fieldAngleDeg": 57,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic",
+      "channels": 16
+    },
+    {
+      "name": "Standard",
+      "channels": 25
+    },
+    {
+      "name": "Extended 34",
+      "channels": 34
+    },
+    {
+      "name": "Extended 42",
+      "channels": 42
+    },
+    {
+      "name": "Extended 50",
+      "channels": 50
+    },
+    {
+      "name": "Std CMY",
+      "channels": 25
+    },
+    {
+      "name": "Ext CMY",
+      "channels": 28
+    }
+  ],
+  "pixelCount": 15,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF lists CMY but the fixture mixes RGBW LEDs (virtual CMY channels)."
+  ],
+  "_refs": [
+    "https://www.adj.com/focus-flex"
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proton_3K_Color@25-19-05_First_Release.gdtf",
+  "fixtureTypeId": "FBC7C7B0-B59E-48A8-841F-714E0B81948D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proton 3K Color",
+  "longName": "Protron 3K Color LED Strobe",
+  "shortName": "Proton3KColor",
+  "description": "The Protron 3K Color™ is a new high powered LED strobe featuring (240) CREE™ XLamp™ 3W RGBW LEDs, 40,000 total peak lumens, 63° beam angle, (2) power modes (HIGH or LOW), strobe effect macros including burst, pulse, lightning, and full ON*, (2) silent cooling fans, electronic dimming, 3/5pin DMX and Locking Power Cable in/out connections, (4) button OLED control menu display, an integrated rigging yoke, 800W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "STROBE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 3000.0,
+  "maxLuminousIntensityCd": 95100.0,
+  "luminousFluxLm": 80000.0,
+  "noiseLevelDb": null,
+  "weightKg": 17.2,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 50.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 75.0,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 5600.0,
+    "max": 5600.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "3 Channel",
+      "channels": 3
+    },
+    {
+      "name": "5 Channel",
+      "channels": 5
+    },
+    {
+      "name": "7 Channel",
+      "channels": 7
+    },
+    {
+      "name": "8 Channel",
+      "channels": 8
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

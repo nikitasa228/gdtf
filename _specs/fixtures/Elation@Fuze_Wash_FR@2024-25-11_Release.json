@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Wash_FR@2024-25-11_Release.gdtf",
+  "fixtureTypeId": "2F70BFB5-F75D-41F1-A6FF-39539F6BB061",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze Wash FR",
+  "longName": "Fuze Wash FR",
+  "shortName": "FzwshFR",
+  "description": "The FUZE WASH FR™ is an automated LED Fresnel wash fixture designed for theater, television, events and a wide array of other precision lighting applications. A High-CRI engine utilizes a 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction while delivering a powerful output of up to 15,000 lumens and maximum CRI of 92. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 480.0,
+  "maxLuminousIntensityCd": 1504000.0,
+  "luminousFluxLm": 25180.0,
+  "noiseLevelDb": null,
+  "weightKg": 28.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 250.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 42.0
+  },
+  "fieldAngleDeg": 44.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2400.0,
+    "max": 8500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended Pan540",
+      "channels": 47
+    },
+    {
+      "name": "CMY Extended Pan540",
+      "channels": 43
+    },
+    {
+      "name": "Standard Pan540",
+      "channels": 29
+    },
+    {
+      "name": "CMY Pan540",
+      "channels": 27
+    },
+    {
+      "name": "Extended Pan630",
+      "channels": 47
+    },
+    {
+      "name": "CMY Extended Pan630",
+      "channels": 43
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 29
+    },
+    {
+      "name": "CMY Pan630",
+      "channels": 27
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

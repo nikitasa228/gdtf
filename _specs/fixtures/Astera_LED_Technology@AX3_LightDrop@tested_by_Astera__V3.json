@@ -1,0 +1,251 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Astera_LED_Technology@AX3_LightDrop@tested_by_Astera__V3.gdtf",
+  "fixtureTypeId": "5D217069-C210-4E6E-8A92-1428A947703C",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "AX3 LightDrop",
+  "longName": "AX3 LightDrop",
+  "shortName": "AX3",
+  "description": "The AX3 is a battery operated, easy to use IP65 RGBW puck aimed at stage lighting and corporate events. It can be used as uplight as well as hanging or standing spotlight and inside translucent objects, truss, etc. It is extremely compact and yet offers a high brightness paired with long battery runtime and range.",
+  "manufacturer": "Astera LED Technology",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 15,
+  "maxLuminousIntensityCd": 14900.0,
+  "luminousFluxLm": 860.0,
+  "noiseLevelDb": null,
+  "weightKg": 0.68,
+  "powerConnectorIn": "DC Jack",
+  "powerConnectorOut": null,
+  "powerSupplyType": "DC Jack",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 13.0,
+    "max": 13.0
+  },
+  "fieldAngleDeg": 22.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1750.0,
+    "max": 9910.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1: RGB",
+      "channels": 3
+    },
+    {
+      "name": "2: RGBW",
+      "channels": 4
+    },
+    {
+      "name": "3: RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "4: DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "5: DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "6: DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "7: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "8: RGBS",
+      "channels": 4
+    },
+    {
+      "name": "9: RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "10: RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "11: DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "12: DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "13: DIM RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "14: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "15: Effect Mode Fix",
+      "channels": 13
+    },
+    {
+      "name": "16: Effect Mode RGB",
+      "channels": 12
+    },
+    {
+      "name": "89: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "90: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "91: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "92: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "93: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "94: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "95: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "96: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "97: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "137: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "168: D CCT GM C CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "169: D16 CCT GM C CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "170: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "171: D16 CCT GM C CRO XY S",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "Battery uplight",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "voltageRangeV": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.panavision.com/lighting/lighting-products/heads/product-detail/xonffa5-ax3-lightdrop"
+  ]
+}

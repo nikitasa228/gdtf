@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Paladin@2023-20-12_Release.gdtf",
+  "fixtureTypeId": "3FA141CD-CC8A-4D06-8744-E49E8F23C66F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Paladin",
+  "longName": "Paladin",
+  "shortName": "Paladn",
+  "description": "PALADIN™ is an IP65 rated strobe wash blinder luminaire with motorized zoom. Featuring (24) high power 40W 4-in-1 RGBW LEDs, 6° to 32° motorized zoom, manual tilt adjustment, pixel zone control, 64 color presets and 15 unique color macros, electronic strobe, 16-bit dimming and variable dimming curve modes, DMX and RDM (Remote Device Management) protocol support, IP rated 5pin DMX and IP65 Power Cable in/out connections, (4) button LCD control display panel, and a multi-voltage universal auto switching power supply (100-240v). Optional barn doors, egg crate, and dual quick-lock omega bracket rigging accessories available.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 720.0,
+  "maxLuminousIntensityCd": 19509700.0,
+  "luminousFluxLm": 239994.0,
+  "noiseLevelDb": null,
+  "weightKg": 20.9,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 32.0
+  },
+  "fieldAngleDeg": 25.9,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended 33CH",
+      "channels": 33
+    },
+    {
+      "name": "Standard 21CH",
+      "channels": 21
+    },
+    {
+      "name": "Basic 12CH",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 18,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

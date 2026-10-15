@@ -1,0 +1,201 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Anolis@Eminere_Inground_4@2026-09-21_RDM_update.gdtf",
+  "fixtureTypeId": "A795985A-E254-4FAE-9C04-8A307432F501",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Eminere Inground 4",
+  "longName": "Eminere® Inground 4",
+  "shortName": "Em In 4",
+  "description": "A robust luminaire designed specifically to be installed into the ground. A stainless steel installation sleeve provides rust protection and as well as “armour” for the fixture itself. Available in three size with standard or Anti-skid glass. Built to exacting standards, these linear fixtures are tough enough to withstand extreme environments whilst producing beautiful colours from the RGBW, RGBA or PureWhite LED chips.",
+  "manufacturer": "Anolis",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 120.0,
+    "max": 277.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 90.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 3960.0,
+  "noiseLevelDb": null,
+  "weightKg": 21.0,
+  "powerConnectorIn": "Fixed Cable",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Fixed Cable",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.0,
+    "max": 100.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+WW+CW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1800.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 RGBW 8bit",
+      "channels": 4
+    },
+    {
+      "name": "Mode 1 RGBA 8bit",
+      "channels": 4
+    },
+    {
+      "name": "Mode 2 RGB 8 bit",
+      "channels": 3
+    },
+    {
+      "name": "Mode 3 full RGBW",
+      "channels": 12
+    },
+    {
+      "name": "Mode 3 full RGBA",
+      "channels": 12
+    },
+    {
+      "name": "Mode 4 White full control",
+      "channels": 3
+    },
+    {
+      "name": "Mode 5 Reduced RGBW",
+      "channels": 6
+    },
+    {
+      "name": "Mode 5 Reduced RGBA",
+      "channels": 6
+    },
+    {
+      "name": "Mode 6 Reduced RGBW + white control",
+      "channels": 8
+    },
+    {
+      "name": "Mode 6 Reduced RGBA + white control",
+      "channels": 8
+    },
+    {
+      "name": "Mode 7 full RGBW + virtual colour wheel",
+      "channels": 15
+    },
+    {
+      "name": "Mode 7 full RGBA + virtual colour wheel",
+      "channels": 15
+    },
+    {
+      "name": "Mode 11 White selection + dim",
+      "channels": 3
+    },
+    {
+      "name": "Mode 12 WW + CW",
+      "channels": 4
+    },
+    {
+      "name": "Mode 13 dimmer",
+      "channels": 2
+    },
+    {
+      "name": "Mode 17 RGBW pixels",
+      "channels": 16
+    },
+    {
+      "name": "Mode 17 RGBA pixels",
+      "channels": 16
+    },
+    {
+      "name": "Mode 17 RGB pixels",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 4,
+  "subType": "Architectural in-ground",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf-derived",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "panRangeDeg": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ]
+}

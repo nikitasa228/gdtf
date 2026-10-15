@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Clay_Paky@Mini-B_ParLED_Aqua@ClayPaky_Official_File_Fw_Ver_5_3.gdtf",
+  "fixtureTypeId": "F47C0795-8D14-4105-878B-8C4BD33F253C",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Mini-B ParLED Aqua",
+  "longName": "Mini-B ParLED Aqua",
+  "shortName": "MiniBPLAqua",
+  "description": "Claypaky’s MINI-B PARLED AQUA fits the needs for size, output, and features. With its seven Osram 40W RGBW LED engine, this little fixture makes it one of the brightest available.\nMINI-B PARLED AQUA is a static version of the recently introduced MINI-B that is IP66 rated. This fixture has the same optical and electronic features as the MINI-B: a motorized 4° to 53° zoom, independent control of the central LED for effects, 2500K to 8000K colour temperature control, 16-bit dimmer with four different dimming curves, 25 flashes per second electronic strobe and Ethernet access.",
+  "manufacturer": "Clay Paky",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 280.0,
+  "maxLuminousIntensityCd": 4352700.0,
+  "luminousFluxLm": 23800.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.4,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.0,
+    "max": 55.0
+  },
+  "fieldAngleDeg": 55.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic RGBW",
+      "channels": 13
+    },
+    {
+      "name": "Basic RGBW 16bit",
+      "channels": 17
+    },
+    {
+      "name": "Extended RGBW",
+      "channels": 17
+    },
+    {
+      "name": "Extended RGBW 16 Bit",
+      "channels": 25
+    },
+    {
+      "name": "Record Mode",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 7,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "estimated",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

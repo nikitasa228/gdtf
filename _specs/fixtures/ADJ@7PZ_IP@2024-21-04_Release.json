@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@7PZ_IP@2024-21-04_Release.gdtf",
+  "fixtureTypeId": "6DCF3823-F1FD-4742-949D-1A3C25408643",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "7PZ IP",
+  "longName": "7PZ IP",
+  "shortName": "7PZIP",
+  "description": "The 7PZ IP is a heavy duty, metal IP65 outdoor rated 105W LED Par with motorized zoom + WiFLY EXR wireless DMX. It features seven 15W quad (4-IN-1 RGBW) LEDs with 64 built-in color macros.",
+  "manufacturer": "ADJ",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 128,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 1643.0,
+  "noiseLevelDb": null,
+  "weightKg": 11.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.0,
+    "max": 45.0
+  },
+  "fieldAngleDeg": null,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+UV",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6900.0,
+    "max": 6900.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "13CH RGBW",
+      "channels": 13
+    },
+    {
+      "name": "12CH RGBWI",
+      "channels": 12
+    },
+    {
+      "name": "10CH HSI",
+      "channels": 10
+    },
+    {
+      "name": "10CH RGBW 16-BIT",
+      "channels": 10
+    },
+    {
+      "name": "9CH RGBW",
+      "channels": 9
+    },
+    {
+      "name": "8CH RGBW",
+      "channels": 8
+    },
+    {
+      "name": "7CH RGBW",
+      "channels": 7
+    },
+    {
+      "name": "7CH sRGBWI",
+      "channels": 7
+    },
+    {
+      "name": "6CH RGBW Zoom",
+      "channels": 6
+    },
+    {
+      "name": "5CH HSI Zoom",
+      "channels": 5
+    },
+    {
+      "name": "4CH RGBW",
+      "channels": 5
+    },
+    {
+      "name": "4CH HSI",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)",
+    "ADJ WiFLY EXR wireless DMX built in."
+  ],
+  "_refs": [
+    "https://www.adj.com/7pz-ip"
+  ]
+}

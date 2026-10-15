@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@REBEL_Wash_12@26-24-07_Release.gdtf",
+  "fixtureTypeId": "C81ECBD7-EDB4-45C8-B691-F931F60CA6BF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "REBEL Wash 12",
+  "longName": "REBEL Wash 12",
+  "shortName": "RblWsh12",
+  "description": "The REBEL WASH 12™ is a powerful IP65-rated LED wash for many interior and exterior applications. Projecting up to 14000 lumens output from 12 60W RGBL emitters, the REBEL WASH 12™ is the ideal work horse luminare providing high output with powerful beams or wide washes, with excellent color quality. From intense primary colors to excellent white color quality with high CRI and calibrated color temperatures, the fixture is the perfect choice for a wide variety of applications. Pixel control or simple uniform access provide additional levels of excitement and effects, and the 360 degree endless Pan and Tilt rotation allows the fixture add another layer of creativity.",
+  "manufacturer": "Elation",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 60.0,
+  "maxLuminousIntensityCd": 2786600.0,
+  "luminousFluxLm": 11666.0,
+  "noiseLevelDb": null,
+  "weightKg": 16.35,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": true,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.5,
+    "max": 51.0
+  },
+  "fieldAngleDeg": 51.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard Pan540 Tilt270",
+      "channels": 21
+    },
+    {
+      "name": "Pixels Pan540 Tilt270",
+      "channels": 20
+    },
+    {
+      "name": "Extended Pan540 Tilt270",
+      "channels": 28
+    },
+    {
+      "name": "Standard Pan360 Tilt270",
+      "channels": 21
+    },
+    {
+      "name": "Pixels Pan360 Tilt270",
+      "channels": 20
+    },
+    {
+      "name": "Extended Pan360 Tilt270",
+      "channels": 28
+    },
+    {
+      "name": "Standard Pan360 Tilt360",
+      "channels": 21
+    },
+    {
+      "name": "Pixels Pan360 Tilt360",
+      "channels": 20
+    },
+    {
+      "name": "Extended Pan360 Tilt360",
+      "channels": 28
+    },
+    {
+      "name": "Standard Pan540 Tilt360",
+      "channels": 21
+    },
+    {
+      "name": "Pixels Pan540 Tilt360",
+      "channels": 20
+    },
+    {
+      "name": "Extended Pan540 Tilt360",
+      "channels": 28
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Focus_Spot_7Z@2025-27-10_Release.gdtf",
+  "fixtureTypeId": "5B177AF0-A79C-493D-8AF2-D46D780FCB2D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Focus Spot 7Z",
+  "longName": "Focus Spot 7Z",
+  "shortName": "Focus7z",
+  "description": "Offering an impressive output of 20,000 Lumens, the ADJ Focus Spot 7Z is a powerful and feature-packed moving head spot luminaire capable of producing spot and wash effects. Its efficient 420W LED light engine and superior optics allow the fixture to deliver crisp and even projections, while its extensive collection of integrated beam-shaping tools provide lighting designers with immense creative potential. These include full CMY + CTO color mixing; an animation wheel; motorized zoom (6° ~ 48°), focus and iris; as well as twin GOBO wheels, rotating prisms and frost filters.",
+  "manufacturer": "ADJ",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 524,
+  "maxLuminousIntensityCd": 1263200,
+  "luminousFluxLm": 20000.0,
+  "noiseLevelDb": 49,
+  "weightKg": 23.45,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 48.0
+  },
+  "fieldAngleDeg": 55.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo 1",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "Rotating Gobo 2",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 14,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open Prism",
+      "facets": null
+    },
+    {
+      "name": "Prism 1 (6 Facet Linear)",
+      "facets": null
+    },
+    {
+      "name": "Prism 2 (4 Facet Square)",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended (45) Pan630",
+      "channels": 45
+    },
+    {
+      "name": "Extended (45) Pan540",
+      "channels": 45
+    },
+    {
+      "name": "Standard (34) Pan540",
+      "channels": 34
+    },
+    {
+      "name": "Standard (34) Pan630",
+      "channels": 34
+    },
+    {
+      "name": "Basic (30) Pan540",
+      "channels": 30
+    },
+    {
+      "name": "Basic (30) Pan630",
+      "channels": 30
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Noise measured at 3 ft (0.9 m)."
+  ],
+  "_refs": [
+    "https://www.adj.com/focus-spot-7z"
+  ]
+}

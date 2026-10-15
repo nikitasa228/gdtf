@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@ElectraPix_Bar_16@26-27-03_Release.gdtf",
+  "fixtureTypeId": "E1FBB838-B671-4603-8EC6-C9D562CCF4E6",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ElectraPix Bar 16",
+  "longName": "ElectraPix Bar 16",
+  "shortName": "Elecpix16",
+  "description": "The ElectraPix Bar 16 is a cutting-edge IP65-rated, battery powered, wireless DMX 1-meter linear fixture. It features sixteen 20-Watt Hex Color LED (RGBAL+UV), Aria X2 wireless DMX / Management System and has a battery life up to 20 hours.",
+  "manufacturer": "ADJ",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 90,
+  "maxLuminousIntensityCd": 377300.0,
+  "luminousFluxLm": 62221.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.2,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 17.0,
+    "max": 17.0
+  },
+  "fieldAngleDeg": 19.8,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBAL+UV",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2300.0,
+    "max": 9900.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "5ch",
+      "channels": 5
+    },
+    {
+      "name": "6ch",
+      "channels": 6
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    },
+    {
+      "name": "13ch",
+      "channels": 13
+    },
+    {
+      "name": "22ch",
+      "channels": 22
+    },
+    {
+      "name": "24ch",
+      "channels": 24
+    },
+    {
+      "name": "96ch",
+      "channels": 6
+    },
+    {
+      "name": "99ch",
+      "channels": 99
+    },
+    {
+      "name": "114ch",
+      "channels": 114
+    },
+    {
+      "name": "12Ch",
+      "channels": 12
+    },
+    {
+      "name": "7Ch",
+      "channels": 7
+    }
+  ],
+  "pixelCount": 19,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Battery-powered option; GDTF power 360 W contradicts spec sheet (90 W)."
+  ],
+  "_refs": [
+    "https://www.adj.com/electrapix-bar-16"
+  ]
+}

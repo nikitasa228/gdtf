@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Cameo@PIXBAR_400_IP-G2@Firmware_1.01_GDTF_1.2.gdtf",
+  "fixtureTypeId": "B78B8701-6884-44CE-94E5-824B135564F7",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "PIXBAR 400 IP-G2",
+  "longName": "PIXBAR 400 IP G2 (CLPB400IPG2)",
+  "shortName": "PIXBAR 400",
+  "description": "IP65 RGBW-LED Bar",
+  "manufacturer": "Cameo",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 180,
+  "maxLuminousIntensityCd": 8200.0,
+  "luminousFluxLm": 1600.0,
+  "noiseLevelDb": 0,
+  "weightKg": 12.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 220.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
+  "fieldAngleDeg": 42,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2200.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "64CH Pixel RGBW",
+      "channels": 4
+    },
+    {
+      "name": "48CH Pixel RGB",
+      "channels": 3
+    },
+    {
+      "name": "68CH Pixel Dim",
+      "channels": 8
+    },
+    {
+      "name": "36CH Pattern",
+      "channels": 36
+    },
+    {
+      "name": "16CH Wash",
+      "channels": 16
+    },
+    {
+      "name": "11CH Effect Pattern",
+      "channels": 11
+    },
+    {
+      "name": "10CH Direct CCT",
+      "channels": 10
+    },
+    {
+      "name": "8CH Direct 16Bit",
+      "channels": 8
+    },
+    {
+      "name": "7CH Direct Ctrl",
+      "channels": 7
+    },
+    {
+      "name": "4CH Direct 16Bit",
+      "channels": 4
+    },
+    {
+      "name": "3CH Preset",
+      "channels": 3
+    },
+    {
+      "name": "1CH DIM UC1",
+      "channels": 1
+    },
+    {
+      "name": "D2CH Dim UC1",
+      "channels": 2
+    },
+    {
+      "name": "D4CH Preset",
+      "channels": 4
+    },
+    {
+      "name": "D7CH Direct",
+      "channels": 7
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "manual",
+    "zoom": "manual",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Fanless (0 dB). GDTF power 10 W invalid."
+  ],
+  "_refs": [
+    "https://adamhall.com/shop/en/brands/pixbar-400-ip-g2"
+  ]
+}

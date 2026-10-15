@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@AstraProfile600IP@Rev_0018_-_HomePosCustom_on_3D_-_RDM_pers_ID_added_-_ShaperRot_fix_-_Animation_wheel_fix.gdtf",
+  "fixtureTypeId": "E0D7D457-E0AC-4F64-9572-6148B2CE2721",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "AstraProfile600IP",
+  "longName": "AstraProfile600IP",
+  "shortName": "ASPRF600IP",
+  "description": "The Astra Profile600IP is a bright, waterproofed (IP65) LED profile moving light, designed for any large-scale touring applications and exterior installations.\nDespite its waterproofed exterior, this unit is tremendous brightness and offers a superior evenness when comparing with other fixtures in the same class.\nIts light source delivers a pure white light emission at 6,500K, reaching 22,800 lumens whilst achieving a flat field beam projection.\nThe Astra Profile600IP's optical system moves linearly from 7° to 54°, and it's equipped with a brand-new 600W LED source\nThe extensive feature set of the Astra Profile600IP includes a 4-layer motorized framing system, linear CMY and CTO, 5,600K high CRI filter, colour and gobo wheels, frost filter, prism, and an iris.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 1336000.0,
+  "luminousFluxLm": 22368.0,
+  "noiseLevelDb": null,
+  "weightKg": 45.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 54.0
+  },
+  "fieldAngleDeg": 23.4,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 7,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 7000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4F Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_29ch",
+      "channels": 29
+    },
+    {
+      "name": "Standard_39ch",
+      "channels": 39
+    },
+    {
+      "name": "Extended_54ch",
+      "channels": 54
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

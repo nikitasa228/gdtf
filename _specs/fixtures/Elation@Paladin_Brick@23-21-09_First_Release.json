@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Paladin_Brick@23-21-09_First_Release.gdtf",
+  "fixtureTypeId": "5241B851-D51D-4094-BB9D-1A6E5224024B",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Paladin Brick",
+  "longName": "Paladin Brick",
+  "shortName": "PalBrck",
+  "description": "The PALADIN BRICK™ is a compact and powerful outdoor flood light for a wide variety of applications. Using 24x15W RGBW cells it provides a total output of up to 8,200 lumens. Certified to IP65 it features a rugged design with a solid build quality, eliminating the need to worry about dust and water ingress. IP rated connections make it an ideal product to illuminate large areas of any outdoor event with vibrant and powerful colors. It can be operated standing on the floor or be hung in any orientation using the provided omega brackets. Available cell control and strobe features make the PALADIN BRICK also a versatile effects fixture or audience blinder.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 720.0,
+  "maxLuminousIntensityCd": 79000.0,
+  "luminousFluxLm": 16800.0,
+  "noiseLevelDb": null,
+  "weightKg": 9.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Ext-Cells 56CH",
+      "channels": 56
+    },
+    {
+      "name": "Cells 50CH",
+      "channels": 50
+    },
+    {
+      "name": "Cells 48CH",
+      "channels": 48
+    },
+    {
+      "name": "Extended 16CH",
+      "channels": 16
+    },
+    {
+      "name": "16bit Dim 10CH",
+      "channels": 10
+    },
+    {
+      "name": "16bit 8CH",
+      "channels": 8
+    },
+    {
+      "name": "8bit 4CH",
+      "channels": 4
+    },
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    },
+    {
+      "name": "HSI-Ext 10CH",
+      "channels": 10
+    },
+    {
+      "name": "HSI 4CH",
+      "channels": 4
+    },
+    {
+      "name": "HSI Cell 26CH",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 12,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

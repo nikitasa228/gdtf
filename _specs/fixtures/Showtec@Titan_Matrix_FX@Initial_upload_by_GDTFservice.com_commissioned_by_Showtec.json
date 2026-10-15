@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Titan_Matrix_FX@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "FA7A7BD3-00FC-11F1-B388-42010A37C006",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Titan Matrix FX",
+  "longName": "Titan Matrix FX",
+  "shortName": "TitanMatrixFX",
+  "description": "Titan Matrix FX is a matrix light with fully controllable pixels. It features 3 rows of 8 RGBW LEDs (24 in all) that are covered with a lens and in front of each lens is a 6 W RGBW LEDs (another 24). This combination makes it possible to create bold, colourful. geometric patterns, making the Titan Matrix FX an excellent choice for live events, studios and more. With an IP65 rating, it can also be used outdoors.\n\nFor ultimate flexibility, the fixture can be controlled with DMX (incl. RDM), Art-Net, sACN or manually. Connection options include 5-pin XLR, etherCON and Power Pro True inputs and outputs. Unique horizontal and vertical setups with multiple fixtures can be built quickly and easily using the optional Titan Connection Blocks.",
+  "manufacturer": "Showtec",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 138.0,
+  "maxLuminousIntensityCd": 1556800.0,
+  "luminousFluxLm": 49314.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.8,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 9.6,
+    "max": 9.6
+  },
+  "fieldAngleDeg": 10.7,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic 18Ch",
+      "channels": 18
+    },
+    {
+      "name": "FX 24Ch",
+      "channels": 24
+    },
+    {
+      "name": "Sectional 42Ch",
+      "channels": 42
+    },
+    {
+      "name": "RGBW 192Ch",
+      "channels": 4
+    },
+    {
+      "name": "Pixel 202Ch",
+      "channels": 202
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

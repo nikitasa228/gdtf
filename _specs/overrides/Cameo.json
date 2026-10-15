@@ -1,0 +1,331 @@
+{
+ "Cameo@AZOR_S2": {
+  "category": "SPOT",
+  "powerConsumptionW": 470,
+  "weightKg": 19.7,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   5,
+   50
+  ],
+  "ipRating": "IP20",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/azor-s2"
+  ]
+ },
+ "Cameo@AZOR_SP2": {
+  "category": "PROFILE",
+  "powerConsumptionW": 550,
+  "weightKg": 24.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   3,
+   50
+  ],
+  "ipRating": "IP20",
+  "_notes": "GDTF weight 23 kg vs spec 24 kg.",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/azor-sp2"
+  ]
+ },
+ "Cameo@AZOR_SP2IP": {
+  "category": "PROFILE",
+  "powerConsumptionW": 550,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   3,
+   50
+  ],
+  "ipRating": "IP65",
+  "_notes": "Power assumed equal to indoor AZOR SP2.",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "powerConsumptionW"
+  ]
+ },
+ "Cameo@Azor_W2": {
+  "category": "WASH BEAM",
+  "powerConsumptionW": 503,
+  "weightKg": 8.6,
+  "noiseLevelDb": 40,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   4,
+   50
+  ],
+  "ipRating": "IP20",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/azor-w2"
+  ]
+ },
+ "Cameo@OPUS_SP5_Plus": {
+  "category": "PROFILE",
+  "powerConsumptionW": 800,
+  "weightKg": 27.8,
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Ethernet (Art-Net/sACN)",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   6,
+   42
+  ],
+  "ipRating": "IP20",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/opus-sp5"
+  ]
+ },
+ "Cameo@Oron_H2": {
+  "category": "BSW",
+  "powerConsumptionW": 460,
+  "weightKg": 32.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Ethernet (Art-Net/sACN)",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "lux": [
+   330000,
+   20
+  ],
+  "beam": [
+   0.6,
+   32
+  ],
+  "ipRating": "IP65",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/oron-h2"
+  ]
+ },
+ "Cameo@Otos_W3": {
+  "category": "WASH BEAM",
+  "powerConsumptionW": 350,
+  "weightKg": 11.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Ethernet (Art-Net/sACN)",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   4,
+   60
+  ],
+  "ipRating": "IP65",
+  "lensType": "Wash",
+  "_notes": "GDTF power 41 W invalid.",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/otos-w3"
+  ]
+ },
+ "Cameo@P6": {
+  "category": "PROFILE",
+  "subType": "Static LED profile / moving yoke",
+  "powerConsumptionW": 620,
+  "weightKg": 20.9,
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Ethernet (Art-Net/sACN)",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": [
+   5,
+   50
+  ],
+  "ipRating": "IP20",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/p6"
+  ]
+ },
+ "Cameo@PIXBAR_400_IP-G2": {
+  "category": "LED BAR",
+  "powerConsumptionW": 180,
+  "weightKg": 12.0,
+  "noiseLevelDb": 0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": 25,
+  "fieldAngleDeg": 42,
+  "zoom": false,
+  "panRangeDeg": 0,
+  "ipRating": "IP65",
+  "_notes": "Fanless (0 dB). GDTF power 10 W invalid.",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/pixbar-400-ip-g2"
+  ]
+ },
+ "Cameo@ROOTBAR_6": {
+  "category": "LED BAR",
+  "subType": "Battery LED bar",
+  "powerConsumptionW": null,
+  "panRangeDeg": 0,
+  "_notes": "GDTF power 10 W invalid, removed.",
+  "mains": "100-240",
+  "lightSourceType": "LED"
+ },
+ "Cameo@ROOTBAR_SMD": {
+  "category": "LED BAR",
+  "subType": "Battery LED bar",
+  "powerConsumptionW": null,
+  "panRangeDeg": 0,
+  "_notes": "GDTF power invalid, removed.",
+  "mains": "100-240",
+  "lightSourceType": "LED"
+ },
+ "Cameo@ZENIT_W300": {
+  "category": "WASH",
+  "subType": "Outdoor flood",
+  "powerConsumptionW": 300,
+  "weightKg": 8.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "ipRating": "IP65",
+  "panRangeDeg": 0,
+  "luminousFluxLm": 10661,
+  "_notes": "GDTF weight 3 kg / power 600 W contradict spec sheet.",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/zenit-w300"
+  ]
+ },
+ "Cameo@ZENIT_W300TW": {
+  "category": "WASH",
+  "subType": "Outdoor flood",
+  "powerConsumptionW": 300,
+  "weightKg": 8.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "ipRating": "IP65",
+  "panRangeDeg": 0,
+  "_notes": "Assumed equal to ZENIT W300.",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_estimated": [
+   "powerConsumptionW",
+   "weightKg"
+  ]
+ },
+ "Cameo@ZENIT_W300_SMD": {
+  "category": "WASH",
+  "subType": "Outdoor flood",
+  "powerConsumptionW": 265,
+  "weightKg": 8.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beamAngleDeg": {
+   "min": 105.0,
+   "max": 118.0
+  },
+  "ipRating": "IP65",
+  "panRangeDeg": 0,
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/zenit-w300-smd"
+  ]
+ },
+ "Cameo@ZENIT_W600": {
+  "category": "WASH",
+  "subType": "Outdoor flood",
+  "powerConsumptionW": 565,
+  "weightKg": 13.0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": 18,
+  "fieldAngleDeg": 35,
+  "ipRating": "IP65",
+  "panRangeDeg": 0,
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/zenit-w600"
+  ]
+ },
+ "Cameo@Zenit_B200": {
+  "category": "BLINDER",
+  "powerConsumptionW": 180,
+  "weightKg": 8.0,
+  "noiseLevelDb": 0,
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "controlSignal": [
+   "DMX512",
+   "RDM",
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "beam": 21,
+  "fieldAngleDeg": 40,
+  "ipRating": "IP65",
+  "panRangeDeg": 0,
+  "_notes": "Convection cooled (silent).",
+  "mains": "100-240",
+  "lightSourceType": "LED",
+  "_refs": [
+   "https://adamhall.com/shop/en/brands/zenit-b200"
+  ]
+ }
+}

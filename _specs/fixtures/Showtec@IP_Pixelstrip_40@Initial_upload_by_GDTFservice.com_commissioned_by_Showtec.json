@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@IP_Pixelstrip_40@Initial_upload_by_GDTFservice.com_commissioned_by_Showtec.gdtf",
+  "fixtureTypeId": "79B3B1FC-999A-11F0-BA60-42010A37C005",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "IP Pixelstrip 40",
+  "longName": "IP Pixelstrip 40",
+  "shortName": "IP Pixelstrip 40",
+  "description": "IP Pixelstrip 40 is a high-brightness LED bar with pixel control. Each of the 40 RGB LEDs can be controlled individually by the dedicated Showtec IP Pixel Controller. It has an IP65-rated enclosure with fanless convection cooling, making it suitable for indoor as well as (temporary) outdoor stage applications.\n\nThe short and fixed combined data/power input cable allows the IP Pixelstrip 40 to be daisy-chained and mixed with the IP Pixelstrip 80 up to a total length of 4 metres per controller output. Dedicated cables run from the controller to the IP Pixelstrip for power and data signals (sold separately). A straight alignment plate is included and locks into place without tools. Optional alignment plates allow for more complex configurations, even 3D setups. A standard smoked black flat cover is included and can be easily replaced by an optional white flat cover, white dome-shaped cover or white rectangular cover.\n\nPlease note that stand-alone or direct DMX operation is not possible; the Showtec IP Pixel Controller is required to drive this LED pixel bar.",
+  "manufacturer": "Showtec",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 64.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 1.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "8Ch Mode",
+      "channels": 8
+    },
+    {
+      "name": "12Ch Mode",
+      "channels": 12
+    },
+    {
+      "name": "10x RGB mode",
+      "channels": 3
+    },
+    {
+      "name": "20x RGB mode",
+      "channels": 3
+    },
+    {
+      "name": "40x RGB mode",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 4,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

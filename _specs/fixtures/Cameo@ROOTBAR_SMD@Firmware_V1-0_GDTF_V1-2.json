@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Cameo@ROOTBAR_SMD@Firmware_V1-0_GDTF_V1-2.gdtf",
+  "fixtureTypeId": "F6488598-F20E-404B-8897-A57F001E5222",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ROOTBAR SMD",
+  "longName": "ROOTBAR SMD (CLROOTBARSMD)",
+  "shortName": "ROOTBAR SMD",
+  "description": "Indoor SMD-LED Bar with 2 Lines RGB and 1 White Strobe LED Line",
+  "manufacturer": "Cameo",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 6600.0,
+  "luminousFluxLm": 11600.0,
+  "noiseLevelDb": null,
+  "weightKg": 3.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 220.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 73.0,
+    "max": 73.0
+  },
+  "fieldAngleDeg": 76.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 6700.0,
+    "max": 6700.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "D9CH Strobe",
+      "channels": 9
+    },
+    {
+      "name": "D7CH Direkt",
+      "channels": 7
+    },
+    {
+      "name": "88CH Pixel",
+      "channels": 77
+    },
+    {
+      "name": "52CH RGB Dual Pixel",
+      "channels": 41
+    },
+    {
+      "name": "9CH Pattern",
+      "channels": 9
+    },
+    {
+      "name": "8CH",
+      "channels": 8
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    },
+    {
+      "name": "4CH",
+      "channels": 4
+    },
+    {
+      "name": "D5CH",
+      "channels": 5
+    },
+    {
+      "name": "10CH Pattern",
+      "channels": 10
+    },
+    {
+      "name": "20CH RGB PIXEL",
+      "channels": 17
+    }
+  ],
+  "pixelCount": 4,
+  "subType": "Battery LED bar",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF power invalid, removed."
+  ]
+}

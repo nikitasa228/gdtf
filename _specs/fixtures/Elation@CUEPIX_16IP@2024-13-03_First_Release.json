@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@CUEPIX_16IP@2024-13-03_First_Release.gdtf",
+  "fixtureTypeId": "4A0F5988-6C20-4FBD-B65F-E5BDD2591F4D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "CUEPIX 16IP",
+  "longName": "CUEPIX 16IP",
+  "shortName": "CuePix16IP",
+  "description": "The CUEPIX 16IP™ is a versatile IP65 outdoor rated effect panel luminaire that features a 4x4 array of 16 30W 4-in-1 RGBA COB LEDs, 62° beam and 87° field angles, full pixel control and 5 pixel flip modes, RGB + Dynamic Amber modes, 16-bit dimming, variable dimming curve modes, high speed electronic shutter and strobe, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, no fans for noise-sensitive applications, DMX, RDM (Remote Device Management), Kling-NET, and Art-NET protocol support, IP65 rated locking 5pin XLR DMX, RJ45 Ethernet, and IP65 Locking Power Cable in/out connections, full color 180° reversible LCD control panel, and a multi-voltage universal auto switching power supply (100-240v). Versatile rigging options include 90° adjustable and fixed yoke brackets with 3-position mounting holes, and integrated alignment pins and interlocks for multiple panel matrix designs. Optional ¼ turn omega brackets available.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 640.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 10000.0,
+  "noiseLevelDb": null,
+  "weightKg": 15.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 62.0,
+    "max": 62.0
+  },
+  "fieldAngleDeg": 87.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "03CH RGB",
+      "channels": 3
+    },
+    {
+      "name": "04CH RGBA",
+      "channels": 4
+    },
+    {
+      "name": "07CH RGBA+",
+      "channels": 7
+    },
+    {
+      "name": "07CH DA+",
+      "channels": 7
+    },
+    {
+      "name": "06CH RGBI",
+      "channels": 6
+    },
+    {
+      "name": "08CH 16Bit",
+      "channels": 8
+    },
+    {
+      "name": "08CH RGBA",
+      "channels": 8
+    },
+    {
+      "name": "11CH Basic",
+      "channels": 11
+    },
+    {
+      "name": "12CH RGBA",
+      "channels": 12
+    },
+    {
+      "name": "12CH RGBI",
+      "channels": 12
+    },
+    {
+      "name": "48CH DA",
+      "channels": 48
+    },
+    {
+      "name": "64CH RGBA",
+      "channels": 64
+    },
+    {
+      "name": "72CH Pixel",
+      "channels": 72
+    },
+    {
+      "name": "128CH 16Bit",
+      "channels": 128
+    }
+  ],
+  "pixelCount": 16,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

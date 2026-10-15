@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ARRI@L7C@DMX_v3.5_13_Jan_2021.gdtf",
+  "fixtureTypeId": "58A6CD9B-01CE-4D33-BA7D-D41ED53D1070",
+  "gdtfDataVersion": "1.1",
+  "gdtfName": "L7C",
+  "longName": "ARRI L7C",
+  "shortName": "L7C",
+  "description": "Arri L7C Fresnel",
+  "manufacturer": "ARRI",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 220,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": null,
+  "weightKg": 8.7,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 15.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": true,
+  "lensType": "Fresnel",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 CCT+RGBW 8Bit",
+      "channels": 8
+    },
+    {
+      "name": "Mode 2 CCT 8Bit",
+      "channels": 3
+    },
+    {
+      "name": "Mode 3 CCT+HSI 8Bit",
+      "channels": 6
+    },
+    {
+      "name": "Mode 4 RGBW 8Bit",
+      "channels": 5
+    },
+    {
+      "name": "Mode 5 HSI 8Bit",
+      "channels": 3
+    },
+    {
+      "name": "Mode 6 CCT+RGBW 16Bit",
+      "channels": 16
+    },
+    {
+      "name": "Mode 7 CCT 16Bit",
+      "channels": 6
+    },
+    {
+      "name": "Mode 8 CCT+HSI 16Bit",
+      "channels": 12
+    },
+    {
+      "name": "Mode 9 RGBW 16Bit",
+      "channels": 10
+    },
+    {
+      "name": "Mode 10 HSI 16Bit",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Fresnel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "estimated",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "manual",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://www.markertek.com/Attachments/Specifications/ARRI/L7-Specifications.pdf"
+  ]
+}

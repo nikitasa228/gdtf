@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Proteus_Excalibur@2023-17-10_Release.gdtf",
+  "fixtureTypeId": "F4A69445-A174-4F71-B694-CE8F57848BD9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Proteus Excalibur",
+  "longName": "Proteus Excalibur",
+  "shortName": "Proteus Excalibur",
+  "description": "The PROTEUS EXCALIBUR is the newest member in the industry leading Proteus range of IP65 automated fixtures from Elation Professional. Excalibur is the brightest IP65 fully featured beam fixture ever created with incredible light output from a surprisingly compact fixture body. Rivaling existing Xenon searchlights or skytrackers, the extremely narrow 0.8° Beam ensures the fixture cuts effortlessly through the sky and is visible at great distances. The intense beam of the PROTEUS EXCALIBUR projects from the ultra-wide 260mm front Lens as a massive column of light that stuns the audience.\n A wide array of gobos and prism overlays allow animating the sky, and with its incredible light intensity all CMY colors remain strong and vibrant even when fully saturated. Beam control is provided through a precise internal focus lens, providing crisp projection without optical errors. Dual variable frosts allow to soften the beam when required. A remote-controlled Expander lens allows widening the beam to approximately 3.5 degrees. The fixture is ideally suited for theme parks, cruise ships, outdoor special events, large scale shows and concerts, and any situation where a massive beam or very powerful prism and flower effects are required. With its compact size and low power consumption the PROTEUS EXCALIBUR can be utilized in almost any application.",
+  "manufacturer": "Elation",
+  "category": "SPOT",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 580.0,
+  "maxLuminousIntensityCd": 118863500.0,
+  "luminousFluxLm": 26000.0,
+  "noiseLevelDb": null,
+  "weightKg": 46.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 250.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "Discharge Lamp",
+  "beamAngleDeg": {
+    "min": 0.8,
+    "max": 0.8
+  },
+  "fieldAngleDeg": 1.6,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel 1",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "Gobo Wheel 2",
+      "slots": 17,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 25,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7800.0,
+    "max": 7800.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "8 Facet Circular",
+      "facets": null
+    },
+    {
+      "name": "4 Facet Linear",
+      "facets": null
+    },
+    {
+      "name": "8 Facet + 4 Facet",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard Pan540",
+      "channels": 26
+    },
+    {
+      "name": "Standard Pan630",
+      "channels": 26
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

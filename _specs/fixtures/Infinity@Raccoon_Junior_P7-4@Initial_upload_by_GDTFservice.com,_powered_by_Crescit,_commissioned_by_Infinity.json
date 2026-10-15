@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Raccoon_Junior_P7-4@Initial_upload_by_GDTFservice.com,_powered_by_Crescit,_commissioned_by_Infinity.gdtf",
+  "fixtureTypeId": "49E57321-4559-4F06-965C-91F502945649",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Raccoon Junior P7-4",
+  "longName": "Raccoon Junior P7-4",
+  "shortName": "RaccoonP7-4",
+  "description": "Raccoon P7-4 is a high-brightness, high-CRI, IP65-rated Par, intended for applications where both brightness and quality are of high importance, especially rental applications and situations that demand a high light output. It has 7 extremely bright LEDs that have four colours each: red, green, blue, and mint. You can switch between maximum brightness and maximum colour quality (high CRI) mode.\n\nThe fixture offers top-of-the-line control options. The core technology of the Raccoon series is the calibrated colour engine, which guarantees outstanding colour quality and stability. By embedding the xy control mode technology, the Raccoon series ensures consistent and accurate colours at any time. The sophisticated software engine, developed in Europe, ensures an exceptionally stable colour output under all circumstances. Thanks to the (LED) temperature compensation, which is monitored continuously by the software, any visible colour shifting during the operation is prevented.",
+  "manufacturer": "Infinity",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 15.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 3459.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": null,
+  "fieldAngleDeg": null,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Dimmer 1Ch",
+      "channels": 1
+    },
+    {
+      "name": "Pixel 3Ch",
+      "channels": 3
+    },
+    {
+      "name": "XY 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "Raw 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "Basic 8Ch",
+      "channels": 8
+    },
+    {
+      "name": "HSI 10Ch",
+      "channels": 10
+    },
+    {
+      "name": "RGB 12Ch",
+      "channels": 12
+    },
+    {
+      "name": "CMY 12Ch",
+      "channels": 12
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Architectural / outdoor",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "beamAngleDeg"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

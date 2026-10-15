@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclProfileTWC_19@Rev_13_-_Added_Snap_Feature.gdtf",
+  "fixtureTypeId": "31A58E39-1199-477B-8A27-87AA90AC4458",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclProfileTWC_19",
+  "longName": "EclProfileTWC_19",
+  "shortName": "ECLHDTWC_19",
+  "description": "EclProfile TWC is an advanced LED ellipsoidal featuring 6 colour mixing to deliver high precision reproduction of the white spectrum from 2.800 K to 10.000 K with high CRI and an extensive colour reproduction.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 252.0,
+  "maxLuminousIntensityCd": 46300.0,
+  "luminousFluxLm": 5235.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.8,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 320.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 18.2,
+    "max": 18.2
+  },
+  "fieldAngleDeg": 20.9,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBALI",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch",
+      "channels": 1
+    },
+    {
+      "name": "2ch",
+      "channels": 2
+    },
+    {
+      "name": "5ch1",
+      "channels": 5
+    },
+    {
+      "name": "5ch2",
+      "channels": 5
+    },
+    {
+      "name": "7ch1",
+      "channels": 7
+    },
+    {
+      "name": "7ch2",
+      "channels": 7
+    },
+    {
+      "name": "8ch",
+      "channels": 8
+    },
+    {
+      "name": "9ch",
+      "channels": 9
+    },
+    {
+      "name": "12ch",
+      "channels": 12
+    },
+    {
+      "name": "13ch",
+      "channels": 13
+    },
+    {
+      "name": "16ch",
+      "channels": 16
+    },
+    {
+      "name": "19ch",
+      "channels": 19
+    },
+    {
+      "name": "21ch",
+      "channels": 21
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

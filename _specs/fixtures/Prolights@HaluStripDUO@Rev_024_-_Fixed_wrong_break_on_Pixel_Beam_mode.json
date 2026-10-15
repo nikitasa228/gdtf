@@ -1,0 +1,197 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@HaluStripDUO@Rev_024_-_Fixed_wrong_break_on_Pixel_Beam_mode.gdtf",
+  "fixtureTypeId": "60829BDB-958B-4775-9837-B17DB946F08F",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "HaluStripDUO",
+  "longName": "HaluStripDUO",
+  "shortName": "HSDUO",
+  "description": "100cm dual layer LED bar with 14x 2700K 4° Beams + 3x42 RGBWW pixels IP65.\nThe HaluStrip DUO is a dual layer LED strip that seamlessly integrates lighting and video capabilities into a modular design. This twin-source unit offers high-power, long-throw white beams alongside high-brightness video and strobe features, with full pixel-level control. This integration facilitates diverse and dynamic lighting setups, suitable for a variety of professional stages and TV applications.",
+  "manufacturer": "Prolights",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 896.0,
+  "maxLuminousIntensityCd": 4800.0,
+  "luminousFluxLm": 20209.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.5,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 116.0,
+    "max": 116.0
+  },
+  "fieldAngleDeg": 154.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic_12ch",
+      "channels": 12
+    },
+    {
+      "name": "Basic_12ch+Beam_14ch",
+      "channels": 13
+    },
+    {
+      "name": "Standard_21ch",
+      "channels": 21
+    },
+    {
+      "name": "Standard_21ch+Beam_14ch",
+      "channels": 22
+    },
+    {
+      "name": "FX1_28ch",
+      "channels": 28
+    },
+    {
+      "name": "FX1_28ch+Beam_14ch",
+      "channels": 29
+    },
+    {
+      "name": "FX2_32ch",
+      "channels": 32
+    },
+    {
+      "name": "FX2_32ch+Beam_14ch",
+      "channels": 33
+    },
+    {
+      "name": "FX3_39ch",
+      "channels": 39
+    },
+    {
+      "name": "FX3_39ch+Beam_14ch",
+      "channels": 40
+    },
+    {
+      "name": "Extended_42ch",
+      "channels": 42
+    },
+    {
+      "name": "Extended_42ch+Beam_14ch",
+      "channels": 43
+    },
+    {
+      "name": "Basic Sectors_81ch",
+      "channels": 81
+    },
+    {
+      "name": "14 Beam",
+      "channels": 1
+    },
+    {
+      "name": "Single Beam",
+      "channels": 1
+    },
+    {
+      "name": "Pixels 3x3_56ch",
+      "channels": 4
+    },
+    {
+      "name": "Pixels 3x1_168ch",
+      "channels": 4
+    },
+    {
+      "name": "Pixels_504ch",
+      "channels": 4
+    },
+    {
+      "name": "Pixels+Beam_518ch",
+      "channels": 505
+    },
+    {
+      "name": "Pixels RGB_378ch",
+      "channels": 3
+    },
+    {
+      "name": "Pixels RGB + Beams_392ch",
+      "channels": 382
+    },
+    {
+      "name": "14 Beam + Strobe",
+      "channels": 15
+    }
+  ],
+  "pixelCount": 5,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "1.0",
+  "file": "flashPRO@LedBar_L1810_45@FLASH_v1.gdtf",
+  "fixtureTypeId": "60C205FB-A734-42B2-89A6-371920C4CACD",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "LedBar L1810 45*",
+  "longName": "LedBar L1810 45°",
+  "shortName": "LedBar L1810 45°",
+  "description": "LedBar L1810 45° - P72001466\nFlash Professional - a new line of high-quality lighting lamps of Polish production. A common source makes it extremely easy to work with devices from the entire series.",
+  "manufacturer": "flashPRO",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 245.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 180,
+  "maxLuminousIntensityCd": 327000.0,
+  "luminousFluxLm": 17448.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.3,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 12.5,
+    "max": 12.5
+  },
+  "fieldAngleDeg": 12.5,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2200.0,
+    "max": 9000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Classic-6",
+      "channels": 6
+    },
+    {
+      "name": "Classic-8",
+      "channels": 8
+    },
+    {
+      "name": "M-Control-10",
+      "channels": 10
+    },
+    {
+      "name": "Pro-6",
+      "channels": 6
+    },
+    {
+      "name": "Pro-7",
+      "channels": 7
+    },
+    {
+      "name": "RGB",
+      "channels": 3
+    },
+    {
+      "name": "RGBW",
+      "channels": 4
+    },
+    {
+      "name": "RGB 16bit",
+      "channels": 6
+    },
+    {
+      "name": "RGBW 16bit",
+      "channels": 8
+    },
+    {
+      "name": "Flash A-DMX",
+      "channels": 8
+    },
+    {
+      "name": "Classic-14",
+      "channels": 6
+    },
+    {
+      "name": "3xClassic-6",
+      "channels": 6
+    },
+    {
+      "name": "M-Control-18",
+      "channels": 18
+    },
+    {
+      "name": "M-Control-22",
+      "channels": 22
+    },
+    {
+      "name": "Pro-15",
+      "channels": 15
+    },
+    {
+      "name": "Pro-21",
+      "channels": 7
+    },
+    {
+      "name": "3xRGB",
+      "channels": 3
+    },
+    {
+      "name": "3xRGBW",
+      "channels": 4
+    },
+    {
+      "name": "3xRGB 16bit",
+      "channels": 6
+    },
+    {
+      "name": "3xRGBW 16bit",
+      "channels": 8
+    },
+    {
+      "name": "3xFlash A-DMX",
+      "channels": 24
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "18 x 10 W; GDTF power 1200 W invalid."
+  ]
+}

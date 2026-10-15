@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@ACL_360_Bar@25-11-04_Release.gdtf",
+  "fixtureTypeId": "77CD875C-C45F-4E23-B093-3A5354A9E701",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACL 360 Bar",
+  "longName": "ACL 360 Bar",
+  "shortName": "ACL 360B",
+  "description": "The ACL 360 BAR™ is a versatile moving bar effect luminaire featuring (7) individual 15W RGBW 4-in-1 LEDs and the new advanced collimator optic lens, which combined produce a laser-like homogenized 4° color-changing beam from each lens which combined produce a 31° beam angle. Features include fast and precise16-bit continuous full 360° pan and tilt rotation, full individual pixel control, strobe, and selectable dimming curve effects, DMX, RDM (Remote Device Management), KlingNET™ and Art-NET support, 3/5pin XLR, Locking Power Cable, and RJ45 ethernet in/out connections, (6) button control full color 180° reversible menu display, 135W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
+  "manufacturer": "Elation",
+  "category": "LED BAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 15.0,
+  "maxLuminousIntensityCd": 19300.0,
+  "luminousFluxLm": 6285.0,
+  "noiseLevelDb": null,
+  "weightKg": 10.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": true,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 31.0,
+    "max": 31.0
+  },
+  "fieldAngleDeg": 33.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Extended",
+      "channels": 43
+    },
+    {
+      "name": "Stand",
+      "channels": 19
+    },
+    {
+      "name": "Basic",
+      "channels": 17
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

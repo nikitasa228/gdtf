@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BOS_Lighting@Amadeus_H300@V003.gdtf",
+  "fixtureTypeId": "BC5258AB-51FF-4A2D-B8D9-C291AF7B16A9",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Amadeus H300",
+  "longName": "Amadeus H300 Hybrid",
+  "shortName": "H300",
+  "description": "The Amadeus H300 is a powerful Beam/Spot/Wash moving head with a powerful 300W bright white LED source and super smooth 3 phase motors. Equipped with 2 gobo wheels, 2 effect wheels and a rotating 3/8-facet prism to make stunning aerial effects in 8 colours plus white. The linear motorized zoom allows you to focus a beam up to 7° or open up to 32° to cover a wider area with ease. This true all-rounder can be controlled via RDM remote control, DMX, built-in automatic programs and presets, including a master/slave mode. Perfect for stage shows, productions, events, DJs, Bands, Venues, and more. A custom heavy-duty case is also available (option) to protect your fixtures during transport or storage.",
+  "manufacturer": "BOS Lighting",
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 300.0,
+  "maxLuminousIntensityCd": 585500.0,
+  "luminousFluxLm": 20000.0,
+  "noiseLevelDb": null,
+  "weightKg": 15.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 280.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 10.0,
+    "max": 10.0
+  },
+  "fieldAngleDeg": 25.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "G1 - Select",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "G2 - Select2",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Red",
+      "facets": null
+    },
+    {
+      "name": "Yellow",
+      "facets": null
+    },
+    {
+      "name": "Blue",
+      "facets": null
+    },
+    {
+      "name": "Cyan",
+      "facets": null
+    },
+    {
+      "name": "Magenta",
+      "facets": null
+    },
+    {
+      "name": "Green",
+      "facets": null
+    },
+    {
+      "name": "Orange",
+      "facets": null
+    },
+    {
+      "name": "UV",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1",
+      "channels": 20
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "estimated",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

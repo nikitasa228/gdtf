@@ -1,0 +1,256 @@
+{
+ "Robe_Lighting@LEDForce_18_RGBW@2022-11-04__Color_wheels_correction.gdtf": {
+  "category": "PAR",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@LEDForce_7_RGBW@2023-03-10__Geometry_axis_revision__Wiring_object_revision.gdtf": {
+  "category": "PAR",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@MediaSpinner_100_AT@2023-05-16__Wiring_object_revision.gdtf": {
+  "category": "OTHER",
+  "subType": "Rotating screen / media spinner",
+  "lightSourceType": null
+ },
+ "Robe_Lighting@Robin_100_LEDBeam@2024-02-09__3D_models_with_robe_color_revision.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_BMFL_Wash_XF@2026-03-27_Color_macro_open_slot_revision.gdtf": {
+  "category": "WASH"
+ },
+ "Robe_Lighting@Robin_ColorStrobe@2023-07-19__DMX_defaults_update__3D_models_and__Geometry_revision.gdtf": {
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_ColorStrobe_IP@2023-07-24__3D_models_revision__Geometry_revision__DMX_defaults_revision__Tilt_revision.gdtf": {
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_CycFX_8@2025-04-28__Shutter_initial_function_fix_in_Mode_6.gdtf": {
+  "category": "LED BAR",
+  "subType": "Cyclorama",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_Esprite_Fresnel@2024-05-09__Beam_output_values_update.gdtf": {
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "Robe_Lighting@Robin_Esprite_PC@2024-05-09__Beam_output_values_update.gdtf": {
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "Robe_Lighting@Robin_Footsie1_RGBW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie1_RGBW_Frost_Shield@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie1_Slim_RGBW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie1_Slim_TW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie1_TW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie1_TW_Frost_Shield@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie2_RGBW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie2_RGBW_Frost_Shield@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie2_Slim_RGBW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie2_Slim_TW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie2_TW@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_Footsie2_TW_Frost_Shield@2025-09-19__Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Footlight",
+  "lensType": "Wash"
+ },
+ "Robe_Lighting@Robin_LEDBeam_150_FW_RGBW@2026-05-22_Control_channel_update.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_LEDBeam_150_RGBA@2026-05-22_Control_channel_update.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_LEDBeam_150_RGBW@2026-05-22_Control_channel_update.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_LEDBeam_350@2026-01-05_Control_channel_update.gdtf": {
+  "category": "WASH BEAM",
+  "noiseLevelDb": 31,
+  "_notes": "Noise 31 dB(A) @1 m in Quiet fan mode.",
+  "_refs": [
+   "https://www.robe.cz/api/support-files/download/downloads/standards/Robin_series/Noise/ROBIN_LEDBeam_350_Noise_Measurement.pdf"
+  ]
+ },
+ "Robe_Lighting@Robin_LEDBeam_350_FW@2026-01-05_Control_channel_update.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_LedPOINTE@2026-10-08_Beam_properties_updated.gdtf": {
+  "category": "BSW"
+ },
+ "Robe_Lighting@Robin_MegaPointe@2026-04-13_Shutter_channel_sets_revision.gdtf": {
+  "category": "BSW",
+  "noiseLevelDb": 46,
+  "_notes": "Noise 46 dB(A) @1 m, Auto fan mode.",
+  "_refs": [
+   "https://monaco.novelty.fr/download/materiel_certificat_de_conformite/robe_mega-pointe_noise-measurement.pdf"
+  ]
+ },
+ "Robe_Lighting@Robin_MiniPointe@2024-04-23__Gobo_channels_revision.gdtf": {
+  "category": "BSW"
+ },
+ "Robe_Lighting@Robin_ParFect_150_RGBW@2023-07-14__Tilt_revision.gdtf": {
+  "category": "PAR",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_Pointe@2024-04-22__Gobos_revision.gdtf": {
+  "category": "BSW"
+ },
+ "Robe_Lighting@Robin_ProMotion@2023-07-13__Quiet_control_channel_and_3D_models_revision.gdtf": {
+  "category": "SPOT",
+  "subType": "Image / gobo projector"
+ },
+ "Robe_Lighting@Robin_SVB1@2026-04-27_CTO_channel_revision.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_SVB1_RGBA@2026-04-27_CTO_channel_revision.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_SilverScan@2026-05-29_Control_channel_fix.gdtf": {
+  "category": "SCANER"
+ },
+ "Robe_Lighting@Robin_Spiider@2025-12-03__Reupload_to_share.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_Spiider_RGBA@2025-12-03__Reupload_to_share.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_SpikiePlus@2025-06-10__Pan_tilt_continuous_physical_data_revision.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_SuperSpikie@2025-06-11__Pan_tilt_continuous_physical_data_revision.gdtf": {
+  "category": "BSW"
+ },
+ "Robe_Lighting@Robin_T11_Profile@2026-09-17_Emitters_names_revision.gdtf": {
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_T15_PC@2026-09-03_RDM_update_Beam_type_fix.gdtf": {
+  "category": "WASH",
+  "subType": "Framing wash",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_T1_Fresnel@2026-09-03_Beam_type_revision.gdtf": {
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "Robe_Lighting@Robin_T1_PC@2026-07-20_Color_control_channel_update.gdtf": {
+  "category": "WASH",
+  "subType": "Framing wash"
+ },
+ "Robe_Lighting@Robin_T32_CYC@2026-10-05_Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Cyclorama",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_T32_CYC_Slim@2026-10-05_Control_channel_update.gdtf": {
+  "category": "LED BAR",
+  "subType": "Cyclorama"
+ },
+ "Robe_Lighting@Robin_Tarrantula@2025-12-03__Reupload_to_share.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_Tetra1@2025-12-03_Reupload_to_share.gdtf": {
+  "category": "LED BAR",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_Tetra2@2025-12-03_Reupload_to_share.gdtf": {
+  "category": "LED BAR",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_TetraX@2026-09-01_Pan_physical_data_update.gdtf": {
+  "category": "LED BAR"
+ },
+ "Robe_Lighting@Robin_iBeam_250@2025-11-07__Personality_RDM_number_revision.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_iBeam_350@2026-01-05_Control_channel_update.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_iBolt@2026-05-26_Safety_control_channel_fix.gdtf": {
+  "category": "BEAM"
+ },
+ "Robe_Lighting@Robin_iParFect_150_FW_RGBA@2022-11-23__Major_update.gdtf": {
+  "category": "PAR"
+ },
+ "Robe_Lighting@Robin_iPointe65@2023-11-08__Animation_wheel_macros_channel_fix.gdtf": {
+  "category": "BSW"
+ },
+ "Robe_Lighting@Robin_iPointe@2025-11-07__Personality_RDM_number_revision.gdtf": {
+  "category": "BSW"
+ },
+ "Robe_Lighting@Robin_iSpiider@2025-12-03_Reupload_to_share.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_iSpiiderX@2026-09-24_Photometrics_added.gdtf": {
+  "category": "WASH BEAM"
+ },
+ "Robe_Lighting@Robin_iT12_Profile@2026-07-21_Color_control_channel_update.gdtf": {
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@Robin_iTetra2@2025-12-03__Reupload_to_share.gdtf": {
+  "category": "LED BAR",
+  "panRangeDeg": 0
+ },
+ "Robe_Lighting@RoboSpot_MotionCamera@2024-06-14__3D_models_revision.gdtf": {
+  "category": "OTHER",
+  "subType": "Follow-spot tracking camera (RoboSpot)",
+  "lightSourceType": null
+ },
+ "Robe_Lighting@pixelPATT@2026-02-19__3D_model_update.gdtf": {
+  "category": "BLINDER",
+  "subType": "Retro LED",
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "Robe_Lighting@Robin_T1_Profile@2026-07-20_Color_Control_channel_update_2.gdtf": {
+  "noiseLevelDb": 24,
+  "_notes": "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto).",
+  "_refs": [
+   "https://www.robe.cz/res/downloads/standards/Robin_series/Noise/ROBIN_T1_Profile_Noise_Measurement.pdf"
+  ]
+ }
+}

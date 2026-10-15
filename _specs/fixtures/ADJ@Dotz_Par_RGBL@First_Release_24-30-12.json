@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Dotz_Par_RGBL@First_Release_24-30-12.gdtf",
+  "fixtureTypeId": "040C0811-425E-440E-86FC-DB6319B7BC44",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Dotz Par RGBL",
+  "longName": "Dotz Par RGBL",
+  "shortName": "DtzPrRGBL",
+  "description": "Drawing on the popularity of Chip On Board (C.O.B.) LED from the Dotz Par fixture, the ADJ Lighting Dotz Par RGBL uses the latest advancements in lighting technology with a RGBL (red, green, blue, lime) C.O.B. LED for a smooth, even field, high CRI output, advanced color mixing and tunable white color temperature control from 2700K to 6500K.",
+  "manufacturer": "ADJ",
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 36,
+  "maxLuminousIntensityCd": 8600,
+  "luminousFluxLm": 1317.0,
+  "noiseLevelDb": null,
+  "weightKg": 2.0,
+  "powerConnectorIn": "IEC C14",
+  "powerConnectorOut": "IEC C14",
+  "powerSupplyType": "IEC C14 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 18.0,
+    "max": 18.0
+  },
+  "fieldAngleDeg": 30,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBL",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "16Ch",
+      "channels": 16
+    },
+    {
+      "name": "13Ch",
+      "channels": 13
+    },
+    {
+      "name": "10Ch",
+      "channels": 10
+    },
+    {
+      "name": "8Ch",
+      "channels": 8
+    },
+    {
+      "name": "7Ch",
+      "channels": 7
+    },
+    {
+      "name": "4Ch",
+      "channels": 4
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "controlSignal": "manual",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "manual",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF weight 7.5 kg / 56 W contradicts spec sheet (2 kg / 36 W)."
+  ],
+  "_refs": [
+    "https://www.adj.com/dotz-par-rgbl"
+  ]
+}

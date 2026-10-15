@@ -1,0 +1,792 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Astera_LED_Technology@FP3_Hyperion_Tube@tested_by_Astera__V3.gdtf",
+  "fixtureTypeId": "1D3F5EC4-0208-4A99-A1F5-A07FC43CFFE8",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "FP3 Hyperion Tube",
+  "longName": "FP3 Hyperion Tube",
+  "shortName": "Hyperion Tube",
+  "description": "After the enormous success of the Titan Tube, Astera has created the double length Hyperion Tube, which measures just over 2 meters and around 80 inches. Double the LEDs, double the batteries, double the brightness, double the pixels and the same high-quality light with App, CRMX and on-tube control and wired DMX option.",
+  "manufacturer": "Astera LED Technology",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 92,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 475600.0,
+  "noiseLevelDb": null,
+  "weightKg": 2.9,
+  "powerConnectorIn": "DC Jack (external PSU / battery)",
+  "powerConnectorOut": null,
+  "powerSupplyType": "DC Jack (external PSU / battery)",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 135.0,
+    "max": 135.0
+  },
+  "fieldAngleDeg": 175.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1750.0,
+    "max": 9910.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1: RGB",
+      "channels": 3
+    },
+    {
+      "name": "2: RGBW",
+      "channels": 4
+    },
+    {
+      "name": "3: RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "4: DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "5: DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "6: DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "7: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "8: RGBS",
+      "channels": 4
+    },
+    {
+      "name": "9: RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "10: RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "11: DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "12: DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "13: DIM RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "14: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "15: Effect Mode Fix",
+      "channels": 13
+    },
+    {
+      "name": "16: Effect Mode RGB",
+      "channels": 12
+    },
+    {
+      "name": "17: RGB*RGB* 1",
+      "channels": 3
+    },
+    {
+      "name": "18: RGB RGB",
+      "channels": 3
+    },
+    {
+      "name": "19: RGBW RGBW",
+      "channels": 4
+    },
+    {
+      "name": "20: RGBAW RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "21: DIM RGB DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "22: DIM RGBW DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "23: DIM RGBAW DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "24: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "25: RGB*RGBS",
+      "channels": 4
+    },
+    {
+      "name": "26: RGB RGB S",
+      "channels": 25
+    },
+    {
+      "name": "27: RGBW RGBW S",
+      "channels": 33
+    },
+    {
+      "name": "28: RGBAW RGBAW S",
+      "channels": 41
+    },
+    {
+      "name": "29: DIM RGB DIM RGB S",
+      "channels": 33
+    },
+    {
+      "name": "30: DIM RGBW DIM RGBW S",
+      "channels": 41
+    },
+    {
+      "name": "31 DIM RGBAW RGBAW S",
+      "channels": 49
+    },
+    {
+      "name": "32: RGB CCT DIM IND S",
+      "channels": 49
+    },
+    {
+      "name": "33: RGBS RGBS",
+      "channels": 4
+    },
+    {
+      "name": "34: RGB RGB SS",
+      "channels": 32
+    },
+    {
+      "name": "35: RGBWS RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "36: RGBAWS RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "37: DIM RGBS DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "38: DIM RGBWS DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "39 DIM RGBAWS DIM RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "40: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "41: RGB*RGB*",
+      "channels": 3
+    },
+    {
+      "name": "42: RGB RGB",
+      "channels": 3
+    },
+    {
+      "name": "43: RGBW RGBW",
+      "channels": 4
+    },
+    {
+      "name": "44: RGBAW RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "45: DIM RGB DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "46: DIM RGBW DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "47: DIM RGBAW DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "48: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "49: RGB*RGBS",
+      "channels": 4
+    },
+    {
+      "name": "50: RGB*RGB S",
+      "channels": 97
+    },
+    {
+      "name": "51: RGBW RGBW S",
+      "channels": 129
+    },
+    {
+      "name": "52: RGBAW RGBAW S",
+      "channels": 161
+    },
+    {
+      "name": "53: DIM RGB DIM RGB S",
+      "channels": 129
+    },
+    {
+      "name": "54: DIM RGBW DIM RGBW S",
+      "channels": 161
+    },
+    {
+      "name": "55 DIM RGBAW RGBAW S",
+      "channels": 193
+    },
+    {
+      "name": "56: RGB CCT DIM IND S",
+      "channels": 193
+    },
+    {
+      "name": "57: RGBS RGBS",
+      "channels": 4
+    },
+    {
+      "name": "58: RGB RGB SS",
+      "channels": 128
+    },
+    {
+      "name": "59: RGBWS RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "60: RGBAWS RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "61: DIM RGBS DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "62: DIM RGBWS DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "63: DIM RGBAWS DIM RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "64: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "65: RGB*RGB*",
+      "channels": 3
+    },
+    {
+      "name": "66: RGB RGB",
+      "channels": 3
+    },
+    {
+      "name": "67: RGBW RGBW",
+      "channels": 4
+    },
+    {
+      "name": "68: RGBAW RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "69: DIM RGB DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "70: DIM RGBW DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "71: DIM RGBAW DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "72: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "73: RGB*RGBS",
+      "channels": 4
+    },
+    {
+      "name": "74: RGB RGB S",
+      "channels": 49
+    },
+    {
+      "name": "75: RGBW RGBW S",
+      "channels": 65
+    },
+    {
+      "name": "76: RGBAW RGBAW S",
+      "channels": 81
+    },
+    {
+      "name": "77: DIM RGB DIM RGB S",
+      "channels": 65
+    },
+    {
+      "name": "78: DIM RGBW DIM RGBW S",
+      "channels": 81
+    },
+    {
+      "name": "79 DIM RGBAW RGBAW S",
+      "channels": 97
+    },
+    {
+      "name": "80: RGB CCT DIM IND S",
+      "channels": 97
+    },
+    {
+      "name": "81: RGBS RGBS",
+      "channels": 4
+    },
+    {
+      "name": "82: RGB RGB SS",
+      "channels": 64
+    },
+    {
+      "name": "83: RGBWS RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "84: RGBAWS RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "85: DIM RGBS DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "86: DIM RGBWS DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "87 DIM RGBAWS RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "88: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "89: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "90: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "91: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "92: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "93: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "94: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "95: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "96: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "97: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "98: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "99: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "100: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "101: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "102: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "103: D CCT GM CRO RGB S",
+      "channels": 57
+    },
+    {
+      "name": "104: D CCT GM HUE SAT S",
+      "channels": 41
+    },
+    {
+      "name": "105: D16 CCT GM H SAT S",
+      "channels": 57
+    },
+    {
+      "name": "106: D16 X Y S",
+      "channels": 49
+    },
+    {
+      "name": "107: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "108: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "109: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "110: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "111: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "112: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "113: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "114: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "115: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "116: D CCT GM CRO RGB S",
+      "channels": 255
+    },
+    {
+      "name": "117: D CCT GM HUE SAT S",
+      "channels": 161
+    },
+    {
+      "name": "118: D16 CCT GM H SAT S",
+      "channels": 255
+    },
+    {
+      "name": "119: D16 X Y S",
+      "channels": 193
+    },
+    {
+      "name": "120: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "121: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "122: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "123: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "124: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "125: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "126: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "127: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "128: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "129: D CCT GM CRO RGB S",
+      "channels": 113
+    },
+    {
+      "name": "130: D CCT GM HUE SAT S",
+      "channels": 81
+    },
+    {
+      "name": "131: D16 CCT GM H SAT S",
+      "channels": 113
+    },
+    {
+      "name": "132: D16 X Y S",
+      "channels": 97
+    },
+    {
+      "name": "133: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "134: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "135: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "136: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "137: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "138: D16 CCT GM C RGB S",
+      "channels": 65
+    },
+    {
+      "name": "139: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "140: D16 CCT GM C RGB S",
+      "channels": 257
+    },
+    {
+      "name": "141: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "142: D16 CCT GM C RGB S",
+      "channels": 129
+    },
+    {
+      "name": "143: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "168: D CCT GM C CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "169: D16 CCT GM C CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "170: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "171: D16 CCT GM C CRO XY S",
+      "channels": 10
+    },
+    {
+      "name": "178: D CCT GM C CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "179: D16 CCT GM C CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "180: D CCT GM C CRO XY S",
+      "channels": 65
+    },
+    {
+      "name": "181: D16 CCT GM C CRO XY S",
+      "channels": 73
+    },
+    {
+      "name": "182: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "183: D16 CCT GM C CRO XY S",
+      "channels": 10
+    },
+    {
+      "name": "184: D CCT GM C CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "185: D16 CCT GM C CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "186: D CCT GM C CRO XY S",
+      "channels": 129
+    },
+    {
+      "name": "187: D16 CCT GM C CRO XY S",
+      "channels": 145
+    },
+    {
+      "name": "188: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "189: D16 CCT GM C CRO XY S",
+      "channels": 10
+    },
+    {
+      "name": "190: D CCT GM C CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "191: D16 CCT GM C CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "192: D CCT GM C CRO XY S",
+      "channels": 257
+    },
+    {
+      "name": "193: D16 CCT GM C CRO XY S",
+      "channels": 289
+    },
+    {
+      "name": "194: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "195: D16 CCT GM C CRO XY S",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 82,
+  "subType": "Battery LED tube",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ],
+  "_refs": [
+    "https://astera-led.com/wp-content/uploads/Datasheet_Hyperion_Tube_V4-1.pdf"
+  ]
+}

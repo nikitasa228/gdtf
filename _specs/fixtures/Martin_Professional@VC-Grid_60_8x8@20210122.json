@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Martin_Professional@VC-Grid_60_8x8@20210122.gdtf",
+  "fixtureTypeId": "9FA3386A-8F09-4187-B319-3B942D4DF8DA",
+  "gdtfDataVersion": "1.1",
+  "gdtfName": "VC-Grid 60 8x8",
+  "longName": "VC-Grid 60 8x8",
+  "shortName": "VCG60 8x8",
+  "description": "Official Martin Professional File",
+  "manufacturer": "Martin Professional",
+  "category": "OTHER",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 25.0,
+  "maxLuminousIntensityCd": 100.0,
+  "luminousFluxLm": 518.0,
+  "noiseLevelDb": null,
+  "weightKg": 0.5,
+  "powerConnectorIn": "Martin proprietary (P3/PDE)",
+  "powerConnectorOut": "Martin proprietary (P3/PDE)",
+  "powerSupplyType": "Martin proprietary (P3/PDE)",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "Ethernet (Martin P3)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 110.0,
+    "max": 110.0
+  },
+  "fieldAngleDeg": 160.0,
+  "zoom": false,
+  "lensType": null,
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "DMX_RGB",
+      "channels": 3
+    },
+    {
+      "name": "DMX_Pixel",
+      "channels": 192
+    },
+    {
+      "name": "P3_Intensity",
+      "channels": 1
+    },
+    {
+      "name": "P3_RGB",
+      "channels": 3
+    },
+    {
+      "name": "P3_Basic",
+      "channels": 5
+    },
+    {
+      "name": "P3_Hybrid 1 Segment",
+      "channels": 6
+    },
+    {
+      "name": "P3_Hybrid 2 Segments",
+      "channels": 9
+    },
+    {
+      "name": "P3_Hybrid 4 Segments",
+      "channels": 15
+    },
+    {
+      "name": "P3_Hybrid 8 Segments",
+      "channels": 27
+    },
+    {
+      "name": "P3_Hybrid 16 Segments",
+      "channels": 51
+    },
+    {
+      "name": "P3_Hybrid 32 Segments",
+      "channels": 99
+    },
+    {
+      "name": "P3_Hybrid 64 Segments",
+      "channels": 195
+    },
+    {
+      "name": "P3_PixelMap 1 Segment",
+      "channels": 3
+    },
+    {
+      "name": "P3_PixelMap 2 Segments",
+      "channels": 6
+    },
+    {
+      "name": "P3_PixelMap 4 Segments",
+      "channels": 12
+    },
+    {
+      "name": "P3_PixelMap 8 Segments",
+      "channels": 24
+    },
+    {
+      "name": "P3_PixelMap 16 Segments",
+      "channels": 48
+    },
+    {
+      "name": "P3_PixelMap 32 Segments",
+      "channels": 96
+    },
+    {
+      "name": "P3_PixelMap 64 Segments",
+      "channels": 192
+    }
+  ],
+  "pixelCount": 64,
+  "subType": "LED video pixel / matrix",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "manual",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [
+    "supportedPowerNetworks",
+    "lensType",
+    "lensType"
+  ],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+  ]
+}

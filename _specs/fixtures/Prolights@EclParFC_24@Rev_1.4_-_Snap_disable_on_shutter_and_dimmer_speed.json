@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclParFC_24@Rev_1.4_-_Snap_disable_on_shutter_and_dimmer_speed.gdtf",
+  "fixtureTypeId": "E6E3230D-180D-49B8-BAA4-C0F49ABFB772",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclParFC_24",
+  "longName": "EclParFC_24",
+  "shortName": "EclParFC_24",
+  "description": "EclPar FC is a range of multipurpose LED fixtures with a single source, delivering silent operation, high quality of light and optical flexibility, designed to redefine the standard for theatrical, TVs and corporate applications.\nEclPar FC features a 150W RGB + Warm White and delivers a superior white CTC with +/- tint control, red-shift (CRI > 95 and R9 > 98 @3.200 K) and colour mixing.\nThe fixture includes an extensive range of accessories including barn doors, filter frame, egg crate and a multitude of interchangeable lenses.\nEclPar FC features a smooth 16-bit dimming as well as RDM control and adjustable PWM providing eye-candy.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 150.0,
+  "maxLuminousIntensityCd": 27900.0,
+  "luminousFluxLm": 5983.0,
+  "noiseLevelDb": null,
+  "weightKg": 5.7,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 25.1,
+    "max": 25.1
+  },
+  "fieldAngleDeg": 41.5,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1ch_Theatre",
+      "channels": 1
+    },
+    {
+      "name": "2ch_Theatre",
+      "channels": 2
+    },
+    {
+      "name": "4ch_Theatre",
+      "channels": 4
+    },
+    {
+      "name": "5ch_Theatre",
+      "channels": 5
+    },
+    {
+      "name": "6ch_Theatre",
+      "channels": 6
+    },
+    {
+      "name": "10ch_Theatre",
+      "channels": 10
+    },
+    {
+      "name": "15ch_Theatre",
+      "channels": 15
+    },
+    {
+      "name": "17ch_Theatre",
+      "channels": 17
+    },
+    {
+      "name": "4ch_Tour",
+      "channels": 4
+    },
+    {
+      "name": "6ch_Tour",
+      "channels": 6
+    },
+    {
+      "name": "10ch_Tour",
+      "channels": 10
+    },
+    {
+      "name": "15ch_Tour",
+      "channels": 15
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

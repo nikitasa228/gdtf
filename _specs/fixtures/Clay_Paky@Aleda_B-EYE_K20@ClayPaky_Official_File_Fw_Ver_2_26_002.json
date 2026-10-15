@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Clay_Paky@Aleda_B-EYE_K20@ClayPaky_Official_File_Fw_Ver_2_26_002.gdtf",
+  "fixtureTypeId": "4B0B5809-849D-470D-9746-2B0CE997E558",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Aleda B-EYE K20",
+  "longName": "Aleda B-EYE K20",
+  "shortName": "bEye k20",
+  "description": "The A.leda B-EYE K20 is a high performance wash light, a breathtaking beam light, and a creator of completely new spectacular visual effects. Its unparalleled versatility makes it an extremely interesting creative tool for all lighting designers.\nThe B-EYE is first and foremost an excellent quality wash light. It is able to wash surfaces with colors at any distance, making the most of its light source. B-EYE is brighter than any LED-wash with the same rated power, thanks to its special optical unit with a truly amazing lumen/watt ratio, designed and built by Clay Paky. The zoom ranges from 4° to 60° and it is therefore suitable both for environments with low ceilings (small theatres and TV studios, for example), where large angles are extremely useful, and for shows in arenas or large environments, where a tight zoom is perfect.\nWhen the B-EYE beam is zoomed down to 4°, the \"wash\" light turns into a \"beam\" fixture. The B-EYE therefore becomes a surprising mid-air parallel effect light, capable of generating a pulsating beam of micro-rays, which may be controlled individually, each with its own colors and shades. All the parameters of each LED can be completely controlled.\nLastly, the B-EYE K20 introduces a completely new feature: the front lens may be rotated to create lots of small bright compositions, which may be opened and closed like petals. By adding colors and dynamic graphics, the B-EYE generates never-seen-before graphic light effects.",
+  "manufacturer": "Clay Paky",
+  "category": "WASH BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1480.0,
+  "maxLuminousIntensityCd": 1613200.0,
+  "luminousFluxLm": 10194.0,
+  "noiseLevelDb": null,
+  "weightKg": 27.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 210.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.3,
+    "max": 39.1
+  },
+  "fieldAngleDeg": 52.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Shapes",
+      "channels": 35
+    },
+    {
+      "name": "Standard",
+      "channels": 21
+    },
+    {
+      "name": "Pixels RGB",
+      "channels": 111
+    },
+    {
+      "name": "Pixels RGBW",
+      "channels": 148
+    }
+  ],
+  "pixelCount": 37,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

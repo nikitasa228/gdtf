@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Vari-Lite@Aurora_Strip_12@Modified_SOCC_Modes_by_GDTFservice.com,_powered_by_Crescit,_commissioned_by_Strand..gdtf",
+  "fixtureTypeId": "CB3E3C01-E3CB-11EA-ABC8-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Aurora Strip 12",
+  "longName": "Aurora Strip 12",
+  "shortName": "Aurora12",
+  "description": "Aurora 12 is a high output theatrical strip luminaire that provides rich color mixing for multiple applications around the performance stage, including set piece illumination, graze / cyc lighting, foot lighting, and more.",
+  "manufacturer": "Vari-Lite",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 321.0,
+  "maxLuminousIntensityCd": 50100.0,
+  "luminousFluxLm": 6700.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 19.8,
+    "max": 19.8
+  },
+  "fieldAngleDeg": 22.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "SSCC Mode",
+      "channels": 12
+    },
+    {
+      "name": "SSCC Mode 4 Cell",
+      "channels": 39
+    },
+    {
+      "name": "SOCC Mode",
+      "channels": 17
+    },
+    {
+      "name": "SQCC Mode 1 Zone",
+      "channels": 4
+    },
+    {
+      "name": "SOCC Mode 4 Cell",
+      "channels": 53
+    },
+    {
+      "name": "SSCC Mode 12 Cell",
+      "channels": 111
+    },
+    {
+      "name": "SOCC Mode 12 Cell",
+      "channels": 149
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

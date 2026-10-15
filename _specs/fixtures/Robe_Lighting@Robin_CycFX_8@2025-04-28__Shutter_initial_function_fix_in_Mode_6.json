@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_CycFX_8@2025-04-28__Shutter_initial_function_fix_in_Mode_6.gdtf",
+  "fixtureTypeId": "474AD409-CDAA-4999-B093-64F770F90173",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin CycFX 8",
+  "longName": "Robin CycFX 8™",
+  "shortName": "CycFX8",
+  "description": "An array of individually controlled 15W RGBW LED modules equally spaced along the strip with fully adjustable zoom from 8-67 degrees. The strip itself has a very fast 270 degree tilt movement which can be precision indexed or programmed to produce rapid sweeping movements. Pre-programmed colour macros and pixel control makes this fixture quick and easy to programme. Tungsten lamp emulation and fade effects at 2700 K and 3200 K are included. Wireless technology CRMX is available as an option. \n\nPlease be aware, since this is a discontinued product, all physical values in this library may not be entirely accurate for this model.",
+  "manufacturer": "Robe Lighting",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 415.0,
+  "maxLuminousIntensityCd": 47700.0,
+  "luminousFluxLm": 1042.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 8.0,
+    "max": 67.0
+  },
+  "fieldAngleDeg": 63.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 20000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - 8 bit",
+      "channels": 14
+    },
+    {
+      "name": "Mode 2 - 16bit",
+      "channels": 21
+    },
+    {
+      "name": "Mode 3 - Pixels RGB",
+      "channels": 45
+    },
+    {
+      "name": "Mode 4 - Pixels RGB + dimmer",
+      "channels": 53
+    },
+    {
+      "name": "Mode 5 - Pixel dimmers without color",
+      "channels": 22
+    },
+    {
+      "name": "Mode 6 - Pixels RGBW",
+      "channels": 53
+    },
+    {
+      "name": "Mode 7 - Pixels RGBW + dimmer",
+      "channels": 61
+    }
+  ],
+  "pixelCount": 8,
+  "subType": "Cyclorama",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "panRangeDeg": "manual"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Chauvet_Professional@onAir_Panel_1_IP@Rev_1.0.2.gdtf",
+  "fixtureTypeId": "3F247251-CD76-4FE9-9C4B-4CD30AB85732",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "onAir Panel 1 IP",
+  "longName": "onAir Panel 1 IP",
+  "shortName": "onAirPanel1IP",
+  "description": "onAir Panel 1 IP is a rugged IP65, full-spectrum LED soft light with a 1×1 format that is capable of facing all of the elements, outdoors or in. Ready to go on-location for any broadcast setting, onAir Panel 1 IP features a superior quality of white light with high CRI/ TLC and TM-30 scores; a smooth 16-bit dimming curve and +/- green adjustment, an emulated redshift, and the ability to produce a pop of color to achieve the exact look you are aiming to create along with built-in, customizable effects accessible from the onboard control menu. Easily switch mounting options from Jr Pin to Omega Bracket on a rugged build, designed with a drop-in slot to ensure ease of use when changing accessories. PWM, DMX, RDM, CRMX, Art-Net, sACN, and an onboard control option ensure camera-ready use. An optional 28 VDC input via 3-pin XLR powers the fixture from an external battery pack to add increased flexibility for all of your remote needs.",
+  "manufacturer": "Chauvet Professional",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": null,
+  "maxLuminousIntensityCd": 3200.0,
+  "luminousFluxLm": 10092.0,
+  "noiseLevelDb": null,
+  "weightKg": 12.7,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 99.3,
+    "max": 99.3
+  },
+  "fieldAngleDeg": 154.0,
+  "zoom": false,
+  "lensType": "Rectangle",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1Ch Mode",
+      "channels": 1
+    },
+    {
+      "name": "3Ch Mode",
+      "channels": 3
+    },
+    {
+      "name": "4Ch Mode",
+      "channels": 4
+    },
+    {
+      "name": "5Ch Mode",
+      "channels": 5
+    },
+    {
+      "name": "6Ch Mode",
+      "channels": 6
+    },
+    {
+      "name": "8Ch1",
+      "channels": 8
+    },
+    {
+      "name": "8Ch2",
+      "channels": 8
+    },
+    {
+      "name": "10Ch",
+      "channels": 10
+    },
+    {
+      "name": "11Ch Mode",
+      "channels": 11
+    },
+    {
+      "name": "15Ch1",
+      "channels": 15
+    },
+    {
+      "name": "15Ch2",
+      "channels": 15
+    },
+    {
+      "name": "16Ch Mode",
+      "channels": 16
+    },
+    {
+      "name": "XYBasic 6Ch",
+      "channels": 6
+    },
+    {
+      "name": "XYExtended 10Ch",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 1,
+  "subType": "Soft light panel",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "powerConsumptionW",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

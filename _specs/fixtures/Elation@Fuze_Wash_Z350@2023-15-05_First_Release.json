@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Fuze_Wash_Z350@2023-15-05_First_Release.gdtf",
+  "fixtureTypeId": "51771EEE-943F-49C7-96EC-7B478523ADF3",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Fuze Wash Z350",
+  "longName": "Fuze Wash Z350",
+  "shortName": "FzWshZ350",
+  "description": "The FUZE WASH Z350™ is a single source par moving head luminaire featuring a 350W Quad Color RGBW COB LED, 6° to 46° motorized zoom, pan and tilt, RGBW color mixing, variable dimming curve and strobe effects, DMX and RDM (remote device management) protocol support, DMX and Locking Power Cable in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 350.0,
+  "maxLuminousIntensityCd": 4900300.0,
+  "luminousFluxLm": 60280.0,
+  "noiseLevelDb": null,
+  "weightKg": 45.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 46.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 8000.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "19 RGBW Pan540",
+      "channels": 19
+    },
+    {
+      "name": "17 RGBI Pan540",
+      "channels": 17
+    },
+    {
+      "name": "16 HSI Pan540",
+      "channels": 16
+    },
+    {
+      "name": "15 RGBW Pan540",
+      "channels": 15
+    },
+    {
+      "name": "19 RGBW Pan630",
+      "channels": 19
+    },
+    {
+      "name": "17 RGBI Pan630",
+      "channels": 17
+    },
+    {
+      "name": "15 RGBW Pan630",
+      "channels": 15
+    },
+    {
+      "name": "16 HSI Pan630",
+      "channels": 16
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

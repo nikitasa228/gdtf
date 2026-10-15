@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Astera_LED_Technology@FP7_LunaBulb@tested_by_Astera__V1.gdtf",
+  "fixtureTypeId": "9A22FD62-FA35-4FC0-8E89-A1171CD559A5",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "FP7 LunaBulb",
+  "longName": "FP7 LunaBulb",
+  "shortName": "LunaBulb",
+  "description": "Threads: E27, E26, B22\nControl: CRMX, AsteraApp, Bluetooth, WiFi",
+  "manufacturer": "Astera LED Technology",
+  "category": "WASH",
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 120.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 8.0,
+  "maxLuminousIntensityCd": null,
+  "luminousFluxLm": 308.0,
+  "noiseLevelDb": null,
+  "weightKg": 0.08,
+  "powerConnectorIn": "DC Jack",
+  "powerConnectorOut": null,
+  "powerSupplyType": "DC Jack",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 240.0,
+    "max": 240.0
+  },
+  "fieldAngleDeg": 338.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 1750.0,
+    "max": 9910.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "1: RGB",
+      "channels": 3
+    },
+    {
+      "name": "2: RGBW",
+      "channels": 4
+    },
+    {
+      "name": "3: RGBAW",
+      "channels": 5
+    },
+    {
+      "name": "4: DIM RGB",
+      "channels": 4
+    },
+    {
+      "name": "5: DIM RGBW",
+      "channels": 5
+    },
+    {
+      "name": "6: DIM RGBAW",
+      "channels": 6
+    },
+    {
+      "name": "7: RGB CCT DIM IND",
+      "channels": 6
+    },
+    {
+      "name": "8: RGBS",
+      "channels": 4
+    },
+    {
+      "name": "9: RGBWS",
+      "channels": 5
+    },
+    {
+      "name": "10: RGBAWS",
+      "channels": 6
+    },
+    {
+      "name": "11: DIM RGBS",
+      "channels": 5
+    },
+    {
+      "name": "12: DIM RGBWS",
+      "channels": 6
+    },
+    {
+      "name": "13: DIM RGBAWS",
+      "channels": 7
+    },
+    {
+      "name": "14: RGB CCT DIM IND S",
+      "channels": 7
+    },
+    {
+      "name": "15: Effect Mode Fix",
+      "channels": 13
+    },
+    {
+      "name": "16: Effect Mode RGB",
+      "channels": 12
+    },
+    {
+      "name": "89: D CCT GM CRO RGB",
+      "channels": 7
+    },
+    {
+      "name": "90: D CCT GM HUE SAT",
+      "channels": 5
+    },
+    {
+      "name": "91: D16 CCT GM C RGB",
+      "channels": 8
+    },
+    {
+      "name": "92: D16 CCT GM H SAT",
+      "channels": 7
+    },
+    {
+      "name": "93: D16 X Y",
+      "channels": 6
+    },
+    {
+      "name": "94: D CCT GM CRO RGB S",
+      "channels": 8
+    },
+    {
+      "name": "95: D CCT GM HUE SAT S",
+      "channels": 6
+    },
+    {
+      "name": "96: D16 CCT GM H SAT S",
+      "channels": 8
+    },
+    {
+      "name": "97: D16 X Y S",
+      "channels": 7
+    },
+    {
+      "name": "137: D16 CCT GM C RGB S",
+      "channels": 9
+    },
+    {
+      "name": "168: D CCT GM C CRO XY",
+      "channels": 8
+    },
+    {
+      "name": "169: D16 CCT GM C CRO XY",
+      "channels": 9
+    },
+    {
+      "name": "170: D CCT GM C CRO XY S",
+      "channels": 9
+    },
+    {
+      "name": "171: D16 CCT GM C CRO XY S",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 2,
+  "subType": "LED bulb (E27)",
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "subType": "manual"
+  },
+  "_missing": [
+    "maxLuminousIntensityCd",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

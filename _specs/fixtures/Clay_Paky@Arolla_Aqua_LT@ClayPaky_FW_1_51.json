@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Clay_Paky@Arolla_Aqua_LT@ClayPaky_FW_1_51.gdtf",
+  "fixtureTypeId": "76B09810-A633-45B1-A37A-82170E8BB20A",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Arolla Aqua LT",
+  "longName": "Arolla Aqua LT",
+  "shortName": "ArolAquaLT",
+  "description": "After the worldwide success of Arolla Aqua, we are proud to present Arolla Aqua LT, the family’s second ultra-equipped luminaire specially designed for larger spaces. Imagine a 900W white LED moving head that delivers exceptional brightness, great color accuracy, precise narrow long-throw beam, and advanced creative control – all in one rugged, IP66 weatherproof design. Designed for intensive outdoor use in long-distance applications requiring high precision, Arolla Aqua LT is the ultimate solution for lighting professionals who demand versatility, reliability, and creativity.",
+  "manufacturer": "Clay Paky",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400,
+  "maxLuminousIntensityCd": 8046900.0,
+  "luminousFluxLm": 44000,
+  "noiseLevelDb": 46.3,
+  "weightKg": 41.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 250.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 4.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 50.5,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Static Gobo",
+      "slots": 8,
+      "rotating": false
+    },
+    {
+      "wheel": "Rotating Gobo",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 15,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2500.0,
+    "max": 7000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "4-Facet Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Standard",
+      "channels": 38
+    },
+    {
+      "name": "Extended",
+      "channels": 41
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "manual",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "manual",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "manual",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "Noise 46.3 dB(A) in Auto fan mode (37.5 silent)."
+  ],
+  "_refs": [
+    "https://www.claypaky.it/products/arolla-aqua-lt/"
+  ]
+}

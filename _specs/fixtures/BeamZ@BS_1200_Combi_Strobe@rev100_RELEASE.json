@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ@BS_1200_Combi_Strobe@rev100_RELEASE.gdtf",
+  "fixtureTypeId": "DF7A4BBF-43AA-46D5-AF85-BDA9EEDBE4AA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "BS 1200 Combi Strobe",
+  "longName": "BS 1200",
+  "shortName": "BS1200",
+  "description": "Hybrid Strobe / Wash :: IP20 / 600 x SMD LED RGB (2 x 10 x 30) / 320 x SMB LED wWcW (4 x 10 x 8) / 240 x SMD LED ColdWhite (1 x 10 x 24) / beam agle 45 degree / field angle 100 degree",
+  "manufacturer": "BeamZ",
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 60.0,
+  "maxLuminousIntensityCd": 102300.0,
+  "luminousFluxLm": 166000.0,
+  "noiseLevelDb": null,
+  "weightKg": 7.15,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 70.0,
+    "max": 70.0
+  },
+  "fieldAngleDeg": 90.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW+WW+CW",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP20",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "150 Ch Pixel Control Basic",
+      "channels": 72
+    },
+    {
+      "name": "150 Ch Pixel Control + Virtual Dimmer",
+      "channels": 72
+    },
+    {
+      "name": "150 Ch Pixel Control + Virtual Dimmer EXTENDED",
+      "channels": 72
+    },
+    {
+      "name": "21 Ch",
+      "channels": 21
+    },
+    {
+      "name": "14 Ch",
+      "channels": 14
+    },
+    {
+      "name": "7 Ch",
+      "channels": 7
+    },
+    {
+      "name": "7 Ch + Virtual Dimmer",
+      "channels": 7
+    }
+  ],
+  "pixelCount": 6,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

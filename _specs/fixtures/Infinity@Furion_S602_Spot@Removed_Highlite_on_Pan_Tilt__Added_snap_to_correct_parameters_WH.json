@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Infinity@Furion_S602_Spot@Removed_Highlite_on_Pan_Tilt__Added_snap_to_correct_parameters_WH.gdtf",
+  "fixtureTypeId": "31326319-821E-11EF-AF1A-525400685065",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Furion S602 Spot",
+  "longName": "Furion S602 Spot",
+  "shortName": "Furion S602 Spot",
+  "description": "Furion S602 Spot is a lightweight, IP65-rated spot moving head with a mighty 600 W flat-field LED, a vast zoom range and a treasure trove of built-in effects. This makes it perfect for full-scale concerts, theatrical productions, live events, and more.\n\nWith a motorized zoom range that offers flawless transitions between a slender 6.3deg beam angle and an all-encompassing 42.6deg beam angle, the S602 Spot delivers adaptable lighting solutions for any scenario. Vivid color combinations come from its CMY + CTO color mixing capabilities and its color wheel with 7 colors plus an open position.\n\nGet creative by delving deep into the S602's box of tricks. These include a rotating gobo wheel with 7 gobos and a static gobo wheel with 9 gobos that cast dynamic light effects. A rotating 5-facet circular prism adds mesmerizing layers to the light beam. An animation wheel and virtual animation offer more dynamic possibilities, while an iris for precise beam control and a light frost filter for softer edges make this fixture even more versatile.\n\nFor environments requiring minimal noise, the studio mode offers whisper-quiet fan operation ensuring discreet performance. Adjustable PWM frequencies guarantee uncompromised quality in filming situations too. Comprehensive control options include basic, advanced and customized DMX modes, CRMX, W-DMX, Art-Net, sACN and RDM. Power Pro True inputs and outputs add power-linking possibilities.\n\nWith a housing forged from magnesium and aluminum, the S602 Spot is both sturdy and lightweight, ensuring durability and minimal maintenance. Its IP65 rating guarantees that the fixture is dust-tight and protected against water, making it suitable for both indoor and outdoor situations. Those looking for a top-notch, spot lighting solution that combines powerful performance, durable design, seamless movements and an arsenal of built-in effects will find everything they need in the Furion S602 Spot.",
+  "manufacturer": "Infinity",
+  "category": "SPOT",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 1855400.0,
+  "luminousFluxLm": 25162.0,
+  "noiseLevelDb": null,
+  "weightKg": 26.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 6.3,
+    "max": 54.1
+  },
+  "fieldAngleDeg": 54.1,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "ROTATING GOBO",
+      "slots": 7,
+      "rotating": true
+    },
+    {
+      "wheel": "STATIC GOBO",
+      "slots": 9,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 7400.0,
+    "max": 7400.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic",
+      "channels": 26
+    },
+    {
+      "name": "Advanced",
+      "channels": 37
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@Pulse_Panel@25-17-02_Release.gdtf",
+  "fixtureTypeId": "11FD5B5E-4B6F-4AAD-9AC4-3F905E6C8695",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Pulse Panel",
+  "longName": "Pulse Panel",
+  "shortName": "PulsPnl",
+  "description": "The PULSE PANEL features the same LED layout found on the Pulse Panel FX. 1,152 1.5W RGB LEDs spread across 24 zones around its perimeter, arranged in a grid of 6 zones wide and 4 zones tall. In addition to this, it includes a central strobe line comprising 288 5W cool-white LEDs organized into 24 zones, with 12 zones across and 2 zones tall. These are separated by a line of 96 1.5W RGB LEDs divided into 12 zones. Furthermore, there are 144 additional 5W cool-white LEDs divided into 24 zones, with 12 zones at the top and 12 at the bottom of the fixture's face. These outer LEDs utilize a linear prismatic lens similar to those used in our Rayzor Blade fixtures. When combined, these components deliver an astonishing output exceeding 100,000 total lumens.",
+  "manufacturer": "Elation",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 1611.0,
+  "maxLuminousIntensityCd": 145100.0,
+  "luminousFluxLm": 222618.0,
+  "noiseLevelDb": null,
+  "weightKg": 13.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 68.0,
+    "max": 68.0
+  },
+  "fieldAngleDeg": 112.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB",
+  "colorWheel": false,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "12CH",
+      "channels": 12
+    },
+    {
+      "name": "22CH",
+      "channels": 22
+    },
+    {
+      "name": "45CH",
+      "channels": 45
+    },
+    {
+      "name": "60CH",
+      "channels": 60
+    },
+    {
+      "name": "170CH",
+      "channels": 14
+    },
+    {
+      "name": "88CH",
+      "channels": 70
+    },
+    {
+      "name": "178CH",
+      "channels": 22
+    },
+    {
+      "name": "156CH",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 32,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

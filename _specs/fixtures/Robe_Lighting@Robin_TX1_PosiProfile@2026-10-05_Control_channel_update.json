@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_TX1_PosiProfile@2026-10-05_Control_channel_update.gdtf",
+  "fixtureTypeId": "1136C09F-A668-4C76-AFE4-E528E36BBAD4",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin TX1 PosiProfile",
+  "longName": "Robin TX1 PosiProfile™",
+  "shortName": "TX1 PosiProfile",
+  "description": "Preliminary physical and color measurements.\nBridging the divide between manual generic and fully automated fixtures, the TX1 PosiProfile™ combines both worlds into one revolutionary luminaire.",
+  "manufacturer": "Robe Lighting",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 640.0,
+  "maxLuminousIntensityCd": 1064200.0,
+  "luminousFluxLm": 11000.0,
+  "noiseLevelDb": null,
+  "weightKg": 24.3,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 263.6,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 5.5,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 49.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo1 - static",
+      "slots": 9,
+      "rotating": false
+    },
+    {
+      "wheel": "Gobo2 - rotating",
+      "slots": 7,
+      "rotating": true
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 8000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - CMY",
+      "channels": 40
+    },
+    {
+      "name": "Mode 1 - RGB",
+      "channels": 40
+    },
+    {
+      "name": "Mode 2 - Reduced CMY",
+      "channels": 27
+    },
+    {
+      "name": "Mode 2 - Reduced RGB",
+      "channels": 27
+    },
+    {
+      "name": "Mode 3 - RGBAL",
+      "channels": 44
+    },
+    {
+      "name": "Mode 4 - CMY + Gobo module",
+      "channels": 48
+    },
+    {
+      "name": "Mode 4 - RGB + Gobo module",
+      "channels": 48
+    },
+    {
+      "name": "Mode 5 - Reduced CMY + Gobo module",
+      "channels": 33
+    },
+    {
+      "name": "Mode 5 - Reduced RGB + Gobo module",
+      "channels": 33
+    },
+    {
+      "name": "Mode 6 - RGBAL + Gobo module",
+      "channels": 52
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

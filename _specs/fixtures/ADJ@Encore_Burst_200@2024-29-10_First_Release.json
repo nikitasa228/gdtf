@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ADJ@Encore_Burst_200@2024-29-10_First_Release.gdtf",
+  "fixtureTypeId": "A7BDEECA-A20E-4C5D-86AE-9F91A8E0C6C3",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Encore Burst 200",
+  "longName": "Encore Burst 200",
+  "shortName": "Encr200",
+  "description": "The Encore Burst 200 is an IPX4 rated, high intensity dual lens audience blinder/strobe. It’s powered by two 110W warm white (2700K) CREE COB LEDs. The fixture is constructed with a rugged metal housing and an aluminum extrusion rails system to connect multiple fixtures to create a larger cluster of fixtures in a vertical or horizontal array. The fixture features a Tungsten Mode effect that replicates a halogen-like dimming profile.",
+  "manufacturer": "ADJ",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 235,
+  "maxLuminousIntensityCd": 12200,
+  "luminousFluxLm": 12248.0,
+  "noiseLevelDb": null,
+  "weightKg": 6.8,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 50.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 1200.0,
+    "max": 2700.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IPX4",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1CH",
+      "channels": 1
+    },
+    {
+      "name": "2CH",
+      "channels": 2
+    },
+    {
+      "name": "2ACH",
+      "channels": 2
+    },
+    {
+      "name": "3CH",
+      "channels": 3
+    },
+    {
+      "name": "4CH",
+      "channels": 4
+    },
+    {
+      "name": "6CH",
+      "channels": 6
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "manual",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "2-cell warm-white COB blinder/strobe."
+  ],
+  "_refs": [
+    "https://www.adj.com/encore-burst-200"
+  ]
+}

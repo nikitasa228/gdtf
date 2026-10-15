@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Robe_Lighting@Robin_iEsprite_LTL_FS@2026-09-24_Photometrics_added.gdtf",
+  "fixtureTypeId": "C1D7632E-988A-4E0E-9AE2-CFFC96F88136",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Robin iEsprite LTL FS",
+  "longName": "Robin iESPRITE® LTL FS",
+  "shortName": "LTL FS",
+  "description": "Inspired by the award-winning iFORTE® LTX FS and maintaining the renowned design and durability of the iSERIES, the smaller and lighter iESPRITE® LTL FS luminaire delivers a powerful advantage in its class for live concert-touring, theatrical productions, and broadcast designs, indoors or out.\nWith exceptional form-factor, impressive output, optical precision with an imposing 200mm front lens and rich feature set, this fixture will fit deliver high performance without occupying excessive space or overloading your truss, at just 37 kg.\nThe iESPRITE® LTL FS FollowSpot is equipped with a full HD digital camera mounted on the head, with parCoat™ lens protection to ensure a clear picture in inclement weather. The IP65-rated camera features 32x optical and 32x digital zooms and is suitable for light levels down to 0.05 lux. Together with EMS™ (Electronic Motion Stabiliser) technology for instant stop and hysteresis elimination, it’s the perfect medium to long throw RoboSpot™ partner.\nThe iESPRITE® LTL FS is available with a choice of patented, IP65-rated iSE-TE™ 750W White LED TRANSFERABLE ENGINES. Choose between the XP (High Performance) engine, which delivers a 6.700 K colour temperature, a fixture output of 35.000 lm (integrating sphere), for an impressive 250.000 lx at 5 m with a CRI of 70 for maximum brightness; or the HCF (High Colour Fidelity) engine, offering a 6.000K colour temperature, 22.750 lm output (integrating sphere), for illuminance of 140.000 lx at 5 m with an exceptional CRI of 96 for superior colour rendition.",
+  "manufacturer": "Robe Lighting",
+  "category": "PROFILE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 950.0,
+  "maxLuminousIntensityCd": 6449300.0,
+  "luminousFluxLm": 27000.0,
+  "noiseLevelDb": null,
+  "weightKg": 37.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 260.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": [
+    "RJ45",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 3.5,
+    "max": 52.0
+  },
+  "fieldAngleDeg": 50.0,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "RotatingGoboWheel",
+      "slots": 8,
+      "rotating": true
+    },
+    {
+      "wheel": "StaticGoboWheel",
+      "slots": 10,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 18,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 6700.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Open/hole",
+      "facets": null
+    },
+    {
+      "name": "P1-6Flinear",
+      "facets": null
+    },
+    {
+      "name": "P2-6Fcircular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 2,
+  "iris": true,
+  "focus": true,
+  "animationWheel": true,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -50.0,
+    "max": 50.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 - Standard 16bit",
+      "channels": 53
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

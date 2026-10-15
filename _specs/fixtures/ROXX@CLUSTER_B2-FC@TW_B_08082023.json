@@ -1,0 +1,197 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ROXX@CLUSTER_B2-FC@TW_B_08082023.gdtf",
+  "fixtureTypeId": "70F505B3-5FDB-44A0-B610-98397CB9F6D4",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "CLUSTER B2-FC",
+  "longName": "CLUSTER B2-FC",
+  "shortName": "CL-B2FC",
+  "description": "LED 2lite Blinder RGBA+WW",
+  "manufacturer": "ROXX",
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 16600.0,
+  "luminousFluxLm": 14000.0,
+  "noiseLevelDb": null,
+  "weightKg": 16.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 50.0,
+    "max": 50.0
+  },
+  "fieldAngleDeg": 87.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBA+WW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "1CH DWE",
+      "channels": 1
+    },
+    {
+      "name": "2CH DWE",
+      "channels": 2
+    },
+    {
+      "name": "4CH DWE",
+      "channels": 4
+    },
+    {
+      "name": "9CH DWE+",
+      "channels": 9
+    },
+    {
+      "name": "6CH Strobe",
+      "channels": 6
+    },
+    {
+      "name": "6CH RGB",
+      "channels": 6
+    },
+    {
+      "name": "10CH Basic RGB",
+      "channels": 10
+    },
+    {
+      "name": "14CH Basic RGB",
+      "channels": 14
+    },
+    {
+      "name": "13CH Standard RGB",
+      "channels": 13
+    },
+    {
+      "name": "22CH Standard RGB",
+      "channels": 22
+    },
+    {
+      "name": "24CH Extended RGB",
+      "channels": 24
+    },
+    {
+      "name": "33CH Extended RGB",
+      "channels": 33
+    },
+    {
+      "name": "10CH Direct",
+      "channels": 10
+    },
+    {
+      "name": "12CH Direct",
+      "channels": 12
+    },
+    {
+      "name": "17CH Direct",
+      "channels": 17
+    },
+    {
+      "name": "28CH Direct",
+      "channels": 28
+    },
+    {
+      "name": "41CH Direct",
+      "channels": 41
+    }
+  ],
+  "pixelCount": 2,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

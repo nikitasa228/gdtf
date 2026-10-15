@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Showtec@Xpression_2000B@Initial_upload_by_GDTFservice_powered_by_Q2Q_Technologies.gdtf",
+  "fixtureTypeId": "770B1581-2973-11F0-AFEE-42010A37C004",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "Xpression 2000B",
+  "longName": "Xpression 2000B",
+  "shortName": "Xpression 2000B",
+  "description": "Xpression 2000B is a bright, medium-sized LED moving head with a beam angle of 2deg, a large lens (12.5 cm) and an output of 2392 lumens, suitable for indoor venues. It features a dichroic color wheel with 14 colors + open, a metal gobo wheel with 13 gobos + open, and dual circular prisms with 8 and 48 facets, that can be overlaid and rotated for dynamic effects such as a moonflower effect. Other features include a frost effect, motorized focus, precise 16-bit pan and endless tilt, and adjustable PWM (1,200 - 15,000 Hz). All color and gobo effects are perfectly matched across the Xpression series, ensuring seamless integration with other fixtures in the range.\n\nControl modes include DMX/RDM, master/slave, manual, auto, built-in program, and stand alone. Custom programming allows you to create and save your own presets, eliminating the need for an external controller for small events. The included quick lock can be adjusted to multiple positions for flexible mounting. The base features an ergonomic handle, enhancing both functionality and the overall stylish design.",
+  "manufacturer": "Showtec",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 152.0,
+  "maxLuminousIntensityCd": 2160100.0,
+  "luminousFluxLm": 2392.0,
+  "noiseLevelDb": null,
+  "weightKg": 11.5,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 1.8,
+    "max": 1.8
+  },
+  "fieldAngleDeg": 2.0,
+  "zoom": false,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "STATIC GOBO",
+      "slots": 13,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 13,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "None",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": true,
+  "prisms": [
+    {
+      "name": "8F Circular",
+      "facets": null
+    },
+    {
+      "name": "48F Circular",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Basic 14Ch",
+      "channels": 14
+    },
+    {
+      "name": "Advanced 18Ch",
+      "channels": 18
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "gdtf-derived",
+    "voltageRangeV": "gdtf",
+    "frequencyRangeHz": "gdtf",
+    "powerConsumptionW": "gdtf",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": []
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@FUZE_PAR_Z120_IP@24-18-06_First_Release.gdtf",
+  "fixtureTypeId": "C148BF30-D43D-42E5-A7D3-9B71635F640E",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "FUZE PAR Z120 IP",
+  "longName": "FUZE PAR Z120 IP",
+  "shortName": "FuzPrZ60",
+  "description": "The IP65 rated FUZE PAR Z120 IP™ is a single source par luminaire with a 120W Quad Color RGBW COB LED. Features 7° to 55° motorized zoom, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, IP rated 5pin XLR and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, dual adjustable yokes, multiple unit power linking, flicker free operation for TV and FILM, a multi-voltage universal auto switching power supply (110-240v), and removable gel frame and barn doors included.",
+  "manufacturer": "Elation",
+  "category": "PAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 120.0,
+  "maxLuminousIntensityCd": 544300.0,
+  "luminousFluxLm": 9112.0,
+  "noiseLevelDb": null,
+  "weightKg": 8.6,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 7.0,
+    "max": 55.0
+  },
+  "fieldAngleDeg": 14.0,
+  "zoom": true,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3200.0,
+    "max": 3200.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "CH:04 RGBW",
+      "channels": 4
+    },
+    {
+      "name": "CH:04 HSI",
+      "channels": 4
+    },
+    {
+      "name": "CH:05 HSI",
+      "channels": 5
+    },
+    {
+      "name": "CH:06 RGBW",
+      "channels": 6
+    },
+    {
+      "name": "CH:07 sRGBWI",
+      "channels": 7
+    },
+    {
+      "name": "CH:07 RGBW",
+      "channels": 7
+    },
+    {
+      "name": "CH:08 RGBW",
+      "channels": 8
+    },
+    {
+      "name": "CH:09 RGBW",
+      "channels": 9
+    },
+    {
+      "name": "CH:10 16Bit",
+      "channels": 10
+    },
+    {
+      "name": "CH:10 HSI",
+      "channels": 10
+    },
+    {
+      "name": "CH:12 sRGBI",
+      "channels": 12
+    },
+    {
+      "name": "CH:13 RGBW",
+      "channels": 13
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

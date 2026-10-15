@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@EclGalleryProfileFC@Rev_0.5_-_Added_highlight_and_grandmaster.gdtf",
+  "fixtureTypeId": "74CD6B6E-6BA3-4C40-BBBB-49FDD2CFF586",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "EclGalleryProfileFC",
+  "longName": "EclGalleryProfile FC",
+  "shortName": "EclGalPrFC",
+  "description": "EclGalleryProfile FC is a compact LED ellipsoidal luminaire engineered with a single 60 W high power RGBW / FC LED by Osram for a limitless colour and white reporduction. The luminaire is designed with a stunning aesthetics and it offers a total control of the light, performing a linear zoom system from 20° to 37°, framing shutters for an accurate focusing of the light, and gobo mounting option for image projections. EclGalleryProfile FC is fitted with electronic and PSU on board, allowing to be implemented on lighting tracks simply applying a track adapter and the fixture can be easily controlled by wireless. EclGalleryProfile FC is truly flexible for any commercials, venues, artgalleries and churches.",
+  "manufacturer": "Prolights",
+  "category": "PROFILE",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 45.0,
+  "maxLuminousIntensityCd": 4800.0,
+  "luminousFluxLm": 650.0,
+  "noiseLevelDb": null,
+  "weightKg": 2.9,
+  "powerConnectorIn": "Schuko",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Schuko",
+  "panRangeDeg": 360.0,
+  "tiltRangeDeg": 360.0,
+  "infinitePan": false,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 20.0,
+    "max": 37.0
+  },
+  "fieldAngleDeg": 30.5,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": true,
+  "framingShutterBlades": 4,
+  "framingShutterRotation": true,
+  "colorMixing": "RGBW",
+  "colorWheel": false,
+  "colorTemperatureK": {
+    "min": 3000.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": null,
+  "operatingTemperatureC": {
+    "min": -20.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "4ch",
+      "channels": 4
+    },
+    {
+      "name": "6ch",
+      "channels": 6
+    },
+    {
+      "name": "11ch",
+      "channels": 11
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf-derived",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

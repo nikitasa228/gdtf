@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Prolights@SmartParNEO@Rev_005_-_Control_Channel_fixed.gdtf",
+  "fixtureTypeId": "C0D05B27-4EA7-4E53-BD1A-22F42FEEAD6D",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "SmartParNEO",
+  "longName": "SmartParNEO",
+  "shortName": "SMPNEO",
+  "description": "7x10W RGB+WW LEDs calibrated LED source with high CRI (>93).\nQuick-release accessory cover, available in gold, chrome, and white finishes.\nMultipurpose design: spotlight /uplighter.\nCRMX / wired control, battery/PSU power.\nBattery powered and IP65 rated.\nThe iconic Smartbat Plus battery-powered uplighter has been transformed into a outdoor battery PAR version. The new Smart PAR NEO features a 7x10W LED source with highly efficient RGB+WW emitters, powered by PROLIGHTS' advanced color management technology. This ensures superior white light quality and an enhanced color spectrum.",
+  "manufacturer": "Prolights",
+  "category": "WASH",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 10.0,
+  "maxLuminousIntensityCd": 8600.0,
+  "luminousFluxLm": 418.0,
+  "noiseLevelDb": null,
+  "weightKg": 4.0,
+  "powerConnectorIn": null,
+  "powerConnectorOut": null,
+  "powerSupplyType": null,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 11.9,
+    "max": 11.9
+  },
+  "fieldAngleDeg": 21.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGB+WW",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": 0.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "UNO",
+      "channels": 1
+    },
+    {
+      "name": "Basic",
+      "channels": 5
+    },
+    {
+      "name": "Standard",
+      "channels": 11
+    },
+    {
+      "name": "Extended",
+      "channels": 17
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "controlSignal": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb",
+    "powerSupplyType"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

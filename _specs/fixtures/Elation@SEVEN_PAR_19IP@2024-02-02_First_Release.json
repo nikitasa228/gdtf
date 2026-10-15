@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "file": "Elation@SEVEN_PAR_19IP@2024-02-02_First_Release.gdtf",
+  "fixtureTypeId": "5BADFE9C-DEDA-469B-AA82-78BE13B17D32",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "SEVEN PAR 19IP",
+  "longName": "SEVEN PAR 19IP",
+  "shortName": "SIXP19IP",
+  "description": "The SEVEN PAR 19IP™ is an IP65 outdoor rated seven color par wash luminaire with (19) 25W 7-in-1 RGBAW + Lime + UV LEDs (Red, Green, Blue, White, Amber, Lime, and a 395nm UV) producing up to 9,300 total output lumens and 90CRI. Features include individual hue, saturation, and intensity control, RGB + seven color 3 channel DMX mode, smooth color mixing, 12 internal programs with speed and fade control, 64 unique 7-color macros, selectable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX and RDM (Remote Device Management) protocol support, IP65 rated 5pin XLR and power in/out connections, dual adjustable yoke / floor stand, multiple unit power linking, OLED menu display with a 4-button control panel, a multi-voltage universal auto switching power supply (100-240v), and a rugged powder coated die-cast aluminum exterior. Gel frame and gel frame holder included, optional 4-leaf barn door available.",
+  "manufacturer": "Elation",
+  "category": "PAR",
+  "supportedPowerNetworks": null,
+  "voltageRangeV": null,
+  "frequencyRangeHz": null,
+  "powerConsumptionW": 266.0,
+  "maxLuminousIntensityCd": 52700.0,
+  "luminousFluxLm": 5071.0,
+  "noiseLevelDb": null,
+  "weightKg": 11.3,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3",
+    "XLR5"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 16.8,
+    "max": 16.8
+  },
+  "fieldAngleDeg": 32.3,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBWA+BG+UV",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -15.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "RGB 3CH",
+      "channels": 3
+    },
+    {
+      "name": "RGBSeven 3CH",
+      "channels": 3
+    },
+    {
+      "name": "16Bit 14CH",
+      "channels": 14
+    },
+    {
+      "name": "8Bit 7CH",
+      "channels": 7
+    },
+    {
+      "name": "Master 15CH",
+      "channels": 15
+    },
+    {
+      "name": "HSI 4CH",
+      "channels": 4
+    },
+    {
+      "name": "HSI Mast 10CH",
+      "channels": 10
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "gdtf-derived",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerConnectorOut": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "gdtf",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived"
+  },
+  "_missing": [
+    "supportedPowerNetworks",
+    "noiseLevelDb"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

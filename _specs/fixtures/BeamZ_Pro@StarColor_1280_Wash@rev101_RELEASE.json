@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1.0",
+  "file": "BeamZ_Pro@StarColor_1280_Wash@rev101_RELEASE.gdtf",
+  "fixtureTypeId": "ECA0A24F-F9C7-4E2E-8F6E-C0F7F6552BCA",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "StarColor 1280 Wash",
+  "longName": "StarColor1280Wash",
+  "shortName": "StarColor1280",
+  "description": "rev 101 RELEASE Edit: Geometry / DMX mode RDM link\n\nStatic LED Wash Light :: IP65 / 24 x 40 W RGBW / beam angle 21 degree / field angle 31 degree / 4-cell control",
+  "manufacturer": "BeamZ Pro",
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 320.0,
+  "maxLuminousIntensityCd": 117300.0,
+  "luminousFluxLm": 16000.0,
+  "noiseLevelDb": null,
+  "weightKg": 15.6,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "panRangeDeg": 0,
+  "tiltRangeDeg": 180.0,
+  "infinitePan": null,
+  "infiniteTilt": false,
+  "controlSignal": [
+    "DMX512",
+    "RDM"
+  ],
+  "dataConnectors": [
+    "XLR3"
+  ],
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 20.0,
+    "max": 20.0
+  },
+  "fieldAngleDeg": 45.0,
+  "zoom": false,
+  "lensType": "Wash",
+  "goboWheels": [],
+  "goboSlots": 0,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "RGBW",
+  "colorWheel": true,
+  "colorTemperatureK": null,
+  "prism": false,
+  "prisms": [],
+  "frost": false,
+  "frostFilters": 0,
+  "iris": false,
+  "focus": false,
+  "animationWheel": false,
+  "ipRating": "IP65",
+  "operatingTemperatureC": {
+    "min": -5.0,
+    "max": 45.0
+  },
+  "dmxModes": [
+    {
+      "name": "30 Ch 4 cell extended + Virtual Dimmer_Tilt",
+      "channels": 30
+    },
+    {
+      "name": "30 Ch 4 cell extended",
+      "channels": 30
+    },
+    {
+      "name": "16 Ch 4 cell standard + Virtual Dimmer_Tilt",
+      "channels": 16
+    },
+    {
+      "name": "16 Ch 4 cell standard",
+      "channels": 16
+    },
+    {
+      "name": "14 Ch 1 cell extended",
+      "channels": 14
+    },
+    {
+      "name": "6 Ch 1 cell standard",
+      "channels": 6
+    },
+    {
+      "name": "4 Ch 1 cell RGBW + Virtual Dimmer",
+      "channels": 4
+    },
+    {
+      "name": "4 Ch 1 cell RGBW",
+      "channels": 7
+    },
+    {
+      "name": "3 Ch Simple",
+      "channels": 3
+    }
+  ],
+  "pixelCount": 32,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "description": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "luminousFluxLm": "gdtf",
+    "weightKg": "gdtf",
+    "powerConnectorIn": "gdtf-derived",
+    "powerSupplyType": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infiniteTilt": "gdtf-derived",
+    "controlSignal": "gdtf-derived",
+    "dataConnectors": "gdtf-derived",
+    "lightSourceType": "gdtf",
+    "beamAngleDeg": "gdtf",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "gdtf-derived",
+    "colorWheel": "gdtf-derived",
+    "prism": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "ipRating": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
+  },
+  "_missing": [
+    "noiseLevelDb",
+    "colorTemperatureK"
+  ],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)"
+  ]
+}

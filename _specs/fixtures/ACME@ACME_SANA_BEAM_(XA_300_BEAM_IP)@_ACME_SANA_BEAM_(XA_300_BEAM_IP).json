@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "1.0",
+  "file": "ACME@ACME_SANA_BEAM_(XA_300_BEAM_IP)@_ACME_SANA_BEAM_(XA_300_BEAM_IP).gdtf",
+  "fixtureTypeId": "C49DC28D-2A31-4C6F-9FF0-FCE5287E94DF",
+  "gdtfDataVersion": "1.2",
+  "gdtfName": "ACME SANA BEAM (XA 300 BEAM IP)",
+  "longName": "SANA BEAM (XA 300 BEAM IP)",
+  "shortName": "(XA 300 BEAM IP)",
+  "description": "IP66-rated LED beam moving head with a 330 W white LED engine, 1.9-8 deg zoom, CMY, two colour wheels, 17 static gobos, two rotating prisms and infinite pan/tilt.",
+  "manufacturer": "ACME",
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 465,
+  "maxLuminousIntensityCd": 5690000,
+  "luminousFluxLm": 5500,
+  "noiseLevelDb": 48,
+  "weightKg": 23.8,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
+  "infinitePan": true,
+  "infiniteTilt": true,
+  "controlSignal": [
+    "DMX512",
+    "RDM",
+    "Ethernet (Art-Net/sACN)"
+  ],
+  "dataConnectors": null,
+  "lightSourceType": "LED",
+  "beamAngleDeg": {
+    "min": 1.9,
+    "max": 8.0
+  },
+  "fieldAngleDeg": 1.7,
+  "zoom": true,
+  "lensType": "Spot",
+  "goboWheels": [
+    {
+      "wheel": "Gobo Wheel",
+      "slots": 16,
+      "rotating": false
+    }
+  ],
+  "goboSlots": 16,
+  "framingShutters": false,
+  "framingShutterBlades": 0,
+  "framingShutterRotation": false,
+  "colorMixing": "CMY",
+  "colorWheel": true,
+  "colorTemperatureK": {
+    "min": 2700.0,
+    "max": 10000.0
+  },
+  "prism": true,
+  "prisms": [
+    {
+      "name": "Prism 8",
+      "facets": null
+    },
+    {
+      "name": "Prism 6F",
+      "facets": null
+    }
+  ],
+  "frost": true,
+  "frostFilters": 1,
+  "iris": false,
+  "focus": true,
+  "animationWheel": false,
+  "ipRating": "IP66",
+  "operatingTemperatureC": {
+    "min": -10.0,
+    "max": 40.0
+  },
+  "dmxModes": [
+    {
+      "name": "Mode 1 29CH",
+      "channels": 29
+    },
+    {
+      "name": "Mode 2 27CH",
+      "channels": 27
+    },
+    {
+      "name": "Mode 3 16CH",
+      "channels": 16
+    },
+    {
+      "name": "Mode 4 27CH",
+      "channels": 27
+    }
+  ],
+  "pixelCount": 1,
+  "_source": {
+    "longName": "gdtf",
+    "shortName": "gdtf",
+    "manufacturer": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "gdtf-derived",
+    "infinitePan": "manual",
+    "infiniteTilt": "manual",
+    "controlSignal": "manual",
+    "lightSourceType": "manual",
+    "beamAngleDeg": "manual",
+    "fieldAngleDeg": "gdtf",
+    "zoom": "gdtf-derived",
+    "lensType": "gdtf-derived",
+    "goboWheels": "gdtf-derived",
+    "goboSlots": "gdtf-derived",
+    "framingShutters": "gdtf-derived",
+    "framingShutterBlades": "gdtf-derived",
+    "framingShutterRotation": "gdtf-derived",
+    "colorMixing": "manual",
+    "colorWheel": "gdtf-derived",
+    "colorTemperatureK": "manual",
+    "prism": "gdtf-derived",
+    "prisms": "gdtf-derived",
+    "frost": "gdtf-derived",
+    "frostFilters": "gdtf-derived",
+    "iris": "gdtf-derived",
+    "focus": "gdtf-derived",
+    "animationWheel": "gdtf-derived",
+    "operatingTemperatureC": "gdtf",
+    "dmxModes": "gdtf",
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerSupplyType": "manual",
+    "luminousFluxLm": "manual",
+    "ipRating": "manual",
+    "description": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
+  },
+  "_missing": [],
+  "_notApplicable": [],
+  "_issues": [
+    "Power consumption taken from beam geometry sum (unverified)",
+    "GDTF weight 5.6 kg contradicts spec sheet (23.8 kg). Noise 48 dB(A) @1 m in Auto mode."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/item/SANA-BEAM"
+  ]
+}
