@@ -1,0 +1,4 @@
+{
+ "SGM_Light@P-6@Rev_C.gdtf": {"powerConsumptionW": 630, "weightKg": 14.5, "ipRating": "IP66", "luminousFluxLm": 18297, "mains": "115-277", "lux": [39400, 3], "cct": [2000, 10000], "beam": [11, 47], "_refs": ["https://www.sgmlight.com/products/p-6"], "_notes": "Native 11 deg beam (10 deg lens), 18 deg / 47 deg with medium / wide filter frames; elliptical 10x60. Manual tilt bracket 220 deg (not motorised). Cooling active forced air."},
+ "SGM_Light@Q-8@Rev_D.gdtf": {"powerConsumptionW": 630, "weightKg": 13.5, "ipRating": "IP66", "luminousFluxLm": 53849, "mains": "115-277", "lux": [1386, 5], "beam": [75, 107], "_refs": ["https://www.sgmlight.com/products/q-8"], "_notes": "53,849 lm = all LEDs on (RGBW panel + strobe blinders combined). Beam 107 deg panel (110 deg lens), 75 deg strobe blinders. Lux only given at 5 m and 10 m. Calibrated white 5700K panel / 7000K strobe."}
+}

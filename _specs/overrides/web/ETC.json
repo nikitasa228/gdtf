@@ -1,0 +1,3 @@
+{
+ "ETC@S4_Series_3_Lustr_X8_50Deg@v1.3.0.gdtf": {"powerConsumptionW": 305, "weightKg": 8.9, "ipRating": "IP20", "luminousFluxLm": 8499, "mains": "100-240", "maxLuminousIntensityCd": 26017, "powerSupplyType": "powerCON TRUE1 TOP LINK", "_refs": ["https://www.etcconnect.com/WorkArea/DownloadAsset.aspx?id=10737506242"], "_notes": "Source Four LED Series 3 datasheet. Wattage 305 W at 230 V (307 W at 120 V). Weight 8.9 kg with (XDLT shutter) barrel, lens tube extra. Photometrics with XDLT 50 deg lens tube: 8,499 lm / 26,017 cd (EDLT/LED 50 deg: 8,045 lm / 24,769 cd; standard 50 deg: 7,893 lm / 24,669 cd). Max lumens 10,889 is with the 25-50 deg zoom at narrow."}
+}
