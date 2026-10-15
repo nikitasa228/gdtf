@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 48.0,
-  "maxLuminousIntensityCd": 1400.0,
+  "powerConsumptionW": 336,
+  "maxLuminousIntensityCd": 7500.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 35,
   "weightKg": 7.05,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -128,14 +128,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -143,8 +143,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF \"gobo\" wheels are effect macros.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "GDTF \"gobo\" wheels are effect macros. Power = rated current at 230 V (1.459 A, beamzlighting.com) x 230 V.",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/bs1100ip-outdoor-stroboscope-led-rgb-cw/"

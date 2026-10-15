@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 110.0,
-  "maxLuminousIntensityCd": 1700.0,
+  "powerConsumptionW": 702,
+  "maxLuminousIntensityCd": 11000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 40,
   "weightKg": 12.65,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -94,7 +94,7 @@
   ],
   "pixelCount": 1,
   "fullName": "BeamZ Pro BS1500W",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -102,7 +102,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -128,12 +128,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
@@ -142,6 +142,10 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Power = rated current at 230 V (3.05 A, beamzlighting.com) x 230 V.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/bs1500w-stroboscope-led-cw-ip65/"
   ]
 }

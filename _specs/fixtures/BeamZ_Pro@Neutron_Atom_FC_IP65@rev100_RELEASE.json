@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 270000.0,
+  "powerConsumptionW": 191,
+  "maxLuminousIntensityCd": 23100.0,
   "luminousFluxLm": 13085.0,
-  "noiseLevelDb": 35,
-  "weightKg": 3.75,
+  "noiseLevelDb": 0,
+  "weightKg": 4.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -132,15 +132,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
-    "powerSupplyType": "estimated",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualPanRangeDeg": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
@@ -169,13 +169,16 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "noiseLevelDb": "estimated"
+    "noiseLevelDb": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Fan-free (passive cooling): silent. Power = rated current at 230 V (0.831 A, beamzlighting.com) x 230 V."
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/neutron-atom-fc-linkable-200w-rgbalrgb/"
   ]
 }

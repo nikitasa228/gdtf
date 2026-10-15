@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 1099,
-  "maxLuminousIntensityCd": 31000000.0,
+  "maxLuminousIntensityCd": 137400.0,
   "luminousFluxLm": 96000.0,
   "noiseLevelDb": 48,
   "weightKg": 20.65,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": null,
   "tiltRangeDeg": 180.0,
@@ -133,15 +133,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "beamAngleDeg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -150,9 +150,10 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "Typical-value estimates (no published data): beamAngleDeg, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.beamzlighting.com/product/nuke4-motorized-beam-outdoor/",
     "https://www.avecorp.com.au/product/beamz-pro-nuke4-motorized-beam-outdoor/"
   ]
 }

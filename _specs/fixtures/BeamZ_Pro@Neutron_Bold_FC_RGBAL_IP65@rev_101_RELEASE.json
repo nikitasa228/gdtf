@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 8700.0,
+  "powerConsumptionW": 420,
+  "maxLuminousIntensityCd": 99200.0,
   "luminousFluxLm": 16100.0,
   "noiseLevelDb": 35,
   "weightKg": 13.4,
@@ -132,15 +132,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
-    "powerSupplyType": "estimated",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualPanRangeDeg": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
@@ -169,13 +169,17 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Power = rated current at 230 V (1.826 A, beamzlighting.com) x 230 V.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/neutron-bold-fc-linkable-600w-rgbal-rgb/"
   ]
 }

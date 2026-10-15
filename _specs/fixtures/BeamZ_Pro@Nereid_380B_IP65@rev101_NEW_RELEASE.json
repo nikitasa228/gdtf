@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 380,
-  "maxLuminousIntensityCd": 7400000.0,
+  "maxLuminousIntensityCd": 10241000.0,
   "luminousFluxLm": 10100.0,
-  "noiseLevelDb": 47,
+  "noiseLevelDb": 43,
   "weightKg": 22.1,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -48,7 +48,7 @@
   "dataConnectors": [
     "XLR3"
   ],
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
     "min": 1.0,
     "max": 1.0
@@ -112,7 +112,7 @@
   ],
   "pixelCount": 2,
   "fullName": "BeamZ Pro Nereid380B IP65",
-  "powerLinkable": false,
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -122,8 +122,8 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -156,20 +156,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.beamzlighting.com/product/nereid380b-outdoor-moving-head-beam/",
     "https://www.beamzlighting.com/product/nereid380b-outdoor-moving-head-beam-2pcs-in-flightcase/"
   ]
 }

@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 216.0,
-  "maxLuminousIntensityCd": 2300000.0,
+  "powerConsumptionW": 441,
+  "maxLuminousIntensityCd": 20900.0,
   "luminousFluxLm": 20000.0,
-  "noiseLevelDb": 38,
-  "weightKg": 15.5,
-  "powerConnectorIn": "powerCON TRUE1",
+  "noiseLevelDb": 43,
+  "weightKg": 15.55,
+  "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "powerCON",
   "motorizedPanTilt": true,
   "panRangeDeg": null,
   "tiltRangeDeg": 180.0,
@@ -124,9 +124,9 @@
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -149,16 +149,17 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -166,6 +167,10 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Power = rated current at 230 V (1.916 A, beamzlighting.com) x 230 V.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/rush-moving-bar-with-zoom-12x-40w/"
   ]
 }

@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 699,
-  "maxLuminousIntensityCd": 16000.0,
+  "maxLuminousIntensityCd": 2500.0,
   "luminousFluxLm": 72981.0,
   "noiseLevelDb": 43,
   "weightKg": 22.3,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON",
   "motorizedPanTilt": true,
   "panRangeDeg": null,
   "tiltRangeDeg": 180.0,
@@ -123,7 +123,7 @@
   ],
   "pixelCount": 2,
   "fullName": "BeamZ Pro Nuke2",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -160,23 +160,24 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.beamzlighting.com/product/nuke2-motorized-strobe-wash-outdoor/",
     "https://www.avecorp.com.au/product/beamz-pro-nuke2-outdoor-motorized-strobe-blinder/"
   ]
 }

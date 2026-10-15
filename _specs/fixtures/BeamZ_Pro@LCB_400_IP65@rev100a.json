@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 290,
-  "maxLuminousIntensityCd": 4100.0,
+  "maxLuminousIntensityCd": 4900.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": 38,
+  "noiseLevelDb": 0,
   "weightKg": 9.8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": null,
   "tiltRangeDeg": 360.0,
@@ -124,7 +124,7 @@
   ],
   "pixelCount": 5086,
   "fullName": "BeamZ Pro LCB400IP",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,24 +159,23 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "noiseLevelDb": "estimated"
+    "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
     "colorTemperatureK"
   ],
   "_issues": [
-    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
-    "GDTF luminous flux 3.6468e+07 lm is implausible for 290 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V). Fan-free (passive cooling): silent.",
+    "GDTF luminous flux 3.6468e+07 lm is implausible for 290 W and was dropped"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/lcb400ip-outdoor-led-bar/"
