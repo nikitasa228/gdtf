@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 307,
-  "maxLuminousIntensityCd": 13000.0,
-  "luminousFluxLm": 10889,
+  "powerConsumptionW": 305,
+  "maxLuminousIntensityCd": 26017,
+  "luminousFluxLm": 8499,
   "noiseLevelDb": 34,
-  "weightKg": 8.87,
+  "weightKg": 8.9,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
@@ -115,6 +115,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -143,23 +144,22 @@
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Manual shutters and gobo slot. GDTF says tungsten lamp - it is an LED engine. Noise 34 dB(A) avg @1 m.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
+    "Manual shutters and gobo slot. GDTF says tungsten lamp - it is an LED engine. Noise 34 dB(A) avg @1 m. Source Four LED Series 3 datasheet. Wattage 305 W at 230 V (307 W at 120 V). Weight 8.9 kg with (XDLT shutter) barrel, lens tube extra. Photometrics with XDLT 50 deg lens tube: 8,499 lm / 26,017 cd (EDLT/LED 50 deg: 8,045 lm / 24,769 cd; standard 50 deg: 7,893 lm / 24,669 cd). Max lumens 10,889 is with the 25-50 deg zoom at narrow."
   ],
   "_refs": [
+    "https://www.etcconnect.com/WorkArea/DownloadAsset.aspx?id=10737506242",
     "https://www.fullcompass.com/prod/599947-etc-source-four-led-series-3-s4-led-series-3-light-engine-only-lustr-x8-black",
     "https://goknight.com/content/documentation/S4LEDS3LS Spec Sheet.pdf"
   ]

@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1400,
-  "maxLuminousIntensityCd": 21000.0,
-  "luminousFluxLm": null,
+  "powerConsumptionW": 1600,
+  "maxLuminousIntensityCd": 31000.0,
+  "luminousFluxLm": 42100,
   "noiseLevelDb": 40,
-  "weightKg": 12.0,
+  "weightKg": 12,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -48,8 +48,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 90.0,
-    "max": 90.0
+    "min": 64.0,
+    "max": 150.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
@@ -120,7 +120,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -144,15 +145,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "powerSupplyType": "estimated",
-    "ipRating": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "beamAngleDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -160,11 +161,11 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "GDTF power 5920 W invalid, removed.",
-    "GDTF luminous flux 1.0105e+06 lm is implausible for 1400 W and was dropped",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+    "GDTF power 5920 W invalid, removed. Output: white LED 20,400 lm, RGBW 42,100 lm. Beam 150/64 deg half peak (two axes). White point 6,600-7,100 K depending on dimmer level. glp.de says IP20 (current record IP65). Cooling: combined convection and forced air.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.glp.de/en/products/entertainment-lighting/strobes/jdc-line-1000-en",
     "https://www.germanlightproducts.com/wp-content/uploads/2020/05/GLP-JDC-Line-1000-Quick-Start-Safety-Manual-EN-Rev-20220317-01.pdf"
   ]
 }

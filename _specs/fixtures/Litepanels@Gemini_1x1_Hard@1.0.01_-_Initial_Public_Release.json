@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 200,
-  "maxLuminousIntensityCd": 4200.0,
+  "maxLuminousIntensityCd": 27200,
   "luminousFluxLm": 3000.0,
   "noiseLevelDb": 35,
   "weightKg": 6.0,
@@ -168,11 +168,11 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "estimated",
     "dataConnectors": "gdtf-derived",
@@ -199,16 +199,21 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Nominal power draw 200W. Lux 5600K no diffuser @10ft/3m. 46 deg no diffuser, >100 deg with domed diffuser. Weight incl. yoke and PSU.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.litepanels.com/wp-content/uploads/2023/06/1_gemini-1x1-hard_one-sheet.pdf"
   ]
 }

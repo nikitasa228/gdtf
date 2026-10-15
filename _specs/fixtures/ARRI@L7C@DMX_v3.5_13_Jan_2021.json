@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 220,
-  "maxLuminousIntensityCd": 110000.0,
+  "maxLuminousIntensityCd": 67600,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
-  "weightKg": 8.7,
+  "weightKg": 8.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -137,7 +137,7 @@
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
-    "beamAngleDeg": "estimated",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "manual",
     "lensType": "manual",
@@ -160,22 +160,24 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Lux: spot 15 deg, 5600 K, 3 m (698 fc). Weight manual version; power connection wording from arri.com L7-C tech data.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.arri.com/resource/blob/31098/dcc9384184e8e310d186423d279f97df/arri-l-series-l7-data-sheet-en-data.pdf",
     "https://www.markertek.com/Attachments/Specifications/ARRI/L7-Specifications.pdf"
   ]
 }

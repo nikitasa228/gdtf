@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 170.0,
-  "maxLuminousIntensityCd": 68000.0,
-  "luminousFluxLm": null,
-  "noiseLevelDb": 35,
+  "powerConsumptionW": 170,
+  "maxLuminousIntensityCd": 80887,
+  "luminousFluxLm": 5093,
+  "noiseLevelDb": 42.8,
   "weightKg": 6.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -98,8 +98,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -125,21 +125,24 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "luminousFluxLm": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Weight 6.0 kg is the engine (datasheet 'Fixture Weight'); lens tube extra. Peak cd, lumens and beam (15.4 deg @50%, field 18.5 deg) for D19 lens tube, RGBL full on, from official photometrics https://vari-lite.s3.eu-west-1.amazonaws.com/graphics/technical/photometrics/vl600-acclaim-ple-d5-70-lens-tube.pdf. Engine-only output 8,500 lm."
+  ],
+  "_refs": [
+    "https://vari-lite.s3.eu-west-1.amazonaws.com/datasheets/vl600-acclaim-ple.pdf"
   ]
 }

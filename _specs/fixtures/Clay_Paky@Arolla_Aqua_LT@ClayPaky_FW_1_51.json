@@ -30,13 +30,13 @@
   "maxLuminousIntensityCd": 8000000.0,
   "luminousFluxLm": 44000,
   "noiseLevelDb": 46.3,
-  "weightKg": 41.0,
+  "weightKg": 40.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 250.0,
+  "tiltRangeDeg": 266,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -120,12 +120,12 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "luminousFluxLm": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -167,10 +167,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 46.3 dB(A) in Auto fan mode (37.5 silent).",
+    "Noise 46.3 dB(A) in Auto fan mode (37.5 silent). 6500 K white LED with linear CTO to 3400 K. Photometric report has values only as images.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=4435",
     "https://www.claypaky.it/products/arolla-aqua-lt/"
   ]
 }

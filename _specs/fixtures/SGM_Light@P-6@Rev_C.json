@@ -10,16 +10,13 @@
   "manufacturer": "SGM Light",
   "category": "STROBE",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 115.0,
     "max": 277.0
   },
   "frequencyRangeHz": {
@@ -27,8 +24,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 630,
-  "maxLuminousIntensityCd": 9600.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 354600,
+  "luminousFluxLm": 18297,
   "noiseLevelDb": 40,
   "weightKg": 14.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -47,8 +44,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 90.0,
-    "max": 90.0
+    "min": 11.0,
+    "max": 47.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -62,8 +59,8 @@
   "colorMixing": "RGBW",
   "colorWheel": false,
   "colorTemperatureK": {
-    "min": 2800.0,
-    "max": 8000.0
+    "min": 2000.0,
+    "max": 10000.0
   },
   "prism": false,
   "prisms": [],
@@ -168,19 +165,20 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "ipRating": "estimated",
+    "ipRating": "manual",
     "powerConsumptionW": "manual",
     "weightKg": "manual",
+    "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "beamAngleDeg": "manual",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "beamAngleDeg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -188,9 +186,11 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "Native 11 deg beam (10 deg lens), 18 deg / 47 deg with medium / wide filter frames; elliptical 10x60. Manual tilt bracket 220 deg (not motorised). Cooling active forced air.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.sgmlight.com/products/p-6",
     "https://www.sgmlighting.com/products/p%C2%B76"
   ]
 }

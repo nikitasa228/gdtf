@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 300,
-  "maxLuminousIntensityCd": 4400000.0,
-  "luminousFluxLm": 23800.0,
-  "noiseLevelDb": 35,
-  "weightKg": 7.0,
+  "maxLuminousIntensityCd": 620000.0,
+  "luminousFluxLm": 3400,
+  "noiseLevelDb": 44.5,
+  "weightKg": 7.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -114,11 +114,11 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -140,24 +140,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "estimated",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "RGBW version: linear CTO 8000-2700K (WW version 2500-6500K).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=3241",
     "https://www.claypaky.it/products/minib-parled-aqua/"
   ]
 }

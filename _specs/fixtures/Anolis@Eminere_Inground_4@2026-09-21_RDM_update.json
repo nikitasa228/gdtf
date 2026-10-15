@@ -23,11 +23,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 90.0,
-  "maxLuminousIntensityCd": 140000.0,
-  "luminousFluxLm": 3960.0,
+  "powerConsumptionW": 90,
+  "maxLuminousIntensityCd": 66100,
+  "luminousFluxLm": 4038,
   "noiseLevelDb": 30,
-  "weightKg": 21.0,
+  "weightKg": 21,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
   "powerSupplyType": "Fixed Cable",
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP67",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -162,12 +162,12 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -196,15 +196,19 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Eminere Inground 4 II spec sheet v2.3 (Oct 2026), anolislighting.com (anolis.com is parked, anolis.eu has a broken certificate). Typical power 90 W (photometry pages: 85 W). Weight 21 kg fixture only; 35.4 kg incl. 18.7 kg installation sleeve. Lux: RGBCW all-on, 9 deg clear glass, E(0) 66,052 lx @1 m (264,208 lx @0.5 m) from the photometric cone diagram. Optics 9/15/30/50/65/100 deg plus elliptical options. Colour: RGBW (W 6500K), RGBA, PureWhite 3000K, TW 2200-3000K - variant not determinable, cct omitted. IP67/IK10, drive-over.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.anolislighting.com/sites/default/files/2026-10/Eminere%C2%AE%20Inground%20II%20Specification%20Sheet%20v2.3%20October%202026.pdf"
   ]
 }

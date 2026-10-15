@@ -30,7 +30,7 @@
   "maxLuminousIntensityCd": 960000.0,
   "luminousFluxLm": 5234.0,
   "noiseLevelDb": 43,
-  "weightKg": 14.5,
+  "weightKg": 15,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -148,9 +148,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "K10 product page removed from claypaky.it (404); values from the official A.leda B-EYE brochure (comparison table + weight). Zoom 4-40 deg @50% peak, 7-60 deg @10% peak. Brochure gives no power/flux/lux; a dealer copy of the 2017 spec sheet (goknight.com) lists 450 VA and 5500 lm but is not official.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.claypaky.it/wp-content/uploads/2022/10/Clay_Paky_Aleda_B-EYE_Brochure_EN.pdf",
     "https://www.cpl.tech/wp-content/uploads/2018/10/Clay-Paky-A-leda-B-EYE-K10-User-Guide.pdf"
   ]
 }

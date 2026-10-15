@@ -164,10 +164,11 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "RGBA zone 22 deg, white strobe 120 deg.",
+    "RGBA zone 22 deg, white strobe 120 deg. Power stated as 'Max 480W @ 100V 4,8A' (no 230 V figure). Beam: RGBA blinder 22 deg, CW/WW strobe 120 deg.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=4483",
     "https://www.claypaky.it/products/tambora-glare/"
   ]
 }

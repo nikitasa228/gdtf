@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 375.0,
-  "maxLuminousIntensityCd": 2800000.0,
-  "luminousFluxLm": 23800.0,
-  "noiseLevelDb": 43,
+  "powerConsumptionW": 375,
+  "maxLuminousIntensityCd": 400000.0,
+  "luminousFluxLm": 3420,
+  "noiseLevelDb": 42.9,
   "weightKg": 6.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -109,15 +109,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -147,14 +147,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Shared Mini-B / Mini-B WW data sheet; WW: RGBWW, linear CTO 6500K to 2500K (web page says 6500-2000K). Lumen value is not split per variant.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=3082"
   ]
 }

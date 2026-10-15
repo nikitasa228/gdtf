@@ -19,18 +19,18 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
-    "max": 240.0
+    "min": 90.0,
+    "max": 260.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
   "powerConsumptionW": 360,
-  "maxLuminousIntensityCd": 170000.0,
+  "maxLuminousIntensityCd": 253000,
   "luminousFluxLm": 13350.0,
   "noiseLevelDb": 35,
-  "weightKg": 24.0,
+  "weightKg": 24,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -119,8 +119,8 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -147,20 +147,23 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Lux: spot, 5600K, 10ft/3m. Weight standard (manual) yoke. Fan: convection + super silent fan with 3 speed presets.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.litepanels.com/wp-content/uploads/2023/06/1_studio-x7-bi-color-360w.pdf",
     "https://www.litepanels.com/en/product/studio-x7-bi-color-360w/"
   ]
 }

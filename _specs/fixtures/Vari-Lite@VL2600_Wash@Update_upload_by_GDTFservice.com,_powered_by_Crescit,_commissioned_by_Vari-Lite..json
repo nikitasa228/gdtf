@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 820,
-  "maxLuminousIntensityCd": 670000.0,
-  "luminousFluxLm": null,
-  "noiseLevelDb": 48,
-  "weightKg": 30.2,
+  "maxLuminousIntensityCd": 450000.0,
+  "luminousFluxLm": 22000,
+  "noiseLevelDb": 48.5,
+  "weightKg": 30.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -129,23 +129,26 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "luminousFluxLm": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Legacy VL2600 Wash datasheet 02/2024 (30.0 kg; user manual says 30.2 kg). Its photometric table is garbled (7 deg/48 deg labels from the Spot; 9284 lx @5 m, 1789 lx @10 m), so lux omitted. Product page now shows VL2600 SE Wash (27,500 lm) - different product.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://vari-lite.s3.eu-west-1.amazonaws.com/datasheets/vl2600-wash.pdf",
     "https://www.vari-lite.com/b-dam/vari-lite/products/vl2600-wash/guides-and-manuals/vl2600-series_user-manual.pdf"
   ]
 }

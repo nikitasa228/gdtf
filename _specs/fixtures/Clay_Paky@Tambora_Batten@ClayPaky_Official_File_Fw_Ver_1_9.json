@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 660,
-  "maxLuminousIntensityCd": 3600000.0,
-  "luminousFluxLm": 19800.0,
+  "maxLuminousIntensityCd": 1800000.0,
+  "luminousFluxLm": 9934,
   "noiseLevelDb": 40.5,
   "weightKg": 15.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -124,7 +124,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -169,6 +169,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=3431",
     "https://www.claypaky.it/products/tambora-batten/"
   ]
 }

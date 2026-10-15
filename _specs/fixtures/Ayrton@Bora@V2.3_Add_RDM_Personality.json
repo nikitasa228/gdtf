@@ -23,10 +23,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1150.0,
-  "maxLuminousIntensityCd": 1800000.0,
-  "luminousFluxLm": 40000.0,
-  "noiseLevelDb": 48,
+  "powerConsumptionW": 1150,
+  "maxLuminousIntensityCd": 2103400,
+  "luminousFluxLm": 40000,
+  "noiseLevelDb": 45.6,
   "weightKg": 37.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -111,14 +111,14 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -148,16 +148,20 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Bora S (standard) values: 40,000 lm, 6800K output (Bora TC: 31,000 lm, 6200K). Lux and auto-mode noise from Bora S photometry https://www.ayrton.eu/wp-content/uploads/2015/02/Bora-S_Photometry.pdf (min zoom, auto mode). Variable CTO, range not stated."
+  ],
+  "_refs": [
+    "https://www.ayrton.eu/produit/bora/"
   ]
 }

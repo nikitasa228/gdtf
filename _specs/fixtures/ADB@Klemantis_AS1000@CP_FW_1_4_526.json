@@ -10,8 +10,6 @@
   "manufacturer": "ADB",
   "category": "LED BAR",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -19,18 +17,18 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 250.0,
+  "powerConsumptionW": 280,
   "maxLuminousIntensityCd": 3800.0,
   "luminousFluxLm": 3055.0,
   "noiseLevelDb": 24.5,
-  "weightKg": 5.89,
+  "weightKg": 16,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -117,9 +115,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
@@ -146,24 +144,24 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "noiseLevelDb": "manual",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Asymmetric optic 49 deg (H) x 108 deg (V). Noise 24.5 dB(A) @1 m in fan mode.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
+    "Asymmetric optic 49 deg (H) x 108 deg (V). Noise 24.5 dB(A) @1 m in fan mode. ADB by Claypaky (product page https://www.claypaky.it/products/klemantis-1000/ gives 15.9 kg). 280 VA at 230 V. Asymmetric optic: 49 deg horizontal x 108 deg vertical spread. Max noise 24.5 dB(A) @1 m. Current record weight 5.89 kg is far off. No lumen/lux published.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=2360",
     "https://goknight.com/content/documentation/KlemantisAS1000_Datasheet_05.2021.pdf",
     "https://www.claypaky.it/products/klemantis-1000/"
   ]

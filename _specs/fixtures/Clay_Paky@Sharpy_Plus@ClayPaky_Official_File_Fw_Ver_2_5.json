@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 30000000,
-  "luminousFluxLm": 12000.0,
+  "maxLuminousIntensityCd": 26000000,
+  "luminousFluxLm": 12000,
   "noiseLevelDb": 49.0,
-  "weightKg": 23.0,
+  "weightKg": 23,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -121,7 +121,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
@@ -167,9 +167,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Max 540 VA; noise 49 dB(A) Auto fan mode."
+    "Max 540 VA; noise 49 dB(A) Auto fan mode. Lux from official photometrics PDF (Id=2306), min zoom beam mode 260000 lx @10 m. Lamp CT 8000K +/-300."
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=3109",
     "https://www.claypaky.it/products/sharpy-plus/"
   ]
 }

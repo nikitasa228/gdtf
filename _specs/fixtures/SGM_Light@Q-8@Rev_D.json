@@ -10,25 +10,22 @@
   "manufacturer": "SGM Light",
   "category": "BLINDER",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
-    "max": 240.0
+    "min": 115.0,
+    "max": 277.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
   "powerConsumptionW": 630,
-  "maxLuminousIntensityCd": 21000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 34600,
+  "luminousFluxLm": 53849,
   "noiseLevelDb": 40,
   "weightKg": 13.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -47,8 +44,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 60.0,
-    "max": 60.0
+    "min": 75.0,
+    "max": 107.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -146,26 +143,29 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "ipRating": "estimated",
+    "ipRating": "manual",
     "powerConsumptionW": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "beamAngleDeg": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "beamAngleDeg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+    "53,849 lm = all LEDs on (RGBW panel + strobe blinders combined). Beam 107 deg panel (110 deg lens), 75 deg strobe blinders. Lux only given at 5 m and 10 m. Calibrated white 5700K panel / 7000K strobe.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.sgmlight.com/products/q-8",
     "https://staticlightcompany.com/wp-content/uploads/2022/10/SGM-Q8-SPECIFICATION-SHEET.pdf"
   ]
 }

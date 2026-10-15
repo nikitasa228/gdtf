@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 400,
   "maxLuminousIntensityCd": 95000.0,
-  "luminousFluxLm": 292.0,
+  "luminousFluxLm": 292,
   "noiseLevelDb": 41.8,
   "weightKg": 20.8,
   "powerConnectorIn": "powerCON TRUE1",
@@ -112,8 +112,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -149,14 +148,17 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Tilting pixel batten. GDTF power 40 W invalid."
+    "Tilting pixel batten. GDTF power 40 W invalid. 400 VA; tilt per module. CTC 2500-8000K (native 8600K).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=3816",
     "https://www.claypaky.it/products/volero-wave/"
   ]
 }
