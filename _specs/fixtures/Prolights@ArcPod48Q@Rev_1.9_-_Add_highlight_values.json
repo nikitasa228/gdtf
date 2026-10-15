@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 540.0,
   "maxLuminousIntensityCd": 336300.0,
-  "luminousFluxLm": 22977.0,
+  "luminousFluxLm": 23000.0,
   "noiseLevelDb": 0,
   "weightKg": 14.0,
   "powerConnectorIn": "IP moulded connector",
@@ -149,7 +149,7 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
-    "colorTemperatureK": "estimated",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],

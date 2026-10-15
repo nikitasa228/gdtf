@@ -6,7 +6,7 @@
   "gdtfName": "DCE DataSplitterBooster IP",
   "longName": "DCE DataSplitterBooster IP",
   "shortName": "DCESplitBoostIP",
-  "description": "Martin Professional DCE DataSplitterBooster IP: device (data splitter / booster).",
+  "description": "Martin Professional DCE DataSplitterBooster IP: device (data splitter / booster), with IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
@@ -15,10 +15,10 @@
     "max": 48.0
   },
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 0.9,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 0.5,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -56,7 +56,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -81,7 +81,7 @@
     "category": "manual",
     "voltageRangeV": "gdtf",
     "powerConsumptionW": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -106,6 +106,8 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],
@@ -116,6 +118,9 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless. Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/dce-datasplitterbooster-ip"
   ]
 }

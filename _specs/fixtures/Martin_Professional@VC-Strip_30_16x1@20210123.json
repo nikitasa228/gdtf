@@ -15,7 +15,7 @@
   "powerConsumptionW": 6.7,
   "maxLuminousIntensityCd": 31.0,
   "luminousFluxLm": 119.0,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 0,
   "weightKg": 0.05,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -136,9 +136,9 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "gdtf",
@@ -165,10 +165,10 @@
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -177,10 +177,11 @@
   ],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white. Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://www.martin.com/en-US/products/vc-strip-30",
     "https://www.martin.com/en-US/products/vc-strip"
   ]
 }

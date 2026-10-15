@@ -6,7 +6,7 @@
   "gdtfName": "P3 PowerPort 500 IP Install",
   "longName": "P3 PowerPort 500 IP Install",
   "shortName": "P3PP500IPInst",
-  "description": "Martin Professional P3 PowerPort 500 IP Install: device (p3 powerport (dc power + data distribution)).",
+  "description": "Martin Professional P3 PowerPort 500 IP Install: device (p3 powerport (dc power + data distribution)), with IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 500.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 9.5,
   "powerConnectorIn": "Terminal Block",
   "powerConnectorOut": "Terminal Block",
@@ -68,7 +68,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -91,11 +91,11 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -120,15 +120,18 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
-    "lensType",
-    "noiseLevelDb"
+    "lensType"
   ],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/p3-powerport-500-ip-install"
   ]
 }

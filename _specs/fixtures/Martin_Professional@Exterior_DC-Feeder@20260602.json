@@ -6,7 +6,7 @@
   "gdtfName": "Exterior DC-Feeder",
   "longName": "Exterior DC-Feeder",
   "shortName": "EXTDCFee",
-  "description": "Martin Professional Exterior DC-Feeder: device (dc feeder (power/data injector)).",
+  "description": "Martin Professional Exterior DC-Feeder: device (dc feeder (power/data injector)), with IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
@@ -18,7 +18,7 @@
   "powerConsumptionW": 110.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 1.4,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin 8-pin / Martin proprietary (P3/PDE)",
@@ -57,7 +57,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -81,8 +81,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "voltageRangeV": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -107,8 +107,9 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
@@ -117,7 +118,9 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless.",
-    "Typical-value estimates (no published data): ipRating"
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless. Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-dc-feeder"
   ]
 }

@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 2000.0,
+  "powerConsumptionW": 2115.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 57.7,
   "weightKg": 6.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -93,11 +93,11 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -123,15 +123,16 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
-    "lensType",
-    "noiseLevelDb"
+    "lensType"
   ],
-  "_issues": [
-    "Typical-value estimates (no published data): ipRating"
+  "_issues": [],
+  "_refs": [
+    "https://www.martin.com/en-US/products/p3-powerport-2000"
   ]
 }

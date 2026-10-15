@@ -6,7 +6,7 @@
   "gdtfName": "P3 PowerPort 500 IP Rental",
   "longName": "P3 PowerPort 500 IP Rental",
   "shortName": "P3PP500IPRent",
-  "description": "Martin Professional P3 PowerPort 500 IP Rental: device (p3 powerport (dc power + data distribution)).",
+  "description": "Martin Professional P3 PowerPort 500 IP Rental: device (p3 powerport (dc power + data distribution)), with IP65 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": [
@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 480.0,
+  "powerConsumptionW": 500.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 3.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "Martin proprietary (P3/PDE) / powerCON TRUE1",
@@ -70,7 +70,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -93,11 +93,11 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -123,15 +123,18 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
-    "lensType",
-    "noiseLevelDb"
+    "lensType"
   ],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/p3-powerport-500-ip-rental"
   ]
 }

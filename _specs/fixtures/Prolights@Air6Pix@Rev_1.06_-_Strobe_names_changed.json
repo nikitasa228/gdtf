@@ -35,8 +35,8 @@
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
-  "panRangeDeg": 630.0,
-  "tiltRangeDeg": 360.0,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 265.0,
   "infinitePan": true,
   "infiniteTilt": true,
   "manualPanRangeDeg": null,
@@ -68,7 +68,7 @@
   "colorWheel": false,
   "colorTemperatureK": {
     "min": 2800.0,
-    "max": 10000.0
+    "max": 9000.0
   },
   "prism": false,
   "prisms": [],
@@ -113,8 +113,8 @@
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
-    "panRangeDeg": "manual",
-    "tiltRangeDeg": "gdtf-derived",
+    "panRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -147,7 +147,7 @@
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "estimated",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },

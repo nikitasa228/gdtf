@@ -22,10 +22,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1350.0,
-  "maxLuminousIntensityCd": 4000000.0,
+  "powerConsumptionW": 1450.0,
+  "maxLuminousIntensityCd": 5000000.0,
   "luminousFluxLm": 63500.0,
-  "noiseLevelDb": 48,
+  "noiseLevelDb": 37.6,
   "weightKg": 39.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -99,15 +99,15 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -137,13 +137,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  "_issues": [],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-ultra-wash"
   ]
 }

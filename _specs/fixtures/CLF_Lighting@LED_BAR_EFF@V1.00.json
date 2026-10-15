@@ -4,7 +4,7 @@
   "fixtureTypeId": "86A02BB4-E327-4650-8DC6-422C7310B390",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LED BAR EFF",
-  "longName": "Lighting LEDBAR EFF",
+  "longName": "LEDBAR EFF",
   "shortName": "LedBarEFF",
   "description": "CLF LEDBAR EFF: RGBWA+WW LED effect bar.",
   "manufacturer": "CLF Lighting",
@@ -142,7 +142,7 @@
     }
   ],
   "pixelCount": 246,
-  "fullName": "CLF Lighting Lighting LEDBAR EFF",
+  "fullName": "CLF Lighting LEDBAR EFF",
   "powerLinkable": true,
   "_source": {
     "longName": "gdtf",

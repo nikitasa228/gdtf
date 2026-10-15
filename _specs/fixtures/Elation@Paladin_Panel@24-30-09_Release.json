@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 800.0,
-  "maxLuminousIntensityCd": 66000.0,
-  "luminousFluxLm": 14000.0,
+  "maxLuminousIntensityCd": 94000.0,
+  "luminousFluxLm": 20000.0,
   "noiseLevelDb": 40,
   "weightKg": 15.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -63,8 +63,8 @@
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
-    "min": 2800.0,
-    "max": 8000.0
+    "min": 6000.0,
+    "max": 6000.0
   },
   "prism": false,
   "prisms": [],
@@ -135,7 +135,7 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -167,16 +167,16 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/paladin-panel",

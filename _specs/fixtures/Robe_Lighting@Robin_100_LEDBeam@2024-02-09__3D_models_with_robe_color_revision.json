@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 190000.0,
-  "luminousFluxLm": 3220.0,
+  "maxLuminousIntensityCd": 360000.0,
+  "luminousFluxLm": 5960.0,
   "noiseLevelDb": 38,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON",

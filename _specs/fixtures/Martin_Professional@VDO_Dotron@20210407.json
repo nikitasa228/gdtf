@@ -6,16 +6,16 @@
   "gdtfName": "VDO Dotron",
   "longName": "VDO Dotron",
   "shortName": "VDODot",
-  "description": "Martin Professional VDO Dotron: device (led video pixel / matrix), with 110 deg beam, RGB colour mixing.",
+  "description": "Martin Professional VDO Dotron: device (led video pixel / matrix), with 110 deg beam, RGB colour mixing, IP65 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 5,
+  "powerConsumptionW": 5.0,
   "maxLuminousIntensityCd": 31.0,
   "luminousFluxLm": 120.0,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 0,
   "weightKg": 0.3,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -58,7 +58,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -106,7 +106,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "gdtf",
@@ -135,10 +135,10 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "powerConsumptionW": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -146,10 +146,11 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white. Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://www.martin.com/en-US/products/vdo-dotron",
     "https://www.martin.com/da/site_elements/vdo-dotron-family-spec-sheet"
   ]
 }

@@ -50,8 +50,8 @@
   ],
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 7.5,
-    "max": 70.0
+    "min": 30.0,
+    "max": 30.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -150,15 +150,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "maxLuminousIntensityCd": "manual",
-    "beamAngleDeg": "manual",
     "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): beamAngleDeg, noiseLevelDb"
   ],
   "_refs": [
     "https://www.robe.cz/ibar-15"

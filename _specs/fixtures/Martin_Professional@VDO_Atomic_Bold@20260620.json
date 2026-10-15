@@ -6,7 +6,7 @@
   "gdtfName": "VDO Atomic Bold",
   "longName": "VDO Atomic Bold",
   "shortName": "VDOAtoBLD",
-  "description": "Martin Professional VDO Atomic Bold: LED strobe, with 12 deg beam, RGB colour mixing, colour wheel.",
+  "description": "Martin Professional VDO Atomic Bold: LED strobe, with 12 deg beam, RGB colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Martin Professional",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 640000.0,
-  "luminousFluxLm": 31502.0,
-  "noiseLevelDb": 35,
+  "maxLuminousIntensityCd": 260000.0,
+  "luminousFluxLm": 13000.0,
+  "noiseLevelDb": 25.9,
   "weightKg": 9.32,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -116,12 +116,12 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -151,14 +151,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vdo-atomic-bold"
   ]
 }

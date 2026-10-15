@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 1400.0,
-  "maxLuminousIntensityCd": 36000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 72000.0,
+  "luminousFluxLm": 110709.0,
   "noiseLevelDb": 40,
   "weightKg": 13.4,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -125,6 +125,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -167,7 +168,6 @@
   ],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF luminous flux 222618 lm is implausible for 1400 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [

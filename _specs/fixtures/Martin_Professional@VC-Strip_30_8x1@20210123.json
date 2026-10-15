@@ -12,11 +12,11 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 3.3,
+  "powerConsumptionW": 6.7,
   "maxLuminousIntensityCd": 15.0,
   "luminousFluxLm": 59.0,
-  "noiseLevelDb": 30,
-  "weightKg": 0.03,
+  "noiseLevelDb": 0,
+  "weightKg": 0.05,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE)",
@@ -129,7 +129,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "gdtf",
@@ -156,11 +156,11 @@
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -168,10 +168,11 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white. Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://www.martin.com/en-US/products/vc-strip-30",
     "https://www.martin.com/en-US/products/vc-strip"
   ]
 }

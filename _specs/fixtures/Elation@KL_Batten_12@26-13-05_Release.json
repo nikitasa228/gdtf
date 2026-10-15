@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 34000.0,
+  "maxLuminousIntensityCd": 76000.0,
   "luminousFluxLm": 10300,
   "noiseLevelDb": 35,
   "weightKg": 6.7,
@@ -51,8 +51,8 @@
   ],
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 30.0,
-    "max": 30.0
+    "min": 20.0,
+    "max": 22.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -214,8 +214,8 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
     "fullName": "gdtf-derived",
-    "beamAngleDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -224,7 +224,7 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/kl-batten-12"

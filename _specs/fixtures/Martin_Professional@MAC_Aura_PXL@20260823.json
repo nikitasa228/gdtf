@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 500.0,
-  "maxLuminousIntensityCd": 50000.0,
-  "luminousFluxLm": 609.0,
-  "noiseLevelDb": 43,
+  "powerConsumptionW": 560.0,
+  "maxLuminousIntensityCd": 940000.0,
+  "luminousFluxLm": 10500.0,
+  "noiseLevelDb": 32.6,
   "weightKg": 15.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -115,15 +115,15 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -153,14 +153,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  "_issues": [],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-aura-pxl"
   ]
 }

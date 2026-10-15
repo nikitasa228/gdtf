@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 945.0,
-  "maxLuminousIntensityCd": 3800000.0,
-  "luminousFluxLm": 42000.0,
-  "noiseLevelDb": 48,
+  "powerConsumptionW": 1040.0,
+  "maxLuminousIntensityCd": 2000000.0,
+  "luminousFluxLm": 21000.0,
+  "noiseLevelDb": 36.2,
   "weightKg": 36.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -127,15 +127,15 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -167,15 +167,16 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "noiseLevelDb": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  "_issues": [],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-encore-two"
   ]
 }

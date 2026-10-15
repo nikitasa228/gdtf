@@ -140,7 +140,7 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "manual",
+    "colorTemperatureK": "estimated",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",

@@ -6,7 +6,7 @@
   "gdtfName": "Exterior AC-Feeder",
   "longName": "Exterior AC-Feeder",
   "shortName": "EXTACFee",
-  "description": "Martin Professional Exterior AC-Feeder: device (ac feeder (power/data injector)).",
+  "description": "Martin Professional Exterior AC-Feeder: device (ac feeder (power/data injector)), with IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 115.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 2.7,
   "powerConnectorIn": "Terminal Block",
   "powerConnectorOut": "Martin 8-pin / Terminal Block",
@@ -68,7 +68,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -94,8 +94,8 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -120,15 +120,18 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
-    "lensType",
-    "noiseLevelDb"
+    "lensType"
   ],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-ac-feeder"
   ]
 }

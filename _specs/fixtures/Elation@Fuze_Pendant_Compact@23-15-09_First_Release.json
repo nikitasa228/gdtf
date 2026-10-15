@@ -124,7 +124,7 @@
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",

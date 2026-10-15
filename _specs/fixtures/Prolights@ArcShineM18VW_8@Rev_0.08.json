@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 14000.0,
+  "maxLuminousIntensityCd": 9500.0,
   "luminousFluxLm": 5401.0,
   "noiseLevelDb": 0,
   "weightKg": 4.9,
@@ -114,7 +114,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "manual",
+    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",

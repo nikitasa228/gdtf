@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Dot-4 Pro",
   "longName": "Exterior Dot-4 Pro",
   "shortName": "EXTDot4Pro",
-  "description": "Martin Professional Exterior Dot-4 Pro: LED wash (architectural rgbw dot / flood), with 115 deg beam, RGBW colour mixing, colour wheel.",
+  "description": "Martin Professional Exterior Dot-4 Pro: LED wash (architectural rgbw dot / flood), with 115 deg beam, RGBW colour mixing, colour wheel, IP67 rated.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": null,
@@ -18,7 +18,7 @@
   "powerConsumptionW": 100.0,
   "maxLuminousIntensityCd": 4.3,
   "luminousFluxLm": 18.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 2.96,
   "powerConnectorIn": "Martin 8-pin",
   "powerConnectorOut": null,
@@ -62,7 +62,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP67",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -121,7 +121,7 @@
     "powerConsumptionW": "gdtf",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -148,8 +148,9 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
@@ -158,7 +159,9 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless.",
-    "Typical-value estimates (no published data): ipRating"
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless. Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-dot-4-pro"
   ]
 }

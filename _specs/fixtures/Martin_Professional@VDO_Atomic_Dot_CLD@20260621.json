@@ -6,7 +6,7 @@
   "gdtfName": "VDO Atomic Dot CLD",
   "longName": "VDO Atomic Dot CLD",
   "shortName": "VDOAtoDOTCLD",
-  "description": "Martin Professional VDO Atomic Dot CLD: LED blinder, with 11 deg beam, RGB colour mixing, colour wheel.",
+  "description": "Martin Professional VDO Atomic Dot CLD: LED blinder, with 11 deg beam, RGB colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Martin Professional",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 50.0,
+  "powerConsumptionW": 55.0,
   "maxLuminousIntensityCd": 81000.0,
-  "luminousFluxLm": 3354.0,
-  "noiseLevelDb": 30,
+  "luminousFluxLm": 3350.0,
+  "noiseLevelDb": 0,
   "weightKg": 2.2,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -112,12 +112,12 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -147,14 +147,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vdo-atomic-dot-cld"
   ]
 }

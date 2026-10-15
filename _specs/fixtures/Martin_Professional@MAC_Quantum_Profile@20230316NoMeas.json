@@ -23,9 +23,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 575.0,
+  "powerConsumptionW": 750.0,
   "maxLuminousIntensityCd": 260000.0,
-  "luminousFluxLm": 12800.0,
+  "luminousFluxLm": 12700.0,
   "noiseLevelDb": 43,
   "weightKg": 23.2,
   "powerConnectorIn": "powerCON",
@@ -114,15 +114,15 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -153,14 +153,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): colorTemperatureK, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-quantum-profile"
   ]
 }

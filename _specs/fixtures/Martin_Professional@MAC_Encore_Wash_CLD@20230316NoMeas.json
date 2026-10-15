@@ -23,10 +23,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 590.0,
+  "powerConsumptionW": 596.0,
   "maxLuminousIntensityCd": 420000.0,
-  "luminousFluxLm": 11100.0,
-  "noiseLevelDb": 43,
+  "luminousFluxLm": 12000.0,
+  "noiseLevelDb": 0,
   "weightKg": 28.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -94,15 +94,15 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -132,14 +132,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-encore-wash-cld"
   ]
 }

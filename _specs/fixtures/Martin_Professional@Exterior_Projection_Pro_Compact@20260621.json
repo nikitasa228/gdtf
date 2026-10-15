@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Projection Pro Compact",
   "longName": "Exterior Projection Pro Compact",
   "shortName": "EXTProProCom",
-  "description": "Martin Professional Exterior Projection Pro Compact: LED profile (gobo projector (architectural)), with 15-45 deg zoom, colour wheel, 3 gobos, framing shutters.",
+  "description": "Martin Professional Exterior Projection Pro Compact: LED profile (gobo projector (architectural)), with 15-45 deg zoom, colour wheel, 3 gobos, framing shutters, IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -28,12 +28,12 @@
   },
   "powerConsumptionW": 180.0,
   "maxLuminousIntensityCd": 61000.0,
-  "luminousFluxLm": 4700.0,
-  "noiseLevelDb": 35,
+  "luminousFluxLm": 5200.0,
+  "noiseLevelDb": 0,
   "weightKg": 13.9,
   "powerConnectorIn": "Terminal Block",
-  "powerConnectorOut": "Terminal Block",
-  "powerSupplyType": "Terminal Block LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "Terminal Block",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -79,7 +79,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -99,7 +99,7 @@
   "subType": "Gobo projector (architectural)",
   "fullName": "Martin Professional Exterior Projection Pro Compact",
   "gdtfDescription": "Official Martin Professional File",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -109,13 +109,13 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualPanRangeDeg": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
@@ -144,14 +144,17 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-projection-pro-compact"
   ]
 }

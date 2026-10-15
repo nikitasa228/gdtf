@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Linear Pro DV QUAD 4ft",
   "longName": "Exterior Linear Pro DV QUAD 4ft",
   "shortName": "EXTLinProDvQUAD 4ft",
-  "description": "Martin Professional Exterior Linear Pro DV QUAD 4ft: LED bar, with 170 deg beam, RGBW colour mixing, colour wheel.",
+  "description": "Martin Professional Exterior Linear Pro DV QUAD 4ft: LED bar, with 170 deg beam, RGBW colour mixing, colour wheel, IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -20,16 +20,16 @@
   ],
   "voltageRangeV": {
     "min": 100.0,
-    "max": 240.0
+    "max": 277.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
   "powerConsumptionW": 48.0,
-  "maxLuminousIntensityCd": 270.0,
-  "luminousFluxLm": 1800.0,
-  "noiseLevelDb": 30,
+  "maxLuminousIntensityCd": 260.0,
+  "luminousFluxLm": 1760.0,
+  "noiseLevelDb": 0,
   "weightKg": 2.8,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -123,11 +123,11 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
     "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -156,14 +156,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-linear-pro-dv-quad"
   ]
 }

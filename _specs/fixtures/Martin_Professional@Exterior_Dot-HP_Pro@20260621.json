@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Dot-HP Pro",
   "longName": "Exterior Dot-HP Pro",
   "shortName": "EXTDotHPPro",
-  "description": "Martin Professional Exterior Dot-HP Pro: LED wash (architectural rgbw dot / flood), with 114 deg beam, RGBW colour mixing, colour wheel.",
+  "description": "Martin Professional Exterior Dot-HP Pro: LED wash (architectural rgbw dot / flood), with 114 deg beam, RGBW colour mixing, colour wheel, IP67 rated.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": null,
@@ -17,9 +17,9 @@
   "frequencyRangeHz": null,
   "powerConsumptionW": 6.0,
   "maxLuminousIntensityCd": 4.5,
-  "luminousFluxLm": 18.0,
-  "noiseLevelDb": null,
-  "weightKg": 0.4,
+  "luminousFluxLm": 50.0,
+  "noiseLevelDb": 0,
+  "weightKg": 0.39,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE) LINK",
@@ -63,7 +63,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP67",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -105,8 +105,8 @@
     "voltageRangeV": "gdtf",
     "powerConsumptionW": "gdtf",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -134,8 +134,9 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
@@ -144,7 +145,9 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless.",
-    "Typical-value estimates (no published data): ipRating"
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless. Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-dot-hp-pro"
   ]
 }
