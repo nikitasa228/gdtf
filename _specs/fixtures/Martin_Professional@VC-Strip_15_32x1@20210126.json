@@ -12,7 +12,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 6.0,
+  "powerConsumptionW": 13.4,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 108.0,
   "noiseLevelDb": null,
@@ -181,6 +181,9 @@
   ],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vc-strip"
   ]
 }

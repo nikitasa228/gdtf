@@ -97,11 +97,11 @@
   },
   "_missing": [],
   "_notApplicable": [
-    "lensType",
-    "noiseLevelDb",
     "powerConsumptionW",
     "powerSupplyType",
-    "supportedPowerNetworks"
+    "controlSignal",
+    "supportedPowerNetworks",
+    "noiseLevelDb"
   ],
   "_issues": [
     "Passive accessory (no power)."

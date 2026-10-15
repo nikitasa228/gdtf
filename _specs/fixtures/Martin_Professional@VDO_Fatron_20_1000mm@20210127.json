@@ -12,7 +12,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 180.0,
+  "powerConsumptionW": 60,
   "maxLuminousIntensityCd": 1200.0,
   "luminousFluxLm": 4500.0,
   "noiseLevelDb": null,
@@ -165,7 +165,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
@@ -205,6 +205,9 @@
   ],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vdo-fatron-20"
   ]
 }

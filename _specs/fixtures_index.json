@@ -119911,11 +119911,11 @@
   },
   "_missing": [],
   "_notApplicable": [
-   "lensType",
-   "noiseLevelDb",
    "powerConsumptionW",
    "powerSupplyType",
-   "supportedPowerNetworks"
+   "controlSignal",
+   "supportedPowerNetworks",
+   "noiseLevelDb"
   ],
   "_issues": [
    "Passive accessory (no power)."
@@ -120020,11 +120020,11 @@
   },
   "_missing": [],
   "_notApplicable": [
-   "lensType",
-   "noiseLevelDb",
    "powerConsumptionW",
    "powerSupplyType",
-   "supportedPowerNetworks"
+   "controlSignal",
+   "supportedPowerNetworks",
+   "noiseLevelDb"
   ],
   "_issues": [
    "Passive accessory (no power)."
@@ -122206,7 +122206,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 102.0,
+  "powerConsumptionW": 100,
   "maxLuminousIntensityCd": 500.0,
   "luminousFluxLm": 1728.0,
   "noiseLevelDb": null,
@@ -122402,7 +122402,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"
   ]
  },
  {
@@ -122419,7 +122422,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 25.0,
+  "powerConsumptionW": 25,
   "maxLuminousIntensityCd": 100.0,
   "luminousFluxLm": 480.0,
   "noiseLevelDb": null,
@@ -122557,7 +122560,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -122599,7 +122602,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"
   ]
  },
  {
@@ -122616,7 +122622,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 25.0,
+  "powerConsumptionW": 25,
   "maxLuminousIntensityCd": 100.0,
   "luminousFluxLm": 475.0,
   "noiseLevelDb": null,
@@ -122754,7 +122760,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -122796,7 +122802,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"
   ]
  },
  {
@@ -122813,7 +122822,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 6.0,
+  "powerConsumptionW": 6.7,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 130.0,
   "noiseLevelDb": null,
@@ -122935,7 +122944,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -122977,7 +122986,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"
   ]
  },
  {
@@ -122994,7 +123006,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 25.0,
+  "powerConsumptionW": 25,
   "maxLuminousIntensityCd": 100.0,
   "luminousFluxLm": 518.0,
   "noiseLevelDb": null,
@@ -123132,7 +123144,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -123174,7 +123186,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"
   ]
  },
  {
@@ -123191,7 +123206,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 6.7,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 54.0,
   "noiseLevelDb": null,
@@ -123340,10 +123355,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -123351,7 +123366,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -123368,7 +123386,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 6.0,
+  "powerConsumptionW": 13.4,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 108.0,
   "noiseLevelDb": null,
@@ -123537,7 +123555,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -123554,7 +123575,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 6.0,
+  "powerConsumptionW": 6.7,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 120.0,
   "noiseLevelDb": null,
@@ -123675,7 +123696,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -123715,7 +123736,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -123732,7 +123756,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 3.3,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 60.0,
   "noiseLevelDb": null,
@@ -123873,10 +123897,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "manual"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -123884,7 +123908,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -123901,7 +123928,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 6.0,
+  "powerConsumptionW": 6.7,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 119.0,
   "noiseLevelDb": null,
@@ -124062,7 +124089,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -124079,7 +124109,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 3.3,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 59.0,
   "noiseLevelDb": null,
@@ -124220,10 +124250,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -124231,7 +124261,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -124248,7 +124281,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1.7,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 32.0,
   "noiseLevelDb": null,
@@ -124381,10 +124414,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -124392,7 +124425,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -124409,7 +124445,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 3.3,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 65.0,
   "noiseLevelDb": null,
@@ -124550,10 +124586,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "estimated"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -124561,7 +124597,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vc-strip"
   ]
  },
  {
@@ -125044,7 +125083,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 5,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 120.0,
   "noiseLevelDb": null,
@@ -125163,10 +125202,10 @@
    "subType": "manual",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "manual"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -125175,7 +125214,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/da/site_elements/vdo-dotron-family-spec-sheet"
   ]
  },
  {
@@ -125277,11 +125319,11 @@
   },
   "_missing": [],
   "_notApplicable": [
-   "lensType",
-   "noiseLevelDb",
    "powerConsumptionW",
    "powerSupplyType",
-   "supportedPowerNetworks"
+   "controlSignal",
+   "supportedPowerNetworks",
+   "noiseLevelDb"
   ],
   "_issues": [
    "Passive accessory (no power)."
@@ -125301,7 +125343,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 180.0,
+  "powerConsumptionW": 60,
   "maxLuminousIntensityCd": 1200.0,
   "luminousFluxLm": 4500.0,
   "noiseLevelDb": null,
@@ -125454,7 +125496,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -125494,7 +125536,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vdo-fatron-20"
   ]
  },
  {
@@ -125511,7 +125556,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 38.0,
+  "powerConsumptionW": 20,
   "maxLuminousIntensityCd": 300.0,
   "luminousFluxLm": 960.0,
   "noiseLevelDb": null,
@@ -125656,7 +125701,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -125696,7 +125741,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en-US/products/vdo-fatron-20"
   ]
  },
  {
@@ -125713,7 +125761,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 90.0,
+  "powerConsumptionW": 30,
   "maxLuminousIntensityCd": 600.0,
   "luminousFluxLm": 2250.0,
   "noiseLevelDb": null,
@@ -125874,7 +125922,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -125914,7 +125962,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"
   ]
  },
  {
@@ -125931,7 +125982,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 10.0,
+  "powerConsumptionW": 10,
   "maxLuminousIntensityCd": 100.0,
   "luminousFluxLm": 240.0,
   "noiseLevelDb": null,
@@ -126068,7 +126119,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -126108,7 +126159,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"
   ]
  },
  {
@@ -126125,7 +126179,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 30.0,
+  "powerConsumptionW": 15,
   "maxLuminousIntensityCd": 200.0,
   "luminousFluxLm": 750.0,
   "noiseLevelDb": null,
@@ -126262,7 +126316,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -126302,7 +126356,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"
   ]
  },
  {
@@ -126319,7 +126376,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 5,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 120.0,
   "noiseLevelDb": null,
@@ -126476,10 +126533,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "manual"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -126487,7 +126544,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"
   ]
  },
  {
@@ -126504,7 +126564,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": 8.0,
+  "powerConsumptionW": 7.5,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 188.0,
   "noiseLevelDb": null,
@@ -126617,7 +126677,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "estimated",
    "weightKg": "gdtf",
@@ -126657,7 +126717,10 @@
   ],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"
   ]
  },
  {
@@ -126674,7 +126737,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 2.5,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 60.0,
   "noiseLevelDb": null,
@@ -126823,10 +126886,10 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "manual",
    "powerConnectorIn": "manual",
-   "powerConnectorOut": "manual"
+   "powerConnectorOut": "manual",
+   "powerConsumptionW": "manual"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -126834,7 +126897,10 @@
    "lensType"
   ],
   "_issues": [
-   "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+   "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+   "https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"
   ]
  },
  {
@@ -127278,11 +127344,11 @@
   },
   "_missing": [],
   "_notApplicable": [
-   "lensType",
-   "noiseLevelDb",
    "powerConsumptionW",
    "powerSupplyType",
-   "supportedPowerNetworks"
+   "controlSignal",
+   "supportedPowerNetworks",
+   "noiseLevelDb"
   ],
   "_issues": [
    "Passive accessory (no power)."

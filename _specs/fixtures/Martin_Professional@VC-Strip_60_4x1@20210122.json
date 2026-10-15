@@ -12,7 +12,7 @@
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1.7,
   "maxLuminousIntensityCd": 0.0,
   "luminousFluxLm": 32.0,
   "noiseLevelDb": null,
@@ -145,10 +145,10 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "powerConsumptionW": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [
@@ -156,6 +156,9 @@
     "lensType"
   ],
   "_issues": [
-    "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vc-strip"
   ]
 }
