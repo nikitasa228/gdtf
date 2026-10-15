@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 830,
+  "powerConsumptionW": 830.0,
   "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 92000.0,
   "noiseLevelDb": 48,
@@ -115,9 +115,9 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -158,6 +158,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/JB-Lighting_A12_Catalog.pdf",
     "https://www.rockshop.de/en/jb-lighting-a12-rgbw"
   ]
 }

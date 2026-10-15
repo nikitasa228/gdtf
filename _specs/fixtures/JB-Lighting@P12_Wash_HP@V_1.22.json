@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 800,
+  "powerConsumptionW": 800.0,
   "maxLuminousIntensityCd": 600000.0,
-  "luminousFluxLm": 25000,
-  "noiseLevelDb": 29,
+  "luminousFluxLm": 25000.0,
+  "noiseLevelDb": 29.0,
   "weightKg": 23.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -113,9 +113,9 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -162,6 +162,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/JB_P12_Wash_brochure_en.pdf",
     "https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798",
     "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"
   ]

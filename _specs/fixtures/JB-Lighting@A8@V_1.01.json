@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 990000.0,
+  "powerConsumptionW": 500.0,
+  "maxLuminousIntensityCd": 910000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 43,
-  "weightKg": 10.0,
+  "weightKg": 11.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -114,9 +114,9 @@
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -154,10 +154,11 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "GDTF luminous flux 92000 lm is implausible for 540 W and was dropped",
+    "GDTF luminous flux 92000 lm is implausible for 500 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/JB-Lighting_A8_Catalog.pdf",
     "https://saleswl.com/product/jb-lighting-a8-tw-rgbw/"
   ]
 }

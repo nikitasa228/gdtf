@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400,
+  "powerConsumptionW": 380.0,
   "maxLuminousIntensityCd": 500000.0,
   "luminousFluxLm": 11020.0,
   "noiseLevelDb": 43,
@@ -121,13 +121,13 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -169,11 +169,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "270 W LED engine; mains draw estimated.",
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/Varyscan_P7_Catalog.pdf",
     "https://jb-lighting.de/download/Prospekt/Varyscan_P7_Catalog.pdf"
   ]
 }

@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1600,
+  "powerConsumptionW": 1600.0,
   "maxLuminousIntensityCd": 5000000.0,
   "luminousFluxLm": 72000.0,
-  "noiseLevelDb": 48,
+  "noiseLevelDb": 28.0,
   "weightKg": 32.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -125,9 +125,9 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -158,22 +158,23 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/JB_M18_Profile_brochure_en.pdf",
     "https://www.jb-lighting.de/en/M18Profile"
   ]
 }

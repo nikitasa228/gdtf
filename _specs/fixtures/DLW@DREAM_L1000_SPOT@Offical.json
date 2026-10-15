@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 524.0,
+  "powerConsumptionW": 480.0,
   "maxLuminousIntensityCd": 3500000.0,
   "luminousFluxLm": 30000.0,
   "noiseLevelDb": 43,

@@ -29,7 +29,7 @@
   "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 10241000.0,
   "luminousFluxLm": 10100.0,
-  "noiseLevelDb": 43,
+  "noiseLevelDb": 47,
   "weightKg": 22.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -48,7 +48,7 @@
   "dataConnectors": [
     "XLR3"
   ],
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 1.0,
     "max": 1.0

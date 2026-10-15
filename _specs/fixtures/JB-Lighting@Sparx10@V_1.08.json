@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 700,
+  "powerConsumptionW": 585.0,
   "maxLuminousIntensityCd": 10000000.0,
   "luminousFluxLm": 56000.0,
   "noiseLevelDb": 43,
@@ -108,9 +108,9 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -155,6 +155,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/Sparx10_Catalog.pdf",
     "https://framelight.com.au/products/jb-lighting-sparx-10-led-wash-moving-head"
   ]
 }

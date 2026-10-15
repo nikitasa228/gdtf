@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1500,
-  "maxLuminousIntensityCd": 820000.0,
-  "luminousFluxLm": 47500.0,
-  "noiseLevelDb": 28,
-  "weightKg": 32.0,
+  "powerConsumptionW": 1200.0,
+  "maxLuminousIntensityCd": 490000.0,
+  "luminousFluxLm": 28000.0,
+  "noiseLevelDb": 29.0,
+  "weightKg": 31.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -106,12 +106,12 @@
     "supportedPowerNetworks": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "powerConsumptionW": "estimated",
-    "luminousFluxLm": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -154,6 +154,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/P18_Wash_Catalogue_engl.pdf",
     "https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"
   ]
 }
