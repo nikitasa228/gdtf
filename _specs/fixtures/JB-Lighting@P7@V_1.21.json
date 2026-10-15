@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 400,
   "maxLuminousIntensityCd": 504000.0,
   "luminousFluxLm": 11020.0,
   "noiseLevelDb": null,
@@ -156,15 +156,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "270 W LED engine; mains draw estimated."
+  ],
+  "_refs": [
+    "https://jb-lighting.de/download/Prospekt/Varyscan_P7_Catalog.pdf"
   ]
 }

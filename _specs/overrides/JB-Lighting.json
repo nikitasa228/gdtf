@@ -1,281 +1,47 @@
 {
- "JB-Lighting@M18_Profile@V_1.20.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@M18_Profile_MA@V_1.01.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P10_Profile_MA_HC@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P10_Profile_MA_HP@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P10_Profile_MA_WW@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Profile_HC@V_1.26.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Profile_HP@V_1.29.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Profile_MA_HC@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Profile_MA_HP@V_1.03.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Profile_MA_WW@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Profile_WW@V_1.24.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Spot_HC@V_1.18.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Spot_HP@V_1.19.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Spot_WW@V_1.18.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P12_Wash_HC@V_1.22.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P12_Wash_HP@V_1.22.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P12_Wash_MA_HC@V_1.01.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P12_Wash_MA_HP@V_1.01.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P12_Wash_MA_WW@V_1.01.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P12_Wash_WW@V_1.22.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P18_MK2_Profile_HC@V_1.16.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_HP@V_1.18.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_MA_HC@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_MA_HP@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_MA_WW@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_S_HC@V_1.06.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_S_HP@V_1.06.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_S_MA_HC@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_S_MA_HP@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_S_MA_WW@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_S_WW@V_1.06.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_MK2_Profile_WW@V_1.15.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_Profile_HP@V_1.09.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_Profile_WW@V_1.08.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P18_Wash_HC@V_1.04.gdtf": {
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P18_Wash_HP@V_1.05.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P18_Wash_WW@V_1.05.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "WASH",
-  "subType": "Framing wash"
- },
- "JB-Lighting@P5_Beamspot_HP@V_2_00.gdtf": {
-  "category": "BSW"
- },
- "JB-Lighting@P7@V_1.21.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "JB-Lighting@P9_Beamspot_HP@V_1.10.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "BSW"
- },
- "JB-Lighting@Sparx10@V_1.08.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "powerConsumptionW": null,
-  "lightSourceType": "LED",
-  "_notes": "GDTF beam-sum power invalid, removed."
- },
- "JB-Lighting@Sparx18@V_1.39.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "powerConsumptionW": null,
-  "lightSourceType": "LED",
-  "_notes": "GDTF beam-sum power invalid, removed."
- },
- "JB-Lighting@Sparx30@V_1.02.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "powerConsumptionW": null,
-  "lightSourceType": "LED",
-  "_notes": "GDTF beam-sum power invalid, removed."
- }
+ "JB-Lighting@M18_Profile@V_1.20.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/en/M18Profile"], "powerConsumptionW": 1600, "weightKg": 32.0},
+ "JB-Lighting@M18_Profile_MA@V_1.01.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/en/M18Profile"], "powerConsumptionW": 1600, "weightKg": 32.0},
+ "JB-Lighting@P10_Profile_MA_HC@V_1.02.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/en/P10Profile"], "powerConsumptionW": 490, "weightKg": 18.0},
+ "JB-Lighting@P10_Profile_MA_HP@V_1.02.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/en/P10Profile"], "powerConsumptionW": 490, "weightKg": 18.0},
+ "JB-Lighting@P10_Profile_MA_WW@V_1.02.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/en/P10Profile"], "powerConsumptionW": 490, "weightKg": 18.0},
+ "JB-Lighting@P12_Profile_HC@V_1.26.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 18500},
+ "JB-Lighting@P12_Profile_HP@V_1.29.gdtf": {"mains": "100-240", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 25000},
+ "JB-Lighting@P12_Profile_MA_HC@V_1.02.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 18500},
+ "JB-Lighting@P12_Profile_MA_HP@V_1.03.gdtf": {"mains": "100-240", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 25000},
+ "JB-Lighting@P12_Profile_MA_WW@V_1.02.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 16300},
+ "JB-Lighting@P12_Profile_WW@V_1.24.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 16300},
+ "JB-Lighting@P12_Spot_HC@V_1.18.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 18500},
+ "JB-Lighting@P12_Spot_HP@V_1.19.gdtf": {"mains": "100-240", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 25000},
+ "JB-Lighting@P12_Spot_WW@V_1.18.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 16300},
+ "JB-Lighting@P12_Wash_HC@V_1.22.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 18500},
+ "JB-Lighting@P12_Wash_HP@V_1.22.gdtf": {"mains": "100-240", "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 25000},
+ "JB-Lighting@P12_Wash_MA_HC@V_1.01.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 18500},
+ "JB-Lighting@P12_Wash_MA_HP@V_1.01.gdtf": {"mains": "100-240", "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 25000},
+ "JB-Lighting@P12_Wash_MA_WW@V_1.01.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 16300},
+ "JB-Lighting@P12_Wash_WW@V_1.22.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798", "https://www.jb-lighting.de/download/Prospekt/JB_P12_Profile_brochure_en.pdf"], "powerConsumptionW": 800, "weightKg": 23.0, "noiseLevelDb": 29, "luminousFluxLm": 16300},
+ "JB-Lighting@P18_MK2_Profile_HC@V_1.16.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 27200, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_HP@V_1.18.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 40000, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_MA_HC@V_1.02.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 27200, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_MA_HP@V_1.02.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 40000, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_MA_WW@V_1.02.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 23300, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_S_HC@V_1.06.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 27200, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_S_HP@V_1.06.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 40000, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_S_MA_HC@V_1.02.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 27200, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_S_MA_HP@V_1.02.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 40000, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_S_MA_WW@V_1.02.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 23300, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_S_WW@V_1.06.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 23300, "noiseLevelDb": 28},
+ "JB-Lighting@P18_MK2_Profile_WW@V_1.15.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 23300, "noiseLevelDb": 28},
+ "JB-Lighting@P18_Profile_HP@V_1.09.gdtf": {"mains": "100-240", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 40000, "noiseLevelDb": 28},
+ "JB-Lighting@P18_Profile_WW@V_1.08.gdtf": {"mains": "100-240", "_estimated": ["luminousFluxLm"], "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "luminousFluxLm": 23300, "noiseLevelDb": 28},
+ "JB-Lighting@P18_Wash_HC@V_1.04.gdtf": {"category": "WASH", "subType": "Framing wash", "mains": "100-240", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "_estimated": ["powerConsumptionW"], "noiseLevelDb": 28},
+ "JB-Lighting@P18_Wash_HP@V_1.05.gdtf": {"mains": "100-240", "_estimated": ["powerConsumptionW"], "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "noiseLevelDb": 28},
+ "JB-Lighting@P18_Wash_WW@V_1.05.gdtf": {"mains": "100-240", "_estimated": ["powerConsumptionW"], "category": "WASH", "subType": "Framing wash", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"], "powerConsumptionW": 1500, "weightKg": 32.0, "noiseLevelDb": 28},
+ "JB-Lighting@P5_Beamspot_HP@V_2_00.gdtf": {"category": "BSW", "mains": "100-240", "powerConsumptionW": 350, "weightKg": 10.9, "_refs": ["https://www.jb-lighting.de/en/P5Spot"]},
+ "JB-Lighting@P7@V_1.21.gdtf": {"mains": "100-240", "powerConsumptionW": 400, "_estimated": ["powerConsumptionW"], "_notes": "270 W LED engine; mains draw estimated.", "_refs": ["https://jb-lighting.de/download/Prospekt/Varyscan_P7_Catalog.pdf"]},
+ "JB-Lighting@P9_Beamspot_HP@V_1.10.gdtf": {"mains": "100-240", "category": "BSW", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=P9+Spot&page=produkte"], "powerConsumptionW": 460, "weightKg": 17.0},
+ "JB-Lighting@Sparx10@V_1.08.gdtf": {"mains": "100-240", "powerConsumptionW": 700, "lightSourceType": "LED", "_notes": "GDTF beam-sum power invalid, removed.", "_refs": ["https://framelight.com.au/products/jb-lighting-sparx-10-led-wash-moving-head"], "weightKg": 12.25},
+ "JB-Lighting@Sparx18@V_1.39.gdtf": {"mains": "100-240", "powerConsumptionW": 1300, "lightSourceType": "LED", "_notes": "GDTF beam-sum power invalid, removed.", "_refs": ["https://www.jb-lighting.de/index.php?lang=EN&product=Sparx+18&page=produkte"], "weightKg": 22.0, "luminousFluxLm": 23000},
+ "JB-Lighting@Sparx30@V_1.02.gdtf": {"mains": "100-240", "powerConsumptionW": 2200, "lightSourceType": "LED", "_notes": "GDTF beam-sum power invalid, removed.", "_refs": ["https://www.jb-lighting.de/download/Prospekt/JB_Sparx30_brochure_en.pdf", "https://focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA998"], "weightKg": 28.4, "luminousFluxLm": 36000, "noiseLevelDb": 29},
+ "JB-Lighting@A12@V_1.05.gdtf": {"mains": "100-240", "powerConsumptionW": 830, "weightKg": 15.7, "_refs": ["https://www.rockshop.de/en/jb-lighting-a12-rgbw"]},
+ "JB-Lighting@A8@V_1.01.gdtf": {"mains": "100-240", "powerConsumptionW": 540, "weightKg": 10.0, "_refs": ["https://saleswl.com/product/jb-lighting-a8-tw-rgbw/"]}
 }

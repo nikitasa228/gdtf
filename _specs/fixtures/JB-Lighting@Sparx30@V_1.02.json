@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 2200,
   "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 213000.0,
-  "noiseLevelDb": null,
-  "weightKg": 27.3,
+  "luminousFluxLm": 36000,
+  "noiseLevelDb": 29,
+  "weightKg": 28.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -105,8 +105,8 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -138,19 +138,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
+    "maxLuminousIntensityCd"
   ],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power invalid, removed."
+  ],
+  "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/JB_Sparx30_brochure_en.pdf",
+    "https://focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA998"
   ]
 }

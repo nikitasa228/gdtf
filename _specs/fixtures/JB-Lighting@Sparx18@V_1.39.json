@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1300,
   "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 92000.0,
+  "luminousFluxLm": 23000,
   "noiseLevelDb": null,
   "weightKg": 22.0,
   "powerConnectorIn": "powerCON TRUE1",
@@ -105,8 +105,8 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -138,12 +138,11 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb"
   ],
@@ -152,5 +151,8 @@
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power invalid, removed."
+  ],
+  "_refs": [
+    "https://www.jb-lighting.de/index.php?lang=EN&product=Sparx+18&page=produkte"
   ]
 }

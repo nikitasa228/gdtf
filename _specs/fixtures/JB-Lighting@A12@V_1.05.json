@@ -10,6 +10,8 @@
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -17,18 +19,18 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 110.0,
+    "min": 100.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 850.0,
+  "powerConsumptionW": 830,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 92000.0,
   "noiseLevelDb": null,
-  "weightKg": 15.5,
+  "weightKg": 15.7,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -104,12 +106,12 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -149,5 +151,8 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.rockshop.de/en/jb-lighting-a12-rgbw"
   ]
 }

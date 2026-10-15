@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1100.0,
+  "powerConsumptionW": 1500,
   "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 72000.0,
-  "noiseLevelDb": null,
+  "luminousFluxLm": 40000,
+  "noiseLevelDb": 28,
   "weightKg": 32.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -120,9 +120,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -156,18 +156,21 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
+    "maxLuminousIntensityCd"
   ],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"
   ]
 }
