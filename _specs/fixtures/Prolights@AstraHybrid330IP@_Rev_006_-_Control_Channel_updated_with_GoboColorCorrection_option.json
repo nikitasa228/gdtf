@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 557,
-  "maxLuminousIntensityCd": 3600000.0,
-  "luminousFluxLm": 10976.0,
+  "powerConsumptionW": 557.0,
+  "maxLuminousIntensityCd": 2867500.0,
+  "luminousFluxLm": 8493.0,
   "noiseLevelDb": 43,
   "weightKg": 25.0,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -111,7 +111,7 @@
   ],
   "pixelCount": 1,
   "fullName": "Prolights AstraHybrid330IP",
-  "powerLinkable": false,
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -119,11 +119,11 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -151,7 +151,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
@@ -159,6 +159,7 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -169,6 +170,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.prolights.it/en/product/ASTRAHYB330IP",
     "https://musiclights.it/en/product/ASTRAHYB330IP"
   ]
 }

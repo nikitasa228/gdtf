@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 270,
-  "maxLuminousIntensityCd": 150000.0,
-  "luminousFluxLm": 11500,
+  "powerConsumptionW": 270.0,
+  "maxLuminousIntensityCd": 161600.0,
+  "luminousFluxLm": 11179.0,
   "noiseLevelDb": 0,
   "weightKg": 9.0,
   "powerConnectorIn": "IP moulded connector",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -114,7 +114,7 @@
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
     "luminousFluxLm": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "powerSupplyType": "manual",
@@ -144,19 +144,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCPOD27Q"

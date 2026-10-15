@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 5700.0,
-  "luminousFluxLm": 125.0,
-  "noiseLevelDb": 30,
+  "powerConsumptionW": 80.0,
+  "maxLuminousIntensityCd": 32800.0,
+  "luminousFluxLm": 3567.0,
+  "noiseLevelDb": 0,
   "weightKg": 4.9,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP67",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -114,9 +114,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -137,28 +137,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "colorTemperatureK": "estimated",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
+    "https://www.prolights.it/en/product/ARCSHINEM1808FC",
     "https://luminaires.dialux.com/en/article/6z1wP-ujTdWGjbJno0IvqQ"
   ]
 }

@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 75,
-  "maxLuminousIntensityCd": 1400.0,
+  "powerConsumptionW": 63.0,
+  "maxLuminousIntensityCd": 2000.0,
   "luminousFluxLm": 1726.0,
-  "noiseLevelDb": 30,
+  "noiseLevelDb": 0,
   "weightKg": 1.85,
   "powerConnectorIn": "Track adapter",
   "powerConnectorOut": null,
@@ -105,9 +105,9 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualPanRangeDeg": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
@@ -135,21 +135,21 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "colorTemperatureK": "estimated",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.prolights.it/en/product/DISPLAYCOBTRWDFC"

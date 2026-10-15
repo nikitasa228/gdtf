@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 24.0,
-  "maxLuminousIntensityCd": 37000.0,
+  "maxLuminousIntensityCd": 17500.0,
   "luminousFluxLm": 592.0,
   "noiseLevelDb": 30,
-  "weightKg": 1.4,
+  "weightKg": 1.1,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": null,
   "powerSupplyType": "IP moulded connector",
@@ -110,10 +110,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -135,7 +135,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
@@ -154,5 +154,8 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCSPOTDOTFC"
   ]
 }

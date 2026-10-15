@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 45,
-  "maxLuminousIntensityCd": 4800.0,
-  "luminousFluxLm": 650.0,
-  "noiseLevelDb": 30,
+  "powerConsumptionW": 45.0,
+  "maxLuminousIntensityCd": 6600.0,
+  "luminousFluxLm": 663.0,
+  "noiseLevelDb": 0,
   "weightKg": 2.9,
-  "powerConnectorIn": "Schuko",
+  "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
-  "powerSupplyType": "Schuko",
+  "powerSupplyType": "Fixed Cable",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP30",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -102,9 +102,9 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -133,22 +133,23 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
+    "https://www.prolights.it/en/product/GALLERYECLFC",
     "https://prolights.it/en/product/GALLERYECLFC"
   ]
 }

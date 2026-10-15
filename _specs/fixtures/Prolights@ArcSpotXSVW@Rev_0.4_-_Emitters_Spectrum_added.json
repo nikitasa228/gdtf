@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 17,
-  "maxLuminousIntensityCd": 21000.0,
+  "powerConsumptionW": 17.0,
+  "maxLuminousIntensityCd": 16000.0,
   "luminousFluxLm": 804.0,
   "noiseLevelDb": 30,
-  "weightKg": 1.3,
+  "weightKg": 1.0,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": null,
   "powerSupplyType": "IP moulded connector",
@@ -111,9 +111,9 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -135,7 +135,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
@@ -156,6 +156,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.prolights.it/en/product/ARCSPOTXSVW",
     "https://musiclights.it/en/product/ARCSPOTXSVW"
   ]
 }

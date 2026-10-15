@@ -777,23 +777,47 @@ def apply_fallbacks(rec, src, issues, na, stats):
 def main(src_dir, out_dir):
     os.makedirs(os.path.join(out_dir, "fixtures"), exist_ok=True)
     # manual research, one JSON per manufacturer: {"<gdtf file name>": {field: value, "_refs": [...]}}
+    # files are read in name order and entries for the same fixture are merged field by field, so a later
+    # layer (e.g. overrides/web/*.json, values parsed from the manufacturer's product pages) refines earlier ones
+    all_files = sorted(f for f in os.listdir(src_dir) if f.lower().endswith(".gdtf"))
+
+    def canon(k):
+        if k.endswith("@*") or k in all_files:
+            return k
+        pre = "@".join(k.split("@")[:2]) + "@"
+        hits = [f for f in all_files if f.startswith(pre)]
+        return hits[0] if len(hits) == 1 else k
+
     overrides = {}
     ov_dir = os.path.join(out_dir, "overrides")
-    if os.path.isdir(ov_dir):
-        for fn in sorted(os.listdir(ov_dir)):
-            if fn.endswith(".json"):
-                with open(os.path.join(ov_dir, fn), encoding="utf-8") as f:
-                    overrides.update(json.load(f))
+    paths = []
+    for root, _, fns in os.walk(ov_dir):
+        paths += [os.path.join(root, fn) for fn in fns if fn.endswith(".json")]
+    for path in sorted(paths, key=lambda p: (p.count(os.sep), p)):
+        with open(path, encoding="utf-8") as f:
+            for k, v in json.load(f).items():
+                cur = overrides.setdefault(canon(k), {})
+                est = set(cur.get("_estimated", []))
+                if "_refs" in v:  # a sourced layer replaces earlier estimates of the fields it sets
+                    est -= {f for f in v if not f.startswith("_")}
+                    cur["_refs"] = list(dict.fromkeys(v["_refs"] + cur.get("_refs", [])))
+                est |= set(v.get("_estimated", []))
+                if est:
+                    cur["_estimated"] = sorted(est)
+                else:
+                    cur.pop("_estimated", None)
+                for kk, vv in v.items():
+                    if kk in ("_refs", "_estimated"):
+                        continue
+                    if kk == "_na":
+                        cur["_na"] = sorted(set(cur.get("_na", [])) | set(vv))
+                    elif kk == "_notes" and cur.get("_notes") and vv not in cur["_notes"]:
+                        cur["_notes"] = cur["_notes"] + " " + vv
+                    else:
+                        cur[kk] = vv
     # an override key may also be just "Manufacturer@Model" (or any unique "Manufacturer@Model@" prefix);
     # "Manufacturer@*" holds defaults for every fixture of that manufacturer (lowest priority)
-    all_files = sorted(f for f in os.listdir(src_dir) if f.lower().endswith(".gdtf"))
     mfr_defaults = {k[:-2]: overrides.pop(k) for k in list(overrides) if k.endswith("@*")}
-    for k in list(overrides):
-        if k not in all_files:
-            pre = "@".join(k.split("@")[:2]) + "@"
-            hits = [f for f in all_files if f.startswith(pre)]
-            if len(hits) == 1:
-                overrides.setdefault(hits[0], overrides.pop(k))
     index, rows = [], []
     for fn in sorted(os.listdir(src_dir)):
         if not fn.lower().endswith(".gdtf"):

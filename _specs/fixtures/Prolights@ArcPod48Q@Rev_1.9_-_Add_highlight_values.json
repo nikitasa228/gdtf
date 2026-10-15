@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 116000,
-  "luminousFluxLm": 28000,
+  "powerConsumptionW": 540.0,
+  "maxLuminousIntensityCd": 336300.0,
+  "luminousFluxLm": 22977.0,
   "noiseLevelDb": 0,
   "weightKg": 14.0,
   "powerConnectorIn": "IP moulded connector",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -143,20 +143,20 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
     "colorTemperatureK": "estimated",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCPOD48Q",

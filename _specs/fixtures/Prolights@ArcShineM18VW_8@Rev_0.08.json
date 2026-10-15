@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 9500.0,
-  "luminousFluxLm": 208.0,
-  "noiseLevelDb": 30,
+  "powerConsumptionW": 80.0,
+  "maxLuminousIntensityCd": 14000.0,
+  "luminousFluxLm": 5401.0,
+  "noiseLevelDb": 0,
   "weightKg": 4.9,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
@@ -114,9 +114,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -138,25 +138,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power assumed equal to the M18FC (same housing and driver).",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Power assumed equal to the M18FC (same housing and driver). Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCSHINEM1808VW"
   ]
 }

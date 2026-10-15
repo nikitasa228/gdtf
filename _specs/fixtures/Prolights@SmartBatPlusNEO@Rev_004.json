@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 66,
-  "maxLuminousIntensityCd": 8700.0,
-  "luminousFluxLm": 2927,
-  "noiseLevelDb": 30,
+  "powerConsumptionW": 66.0,
+  "maxLuminousIntensityCd": 37300.0,
+  "luminousFluxLm": 2927.0,
+  "noiseLevelDb": 0,
   "weightKg": 3.4,
   "powerConnectorIn": "Battery (internal)",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -124,9 +124,9 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -153,21 +153,20 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Charged via magnetic contacts in the charging flight case (570 W for 6 units).",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Charged via magnetic contacts in the charging flight case (570 W for 6 units). Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.prolights.it/en/product/SMARTBATPLUSNEO"

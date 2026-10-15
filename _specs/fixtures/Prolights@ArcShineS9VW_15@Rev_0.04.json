@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 17.5,
-  "maxLuminousIntensityCd": 1400.0,
-  "luminousFluxLm": 133.0,
-  "noiseLevelDb": 30,
-  "weightKg": 1.9,
+  "maxLuminousIntensityCd": 6300.0,
+  "luminousFluxLm": 1332.0,
+  "noiseLevelDb": 0,
+  "weightKg": 1.95,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
   "powerSupplyType": "IP moulded connector LINK",
@@ -110,9 +110,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -134,27 +134,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
+    "https://www.prolights.it/en/product/ARCSHINES915VW",
     "https://aclighting.com/arcshine-s9vw"
   ]
 }
