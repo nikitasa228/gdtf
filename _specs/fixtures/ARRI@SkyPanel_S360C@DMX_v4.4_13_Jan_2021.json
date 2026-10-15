@@ -310,7 +310,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "External PSU 10.7 kg. GDTF power 3125 W invalid.",
     "GDTF luminous flux 250000 lm is implausible for 1600 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"

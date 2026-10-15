@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 165.0,
-  "maxLuminousIntensityCd": 9500.0,
+  "maxLuminousIntensityCd": 10000.0,
   "luminousFluxLm": 9822.0,
   "noiseLevelDb": 35,
   "weightKg": 4.95,
@@ -105,7 +105,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -143,13 +142,13 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/STUDIOCOBPDY2"

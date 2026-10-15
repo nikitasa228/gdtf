@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 115.0,
-  "maxLuminousIntensityCd": 23000.0,
+  "maxLuminousIntensityCd": 260000.0,
   "luminousFluxLm": 7135.0,
   "noiseLevelDb": 30,
   "weightKg": 3.6,
@@ -107,7 +107,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -141,15 +140,15 @@
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "LED (COB), not halogen as GDTF states; manual zoom.",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/par-z100-3k",

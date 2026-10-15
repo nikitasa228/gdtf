@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 175.0,
-  "maxLuminousIntensityCd": 140000.0,
+  "maxLuminousIntensityCd": 8800.0,
   "luminousFluxLm": 4743.0,
   "noiseLevelDb": 35,
   "weightKg": 4.3,
@@ -134,7 +134,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -170,14 +169,14 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "80 deg native; 40/50 deg lenses included (manual).",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/cob-cannon-lp200x",

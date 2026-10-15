@@ -4,7 +4,7 @@
   "fixtureTypeId": "AB74CFF6-37EF-40BA-A579-D1867CFE75B1",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Orion",
-  "longName": "Orion",
+  "longName": "Lighting Orion",
   "shortName": "Orion",
   "description": "CLF Orion: discharge-lamp beam/spot/wash hybrid with CMY, gobos, prisms and 3-42 deg zoom.",
   "manufacturer": "CLF Lighting",
@@ -116,7 +116,7 @@
     }
   ],
   "pixelCount": 1,
-  "fullName": "CLF Lighting Orion",
+  "fullName": "CLF Lighting Lighting Orion",
   "powerLinkable": true,
   "_source": {
     "longName": "gdtf",

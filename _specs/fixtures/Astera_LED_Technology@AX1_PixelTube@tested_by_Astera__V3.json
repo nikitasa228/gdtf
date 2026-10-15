@@ -793,7 +793,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Battery powered; mains via external charger/PSU. GDTF power 4876 W invalid.",
     "Typical-value estimates (no published data): powerConsumptionW, maxLuminousIntensityCd, noiseLevelDb"
   ]

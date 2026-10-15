@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 330000.0,
+  "maxLuminousIntensityCd": 410000.0,
   "luminousFluxLm": 11230.0,
   "noiseLevelDb": 43,
   "weightKg": 16.5,
@@ -127,7 +127,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -166,12 +165,13 @@
     "ipRating": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.robe.cz/silverscan"

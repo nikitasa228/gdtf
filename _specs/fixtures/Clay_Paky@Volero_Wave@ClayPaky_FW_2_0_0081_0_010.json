@@ -154,7 +154,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Tilting pixel batten. GDTF power 40 W invalid."
   ],
   "_refs": [

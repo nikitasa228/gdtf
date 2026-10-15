@@ -168,7 +168,6 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white. Fan-free (passive cooling): silent.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],

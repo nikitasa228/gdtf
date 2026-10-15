@@ -149,7 +149,6 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [

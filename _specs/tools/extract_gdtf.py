@@ -798,6 +798,8 @@ def main(src_dir, out_dir):
             for k, v in json.load(f).items():
                 cur = overrides.setdefault(canon(k), {})
                 est = set(cur.get("_estimated", []))
+                if "_refs" in v and not cur.get("_refs") and "_notes" in v:
+                    cur.pop("_notes", None)  # notes of an unsourced (estimate) entry are superseded by the sourced one
                 if "_refs" in v:  # a sourced layer replaces earlier estimates of the fields it sets
                     est -= {f for f in v if not f.startswith("_")}
                     cur["_refs"] = list(dict.fromkeys(v["_refs"] + cur.get("_refs", [])))
@@ -855,6 +857,12 @@ def main(src_dir, out_dir):
             rec[k] = v
             src[k] = "estimated" if k in est else ov.get("_source", "manual")
         issues = list(issues)
+        if src.get("powerConsumptionW") != "estimated":
+            issues = [i for i in issues if not i.startswith("Power consumption taken from GDTF beam")]
+        if src.get("maxLuminousIntensityCd") == "estimated" and "maxLuminousIntensityCd" not in ov \
+                and ({"luminousFluxLm", "beamAngleDeg"} & set(ov)):
+            rec["maxLuminousIntensityCd"] = None  # re-estimated below from the published flux / beam
+            src.pop("maxLuminousIntensityCd")
         if ov.get("_notes"):
             issues.append(ov["_notes"])
         for ax in ("panRangeDeg", "tiltRangeDeg"):

@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": 8200.0,
+  "maxLuminousIntensityCd": 7500.0,
   "luminousFluxLm": 1600.0,
   "noiseLevelDb": 0,
   "weightKg": 12.0,
@@ -157,7 +157,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -194,13 +193,14 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Fanless (0 dB). GDTF power 10 W invalid."
+    "Fanless (0 dB). GDTF power 10 W invalid.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/pixbar-400-ip-g2"

@@ -792,7 +792,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Battery up to 20 h; IP65 with FP1-SP. GDTF power 4876 W invalid.",
     "GDTF luminous flux 307400 lm is implausible for 48 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"

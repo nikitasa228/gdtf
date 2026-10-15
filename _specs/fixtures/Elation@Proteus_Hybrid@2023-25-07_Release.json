@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 700.0,
-  "maxLuminousIntensityCd": 9600000.0,
+  "maxLuminousIntensityCd": 10000000.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": 47,
   "weightKg": 38.0,
@@ -145,7 +145,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -187,13 +186,13 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/proteus-hybrid"

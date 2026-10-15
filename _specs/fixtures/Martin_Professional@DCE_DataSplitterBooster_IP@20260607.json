@@ -118,7 +118,7 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless. Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/dce-datasplitterbooster-ip"

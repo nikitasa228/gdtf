@@ -345,7 +345,6 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Beam angle depends on optic (open face, projection, dome, Fresnel). GDTF lamp type 'Discharge' is wrong.",
     "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],

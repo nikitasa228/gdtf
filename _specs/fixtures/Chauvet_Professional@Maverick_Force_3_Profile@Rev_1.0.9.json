@@ -167,9 +167,7 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
-  ],
+  "_issues": [],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-3-profile/"
   ]

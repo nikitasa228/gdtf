@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 265.0,
-  "maxLuminousIntensityCd": 21000.0,
+  "maxLuminousIntensityCd": 10000.0,
   "luminousFluxLm": 4406.0,
   "noiseLevelDb": 35,
   "weightKg": 7.3,
@@ -113,7 +113,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -152,13 +151,13 @@
     "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ECLFWVW"

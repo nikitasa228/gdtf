@@ -4,7 +4,7 @@
   "fixtureTypeId": "86A02BB4-E327-4650-8DC6-422C7310B390",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LED BAR EFF",
-  "longName": "LEDBAR EFF",
+  "longName": "Lighting LEDBAR EFF",
   "shortName": "LedBarEFF",
   "description": "CLF LEDBAR EFF: RGBWA+WW LED effect bar.",
   "manufacturer": "CLF Lighting",
@@ -142,7 +142,7 @@
     }
   ],
   "pixelCount": 246,
-  "fullName": "CLF Lighting LEDBAR EFF",
+  "fullName": "CLF Lighting Lighting LEDBAR EFF",
   "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
@@ -191,7 +191,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "220 W wash, 380 W strobe peak.",
     "GDTF luminous flux 100280 lm is implausible for 380 W and was dropped",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"

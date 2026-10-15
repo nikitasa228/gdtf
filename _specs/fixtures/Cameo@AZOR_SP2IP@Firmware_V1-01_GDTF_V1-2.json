@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 1500000.0,
+  "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 13000.0,
   "noiseLevelDb": 43,
   "weightKg": 25.0,
@@ -127,7 +127,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "powerConnectorIn": "manual",
@@ -170,6 +169,7 @@
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -177,6 +177,6 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Power assumed equal to indoor AZOR SP2.",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

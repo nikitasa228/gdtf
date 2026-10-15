@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 9500.0,
+  "maxLuminousIntensityCd": 250000.0,
   "luminousFluxLm": 5401.0,
   "noiseLevelDb": 0,
   "weightKg": 4.9,
@@ -114,7 +114,6 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -151,12 +150,14 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power assumed equal to the M18FC (same housing and driver). Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCSHINEM1808VW"

@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 180.0,
-  "maxLuminousIntensityCd": 61000.0,
+  "maxLuminousIntensityCd": 68000.0,
   "luminousFluxLm": 5200.0,
   "noiseLevelDb": 0,
   "weightKg": 13.9,
@@ -110,7 +110,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -147,12 +146,14 @@
     "ipRating": "manual",
     "noiseLevelDb": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/exterior-projection-pro-compact"

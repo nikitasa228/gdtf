@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 250.0,
-  "maxLuminousIntensityCd": 2500.0,
+  "maxLuminousIntensityCd": 3800.0,
   "luminousFluxLm": 3055.0,
   "noiseLevelDb": 24.5,
   "weightKg": 5.89,
@@ -118,7 +118,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -154,6 +153,7 @@
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated"
   },
   "_missing": [],
@@ -161,7 +161,7 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Asymmetric optic 49 deg (H) x 108 deg (V). Noise 24.5 dB(A) @1 m in fan mode.",
-    "Typical-value estimates (no published data): ipRating"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
     "https://goknight.com/content/documentation/KlemantisAS1000_Datasheet_05.2021.pdf",

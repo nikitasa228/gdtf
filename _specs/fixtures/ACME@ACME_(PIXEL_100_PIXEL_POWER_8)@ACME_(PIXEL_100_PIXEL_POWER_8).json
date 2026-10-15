@@ -143,7 +143,6 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "24 V DC pixel bar fed by the PIXEL POWER 8 supply (530 W, up to 8 units).",
     "GDTF luminous flux 176000 lm is implausible for 75 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"

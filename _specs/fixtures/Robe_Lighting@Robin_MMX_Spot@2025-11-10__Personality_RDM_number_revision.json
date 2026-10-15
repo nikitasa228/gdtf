@@ -131,7 +131,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -168,13 +167,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.robe.cz/mmx-spot"

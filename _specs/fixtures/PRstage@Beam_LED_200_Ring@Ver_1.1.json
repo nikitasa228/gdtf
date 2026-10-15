@@ -152,7 +152,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF said discharge lamp / 295 W (copied from Beam 295); LED 200 W model.",
     "Typical-value estimates (no published data): powerConsumptionW, powerSupplyType, powerConnectorIn, powerConnectorOut, ipRating, noiseLevelDb"
   ]

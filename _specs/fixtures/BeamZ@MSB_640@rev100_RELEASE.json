@@ -155,7 +155,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power 3412 W invalid, removed.",
     "Typical-value estimates (no published data): powerConsumptionW, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
   ]

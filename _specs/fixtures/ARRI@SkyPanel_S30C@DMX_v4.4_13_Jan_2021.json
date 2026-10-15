@@ -311,7 +311,6 @@
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF luminous flux 50000 lm is implausible for 220 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],

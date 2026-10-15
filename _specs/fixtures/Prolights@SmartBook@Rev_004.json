@@ -145,8 +145,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "No public data sheet found. Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.prolights.it/en/product/SMARTBOOK"

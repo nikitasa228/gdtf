@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 1555,
-  "maxLuminousIntensityCd": 2700000.0,
+  "maxLuminousIntensityCd": 3900000.0,
   "luminousFluxLm": 33500,
   "noiseLevelDb": 48,
   "weightKg": 43.0,
@@ -124,7 +124,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -166,13 +165,13 @@
     "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-15"

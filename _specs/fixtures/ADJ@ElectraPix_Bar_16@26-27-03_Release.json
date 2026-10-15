@@ -175,7 +175,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Battery-powered option; GDTF power 360 W contradicts spec sheet (90 W).",
     "GDTF luminous flux 62221 lm is implausible for 90 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"

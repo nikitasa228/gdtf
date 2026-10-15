@@ -163,7 +163,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "300 W Ushio NSL lamp."
   ],
   "_refs": [

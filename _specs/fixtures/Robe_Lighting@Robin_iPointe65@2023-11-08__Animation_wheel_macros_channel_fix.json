@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 550.0,
-  "maxLuminousIntensityCd": 8500000.0,
+  "maxLuminousIntensityCd": 8800000.0,
   "luminousFluxLm": 12000.0,
   "noiseLevelDb": 47,
   "weightKg": 42.8,
@@ -143,7 +143,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -181,12 +180,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.robe.cz/ipointe65"

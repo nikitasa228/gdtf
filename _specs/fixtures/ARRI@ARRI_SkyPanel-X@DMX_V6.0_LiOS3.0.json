@@ -174,7 +174,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Values for SkyPanel X21 (1 x 2 engines); X22/X23 = 2x/3x power. GDTF power 3125 W invalid.",
     "GDTF luminous flux 250000 lm is implausible for 800 W and was dropped",
     "Typical-value estimates (no published data): noiseLevelDb"

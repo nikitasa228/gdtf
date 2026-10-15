@@ -165,7 +165,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Charged via magnetic contacts in the charging flight case (570 W for 6 units). Fan-free (passive cooling): silent."
   ],
   "_refs": [

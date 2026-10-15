@@ -152,7 +152,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Power assumed equal to the IP20 Profile HP (same 130 W engine).",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],

@@ -225,7 +225,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "1500 W peak in strobe mode, 580 W static.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],

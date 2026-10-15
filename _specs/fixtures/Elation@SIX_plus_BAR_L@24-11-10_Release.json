@@ -211,7 +211,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF weight (27) was wrong.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],

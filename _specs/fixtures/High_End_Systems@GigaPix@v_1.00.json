@@ -164,7 +164,6 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "2.9 A @ 230 V.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],

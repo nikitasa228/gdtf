@@ -23,7 +23,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 2000.0,
-  "maxLuminousIntensityCd": 7300000.0,
+  "maxLuminousIntensityCd": 6800000.0,
   "luminousFluxLm": 37000.0,
   "noiseLevelDb": 48,
   "weightKg": 41.0,
@@ -112,7 +112,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -153,15 +152,15 @@
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Values of the F1700WB-P (same 1700 W platform).",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/f1700wb-p/"

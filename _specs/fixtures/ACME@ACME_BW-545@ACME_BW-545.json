@@ -104,7 +104,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -136,6 +135,7 @@
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
@@ -143,9 +143,8 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power value (10 W) implausible, removed; discontinued, no spec sheet found.",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=2180"

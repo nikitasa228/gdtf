@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 3600000.0,
+  "maxLuminousIntensityCd": 170000.0,
   "luminousFluxLm": 7000.0,
   "noiseLevelDb": 38,
   "weightKg": 10.0,
@@ -130,7 +130,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -170,6 +169,7 @@
     "powerConnectorOut": "manual",
     "colorTemperatureK": "estimated",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -178,7 +178,7 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF weight 14.1 kg contradicts spec sheet (10 kg); GDTF CCT 21333 K invalid.",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/focus-spot-4z",

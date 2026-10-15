@@ -144,7 +144,6 @@
   ],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power 102 W implausible, removed.",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ],

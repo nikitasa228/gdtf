@@ -170,7 +170,6 @@
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Values of the Lunar BSW (same 420 W lamp platform); no F420BSW page found.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],

@@ -156,7 +156,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power taken from the S18VW datasheet (same body). Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent."
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCSHINES1815FC"

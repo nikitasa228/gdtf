@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 1500000.0,
+  "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 13000.0,
   "noiseLevelDb": 43,
   "weightKg": 24.0,
@@ -127,7 +127,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -170,14 +169,14 @@
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF weight 23 kg vs spec 24 kg.",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/azor-sp2"

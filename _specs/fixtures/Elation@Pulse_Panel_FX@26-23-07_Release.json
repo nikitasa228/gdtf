@@ -183,7 +183,6 @@
     "colorTemperatureK"
   ],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Values from the unlabelled comparison table on the Pulse Panel page.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],

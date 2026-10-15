@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 265,
-  "maxLuminousIntensityCd": 140000.0,
+  "powerConsumptionW": 250.0,
+  "maxLuminousIntensityCd": 130000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
   "weightKg": 13.4,
@@ -140,7 +140,6 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power 400 W copied from 400 model, removed.",
     "Typical-value estimates (no published data): powerConsumptionW, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]

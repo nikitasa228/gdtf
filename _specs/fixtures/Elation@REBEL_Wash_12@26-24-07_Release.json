@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 730.0,
-  "maxLuminousIntensityCd": 2800000.0,
+  "maxLuminousIntensityCd": 3300000.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": 43,
   "weightKg": 16.5,
@@ -139,7 +139,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -178,13 +177,13 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/rebel-wash-12"

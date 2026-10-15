@@ -159,8 +159,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Weight is 0 in GDTF"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-2-solowash/"

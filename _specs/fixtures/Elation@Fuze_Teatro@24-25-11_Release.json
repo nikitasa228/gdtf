@@ -205,9 +205,7 @@
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
-  ],
+  "_issues": [],
   "_refs": [
     "https://www.elationlighting.com/products/fuze-teatro",
     "https://assets.centryngroup.com/dl/files/FUZ625__DL__004.pdf"

@@ -186,7 +186,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Noise measured at 3 ft (0.9 m)."
   ],
   "_refs": [

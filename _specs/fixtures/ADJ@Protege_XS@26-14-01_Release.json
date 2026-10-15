@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 616.0,
-  "maxLuminousIntensityCd": 2000000.0,
+  "maxLuminousIntensityCd": 1200000.0,
   "luminousFluxLm": 9800.0,
   "noiseLevelDb": 43,
   "weightKg": 17.85,
@@ -124,7 +124,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -165,13 +164,13 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/protege-xs"

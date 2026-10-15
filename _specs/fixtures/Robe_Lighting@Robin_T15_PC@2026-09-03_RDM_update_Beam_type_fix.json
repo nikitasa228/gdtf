@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 440.0,
-  "maxLuminousIntensityCd": 280000.0,
+  "maxLuminousIntensityCd": 350000.0,
   "luminousFluxLm": 11960.0,
   "noiseLevelDb": 30.0,
   "weightKg": 14.5,
@@ -124,7 +124,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -159,11 +158,14 @@
     "subType": "manual",
     "ipRating": "manual",
     "noiseLevelDb": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
   "_refs": [
     "https://www.robe.cz/t15-pc"
   ]

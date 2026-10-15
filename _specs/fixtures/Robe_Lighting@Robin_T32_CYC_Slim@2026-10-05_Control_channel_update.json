@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 500.0,
-  "maxLuminousIntensityCd": 2400.0,
+  "maxLuminousIntensityCd": 42000.0,
   "luminousFluxLm": 17565.0,
   "noiseLevelDb": 35,
   "weightKg": 21.5,
@@ -112,7 +112,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -146,12 +145,13 @@
     "subType": "manual",
     "ipRating": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.robe.cz/t32-cyc-slim"

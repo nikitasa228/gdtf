@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 410.0,
-  "maxLuminousIntensityCd": 500000.0,
+  "maxLuminousIntensityCd": 4500000.0,
   "luminousFluxLm": 6200.0,
   "noiseLevelDb": 47,
   "weightKg": 18.7,
@@ -114,7 +114,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -154,15 +153,15 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Osram Sirius HRI 310 W lamp (GDTF wrongly says LED).",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/vizi-beam-cmy"

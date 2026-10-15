@@ -170,7 +170,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "880 W white LED engine; mains draw assumed as Super Scope Plus (same 37.5 kg platform).",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],

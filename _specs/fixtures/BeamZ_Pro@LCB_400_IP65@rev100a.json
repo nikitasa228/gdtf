@@ -174,7 +174,6 @@
     "colorTemperatureK"
   ],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
     "GDTF luminous flux 3.6468e+07 lm is implausible for 290 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"

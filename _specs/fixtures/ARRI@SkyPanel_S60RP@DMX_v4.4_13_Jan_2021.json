@@ -101,7 +101,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -136,6 +135,7 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -145,6 +145,6 @@
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Remote-phosphor 5600 K version; same housing as S60-C.",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

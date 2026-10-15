@@ -24,7 +24,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 596.0,
-  "maxLuminousIntensityCd": 320000.0,
+  "maxLuminousIntensityCd": 360000.0,
   "luminousFluxLm": 9500.0,
   "noiseLevelDb": 0,
   "weightKg": 28.5,
@@ -98,7 +98,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -136,12 +135,14 @@
     "noiseLevelDb": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/mac-encore-wash-wrm"

@@ -174,7 +174,6 @@
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "XP-20R = 20R (440 W) discharge lamp; discontinued, no spec sheet found.",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
   ],

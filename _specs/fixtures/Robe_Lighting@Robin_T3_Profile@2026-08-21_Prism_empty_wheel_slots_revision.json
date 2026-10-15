@@ -24,7 +24,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 1700.0,
-  "maxLuminousIntensityCd": 2000000.0,
+  "maxLuminousIntensityCd": 2700000.0,
   "luminousFluxLm": 40200.0,
   "noiseLevelDb": 37.0,
   "weightKg": 46.5,
@@ -140,7 +140,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -179,11 +178,14 @@
     "ipRating": "manual",
     "noiseLevelDb": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
   "_refs": [
     "https://www.robe.cz/t3-profile"
   ]

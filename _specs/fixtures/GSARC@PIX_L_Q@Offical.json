@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 420,
-  "maxLuminousIntensityCd": 4100.0,
-  "luminousFluxLm": 200.0,
-  "noiseLevelDb": 35,
+  "maxLuminousIntensityCd": 360000.0,
+  "luminousFluxLm": 12200,
+  "noiseLevelDb": 0,
   "weightKg": 19.9,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -48,8 +48,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 12.0,
-    "max": 12.0
+    "min": 10.0,
+    "max": 10.0
   },
   "fieldAngleDeg": 12.0,
   "zoom": false,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP66",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
@@ -101,11 +101,11 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "estimated",
     "lightSourceType": "gdtf",
-    "beamAngleDeg": "gdtf",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
     "lensType": "gdtf-derived",
@@ -124,27 +124,28 @@
     "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "ipRating": "manual",
     "subType": "manual",
     "weightKg": "manual",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
-    "noiseLevelDb": "estimated"
+    "colorTemperatureK": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "Convection cooled (no fan): silent. Power/data via integrated cable with waterproof connector. Narrowest standard optic 10 deg (beam angle is chosen at order: up to 60 deg and elliptical options).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK"
   ],
   "_refs": [
+    "https://en.gsarc.com/en/products/849.html?t=1",
     "https://www.gsarc.com/en/products/849.html?t=1"
   ]
 }

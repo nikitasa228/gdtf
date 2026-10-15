@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 1150.0,
-  "maxLuminousIntensityCd": 600000.0,
+  "maxLuminousIntensityCd": 1300000.0,
   "luminousFluxLm": 22000.0,
   "noiseLevelDb": 29.0,
   "weightKg": 37.5,
@@ -138,7 +138,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -177,11 +176,14 @@
     "ipRating": "manual",
     "noiseLevelDb": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
   "_refs": [
     "https://www.robe.cz/t2-profile-fs"
   ]

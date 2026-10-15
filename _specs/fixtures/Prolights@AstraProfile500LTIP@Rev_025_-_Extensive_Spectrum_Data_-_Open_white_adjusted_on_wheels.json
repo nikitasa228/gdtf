@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 788.0,
-  "maxLuminousIntensityCd": 4300000.0,
+  "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 25490.0,
   "noiseLevelDb": 43,
   "weightKg": 34.0,
@@ -122,7 +122,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -162,12 +161,13 @@
     "pixelCount": "gdtf-derived",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ASTRAPROF500LTIP"

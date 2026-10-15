@@ -310,7 +310,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Lamphead powered by external PSU (approx. 4 kg, powerCON TRUE1 in/thru). GDTF power 900 W invalid.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],

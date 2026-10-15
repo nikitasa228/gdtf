@@ -156,7 +156,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Interchangeable lens tubes 14/19/26/36/50 deg or 15-30 / 25-50 zoom; manual shutters and gobo slot. GDTF power 922 W contradicts spec sheet (250 W).",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],

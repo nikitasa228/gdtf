@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 750.0,
-  "maxLuminousIntensityCd": 600000.0,
+  "maxLuminousIntensityCd": 750000.0,
   "luminousFluxLm": 12600.0,
   "noiseLevelDb": 30.0,
   "weightKg": 24.3,
@@ -130,7 +130,6 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -170,12 +169,14 @@
     "ipRating": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto)."
+    "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.robe.cz/t1-profile",

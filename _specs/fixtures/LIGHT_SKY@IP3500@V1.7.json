@@ -160,7 +160,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF has no pan/tilt channels for this file.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],

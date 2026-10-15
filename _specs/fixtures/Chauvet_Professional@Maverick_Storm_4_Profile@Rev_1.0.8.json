@@ -168,7 +168,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF weight 46.5 kg contradicts spec sheet (50.6 kg)."
   ],
   "_refs": [

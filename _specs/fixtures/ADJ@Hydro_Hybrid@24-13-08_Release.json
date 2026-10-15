@@ -170,7 +170,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Osram Sirius HRI 420 W lamp.",
     "Typical-value estimates (no published data): noiseLevelDb"
   ],

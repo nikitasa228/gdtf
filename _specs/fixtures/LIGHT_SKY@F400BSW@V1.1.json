@@ -160,7 +160,6 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF luminous flux 244000 lm is implausible for 495 W and was dropped",
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],

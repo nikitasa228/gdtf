@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 75.0,
-  "maxLuminousIntensityCd": 19000.0,
+  "maxLuminousIntensityCd": 170000.0,
   "luminousFluxLm": 3700.0,
   "noiseLevelDb": 0,
   "weightKg": 7.3,
@@ -115,7 +115,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -148,12 +147,14 @@
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
     "noiseLevelDb": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/exterior-wash-pro-m-quad"

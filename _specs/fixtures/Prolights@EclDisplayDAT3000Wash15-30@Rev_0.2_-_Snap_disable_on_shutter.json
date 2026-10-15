@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 33.0,
-  "maxLuminousIntensityCd": 18000.0,
+  "maxLuminousIntensityCd": 25000.0,
   "luminousFluxLm": 1894.0,
   "noiseLevelDb": 0,
   "weightKg": 1.4,
@@ -107,7 +107,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -144,13 +143,14 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorOut": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ECLDISPLAYDAT"

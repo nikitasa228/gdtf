@@ -119,7 +119,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "manual",
@@ -162,13 +161,14 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Noise 46.3 dB(A) in Auto fan mode (37.5 silent)."
+    "Noise 46.3 dB(A) in Auto fan mode (37.5 silent).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.claypaky.it/products/arolla-aqua-lt/"

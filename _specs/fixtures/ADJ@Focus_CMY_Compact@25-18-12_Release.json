@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": 5200000.0,
+  "maxLuminousIntensityCd": 5100000.0,
   "luminousFluxLm": 15800,
   "noiseLevelDb": 43,
   "weightKg": 20.2,
@@ -141,7 +141,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -182,13 +181,13 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/focus-cmy-compact"

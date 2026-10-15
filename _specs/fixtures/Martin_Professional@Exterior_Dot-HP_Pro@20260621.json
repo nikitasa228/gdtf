@@ -16,7 +16,7 @@
   },
   "frequencyRangeHz": null,
   "powerConsumptionW": 6.0,
-  "maxLuminousIntensityCd": 4.5,
+  "maxLuminousIntensityCd": 12.0,
   "luminousFluxLm": 50.0,
   "noiseLevelDb": 0,
   "weightKg": 0.39,
@@ -104,7 +104,6 @@
     "category": "manual",
     "voltageRangeV": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -136,7 +135,8 @@
     "subType": "manual",
     "ipRating": "manual",
     "noiseLevelDb": "manual",
-    "fullName": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -145,7 +145,8 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless. Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/exterior-dot-hp-pro"
