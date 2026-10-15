@@ -9,10 +9,24 @@
   "description": "The Ra 2000ProfileHB is the high-flux variant of the Ra 2000Profile designed for touring applications, offering the same footprint and feature set, but engineered around an LED source, which scores 40% higher intensity with lower colour rendering.",
   "manufacturer": "Prolights",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 540.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 640,
   "maxLuminousIntensityCd": 864400.0,
   "luminousFluxLm": 18900.0,
   "noiseLevelDb": null,
@@ -75,6 +89,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 50.0
@@ -108,7 +123,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -142,17 +157,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://prolights.it/en/product/RA2000PROFILEHB"
   ]
 }

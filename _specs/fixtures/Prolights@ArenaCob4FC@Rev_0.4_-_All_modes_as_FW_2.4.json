@@ -8,7 +8,7 @@
   "shortName": "ARCOB4FC",
   "description": "ArenaCob 4FC is a full colour LED replacement for a traditional 4 cell DWE blinder. Each of the individually controllable 75 W RGBW cells deliver a consistent, powerful punch that has been designed to perform in even the largest environments",
   "manufacturer": "Prolights",
-  "category": "WASH",
+  "category": "BLINDER",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -76,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -128,10 +129,10 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
+    "category": "manual",
+    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
     "powerConsumptionW": "gdtf",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
@@ -160,6 +161,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived"

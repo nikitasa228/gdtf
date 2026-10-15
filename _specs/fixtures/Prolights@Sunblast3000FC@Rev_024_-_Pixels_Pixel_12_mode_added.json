@@ -8,13 +8,27 @@
   "shortName": "S3000FC",
   "description": "Sunblast 3000FC is an exceptionally powerful IP65 graphic strobe, blinder and flood. Available in white or full colour versions and designed to deliver simply staggering light levels, this versatile fixture can provide an unbelievable punch over a huge area.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 6156.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 130483.0,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1500,
+  "maxLuminousIntensityCd": 12800,
+  "luminousFluxLm": 34717,
   "noiseLevelDb": null,
   "weightKg": 14.0,
   "powerConnectorIn": "powerCON TRUE1",
@@ -64,6 +78,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -164,9 +179,9 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -194,17 +209,24 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "maxLuminousIntensityCd",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "1500 W peak in strobe mode, 580 W static."
+  ],
+  "_refs": [
+    "https://prolights.it/en/product/SUNBLAST3000FC"
   ]
 }

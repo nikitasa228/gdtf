@@ -9,10 +9,24 @@
   "description": "Pixie Wash is a single source, compact LED wash luminaire with a 7° to 40° zoom. Featuring a single 60W LED, its small form factor and near-silent cooling make it ideal for low ceilings or noise-sensitive environments.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 60.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 112,
   "maxLuminousIntensityCd": 78400.0,
   "luminousFluxLm": 1312.0,
   "noiseLevelDb": null,
@@ -61,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -82,7 +97,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -114,16 +129,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/PIXIEWASH"
   ]
 }

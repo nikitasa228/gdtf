@@ -9,10 +9,24 @@
   "description": "EclGalleryProfile FC is a compact LED ellipsoidal luminaire engineered with a single 60 W high power RGBW / FC LED by Osram for a limitless colour and white reporduction. The luminaire is designed with a stunning aesthetics and it offers a total control of the light, performing a linear zoom system from 20° to 37°, framing shutters for an accurate focusing of the light, and gobo mounting option for image projections. EclGalleryProfile FC is fitted with electronic and PSU on board, allowing to be implemented on lighting tracks simply applying a track adapter and the fixture can be easily controlled by wireless. EclGalleryProfile FC is truly flexible for any commercials, venues, artgalleries and churches.",
   "manufacturer": "Prolights",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 45.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 45,
   "maxLuminousIntensityCd": 4800.0,
   "luminousFluxLm": 650.0,
   "noiseLevelDb": null,
@@ -59,6 +73,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -84,12 +99,12 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualPanRangeDeg": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
@@ -112,17 +127,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://prolights.it/en/product/GALLERYECLFC"
   ]
 }

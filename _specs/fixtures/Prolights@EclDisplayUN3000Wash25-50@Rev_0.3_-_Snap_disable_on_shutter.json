@@ -9,9 +9,23 @@
   "description": "EclDisplay is a range of revolutionary and flexible LED fixtures designed for galleries, commercials and any public venue where an advanced but classy fixture, with several control options, sources and optic variants available to precisely meet any application.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
   "powerConsumptionW": 25.0,
   "maxLuminousIntensityCd": 7200.0,
   "luminousFluxLm": 1542.0,
@@ -60,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -89,7 +104,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -117,16 +132,19 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
   ]
 }

@@ -9,10 +9,24 @@
   "description": "The EclFresnel VW is a powerful LED Fresnel lamp, designed as a replacement for a 1,000W fixture, with a bright and high-quality variable-white light, from 2,700K to 5,600K, using a 250W LED source. \nThis is the perfect luminaire for those applications requiring high-quality white rendering, such as in TV studios, galleries, and virtual productions, with high CRI (>96), TLCI (>96), TM-30 and R9.\nThe EclFresnel VW has a manual zoom range from 17° to 64°, with precise focusing, and an 8-leaf barndoor (included).\nThis fixture has an intuitive user interface with rotatory knobs. It also has stand-alone settings, PowerCon True in & through connections and XLR in & through, offering an incredible user experience and easy setup.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 240.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 240,
   "maxLuminousIntensityCd": 137400.0,
   "luminousFluxLm": 10552.0,
   "noiseLevelDb": null,
@@ -62,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -95,7 +110,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -125,16 +140,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ECLFRESNELVW"
   ]
 }

@@ -9,17 +9,31 @@
   "description": "DisplayCob TRWDFC is a track mounted 60 W RGB / FC COB spotlight, designed with electronic and user interface on board being able to be implemented with any existing lighting track easily. The on board Wireless DMX receiver allow users to control this luminaire without any cable, so it doesn't need a specific track with data wirings, or it can be hanged without its track adaptor, anywhere using the onboard bracket and controlling via wired DMX protocol. DisplayCob TRWDFC optical systems is composed by a powerful 60 W COB LED source and a parabolic reflector, with swappable lenses allowing a beam angle from 15° up to 60° for a perfect focusing. DisplayCob TRWDFC features are an ideal solution to add dynamics and creativity in any installations such as commercials, hotels, restaurants and art galleries.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 60.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 75,
   "maxLuminousIntensityCd": 1400.0,
   "luminousFluxLm": 1726.0,
   "noiseLevelDb": null,
   "weightKg": 1.85,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "Track adapter",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Track adapter",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -50,7 +64,10 @@
   "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -59,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -84,7 +102,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -110,18 +128,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "colorTemperatureK": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/DISPLAYCOBTRWDFC"
   ]
 }

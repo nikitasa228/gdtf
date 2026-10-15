@@ -9,10 +9,24 @@
   "description": "IP65 1200W Fresnel with 6 color LED source, 300mm-12''glass lens, zoom 10-90°\nThe EclFresnel CT+ XLIP stands out as a bright IP65-rated Fresnel hard source, crafted to replace traditional 5K Tungsten and 2.5K HMI lighting in film sets and large-scale indoor and outdoor setups. At the heart of this fixture is a robust 1500W (driven @1200 W) LED source, featuring 6 color emitters.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1200.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1260,
   "maxLuminousIntensityCd": 134500.0,
   "luminousFluxLm": 30000.0,
   "noiseLevelDb": null,
@@ -62,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -139,7 +154,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -168,16 +183,22 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ECLFRCTPXLIP"
   ]
 }

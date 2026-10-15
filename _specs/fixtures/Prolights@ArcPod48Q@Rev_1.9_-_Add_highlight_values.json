@@ -9,17 +9,31 @@
   "description": "ArcPod 48Q is a compact high-power exterior wash light featuring an outstanding brightness of 23'000 lumens. It is equipped with 48x10W RGBW / FC LEDs, delivering a limitless reproduction of colours and whites. ArcPod 48Q is designed slim and fanless, and it's completed by a wide selection of available optics, making the ArcPod 48Q an incredibly flexible and versatile device for any outdoor install.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1391.0,
-  "maxLuminousIntensityCd": 797900.0,
-  "luminousFluxLm": 61272.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 540,
+  "maxLuminousIntensityCd": 116000,
+  "luminousFluxLm": 28000,
   "noiseLevelDb": null,
   "weightKg": 14.0,
-  "powerConnectorIn": "Schuko",
-  "powerConnectorOut": "Schuko",
-  "powerSupplyType": "Schuko LINK",
+  "powerConnectorIn": "IP moulded connector",
+  "powerConnectorOut": "IP moulded connector",
+  "powerSupplyType": "IP moulded connector LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -50,7 +64,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -59,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -92,13 +110,13 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -120,17 +138,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "colorTemperatureK": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "colorTemperatureK"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCPOD48Q",
+    "https://musiclights.it/product/ARCPOD48Q"
   ]
 }

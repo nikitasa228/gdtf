@@ -8,18 +8,32 @@
   "shortName": "SMBNEO",
   "description": "The iconic Smart BatPlus battery uplighter has been updated while retaining its distinctive identity. The new Smart BatPlusNEO maintains the original design but features an enhanced LED source with higher efficient RGB+WW emitters powered by PROLIGHTS color math. This upgrade not only offers a better quality of white light and color spectrum but also doubles the lumen output, elevating its performance.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 20.0,
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 66,
   "maxLuminousIntensityCd": 8700.0,
-  "luminousFluxLm": 420.0,
+  "luminousFluxLm": 2927,
   "noiseLevelDb": null,
   "weightKg": 3.4,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "Battery (internal)",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Battery (internal)",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -34,8 +48,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 11.9,
-    "max": 11.9
+    "min": 11.0,
+    "max": 11.0
   },
   "fieldAngleDeg": 21.0,
   "zoom": false,
@@ -60,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 45.0
@@ -99,20 +114,21 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Battery uplighter",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
-    "beamAngleDeg": "gdtf",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
     "lensType": "gdtf-derived",
@@ -122,24 +138,34 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf-derived",
+    "colorTemperatureK": "estimated",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "manual",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Charged via magnetic contacts in the charging flight case (570 W for 6 units)."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/SMARTBATPLUSNEO"
   ]
 }

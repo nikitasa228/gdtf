@@ -9,10 +9,24 @@
   "description": "Astra Beam260IP is a compact outdoor IP65 beam moving head with a long lamp life source, engineered to produce a sharp and parallel beam of light with a boosted light output, thanks to its brand new Osram 260 W PRO arc lamp.\nAstra Beam260IP is smaller, brighter and faster than any other IP pure beamlight on the market, and when compared to indoor alternatives it requires less maintenance time and extra costs, due to the sealed housing and outstanding long lamp life (6.000 hours). In addition, with its compact size and at an attractive price point, this luminaire is an ideal upgrade for any indoor beamlight.",
   "manufacturer": "Prolights",
   "category": "BEAM",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 260.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 345,
   "maxLuminousIntensityCd": 171764600.0,
   "luminousFluxLm": 21134.0,
   "noiseLevelDb": null,
@@ -79,6 +93,7 @@
   "focus": true,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 40.0
@@ -96,7 +111,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -130,16 +145,22 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ASTRABEAM260IP"
   ]
 }

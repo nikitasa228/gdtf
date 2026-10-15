@@ -92,6 +92,7 @@
   "focus": true,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -144,6 +145,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -159,7 +161,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-storm-2-profile/"

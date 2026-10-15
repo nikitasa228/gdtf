@@ -90,6 +90,7 @@
   "focus": true,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -146,6 +147,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -164,7 +166,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF weight 5.6 kg contradicts spec sheet (23.8 kg). Noise 48 dB(A) @1 m in Auto mode."
   ],
   "_refs": [

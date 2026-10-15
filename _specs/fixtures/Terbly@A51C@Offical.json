@@ -74,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -96,7 +97,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -119,6 +120,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
@@ -132,6 +134,6 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
   ]
 }

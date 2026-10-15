@@ -8,15 +8,29 @@
   "shortName": "Air6Pix",
   "description": "AIR6PIX is a moving batten designed to deliver a powerful blade of beams. Each of the 4,5° RGBW LED pixels are individually controllable and both sides pivot to create classic ACL 'fan' and 'knot' looks. With infinite rotation of both pan and tilt, the only limit is the designer's imagination.",
   "manufacturer": "Prolights",
-  "category": "WASH BEAM",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 40.0,
-  "maxLuminousIntensityCd": null,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 216,
+  "maxLuminousIntensityCd": 212000,
   "luminousFluxLm": 145.0,
   "noiseLevelDb": null,
-  "weightKg": 14.0,
+  "weightKg": 12.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -38,8 +52,8 @@
   ],
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 0.1,
-    "max": 15.0
+    "min": 4.5,
+    "max": 4.5
   },
   "fieldAngleDeg": 6.5,
   "zoom": true,
@@ -52,7 +66,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -61,6 +78,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -80,15 +98,16 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Moving batten",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -99,7 +118,7 @@
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
-    "beamAngleDeg": "gdtf-derived",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
     "lensType": "gdtf-derived",
@@ -115,18 +134,25 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "colorTemperatureK": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/AIR6PIX"
   ]
 }

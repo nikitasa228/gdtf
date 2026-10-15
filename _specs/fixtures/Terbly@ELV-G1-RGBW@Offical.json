@@ -71,6 +71,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -107,6 +108,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",

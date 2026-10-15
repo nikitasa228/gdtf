@@ -59,6 +59,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -156,9 +157,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -179,6 +180,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -194,7 +196,7 @@
     "lensType"
   ],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
   ]
 }

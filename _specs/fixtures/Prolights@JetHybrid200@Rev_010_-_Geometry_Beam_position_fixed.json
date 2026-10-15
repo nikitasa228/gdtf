@@ -19,8 +19,8 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 90.0,
-    "max": 264.0
+    "min": 100.0,
+    "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
@@ -92,6 +92,7 @@
   "focus": true,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -109,9 +110,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
+    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
     "powerConsumptionW": "gdtf",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
@@ -146,6 +147,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived"

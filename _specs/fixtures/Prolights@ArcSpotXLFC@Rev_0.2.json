@@ -9,17 +9,31 @@
   "description": "The ArcSpot series offers a range of IP66-rated dynamic luminaires, designed for exterior lighting of landscapes, trees, architectural features, and facades. This series provides a variety of fixture sizes and accessories, enabling precise targeting of the desired light intensity and quality for any application.\nAmong the series, the ArcSpot XLFC stands out as a extra large sized round spot. It is equipped with 61x 4W RGB+WarmWhite LED source, delivering 10° beam angle with a fixture output of 11600 lumens.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 220.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 220,
   "maxLuminousIntensityCd": 258500.0,
   "luminousFluxLm": 10684.0,
   "noiseLevelDb": null,
   "weightKg": 11.9,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "IP moulded connector",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -60,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -93,7 +108,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -119,17 +134,25 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCSPOTXLFC"
   ]
 }

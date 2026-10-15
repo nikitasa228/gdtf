@@ -79,6 +79,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -136,7 +137,7 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -165,6 +166,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived"

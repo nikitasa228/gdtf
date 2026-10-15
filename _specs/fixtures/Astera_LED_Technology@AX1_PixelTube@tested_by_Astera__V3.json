@@ -74,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -749,7 +750,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -771,6 +772,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -790,7 +792,7 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Battery powered; mains via external charger/PSU. GDTF power 4876 W invalid."
   ]
 }

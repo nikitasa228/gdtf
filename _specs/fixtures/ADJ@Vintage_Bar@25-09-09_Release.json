@@ -74,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -124,7 +125,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -146,6 +147,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -163,7 +165,7 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "4 x 150 W amber COB + RGBL pixels. GDTF power 39 W invalid."
   ],
   "_refs": [

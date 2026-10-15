@@ -9,10 +9,24 @@
   "description": "Astra Wash19Pix is an LED moving wash light, designed to be a workhorse for any touring, corporate and event applications, offering a superior level of brightness and advanced creative effect possibilities.\nBased on a 40 W Osram RGBW LED light source, plus the exterior pixel ring, this unit features an extremely high-efficiency optical system capable of zooming from 4° to 54°, making this luminaire extremely versatile for any application.\nAstra Wash19Pix is single pixel controllable, with multiple on-board FX, and allows access to a precise and advanced white and colour control, all through DMX, W-DMX, Art-Net, sACN and RDM",
   "manufacturer": "Prolights",
   "category": "WASH BEAM",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 3340.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 750,
   "maxLuminousIntensityCd": 5602700.0,
   "luminousFluxLm": 30635.0,
   "noiseLevelDb": null,
@@ -65,6 +79,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -126,9 +141,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -158,16 +173,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://musiclights.it/en/product/ASTRAWASH19PIXIP"
   ]
 }

@@ -395,8 +395,9 @@ def extract(path):
         power, power_src = wiring_payload, "gdtf"
     elif beam_power and not (len(beams) and all(fnum(b.get("PowerConsumption")) in (1000.0,) for b in beams)) \
             and beam_power >= 5:
-        power, power_src = beam_power, "gdtf-derived"
-        issues.append("Power consumption taken from beam geometry sum (unverified)")
+        # GDTF beam power is the emitter wattage, not the fixture's mains draw; summed over pixels it is unreliable
+        power, power_src = beam_power, "estimated"
+        issues.append("Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)")
     put(rec, "powerConsumptionW", rnd(power, 0), power_src)
 
     cd = None
@@ -406,7 +407,8 @@ def extract(path):
         omega = 2 * math.pi * (1 - math.cos(math.radians(ang) / 2))
         cd = beam_flux / omega * 0.7
     put(rec, "maxLuminousIntensityCd", rnd(cd, -2) if cd else None, "estimated")
-    put(rec, "luminousFluxLm", rnd(beam_flux, 0) if beam_flux and beam_flux != 10000.0 * max(1, len(beams)) else None, "gdtf")
+    put(rec, "luminousFluxLm", rnd(beam_flux, 0) if beam_flux and beam_flux != 10000.0 * max(1, len(beams)) else None,
+        "gdtf" if len(beams) <= 1 else "estimated")
     put(rec, "noiseLevelDb", None, None)
     put(rec, "weightKg", rnd(weight, 2), "gdtf")
 
@@ -475,6 +477,8 @@ def extract(path):
     put(rec, "focus", focus, "gdtf-derived")
     put(rec, "animationWheel", animation, "gdtf-derived")
     put(rec, "ipRating", ip, "gdtf-derived")
+    battery = bool(re.search(r"\bbatter(y|ies)|\bbatt\b|\bbatt[a-z]*\b|wireless uplight", f"{name} {long_name or ''} {desc or ''}", re.I))
+    put(rec, "batteryPowered", battery, "gdtf-derived")
     put(rec, "operatingTemperatureC", {"min": op_lo, "max": op_hi} if op_hi else None, "gdtf")
     put(rec, "dmxModes", modes, "gdtf")
     put(rec, "pixelCount", pixel_count, "gdtf-derived")
@@ -606,8 +610,10 @@ def main(src_dir, out_dir):
             if fn.endswith(".json"):
                 with open(os.path.join(ov_dir, fn), encoding="utf-8") as f:
                     overrides.update(json.load(f))
-    # an override key may also be just "Manufacturer@Model" (or any unique "Manufacturer@Model@" prefix)
+    # an override key may also be just "Manufacturer@Model" (or any unique "Manufacturer@Model@" prefix);
+    # "Manufacturer@*" holds defaults for every fixture of that manufacturer (lowest priority)
     all_files = sorted(f for f in os.listdir(src_dir) if f.lower().endswith(".gdtf"))
+    mfr_defaults = {k[:-2]: overrides.pop(k) for k in list(overrides) if k.endswith("@*")}
     for k in list(overrides):
         if k not in all_files:
             pre = "@".join(k.split("@")[:2]) + "@"
@@ -623,7 +629,18 @@ def main(src_dir, out_dir):
         except Exception as e:  # keep going, report
             index.append({"file": fn, "error": str(e)})
             continue
-        ov = expand_override(overrides.get(fn) or overrides.get(meta["fixtureTypeId"]) or {})
+        own = overrides.get(fn) or overrides.get(meta["fixtureTypeId"]) or {}
+        dflt = dict(mfr_defaults.get(fn.split("@")[0], {}))
+        if dflt:
+            # defaults are generic for the brand: estimated unless the fixture's own entry says otherwise
+            dflt_est = set(dflt.pop("_estimated", [k for k in dflt if not k.startswith("_")]))
+            for k in ("_refs", "_notes", "_source"):
+                dflt.pop(k, None)
+            for k in list(dflt):
+                if k in own:
+                    dflt.pop(k)
+            own = {**dflt, **own, "_estimated": sorted(set(own.get("_estimated", [])) | (dflt_est & set(dflt)))}
+        ov = expand_override(own)
         # "_source": default source for the override ("manual" = manufacturer spec sheet),
         # "_estimated": fields filled from general knowledge / typical values, not a verified sheet
         est = set(ov.get("_estimated", []))

@@ -1,0 +1,774 @@
+{
+ "Prolights@*": {
+  "mains": "100-240",
+  "_notes": "Prolights fixtures use universal 100-240 V 50/60 Hz inputs."
+ },
+ "Prolights@Air6Pix": {
+  "category": "LED BAR",
+  "subType": "Moving batten",
+  "powerConsumptionW": 216,
+  "weightKg": 12.0,
+  "mains": "100-240",
+  "lux": [
+   23560,
+   3
+  ],
+  "beam": 4.5,
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/AIR6PIX"
+  ]
+ },
+ "Prolights@ArcPod27Q": {
+  "powerConsumptionW": 270,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "luminousFluxLm": 11500,
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCPOD27Q"
+  ]
+ },
+ "Prolights@ArcPod48Q": {
+  "powerConsumptionW": 540,
+  "weightKg": 14.0,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "luminousFluxLm": 28000,
+  "lux": [
+   4638,
+   5
+  ],
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCPOD48Q",
+   "https://musiclights.it/product/ARCPOD48Q"
+  ]
+ },
+ "Prolights@ArcPod96Q": {
+  "powerConsumptionW": 1020,
+  "weightKg": 27.0,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCPOD96Q"
+  ]
+ },
+ "Prolights@ArcShineM18FC_8": {
+  "category": "LED BAR",
+  "powerConsumptionW": 80,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://luminaires.dialux.com/en/article/6z1wP-ujTdWGjbJno0IvqQ"
+  ]
+ },
+ "Prolights@ArcShineM18VW_8": {
+  "category": "LED BAR",
+  "powerConsumptionW": 80,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "_estimated": [
+   "powerConsumptionW"
+  ],
+  "_notes": "Power assumed equal to the M18FC (same housing and driver)."
+ },
+ "Prolights@ArcShineM9FC_8": {
+  "category": "LED BAR",
+  "powerConsumptionW": 40,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://aclighting.com/arcshine-m9fc"
+  ]
+ },
+ "Prolights@ArcShineM9VW_8": {
+  "category": "LED BAR",
+  "powerConsumptionW": 40,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "_estimated": [
+   "powerConsumptionW"
+  ],
+  "_notes": "Power assumed equal to the M9FC."
+ },
+ "Prolights@ArcShineS18FC_15": {
+  "category": "LED BAR",
+  "powerConsumptionW": 40,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "powerConsumptionW",
+   "cct"
+  ],
+  "_notes": "Power taken from the S18VW datasheet (same body)."
+ },
+ "Prolights@ArcShineS18VW_15": {
+  "category": "LED BAR",
+  "powerConsumptionW": 40,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "_refs": [
+   "https://seesound.es/productos/pdfs/Arcshines1815vw_A4_DATASHEET_(EN)-14057 .pdf"
+  ]
+ },
+ "Prolights@ArcShineS9FC_15": {
+  "category": "LED BAR",
+  "powerConsumptionW": 17.5,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "powerConsumptionW",
+   "cct"
+  ],
+  "_notes": "Power taken from the S9VW datasheet (same body)."
+ },
+ "Prolights@ArcShineS9VW_15": {
+  "category": "LED BAR",
+  "powerConsumptionW": 17.5,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector LINK",
+  "_refs": [
+   "https://aclighting.com/arcshine-s9vw"
+  ]
+ },
+ "Prolights@ArcSpotDOTFC": {
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_estimated": [
+   "powerConsumptionW"
+  ]
+ },
+ "Prolights@ArcSpotDOTVW": {
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_estimated": [
+   "powerConsumptionW"
+  ]
+ },
+ "Prolights@ArcSpotLFC": {
+  "powerConsumptionW": 130,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://prolights.it/product/ARCSPOTLFC"
+  ]
+ },
+ "Prolights@ArcSpotLVW": {
+  "powerConsumptionW": 130,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://prolights.it/en/product/ARCSPOTLVW"
+  ]
+ },
+ "Prolights@ArcSpotMFC": {
+  "powerConsumptionW": 80,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_estimated": [
+   "powerConsumptionW"
+  ]
+ },
+ "Prolights@ArcSpotMVW": {
+  "powerConsumptionW": 80,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCSPOTMVW"
+  ]
+ },
+ "Prolights@ArcSpotSVW": {
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_estimated": [
+   "powerConsumptionW"
+  ]
+ },
+ "Prolights@ArcSpotXLFC": {
+  "powerConsumptionW": 220,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCSPOTXLFC"
+  ]
+ },
+ "Prolights@ArcSpotXLVW": {
+  "powerConsumptionW": 230,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCSPOTXLVW"
+  ]
+ },
+ "Prolights@ArcSpotXSFC": {
+  "powerConsumptionW": 17,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://www.prolights.it/en/product/ARCSPOTXSFC"
+  ]
+ },
+ "Prolights@ArcSpotXSVW": {
+  "powerConsumptionW": 17,
+  "mains": "100-240",
+  "powerSupplyType": "IP moulded connector",
+  "_refs": [
+   "https://musiclights.it/en/product/ARCSPOTXSVW"
+  ]
+ },
+ "Prolights@ArenaCob4FC": {
+  "category": "BLINDER",
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "Prolights@AstraBeam260IP": {
+  "powerConsumptionW": 345,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ASTRABEAM260IP"
+  ]
+ },
+ "Prolights@AstraHybrid330@": {
+  "powerConsumptionW": 517,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ASTRAHYB330"
+  ]
+ },
+ "Prolights@AstraHybrid330IP": {
+  "powerConsumptionW": 557,
+  "mains": "100-240",
+  "_refs": [
+   "https://musiclights.it/en/product/ASTRAHYB330IP"
+  ]
+ },
+ "Prolights@AstraHybrid420": {
+  "powerConsumptionW": 590,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ASTRAHYB420"
+  ]
+ },
+ "Prolights@AstraProfile400": {
+  "powerConsumptionW": 620,
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "_refs": [
+   "https://www.bhphotovideo.com/c/product/1869781-REG/prolights_piastraprofile400_astra_profile400_indoor_led.html"
+  ]
+ },
+ "Prolights@AstraProfile600IP": {
+  "powerConsumptionW": 800,
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "_refs": [
+   "https://www.prolights.it/en/product/ASTRAPROFILE600IP"
+  ]
+ },
+ "Prolights@AstraWash19PIXIP": {
+  "powerConsumptionW": 750,
+  "mains": "100-240",
+  "_refs": [
+   "https://musiclights.it/en/product/ASTRAWASH19PIXIP"
+  ]
+ },
+ "Prolights@DisplayCobTRWDFC_60": {
+  "powerConsumptionW": 75,
+  "mains": "100-240",
+  "powerSupplyType": "Track adapter",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/DISPLAYCOBTRWDFC"
+  ]
+ },
+ "Prolights@EclCyclorama050": {
+  "powerConsumptionW": 180,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCYC050"
+  ]
+ },
+ "Prolights@EclCyclorama100": {
+  "powerConsumptionW": 400,
+  "mains": "100-240",
+  "_refs": [
+   "https://acamericas.com/products/eclcyclorama-100/"
+  ]
+ },
+ "Prolights@EclFresnel2KDY": {
+  "powerConsumptionW": 500,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLFR2K"
+  ]
+ },
+ "Prolights@EclFresnel2KTU": {
+  "powerConsumptionW": 500,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLFR2K"
+  ]
+ },
+ "Prolights@EclFresnelCTPXLIP": {
+  "powerConsumptionW": 1260,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLFRCTPXLIP"
+  ]
+ },
+ "Prolights@EclFresnelDY": {
+  "powerConsumptionW": 220,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/ECLFRESNELTU"
+  ]
+ },
+ "Prolights@EclFresnelTU": {
+  "powerConsumptionW": 220,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/ECLFRESNELTU"
+  ]
+ },
+ "Prolights@EclFresnelVW": {
+  "powerConsumptionW": 240,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLFRESNELVW"
+  ]
+ },
+ "Prolights@EclFresnelTW": {
+  "powerConsumptionW": 260,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/ECLFRESNELTW"
+  ]
+ },
+ "Prolights@EclFresnelJDY": {
+  "powerConsumptionW": 90,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLFRESNELJ"
+  ]
+ },
+ "Prolights@EclFresnelJTU": {
+  "powerConsumptionW": 90,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLFRESNELJ"
+  ]
+ },
+ "Prolights@EclGalleryProfileFC": {
+  "powerConsumptionW": 45,
+  "mains": "100-240",
+  "powerSupplyType": "Schuko",
+  "_refs": [
+   "https://prolights.it/en/product/GALLERYECLFC"
+  ]
+ },
+ "Prolights@EclPanelTWC": {
+  "powerConsumptionW": 460,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLPANELTWC"
+  ]
+ },
+ "Prolights@EclParDY_24": {
+  "category": "PAR",
+  "powerConsumptionW": 207,
+  "mains": "100-240",
+  "_refs": [
+   "https://musiclights.it/en/product/ECLPAR"
+  ]
+ },
+ "Prolights@EclParTU_24": {
+  "category": "PAR",
+  "powerConsumptionW": 207,
+  "mains": "100-240",
+  "_refs": [
+   "https://musiclights.it/en/product/ECLPAR"
+  ]
+ },
+ "Prolights@EclParFC_24": {
+  "category": "PAR",
+  "powerConsumptionW": 150,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLPARFC"
+  ]
+ },
+ "Prolights@EclParIPMFC_15": {
+  "category": "PAR",
+  "mains": "100-240",
+  "_estimated": [
+   "mains"
+  ]
+ },
+ "Prolights@EclProfileCTPlusHP": {
+  "powerConsumptionW": 470,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUSHP"
+  ]
+ },
+ "Prolights@EclProfileCTPlusRGB26": {
+  "powerConsumptionW": 270,
+  "mains": "100-240",
+  "lux": [
+   8663,
+   5
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
+  ]
+ },
+ "Prolights@HaluStripDUO": {
+  "category": "LED BAR",
+  "powerConsumptionW": 200,
+  "weightKg": 8.0,
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "_refs": [
+   "https://prolights.it/en/product/HALUSTRIPDUO"
+  ]
+ },
+ "Prolights@HalupixDUO": {
+  "category": "STROBE",
+  "subType": "LED matrix panel (strobe/wash)",
+  "powerConsumptionW": 500,
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "_notes": "Wash mode 500 W, strobe peak 1200 W.",
+  "_refs": [
+   "https://www.prolights.it/en/product/HALUPIXDUO"
+  ]
+ },
+ "Prolights@JetSpot4Z": {
+  "powerConsumptionW": 250,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/JETSPOT4Z"
+  ]
+ },
+ "Prolights@JetWash7": {
+  "powerConsumptionW": 160,
+  "weightKg": 8.3,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/JETWASH7"
+  ]
+ },
+ "Prolights@JetWash19": {
+  "powerConsumptionW": 350,
+  "weightKg": 14.7,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/JETWASH19"
+  ]
+ },
+ "Prolights@Lumipix15IP": {
+  "category": "LED BAR",
+  "powerConsumptionW": 161,
+  "mains": "100-240",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_refs": [
+   "https://www.ac-et.com/storage/product_images/prolights-lumipix15ip/Lumipix15ip_A4_DATASHEET_EN.pdf-Lumipix15ip_A4_DATASHEET_EN.pdf"
+  ]
+ },
+ "Prolights@MiniEclWDDY_26": {
+  "powerConsumptionW": 22,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
+  ]
+ },
+ "Prolights@MiniEclWDTU_26": {
+  "powerConsumptionW": 22,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
+  ]
+ },
+ "Prolights@MosaicoL": {
+  "powerConsumptionW": 440,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/MOSAICOL"
+  ]
+ },
+ "Prolights@PixieWash": {
+  "powerConsumptionW": 112,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/PIXIEWASH"
+  ]
+ },
+ "Prolights@Polar3000": {
+  "category": "STROBE",
+  "powerConsumptionW": 462,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/POLAR3000"
+  ]
+ },
+ "Prolights@RA2000ProfileHB": {
+  "powerConsumptionW": 640,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/RA2000PROFILEHB"
+  ]
+ },
+ "Prolights@SmartBatPlusNEO": {
+  "category": "PAR",
+  "subType": "Battery uplighter",
+  "batteryPowered": true,
+  "powerConsumptionW": 66,
+  "mains": "100-240",
+  "powerSupplyType": "Battery (internal)",
+  "beam": 11,
+  "cct": [
+   2800,
+   10000
+  ],
+  "luminousFluxLm": 2927,
+  "_estimated": [
+   "cct"
+  ],
+  "_notes": "Charged via magnetic contacts in the charging flight case (570 W for 6 units).",
+  "_refs": [
+   "https://www.prolights.it/en/product/SMARTBATPLUSNEO"
+  ]
+ },
+ "Prolights@SmartBatWash": {
+  "subType": "Battery wash",
+  "batteryPowered": true,
+  "powerConsumptionW": 180,
+  "mains": "100-240",
+  "powerSupplyType": "Battery (internal) + powerCON TRUE1 TOP LINK",
+  "_refs": [
+   "https://www.prolights.it/en/product/SMARTBATWASH"
+  ]
+ },
+ "Prolights@SmartBook": {
+  "subType": "Battery decorative light",
+  "batteryPowered": true,
+  "mains": "100-240",
+  "powerSupplyType": "Battery (internal)",
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "mains",
+   "powerSupplyType",
+   "cct"
+  ],
+  "_notes": "No public data sheet found."
+ },
+ "Prolights@SmartParNEO": {
+  "category": "PAR",
+  "subType": "Battery PAR",
+  "batteryPowered": true,
+  "powerConsumptionW": 85,
+  "weightKg": 3.84,
+  "mains": "100-240",
+  "powerSupplyType": "Battery (internal) + powerCON TRUE1 TOP LINK",
+  "_refs": [
+   "https://www.prolights.it/en/product/SMARTPARNEO"
+  ]
+ },
+ "Prolights@Solar48Q": {
+  "powerConsumptionW": 520,
+  "mains": "100-240",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "luminousFluxLm": 28213,
+  "lux": [
+   4638,
+   5
+  ],
+  "cct": [
+   2800,
+   10000
+  ],
+  "_estimated": [
+   "cct"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/SOLAR48Q"
+  ]
+ },
+ "Prolights@StudioCobDY_15": {
+  "category": "PAR",
+  "powerConsumptionW": 109,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/STUDIOCOBDY"
+  ]
+ },
+ "Prolights@StudioCobDY_30": {
+  "category": "PAR",
+  "powerConsumptionW": 109,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/STUDIOCOBDY"
+  ]
+ },
+ "Prolights@StudioCobDY_60": {
+  "category": "PAR",
+  "powerConsumptionW": 109,
+  "mains": "100-240",
+  "_refs": [
+   "https://prolights.it/en/product/STUDIOCOBDY"
+  ]
+ },
+ "Prolights@StudioCobTU_15": {
+  "category": "PAR",
+  "mains": "100-240"
+ },
+ "Prolights@StudioCobTU_30": {
+  "category": "PAR",
+  "mains": "100-240"
+ },
+ "Prolights@StudioCobTU_60": {
+  "category": "PAR",
+  "mains": "100-240"
+ },
+ "Prolights@StudioCobPlusDY2_19": {
+  "category": "PAR",
+  "powerConsumptionW": 165,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/STUDIOCOBPDY2"
+  ]
+ },
+ "Prolights@StudioCobPlusDY2_37": {
+  "category": "PAR",
+  "powerConsumptionW": 165,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/STUDIOCOBPDY2"
+  ]
+ },
+ "Prolights@StudioCobPlusDY2_54": {
+  "category": "PAR",
+  "powerConsumptionW": 165,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/STUDIOCOBPDY2"
+  ]
+ },
+ "Prolights@StudioCobPlusTW_20": {
+  "category": "PAR",
+  "powerConsumptionW": 157,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/STUDIOCOBPLUSTW"
+  ]
+ },
+ "Prolights@StudioCobPlusTW_36": {
+  "category": "PAR",
+  "powerConsumptionW": 157,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/STUDIOCOBPLUSTW"
+  ]
+ },
+ "Prolights@StudioCobPlusTW_53": {
+  "category": "PAR",
+  "powerConsumptionW": 157,
+  "mains": "100-240",
+  "_refs": [
+   "https://www.prolights.it/en/product/STUDIOCOBPLUSTW"
+  ]
+ },
+ "Prolights@Sunblast3000FC": {
+  "category": "STROBE",
+  "powerConsumptionW": 1500,
+  "mains": "100-240",
+  "luminousFluxLm": 34717,
+  "lux": [
+   1425,
+   3
+  ],
+  "_notes": "1500 W peak in strobe mode, 580 W static.",
+  "_refs": [
+   "https://prolights.it/en/product/SUNBLAST3000FC"
+  ]
+ },
+ "Prolights@TabledC": {
+  "category": "OTHER",
+  "subType": "Battery table lamp",
+  "batteryPowered": true,
+  "mains": "100-240",
+  "powerSupplyType": "Battery (internal)",
+  "cct": 4000,
+  "controlSignal": [
+   "Wireless DMX (CRMX/W-DMX)"
+  ],
+  "_estimated": [
+   "mains"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/TABLEDC"
+  ]
+ }
+}

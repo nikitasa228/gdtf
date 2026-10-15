@@ -60,6 +60,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -100,6 +101,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived"
   },

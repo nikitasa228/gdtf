@@ -98,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -148,6 +149,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -161,7 +163,7 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Max 540 VA; noise 49 dB(A) Auto fan mode."
   ],
   "_refs": [

@@ -78,6 +78,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP20",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -119,8 +120,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
+    "powerConsumptionW": "estimated",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -147,6 +148,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -162,6 +164,6 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
   ]
 }

@@ -8,11 +8,25 @@
   "shortName": "LP15IP",
   "description": "Lumipix 15IP is a tour-ready LED pixel batten conceived to be fully versatile and perform outdoor, delivering advanced brightness and colour mixing by offering individual pixel control of each cell. The robust die-cast aluminium structure with omega quick lock socket on the bracket and the waterproof power and signal connector make Lumipix 15IP suitable for the most demanding environments.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 173.0,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 161,
   "maxLuminousIntensityCd": 65900.0,
   "luminousFluxLm": 5760.0,
   "noiseLevelDb": null,
@@ -49,7 +63,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -58,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -90,10 +108,10 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -119,17 +137,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "colorTemperatureK": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "colorTemperatureK"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.ac-et.com/storage/product_images/prolights-lumipix15ip/Lumipix15ip_A4_DATASHEET_EN.pdf-Lumipix15ip_A4_DATASHEET_EN.pdf"
   ]
 }

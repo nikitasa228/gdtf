@@ -9,10 +9,24 @@
   "description": "The Mosaico L is a bright outdoor LED image projector, designed for long-range image, textures and logo projections.\nBuilt in a durable IP66 die-cast housing, the Mosaico L offers a phenomenal output of 11,700 lumens and an extensive set of features including a rotating animation wheel, 7 interchangeable gobos, and motorized framing shutters that precisely focus within a certain projection area.\nIt has an exceptional zoom range, from 7° to 49°, making it versatile in both near-field and long-throw installations, or even for static and animated facade building lighting.",
   "manufacturer": "Prolights",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 300.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 440,
   "maxLuminousIntensityCd": 697200.0,
   "luminousFluxLm": 11672.0,
   "noiseLevelDb": null,
@@ -73,6 +87,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -102,7 +117,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -134,17 +149,23 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/MOSAICOL"
   ]
 }

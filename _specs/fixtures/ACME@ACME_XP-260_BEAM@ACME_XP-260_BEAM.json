@@ -89,6 +89,7 @@
   "focus": true,
   "animationWheel": false,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -136,6 +137,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "weightKg": "manual",
@@ -152,7 +154,7 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Same fixture as ACME ORION (XP-260 BEAM)."
   ],
   "_refs": [

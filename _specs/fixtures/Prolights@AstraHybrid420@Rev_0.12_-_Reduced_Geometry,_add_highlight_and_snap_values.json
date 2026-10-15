@@ -9,10 +9,24 @@
   "description": "The Astra Hybrid420 is a hybrid moving head that excels as a bright beam fixture and perfect spotlight, offering a tremendous lumen output and superior evenness compared with other lights in the same category.\nThe Astra Hybrid420 optical system moves linearly from 2.4° to 40°, and it's equipped with a brand new 420W USHIO NSL421 lamp, featuring an equivalent output of higher power consumption units, but in a smaller, lighter, and faster body.\nThe extensive feature set of the Astra Hybrid420 includes functions like aerial effects with a fat and parallel beam and crisp projection textures and pattern effects, with linear CMY, three colour-wheels, an animation wheel, two overlapping prisms, frost and two gobo wheels.",
   "manufacturer": "Prolights",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 420.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 590,
   "maxLuminousIntensityCd": 14375100.0,
   "luminousFluxLm": 35815.0,
   "noiseLevelDb": null,
@@ -84,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -101,7 +116,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -134,16 +149,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ASTRAHYB420"
   ]
 }

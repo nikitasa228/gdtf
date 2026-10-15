@@ -11,8 +11,11 @@
   "category": "PROFILE",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
@@ -21,7 +24,7 @@
   },
   "frequencyRangeHz": {
     "min": 50.0,
-    "max": 50.0
+    "max": 60.0
   },
   "powerConsumptionW": 670.0,
   "maxLuminousIntensityCd": 4274700.0,
@@ -95,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -112,9 +116,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
+    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
     "powerConsumptionW": "gdtf",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
@@ -150,6 +154,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",

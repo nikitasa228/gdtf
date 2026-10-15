@@ -9,11 +9,25 @@
   "description": "EclProfile CT+ is a high quality, six colour mixing LED ellipsoidal. Designed to reach the finest quality of light for white tones and colour spectrum, its custom LED array and powerful on-board colour control allows to reach bright and high quality whites, up to 97 of CRI, keeping a consistent output and ensuring a total control of the light. The wide feature set includes special theatrical functions such as tungsten emulation on dimming, colour gels, virtual CTO and studio functions, such as +/- green green correction on linear white CTC.",
   "manufacturer": "Prolights",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 270.0,
-  "maxLuminousIntensityCd": 30000.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 270,
+  "maxLuminousIntensityCd": 216600,
   "luminousFluxLm": 6681.0,
   "noiseLevelDb": null,
   "weightKg": 7.9,
@@ -62,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -95,8 +110,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -125,16 +140,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
 }

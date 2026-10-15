@@ -75,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -100,7 +101,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -128,6 +129,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",

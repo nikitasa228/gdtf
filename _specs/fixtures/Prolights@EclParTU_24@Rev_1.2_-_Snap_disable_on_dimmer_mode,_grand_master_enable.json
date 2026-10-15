@@ -8,11 +8,25 @@
   "shortName": "EclParTU_24",
   "description": "EclPar is a range of multipurpose LED fixtures with a single source, delivering silent operation, high quality of light and optical flexibility, designed to redefine the standard for theatrical, TV and corporate applications.\nEclPar TU and DY features a 177W white LED source (3.200 K TU; 6.000 K DY) delivering a tremendous lumen output and superior light quality with CRI and R9 > of 96.\nEclPar UV is a real UV LED luminaire with a 365nm wavelength LED source.\nThe fixture offers an extensive accessory range including barn doors, filter frame, egg crate and a multitude of interchangeable lenses.\nEclPar features a smooth 16-bit dimming as well as RDM control and adjustable PWM to look good in front of a camera.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 177.0,
+  "category": "PAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 207,
   "maxLuminousIntensityCd": 62500.0,
   "luminousFluxLm": 12454.0,
   "noiseLevelDb": null,
@@ -63,6 +77,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -91,8 +106,8 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -122,16 +137,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://musiclights.it/en/product/ECLPAR"
   ]
 }

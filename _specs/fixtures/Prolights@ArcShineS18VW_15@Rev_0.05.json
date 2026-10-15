@@ -8,18 +8,32 @@
   "shortName": "ASS18VW",
   "description": "The ArcShine S18VW and ArcShine S9VW are a series of slim linear LED fixtures, designed for interior and exterior applications (IP66) such as flood lighting, wall washing and accent lighting.\nThere are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 2W each, with Variable White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings. \nOptic: 15° lenses capable of delivering multiple angles with optional holographic filters.\nOptional holographic symmetric and elliptical filters available: 20°, 60°, 10°x60°, 30°x60°.\nThe ArcShine range has an on-board power supply and DMX/RDM control. The 100 cm version is controllable in two sections.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 40,
   "maxLuminousIntensityCd": 1000.0,
   "luminousFluxLm": 124.0,
   "noiseLevelDb": null,
   "weightKg": 3.5,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "IP moulded connector",
+  "powerConnectorOut": "IP moulded connector",
+  "powerSupplyType": "IP moulded connector LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -60,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -96,7 +111,7 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
+    "category": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -122,16 +137,24 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://seesound.es/productos/pdfs/Arcshines1815vw_A4_DATASHEET_(EN)-14057 .pdf"
+  ]
 }

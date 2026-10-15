@@ -8,18 +8,32 @@
   "shortName": "HDUO",
   "description": "The HaluPix DUO is an advanced hybrid LED tile that seamlessly integrates lighting and video capabilities into a modular design. This dual-source unit offers high-power, long-throw white pixels alongside high-brightness video and strobe features, with full pixel-level control. This integration facilitates diverse and dynamic lighting setups, suitable for a variety of professional stage and TV applications.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1788.0,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 500,
   "maxLuminousIntensityCd": 9600.0,
   "luminousFluxLm": 40323.0,
   "noiseLevelDb": null,
   "weightKg": 16.3,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -60,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -175,15 +190,16 @@
     }
   ],
   "pixelCount": 7,
+  "subType": "LED matrix panel (strobe/wash)",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -205,17 +221,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Wash mode 500 W, strobe peak 1200 W."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/HALUPIXDUO"
   ]
 }

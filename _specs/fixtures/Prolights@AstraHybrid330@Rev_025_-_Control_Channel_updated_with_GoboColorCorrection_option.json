@@ -9,10 +9,24 @@
   "description": "The Astra Hybrid330 is an ultra compact LED hybrid moving head with phenomenal power for its size and delivering a stunning set of visual effects.\nThe Astra Hybrid330 optical system ranges linearly from 3° to 46°, and it's equipped with a large 140mm front lens featuring both an high intensity beam and perfect spotlight, offering a tremendous lumen output and superior evenness compared with other lights in the same category.\nThe extensive feature set of the Astra Hybrid330 includes functions like aerial effects with a fat and parallel beam and crisp projection textures and pattern effects, with linear CMY, three colour-wheels, an animation wheel, two overlapping prisms, frost and two gobo wheels.",
   "manufacturer": "Prolights",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 330.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 517,
   "maxLuminousIntensityCd": 3568500.0,
   "luminousFluxLm": 10976.0,
   "noiseLevelDb": null,
@@ -84,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": null,
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -101,7 +116,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -134,16 +149,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ASTRAHYB330"
   ]
 }

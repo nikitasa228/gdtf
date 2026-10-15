@@ -99,6 +99,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -154,6 +155,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived"

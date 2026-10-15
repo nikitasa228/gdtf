@@ -8,18 +8,32 @@
   "shortName": "TabledC",
   "description": "Tabled C is an ingenious product which offers beautiful table lighting for events whilst keeping the atmosphere of the room. Based on a stunning aesthetic design, it is not only a stylish centerpiece but fast to deploy and easy to use. With local control and wireless DMX, it can either act as a standalone table light or be part of a spectacular event lighting package.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
+  "category": "OTHER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
   "powerConsumptionW": 24.0,
   "maxLuminousIntensityCd": 100.0,
   "luminousFluxLm": 96.0,
   "noiseLevelDb": null,
   "weightKg": 1.18,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "Battery (internal)",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Battery (internal)",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -28,7 +42,6 @@
   "manualPanRangeDeg": null,
   "manualTiltRangeDeg": null,
   "controlSignal": [
-    "DMX512",
     "Wireless DMX (CRMX/W-DMX)"
   ],
   "dataConnectors": null,
@@ -48,7 +61,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 4000.0,
+    "max": 4000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -57,6 +73,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": null,
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -80,18 +97,19 @@
     }
   ],
   "pixelCount": 6,
+  "subType": "Battery table lamp",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
-    "controlSignal": "gdtf-derived",
+    "controlSignal": "manual",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
@@ -109,18 +127,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "manual",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "colorTemperatureK": "manual"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/TABLEDC"
   ]
 }
