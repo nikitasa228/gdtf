@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 900,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": 15.8,
+  "weightKg": 16.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -104,7 +104,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -132,12 +132,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
     "powerSupplyType"
@@ -145,5 +145,8 @@
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://en.terbly.com/index.php/Product/detail/goods_id/163"
   ]
 }

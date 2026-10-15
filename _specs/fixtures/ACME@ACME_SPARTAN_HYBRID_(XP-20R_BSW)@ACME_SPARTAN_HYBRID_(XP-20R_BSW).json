@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 470.0,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 3657400.0,
   "luminousFluxLm": 5000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 28.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -120,7 +120,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -129,7 +129,7 @@
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "estimated",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -152,13 +152,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType",
     "colorTemperatureK"
   ],
@@ -167,5 +167,8 @@
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "XP-20R = 20R (440 W) discharge lamp; discontinued, no spec sheet found."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/Info/productdetail/cat_id/16/id/373"
   ]
 }

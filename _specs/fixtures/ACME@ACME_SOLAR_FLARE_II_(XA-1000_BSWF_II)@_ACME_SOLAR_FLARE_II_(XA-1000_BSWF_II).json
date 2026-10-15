@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1370,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -120,7 +120,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -150,13 +150,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
     "powerSupplyType"
@@ -165,5 +165,8 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Discontinued; no spec sheet found."
+  ],
+  "_refs": [
+    "https://www.acmelighting.com/index.php/Info/productdetail/id/3598"
   ]
 }

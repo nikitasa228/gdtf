@@ -4,7 +4,7 @@
   "fixtureTypeId": "A908B635-3CEA-43FC-96D6-8B85FC187ED3",
   "gdtfDataVersion": "1.0",
   "gdtfName": "ACME BW-545",
-  "longName": "BW-545",
+  "longName": "COOLIE 545 (BW-545)",
   "shortName": "BW-545",
   "description": "ACME BW-545 3W LED",
   "manufacturer": "ACME",
@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 173,
   "maxLuminousIntensityCd": 48700.0,
   "luminousFluxLm": 6000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 9.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -92,7 +92,7 @@
   ],
   "pixelCount": 1,
   "_source": {
-    "longName": "gdtf",
+    "longName": "manual",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
@@ -103,7 +103,7 @@
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "estimated",
-    "beamAngleDeg": "gdtf",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
     "lensType": "gdtf-derived",
@@ -122,14 +122,13 @@
     "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType",
     "colorTemperatureK"
   ],
@@ -137,5 +136,8 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF power value (10 W) implausible, removed; discontinued, no spec sheet found."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=2180"
   ]
 }

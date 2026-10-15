@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 35.0,
+  "powerConsumptionW": 290,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 400.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 6.8,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -101,7 +101,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -125,6 +125,7 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
@@ -132,7 +133,6 @@
   "_missing": [
     "maxLuminousIntensityCd",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType",
     "colorTemperatureK"
   ],
@@ -141,5 +141,8 @@
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.bespokesolutions.co.za/LPAR7QZ-stage-lighting.html"
   ]
 }

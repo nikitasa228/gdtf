@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 150.0,
+  "powerConsumptionW": 200,
   "maxLuminousIntensityCd": 143200.0,
   "luminousFluxLm": 11000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 12.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -98,7 +98,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -125,17 +125,20 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "http://en.terbly.com/index.php/Product/detail/goods_id/64"
   ]
 }

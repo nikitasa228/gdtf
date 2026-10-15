@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 330.0,
+  "powerConsumptionW": 540,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 21.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -110,7 +110,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -142,6 +142,7 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -150,8 +151,7 @@
   },
   "_missing": [
     "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
@@ -159,6 +159,6 @@
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
   ],
   "_refs": [
-    "https://gearsource.com/product/acme-chiron-xp-380-beam-ii-lot-of-22/012395"
+    "https://www.acmelighting.com/Info/productdetail/cat_id/246/id/3602"
   ]
 }

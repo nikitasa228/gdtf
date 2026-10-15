@@ -45,7 +45,7 @@
     "DMX512"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 82.0,
     "max": 82.0

@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 440,
   "maxLuminousIntensityCd": 4299600.0,
   "luminousFluxLm": 18000.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 17.0,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -124,14 +124,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "panRangeDeg": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
-    "weightKg",
     "powerSupplyType",
     "colorTemperatureK"
   ],
@@ -139,5 +139,8 @@
   "_issues": [
     "Weight is 0 in GDTF",
     "Tilt-only LED bar (no pan)."
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=1812"
   ]
 }

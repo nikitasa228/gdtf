@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 25.0,
+  "powerConsumptionW": 90,
   "maxLuminousIntensityCd": 24000.0,
   "luminousFluxLm": 2398.0,
   "noiseLevelDb": null,
-  "weightKg": 4.0,
+  "weightKg": 4.5,
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
@@ -121,10 +121,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -162,5 +162,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/200551-raccoon-junior-p4-7.html"
   ]
 }

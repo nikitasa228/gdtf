@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 50.0,
+  "powerConsumptionW": 825,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -104,8 +104,8 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -144,5 +144,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/200610-raccoon-w40-4.html"
   ]
 }
