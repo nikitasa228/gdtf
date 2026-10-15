@@ -6,12 +6,10 @@
   "gdtfName": "Nexon M",
   "longName": "Nexon M",
   "shortName": "Nexon M",
-  "description": "NXT Lights Nexon M: moving-head Discharge Lamp beam/spot/wash hybrid, with 0.9-25.5 deg zoom, CMY colour mixing, colour wheel, 38 gobos, prism, frost.",
+  "description": "NXT Lights Nexon M: moving-head Discharge Lamp beam/spot/wash hybrid, with 0.9-25.5 deg zoom, CMY colour mixing, colour wheel, 38 gobos, prism, frost, IP65 rated.",
   "manufacturer": "NXT Lights",
   "category": "BSW",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -19,16 +17,16 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 606.0,
-  "maxLuminousIntensityCd": 11000000.0,
-  "luminousFluxLm": 15500.0,
+  "powerConsumptionW": 650,
+  "maxLuminousIntensityCd": 76000000,
+  "luminousFluxLm": 23000,
   "noiseLevelDb": 47,
   "weightKg": 32.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -105,7 +103,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -129,16 +127,16 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -170,14 +168,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "500W 8100K laser engine. Rated power 650 W on product page; data sheet PDF says 606 W. Lux from official photometric report (https://cdn.prod.website-files.com/67adbfcb8ba24761898e3b55/68cddfdff5f23755089cfb04_NEXON-M-photometrics.pdf) at 0.9 deg, 10 m (= 7600 lux @100 m, ~76 Mcd). Pan also has infinite-pan feature.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.nxtlights.com/nexon"
   ]
 }

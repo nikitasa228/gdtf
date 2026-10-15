@@ -1,0 +1,6 @@
+{
+ "DLW@DLW_L1240C4_LC@Offical.gdtf": {"powerConsumptionW": 530, "weightKg": 20.5, "ipRating": "IP20", "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_refs": ["https://www.dlwlighting.com/eol-products/led-strip-stage-lighting.html"]},
+ "DLW@DREAM_400C7_BRIGHT@Offical.gdtf": {"powerConsumptionW": 400, "weightKg": 17.6, "ipRating": "IP20", "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_refs": ["https://www.dlwlighting.com/basic-stage-lighting/cyc-stage-lighting.html"], "_notes": "Asymmetric wedge reflector 45x60 deg (not a zoom range), so beam omitted."},
+ "DLW@DREAM_L1000_SPOT@Offical.gdtf": {"powerConsumptionW": 1280, "weightKg": 44, "ipRating": "IP20", "mains": "200-240", "_refs": ["https://www.dlwlighting.com/eol-products/moving-gobo-lights.html"], "_notes": "Official page states input power 1280 W (1000 W LED engine); index had 480 W. CCT is the linear CTO range."},
+ "DLW@DREAM_L1400P_FLAG@L1400P_FLAG.gdtf": {"powerConsumptionW": 1650, "weightKg": 49, "ipRating": "IP20", "mains": "200-240", "_refs": ["https://www.dlwlighting.com/eol-products/1400w-stage-lighting.html"], "_notes": "CCT is the linear CTO range."}
+}

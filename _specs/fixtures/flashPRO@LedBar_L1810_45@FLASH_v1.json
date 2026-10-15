@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 180,
+  "powerConsumptionW": 200,
   "maxLuminousIntensityCd": 330000.0,
   "luminousFluxLm": 17448.0,
   "noiseLevelDb": 35,
-  "weightKg": 5.3,
+  "weightKg": 4.4,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -175,15 +175,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "estimated",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -209,15 +209,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "18 x 10 W; GDTF power 1200 W invalid.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Product code P7200146. Cooling active.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://flashpro.pl/reflektory-led/reflektory-led-bar/ledbar-l1810-45"
   ]
 }

@@ -10,16 +10,12 @@
   "manufacturer": "DLW",
   "category": "PROFILE",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
-    "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 200.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
@@ -30,7 +26,7 @@
   "maxLuminousIntensityCd": 5900000.0,
   "luminousFluxLm": 50000.0,
   "noiseLevelDb": 48,
-  "weightKg": 49.0,
+  "weightKg": 49,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -152,9 +148,10 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
@@ -162,14 +159,14 @@
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "CCT is the linear CTO range.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.dlwlighting.com/eol-products/1400w-stage-lighting.html"

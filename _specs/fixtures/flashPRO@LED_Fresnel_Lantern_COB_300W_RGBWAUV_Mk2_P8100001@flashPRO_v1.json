@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 150000.0,
   "luminousFluxLm": 5089.0,
   "noiseLevelDb": 35,
-  "weightKg": 10.6,
+  "weightKg": 11.6,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -132,16 +132,16 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -168,13 +168,17 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Product code P8100001 = FRESNEL LED F300 +AUV on flashpro.pl. Cooling active.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://flashpro.pl/oswietlenie-ekspozycyjne/reflektory-pc/fresnel-led-f300-auv"
   ]
 }

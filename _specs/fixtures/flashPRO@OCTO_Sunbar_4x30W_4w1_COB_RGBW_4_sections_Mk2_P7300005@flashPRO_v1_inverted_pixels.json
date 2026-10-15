@@ -30,7 +30,7 @@
   "maxLuminousIntensityCd": 34000.0,
   "luminousFluxLm": 10400.0,
   "noiseLevelDb": 30,
-  "weightKg": 5.3,
+  "weightKg": 5.2,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -175,15 +175,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "estimated",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -207,17 +207,20 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
     "beamAngleDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "4 x 30 W; GDTF power 770 W invalid.",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Product code P7300005 = OCTO SUNBAR 430. Cooling active.",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://flashpro.pl/reflektory-retro/octo-sunbar-430"
   ]
 }

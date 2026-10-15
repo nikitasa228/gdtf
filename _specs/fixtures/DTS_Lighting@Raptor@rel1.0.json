@@ -19,18 +19,18 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 90.0,
-    "max": 260.0
+    "min": 100.0,
+    "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": 3700000.0,
+  "powerConsumptionW": 450,
+  "maxLuminousIntensityCd": 35280000,
   "luminousFluxLm": null,
   "noiseLevelDb": 47,
-  "weightKg": 15.4,
+  "weightKg": 17,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -51,8 +51,8 @@
   ],
   "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
-    "min": 4.0,
-    "max": 4.0
+    "min": 3.4,
+    "max": 3.4
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -72,8 +72,8 @@
   "colorMixing": "None",
   "colorWheel": true,
   "colorTemperatureK": {
-    "min": 7000.0,
-    "max": 7000.0
+    "min": 7500.0,
+    "max": 7500.0
   },
   "prism": true,
   "prisms": [
@@ -108,14 +108,14 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -144,17 +144,20 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "beamAngleDeg": "manual",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived",
-    "beamAngleDeg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "DTS Raptor FPR: discharge hybrid (beam/spot) with framing-free optics.",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "Osram Sirius HRI 330 W lamp (16500 lm lamp lumens). Pan is limitless (FPR system), so panRangeDeg omitted.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://dts-lighting.it/product/entertainment/raptor/"
   ]
 }

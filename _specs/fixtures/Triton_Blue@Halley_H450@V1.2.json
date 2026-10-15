@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 440.0,
-  "maxLuminousIntensityCd": 4400000.0,
-  "luminousFluxLm": 24000.0,
-  "noiseLevelDb": 43,
-  "weightKg": 26.5,
+  "powerConsumptionW": 610,
+  "maxLuminousIntensityCd": 2400000,
+  "luminousFluxLm": 21000,
+  "noiseLevelDb": 42,
+  "weightKg": 26.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -111,16 +111,16 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -152,15 +152,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "description": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "description": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Weight from the official data sheet PDF (https://d7rh5s3nxmpy4.cloudfront.net/CMP10538/files/10297862_data_sheet_2.pdf); other values from the product page. Data sheet gives 26000 lux @10 m (page 24000 lux @10 m). Noise = Auto fan mode (SLN 30, theatre 38, constant 46 dBA)."
+  ],
+  "_refs": [
+    "https://www.triton-blue.com/p/triton-blue-halley-h450"
   ]
 }

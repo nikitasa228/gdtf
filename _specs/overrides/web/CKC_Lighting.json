@@ -1,0 +1,3 @@
+{
+ "CKC_Lighting@CYC_M@Revision.gdtf": {"powerConsumptionW": 208, "weightKg": 4.3, "ipRating": "IP30", "luminousFluxLm": 7900, "mains": "100-240", "lux": [327, 5], "noiseLevelDb": 0, "_notes": "Fan-free (passive cooling): silent. Asymmetric cyc: beam 59 x 37 deg (50%), field 97 x 68 deg; beam omitted. Page says 'Natural heat dissipation'.", "_refs": ["https://www.ckclighting.com/item/241.html"]}
+}

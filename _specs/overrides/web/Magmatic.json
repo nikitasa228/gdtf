@@ -1,0 +1,4 @@
+{
+ "Magmatic@Prisma_Par_50@2024-03-09_First_Release.gdtf": {"powerConsumptionW": 83, "weightKg": 3.2, "ipRating": "IP65", "mains": "100-240", "powerSupplyType": "powerCON TRUE1 TOP", "_refs": ["https://www.elationlighting.com/prisma-par-50"], "_notes": "Magmatic is Elation Professional's effects brand; product page is on elationlighting.com. UV-only (365 nm) fixture, no lux/lumen published. Air cooled."},
+ "Magmatic@SIDEWINDER@25-27-06_First_Release.gdtf": {"powerConsumptionW": 1560, "weightKg": 13.4, "ipRating": "IP20", "powerSupplyType": "powerCON TRUE1 TOP", "_refs": ["https://www.elationlighting.com/sidewinder"], "_notes": "CO2-simulator fog machine with 22x3W RGBA LEDs. 1560 W max is the whole machine incl. heater (rated 1450 W); index 66 W likely LED-only. Page lists AC 100-120V plus a 230/240V version, so mains omitted. Approvals line lists IP20 although power inlet is IP65-type."}
+}

@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 97000.0,
-  "luminousFluxLm": 6600.0,
+  "luminousFluxLm": 6600,
   "noiseLevelDb": 43,
   "weightKg": 15.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -113,16 +113,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -152,13 +151,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Noise only given for Silent mode (35 dBA @1 m), omitted.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://dts-lighting.it/product/entertainment/alchemy-3/"
   ]
 }

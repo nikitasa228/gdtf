@@ -26,17 +26,17 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 4600.0,
+  "powerConsumptionW": 125,
+  "maxLuminousIntensityCd": 2400.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 38,
-  "weightKg": 8.6,
+  "weightKg": 16,
   "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 270.0,
+  "panRangeDeg": null,
+  "tiltRangeDeg": 360,
   "infinitePan": null,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -85,7 +85,7 @@
   "pixelCount": 1,
   "subType": "Kinetic LED panel",
   "fullName": "Minuit Une IVL Carre",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",
@@ -116,19 +116,18 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "tiltRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "weightKg": "estimated",
-    "powerSupplyType": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
-    "panRangeDeg": "estimated",
-    "tiltRangeDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -136,6 +135,10 @@
     "colorTemperatureK"
   ],
   "_issues": [
-    "Typical-value estimates (no published data): powerConsumptionW, weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, panRangeDeg, tiltRangeDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Laser-based fixture with 4 independent tilting mirrors (0-360 deg each); laser power 10 W. Beam range 1-80 deg refers to the light-plane fan, not a zoom, so beam omitted. Index had 240 W / 8.6 kg.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://minuitune.com/products/ivl-carres/"
   ]
 }

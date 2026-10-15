@@ -132,23 +132,24 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Tilt-only bar; GDTF power 40 W implausible for 12 x 40 W, removed.",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.dlwlighting.com/eol-products/led-strip-stage-lighting.html",
     "https://www.dlwlighting.com/moving-head-lights/effect-lights/led-strip-stage-lighting.html"
   ]
 }

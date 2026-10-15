@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 85.0,
-  "maxLuminousIntensityCd": 920.0,
+  "powerConsumptionW": 713,
+  "maxLuminousIntensityCd": 7700.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": 38,
-  "weightKg": 10.4,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "noiseLevelDb": 43,
+  "weightKg": 10.43,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": null,
   "tiltRangeDeg": 190.0,
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP64",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -113,8 +113,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -140,22 +140,25 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 17112 W invalid.",
-    "Typical-value estimates (no published data): powerConsumptionW, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "User manual states 713 W / 6.22 A; weight 23 lb (10.43 kg) and IP64 from spec sheet https://www.mega.lighting/_files/ugd/e740dc_7c4a4cb1b0d145bfb671f42ec23dc091.pdf. 572x1W RGB + 144x8W white LEDs. Index had 80 W / IP20.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.mega.lighting/_files/ugd/e740dc_79f49506ac1b4791a3fd1975db03d587.pdf"
   ]
 }

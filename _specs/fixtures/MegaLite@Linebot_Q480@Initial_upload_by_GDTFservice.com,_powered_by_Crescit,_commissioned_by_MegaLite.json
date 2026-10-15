@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 590,
-  "maxLuminousIntensityCd": 7700000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 800000.0,
+  "luminousFluxLm": 2459,
   "noiseLevelDb": 43,
   "weightKg": 17.4,
   "powerConnectorIn": "powerCON TRUE1",
@@ -62,8 +62,8 @@
   "colorMixing": "RGBW",
   "colorWheel": false,
   "colorTemperatureK": {
-    "min": 2800.0,
-    "max": 8000.0
+    "min": 6958.0,
+    "max": 6958.0
   },
   "prism": false,
   "prisms": [],
@@ -98,7 +98,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -124,25 +124,27 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 7080 W invalid.",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "GDTF power 7080 W invalid. Official Mega-Lite spec sheet (product page https://www.mega.lighting/out-of-produccion/linebot-q480, discontinued). Weight converted from 38.3 lb. 2459 lm as published (seems low for 12x40W). 590 W / 5.04 A.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.mega.lighting/_files/ugd/e740dc_d463a741a1c544b2869c4a3591fd704b.pdf",
     "https://www.mega.lighting/linebotq480"
   ]
 }

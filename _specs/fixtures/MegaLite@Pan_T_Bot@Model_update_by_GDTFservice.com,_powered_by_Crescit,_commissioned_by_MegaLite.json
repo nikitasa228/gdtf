@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 590,
-  "maxLuminousIntensityCd": 11000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 14000.0,
+  "luminousFluxLm": 28595,
   "noiseLevelDb": 43,
-  "weightKg": 16.3,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "weightKg": 16.33,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -99,7 +99,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -128,13 +129,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
@@ -142,11 +143,11 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 53100 W invalid.",
-    "GDTF luminous flux 2.57355e+06 lm is implausible for 590 W and was dropped",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "GDTF power 53100 W invalid. Official Mega-Lite spec sheet (product page https://www.mega.lighting/out-of-produccion/pan-t-bot). 590 W / 5.04 A @110 V. Lens 89 deg RGB emitters / 40 deg white emitters (no zoom). White CCT 6670 K (6911 K measured).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.mega.lighting/_files/ugd/e740dc_01a636de419b44d68e0b773b27a50625.pdf",
     "https://proadv.com/mega-lite-pan-t-bot/"
   ]
 }

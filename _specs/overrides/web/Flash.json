@@ -1,0 +1,4 @@
+{
+ "Flash@EVENT_WASH_FX_300@FLASH_v2.gdtf": {"powerConsumptionW": 450, "weightKg": 12.4, "ipRating": "IP20", "mains": "100-240", "powerSupplyType": "powerCON LINK", "tiltRangeDeg": 270, "_refs": ["https://flash-butrym.pl/en/washfx-300"], "_notes": "Flash (Flash-Butrym) EVENT series WashFX 300, code F7100810. Page states 450 W (max current 1.875 A); index had 240 W and 27.5 kg."},
+ "Flash@LED_MOVING_HEAD_19x15W_BIG_EYE@FLASH_v2.gdtf": {"powerConsumptionW": 300, "weightKg": 14.4, "ipRating": "IP20", "mains": "110-240", "powerSupplyType": "powerCON LINK", "tiltRangeDeg": 270, "_refs": ["https://flash-butrym.pl/en/wash-be-led-1915-v2305"], "_notes": "Matched to Flash WASH-BE LED 1915 (19x15W RGBW bee-eye, v2305; v2110 page gives identical figures). Model-name match is inferred, not explicit. Index weight 27.5 kg not supported."}
+}

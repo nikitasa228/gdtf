@@ -1,0 +1,4 @@
+{
+ "Minuit_Une@IVL_Carre@Version_1.gdtf": {"powerConsumptionW": 125, "weightKg": 16, "ipRating": "IP20", "mains": "100-240", "powerSupplyType": "powerCON TRUE1", "tiltRangeDeg": 360, "_refs": ["https://minuitune.com/products/ivl-carres/"], "_notes": "Laser-based fixture with 4 independent tilting mirrors (0-360 deg each); laser power 10 W. Beam range 1-80 deg refers to the light-plane fan, not a zoom, so beam omitted. Index had 240 W / 8.6 kg."},
+ "Minuit_Une@IVL_Square@Version_1.gdtf": {"powerConsumptionW": 75, "weightKg": 16, "ipRating": "IP20", "mains": "100-240", "powerSupplyType": "powerCON TRUE1", "tiltRangeDeg": 360, "_refs": ["https://minuitune.com/products/ivl-square/"], "_notes": "Class 3R laser fixture, 4 independent tilting mirrors (0-360 deg each). Beam range 1-80 deg is the light-plane fan, so beam omitted. Index had 240 W / 8.6 kg."}
+}

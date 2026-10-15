@@ -1,0 +1,3 @@
+{
+ "Triton_Blue@Halley_H450@V1.2.gdtf": {"powerConsumptionW": 610, "weightKg": 26.3, "ipRating": "IP20", "luminousFluxLm": 21000, "mains": "100-240", "lux": [24000, 10], "powerSupplyType": "powerCON TRUE1 LINK", "noiseLevelDb": 42, "_refs": ["https://www.triton-blue.com/p/triton-blue-halley-h450"], "_notes": "Weight from the official data sheet PDF (https://d7rh5s3nxmpy4.cloudfront.net/CMP10538/files/10297862_data_sheet_2.pdf); other values from the product page. Data sheet gives 26000 lux @10 m (page 24000 lux @10 m). Noise = Auto fan mode (SLN 30, theatre 38, constant 46 dBA)."}
+}
