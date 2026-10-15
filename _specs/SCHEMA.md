@@ -27,6 +27,9 @@ Never edit `fixtures/*.json` by hand. Researched values go into `overrides/*.jso
 - shorthands: `"mains": "100-240"` (or `"200-240/50"`), `"lux": [lux, metres]` → candela, `"beam": [min, max]`, `"cct": [min, max]`
 - `_refs`: manufacturer pages / datasheets the values come from; `_estimated`: fields that are not from a datasheet;
   `_na`: fields that do not apply to the device
+- files are merged field by field, shallowest path first, so `overrides/web/<Manufacturer>.json` (values read from the
+  manufacturer's own product pages, brochures and manuals) is applied last and wins; a layer with `_refs` clears earlier
+  estimates of the fields it sets
 
 ## Provenance
 
