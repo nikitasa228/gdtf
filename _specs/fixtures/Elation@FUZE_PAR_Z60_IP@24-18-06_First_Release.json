@@ -24,7 +24,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 78,
+  "powerConsumptionW": 78.0,
   "maxLuminousIntensityCd": 450000.0,
   "luminousFluxLm": 3813.0,
   "noiseLevelDb": 30,
@@ -160,17 +160,17 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -181,6 +181,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-par-z60-ip",
     "https://shop.ccisolutions.com/StoreFront/jsp/pdf/ELA-FUZPARZ60IP_specifications.pdf"
   ]
 }

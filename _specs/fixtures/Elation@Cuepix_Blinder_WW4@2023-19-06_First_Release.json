@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 427,
+  "powerConsumptionW": 427.0,
   "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
@@ -140,22 +140,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/cuepix-blinder-ww4"

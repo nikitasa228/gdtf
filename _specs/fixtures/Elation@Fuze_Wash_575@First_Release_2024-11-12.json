@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 425,
+  "powerConsumptionW": 425.0,
   "maxLuminousIntensityCd": 160000.0,
   "luminousFluxLm": 6502.0,
   "noiseLevelDb": 43,
   "weightKg": 12.2,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP30",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -130,23 +130,24 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-wash-575",
     "https://www.elationlighting.eu/fuze-wash-575"
   ]
 }

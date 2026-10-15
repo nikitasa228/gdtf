@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 990,
+  "powerConsumptionW": 990.0,
   "maxLuminousIntensityCd": 3200000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 40,
@@ -124,16 +124,16 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
@@ -149,6 +149,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/paladin",
     "https://www.venuesupply.com/detail/elation-professional-paladin-ip65-outdoor-rated-strobe-wash-blinder-with-motorized-zoom-6951"
   ]
 }

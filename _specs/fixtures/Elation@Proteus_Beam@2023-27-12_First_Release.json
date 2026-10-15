@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 500,
+  "powerConsumptionW": 500.0,
   "maxLuminousIntensityCd": 810000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 47,
   "weightKg": 35.0,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 260.0,
@@ -137,7 +137,7 @@
   ],
   "pixelCount": 1,
   "fullName": "Elation Proteus Beam",
-  "powerLinkable": false,
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -145,9 +145,9 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -175,14 +175,15 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
@@ -195,6 +196,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/proteus-beam",
     "https://elationlighting.com/proteus-beam"
   ]
 }

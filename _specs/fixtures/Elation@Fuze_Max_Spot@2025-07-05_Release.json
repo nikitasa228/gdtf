@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1214,
-  "maxLuminousIntensityCd": 1300000.0,
+  "powerConsumptionW": 1214.0,
+  "maxLuminousIntensityCd": 860025.0,
   "luminousFluxLm": 21000.0,
   "noiseLevelDb": 48,
   "weightKg": 34.5,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 250.0,
@@ -140,7 +140,7 @@
   ],
   "pixelCount": 1,
   "fullName": "Elation Fuze Max Spot",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -148,7 +148,7 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -181,23 +181,24 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
-    "https://www.elationlighting.com/products/fuze-max-spot"
+    "https://www.elationlighting.com/products/fuze-max-spot",
+    "https://assets.centryngroup.com/dl/files/FUZ528__DL__005.pdf"
   ]
 }

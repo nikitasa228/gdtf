@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 24,
+  "powerConsumptionW": 24.0,
   "maxLuminousIntensityCd": 3100.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 30,
@@ -158,6 +158,7 @@
     "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/pixel-bar-120ip",
     "https://www.elationlighting.com/pixel-bar-120ip"
   ]
 }

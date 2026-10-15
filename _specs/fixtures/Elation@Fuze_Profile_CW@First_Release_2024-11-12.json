@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 590,
-  "maxLuminousIntensityCd": 670000.0,
+  "powerConsumptionW": 590.0,
+  "maxLuminousIntensityCd": 499225.0,
   "luminousFluxLm": 11200.0,
   "noiseLevelDb": 43,
   "weightKg": 23.3,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 270.0,
@@ -113,7 +113,7 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -145,24 +145,26 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-profile-cw",
+    "https://assets.centryngroup.com/dl/files/FUZ131__DL__002.pdf",
     "https://www.elationlighting.eu/fuze-profile-cw"
   ]
 }

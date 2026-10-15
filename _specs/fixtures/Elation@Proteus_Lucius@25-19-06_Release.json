@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1000,
-  "maxLuminousIntensityCd": 4200000.0,
+  "powerConsumptionW": 1000.0,
+  "maxLuminousIntensityCd": 1886675.0,
   "luminousFluxLm": 43000.0,
   "noiseLevelDb": 48,
   "weightKg": 40.8,
-  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 270.0,
@@ -136,11 +136,11 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -168,14 +168,15 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
@@ -187,6 +188,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
-    "https://www.elationlighting.com/products/proteus-lucius"
+    "https://www.elationlighting.com/products/proteus-lucius",
+    "https://assets.centryngroup.com/dl/files/PRL546__DL__002.pdf"
   ]
 }

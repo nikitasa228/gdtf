@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1000,
+  "powerConsumptionW": 1000.0,
   "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 43000.0,
   "noiseLevelDb": 48,
@@ -168,14 +168,14 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
@@ -187,6 +187,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/proteus-lucius-ops",
     "https://www.elationlighting.com/products/proteus-lucius"
   ]
 }

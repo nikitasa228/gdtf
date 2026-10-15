@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 900,
-  "maxLuminousIntensityCd": 1900000.0,
+  "powerConsumptionW": 900.0,
+  "maxLuminousIntensityCd": 1160868.0,
   "luminousFluxLm": 16000.0,
   "noiseLevelDb": 48,
-  "weightKg": 20.5,
-  "powerConnectorIn": "powerCON TRUE1",
+  "weightKg": 23.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 263.0,
@@ -102,7 +102,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": "IP20",
+  "ipRating": "IP54",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -136,11 +136,11 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -172,21 +172,24 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/paragon-s",
+    "https://assets.centryngroup.com/dl/files/PAR101__DL__005.pdf",
     "https://goknight.com/content/documentation/Elation%20Paragon%20S%20-%20%20Spec%20Sheet%202025-02-05.pdf"
   ]
 }

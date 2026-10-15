@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 540,
+  "powerConsumptionW": 781.0,
   "maxLuminousIntensityCd": 600000.0,
   "luminousFluxLm": 10100.0,
   "noiseLevelDb": 43,
-  "weightKg": 25.9,
+  "weightKg": 29.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -141,7 +141,7 @@
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -172,12 +172,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "ipRating": "estimated",
@@ -190,6 +190,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-profile-1",
     "https://www.illuminationdynamics.com/automated-lighting/elation-fuze-profile"
   ]
 }

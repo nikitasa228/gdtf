@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 160,
-  "maxLuminousIntensityCd": 83000.0,
+  "powerConsumptionW": 170.0,
+  "maxLuminousIntensityCd": 89000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
   "weightKg": 8.8,
@@ -105,8 +105,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -132,12 +132,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
@@ -147,7 +147,10 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Power assumed equal to the IP20 CW Profile HP (same 130 W engine).",
-    "GDTF luminous flux 36000 lm is implausible for 160 W and was dropped",
+    "GDTF luminous flux 36000 lm is implausible for 170 W and was dropped",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/cw-profile-hp-ip"
   ]
 }

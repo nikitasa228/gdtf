@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 285,
+  "powerConsumptionW": 285.0,
   "maxLuminousIntensityCd": 8800.0,
   "luminousFluxLm": 9128,
   "noiseLevelDb": 35,
@@ -166,12 +166,12 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -182,6 +182,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/sol-i-blinder",
     "https://www.elationlighting.eu/sol-i-blinder"
   ]
 }

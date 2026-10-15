@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1400,
-  "maxLuminousIntensityCd": 41000000.0,
+  "powerConsumptionW": 1400.0,
+  "maxLuminousIntensityCd": 49997.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 48,
   "weightKg": 33.0,
-  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": null,
   "tiltRangeDeg": 270.0,
@@ -120,8 +120,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -144,27 +144,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerConsumptionW": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
-    "https://www.elationlighting.com/products/proteus-rayzor-blade-l"
+    "https://www.elationlighting.com/products/proteus-rayzor-blade-l",
+    "https://assets.centryngroup.com/dl/files/PRR048__DL__007.pdf"
   ]
 }

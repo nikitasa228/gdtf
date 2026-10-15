@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 350,
+  "powerConsumptionW": 350.0,
   "maxLuminousIntensityCd": 330000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 47,
@@ -140,24 +140,25 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/platinum-beam-5r-extreme",
     "https://www.elationlighting.eu/platinum-beam-5r-extreme"
   ]
 }

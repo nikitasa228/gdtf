@@ -10,8 +10,6 @@
   "manufacturer": "Elation",
   "category": "PAR",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -19,14 +17,14 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
-    "max": 240.0
+    "min": 110.0,
+    "max": 250.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 150,
+  "powerConsumptionW": 150.0,
   "maxLuminousIntensityCd": 44000.0,
   "luminousFluxLm": 3350.0,
   "noiseLevelDb": 35,
@@ -137,14 +135,14 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -155,6 +153,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/sixpar-200ip",
     "https://www.christielites.com/file_uploads/elation_sixpar_200_ip_specification_sheet.pdf"
   ]
 }

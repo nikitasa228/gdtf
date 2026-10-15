@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1750,
+  "powerConsumptionW": 1750.0,
   "maxLuminousIntensityCd": 150000.0,
   "luminousFluxLm": 222618.0,
   "noiseLevelDb": 48,
   "weightKg": 17.5,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 360.0,
@@ -70,7 +70,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -129,16 +129,16 @@
   "pixelCount": 32,
   "subType": "Strobe pixel panel",
   "fullName": "Elation Pulse Panel FX",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "estimated",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -167,15 +167,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -185,9 +185,10 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Values from the unlabelled comparison table on the Pulse Panel page.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/pulse-panel-fx",
     "https://www.elationlighting.com/products/pulse-panel"
   ]
 }

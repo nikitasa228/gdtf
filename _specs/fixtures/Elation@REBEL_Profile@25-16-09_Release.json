@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 950,
+  "powerConsumptionW": 950.0,
   "maxLuminousIntensityCd": 5300000.0,
   "luminousFluxLm": 22000.0,
   "noiseLevelDb": 48,
   "weightKg": 29.9,
   "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -111,7 +111,7 @@
   ],
   "pixelCount": 1,
   "fullName": "Elation REBEL Profile",
-  "powerLinkable": true,
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -148,17 +148,17 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
@@ -170,6 +170,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/rebel-profile",
     "https://www.r90lighting.com/rental-inventory/elation-rebel-profile/"
   ]
 }

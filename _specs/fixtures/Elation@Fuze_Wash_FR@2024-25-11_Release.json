@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 631,
-  "maxLuminousIntensityCd": 1500000.0,
+  "powerConsumptionW": 631.0,
+  "maxLuminousIntensityCd": 621265.0,
   "luminousFluxLm": 25180.0,
-  "noiseLevelDb": 43,
+  "noiseLevelDb": 42.1,
   "weightKg": 28.1,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 250.0,
@@ -123,7 +123,7 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -154,24 +154,26 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-wash-fr",
+    "https://assets.centryngroup.com/dl/files/FUZ501__DL__001.pdf",
+    "https://assets.centryngroup.com/dl/files/FUZ501__DL__004.pdf",
     "https://www.elationlighting.eu/fuze-wash-fr"
   ]
 }

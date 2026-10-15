@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 700,
+  "powerConsumptionW": 700.0,
   "maxLuminousIntensityCd": 20000000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 43,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -142,16 +142,16 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
@@ -165,6 +165,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/proteus-rayzor-760-ops",
     "https://www.elationlighting.eu/proteus-rayzor-760-wmg"
   ]
 }

@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1000,
+  "powerConsumptionW": 1000.0,
   "maxLuminousIntensityCd": 81000.0,
   "luminousFluxLm": 14670.0,
   "noiseLevelDb": 40,
@@ -145,9 +145,9 @@
     "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -173,19 +173,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/seven-batten-72"

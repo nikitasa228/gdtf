@@ -30,7 +30,7 @@
   "maxLuminousIntensityCd": 2200.0,
   "luminousFluxLm": 1000.0,
   "noiseLevelDb": 30,
-  "weightKg": 4.1,
+  "weightKg": 4.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",

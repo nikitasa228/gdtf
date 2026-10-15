@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 700,
-  "maxLuminousIntensityCd": 8500000.0,
+  "powerConsumptionW": 700.0,
+  "maxLuminousIntensityCd": 454879.0,
   "luminousFluxLm": 11615.0,
   "noiseLevelDb": 43,
   "weightKg": 12.2,
@@ -148,15 +148,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -164,9 +164,10 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
-    "https://www.elationlighting.com/products/rayzor-760"
+    "https://www.elationlighting.com/products/rayzor-760",
+    "https://assets.centryngroup.com/dl/files/RAY760__DL__008.pdf"
   ]
 }

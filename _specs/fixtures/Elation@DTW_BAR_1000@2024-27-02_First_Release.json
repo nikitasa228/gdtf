@@ -24,8 +24,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 120,
-  "maxLuminousIntensityCd": 19000.0,
+  "powerConsumptionW": 120.0,
+  "maxLuminousIntensityCd": 17878.0,
   "luminousFluxLm": 2640.0,
   "noiseLevelDb": 30,
   "weightKg": 6.4,
@@ -169,23 +169,25 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
+    "maxLuminousIntensityCd": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/dtw-bar-1000",
+    "https://assets.centryngroup.com/dl/files/DTW392__DL__003.pdf",
     "https://www.stagespot.com/elation-dtw-bar-1000.html"
   ]
 }

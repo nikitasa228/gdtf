@@ -10,24 +10,21 @@
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 120.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1500,
-  "maxLuminousIntensityCd": 25000000.0,
+  "powerConsumptionW": 1500.0,
+  "maxLuminousIntensityCd": 4951921.0,
   "luminousFluxLm": 77000.0,
   "noiseLevelDb": 48,
   "weightKg": 47.5,
@@ -126,11 +123,11 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -162,21 +159,23 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
-    "https://www.elationlighting.com/products/artiste-mondrian"
+    "https://www.elationlighting.com/products/artiste-mondrian",
+    "https://assets.centryngroup.com/dl/files/EAM297__DL__009.pdf"
   ]
 }

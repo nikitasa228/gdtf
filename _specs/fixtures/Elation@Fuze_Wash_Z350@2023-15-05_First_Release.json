@@ -10,8 +10,6 @@
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -19,17 +17,17 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 399,
+  "powerConsumptionW": 399.0,
   "maxLuminousIntensityCd": 1300000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": 43,
+  "noiseLevelDb": 39.4,
   "weightKg": 20.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +71,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP30",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -152,16 +150,16 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
@@ -169,9 +167,11 @@
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF weight (45) was in lbs.",
     "GDTF luminous flux 60280 lm is implausible for 399 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-wash-z350",
+    "https://assets.centryngroup.com/dl/files/FUZ035__DL__003.pdf",
     "https://www.elationlighting.com/fuze-wash-z350"
   ]
 }

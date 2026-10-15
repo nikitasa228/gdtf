@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 50,
+  "powerConsumptionW": 50.0,
   "maxLuminousIntensityCd": 34000.0,
   "luminousFluxLm": 2264.0,
   "noiseLevelDb": 30,
@@ -76,7 +76,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -15.0,
@@ -141,14 +141,14 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -159,6 +159,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/kl-fresnel-4-cw",
     "https://www.elationlighting.eu/kl-fresnel-4-cw"
   ]
 }

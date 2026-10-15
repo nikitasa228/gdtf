@@ -10,8 +10,6 @@
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -19,14 +17,14 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 157,
+  "powerConsumptionW": 157.0,
   "maxLuminousIntensityCd": 320000.0,
   "luminousFluxLm": 5320.0,
   "noiseLevelDb": 38,
@@ -73,7 +71,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP30",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -138,23 +136,24 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.elationlighting.com/products/fuze-wash-z120",
     "https://www.springtree.net/product/elation-fuze-wash-z120/"
   ]
 }
