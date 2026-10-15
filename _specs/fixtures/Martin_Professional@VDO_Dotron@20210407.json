@@ -20,10 +20,13 @@
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE)",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "Ethernet (Martin P3)"
   ],
@@ -41,6 +44,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -100,6 +104,7 @@
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",

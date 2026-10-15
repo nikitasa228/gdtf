@@ -32,10 +32,13 @@
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 433.6,
   "tiltRangeDeg": 333.3,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -108,6 +112,7 @@
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",

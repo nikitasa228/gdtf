@@ -8,7 +8,7 @@
   "shortName": "JSPOT4Z",
   "description": "Jet Spot4Z is a 180W 6.800 K LED spotlight designed to replace a 700W discharge fixture in theatres, concert halls and a host of other venues. The compact size allows for the use of this luminaire in venues with low ceilings without resorting to zoom. Its custom optical system delivers a consistent output with a flat-field and crisp gobo projection right through the massive 8° to 40° zoom range.",
   "manufacturer": "Prolights",
-  "category": "FOG",
+  "category": "SPOT",
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
@@ -20,10 +20,13 @@
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 539.2,
   "tiltRangeDeg": 261.9,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -107,6 +111,7 @@
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",

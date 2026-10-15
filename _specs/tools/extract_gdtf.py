@@ -113,7 +113,8 @@ def pick_category(name, desc, attrs, has_pan, has_tilt, blades, gobo_wheels, zoo
     a = set(attrs)
     if re.search(r"\bfire|flame", n): return "GENERATOR FIRE"
     if re.search(r"\bhaz(e|er)\b|haze", n): return "HAZE"
-    if re.search(r"\bfog|smoke|\bmist|low fog|geyser|co2|jet", n) or "Fog1" in a or "Fog" in a: return "FOG"
+    if re.search(r"\bfog|smoke|\bmist|low fog|geyser|co2", n) or "Fog1" in a or "Fog" in a: return "FOG"
+    if re.search(r"\bjet\b", n) and not lamp: return "FOG"
     if re.search(r"\bfan\b|wind machine", n): return "FAN"
     if re.search(r"laser", n): return "LASER"
     if re.search(r"follow ?spot|followspot", n): return "FOLLOW SPOT"
@@ -122,6 +123,7 @@ def pick_category(name, desc, attrs, has_pan, has_tilt, blades, gobo_wheels, zoo
     if re.search(r"\bscan(ner)?\b|scanner", n): return "SCANER"
     if has_pan and has_tilt:
         if re.search(r"bswf?|hybrid|\b3[ -]?in[ -]?1\b", n): return "BSW"
+        if re.search(r"\bbracket\b|clamp|mount", n) and not lamp: return "OTHER"
         if re.search(r"wash ?beam|beam ?wash|b-eye|beye|\bbee\b", n): return "WASH BEAM"
         if re.search(r"\bbeam\b|beam", n) and not re.search(r"wash", n): return "BEAM"
         if blades and gobo_wheels: return "PROFILE"
@@ -130,9 +132,11 @@ def pick_category(name, desc, attrs, has_pan, has_tilt, blades, gobo_wheels, zoo
         if re.search(r"\bbar\b|batten|pixel ?bar", n): return "LED BAR"
         if zoom_rng and zoom_rng[0] is not None and zoom_rng[0] <= 5: return "WASH BEAM"
         return "WASH"
+    if re.search(r"\bbracket\b|clamp|mount", n) and not lamp: return "OTHER"
     if re.search(r"strobe|\bflash\b|atomic|lightning", n): return "STROBE"
-    if re.search(r"ellipsoidal|profile|leko|source four|\bpro(file)?\b", n) or blades: return "PROFILE"
-    if re.search(r"\bpar\b|par[ -]?\d|\bpar$|\bpar\d", n): return "PAR"
+    if re.search(r"wash|fresnel|\bmanet\b", n) and not re.search(r"profile|ellipsoidal", n): return "WASH"
+    if re.search(r"ellipsoidal|profile|leko|source four", n) or blades: return "PROFILE"
+    if re.search(r"\bpar\b|par[ -]?\d|\bpar$|\bpar\d|propar", n): return "PAR"
     if re.search(r"\bbar\b|batten|\bline\b|tube|strip|dotline|dotchain|pixel ?line|linear|bar\d|bar\b", n): return "LED BAR"
     if re.search(r"\bspot\b", n) or gobo_wheels: return "SPOT"
     if re.search(r"\bbeam\b", n): return "BEAM"
@@ -173,6 +177,14 @@ def extract(path):
             used_attrs.add(at)
             chf_by_attr.setdefault(at, []).append(cf)
     all_attrs = used_attrs or set(attrs)
+    # attributes reachable through an addressed DMX channel; channels with an empty Offset are virtual
+    # (e.g. Prolights files use them for manual yoke/bracket positioning in visualisers)
+    dmx_attrs = set()
+    for ch in ft.iter("DMXChannel"):
+        o = (ch.get("Offset") or "").strip()
+        if o and o.lower() != "none":
+            for cf in ch.iter("ChannelFunction"):
+                dmx_attrs.add((cf.get("Attribute") or "").split(".")[-1])
 
     def phys_range(attr):
         vals = []
@@ -283,6 +295,8 @@ def extract(path):
     tilt = span("Tilt")
     has_pan = "Pan" in all_attrs or "Pan" in attrs
     has_tilt = "Tilt" in all_attrs or "Tilt" in attrs
+    motor_pan = "Pan" in dmx_attrs
+    motor_tilt = "Tilt" in dmx_attrs
     infinite_pan = any(a in all_attrs for a in ("PanRotate", "PanMode")) and "PanRotate" in all_attrs
     infinite_tilt = "TiltRotate" in all_attrs
 
@@ -311,7 +325,7 @@ def extract(path):
         users = wheel_users.get(wn, set())
         slots = [s for s in w.findall("Slot") if (s.get("Name") or "").strip().lower() not in ("open", "empty", "")]
         if any(re.match(r"Gobo\d", u) for u in users):
-            gnum = next(re.match(r"Gobo(\d)", u).group(1) for u in users if re.match(r"Gobo\d", u))
+            gnum = next(re.match(r"Gobo(\d)", u).group(1) for u in sorted(users) if re.match(r"Gobo\d", u))
             rot = any(a.startswith(f"Gobo{gnum}Pos") for a in all_attrs)
             gobo_wheels.append({"wheel": clean_text(wn), "slots": len(slots), "rotating": rot})
         elif any(u.startswith("Prism") for u in users):
@@ -361,7 +375,7 @@ def extract(path):
     put(rec, "shortName", short_name, "gdtf")
     put(rec, "description", desc, "gdtf")
     put(rec, "manufacturer", manu, "gdtf")
-    cat = pick_category(f"{name} {long_name or ''}", desc or "", all_attrs, has_pan, has_tilt, blades,
+    cat = pick_category(f"{name} {long_name or ''}", desc or "", all_attrs, motor_pan, motor_tilt, blades,
                         gobo_wheels, (zoom_min, zoom_max) if zoom_min else None, beam_angle,
                         lamp_types, pixel_count, None)
     put(rec, "category", cat, "gdtf-derived")
@@ -405,10 +419,14 @@ def extract(path):
         pst = pin[0] + (" LINK" if pout else "")
     put(rec, "powerSupplyType", pst, "gdtf-derived")
 
-    put(rec, "panRangeDeg", rnd(pan) if has_pan else None, "gdtf-derived")
-    put(rec, "tiltRangeDeg", rnd(tilt) if has_tilt else None, "gdtf-derived")
-    put(rec, "infinitePan", infinite_pan if has_pan else None, "gdtf-derived")
-    put(rec, "infiniteTilt", infinite_tilt if has_tilt else None, "gdtf-derived")
+    # pan/tilt ranges describe the motorised movement; a manual yoke/bracket range goes to manual*RangeDeg
+    put(rec, "motorizedPanTilt", motor_pan or motor_tilt, "gdtf-derived")
+    put(rec, "panRangeDeg", rnd(pan) if motor_pan else None, "gdtf-derived")
+    put(rec, "tiltRangeDeg", rnd(tilt) if motor_tilt else None, "gdtf-derived")
+    put(rec, "infinitePan", infinite_pan if motor_pan else None, "gdtf-derived")
+    put(rec, "infiniteTilt", infinite_tilt if motor_tilt else None, "gdtf-derived")
+    put(rec, "manualPanRangeDeg", rnd(pan) if has_pan and not motor_pan and pan else None, "gdtf-derived")
+    put(rec, "manualTiltRangeDeg", rnd(tilt) if has_tilt and not motor_tilt and tilt else None, "gdtf-derived")
     put(rec, "controlSignal", signal or None, "gdtf-derived")
     put(rec, "dataConnectors", dmx_conn or None, "gdtf-derived")
 
@@ -440,6 +458,7 @@ def extract(path):
     put(rec, "framingShutters", bool(blades), "gdtf-derived")
     put(rec, "framingShutterBlades", len({b[:6] for b in blades}) if blades else 0, "gdtf-derived")
     put(rec, "framingShutterRotation", blade_rot if blades else False, "gdtf-derived")
+    put(rec, "framingShutterType", None, None)  # resolved in main() once the final category is known
     put(rec, "colorMixing", color_mixing(all_attrs), "gdtf-derived")
     put(rec, "colorWheel", color_wheel, "gdtf-derived")
     if cts:
@@ -481,7 +500,7 @@ NOT_FOR_ATMOS = {"maxLuminousIntensityCd", "beamAngleDeg", "lensType", "colorTem
 
 def missing_fields(rec, na=()):
     out = []
-    moving = rec.get("panRangeDeg") is not None or rec.get("tiltRangeDeg") is not None
+    moving = bool(rec.get("motorizedPanTilt"))
     atmos = rec.get("category") in ("HAZE", "FOG", "FAN", "OTHER") and rec.get("lightSourceType") is None
     for k in REQUIRED:
         if k in MOVING_ONLY and not moving:
@@ -622,6 +641,14 @@ def main(src_dir, out_dir):
             src[k] = "estimated" if k in est else ov.get("_source", "manual")
         if ov.get("_notes"):
             issues = issues + [ov["_notes"]]
+        if "framingShutterType" not in ov:
+            # wash/fresnel optics shape the beam with barn doors, profiles/spots with framing shutters in the gate
+            kind = None
+            if rec.get("framingShutters"):
+                kind = "Barn doors" if rec.get("category") in ("WASH", "WASH BEAM", "PAR", "LED BAR") else "Framing shutters"
+            rec["framingShutterType"] = kind
+            if kind:
+                src["framingShutterType"] = "gdtf-derived"
         if not rec.get("description"):
             rec["description"] = auto_description(rec)
             src["description"] = "gdtf-derived"

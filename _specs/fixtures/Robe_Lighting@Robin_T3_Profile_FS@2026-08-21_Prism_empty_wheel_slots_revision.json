@@ -34,10 +34,13 @@
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 263.6,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -72,6 +75,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -141,6 +145,7 @@
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -169,7 +174,8 @@
     "animationWheel": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
     "noiseLevelDb"

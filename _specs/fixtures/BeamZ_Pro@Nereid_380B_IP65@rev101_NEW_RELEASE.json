@@ -34,10 +34,13 @@
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -45,7 +48,7 @@
   "dataConnectors": [
     "XLR3"
   ],
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 1.0,
     "max": 1.0
@@ -64,6 +67,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -118,6 +122,7 @@
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",

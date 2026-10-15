@@ -34,10 +34,13 @@
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -67,6 +70,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "RGB",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -116,6 +120,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "gdtf",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -145,7 +150,8 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
     "powerConsumptionW",

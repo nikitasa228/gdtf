@@ -34,10 +34,13 @@
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBA",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -115,6 +119,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "zoom": "gdtf-derived",

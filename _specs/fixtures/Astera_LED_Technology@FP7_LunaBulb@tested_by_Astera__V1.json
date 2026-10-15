@@ -31,10 +31,13 @@
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
   "powerSupplyType": "DC Jack",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Wireless DMX (CRMX/W-DMX)"
@@ -53,6 +56,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWA",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -209,6 +213,7 @@
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",

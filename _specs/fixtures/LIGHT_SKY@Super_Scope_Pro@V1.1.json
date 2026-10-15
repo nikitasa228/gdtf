@@ -34,10 +34,13 @@
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Ethernet (Art-Net/sACN)"
@@ -65,6 +68,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": false,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -114,6 +118,7 @@
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -143,6 +148,7 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "framingShutterType": "gdtf-derived",
     "description": "gdtf-derived"
   },
   "_missing": [

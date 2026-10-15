@@ -34,10 +34,13 @@
   "powerConnectorIn": null,
   "powerConnectorOut": null,
   "powerSupplyType": null,
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 260.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -61,6 +64,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -107,6 +111,7 @@
     "powerConsumptionW": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",

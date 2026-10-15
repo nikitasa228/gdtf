@@ -34,10 +34,13 @@
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -65,13 +68,14 @@
     {
       "wheel": "VLFX",
       "slots": 3,
-      "rotating": false
+      "rotating": true
     }
   ],
   "goboSlots": 20,
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -120,6 +124,7 @@
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -154,7 +159,8 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
     "noiseLevelDb"

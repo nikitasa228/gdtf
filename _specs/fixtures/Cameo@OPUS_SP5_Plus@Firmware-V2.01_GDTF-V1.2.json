@@ -34,10 +34,13 @@
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 220.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -73,6 +76,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -124,6 +128,7 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -156,7 +161,8 @@
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
     "noiseLevelDb"

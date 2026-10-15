@@ -20,10 +20,13 @@
   "powerConnectorIn": "DIN3 (low-voltage DC)",
   "powerConnectorOut": null,
   "powerSupplyType": "DIN3 (low-voltage DC)",
-  "panRangeDeg": 360.0,
-  "tiltRangeDeg": 280.0,
-  "infinitePan": false,
-  "infiniteTilt": false,
+  "motorizedPanTilt": false,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": 360.0,
+  "manualTiltRangeDeg": 280.0,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +45,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -91,10 +95,9 @@
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
-    "infinitePan": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualPanRangeDeg": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf-derived",
@@ -116,7 +119,8 @@
     "animationWheel": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "framingShutterType": "gdtf-derived"
   },
   "_missing": [
     "supportedPowerNetworks",
