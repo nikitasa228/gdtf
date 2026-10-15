@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 345.0,
-  "maxLuminousIntensityCd": 350000.0,
+  "powerConsumptionW": 345,
+  "maxLuminousIntensityCd": 143490,
   "luminousFluxLm": null,
   "noiseLevelDb": 0,
   "weightKg": 9.8,
@@ -124,11 +124,11 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -152,19 +152,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "maxLuminousIntensityCd": "manual",
+    "noiseLevelDb": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
-    "noiseLevelDb": "estimated"
+    "colorTemperatureK": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "Fan-free (passive cooling): silent. peakCd = highest official photometric report value (4000K preset, https://www.highlite.com/en/mwdownloads/download/link/id/17464059); RGBW full = 96,436 cd, W only = 101,462 cd",
+    "Typical-value estimates (no published data): colorTemperatureK"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/42655-spectra-wash.html"
   ]
 }

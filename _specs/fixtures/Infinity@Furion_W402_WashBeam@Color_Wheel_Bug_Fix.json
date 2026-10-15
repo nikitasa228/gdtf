@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": 690000.0,
-  "luminousFluxLm": 2272.0,
+  "powerConsumptionW": 375,
+  "maxLuminousIntensityCd": 497332,
+  "luminousFluxLm": 3951,
   "noiseLevelDb": 43,
   "weightKg": 15.1,
   "powerConnectorIn": "powerCON TRUE1",
@@ -100,10 +100,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -128,15 +128,15 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
@@ -145,7 +145,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 45 W invalid, removed.",
-    "Typical-value estimates (no published data): powerConsumptionW, noiseLevelDb"
+    "peakCd from official photometric report \"41440_Furion W402 - RGBW - Zoom Narrow.pdf\" (https://www.highlite.com/en/mwdownloads/download/link/id/17456678)",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/41440-furion-w402-washbeam.html"
   ]
 }

@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 325.0,
-  "maxLuminousIntensityCd": 11000.0,
+  "powerConsumptionW": 360,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
-  "weightKg": 12.5,
+  "weightKg": 12,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -116,11 +116,11 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -147,17 +147,21 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
     "beamAngleDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "no photometric data published on page",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/43325-goliath.html"
   ]
 }

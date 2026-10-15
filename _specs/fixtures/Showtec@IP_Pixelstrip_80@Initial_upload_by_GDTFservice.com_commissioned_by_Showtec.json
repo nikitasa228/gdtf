@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 124.0,
-  "maxLuminousIntensityCd": 16000.0,
+  "powerConsumptionW": 31,
+  "maxLuminousIntensityCd": 4100.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 0,
   "weightKg": 2.4,
@@ -106,8 +106,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -130,16 +130,16 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "powerSupplyType": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
     "beamAngleDeg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "noiseLevelDb": "estimated"
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -147,7 +147,10 @@
   ],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+    "Fan-free (passive cooling): silent. powered by 48 V DC (external PSU), not mains; brightness 9200 nits",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/44523-ip-pixelstrip-80.html"
   ]
 }

@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 700.0,
-  "maxLuminousIntensityCd": 9400.0,
-  "luminousFluxLm": 5229.0,
+  "powerConsumptionW": 700,
+  "maxLuminousIntensityCd": 7898,
+  "luminousFluxLm": 5229,
   "noiseLevelDb": 40,
   "weightKg": 1.47,
   "powerConnectorIn": "powerCON TRUE1",
@@ -120,13 +120,13 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -151,7 +151,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
@@ -162,6 +162,10 @@
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
+    "peakCd from official photometric report (White, single pod, 96 W) https://www.highlite.com/en/mwdownloads/download/link/id/17450528; 700 W / 5229 lm are for the whole 8-pod set incl. controller, weight is per pod (controller 3.65 kg)",
     "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/30785-stage-blinder-flex-blaze.html"
   ]
 }

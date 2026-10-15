@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 600.0,
-  "maxLuminousIntensityCd": 1600000.0,
-  "luminousFluxLm": 22442.0,
-  "noiseLevelDb": 43,
+  "powerConsumptionW": 750,
+  "maxLuminousIntensityCd": 1301197,
+  "luminousFluxLm": 22442,
+  "noiseLevelDb": 55,
   "weightKg": 28.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -116,10 +116,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -146,25 +146,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "noiseLevelDb": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): noiseLevelDb"
+    "peakCd from official photometric report \"41461_Furion P602 Profile - Zoom Narrow.pdf\" (https://www.highlite.com/en/mwdownloads/download/link/id/17456794); noise: page lists \"Noise Level Maximum 55 dB\" and \"Silent Mode Noise Level 42.4 dB\"; no normal/auto-mode figure given"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/41461-furion-p602-profile.html"
   ]
 }

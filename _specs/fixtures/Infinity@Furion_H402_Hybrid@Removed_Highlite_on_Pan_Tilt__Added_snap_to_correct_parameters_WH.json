@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 13000000.0,
-  "luminousFluxLm": null,
+  "powerConsumptionW": 660,
+  "maxLuminousIntensityCd": 33605127,
+  "luminousFluxLm": 32970,
   "noiseLevelDb": 47,
   "weightKg": 26.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -76,8 +76,8 @@
   "colorMixing": "None",
   "colorWheel": true,
   "colorTemperatureK": {
-    "min": 7000.0,
-    "max": 7000.0
+    "min": 6900.0,
+    "max": 6900.0
   },
   "prism": true,
   "prisms": [
@@ -120,8 +120,8 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -147,26 +147,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "luminousFluxLm": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "colorTemperatureK": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+    "peakCd from official photometric report \"41431_H402 Furion - Zoom Narrow 2.pdf\" (https://www.highlite.com/en/mwdownloads/download/link/id/17456710); page also gives 1,323,098 lx @ 5 m",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/41431-furion-h402-hybrid.html"
   ]
 }

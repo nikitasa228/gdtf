@@ -10,24 +10,27 @@
   "manufacturer": "Showtec",
   "category": "STROBE",
   "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 120.0,
-    "max": 250.0
+    "min": 100.0,
+    "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 100.0,
-  "maxLuminousIntensityCd": 3900.0,
-  "luminousFluxLm": 10148.0,
+  "powerConsumptionW": 100,
+  "maxLuminousIntensityCd": 1900.0,
+  "luminousFluxLm": 5074,
   "noiseLevelDb": 30,
-  "weightKg": 4.0,
+  "weightKg": 4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -106,12 +109,12 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -133,7 +136,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
@@ -149,5 +152,8 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/40303-titan-strobe-100-fx.html"
   ]
 }

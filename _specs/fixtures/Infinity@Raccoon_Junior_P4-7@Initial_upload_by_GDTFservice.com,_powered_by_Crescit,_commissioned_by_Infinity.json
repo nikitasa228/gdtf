@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 90,
-  "maxLuminousIntensityCd": 24000.0,
-  "luminousFluxLm": 2398.0,
-  "noiseLevelDb": 30,
+  "maxLuminousIntensityCd": 28500,
+  "luminousFluxLm": 2398,
+  "noiseLevelDb": 0,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -124,8 +124,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -147,25 +147,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
-    "noiseLevelDb": "estimated"
+    "powerConnectorOut": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut"
   ],
   "_refs": [
     "https://www.highlite.com/en/200551-raccoon-junior-p4-7.html"

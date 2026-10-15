@@ -127,9 +127,9 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
@@ -144,10 +144,11 @@
   ],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "GDTF power 102 W implausible, removed.",
+    "GDTF power 102 W implausible, removed. no photometric data published on page",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.highlite.com/en/40351-titan-strobe-1000-fx.html",
     "https://www.highlite.com/en/brands/40351-titan-strobe-1000-fx.html"
   ]
 }

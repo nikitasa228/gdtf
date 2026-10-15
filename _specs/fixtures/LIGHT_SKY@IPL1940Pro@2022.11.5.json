@@ -6,7 +6,7 @@
   "gdtfName": "IPL1940Pro",
   "longName": "IPL1940Pro",
   "shortName": "IPL1940Pro",
-  "description": "LIGHT SKY IPL1940Pro: moving-head Discharge Lamp wash, with 10-60 deg zoom, IP66 rated.",
+  "description": "LIGHT SKY IPL1940Pro: moving-head LED wash, with 10-60 deg zoom, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 800.0,
   "maxLuminousIntensityCd": 280000.0,
   "luminousFluxLm": 9653.0,
-  "noiseLevelDb": 47,
+  "noiseLevelDb": 48,
   "weightKg": 29.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -46,7 +46,7 @@
     "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
     "min": 10.0,
     "max": 60.0

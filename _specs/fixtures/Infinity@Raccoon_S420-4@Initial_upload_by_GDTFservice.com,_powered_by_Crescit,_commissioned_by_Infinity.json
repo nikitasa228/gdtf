@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 860,
-  "maxLuminousIntensityCd": 6900.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 20758,
+  "luminousFluxLm": 96661,
   "noiseLevelDb": 40,
   "weightKg": 17.8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -115,6 +115,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -136,30 +137,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerConsumptionW": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF luminous flux 144000 lm is implausible for 860 W and was dropped",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
+    "peakCd from official photometric report \"200600_Raccoon S420 - Full On.pdf\" (https://www.highlite.com/en/mwdownloads/download/link/id/17462856) (Full On; a 40 ms strobe flash measured 26,528 cd)",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.highlite.com/en/200600-raccoon-s420-4.html",
     "https://www.licht-produktiv.de/infinity-raccoon-s420-4_1"
   ]
 }
