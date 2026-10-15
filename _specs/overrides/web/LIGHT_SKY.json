@@ -24,7 +24,7 @@
  "LIGHT_SKY@IPL1015_WASH@2022.11.11.gdtf": {"powerConsumptionW": 100.0, "weightKg": 7.3, "ipRating": "IP65", "mains": "100-240", "_refs": ["https://en.lightsky.com.cn/product/pl1015b/"]},
  "LIGHT_SKY@IPL1215@V1.2.gdtf": {"powerConsumptionW": 157.0, "weightKg": 7.2, "ipRating": "IP66", "mains": "100-240", "lux": [5510.0, 5.0], "_refs": ["https://en.lightsky.com.cn/product/pl1215ii/"]},
  "LIGHT_SKY@IPL1215_II@V1.0.gdtf": {"powerConsumptionW": 157.0, "weightKg": 7.2, "ipRating": "IP66", "mains": "100-240", "lux": [5510.0, 5.0], "_refs": ["https://en.lightsky.com.cn/product/pl1215ii/"]},
- "LIGHT_SKY@IPL1940Pro@2022.11.5.gdtf": {"powerConsumptionW": 800.0, "weightKg": 29.0, "ipRating": "IP66", "luminousFluxLm": 9653.0, "mains": "100-240", "_refs": ["https://www.lightsky.com.cn/product/pl1940pro/"]},
+ "LIGHT_SKY@IPL1940Pro@2022.11.5.gdtf": {"powerConsumptionW": 800.0, "weightKg": 29.0, "ipRating": "IP66", "luminousFluxLm": 9653.0, "mains": "100-240", "_refs": ["https://www.lightsky.com.cn/product/pl1940pro/"], "lightSourceType": "LED"},
  "LIGHT_SKY@IPL300@V1.2.gdtf": {"powerConsumptionW": 562.0, "weightKg": 22.0, "ipRating": "IP66", "mains": "100-240", "lux": [60000.0, 10.0], "_refs": ["https://www.lightsky.com.cn/product/ipl300/"]},
  "LIGHT_SKY@IPL6103@V1.3.gdtf": {"powerConsumptionW": 190.0, "weightKg": 8.7, "ipRating": "IP65", "luminousFluxLm": 5362.0, "mains": "100-240", "_refs": ["https://www.lightsky.com.cn/product/ipl6103/"]},
  "LIGHT_SKY@IPL715@V1.2.gdtf": {"powerConsumptionW": 80.0, "weightKg": 3.7, "mains": "100-240", "_refs": ["https://en.lightsky.com.cn/product/ipl715n/"]},

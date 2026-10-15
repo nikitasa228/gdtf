@@ -442,7 +442,7 @@ def extract(path):
 
     lamp = None
     if lamp_types:
-        lamp = max(set(lamp_types), key=lamp_types.count)
+        lamp = max(dict.fromkeys(lamp_types), key=lamp_types.count)  # ties: first listed beam wins
         lamp = {"LED": "LED", "Discharge": "Discharge Lamp", "Tungsten": "Tungsten Lamp",
                 "Halogen": "Halogen Lamp"}.get(lamp, lamp)
     put(rec, "lightSourceType", lamp, "gdtf")
@@ -619,6 +619,13 @@ CONN_ALIASES = {"DC Jack (external PSU / battery)": "DC Jack", "DC 24 V from PIX
                 "PWB CAB Connector": "PWB-CAB Connector"}
 WEAK_DESC = re.compile(r"^(official .*file|www\.|https?://)|\(no measurements", re.I)
 NON_ENGLISH = re.compile(r"[Ѐ-ӿ぀-ヿ一-鿿가-힯]")
+# Latin-script foreign text: two or more Spanish/Portuguese/Italian/French/German function words
+FOREIGN_WORDS = re.compile(r"\b(es|un|una|el|los|las|del|con|para|dispositivo|und|mit|für|ein|eine|einem|der|das|ist|"
+                           r"della|delle|il|questo|avec|pour|est|une|des|sur|não|uma)\b", re.I)
+
+
+def foreign(d):
+    return NON_ENGLISH.search(d) or len(set(w.lower() for w in FOREIGN_WORDS.findall(d))) >= 3
 
 
 def normalize_record(rec, src, meta, issues):
@@ -628,9 +635,11 @@ def normalize_record(rec, src, meta, issues):
     ln = rec.get("longName") or meta.get("gdtfName") or ""
     orig = ln
     ln = ln.replace("_", " ")
-    for token in {mfr, mfr.replace(" ", "_"), mfr.split(" ")[0], meta["file"].split("@")[0].replace("_", " ")}:
+    tokens = {mfr, mfr.replace(" ", "_"), mfr.split(" ")[0], meta["file"].split("@")[0].replace("_", " ")}
+    for token in sorted(tokens, key=lambda t: (-len(t), t)):  # longest brand form first ("CLF Lighting" before "CLF")
         if token and ln.lower().startswith(token.lower() + " "):
-            ln = ln[len(token):]
+            ln = ln[len(token):].lstrip()
+            break
     ln = re.sub(r"\s+", " ", ln).strip()
     if re.fullmatch(r"\(([^()]+)\)", ln):
         ln = ln[1:-1].strip()
@@ -643,7 +652,7 @@ def normalize_record(rec, src, meta, issues):
     rec["fullName"] = ln if ln.lower().startswith(mfr.lower()) else f"{mfr} {ln}".strip()
     src["fullName"] = "gdtf-derived"
     d = rec.get("description") or ""
-    if (len(d) < 40 or WEAK_DESC.search(d) or NON_ENGLISH.search(d) or d.strip() == ln) and src.get("description") != "manual":
+    if (len(d) < 40 or WEAK_DESC.search(d) or foreign(d) or d.strip() == ln) and src.get("description") != "manual":
         if d:
             rec["gdtfDescription"] = d
         rec["description"] = auto_description(rec)

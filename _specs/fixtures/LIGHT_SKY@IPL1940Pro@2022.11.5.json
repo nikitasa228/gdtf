@@ -104,7 +104,7 @@
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
