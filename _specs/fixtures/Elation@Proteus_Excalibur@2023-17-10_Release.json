@@ -9,14 +9,28 @@
   "description": "The PROTEUS EXCALIBUR is the newest member in the industry leading Proteus range of IP65 automated fixtures from Elation Professional. Excalibur is the brightest IP65 fully featured beam fixture ever created with incredible light output from a surprisingly compact fixture body. Rivaling existing Xenon searchlights or skytrackers, the extremely narrow 0.8° Beam ensures the fixture cuts effortlessly through the sky and is visible at great distances. The intense beam of the PROTEUS EXCALIBUR projects from the ultra-wide 260mm front Lens as a massive column of light that stuns the audience.\n A wide array of gobos and prism overlays allow animating the sky, and with its incredible light intensity all CMY colors remain strong and vibrant even when fully saturated. Beam control is provided through a precise internal focus lens, providing crisp projection without optical errors. Dual variable frosts allow to soften the beam when required. A remote-controlled Expander lens allows widening the beam to approximately 3.5 degrees. The fixture is ideally suited for theme parks, cruise ships, outdoor special events, large scale shows and concerts, and any situation where a massive beam or very powerful prism and flower effects are required. With its compact size and low power consumption the PROTEUS EXCALIBUR can be utilized in almost any application.",
   "manufacturer": "Elation",
   "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 580.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 800,
   "maxLuminousIntensityCd": 118863500.0,
   "luminousFluxLm": 26000.0,
   "noiseLevelDb": null,
-  "weightKg": 46.5,
+  "weightKg": 49.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -110,10 +124,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -147,14 +161,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.illuminationdynamics.com/automated-lighting1/proteus-excalibur"
   ]
 }

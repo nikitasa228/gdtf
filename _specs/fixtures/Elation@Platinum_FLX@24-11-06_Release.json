@@ -8,18 +8,32 @@
   "shortName": "PlatFlx",
   "description": "The award winning Platinum FLX™ is an innovative full featured patent pending design 3-in-1 luminaire which can be utilized as a beam, spot, or wash fixture, featuring the brand new Philips™ MSD Platinum 20R 470W 80CRI lamp, 7,800K, 23,000 total lumens delivering comparable output to 1,200W fixtures, 1.8° to 18° zoom in beam mode and 2.9° to 25° zoom in spot mode, 6° - 42° zoomable wash / frost effect, full CMY color mixing plus linear CTO color correction, 10 dichroic colors including UV, CTB, plus white (open), 8 rotating-interchangeable and 6 static-stamped gobos, 6-way linear and 8-facet rotating prisms, bi-directional animation wash frost effects, DMX, RDM (Remote Device Management), Art-NET and sACN support, 5pin DMX, RJ45 Ethernet, and power connections, (6) button control full color 180° reversible menu display, 740W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
-  "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 470.0,
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 740,
   "maxLuminousIntensityCd": 1869700.0,
-  "luminousFluxLm": 23000.0,
+  "luminousFluxLm": 23000,
   "noiseLevelDb": null,
   "weightKg": 34.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 248.0,
@@ -33,7 +47,7 @@
     "Ethernet (Art-Net/sACN)"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 6.0,
     "max": 42.0
@@ -97,18 +111,18 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -120,7 +134,7 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf-derived",
+    "colorTemperatureK": "manual",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
@@ -130,15 +144,22 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/platinum-flx"
   ]
 }

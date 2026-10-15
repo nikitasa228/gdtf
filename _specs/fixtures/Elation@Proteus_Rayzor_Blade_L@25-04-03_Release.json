@@ -8,11 +8,25 @@
   "shortName": "Proteus Rayzor Blade L",
   "description": "The PROTEUS RAYZOR BLADE L™ is a striking visual combination of Linear Wash, high intensity Strobe Lines and SparkLED FX inside a compact IP65 linear fixture design. Envisioned to provide the designer infinite creative control of powerful colors and high-powered strobe effects from a single unit it allows unlimited placement in any outdoor and indoor environment. Protected from dust and water ingress the Rayzor Blade L is part of Elation’s industry leading Proteus Range of outdoor luminaires.",
   "manufacturer": "Elation",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -96,13 +110,14 @@
     }
   ],
   "pixelCount": 8,
+  "subType": "Tilting multi-source batten (beam/wash/strobe)",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -131,17 +146,22 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerConsumptionW": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "panRangeDeg"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-rayzor-blade-l"
   ]
 }

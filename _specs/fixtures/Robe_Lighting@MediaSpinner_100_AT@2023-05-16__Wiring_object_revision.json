@@ -123,8 +123,7 @@
     "lightSourceType": "manual"
   },
   "_missing": [
-    "noiseLevelDb",
-    "tiltRangeDeg"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": []

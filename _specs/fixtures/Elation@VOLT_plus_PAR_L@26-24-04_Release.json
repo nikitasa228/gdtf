@@ -9,12 +9,26 @@
   "description": "Introducing the VOLT+ PAR L, a next-generation replacement fixture in Elation’s popular VOLT Series that delivers the ultimate in battery-powered lighting performance with enhanced efficiency, versatility, and durability in a compact, sleek form factor.",
   "manufacturer": "Elation",
   "category": "PAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
   "powerConsumptionW": 60.0,
   "maxLuminousIntensityCd": 52900.0,
-  "luminousFluxLm": 4060.0,
+  "luminousFluxLm": 3600,
   "noiseLevelDb": null,
   "weightKg": 6.85,
   "powerConnectorIn": "powerCON TRUE1",
@@ -103,6 +117,7 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Battery PAR",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -111,7 +126,7 @@
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -137,17 +152,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "batteryPowered": "gdtf-derived",
+    "batteryPowered": "manual",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/blogs/news/elation-volt-series-next-gen-battery-powered-lighting-for-instant-inspiration"
   ]
 }

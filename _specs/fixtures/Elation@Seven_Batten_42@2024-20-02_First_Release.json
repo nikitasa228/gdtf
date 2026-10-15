@@ -9,10 +9,24 @@
   "description": "The SEVEN BATTEN 42™ is a seven color 3.5 foot (1m) long batten wash luminaire with (36) 25W 7-in-1 RGBAW + Lime + UV (395nm) LEDs. Features include individual hue, saturation, and intensity control, special RGB SEVEN 3 channel mode (RGB + dynamic white, amber, lime, and UV), 6 pixel mapping zones with pixel flip mode, smooth color mixing, 12 internal programs with speed and fade control, 64 unique 7-color macros, selectable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX Art-Net, Kling-Net, and RDM (Remote Device Management) protocol support, 3/5pin DMX, RJ45 ethernet, and Locking Power Cable in/out connections, dual 220° manual tilt adjustable mounting brackets, OLED menu display with a 4-button control panel, a multi-voltage universal auto switching power supply (100-240v), a rugged powder coated die-cast aluminum exterior, and an integrated gel / frost filter slot.",
   "manufacturer": "Elation",
   "category": "LED BAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 900.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 614,
   "maxLuminousIntensityCd": 107500.0,
   "luminousFluxLm": 14658.0,
   "noiseLevelDb": null,
@@ -126,10 +140,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -157,14 +171,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://store.monkeywrenchpro.com/seven-batten-42/"
   ]
 }

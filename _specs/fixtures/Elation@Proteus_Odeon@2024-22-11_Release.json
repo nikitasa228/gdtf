@@ -9,10 +9,24 @@
   "description": "The PROTEUS ODEON™ is a powerful yet compact IP66-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\n\nProviding up to 30800 lumens output from its custom-designed Variable CRI LED engine, the PROTEUS ODEON is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. \nThe TruTone variable CRI allows selecting the best blend of light output and color accuracy, depending on the requirement of the show or scene. It is seamlessly adjustable from CRI 70 to CRI 93.\n\nPROTEUS ODEON provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.\n\nWith a fast zoom range from 5.5° to 50° out of an impressively compact fixture design, the PROTEUS ODEON has the power to cut through and make a statement on any stage. Fully sealed from dust and water, it is a rugged fixture for a wide variety of applications.\n\nThe PROTEUS ODEON ships in a cardboard box with a custom-fitted polyurethane foam FIL (Foam In Lay) insert. The foam insert easily fits into a custom flight case (not included) and provides enhanced impact protection during transport.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 850.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1000,
   "maxLuminousIntensityCd": 2979600.0,
   "luminousFluxLm": 30800.0,
   "noiseLevelDb": null,
@@ -119,10 +133,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -157,14 +171,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://goknight.com/elation-pro621-proteus-odeon-ip66-rated-led-profile-fixture/"
   ]
 }

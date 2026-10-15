@@ -9,10 +9,24 @@
   "description": "KL FRESNEL 8 CW™ is a 350W 5,600K >97CRI Cool White LED Fresnel, producing over 14,000 total lumen output. Features include manual and DMX control, 11° to 56° wide motorized zoom, manual and DMX controlled dimmer, shutter, and zoom, dimmer and zoom rotary dials, smooth 16-bit selectable dimming modes and curves, LED refresh rate frequency adjustment for flicker free operation for TV and FILM, removable barn doors (included), RDM (remote device management) protocol support, 3/5pin DMX and IP65 Locking Power Cable in/out connections, 4 button control panel, LCD menu display, multiple unit power linking, a universal auto switching power supply (100-240v), gel frame and rotating bar doors (included).",
   "manufacturer": "Elation",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 370.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 430,
   "maxLuminousIntensityCd": 338800.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": null,
@@ -97,10 +111,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -129,14 +143,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/kl-fresnel-8-cw"
   ]
 }

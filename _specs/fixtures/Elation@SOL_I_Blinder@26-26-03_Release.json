@@ -9,17 +9,31 @@
   "description": "Inspired by the radiant sun, the SŌL I Blinder is the first in a new groundbreaking series of creative LED blinder and effects solutions that seamlessly marries cutting-edge technology with artistic ingenuity. \nWith its sleek and modern aesthetic, SŌL I Blinder seamlessly integrates into any stage or event setting, offering limitless creative potential. What sets SŌL apart is its ingenious modular design, offering endless possibilities for configuration and arrangement. Using simple fixture interconnects, threaded adapters, mounts and yoke accessories, designers can effortlessly link SŌL I Blinder to other fixtures or devices, exponentially expanding creative options for unique shapes and arrays. Use it as a single-cell, 2- or 4-cell blinder or connect even more fixtures together for a versatile effects panel that is perfect for eye-candy looks. Create linear blinder arrays, single or multi-unit pendants, custom shapes, and more. The possibilities are endless! \nMultiple lens options, coupled with a host of accessories, enhance the fixture's potential even further. An optional Bowens mount adaptor ring allows for a number of Bowens mount accessories to be attached to the front of the fixture for even more aesthetic options and creative impact. Add to that a variety of mounting options and designers are empowered with the flexibility to craft unique visual experiences tailored to each performance or event. \nThe SŌL I Blinder boasts a remarkable spectrum of colors from a 250W RGB+Lime+Amber+White LED engine with 93+ CRI for high-quality color reproduction. The proprietary RGBLAW engine delivers exceptionally bright, high-fidelity whites while offering a full color range that takes LED blinder color to the next level.",
   "manufacturer": "Elation",
   "category": "BLINDER",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 250.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 285,
   "maxLuminousIntensityCd": 8800.0,
-  "luminousFluxLm": 8000.0,
+  "luminousFluxLm": 9128,
   "noiseLevelDb": null,
-  "weightKg": 3.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "weightKg": 2.9,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -48,8 +62,8 @@
   "colorMixing": "RGBWALCMY",
   "colorWheel": true,
   "colorTemperatureK": {
-    "min": 1600.0,
-    "max": 10000.0
+    "min": 1800.0,
+    "max": 8500.0
   },
   "prism": false,
   "prisms": [],
@@ -58,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -121,10 +135,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -138,7 +152,7 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf-derived",
+    "colorTemperatureK": "manual",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
@@ -148,15 +162,23 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.eu/sol-i-blinder"
   ]
 }

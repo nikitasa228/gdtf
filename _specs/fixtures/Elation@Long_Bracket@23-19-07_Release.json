@@ -9,9 +9,23 @@
   "description": "Elation Professional Long Omega Bracket. This Quick Lock Bracket is used by most Elation Professional catalog of fixtures. Refer to manual to see if this is the bracket is used by the fixture you are using.",
   "manufacturer": "Elation",
   "category": "OTHER",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
   "powerConsumptionW": null,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
@@ -81,15 +95,19 @@
     "animationWheel": "gdtf-derived",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "lightSourceType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
+  "_missing": [],
+  "_notApplicable": [
     "powerConsumptionW",
-    "noiseLevelDb",
     "powerSupplyType",
-    "controlSignal"
+    "controlSignal",
+    "supportedPowerNetworks",
+    "noiseLevelDb"
   ],
-  "_notApplicable": [],
   "_issues": []
 }

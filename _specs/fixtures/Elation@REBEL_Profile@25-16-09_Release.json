@@ -9,17 +9,31 @@
   "description": "The REBEL Profile™ combines power and versatility in a compact IP65-rated design, perfect for indoor and outdoor applications. Its Peak Field 500W 6,500K LED engine produces a dazzling 22,000 lumens, delivering high-intensity beams, sharp projections, and dynamic mid-air effects.\nA full-featured graphics suite includes 15 glass gobos, a complete animation wheel, dual prisms, dual frost, and a high-speed iris. \nThe indexable framing system ensures precise control with blackout shutter cuts, while a zoom range of 3.5° to 51° enhances its flexibility.Housing 18 carefully designed gobos and a 4.5° to 38° zoom, the FUZE SFX can create stunning mid-air FX as easily as precise image projections. The SFX allows for even stage washes utilizing its variable frost filter while a wide array of beautiful colors is possible from a seamless CMY color-mixing system plus color wheel. Dual independent rotating and overlaying prisms plus a fast iris round out the comprehensive feature set.\nA truly remarkable compact powerhouse for any application, the FUZE SFX is sure to create amazing effects, outstanding projections and beautiful bright washes on any stage.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 500.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 950,
   "maxLuminousIntensityCd": 5255000.0,
   "luminousFluxLm": 22000.0,
   "noiseLevelDb": null,
   "weightKg": 29.9,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -102,10 +116,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -137,15 +151,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.r90lighting.com/rental-inventory/elation-rebel-profile/"
   ]
 }

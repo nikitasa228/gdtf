@@ -9,14 +9,28 @@
   "description": "The SIX+ PAR S is a compact and rugged LED fixture that features (7) 20W RGBMA+UV LED’s, which produce an ultra-wide color spectrum and high quality of light. The optical system has been carefully engineered to offer an even distribution of light and color homogenization within the beam. This fixture has been designed to offer ultimate flexibility, use it indoors or out, it’s IP65 rating can handle any environment. The fanless cooling system ensures silent operation allowing it to be installed in the most noise sensitive environments. \nWith a six color LED array, the SIX+ PAR S is able to offer outstanding color rendering capabilities with a high CRI of 87. This, paired with its remotely variably LED refresh frequency allows it to be easily integrated into any TV and Film application.",
   "manufacturer": "Elation",
   "category": "PAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 216.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 100,
   "maxLuminousIntensityCd": 41700.0,
   "luminousFluxLm": 3200.0,
   "noiseLevelDb": null,
-  "weightKg": 4.0,
+  "weightKg": 4.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -129,10 +143,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -161,14 +175,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/six-par-s"
   ]
 }

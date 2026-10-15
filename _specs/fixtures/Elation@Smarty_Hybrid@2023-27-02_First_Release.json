@@ -9,17 +9,31 @@
   "description": "The Smarty Hybrid™ is a compact full featured CMY color mixing spot, beam, and wash hybrid luminaire featuring the all new Philips™ MSD Platinum 200 Flex lamp with “FLEX” technology which uses a smartly designed discharge lamp/ballast package to produce high output and compact performance at an efficient, long life solution of up to 6,000 hours. Features include 11,000 total lumen output, motorized zoom ranges of 1° to 18° in beam mode, 3° to 27° in spot mode, and 5° to 33° in wash mode, a full CMY color mixing system, a full frost filter for wash effects, 13 dichroic colors including a quad-color filter, CTB, CTO, and UV, 8 rotating—interchangeable glass and 12 static-stamped metal gobos, a 16-facet and 5-facet linear independent rotating prisms, multiple CMY color, gobo, and prism macros, motorized focus with an auto-focus feature, high speed shutter and strobe, lamp hibernation mode, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, 5pin XLR, RJ45 etherCON, and Neutrik TRUE1 power in/out connections, full color 180° reversible LCD menu display with battery backup, a multi-voltage universal auto switching power supply (100-240V), and a comprehensive 2-year / 6,000 hour.",
   "manufacturer": "Elation",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 240.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 480,
   "maxLuminousIntensityCd": 836200.0,
-  "luminousFluxLm": 14000.0,
+  "luminousFluxLm": 11000,
   "noiseLevelDb": null,
-  "weightKg": 22.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "weightKg": 22.2,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 270.0,
@@ -120,10 +134,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -153,15 +167,22 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/smarty-hybrid"
   ]
 }

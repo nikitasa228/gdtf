@@ -9,10 +9,24 @@
   "description": "The Artiste DaVinci™ features a new 270W LED Cool White LED engine with advanced optics delivering over 12,000 total lumens, ultra wide 6° to 48° zoom, full CMY color mixing and linear CTO color correction, 7 dichroic colors including CTB and Violet, 6 rotating glass and 9 static-stamped metal interchangeable gobos, 3-facet and linear rotating prisms, frost filter, full 360° bi-directional animation wheel, motorized iris, focus, and auto-focus, variable dimming curve modes, high speed electronic shutter and strobe, hibernation mode, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation's E-FLY™ internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, power in/out connections, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 270.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 470,
   "maxLuminousIntensityCd": 975500.0,
   "luminousFluxLm": 12000.0,
   "noiseLevelDb": null,
@@ -123,10 +137,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -159,14 +173,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/artiste-davinci"
   ]
 }

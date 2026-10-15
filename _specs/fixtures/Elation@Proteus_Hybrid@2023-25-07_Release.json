@@ -9,10 +9,24 @@
   "description": "PROTEUS HYBRID™ is an IP65 rated 3-in-1 hybrid moving head beam, spot, and wash luminaire with the Philips™ MSD Platinum 21R 470W 80 CRI 8,000K lamp producing up to14,000 lumens. Features include an advanced optical system with motorized zoom from 2° in beam mode to 38° in spot mode or 40° in wash mode, an advanced internal thermal cooling system, full CMY and linear CTO color mixing, 14 dichroic colors including CTB, CTO, and UV, 8 rotating glass interchangeable and 14 static-stamped metal gobos, full 360° bi-directional animation wheel, 8-facet and linear rotating prisms and frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 ethernet in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 470.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 700,
   "maxLuminousIntensityCd": 9610200.0,
   "luminousFluxLm": 13138.0,
   "noiseLevelDb": null,
@@ -128,10 +142,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -165,14 +179,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-hybrid"
   ]
 }

@@ -9,10 +9,24 @@
   "description": "The SEVEN PAR 7IP™ is an IP65 outdoor rated seven color par wash luminaire with (7) 25W 7-in-1 RGBAW + Lime + UV LEDs (Red, Green, Blue, White, Amber, Lime, and a 395nm UV) producing 3,600 total output lumens and 90CRI. Features include individual hue, saturation, and intensity control, RGB + seven color 3 channel DMX mode, 17° beam and 33° field angles, smooth color mixing, 12 internal programs with speed and fade control, 64 unique 7-color macros, selectable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX and RDM (Remote Device Management) protocol support, IP65 rated 5pin DMX and power in/out connections, dual adjustable yoke / floor stand, multiple unit power linking, OLED menu display with a 4-button control panel, a multi-voltage universal auto switching power supply (100-240v), and a rugged powder coated die-cast aluminum exterior. Gel frame and gel frame holder included, optional 4-leaf barn door available.",
   "manufacturer": "Elation",
   "category": "PAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 161.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 185,
   "maxLuminousIntensityCd": 39600.0,
   "luminousFluxLm": 3548.0,
   "noiseLevelDb": null,
@@ -105,10 +119,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -137,14 +151,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://store.monkeywrenchpro.com/seven-par-7ip/"
   ]
 }

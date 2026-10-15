@@ -9,17 +9,31 @@
   "description": "The IP65 rated DTW Blinder 350 IP™ features (2) high powered 175W 2-in-1 Warm White / Amber COB LEDs, 65° wide beam angle, full color temperature range control plus independent Dim-to-Warm channel control (1,800K - 3,200K), easily attachable 15° narrow beam filters (included), pixel control, manual adjustable pan focus, variable dimming curve modes, strobe effects, flicker free operation for TV and Film, RDM (Remote Device Management), IP rated DMX and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, integrated yoke and side mounting brackets, and a multi-voltage universal auto switching power supply (100-250v).",
   "manufacturer": "Elation",
   "category": "BLINDER",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 310,
   "maxLuminousIntensityCd": 28500.0,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
   "weightKg": 8.2,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -32,7 +46,7 @@
     "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "Tungsten Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
     "min": 65.0,
     "max": 65.0
@@ -103,10 +117,10 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -128,14 +142,23 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Dim-to-warm COB LED (GDTF lamp type Tungsten is a CCT-emulation)."
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/dtw-blinder-350-ip"
+  ]
 }

@@ -9,14 +9,28 @@
   "description": "The PROTEUS HYBRID MAX™ combines high output and long lamp life in a feature packed compact IP66 Hybrid fixture. PROTEUS HYBRID MAX is the Extreme Output Hybrid featuring the innovative Philips MSD Platinum FLEX 500 lamp.\n\n\nRated at 550W and up to 4,000 hours smart lamp life the HYBRID MAX includes CMY and variable CTO plus a full complement of projection and effects options. \nFour prisms on two planes, dual frosts plus dual gobo wheel and three tracks of animation patterns round out the comprehensive FX package in a compact and lightweight housing. For extra impact the fixture features a fast continuous pan rotation. \nDelivering 22,000 lumens from its large 170mm front aperture, the PROTEUS HYBRID MAX has a crisp output for extremely powerful beams, sharp gobos and bright washes, making it a flexible fixture for almost any application, while providing an excellent return on investment.",
   "manufacturer": "Elation",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 550.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 800,
   "maxLuminousIntensityCd": 19867400.0,
   "luminousFluxLm": 22000.0,
   "noiseLevelDb": null,
-  "weightKg": 34.5,
+  "weightKg": 35.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -123,10 +137,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -160,14 +174,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-hybrid-max"
   ]
 }

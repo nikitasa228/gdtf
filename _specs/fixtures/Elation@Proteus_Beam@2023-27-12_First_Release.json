@@ -9,10 +9,24 @@
   "description": "PROTEUS BEAM™ is an IP65 rated moving head beam luminaire with the Philips™ MSD Platinum 14R 80CRI 7,800K lamp producing over 12,000 total lumens. Features include an advanced optical system producing a precise 2.5° beam aperture, a revolutionary internal thermal cooling system, full CMY color mixing, 13 dichroic colors including CTB, CTO, and UV, 8 rotating interchangeable metal and 13 static-stamped metal gobos, 5 and 32 facet rotating prisms, frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM, Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 etherCON in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "BEAM",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 280.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 500,
   "maxLuminousIntensityCd": 4944000.0,
   "luminousFluxLm": 136800.0,
   "noiseLevelDb": null,
@@ -128,7 +142,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -165,14 +179,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://elationlighting.com/proteus-beam"
   ]
 }

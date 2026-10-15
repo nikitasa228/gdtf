@@ -9,14 +9,28 @@
   "description": "The PARAGON S™ is the ideal fixture for various applications requiring superior output, bright and powerful beams, quiet operation, precise gobos, colors, and framing cuts. With a custom-designed variable, the CRI LED engine provides up to 20500 lumens output (at CRI 80), providing exceptional output and true-to-life color accuracy control.\n\nUtilizing variable CRI technology, the PARAGON S™ utilizes Elation’s TruTone empowering designers to effortlessly balance light output and color accuracy to meet the specific demands of each scene or show. Its seamless adjustability from CRI 70 to CRI 93 ensures accurate and vivid color fidelity, with infinite control over the underlying white spectrum for enhanced mixed tones.\n\nThe PARAGON S™ offers a powerful FX package, including seven rotating glass gobos, nine fixed metal gobos, a fully interchangeable animation wheel, dual prisms, dual frost effects, and a high-speed iris. The animation wheel can be swapped for custom designs or an optional seven-gobo position disc for customization. Its 240-degree indexable framing system ensures precision with full-blackout shutter cuts, while its dynamic zoom range of 5° to 50° makes it a standout performer on any stage.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 550.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 900,
   "maxLuminousIntensityCd": 1872800.0,
   "luminousFluxLm": 16000.0,
   "noiseLevelDb": null,
-  "weightKg": 23.0,
+  "weightKg": 20.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
@@ -119,10 +133,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -156,14 +170,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://goknight.com/content/documentation/Elation%20Paragon%20S%20-%20%20Spec%20Sheet%202025-02-05.pdf"
   ]
 }

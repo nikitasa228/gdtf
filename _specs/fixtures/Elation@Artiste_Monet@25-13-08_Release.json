@@ -9,17 +9,31 @@
   "description": "The award winning Artiste Monet™ is an extremely bright fully featured LEDProfile fixture offering outstanding projection quality and a wide color mixing gamut through its variable SpectraColor engine.\nProviding up to 45,000 lumens from its efficient 950W 6,500K LED engine the Monet is the ideal fixture for any application requiring superior output, bright and powerful beams, quiet operation as well as stunningly precise gobos and colors. Monet integrates Elation's new SpectraColor system which offers traditional CMY mixing but adds a variable RGB color mix for rich saturated primaries. In combination with the variable CTO the Monet allows for colors that were previously impossible to achieve, from theatrical pastels to the most vibrant red or blues ever produced by a color mixing system. The wide color gamut of the Artiste Monet achieved by seven color mixing flags with 16bit precision provides artistic possibilities that are truly inspiring. The fixed color wheel offers UV and High CRI options to round out the amazing color range of the fixture.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400,
   "maxLuminousIntensityCd": 3384400.0,
   "luminousFluxLm": 74000.0,
   "noiseLevelDb": null,
   "weightKg": 42.6,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 244.0,
@@ -108,7 +122,7 @@
     "category": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -139,14 +153,21 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://www.elationlighting.com/products/artiste-monet"
+  ]
 }

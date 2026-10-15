@@ -8,18 +8,32 @@
   "shortName": "Smarty Max",
   "description": "The SMARTY MAX™ combines high output and long lamp life in a feature packed compact and lightweight Hybrid fixture. SMARTY MAX is the Extreme Output Hybrid featuring the new Philips MSD Platinum FLEX 400 lamp and Elation’s 2 year / 4,000 hours Ultimate Warranty.** Rated at 480W and up to 4,000 hours smart lamp life the SMARTY MAX includes CMY and variable CTO and is the world’s first Hybrid incorporating a full Iris for dynamic beam effects. Four prisms on two planes, dual frosts plus dual gobo wheel and the unique dual track animation round out the comprehensive FX package in a compact and lightweight housing. Delivering 21,000 lumens from its large 160mm front aperture, the SMARTY MAX has a crisp output for extremely powerful beams, sharp gobos and bright washes, making it a flexible fixture for almost any application, while providing an excellent return on investment.",
   "manufacturer": "Elation",
-  "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 470.0,
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 700,
   "maxLuminousIntensityCd": 6827400.0,
   "luminousFluxLm": 21000.0,
   "noiseLevelDb": null,
   "weightKg": 27.2,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 248.0,
@@ -117,11 +131,11 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -151,15 +165,22 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.elationlighting.eu/smarty-max"
   ]
 }

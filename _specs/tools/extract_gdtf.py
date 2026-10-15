@@ -509,6 +509,11 @@ def missing_fields(rec, na=()):
     for k in REQUIRED:
         if k in MOVING_ONLY and not moving:
             continue
+        # tilt-only battens / pan-only effects: the axis without a motor is not missing
+        if k == "panRangeDeg" and moving and rec.get("infinitePan") is None and rec.get("tiltRangeDeg") is not None:
+            continue
+        if k == "tiltRangeDeg" and moving and rec.get("infiniteTilt") is None and rec.get("panRangeDeg") is not None:
+            continue
         if atmos and k in NOT_FOR_ATMOS:
             continue
         if k == "colorMixing" and rec.get("category") in ("PROFILE", "SPOT", "BEAM", "STROBE", "BLINDER", "UV", "FOLLOW SPOT", "LASER"):
