@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 42200000,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
   "weightKg": 38.5,
@@ -164,16 +164,19 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "description": "gdtf-derived"
   },
   "_missing": [
-    "maxLuminousIntensityCd",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.lightsky.com.cn/product/ip3500bsw/"
   ]
 }

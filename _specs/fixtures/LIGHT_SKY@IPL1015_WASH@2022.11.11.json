@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 100,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 400.0,
   "noiseLevelDb": null,
@@ -93,7 +93,7 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "manual",
+    "powerConsumptionW": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -127,7 +127,6 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb",
     "beamAngleDeg",
@@ -138,5 +137,8 @@
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/pl1015b/"
   ]
 }

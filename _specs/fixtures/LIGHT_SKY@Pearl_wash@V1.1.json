@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 500,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 579.0,
   "noiseLevelDb": null,
@@ -96,7 +96,7 @@
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -133,7 +133,6 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb"
   ],
@@ -142,5 +141,8 @@
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/pearl-wash/"
   ]
 }

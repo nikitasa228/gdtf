@@ -6,9 +6,9 @@
   "gdtfName": "8800-C42",
   "longName": "8800-C42",
   "shortName": "8800-C42",
-  "description": "LIGHT SKY 8800-C42: LED wash, with 19 deg beam, RGBAV+BG colour mixing.",
+  "description": "LIGHT SKY 8800-C42: LED profile, with 19 deg beam, RGBAV+BG colour mixing.",
   "manufacturer": "LIGHT SKY",
-  "category": "WASH",
+  "category": "PROFILE",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 71500.0,
   "luminousFluxLm": 8800.0,
   "noiseLevelDb": null,
@@ -110,11 +110,11 @@
     "longName": "gdtf",
     "shortName": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
@@ -153,5 +153,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/8800-c42/"
   ]
 }

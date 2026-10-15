@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 157,
   "maxLuminousIntensityCd": 50200.0,
   "luminousFluxLm": 841.0,
   "noiseLevelDb": null,
@@ -94,7 +94,7 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "manual",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -132,12 +132,14 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/pl1215ii/"
   ]
 }

@@ -4,9 +4,9 @@
   "fixtureTypeId": "BB6AF8ED-7498-4BE4-8E71-585A664E0573",
   "gdtfDataVersion": "1.2",
   "gdtfName": "F1000Prifile",
-  "longName": "F1000Prifile",
+  "longName": "F1000 Profile",
   "shortName": "F1000Prifile",
-  "description": "LIGHT SKY F1000Prifile: moving-head LED profile, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 14 gobos, framing shutters, prism, frost.",
+  "description": "LIGHT SKY F1000 Profile: moving-head LED profile, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 14 gobos, framing shutters, prism, frost.",
   "manufacturer": "LIGHT SKY",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1310,
   "maxLuminousIntensityCd": 2770800.0,
   "luminousFluxLm": 40000.0,
   "noiseLevelDb": null,
@@ -107,13 +107,13 @@
   ],
   "pixelCount": 1,
   "_source": {
-    "longName": "gdtf",
+    "longName": "manual",
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -145,6 +145,7 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -154,9 +155,11 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://www.manualslib.com/manual/1794053/Tourpro-Lighting-Light-Sky-F1000-Profile-50R-Series.html"
+  ]
 }

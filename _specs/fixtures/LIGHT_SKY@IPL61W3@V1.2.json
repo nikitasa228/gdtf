@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 200.0,
+  "powerConsumptionW": 190,
   "maxLuminousIntensityCd": 234200.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": null,
@@ -132,6 +132,7 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Same housing as IPL6103."
   ]
 }

@@ -97304,9 +97304,9 @@
   "gdtfName": "8800-C42",
   "longName": "8800-C42",
   "shortName": "8800-C42",
-  "description": "LIGHT SKY 8800-C42: LED wash, with 19 deg beam, RGBAV+BG colour mixing.",
+  "description": "LIGHT SKY 8800-C42: LED profile, with 19 deg beam, RGBAV+BG colour mixing.",
   "manufacturer": "LIGHT SKY",
-  "category": "WASH",
+  "category": "PROFILE",
   "supportedPowerNetworks": [
    "100 V - 50 Hz",
    "100 V - 60 Hz",
@@ -97324,7 +97324,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 71500.0,
   "luminousFluxLm": 8800.0,
   "noiseLevelDb": null,
@@ -97408,11 +97408,11 @@
    "longName": "gdtf",
    "shortName": "gdtf",
    "manufacturer": "gdtf",
-   "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "category": "manual",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "manual",
@@ -97451,6 +97451,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/8800-c42/"
   ]
  },
  {
@@ -97461,7 +97464,7 @@
   "gdtfName": "AQUABEAM400 LL-E",
   "longName": "AQUABEAM400 LL-E",
   "shortName": "AQUABEAM400 LL-E",
-  "description": "LIGHT SKY AQUABEAM400 LL-E: moving-head Discharge Lamp beam, with 2 deg beam, colour wheel, 15 gobos, prism, frost, IP65 rated.",
+  "description": "LIGHT SKY AQUABEAM400 LL-E: moving-head Discharge Lamp beam, with 2 deg beam, colour wheel, 15 gobos, prism, frost, IP54 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -97481,7 +97484,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 400.0,
+  "powerConsumptionW": 530,
   "maxLuminousIntensityCd": 32916800.0,
   "luminousFluxLm": 45000.0,
   "noiseLevelDb": null,
@@ -97547,7 +97550,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP54",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -97565,7 +97568,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -97600,7 +97603,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
-   "ipRating": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -97614,6 +97617,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/aquabeam400ll-e/"
   ]
  },
  {
@@ -97624,7 +97630,7 @@
   "gdtfName": "AQUABEAM400 LL",
   "longName": "AQUABEAM400 LL",
   "shortName": "AQUABEAM400 LL",
-  "description": "LIGHT SKY AQUABEAM400 LL: moving-head Discharge Lamp beam, with 2 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP65 rated.",
+  "description": "LIGHT SKY AQUABEAM400 LL: moving-head Discharge Lamp beam, with 2 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP54 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -97644,11 +97650,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 550,
   "maxLuminousIntensityCd": 32916800.0,
   "luminousFluxLm": 45000.0,
   "noiseLevelDb": null,
-  "weightKg": 27.5,
+  "weightKg": 24.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -97710,7 +97716,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP54",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -97728,10 +97734,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -97763,7 +97769,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
-   "ipRating": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -97777,6 +97783,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/aquabeam400ll/"
   ]
  },
  {
@@ -97961,9 +97970,9 @@
   "gdtfName": "C42",
   "longName": "C42",
   "shortName": "C42",
-  "description": "LIGHT SKY C42: LED wash, with 19 deg beam, RGBAV+BG colour mixing.",
+  "description": "LIGHT SKY C42: LED profile, with 19 deg beam, RGBAV+BG colour mixing.",
   "manufacturer": "LIGHT SKY",
-  "category": "WASH",
+  "category": "PROFILE",
   "supportedPowerNetworks": [
    "100 V - 50 Hz",
    "100 V - 60 Hz",
@@ -97981,7 +97990,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 71500.0,
   "luminousFluxLm": 8800.0,
   "noiseLevelDb": null,
@@ -98064,11 +98073,11 @@
    "longName": "gdtf",
    "shortName": "gdtf",
    "manufacturer": "gdtf",
-   "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "category": "manual",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "manual",
@@ -98107,6 +98116,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/8800-c42/"
   ]
  },
  {
@@ -98463,9 +98475,9 @@
   "fixtureTypeId": "BB6AF8ED-7498-4BE4-8E71-585A664E0573",
   "gdtfDataVersion": "1.2",
   "gdtfName": "F1000Prifile",
-  "longName": "F1000Prifile",
+  "longName": "F1000 Profile",
   "shortName": "F1000Prifile",
-  "description": "LIGHT SKY F1000Prifile: moving-head LED profile, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 14 gobos, framing shutters, prism, frost.",
+  "description": "LIGHT SKY F1000 Profile: moving-head LED profile, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 14 gobos, framing shutters, prism, frost.",
   "manufacturer": "LIGHT SKY",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -98485,7 +98497,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1310,
   "maxLuminousIntensityCd": 2770800.0,
   "luminousFluxLm": 40000.0,
   "noiseLevelDb": null,
@@ -98566,13 +98578,13 @@
   ],
   "pixelCount": 1,
   "_source": {
-   "longName": "gdtf",
+   "longName": "manual",
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -98604,6 +98616,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "powerConsumptionW": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -98613,11 +98626,13 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://www.manualslib.com/manual/1794053/Tourpro-Lighting-Light-Sky-F1000-Profile-50R-Series.html"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -98647,7 +98662,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1310,
   "maxLuminousIntensityCd": 5368400.0,
   "luminousFluxLm": 77500.0,
   "noiseLevelDb": null,
@@ -98767,6 +98782,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "powerConsumptionW": "estimated",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -98775,11 +98791,12 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+   "Assumed equal to the F1000 Profile (same 1000 W platform)."
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -98787,29 +98804,25 @@
   "fixtureTypeId": "ADCCE5CC-B075-4C58-910D-DDCFC794D6CC",
   "gdtfDataVersion": "1.2",
   "gdtfName": "F1700Prifile",
-  "longName": "F1700Prifile",
+  "longName": "F1700 Profile",
   "shortName": "F1700Prifile",
-  "description": "LIGHT SKY F1700Prifile: moving-head LED profile, with 4-45 deg zoom, CMY colour mixing, colour wheel, 7 gobos, framing shutters, frost.",
+  "description": "LIGHT SKY F1700 Profile: moving-head LED profile, with 4-45 deg zoom, CMY colour mixing, colour wheel, 7 gobos, framing shutters, frost.",
   "manufacturer": "LIGHT SKY",
   "category": "PROFILE",
   "supportedPowerNetworks": [
-   "100 V - 50 Hz",
-   "100 V - 60 Hz",
-   "110/120 V - 60 Hz",
-   "110/120 V - 50 Hz",
    "220/230 V - 50 Hz",
    "220/230 V - 60 Hz",
    "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-   "min": 100.0,
-   "max": 240.0
+   "min": 198.0,
+   "max": 264.0
   },
   "frequencyRangeHz": {
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 600.0,
+  "powerConsumptionW": 2000,
   "maxLuminousIntensityCd": 7315400.0,
   "luminousFluxLm": 40000.0,
   "noiseLevelDb": null,
@@ -98892,14 +98905,14 @@
   ],
   "pixelCount": 1,
   "_source": {
-   "longName": "gdtf",
+   "longName": "manual",
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
    "powerConsumptionW": "estimated",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "estimated",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -98943,7 +98956,11 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Values of the F1700WB-P (same 1700 W platform)."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/f1700wb-p/"
   ]
  },
  {
@@ -98974,7 +98991,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 345.0,
+  "powerConsumptionW": 345,
   "maxLuminousIntensityCd": 428830900.0,
   "luminousFluxLm": 916000.0,
   "noiseLevelDb": null,
@@ -99067,10 +99084,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -99114,6 +99131,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/f230ii/"
   ]
  },
  {
@@ -99144,7 +99164,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 450,
   "maxLuminousIntensityCd": 506649700.0,
   "luminousFluxLm": 916000.0,
   "noiseLevelDb": null,
@@ -99237,10 +99257,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -99284,6 +99304,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/f330ii/"
   ]
  },
  {
@@ -99314,7 +99337,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 460.0,
+  "powerConsumptionW": 460,
   "maxLuminousIntensityCd": 506649700.0,
   "luminousFluxLm": 916000.0,
   "noiseLevelDb": null,
@@ -99407,10 +99430,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -99454,6 +99477,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/f350ii/"
   ]
  },
  {
@@ -99484,7 +99510,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 360.0,
+  "powerConsumptionW": 495,
   "maxLuminousIntensityCd": 11159400.0,
   "luminousFluxLm": 244000.0,
   "noiseLevelDb": null,
@@ -99569,10 +99595,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -99617,6 +99643,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/f400bsw/"
   ]
  },
  {
@@ -99647,11 +99676,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 420.0,
+  "powerConsumptionW": 550,
   "maxLuminousIntensityCd": 35783500.0,
   "luminousFluxLm": 12230.0,
   "noiseLevelDb": null,
-  "weightKg": null,
+  "weightKg": 22.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -99774,6 +99803,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "weightKg": "estimated",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -99782,13 +99812,16 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "noiseLevelDb",
-   "weightKg"
+   "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Weight is 0 in GDTF",
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Values of the Lunar BSW (same 420 W lamp platform); no F420BSW page found."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/lunar-bsw/"
   ]
  },
  {
@@ -99991,7 +100024,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1200.0,
+  "powerConsumptionW": 1400,
   "maxLuminousIntensityCd": 3095700.0,
   "luminousFluxLm": 32000.0,
   "noiseLevelDb": null,
@@ -100087,7 +100120,7 @@
    "powerConsumptionW": "estimated",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -100132,7 +100165,11 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "880 W white LED engine; mains draw assumed as Super Scope Plus (same 37.5 kg platform)."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/hs880for-south-korean-only/"
   ]
  },
  {
@@ -100474,7 +100511,7 @@
   "gdtfName": "IP3500",
   "longName": "IP3500",
   "shortName": "IP3500",
-  "description": "LIGHT SKY IP3500: Discharge Lamp beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP65 rated.",
+  "description": "LIGHT SKY IP3500: moving-head Discharge Lamp beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -100503,8 +100540,8 @@
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -100560,7 +100597,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -100612,6 +100649,8 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
    "ipRating": "estimated",
+   "panRangeDeg": "estimated",
+   "tiltRangeDeg": "estimated",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -100620,9 +100659,7 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "noiseLevelDb",
-   "panRangeDeg",
-   "tiltRangeDeg"
+   "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
@@ -100659,7 +100696,7 @@
    "max": 60.0
   },
   "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 42200000,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
   "weightKg": 38.5,
@@ -100796,17 +100833,20 @@
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
+   "maxLuminousIntensityCd": "manual",
    "powerConnectorIn": "estimated",
    "powerConnectorOut": "estimated",
    "description": "gdtf-derived"
   },
   "_missing": [
-   "maxLuminousIntensityCd",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.lightsky.com.cn/product/ip3500bsw/"
   ]
  },
  {
@@ -100817,7 +100857,7 @@
   "gdtfName": "IP4000LL",
   "longName": "IP4000LL",
   "shortName": "IP4000LL",
-  "description": "LIGHT SKY IP4000LL: moving-head Discharge Lamp beam, with 2 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP65 rated.",
+  "description": "LIGHT SKY IP4000LL: moving-head Discharge Lamp beam, with 2 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP54 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -100837,7 +100877,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 550,
   "maxLuminousIntensityCd": 32916800.0,
   "luminousFluxLm": 45000.0,
   "noiseLevelDb": null,
@@ -100903,7 +100943,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP54",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -100921,10 +100961,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -100956,7 +100996,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
-   "ipRating": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -100970,6 +101010,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.lightsky.com.cn/product/ip4000ll/"
   ]
  },
  {
@@ -101332,7 +101375,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 100,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 400.0,
   "noiseLevelDb": null,
@@ -101399,7 +101442,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "manual",
+   "powerConsumptionW": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
@@ -101433,7 +101476,6 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb",
    "beamAngleDeg",
@@ -101444,6 +101486,9 @@
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/pl1015b/"
   ]
  },
  {
@@ -101474,7 +101519,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 157,
   "maxLuminousIntensityCd": 50200.0,
   "luminousFluxLm": 841.0,
   "noiseLevelDb": null,
@@ -101542,7 +101587,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "manual",
+   "powerConsumptionW": "estimated",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -101580,13 +101625,15 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/pl1215ii/"
   ]
  },
  {
@@ -101617,7 +101664,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 30.0,
+  "powerConsumptionW": 157,
   "maxLuminousIntensityCd": 59700.0,
   "luminousFluxLm": 1000.0,
   "noiseLevelDb": null,
@@ -101691,7 +101738,7 @@
    "supportedPowerNetworks": "gdtf-derived",
    "voltageRangeV": "gdtf",
    "frequencyRangeHz": "gdtf",
-   "powerConsumptionW": "gdtf",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -101729,7 +101776,10 @@
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/pl1215ii/"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -101739,7 +101789,7 @@
   "gdtfName": "IPL1940Pro",
   "longName": "IPL1940Pro",
   "shortName": "IPL1940Pro",
-  "description": "LIGHT SKY IPL1940Pro: Discharge Lamp wash, with 10-60 deg zoom, IP65 rated.",
+  "description": "LIGHT SKY IPL1940Pro: moving-head Discharge Lamp wash, with 10-60 deg zoom, IP65 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -101768,8 +101818,8 @@
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -101860,6 +101910,8 @@
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
    "ipRating": "estimated",
+   "panRangeDeg": "estimated",
+   "tiltRangeDeg": "estimated",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -101868,9 +101920,7 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "noiseLevelDb",
-   "panRangeDeg",
-   "tiltRangeDeg"
+   "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
@@ -102080,7 +102130,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 200.0,
+  "powerConsumptionW": 190,
   "maxLuminousIntensityCd": 234200.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": null,
@@ -102156,10 +102206,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -102199,6 +102249,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.manualslib.com/manual/2430013/Light-Sky-Ipl6103.html"
   ]
  },
  {
@@ -102229,7 +102282,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 200.0,
+  "powerConsumptionW": 190,
   "maxLuminousIntensityCd": 234200.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": null,
@@ -102335,7 +102388,8 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Same housing as IPL6103."
   ]
  },
  {
@@ -102366,11 +102420,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 3000.0,
   "luminousFluxLm": 500.0,
   "noiseLevelDb": null,
-  "weightKg": 4.3,
+  "weightKg": 3.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -102430,10 +102484,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -102473,6 +102527,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/ipl715n/"
   ]
  },
  {
@@ -102503,11 +102560,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 80.0,
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 3000.0,
   "luminousFluxLm": 500.0,
   "noiseLevelDb": null,
-  "weightKg": 4.3,
+  "weightKg": 3.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -102567,10 +102624,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -102610,6 +102667,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/ipl715p/"
   ]
  },
  {
@@ -102640,7 +102700,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1150,
   "maxLuminousIntensityCd": 3900.0,
   "luminousFluxLm": 300.0,
   "noiseLevelDb": null,
@@ -102708,7 +102768,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "manual",
+   "powerConsumptionW": "estimated",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -102746,13 +102806,12 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-   "GDTF beam-sum power implausible, removed."
+   "72 x 15 W LEDs; mains draw estimated from emitter load."
   ]
  },
  {
@@ -102783,7 +102842,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 421.0,
+  "powerConsumptionW": 565,
   "maxLuminousIntensityCd": 670038800.0,
   "luminousFluxLm": 916000.0,
   "noiseLevelDb": null,
@@ -102876,10 +102935,10 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -102923,6 +102982,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/lunar-beam/"
   ]
  },
  {
@@ -102953,7 +103015,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 421.0,
+  "powerConsumptionW": 535,
   "maxLuminousIntensityCd": 670038800.0,
   "luminousFluxLm": 916000.0,
   "noiseLevelDb": null,
@@ -103049,10 +103111,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -103097,6 +103159,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/lunar-max/"
   ]
  },
  {
@@ -103127,7 +103192,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 420.0,
+  "powerConsumptionW": 550,
   "maxLuminousIntensityCd": 1012353700.0,
   "luminousFluxLm": 346000.0,
   "noiseLevelDb": null,
@@ -103224,10 +103289,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -103272,6 +103337,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/lunar-bsw/"
   ]
  },
  {
@@ -103436,7 +103504,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 425,
   "maxLuminousIntensityCd": 106000.0,
   "luminousFluxLm": 469.0,
   "noiseLevelDb": null,
@@ -103507,7 +103575,7 @@
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
    "infiniteTilt": "gdtf-derived",
@@ -103544,13 +103612,15 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/mamba/"
   ]
  },
  {
@@ -103581,7 +103651,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 100.0,
+  "powerConsumptionW": 212,
   "maxLuminousIntensityCd": 846329400.0,
   "luminousFluxLm": 350000.0,
   "noiseLevelDb": null,
@@ -103673,7 +103743,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -103723,6 +103793,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/mini-laser-aqua/"
   ]
  },
  {
@@ -103753,7 +103826,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 400,
   "maxLuminousIntensityCd": 338648100.0,
   "luminousFluxLm": 375000.0,
   "noiseLevelDb": null,
@@ -103845,10 +103918,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -103893,6 +103966,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/mini-lunar/"
   ]
  },
  {
@@ -103923,7 +103999,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 30.0,
+  "powerConsumptionW": 157,
   "maxLuminousIntensityCd": 59700.0,
   "luminousFluxLm": 1000.0,
   "noiseLevelDb": null,
@@ -103997,7 +104073,7 @@
    "supportedPowerNetworks": "gdtf-derived",
    "voltageRangeV": "gdtf",
    "frequencyRangeHz": "gdtf",
-   "powerConsumptionW": "gdtf",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -104035,7 +104111,10 @@
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/pl1215ii/"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -104065,7 +104144,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 300.0,
+  "powerConsumptionW": 300,
   "maxLuminousIntensityCd": 12500.0,
   "luminousFluxLm": 6109.0,
   "noiseLevelDb": null,
@@ -104133,10 +104212,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -104176,6 +104255,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://stagelighting.ru/product/light-sky-pl1915"
   ]
  },
  {
@@ -104206,7 +104288,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 200.0,
+  "powerConsumptionW": 190,
   "maxLuminousIntensityCd": 234200.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": null,
@@ -104282,10 +104364,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "controlSignal": "gdtf-derived",
    "lightSourceType": "gdtf",
@@ -104325,6 +104407,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/pl6103/"
   ]
  },
  {
@@ -104355,7 +104440,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 200.0,
+  "powerConsumptionW": 190,
   "maxLuminousIntensityCd": 234200.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": null,
@@ -104461,7 +104546,8 @@
   ],
   "_notApplicable": [],
   "_issues": [
-   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+   "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+   "Same housing as PL6103."
   ]
  },
  {
@@ -104492,7 +104578,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 500,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 579.0,
   "noiseLevelDb": null,
@@ -104562,7 +104648,7 @@
    "category": "gdtf-derived",
    "powerConsumptionW": "manual",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -104599,7 +104685,6 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "maxLuminousIntensityCd",
    "noiseLevelDb"
   ],
@@ -104608,6 +104693,9 @@
    "Beam angle equals the GDTF default (25°) - probably not filled in",
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/pearl-wash/"
   ]
  },
  {
@@ -104638,11 +104726,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 230.0,
+  "powerConsumptionW": 350,
   "maxLuminousIntensityCd": 210182200.0,
   "luminousFluxLm": 380000.0,
   "noiseLevelDb": null,
-  "weightKg": 20.0,
+  "weightKg": 18.8,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
@@ -104731,10 +104819,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -104780,6 +104868,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/scope-beam/"
   ]
  },
  {
@@ -104790,7 +104881,7 @@
   "gdtfName": "SHARK400",
   "longName": "SHARK400",
   "shortName": "SHARK400",
-  "description": "LIGHT SKY SHARK400: moving-head Discharge Lamp beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost.",
+  "description": "LIGHT SKY SHARK400: moving-head Discharge Lamp beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -104810,7 +104901,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 580,
   "maxLuminousIntensityCd": 40637800.0,
   "luminousFluxLm": 45000.0,
   "noiseLevelDb": null,
@@ -104876,7 +104967,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -104894,10 +104985,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -104929,6 +105020,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -104942,6 +105034,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark400/"
   ]
  },
  {
@@ -104952,7 +105047,7 @@
   "gdtfName": "SHARK400BSW",
   "longName": "SHARK400BSW",
   "shortName": "SHARK400BSW",
-  "description": "LIGHT SKY SHARK400BSW: moving-head Discharge Lamp beam/spot/wash hybrid, with 2-42 deg zoom, CMY colour mixing, colour wheel, 20 gobos, prism, frost.",
+  "description": "LIGHT SKY SHARK400BSW: moving-head Discharge Lamp beam/spot/wash hybrid, with 2-42 deg zoom, CMY colour mixing, colour wheel, 20 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -104972,7 +105067,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 380.0,
+  "powerConsumptionW": 630,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -105055,7 +105150,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -105073,7 +105168,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "weightKg": "gdtf",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
@@ -105106,6 +105201,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -105120,6 +105216,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark400bsw/"
   ]
  },
  {
@@ -105130,7 +105229,7 @@
   "gdtfName": "SHARK450",
   "longName": "SHARK450",
   "shortName": "SHARK450",
-  "description": "LIGHT SKY SHARK450: moving-head Discharge Lamp beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost.",
+  "description": "LIGHT SKY SHARK450: moving-head Discharge Lamp beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -105150,7 +105249,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 650,
   "maxLuminousIntensityCd": 40637800.0,
   "luminousFluxLm": 45000.0,
   "noiseLevelDb": null,
@@ -105216,7 +105315,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -105234,10 +105333,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -105269,6 +105368,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -105282,6 +105382,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark450/"
   ]
  },
  {
@@ -105292,7 +105395,7 @@
   "gdtfName": "SHARK450BSW",
   "longName": "SHARK450BSW",
   "shortName": "SHARK450BSW",
-  "description": "LIGHT SKY SHARK450BSW: moving-head Discharge Lamp beam/spot/wash hybrid, with 2-42 deg zoom, CMY colour mixing, colour wheel, 20 gobos, prism, frost.",
+  "description": "LIGHT SKY SHARK450BSW: moving-head Discharge Lamp beam/spot/wash hybrid, with 2-42 deg zoom, CMY colour mixing, colour wheel, 20 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -105312,7 +105415,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 700,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -105395,7 +105498,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
    "min": -20.0,
@@ -105413,8 +105516,8 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
-   "weightKg": "gdtf",
+   "powerConsumptionW": "manual",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -105446,6 +105549,7 @@
    "dmxModes": "gdtf",
    "pixelCount": "gdtf-derived",
    "powerSupplyType": "estimated",
+   "ipRating": "manual",
    "voltageRangeV": "estimated",
    "frequencyRangeHz": "estimated",
    "supportedPowerNetworks": "estimated",
@@ -105460,6 +105564,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark450bsw/"
   ]
  },
  {
@@ -105490,7 +105597,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 380.0,
+  "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 45339000.0,
   "luminousFluxLm": 12000.0,
   "noiseLevelDb": null,
@@ -105575,10 +105682,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -105624,6 +105731,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark-laser/"
   ]
  },
  {
@@ -105654,11 +105764,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 380.0,
+  "powerConsumptionW": 370,
   "maxLuminousIntensityCd": 45339000.0,
   "luminousFluxLm": 12000.0,
   "noiseLevelDb": null,
-  "weightKg": 36.0,
+  "weightKg": 35.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -105739,10 +105849,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -105788,6 +105898,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark-laser-economic/"
   ]
  },
  {
@@ -106321,7 +106434,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 550.0,
+  "powerConsumptionW": 770,
   "maxLuminousIntensityCd": 21372800.0,
   "luminousFluxLm": 18700.0,
   "noiseLevelDb": null,
@@ -106413,10 +106526,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -106461,6 +106574,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/super-shark-beam/"
   ]
  },
  {
@@ -106491,7 +106607,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 1200.0,
+  "powerConsumptionW": 1530,
   "maxLuminousIntensityCd": 4121500.0,
   "luminousFluxLm": 50700.0,
   "noiseLevelDb": null,
@@ -106580,7 +106696,7 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -106629,6 +106745,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/shark-profile/"
   ]
  },
  {
@@ -106659,7 +106778,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 600.0,
+  "powerConsumptionW": 910,
   "maxLuminousIntensityCd": 3251700.0,
   "luminousFluxLm": 40000.0,
   "noiseLevelDb": null,
@@ -106756,10 +106875,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -106805,6 +106924,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/super-scope/"
   ]
  },
  {
@@ -107002,11 +107124,11 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 440.0,
+  "powerConsumptionW": 620,
   "maxLuminousIntensityCd": 4389200.0,
   "luminousFluxLm": 24000.0,
   "noiseLevelDb": null,
-  "weightKg": 26.5,
+  "weightKg": 26.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -107088,10 +107210,10 @@
    "supportedPowerNetworks": "gdtf-derived",
    "voltageRangeV": "gdtf",
    "frequencyRangeHz": "gdtf",
-   "powerConsumptionW": "gdtf",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "powerConnectorIn": "gdtf-derived",
    "powerConnectorOut": "gdtf-derived",
    "powerSupplyType": "gdtf-derived",
@@ -107133,7 +107255,10 @@
    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/super-scope-pro/"
+  ]
  },
  {
   "schemaVersion": "1.0",
@@ -107163,7 +107288,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 403.0,
+  "powerConsumptionW": 410,
   "maxLuminousIntensityCd": 382000.0,
   "luminousFluxLm": 6396.0,
   "noiseLevelDb": null,
@@ -107228,10 +107353,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -107274,6 +107399,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/tx1920-hc/"
   ]
  },
  {
@@ -107304,7 +107432,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 403.0,
+  "powerConsumptionW": 403,
   "maxLuminousIntensityCd": 382000.0,
   "luminousFluxLm": 6396.0,
   "noiseLevelDb": null,
@@ -107377,10 +107505,10 @@
    "shortName": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -107423,6 +107551,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/product/tx1920-zoom/"
   ]
  },
  {
@@ -107453,7 +107584,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 632,
   "maxLuminousIntensityCd": 1254200.0,
   "luminousFluxLm": 10715.0,
   "noiseLevelDb": null,
@@ -107532,7 +107663,7 @@
    "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
-   "weightKg": "gdtf",
+   "weightKg": "manual",
    "motorizedPanTilt": "gdtf-derived",
    "panRangeDeg": "gdtf-derived",
    "tiltRangeDeg": "gdtf-derived",
@@ -107570,13 +107701,15 @@
    "description": "gdtf-derived"
   },
   "_missing": [
-   "powerConsumptionW",
    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
    "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+   "https://en.lightsky.com.cn/wp-content/uploads/2021/06/TX1940ZOOM-UserManual.pdf"
   ]
  },
  {
@@ -137905,7 +138038,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 11000.0,
   "luminousFluxLm": 1496.0,
   "noiseLevelDb": null,
@@ -137983,7 +138116,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138026,6 +138159,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138056,7 +138192,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 16400.0,
   "luminousFluxLm": 1257.0,
   "noiseLevelDb": null,
@@ -138134,7 +138270,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138176,6 +138312,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138206,7 +138345,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 6800.0,
   "luminousFluxLm": 1454.0,
   "noiseLevelDb": null,
@@ -138284,7 +138423,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138326,6 +138465,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138356,7 +138498,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 11100.0,
   "luminousFluxLm": 1517.0,
   "noiseLevelDb": null,
@@ -138434,7 +138576,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138477,6 +138619,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138507,7 +138652,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 17700.0,
   "luminousFluxLm": 1362.0,
   "noiseLevelDb": null,
@@ -138585,7 +138730,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138627,6 +138772,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138657,7 +138805,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 7200.0,
   "luminousFluxLm": 1542.0,
   "noiseLevelDb": null,
@@ -138735,7 +138883,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138777,6 +138925,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138807,7 +138958,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 12100.0,
   "luminousFluxLm": 1646.0,
   "noiseLevelDb": null,
@@ -138885,7 +139036,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -138928,6 +139079,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -138958,7 +139112,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 19100.0,
   "luminousFluxLm": 1467.0,
   "noiseLevelDb": null,
@@ -139036,7 +139190,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -139078,6 +139232,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -139108,7 +139265,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 7600.0,
   "luminousFluxLm": 1623.0,
   "noiseLevelDb": null,
@@ -139186,7 +139343,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -139228,6 +139385,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -139258,7 +139418,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 13100.0,
   "luminousFluxLm": 1792.0,
   "noiseLevelDb": null,
@@ -139336,7 +139496,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -139379,6 +139539,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -139409,7 +139572,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 20600.0,
   "luminousFluxLm": 1586.0,
   "noiseLevelDb": null,
@@ -139487,7 +139650,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -139529,6 +139692,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -139559,7 +139725,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 33.0,
+  "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 8300.0,
   "luminousFluxLm": 1762.0,
   "noiseLevelDb": null,
@@ -139637,7 +139803,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -139679,6 +139845,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLDISPLAYDAT"
   ]
  },
  {
@@ -148639,7 +148808,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 30000.0,
   "luminousFluxLm": 6681.0,
   "noiseLevelDb": null,
@@ -148733,7 +148902,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -148778,6 +148947,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -148808,7 +148980,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 30000.0,
   "luminousFluxLm": 6681.0,
   "noiseLevelDb": null,
@@ -148926,7 +149098,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -148971,6 +149143,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -149001,7 +149176,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 30000.0,
   "luminousFluxLm": 6681.0,
   "noiseLevelDb": null,
@@ -149143,7 +149318,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -149186,6 +149361,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -149216,7 +149394,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 30000.0,
   "luminousFluxLm": 6681.0,
   "noiseLevelDb": null,
@@ -149292,7 +149470,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -149336,6 +149514,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -149366,7 +149547,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 41500.0,
   "luminousFluxLm": 5380.0,
   "noiseLevelDb": null,
@@ -149450,7 +149631,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -149494,6 +149675,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -149685,7 +149869,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 13700.0,
   "luminousFluxLm": 6814.0,
   "noiseLevelDb": null,
@@ -149769,7 +149953,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -149813,6 +149997,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -149843,7 +150030,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 7900.0,
   "luminousFluxLm": 5773.0,
   "noiseLevelDb": null,
@@ -149927,7 +150114,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -149971,6 +150158,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/ECLCTPLUS"
   ]
  },
  {
@@ -150001,7 +150191,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 72200.0,
   "luminousFluxLm": 8704.0,
   "noiseLevelDb": null,
@@ -150081,7 +150271,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -150125,6 +150315,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -150155,7 +150348,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 42400.0,
   "luminousFluxLm": 9876.0,
   "noiseLevelDb": null,
@@ -150235,7 +150428,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -150279,6 +150472,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -150309,7 +150505,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 23100.0,
   "luminousFluxLm": 9707.0,
   "noiseLevelDb": null,
@@ -150389,7 +150585,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -150433,6 +150629,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -150463,7 +150662,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 12200.0,
   "luminousFluxLm": 9017.0,
   "noiseLevelDb": null,
@@ -150543,7 +150742,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -150587,6 +150786,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -150617,7 +150819,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 42400.0,
   "luminousFluxLm": 9876.0,
   "noiseLevelDb": null,
@@ -150719,7 +150921,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -150762,6 +150964,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -150792,7 +150997,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 38300.0,
   "luminousFluxLm": 8944.0,
   "noiseLevelDb": null,
@@ -150894,7 +151099,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -150937,6 +151142,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -151174,7 +151382,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 66100.0,
   "luminousFluxLm": 7965.0,
   "noiseLevelDb": null,
@@ -151254,7 +151462,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -151298,6 +151506,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -151328,7 +151539,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 38200.0,
   "luminousFluxLm": 8944.0,
   "noiseLevelDb": null,
@@ -151408,7 +151619,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -151452,6 +151663,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -151482,7 +151696,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 25500.0,
   "luminousFluxLm": 8996.0,
   "noiseLevelDb": null,
@@ -151562,7 +151776,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -151606,6 +151820,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -151636,7 +151853,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 270.0,
+  "powerConsumptionW": 270,
   "maxLuminousIntensityCd": 10800.0,
   "luminousFluxLm": 8286.0,
   "noiseLevelDb": null,
@@ -151716,7 +151933,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -151760,6 +151977,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://musiclights.it/en/product/ECLFW"
   ]
  },
  {
@@ -154216,7 +154436,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 28.0,
+  "powerConsumptionW": 22,
   "maxLuminousIntensityCd": 6500.0,
   "luminousFluxLm": 731.0,
   "noiseLevelDb": null,
@@ -154290,7 +154510,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -154332,6 +154552,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
   ]
  },
  {
@@ -154511,7 +154734,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 28.0,
+  "powerConsumptionW": 22,
   "maxLuminousIntensityCd": 1800.0,
   "luminousFluxLm": 743.0,
   "noiseLevelDb": null,
@@ -154585,7 +154808,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -154627,6 +154850,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
   ]
  },
  {
@@ -154657,7 +154883,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 28.0,
+  "powerConsumptionW": 22,
   "maxLuminousIntensityCd": 900.0,
   "luminousFluxLm": 693.0,
   "noiseLevelDb": null,
@@ -154731,7 +154957,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -154773,6 +154999,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
   ]
  },
  {
@@ -154803,7 +155032,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 28.0,
+  "powerConsumptionW": 22,
   "maxLuminousIntensityCd": 5600.0,
   "luminousFluxLm": 563.0,
   "noiseLevelDb": null,
@@ -154877,7 +155106,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -154919,6 +155148,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
   ]
  },
  {
@@ -155098,7 +155330,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 28.0,
+  "powerConsumptionW": 22,
   "maxLuminousIntensityCd": 1500.0,
   "luminousFluxLm": 582.0,
   "noiseLevelDb": null,
@@ -155172,7 +155404,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -155214,6 +155446,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
   ]
  },
  {
@@ -155244,7 +155479,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 28.0,
+  "powerConsumptionW": 22,
   "maxLuminousIntensityCd": 800.0,
   "luminousFluxLm": 552.0,
   "noiseLevelDb": null,
@@ -155318,7 +155553,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "gdtf-derived",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -155360,6 +155595,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://www.prolights.it/en/product/MINIECLWD"
   ]
  },
  {
@@ -158417,7 +158655,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 109.0,
+  "powerConsumptionW": 109,
   "maxLuminousIntensityCd": 71600.0,
   "luminousFluxLm": 5426.0,
   "noiseLevelDb": null,
@@ -158493,7 +158731,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -158537,6 +158775,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://prolights.it/en/product/STUDIOCOBDY"
   ]
  },
  {
@@ -158567,7 +158808,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 109.0,
+  "powerConsumptionW": 109,
   "maxLuminousIntensityCd": 14100.0,
   "luminousFluxLm": 6085.0,
   "noiseLevelDb": null,
@@ -158643,7 +158884,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -158687,6 +158928,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://prolights.it/en/product/STUDIOCOBDY"
   ]
  },
  {
@@ -158717,7 +158961,7 @@
    "min": 50.0,
    "max": 60.0
   },
-  "powerConsumptionW": 109.0,
+  "powerConsumptionW": 109,
   "maxLuminousIntensityCd": 4700.0,
   "luminousFluxLm": 6697.0,
   "noiseLevelDb": null,
@@ -158793,7 +159037,7 @@
    "description": "gdtf",
    "manufacturer": "gdtf",
    "category": "manual",
-   "powerConsumptionW": "estimated",
+   "powerConsumptionW": "manual",
    "maxLuminousIntensityCd": "estimated",
    "luminousFluxLm": "gdtf",
    "weightKg": "gdtf",
@@ -158837,6 +159081,9 @@
   "_notApplicable": [],
   "_issues": [
    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+   "https://prolights.it/en/product/STUDIOCOBDY"
   ]
  },
  {

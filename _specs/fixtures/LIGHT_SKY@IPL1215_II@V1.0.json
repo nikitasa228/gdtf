@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 30.0,
+  "powerConsumptionW": 157,
   "maxLuminousIntensityCd": 59700.0,
   "luminousFluxLm": 1000.0,
   "noiseLevelDb": null,
@@ -100,7 +100,7 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -138,5 +138,8 @@
     "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/pl1215ii/"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "SHARK450BSW",
   "longName": "SHARK450BSW",
   "shortName": "SHARK450BSW",
-  "description": "LIGHT SKY SHARK450BSW: moving-head Discharge Lamp beam/spot/wash hybrid, with 2-42 deg zoom, CMY colour mixing, colour wheel, 20 gobos, prism, frost.",
+  "description": "LIGHT SKY SHARK450BSW: moving-head Discharge Lamp beam/spot/wash hybrid, with 2-42 deg zoom, CMY colour mixing, colour wheel, 20 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 700,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -109,7 +109,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -127,8 +127,8 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -160,6 +160,7 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
+    "ipRating": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -174,5 +175,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/shark450bsw/"
   ]
 }

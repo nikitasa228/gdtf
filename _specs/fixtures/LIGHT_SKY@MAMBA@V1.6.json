@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 425,
   "maxLuminousIntensityCd": 106000.0,
   "luminousFluxLm": 469.0,
   "noiseLevelDb": null,
@@ -97,7 +97,7 @@
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -134,12 +134,14 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/mamba/"
   ]
 }

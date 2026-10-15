@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 109.0,
+  "powerConsumptionW": 109,
   "maxLuminousIntensityCd": 14100.0,
   "luminousFluxLm": 6085.0,
   "noiseLevelDb": null,
@@ -102,7 +102,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -146,5 +146,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://prolights.it/en/product/STUDIOCOBDY"
   ]
 }

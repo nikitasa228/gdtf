@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1200.0,
+  "powerConsumptionW": 1400,
   "maxLuminousIntensityCd": 3095700.0,
   "luminousFluxLm": 32000.0,
   "noiseLevelDb": null,
@@ -122,7 +122,7 @@
     "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -167,6 +167,10 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "880 W white LED engine; mains draw assumed as Super Scope Plus (same 37.5 kg platform)."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/hs880for-south-korean-only/"
   ]
 }

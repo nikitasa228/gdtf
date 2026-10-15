@@ -6,7 +6,7 @@
   "gdtfName": "IP4000LL",
   "longName": "IP4000LL",
   "shortName": "IP4000LL",
-  "description": "LIGHT SKY IP4000LL: moving-head Discharge Lamp beam, with 2 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP65 rated.",
+  "description": "LIGHT SKY IP4000LL: moving-head Discharge Lamp beam, with 2 deg beam, CMY colour mixing, colour wheel, 15 gobos, prism, frost, IP54 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450.0,
+  "powerConsumptionW": 550,
   "maxLuminousIntensityCd": 32916800.0,
   "luminousFluxLm": 45000.0,
   "noiseLevelDb": null,
@@ -92,7 +92,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP54",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -110,10 +110,10 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -145,7 +145,7 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "ipRating": "estimated",
+    "ipRating": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -159,5 +159,8 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.lightsky.com.cn/product/ip4000ll/"
   ]
 }

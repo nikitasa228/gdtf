@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 1310,
   "maxLuminousIntensityCd": 5368400.0,
   "luminousFluxLm": 77500.0,
   "noiseLevelDb": null,
@@ -146,6 +146,7 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
+    "powerConsumptionW": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
@@ -154,9 +155,10 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Assumed equal to the F1000 Profile (same 1000 W platform)."
+  ]
 }

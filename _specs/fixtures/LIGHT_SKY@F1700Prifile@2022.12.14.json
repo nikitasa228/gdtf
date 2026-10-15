@@ -4,29 +4,25 @@
   "fixtureTypeId": "ADCCE5CC-B075-4C58-910D-DDCFC794D6CC",
   "gdtfDataVersion": "1.2",
   "gdtfName": "F1700Prifile",
-  "longName": "F1700Prifile",
+  "longName": "F1700 Profile",
   "shortName": "F1700Prifile",
-  "description": "LIGHT SKY F1700Prifile: moving-head LED profile, with 4-45 deg zoom, CMY colour mixing, colour wheel, 7 gobos, framing shutters, frost.",
+  "description": "LIGHT SKY F1700 Profile: moving-head LED profile, with 4-45 deg zoom, CMY colour mixing, colour wheel, 7 gobos, framing shutters, frost.",
   "manufacturer": "LIGHT SKY",
   "category": "PROFILE",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
-    "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
-    "max": 240.0
+    "min": 198.0,
+    "max": 264.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 600.0,
+  "powerConsumptionW": 2000,
   "maxLuminousIntensityCd": 7315400.0,
   "luminousFluxLm": 40000.0,
   "noiseLevelDb": null,
@@ -109,14 +105,14 @@
   ],
   "pixelCount": 1,
   "_source": {
-    "longName": "gdtf",
+    "longName": "manual",
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -160,6 +156,10 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Values of the F1700WB-P (same 1700 W platform)."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/f1700wb-p/"
   ]
 }

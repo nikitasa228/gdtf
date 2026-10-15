@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 632,
   "maxLuminousIntensityCd": 1254200.0,
   "luminousFluxLm": 10715.0,
   "noiseLevelDb": null,
@@ -105,7 +105,7 @@
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -143,12 +143,14 @@
     "description": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF beam-sum power implausible, removed."
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/wp-content/uploads/2021/06/TX1940ZOOM-UserManual.pdf"
   ]
 }
