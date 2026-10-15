@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 53,
+  "powerConsumptionW": 53.0,
   "maxLuminousIntensityCd": 39000.0,
   "luminousFluxLm": 3000.0,
   "noiseLevelDb": 38,
@@ -153,6 +153,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/pocket-pro",
     "https://www.adj.com/pocket-pro"
   ]
 }

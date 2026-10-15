@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 524,
+  "powerConsumptionW": 524.0,
   "maxLuminousIntensityCd": 1263200,
   "luminousFluxLm": 20000.0,
   "noiseLevelDb": 49,
@@ -174,13 +174,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],
@@ -190,6 +190,7 @@
     "Noise measured at 3 ft (0.9 m)."
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-spot-7z",
     "https://www.adj.com/focus-spot-7z"
   ]
 }

@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 27,
-  "maxLuminousIntensityCd": 19300,
+  "powerConsumptionW": 27.0,
+  "maxLuminousIntensityCd": 19300.0,
   "luminousFluxLm": 1000.0,
   "noiseLevelDb": 38,
   "weightKg": 3.0,
@@ -153,6 +153,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/inno-pocket-spot",
     "https://www.adj.com/inno-pocket-spot"
   ]
 }

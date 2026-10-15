@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 632,
+  "powerConsumptionW": 632.0,
   "maxLuminousIntensityCd": 1300000.0,
   "luminousFluxLm": 10715.0,
   "noiseLevelDb": 43,
@@ -106,7 +106,7 @@
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -137,9 +137,9 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
@@ -155,6 +155,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://en.lightsky.com.cn/product/tx1940-zoom/",
     "https://en.lightsky.com.cn/wp-content/uploads/2021/06/TX1940ZOOM-UserManual.pdf"
   ]
 }

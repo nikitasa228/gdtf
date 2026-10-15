@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 8900000.0,
+  "powerConsumptionW": 550.0,
+  "maxLuminousIntensityCd": 34600000.0,
   "luminousFluxLm": 12230.0,
   "noiseLevelDb": 47,
   "weightKg": 22.5,
@@ -121,8 +121,8 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -155,15 +155,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "weightKg": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -172,7 +172,7 @@
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Values of the Lunar BSW (same 420 W lamp platform); no F420BSW page found.",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/lunar-bsw/"

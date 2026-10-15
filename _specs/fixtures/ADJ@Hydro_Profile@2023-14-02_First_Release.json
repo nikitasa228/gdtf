@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1088,
+  "powerConsumptionW": 1088.0,
   "maxLuminousIntensityCd": 2000000.0,
   "luminousFluxLm": 25000,
   "noiseLevelDb": 48,
@@ -160,13 +160,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
@@ -180,6 +180,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/hydro-profile",
     "https://www.adj.com/hydro-profile"
   ]
 }

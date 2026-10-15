@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 227,
+  "powerConsumptionW": 227.0,
   "maxLuminousIntensityCd": 520000.0,
-  "luminousFluxLm": 4400,
+  "luminousFluxLm": 4400.0,
   "noiseLevelDb": 35,
   "weightKg": 7.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -164,6 +164,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/encore-lp12z-ip",
     "https://www.adj.com/encore-lp12z-ip"
   ]
 }

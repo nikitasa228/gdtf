@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 400,
-  "maxLuminousIntensityCd": 13000000.0,
-  "luminousFluxLm": null,
+  "maxLuminousIntensityCd": 37500000.0,
+  "luminousFluxLm": 19000.0,
   "noiseLevelDb": 47,
   "weightKg": 15.4,
   "powerConnectorIn": "powerCON TRUE1",
@@ -121,6 +121,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -153,14 +155,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -168,8 +169,7 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF luminous flux 375000 lm is implausible for 400 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/mini-lunar/"

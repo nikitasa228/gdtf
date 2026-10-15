@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 214,
+  "powerConsumptionW": 214.0,
   "maxLuminousIntensityCd": 4400.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 35,
@@ -218,6 +218,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/jolt-bar-fxip",
     "https://www.adj.com/jolt-bar-fxip"
   ]
 }

@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 30,
+  "powerConsumptionW": 10.5,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": 4.0,
+  "weightKg": 2.0,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": null,
   "powerSupplyType": "IEC C14",
@@ -89,7 +89,7 @@
     "description": "gdtf",
     "manufacturer": "manual",
     "category": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "zoom": "gdtf-derived",
@@ -111,7 +111,7 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "powerSupplyType": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
@@ -128,5 +128,8 @@
   "_issues": [
     "DMX mirror-ball motor; no published power data.",
     "Typical-value estimates (no published data): ipRating"
+  ],
+  "_refs": [
+    "https://www.adj.com/products/mbdmx-plus"
   ]
 }

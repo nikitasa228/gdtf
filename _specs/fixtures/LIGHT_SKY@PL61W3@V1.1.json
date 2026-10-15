@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 190,
+  "powerConsumptionW": 190.0,
   "maxLuminousIntensityCd": 230000.0,
   "luminousFluxLm": 8000.0,
   "noiseLevelDb": 35,
@@ -92,10 +92,10 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -122,9 +122,9 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
     "ipRating": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
@@ -137,5 +137,8 @@
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "Same housing as PL6103.",
     "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/pl61w3/"
   ]
 }

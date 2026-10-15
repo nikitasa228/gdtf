@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 990,
+  "powerConsumptionW": 990.0,
   "maxLuminousIntensityCd": 32000.0,
-  "luminousFluxLm": 7500,
+  "luminousFluxLm": 7500.0,
   "noiseLevelDb": 48,
   "weightKg": 24.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -166,6 +166,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/hydro-wash-x19",
     "https://www.adj.com/hydro-wash-x19"
   ]
 }

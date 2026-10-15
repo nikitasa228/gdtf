@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 350,
-  "maxLuminousIntensityCd": 7700000.0,
-  "luminousFluxLm": null,
+  "powerConsumptionW": 350.0,
+  "maxLuminousIntensityCd": 4694800.0,
+  "luminousFluxLm": 6850.0,
   "noiseLevelDb": 43,
   "weightKg": 18.8,
   "powerConnectorIn": "powerCON",
@@ -122,6 +122,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -157,12 +159,11 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
@@ -170,8 +171,7 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF luminous flux 380000 lm is implausible for 350 W and was dropped",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/scope-beam/"

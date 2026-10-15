@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 560,
+  "powerConsumptionW": 560.0,
   "maxLuminousIntensityCd": 1108200,
   "luminousFluxLm": null,
   "noiseLevelDb": 49,
@@ -156,14 +156,14 @@
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "noiseLevelDb": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived"
   },
@@ -173,6 +173,7 @@
     "Noise measured at 3 ft (0.9 m)."
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-profile",
     "https://www.adj.com/focus-profile"
   ]
 }

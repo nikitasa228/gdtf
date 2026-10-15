@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1400,
-  "maxLuminousIntensityCd": 3100000.0,
-  "luminousFluxLm": 32000.0,
+  "powerConsumptionW": 1280.0,
+  "maxLuminousIntensityCd": 3200000.0,
+  "luminousFluxLm": 40800.0,
   "noiseLevelDb": 48,
   "weightKg": 37.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -121,9 +121,9 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -156,15 +156,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -172,7 +172,7 @@
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "880 W white LED engine; mains draw assumed as Super Scope Plus (same 37.5 kg platform).",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/hs880for-south-korean-only/"

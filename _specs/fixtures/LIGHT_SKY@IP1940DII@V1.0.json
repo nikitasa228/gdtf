@@ -6,7 +6,7 @@
   "gdtfName": "IP1940DII",
   "longName": "IP1940DII",
   "shortName": "IP1940DII",
-  "description": "LIGHT SKY IP1940DII: moving-head LED wash-beam, with 5-45 deg zoom, RGBW colour mixing, IP65 rated.",
+  "description": "LIGHT SKY IP1940DII: moving-head LED wash-beam, with 5-45 deg zoom, RGBW colour mixing, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 660.0,
-  "maxLuminousIntensityCd": 220000.0,
-  "luminousFluxLm": 1837.0,
+  "powerConsumptionW": 730.0,
+  "maxLuminousIntensityCd": 800000.0,
+  "luminousFluxLm": 9700.0,
   "noiseLevelDb": 43,
   "weightKg": 25.0,
   "powerConnectorIn": "powerCON TRUE1",
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -114,12 +114,12 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -150,16 +150,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "ipRating": "estimated",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.lightsky.com.cn/product/ip1940d%e2%85%b1/"
   ]
 }

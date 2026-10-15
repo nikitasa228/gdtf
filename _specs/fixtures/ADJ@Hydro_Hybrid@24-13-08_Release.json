@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 580,
+  "powerConsumptionW": 580.0,
   "maxLuminousIntensityCd": 14065000,
-  "luminousFluxLm": 14000.0,
+  "luminousFluxLm": 14416.0,
   "noiseLevelDb": 47,
   "weightKg": 31.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -125,7 +125,7 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -175,6 +175,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/hydro-hybrid",
     "https://www.adj.com/hydro-hybrid"
   ]
 }

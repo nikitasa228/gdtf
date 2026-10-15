@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 200.0,
   "maxLuminousIntensityCd": 3600000.0,
-  "luminousFluxLm": 7000,
+  "luminousFluxLm": 7000.0,
   "noiseLevelDb": 38,
   "weightKg": 10.0,
   "powerConnectorIn": "powerCON TRUE1",
@@ -162,12 +162,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "colorTemperatureK": "estimated",
     "fullName": "gdtf-derived",
     "ipRating": "estimated",
@@ -181,6 +181,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-spot-4z",
     "https://www.adj.com/focus-spot-4z"
   ]
 }

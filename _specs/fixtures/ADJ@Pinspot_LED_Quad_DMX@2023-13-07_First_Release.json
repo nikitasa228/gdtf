@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 11,
+  "powerConsumptionW": 11.0,
   "maxLuminousIntensityCd": 1500.0,
   "luminousFluxLm": 112.0,
   "noiseLevelDb": 30,
@@ -140,6 +140,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/pinspot-led-quad-dmx",
     "https://www.adj.com/pinspot-led-quad-dmx"
   ]
 }

@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 347,
+  "powerConsumptionW": 347.0,
   "maxLuminousIntensityCd": 8000.0,
   "luminousFluxLm": 11465,
   "noiseLevelDb": 35,
@@ -242,6 +242,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/encore-dbx",
     "https://www.adj.com/encore-dbx"
   ]
 }

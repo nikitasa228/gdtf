@@ -23,7 +23,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 660,
+  "powerConsumptionW": 660.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 50,
@@ -131,6 +131,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/entour-haze-pro",
     "https://www.adj.com/entour-haze-pro"
   ]
 }

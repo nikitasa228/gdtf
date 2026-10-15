@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450,
+  "powerConsumptionW": 450.0,
   "maxLuminousIntensityCd": 10000000.0,
   "luminousFluxLm": 14000.0,
   "noiseLevelDb": 47,
@@ -145,12 +145,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -162,6 +162,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/hydro-beam-cmy",
     "https://www.adj.com/hydro-beam-cmy"
   ]
 }

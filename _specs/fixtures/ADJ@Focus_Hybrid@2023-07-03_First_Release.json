@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 335,
+  "powerConsumptionW": 335.0,
   "maxLuminousIntensityCd": 1435800,
   "luminousFluxLm": 41000.0,
   "noiseLevelDb": 43.2,
@@ -170,13 +170,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],
@@ -186,6 +186,7 @@
     "Noise measured at 3 ft (0.9 m)."
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-hybrid",
     "https://www.adj.com/focus-hybrid"
   ]
 }

@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 180,
+  "powerConsumptionW": 180.0,
   "maxLuminousIntensityCd": 43000.0,
   "luminousFluxLm": 3741.0,
   "noiseLevelDb": 38,
@@ -164,6 +164,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-spot-2x",
     "https://www.adj.com/focus-spot-2x"
   ]
 }

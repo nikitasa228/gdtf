@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1400,
+  "powerConsumptionW": 1400.0,
   "maxLuminousIntensityCd": 1360000,
-  "luminousFluxLm": 11580.0,
+  "luminousFluxLm": 17000.0,
   "noiseLevelDb": 48,
   "weightKg": 27.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -121,7 +121,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -152,13 +152,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "noiseLevelDb": "estimated"
   },
@@ -169,6 +169,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/hydro-flex-l19",
     "https://www.adj.com/hydro-flex-l19"
   ]
 }

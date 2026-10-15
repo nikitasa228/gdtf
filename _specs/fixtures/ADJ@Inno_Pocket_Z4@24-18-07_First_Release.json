@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 67,
-  "maxLuminousIntensityCd": 22900,
+  "powerConsumptionW": 67.0,
+  "maxLuminousIntensityCd": 22900.0,
   "luminousFluxLm": 9464.0,
   "noiseLevelDb": 38,
   "weightKg": 3.2,
@@ -150,6 +150,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/inno-pocket-z4",
     "https://www.adj.com/inno-pocket-z4"
   ]
 }

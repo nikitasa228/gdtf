@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 198,
+  "powerConsumptionW": 198.0,
   "maxLuminousIntensityCd": 3800.0,
-  "luminousFluxLm": 5982,
+  "luminousFluxLm": 5900.0,
   "noiseLevelDb": 35,
   "weightKg": 8.85,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -177,6 +177,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/encore-lb15ip",
     "https://www.adj.com/encore-lb15ip"
   ]
 }

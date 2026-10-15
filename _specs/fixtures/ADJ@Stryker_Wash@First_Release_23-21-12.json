@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 300,
+  "powerConsumptionW": 300.0,
   "maxLuminousIntensityCd": 190000.0,
   "luminousFluxLm": 2299.0,
   "noiseLevelDb": 43,
@@ -146,6 +146,7 @@
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/stryker-wash",
     "https://www.stagelightingstore.com/Eliminator-Stryker-Wash"
   ]
 }

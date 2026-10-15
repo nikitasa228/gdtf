@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 380,
+  "powerConsumptionW": 380.0,
   "maxLuminousIntensityCd": 890000.0,
-  "luminousFluxLm": 11000,
+  "luminousFluxLm": 11000.0,
   "noiseLevelDb": 43,
   "weightKg": 20.0,
   "powerConnectorIn": "powerCON TRUE1",
@@ -162,12 +162,12 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
     "ipRating": "estimated",
     "noiseLevelDb": "estimated"
@@ -179,6 +179,7 @@
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-spot-6z",
     "https://www.adj.com/focus-spot-6z"
   ]
 }

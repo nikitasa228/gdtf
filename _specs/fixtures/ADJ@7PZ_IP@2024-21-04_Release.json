@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 128,
+  "powerConsumptionW": 128.0,
   "maxLuminousIntensityCd": 190000.0,
   "luminousFluxLm": 1643.0,
   "noiseLevelDb": 30,
@@ -184,6 +184,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/7pz-ip",
     "https://www.adj.com/7pz-ip"
   ]
 }

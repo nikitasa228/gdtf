@@ -6,7 +6,7 @@
   "gdtfName": "SUPER SHARK BEAM",
   "longName": "SUPER SHARK BEAM",
   "shortName": "SUPER SHARK BEAM",
-  "description": "LIGHT SKY SUPER SHARK BEAM: moving-head Discharge Lamp beam, with 1.6 deg beam, CMY colour mixing, colour wheel, 10 gobos, prism, frost.",
+  "description": "LIGHT SKY SUPER SHARK BEAM: moving-head Discharge Lamp beam, with 1.6 deg beam, CMY colour mixing, colour wheel, 10 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -26,8 +26,8 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 770,
-  "maxLuminousIntensityCd": 14000000.0,
+  "powerConsumptionW": 770.0,
+  "maxLuminousIntensityCd": 150000000.0,
   "luminousFluxLm": 18700.0,
   "noiseLevelDb": 47,
   "weightKg": 41.5,
@@ -96,7 +96,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -121,8 +121,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -155,21 +155,21 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/super-shark-beam/"

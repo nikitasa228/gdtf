@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 175,
+  "powerConsumptionW": 175.0,
   "maxLuminousIntensityCd": 140000.0,
   "luminousFluxLm": 4743.0,
   "noiseLevelDb": 35,
@@ -180,6 +180,7 @@
     "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/cob-cannon-lp200x",
     "https://www.adj.com/cob-cannon-lp200x"
   ]
 }

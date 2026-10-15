@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 60,
+  "powerConsumptionW": 60.0,
   "maxLuminousIntensityCd": 24000.0,
   "luminousFluxLm": null,
   "noiseLevelDb": 30,
@@ -180,6 +180,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/electrapix-bar-8",
     "https://www.adj.com/electrapix-bar-8"
   ]
 }

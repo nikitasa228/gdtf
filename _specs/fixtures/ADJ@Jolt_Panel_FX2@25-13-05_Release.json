@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 235,
+  "powerConsumptionW": 235.0,
   "maxLuminousIntensityCd": 14000.0,
   "luminousFluxLm": 24000.0,
   "noiseLevelDb": 35,
@@ -192,6 +192,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/jolt-panel-fx2",
     "https://www.adj.com/jolt-panel-fx2"
   ]
 }

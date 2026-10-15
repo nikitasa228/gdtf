@@ -6,7 +6,7 @@
   "gdtfName": "DOPHINE SMART",
   "longName": "DOPHINE SMART",
   "shortName": "DOPHINE SMART",
-  "description": "LIGHT SKY DOPHINE SMART: moving-head LED beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 16 gobos, prism, frost.",
+  "description": "LIGHT SKY DOPHINE SMART: moving-head LED beam, with 1.8 deg beam, CMY colour mixing, colour wheel, 16 gobos, prism, frost, IP66 rated.",
   "manufacturer": "LIGHT SKY",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 850.0,
-  "maxLuminousIntensityCd": 44000000.0,
+  "powerConsumptionW": 562.0,
+  "maxLuminousIntensityCd": 6000000.0,
   "luminousFluxLm": 60000.0,
-  "noiseLevelDb": 48,
+  "noiseLevelDb": 43,
   "weightKg": 22.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,7 +105,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -125,13 +125,13 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -166,14 +166,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
     "fullName": "gdtf-derived",
     "description": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/dolphin-smart/"
   ]
 }

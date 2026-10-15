@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 250,
+  "powerConsumptionW": 250.0,
   "maxLuminousIntensityCd": 90000.0,
-  "luminousFluxLm": 6000,
+  "luminousFluxLm": 6000.0,
   "noiseLevelDb": 35,
   "weightKg": 9.1,
   "powerConnectorIn": "powerCON TRUE1",
@@ -141,13 +141,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
     "fullName": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
@@ -161,6 +161,7 @@
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/encore-profile-pro-color",
     "https://www.adj.com/encore-profile-pro-color"
   ]
 }

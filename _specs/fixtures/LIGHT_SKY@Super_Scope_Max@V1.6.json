@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 750.0,
-  "maxLuminousIntensityCd": 4100000.0,
+  "powerConsumptionW": 1430.0,
+  "maxLuminousIntensityCd": 2900000.0,
   "luminousFluxLm": 50700.0,
-  "noiseLevelDb": 43,
+  "noiseLevelDb": 48,
   "weightKg": 44.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -118,13 +118,13 @@
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -168,5 +168,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.lightsky.com.cn/product/super-scope-max/"
   ]
 }

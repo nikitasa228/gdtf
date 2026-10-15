@@ -147,6 +147,7 @@
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/stryker-max",
     "https://www.fullcompass.com/prod/645593-eliminator-lighting-stryker-max-6x40w-rgbw-led-moving-head-wash"
   ]
 }
