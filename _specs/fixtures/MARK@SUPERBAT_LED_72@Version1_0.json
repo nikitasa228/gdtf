@@ -127,9 +127,9 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "weightKg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
@@ -142,9 +142,11 @@
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
+    "Official Equipson manual v1.1 (linked from equipson.es/producto/12x-superbat-led-72-flightcase). Battery-powered, 6x12W RGBWA+UV.",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://media.equipson.es/Docs/Manuales/SUPERBAT_LED_72_MANUAL_V_1_1_20240614131015.pdf",
     "https://open-fixture-library.org/mark/superbat-led-72"
   ]
 }

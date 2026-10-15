@@ -104,7 +104,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -145,6 +145,10 @@
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Official manual v1.1: power supply \"AC 240 V 50/60 Hz + rechargeable battery\" (no range, mains omitted); no consumption figure published (3x4W RGBW LEDs).",
     "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://media.equipson.es/Docs/Manuales/light_truss_bat_41_v1_1_20251223162804.pdf"
   ]
 }

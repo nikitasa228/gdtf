@@ -6,7 +6,7 @@
   "gdtfName": "MOVILED 1210 B MKII",
   "longName": "MOVILED 1210 B MKII",
   "shortName": "MOVILED1210B",
-  "description": "MARK MOVILED 1210 B MKII: moving-head LED wash, with RGBW colour mixing.",
+  "description": "MARK MOVILED 1210 B MKII: moving-head LED wash, with 8 deg beam, RGBW colour mixing.",
   "manufacturer": "MARK",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -26,17 +26,17 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 120.0,
-  "maxLuminousIntensityCd": 21000.0,
+  "powerConsumptionW": 150,
+  "maxLuminousIntensityCd": 210000.0,
   "luminousFluxLm": 4500.0,
   "noiseLevelDb": 38,
-  "weightKg": 6.0,
+  "weightKg": 6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 200.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -47,8 +47,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 25.0,
-    "max": 25.0
+    "min": 8.0,
+    "max": 8.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -94,12 +94,12 @@
     "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -122,24 +122,27 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "beamAngleDeg": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "colorTemperatureK": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+    "Consumption 150 W (LEDs 12x10W = 120 W). Same values in manual v1.3. Record had tilt 200 / beam 25.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.equipson.es/producto/moviled-1210-b-mkii"
   ]
 }

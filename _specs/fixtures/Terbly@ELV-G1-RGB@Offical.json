@@ -20,15 +20,15 @@
   ],
   "voltageRangeV": {
     "min": 100.0,
-    "max": 240.0
+    "max": 277.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
   "powerConsumptionW": 20,
-  "maxLuminousIntensityCd": 1900.0,
-  "luminousFluxLm": 66.0,
+  "maxLuminousIntensityCd": 20000.0,
+  "luminousFluxLm": 700,
   "noiseLevelDb": 30,
   "weightKg": 1.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
@@ -89,8 +89,7 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -117,13 +116,14 @@
     "subType": "manual",
     "powerConsumptionW": "manual",
     "weightKg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
@@ -131,9 +131,11 @@
     "colorTemperatureK"
   ],
   "_issues": [
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
+    "Shared page ELV-G1/G4 RGB/RGBW/RGBA; 1' = 20 W/700 lm/1.5 kg, 4' = 80 W/2800 lm/6 kg. Beam angle options 10, 60, 10x60, 30x60 deg (lens options, not zoom).",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://en.terbly.com/index.php/Product/detail/goods_id/113",
     "http://en.terbly.com/index.php/Product/detail/goods_id/113"
   ]
 }

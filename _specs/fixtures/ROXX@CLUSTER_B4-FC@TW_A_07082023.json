@@ -6,7 +6,7 @@
   "gdtfName": "CLUSTER B4-FC",
   "longName": "CLUSTER B4-FC",
   "shortName": "CL-B4FC",
-  "description": "ROXX CLUSTER B4-FC: LED blinder, with 50 deg beam, RGBA+WW colour mixing, colour wheel.",
+  "description": "ROXX CLUSTER B4-FC: LED blinder, with 50 deg beam, RGBA+WW colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "ROXX",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 1250,
-  "maxLuminousIntensityCd": 33000.0,
-  "luminousFluxLm": 28000.0,
+  "maxLuminousIntensityCd": 30900,
+  "luminousFluxLm": 26049,
   "noiseLevelDb": 40,
   "weightKg": 16.2,
   "powerConnectorIn": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -166,11 +166,11 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -196,21 +196,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "1250 W boost mode, 400 W constant.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "1250 W boost mode, 400 W constant. Max (boost) 1250 W, constant 400 W. Flux 26,049 lm RAW (22,952 lm @3200K). Lux 30.9 klx @1 m (@2900K). AC max range 90-285 V.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://roxxlight.com/cluster-b4-fc/",
     "https://www.ambersphere.com/product/cluster-b4-fc/"
   ]
 }

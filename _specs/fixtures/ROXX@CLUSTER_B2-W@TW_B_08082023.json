@@ -6,7 +6,7 @@
   "gdtfName": "CLUSTER B2-W",
   "longName": "CLUSTER B2-W",
   "shortName": "CL-B2",
-  "description": "ROXX CLUSTER B2-W: LED blinder, with 50 deg beam.",
+  "description": "ROXX CLUSTER B2-W: LED blinder, with 50 deg beam, IP65 rated.",
   "manufacturer": "ROXX",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 650,
-  "maxLuminousIntensityCd": 25000.0,
-  "luminousFluxLm": 20800.0,
+  "maxLuminousIntensityCd": 21200,
+  "luminousFluxLm": 20800,
   "noiseLevelDb": 40,
   "weightKg": 10.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP20",
+  "ipRating": "IP65",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -122,11 +122,11 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -152,21 +152,22 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "fullName": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "650 W boost mode, 220 W constant.",
-    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+    "650 W boost mode, 220 W constant. Max (boost) 650 W, constant 220 W. AC max range 90-285 V.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://roxxlight.com/cluster-b2-w/",
     "https://roxxlight.com/wp-content/uploads/2024/09/roxx-data-sheet-cluster-B2-W-rev04.pdf"
   ]
 }

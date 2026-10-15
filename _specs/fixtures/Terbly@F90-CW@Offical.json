@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 200,
   "maxLuminousIntensityCd": 140000.0,
-  "luminousFluxLm": 11000.0,
+  "luminousFluxLm": 11000,
   "noiseLevelDb": 35,
   "weightKg": 12.5,
   "powerConnectorIn": "powerCON TRUE1",
@@ -102,8 +102,7 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -129,22 +128,24 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "weightKg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "fullName": "gdtf-derived",
     "powerSupplyType": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "ipRating": "estimated",
+    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://en.terbly.com/index.php/Product/detail/goods_id/64",
     "http://en.terbly.com/index.php/Product/detail/goods_id/64"
   ]
 }

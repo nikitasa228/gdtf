@@ -19,17 +19,17 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
-    "max": 240.0
+    "min": 90.0,
+    "max": 250.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400.0,
+  "powerConsumptionW": 600,
   "maxLuminousIntensityCd": 17000.0,
   "luminousFluxLm": 20000.0,
-  "noiseLevelDb": 35,
+  "noiseLevelDb": 40,
   "weightKg": 11.2,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -94,9 +94,9 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -122,9 +122,9 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
     "colorTemperatureK": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "fullName": "gdtf-derived",
@@ -137,7 +137,10 @@
     "colorTemperatureK"
   ],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Official Equipson user manual v1.0 (product page equipson.es/producto/blinder-400-rgb has no tech table). 4x100W RGB COB.",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://media.equipson.es/Docs/Manuales/blinder_400_rgb_manual_1-0_20251210121955.pdf"
   ]
 }
