@@ -6,7 +6,7 @@
   "gdtfName": "L5-C",
   "longName": "L5-C",
   "shortName": "L5C",
-  "description": "Arri L5C Fresnel",
+  "description": "ARRI L5-C: LED wash (fresnel), with 14-50 deg zoom, RGBW colour mixing.",
   "manufacturer": "ARRI",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 115,
-  "maxLuminousIntensityCd": 149400.0,
+  "maxLuminousIntensityCd": 150000.0,
   "luminousFluxLm": 9998.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 5.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -123,10 +123,13 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "ARRI L5-C",
+  "gdtfDescription": "Arri L5C Fresnel",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -163,14 +166,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adorama.com/used-arri-l5-c-color-led-fresnel-hanging-light-2800k-10000k-white-light-color-temperature-50000hrs-estimated-led-lifetime-l70-blue-silver/p/us1871581"

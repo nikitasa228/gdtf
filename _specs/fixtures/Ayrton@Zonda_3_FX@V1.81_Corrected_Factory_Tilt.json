@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1600.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 3900000.0,
   "luminousFluxLm": 12100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 11.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Ayrton Zonda 3 FX",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -156,14 +158,16 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "estimated"
+    "description": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

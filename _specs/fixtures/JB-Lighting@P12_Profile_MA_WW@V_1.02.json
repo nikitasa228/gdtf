@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 800,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 1500000.0,
   "luminousFluxLm": 16300,
   "noiseLevelDb": 29,
   "weightKg": 23.0,
@@ -97,7 +97,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "JB-Lighting P12 Profile MA WW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -160,15 +162,17 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
     "https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798",

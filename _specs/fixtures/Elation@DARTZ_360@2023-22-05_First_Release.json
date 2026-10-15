@@ -6,7 +6,7 @@
   "gdtfName": "Dartz 360",
   "longName": "Dartz 360",
   "shortName": "Dartz360",
-  "description": "The DARTZ 360™ is a unique, compact, narrow beam luminaire featuring a new patent pending single source 50W RGB LED engine producing an impressive 3° aperture, amazing high output level, and smooth color-mixed effects that can be used in a variety of applications requiring no minimum safe project distance as with typical discharge lamp beam fixtures, fast and precise 16-bit continuous 360° pan and tilt rotation, 14 static-stamped metal gobos, 6-facet linear and 8-facet independent rotating prisms, 0-100% linear frost filter for wash effects, high speed electronic shutter and strobe, electronic dimming and variable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX, RDM (Remote Device Management), Kling-Net, Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, 5pin XLR, RJ45 ethernet, and Locking Power Cable in/out connections, full color 180° reversible menu display with multi-button control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The DARTZ 360 is a unique, compact, narrow beam luminaire featuring a new patent pending single source 50W RGB LED engine producing an impressive 3° aperture, amazing high output level, and smooth color-mixed effects that can be used in a variety of applications requiring no minimum safe project distance as with typical discharge lamp beam fixtures, fast and precise 16-bit continuous 360° pan and tilt rotation, 14 static-stamped metal gobos, 6-facet linear and 8-facet independent rotating prisms, 0-100% linear frost filter for wash effects, high speed electronic shutter and strobe, electronic dimming and variable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX, RDM (Remote Device Management), Kling-Net, Art-NET, and sACN protocol support, Elation’s E-FLY internal wireless DMX transceiver, 5pin XLR, RJ45 ethernet, and Locking Power Cable in/out connections, full color 180° reversible menu display with multi-button control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 154,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 29562.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 2000000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 38,
   "weightKg": 12.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -49,7 +49,10 @@
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 3.0,
+    "max": 3.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Spot",
@@ -117,6 +120,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Dartz 360",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,7 +129,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -159,18 +163,21 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 29562 lm is implausible for 154 W and was dropped",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/dartz-360"

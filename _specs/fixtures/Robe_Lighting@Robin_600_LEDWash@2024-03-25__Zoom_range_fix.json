@@ -6,7 +6,7 @@
   "gdtfName": "Robin 600 LEDWash",
   "longName": "Robin 600 LEDWash",
   "shortName": "600 LEDWash",
-  "description": "The super-slim ROBIN® 600 LEDWash features 37x 10 Watt RGBW multichip LEDs with colour output ranging from gentle pastels to the richest saturation.",
+  "description": "The super-slim ROBIN 600 LEDWash features 37x 10 Watt RGBW multichip LEDs with colour output ranging from gentle pastels to the richest saturation.",
   "manufacturer": "Robe Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 415.0,
   "maxLuminousIntensityCd": 1700.0,
   "luminousFluxLm": 130.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 10.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -111,6 +111,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin 600 LEDWash",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -154,11 +156,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

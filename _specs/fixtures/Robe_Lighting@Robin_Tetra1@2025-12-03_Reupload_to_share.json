@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 300.0,
-  "maxLuminousIntensityCd": 171700.0,
+  "maxLuminousIntensityCd": 170000.0,
   "luminousFluxLm": 939.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 11.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 191.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Robe Lighting Robin Tetra1",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -120,7 +122,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -153,11 +154,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

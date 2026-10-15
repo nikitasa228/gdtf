@@ -6,7 +6,7 @@
   "gdtfName": "FUZE PAR Z175",
   "longName": "FUZE PAR Z175",
   "shortName": "FuzPrZ175",
-  "description": "The FUZE PAR Z175™ is a single source par with zoom. Featuring a 175W RGBW COB LED engine, 8° to 35° motorized zoom, an advanced cooling system, smooth RGBW color mixing, 64 color presets and 14 unique color macros, electronic strobe and 16-bit variable dimming curve modes, flicker free operation for TV and FILM, 3/5pin DMX and Locking Power Cable in/out connections, (4) button LCD control display panel, integrated dual rigging yokes, and a multi-voltage universal auto switching power supply (100-240v). Gel frame and barn doors included.",
+  "description": "The FUZE PAR Z175 is a single source par with zoom. Featuring a 175W RGBW COB LED engine, 8° to 35° motorized zoom, an advanced cooling system, smooth RGBW color mixing, 64 color presets and 14 unique color macros, electronic strobe and 16-bit variable dimming curve modes, flicker free operation for TV and FILM, 3/5pin DMX and Locking Power Cable in/out connections, (4) button LCD control display panel, integrated dual rigging yokes, and a multi-voltage universal auto switching power supply (100-240v). Gel frame and barn doors included.",
   "manufacturer": "Elation",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 200,
-  "maxLuminousIntensityCd": 895900.0,
+  "maxLuminousIntensityCd": 900000.0,
   "luminousFluxLm": 15000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.07,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -154,6 +154,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation FUZE PAR Z175",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -194,14 +196,15 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/fuze-par-z175"

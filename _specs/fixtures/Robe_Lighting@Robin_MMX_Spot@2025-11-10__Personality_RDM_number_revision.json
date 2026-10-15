@@ -4,7 +4,7 @@
   "fixtureTypeId": "6AFC1642-ACD4-42BC-B53C-0E8E9BBF01AC",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin MMX Spot",
-  "longName": "Robin MMX Spot™",
+  "longName": "Robin MMX Spot",
   "shortName": "MMX Spot",
   "description": "The unit is based on the all new Robin advanced technology design that provides Brighter, more efficient, physically lighter and smaller fixtures than previously possible. The MMX includes the Robe exclusive Hot-Spot lamp control feature that allows remote adjustment of flat beam uniformity or power beam hot-spot. Key feature of the MMX is the 'Dual Graphics Wheel' - 2 fully controllable contra-rotating plates that can be positioned anywhere across the light path to produce unique visual effects.",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1020.0,
-  "maxLuminousIntensityCd": 1059100.0,
+  "maxLuminousIntensityCd": 1100000.0,
   "luminousFluxLm": 26141.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 25.5,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -94,7 +94,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -119,6 +119,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin MMX Spot",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -164,11 +166,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

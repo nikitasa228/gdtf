@@ -4,7 +4,7 @@
   "fixtureTypeId": "94583236-B920-4FD7-9248-EE5E825733FD",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin Arianne 6",
-  "longName": "Robin Arianne 6™",
+  "longName": "Robin Arianne 6",
   "shortName": "Arianne6",
   "description": "If you are looking for a refreshingly simple, no-fuss, robust wash light with superior colour mixing, increased output, and full IP65/66 ingress protection - plus simplified maintenance - the Arianne 6 is the fixture for you!\nBy eliminating sometimes unnecessary complexities such as pixel mapping, layers and background effects, yet upholding Robe’s renowned quality, Arianne 6 delivers all the essential attributes for exceptional wash and beam effects in any environment.\n\nFeaturing a 19 x 55W RGB Lime LED multichip source, Arianne 6 produces striking colours, alongside remarkable brightness.",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 3700000.0,
   "luminousFluxLm": 18029.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 18.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Robe Lighting Robin Arianne 6",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -140,14 +142,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

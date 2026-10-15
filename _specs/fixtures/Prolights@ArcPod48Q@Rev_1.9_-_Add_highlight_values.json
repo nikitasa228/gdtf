@@ -29,7 +29,7 @@
   "powerConsumptionW": 540,
   "maxLuminousIntensityCd": 116000,
   "luminousFluxLm": 28000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 14.0,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -104,6 +104,8 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "Prolights ArcPod48Q",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -111,7 +113,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -145,14 +146,17 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "colorTemperatureK": "estimated"
+    "maxLuminousIntensityCd": "manual",
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCPOD48Q",

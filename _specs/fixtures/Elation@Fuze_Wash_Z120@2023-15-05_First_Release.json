@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Wash Z120",
   "longName": "Fuze Wash Z120",
   "shortName": "FzWshZ120",
-  "description": "The FUZE WASH Z120™ is a single source par moving head luminaire with a 120W Quad Color RGBW COB LED. Features 7° to 55° motorized zoom, pan and tilt, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, DMX and power in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
+  "description": "The FUZE WASH Z120 is a single source par moving head luminaire with a 120W Quad Color RGBW COB LED. Features 7° to 55° motorized zoom, pan and tilt, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, DMX and power in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 157,
-  "maxLuminousIntensityCd": 317800.0,
+  "maxLuminousIntensityCd": 320000.0,
   "luminousFluxLm": 5320.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 10.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Wash Z120",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -141,14 +143,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.springtree.net/product/elation-fuze-wash-z120/"

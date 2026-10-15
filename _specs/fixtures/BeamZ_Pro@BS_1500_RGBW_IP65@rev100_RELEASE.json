@@ -29,7 +29,7 @@
   "powerConsumptionW": 702,
   "maxLuminousIntensityCd": 9500.0,
   "luminousFluxLm": 25000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 12.65,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -109,6 +109,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "BeamZ Pro BS 1500 RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,15 +151,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/bs1500-stroboscope-led-rgbw-ip65/"

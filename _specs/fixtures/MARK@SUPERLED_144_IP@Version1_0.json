@@ -6,7 +6,7 @@
   "gdtfName": "SUPERLED 144 IP",
   "longName": "SUPERLED 144 IP",
   "shortName": "SupLed144IP",
-  "description": "Outdoor LED Par 12x12W RGBWA+UV",
+  "description": "MARK SUPERLED 144 IP: LED PAR, with 15 deg beam, RGBWA+UV colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "MARK",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 144.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 75000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 30,
+  "weightKg": 5.9,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -61,7 +61,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBWA+UV",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -86,10 +89,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "MARK SUPERLED 144 IP",
+  "gdtfDescription": "Outdoor LED Par 12x12W RGBWA+UV",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
@@ -119,18 +125,21 @@
     "ipRating": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "weightKg": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ]
 }

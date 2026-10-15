@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 227,
-  "maxLuminousIntensityCd": 515000.0,
+  "maxLuminousIntensityCd": 520000.0,
   "luminousFluxLm": 4400,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Encore LP12Z IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -151,14 +153,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/encore-lp12z-ip"

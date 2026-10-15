@@ -4,7 +4,7 @@
   "fixtureTypeId": "69C31FC8-932B-4C7D-B1D8-CDDE0B2A7B2C",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LEDForce 18 RGBW",
-  "longName": "LEDForce 18™ RGBW",
+  "longName": "LEDForce 18 RGBW",
   "shortName": "LEDForce 18",
   "description": "GDTF info: 3D model does not match 100% physical appearance of the light. Proportions of 3D model are correct. \n\nLEDForce 18 RGB and LEDForce 18 RGBW Par Cans will blind you with powerful light output of 18 x 3IN1 RGB LED or 18 x 4IN1 RGBW LED multichip New Tri-color and Quad-color LED technology. Superior color mixing with no multicolor shadows and extremely bright beam of 25°beam angle will please any lighting professional. Die cast aluminum casting with double hanging brackets – for truss mounting and floor standing allows mounting in any position. Gel frame included as standard and optional 10° lens kit available upon demand.",
   "manufacturer": "Robe Lighting",
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 95.0,
-  "maxLuminousIntensityCd": 200.0,
+  "maxLuminousIntensityCd": 160.0,
   "luminousFluxLm": 33.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.9,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": null,
   "powerSupplyType": "IEC C14",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -91,6 +91,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting LEDForce 18 RGBW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -132,11 +134,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

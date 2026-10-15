@@ -63,6 +63,8 @@
   ],
   "pixelCount": 1,
   "subType": "Test / placeholder profile",
+  "fullName": "Trolley",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -89,18 +91,20 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "fullName": "gdtf-derived",
     "description": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
+  "_missing": [],
+  "_notApplicable": [
+    "controlSignal",
     "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
+    "powerConsumptionW",
+    "powerSupplyType",
+    "supportedPowerNetworks",
+    "weightKg"
   ],
-  "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "File is a test-mode placeholder ('testmode000'); not a real fixture."
+    "Test / placeholder GDTF profile, not a physical fixture."
   ]
 }

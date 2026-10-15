@@ -6,7 +6,7 @@
   "gdtfName": "Odin",
   "longName": "Odin",
   "shortName": "Odin",
-  "description": "Virtual Tilt - for 3D Only",
+  "description": "CLF Lighting Odin: LED bar, with 11-50 deg zoom, RGBL colour mixing.",
   "manufacturer": "CLF Lighting",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 262.0,
-  "maxLuminousIntensityCd": 4737600.0,
-  "luminousFluxLm": 195776.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 250000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 35,
   "weightKg": 6.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -103,18 +103,19 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Odin",
+  "gdtfDescription": "Virtual Tilt - for 3D Only",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -145,11 +146,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "GDTF luminous flux 195776 lm is implausible for 262 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

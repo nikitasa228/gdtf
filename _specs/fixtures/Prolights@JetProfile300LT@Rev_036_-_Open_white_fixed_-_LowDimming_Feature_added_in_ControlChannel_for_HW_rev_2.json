@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 491.0,
-  "maxLuminousIntensityCd": 3894500.0,
+  "maxLuminousIntensityCd": 3900000.0,
   "luminousFluxLm": 11979.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 21.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -90,7 +90,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -107,6 +107,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights JetProfile300LT",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -154,11 +156,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

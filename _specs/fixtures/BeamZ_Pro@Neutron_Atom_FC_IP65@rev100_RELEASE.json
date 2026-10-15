@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 266100.0,
+  "maxLuminousIntensityCd": 270000.0,
   "luminousFluxLm": 13085.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 3.75,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -124,6 +124,8 @@
   ],
   "pixelCount": 37,
   "subType": "Outdoor flood",
+  "fullName": "BeamZ Pro Neutron Atom FC",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -134,7 +136,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "estimated",
@@ -167,11 +168,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ]
 }

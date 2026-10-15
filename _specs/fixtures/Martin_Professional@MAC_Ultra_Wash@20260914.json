@@ -6,7 +6,7 @@
   "gdtfName": "MAC Ultra Wash",
   "longName": "MAC Ultra Wash",
   "shortName": "MACUltWas",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional MAC Ultra Wash: moving-head LED wash, with 6.8-47.5 deg zoom, CMY colour mixing, colour wheel, frost.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -23,9 +23,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1350.0,
-  "maxLuminousIntensityCd": 4019200.0,
+  "maxLuminousIntensityCd": 4000000.0,
   "luminousFluxLm": 63500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 39.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
@@ -90,10 +90,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional MAC Ultra Wash",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -133,11 +136,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

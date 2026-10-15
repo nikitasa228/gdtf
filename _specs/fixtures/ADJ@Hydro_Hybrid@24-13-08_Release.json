@@ -29,7 +29,7 @@
   "powerConsumptionW": 580,
   "maxLuminousIntensityCd": 14065000,
   "luminousFluxLm": 14000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 31.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Hydro Hybrid",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,15 +163,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Osram Sirius HRI 420 W lamp."
+    "Osram Sirius HRI 420 W lamp.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/hydro-hybrid"

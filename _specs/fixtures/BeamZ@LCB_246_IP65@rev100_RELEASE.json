@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 15.0,
-  "maxLuminousIntensityCd": 700.0,
+  "maxLuminousIntensityCd": 670.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.75,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -67,8 +67,8 @@
   "colorMixing": "RGBWA+UV",
   "colorWheel": true,
   "colorTemperatureK": {
-    "min": 65000.0,
-    "max": 65000.0
+    "min": 2800.0,
+    "max": 8000.0
   },
   "prism": false,
   "prisms": [],
@@ -122,6 +122,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "BeamZ LCB246",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,7 +151,6 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
@@ -163,13 +164,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ]
 }

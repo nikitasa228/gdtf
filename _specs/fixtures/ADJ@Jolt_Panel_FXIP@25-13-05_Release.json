@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 250,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 14000.0,
   "luminousFluxLm": 24000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -139,6 +139,8 @@
     }
   ],
   "pixelCount": 10,
+  "fullName": "ADJ Jolt Panel FXIP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -177,16 +179,17 @@
     "supportedPowerNetworks": "manual",
     "beamAngleDeg": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/jolt-panel-fxip"

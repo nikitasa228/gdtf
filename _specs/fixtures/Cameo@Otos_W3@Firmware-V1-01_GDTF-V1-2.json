@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 350,
-  "maxLuminousIntensityCd": 219500.0,
+  "maxLuminousIntensityCd": 220000.0,
   "luminousFluxLm": 1200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 11.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -127,6 +127,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Cameo Otos W3 Wash (CLOTOSW3)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -134,7 +136,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -172,15 +173,17 @@
     "lensType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 41 W invalid."
+    "GDTF power 41 W invalid.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/otos-w3"

@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 60,
-  "maxLuminousIntensityCd": 149800.0,
-  "luminousFluxLm": 27000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 13000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -112,6 +112,8 @@
     }
   ],
   "pixelCount": 18,
+  "fullName": "BeamZ Pro Neutron Dot WW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -119,8 +121,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -154,14 +154,17 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 27000 lm is implausible for 60 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/neutron-dot-linkable-60w-ww-rgb/"

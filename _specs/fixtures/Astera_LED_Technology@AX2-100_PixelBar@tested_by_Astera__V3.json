@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 1572700.0,
-  "luminousFluxLm": 236380.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 21000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
   "weightKg": 7.4,
   "powerConnectorIn": "XLR5 / powerCON TRUE1",
   "powerConnectorOut": "XLR5 / powerCON TRUE1",
@@ -742,6 +742,8 @@
     }
   ],
   "pixelCount": 53,
+  "fullName": "Astera LED Technology AX2-100 PixelBar",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -752,8 +754,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -782,14 +782,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "ipRating": "manual"
+    "ipRating": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Battery up to 20 h. GDTF power 5824 W invalid."
+    "Battery up to 20 h. GDTF power 5824 W invalid.",
+    "GDTF luminous flux 236380 lm is implausible for 80 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://astera-led.com/wp-content/uploads/Datasheet_AX2_PixelBar_V1-1.pdf"

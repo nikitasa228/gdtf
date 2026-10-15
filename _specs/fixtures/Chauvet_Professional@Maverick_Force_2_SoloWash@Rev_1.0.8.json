@@ -104,6 +104,8 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "Chauvet Professional Maverick Force 2 SoloWash",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -151,7 +153,8 @@
     "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "manual"
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

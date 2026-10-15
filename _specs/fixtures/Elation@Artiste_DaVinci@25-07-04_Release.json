@@ -6,7 +6,7 @@
   "gdtfName": "Artiste DaVinci",
   "longName": "Artiste DaVinci",
   "shortName": "ArtDVinci",
-  "description": "The Artiste DaVinci™ features a new 270W LED Cool White LED engine with advanced optics delivering over 12,000 total lumens, ultra wide 6° to 48° zoom, full CMY color mixing and linear CTO color correction, 7 dichroic colors including CTB and Violet, 6 rotating glass and 9 static-stamped metal interchangeable gobos, 3-facet and linear rotating prisms, frost filter, full 360° bi-directional animation wheel, motorized iris, focus, and auto-focus, variable dimming curve modes, high speed electronic shutter and strobe, hibernation mode, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation's E-FLY™ internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, power in/out connections, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The Artiste DaVinci features a new 270W LED Cool White LED engine with advanced optics delivering over 12,000 total lumens, ultra wide 6° to 48° zoom, full CMY color mixing and linear CTO color correction, 7 dichroic colors including CTB and Violet, 6 rotating glass and 9 static-stamped metal interchangeable gobos, 3-facet and linear rotating prisms, frost filter, full 360° bi-directional animation wheel, motorized iris, focus, and auto-focus, variable dimming curve modes, high speed electronic shutter and strobe, hibernation mode, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation's E-FLY internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, power in/out connections, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 470,
-  "maxLuminousIntensityCd": 975500.0,
+  "maxLuminousIntensityCd": 980000.0,
   "luminousFluxLm": 12000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 25.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -131,6 +131,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Artiste DaVinci",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -176,14 +178,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/artiste-davinci"

@@ -4,7 +4,7 @@
   "fixtureTypeId": "09F90273-3E12-4E58-ADF9-AD6A2FEDB044",
   "gdtfDataVersion": "1.2",
   "gdtfName": "StudioCobTU_60",
-  "longName": "StudioCobTU_60",
+  "longName": "StudioCobTU 60",
   "shortName": "STCOBTU60",
   "description": "StudioCob TU is a powerful and incredibly versatile LED PAR. Fusing the old and the new, it pairs a 3.100 K COB LED source with a traditional parabolic reflector to deliver a proper PAR replacement with a homogenised output, single shadow and flexible lens options.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 109,
   "maxLuminousIntensityCd": 4700.0,
   "luminousFluxLm": 6697.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -96,6 +96,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights StudioCobTU 60",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,14 +140,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://prolights.it/en/product/STUDIOCOBDY"

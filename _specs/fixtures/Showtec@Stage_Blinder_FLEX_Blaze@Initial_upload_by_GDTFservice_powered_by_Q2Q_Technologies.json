@@ -29,7 +29,7 @@
   "powerConsumptionW": 700.0,
   "maxLuminousIntensityCd": 9400.0,
   "luminousFluxLm": 5229.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 1.47,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -112,6 +112,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Showtec Stage Blinder FLEX Blaze",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -153,11 +155,13 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

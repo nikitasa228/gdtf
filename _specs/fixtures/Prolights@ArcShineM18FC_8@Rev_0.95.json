@@ -4,7 +4,7 @@
   "fixtureTypeId": "F971DDB2-FF83-4876-8043-B13EFE54B3C5",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ArcShineM18FC_8",
-  "longName": "ArcShineM18FC_8",
+  "longName": "ArcShineM18FC 8",
   "shortName": "ASM18FC",
   "description": "The ArcShine M18FC and ArcShine M9FC are a series of linear LED fixtures, designed for interior and exterior applications (IP67) such as flood lighting, wall washing and accent lighting. There are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 4W each, with RGB + Warm White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 5700.0,
   "luminousFluxLm": 125.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.9,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcShineM18FC 8",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -147,13 +149,15 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "estimated"
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
   "_refs": [
     "https://luminaires.dialux.com/en/article/6z1wP-ujTdWGjbJno0IvqQ"
   ]

@@ -4,7 +4,7 @@
   "fixtureTypeId": "EFD27669-9933-4808-859E-9034054616F7",
   "gdtfDataVersion": "1.2",
   "gdtfName": "StudioCobDY_15",
-  "longName": "StudioCobDY_15",
+  "longName": "StudioCobDY 15",
   "shortName": "STCOBDY15",
   "description": "StudioCob DY is a powerful and incredibly versatile LED PAR. Fusing the old and the new, it pairs a 5.000 K COB LED source with a traditional parabolic reflector to deliver a proper PAR replacement with a homogenised output, single shadow and flexible lens options.",
   "manufacturer": "Prolights",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 109,
-  "maxLuminousIntensityCd": 85600.0,
+  "maxLuminousIntensityCd": 86000.0,
   "luminousFluxLm": 6874.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -96,6 +96,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights StudioCobDY 15",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,14 +140,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://prolights.it/en/product/STUDIOCOBDY"

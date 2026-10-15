@@ -29,7 +29,7 @@
   "powerConsumptionW": 620,
   "maxLuminousIntensityCd": 1033900,
   "luminousFluxLm": 9183.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 13.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -128,6 +128,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional Maverick Force 2 BeamWash",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -172,15 +174,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 45 W invalid."
+    "GDTF power 45 W invalid.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-force-2-beamwash/"

@@ -131,6 +131,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Focus Spot 7Z",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -178,7 +180,8 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

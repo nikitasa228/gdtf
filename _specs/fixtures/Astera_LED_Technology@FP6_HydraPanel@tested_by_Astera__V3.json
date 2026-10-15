@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 25,
-  "maxLuminousIntensityCd": 323100.0,
-  "luminousFluxLm": 48562.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 6700.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
   "weightKg": 0.6,
-  "powerConnectorIn": "DC Jack (external PSU / battery)",
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "DC Jack (external PSU / battery)",
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -743,6 +743,8 @@
   ],
   "pixelCount": 37,
   "subType": "Battery LED panel",
+  "fullName": "Astera LED Technology FP6 HydraPanel",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -750,8 +752,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -784,14 +784,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 48562 lm is implausible for 25 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://proav.co.uk/lighting/astera-hydrapanel"

@@ -6,7 +6,7 @@
   "gdtfName": "Proteus Brutus",
   "longName": "Proteus Brutus",
   "shortName": "Proteus Brutus",
-  "description": "The PROTEUS BRUTUS™ an extremely bright IP65 rated LED Wash FX fixture offering high intensity wash and effects qualities in any environment.\nProviding up to 75.000 lumens from its custom designed 1200W Peak Field LED engine the Proteus Brutus is the ideal fixture for any outdoor application requiring superior output, bright and powerful wash, quiet operation as well as stunning colors and effects.",
+  "description": "The PROTEUS BRUTUS an extremely bright IP65 rated LED Wash FX fixture offering high intensity wash and effects qualities in any environment.\nProviding up to 75.000 lumens from its custom designed 1200W Peak Field LED engine the Proteus Brutus is the ideal fixture for any outdoor application requiring superior output, bright and powerful wash, quiet operation as well as stunning colors and effects.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1700,
-  "maxLuminousIntensityCd": 9287200.0,
+  "maxLuminousIntensityCd": 9300000.0,
   "luminousFluxLm": 96000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 50.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -124,6 +124,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Brutus",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -170,14 +172,15 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/proteus-brutus"

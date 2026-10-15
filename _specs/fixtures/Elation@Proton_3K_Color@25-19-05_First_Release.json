@@ -6,7 +6,7 @@
   "gdtfName": "Proton 3K Color",
   "longName": "Protron 3K Color LED Strobe",
   "shortName": "Proton3KColor",
-  "description": "The Protron 3K Color™ is a new high powered LED strobe featuring (240) CREE™ XLamp™ 3W RGBW LEDs, 40,000 total peak lumens, 63° beam angle, (2) power modes (HIGH or LOW), strobe effect macros including burst, pulse, lightning, and full ON*, (2) silent cooling fans, electronic dimming, 3/5pin DMX and Locking Power Cable in/out connections, (4) button OLED control menu display, an integrated rigging yoke, 800W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The Protron 3K Color is a new high powered LED strobe featuring (240) CREE XLamp 3W RGBW LEDs, 40,000 total peak lumens, 63° beam angle, (2) power modes (HIGH or LOW), strobe effect macros including burst, pulse, lightning, and full ON*, (2) silent cooling fans, electronic dimming, 3/5pin DMX and Locking Power Cable in/out connections, (4) button OLED control menu display, an integrated rigging yoke, 800W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 800,
-  "maxLuminousIntensityCd": 95100.0,
+  "maxLuminousIntensityCd": 95000.0,
   "luminousFluxLm": 80000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 11.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -97,6 +97,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Protron 3K Color LED Strobe",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -136,14 +138,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.springtree.net/product/elation-protron-3k-color-led-strobe/"

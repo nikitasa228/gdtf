@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 740.0,
-  "maxLuminousIntensityCd": 90800.0,
-  "luminousFluxLm": 200000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 15000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 8.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
@@ -93,6 +93,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "MARK AVATAR 3000",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -100,8 +102,6 @@
     "manufacturer": "gdtf",
     "category": "estimated",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -131,13 +131,17 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 200000 lm is implausible for 740 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

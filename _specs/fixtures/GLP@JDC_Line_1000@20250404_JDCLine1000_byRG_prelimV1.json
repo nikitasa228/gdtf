@@ -4,7 +4,7 @@
   "fixtureTypeId": "935170CD-6BEB-443F-84B8-EEC744652C29",
   "gdtfDataVersion": "1.2",
   "gdtfName": "JDC Line 1000",
-  "longName": "GLP JDC Line 1000",
+  "longName": "JDC Line 1000",
   "shortName": "JDCLine1000",
   "description": "The JDC Line 1000 consists of two sections: Srtob Module A and Strobe Module B / two Times JDC Line 500 !",
   "manufacturer": "GLP",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1400,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 1010500.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 21000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 12.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -47,7 +47,10 @@
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 90.0,
+    "max": 90.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Rectangle",
@@ -108,6 +111,8 @@
   ],
   "pixelCount": 15,
   "subType": "Strobe bar",
+  "fullName": "GLP JDC Line 1000",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -115,7 +120,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -146,18 +150,20 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 5920 W invalid, removed."
+    "GDTF power 5920 W invalid, removed.",
+    "GDTF luminous flux 1.0105e+06 lm is implausible for 1400 W and was dropped",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.germanlightproducts.com/wp-content/uploads/2020/05/GLP-JDC-Line-1000-Quick-Start-Safety-Manual-EN-Rev-20220317-01.pdf"

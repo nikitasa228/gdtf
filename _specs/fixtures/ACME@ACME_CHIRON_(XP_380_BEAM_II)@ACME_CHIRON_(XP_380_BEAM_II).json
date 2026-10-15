@@ -4,9 +4,9 @@
   "fixtureTypeId": "730188B3-70D5-4539-85EE-5E4E83A4E935",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME CHIRON (XP 380 BEAM II)",
-  "longName": "ACME CHIRON (XP 380 BEAM II)",
+  "longName": "CHIRON (XP 380 BEAM II)",
   "shortName": "XP 380 BEAM II",
-  "description": "ACME XP-380 BEAM II 380W",
+  "description": "ACME CHIRON (XP 380 BEAM II): moving-head Discharge Lamp beam, with 2 deg beam, colour wheel, 16 gobos, prism, frost.",
   "manufacturer": "ACME",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 18000000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 21.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -87,7 +87,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -104,10 +104,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME CHIRON (XP 380 BEAM II)",
+  "gdtfDescription": "ACME XP-380 BEAM II 380W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -147,16 +150,18 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.acmelighting.com/Info/productdetail/cat_id/246/id/3602"

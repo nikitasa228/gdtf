@@ -6,7 +6,7 @@
   "gdtfName": "CUEPIX BLINDER WW4",
   "longName": "CUEPIX BLINDER WW4",
   "shortName": "CuePixBlndWW4",
-  "description": "The CUEPIX Blinder WW4™ features (4) long life 100W Warm White 3,200K COB LEDs, a 62° beam angle, RDM (Remote Device Management), individual control of each COB module, manual pan focus, variable and selectable dimming curves, strobe effects, flicker free operation for TV and Film, 3pin and 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 4 button control panel, integrated yoke and side mounting brackets, and a multi-voltage universal auto switching power supply (100-250v).",
+  "description": "The CUEPIX Blinder WW4 features (4) long life 100W Warm White 3,200K COB LEDs, a 62° beam angle, RDM (Remote Device Management), individual control of each COB module, manual pan focus, variable and selectable dimming curves, strobe effects, flicker free operation for TV and Film, 3pin and 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 4 button control panel, integrated yoke and side mounting brackets, and a multi-voltage universal auto switching power supply (100-250v).",
   "manufacturer": "Elation",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 427,
-  "maxLuminousIntensityCd": 56900.0,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 8,
+  "fullName": "Elation CUEPIX BLINDER WW4",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -113,7 +115,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -144,14 +145,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/cuepix-blinder-ww4"

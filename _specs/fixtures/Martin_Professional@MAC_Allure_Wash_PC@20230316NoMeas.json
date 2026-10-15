@@ -6,7 +6,7 @@
   "gdtfName": "MAC Allure Wash PC",
   "longName": "MAC Allure Wash PC",
   "shortName": "MACAllWas",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional MAC Allure Wash PC: moving-head LED wash, with 9.4-24.4 deg zoom, RGB colour mixing, colour wheel.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 960.0,
-  "maxLuminousIntensityCd": 397600.0,
+  "maxLuminousIntensityCd": 400000.0,
   "luminousFluxLm": 12000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 17.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
@@ -94,17 +94,19 @@
     }
   ],
   "pixelCount": 8,
+  "fullName": "Martin Professional MAC Allure Wash PC",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -138,11 +140,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

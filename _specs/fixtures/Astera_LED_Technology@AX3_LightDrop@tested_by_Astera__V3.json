@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 15,
-  "maxLuminousIntensityCd": 14900.0,
+  "maxLuminousIntensityCd": 15000.0,
   "luminousFluxLm": 860.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 0.68,
   "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
@@ -203,6 +203,8 @@
   ],
   "pixelCount": 2,
   "subType": "Battery uplight",
+  "fullName": "Astera LED Technology AX3 LightDrop",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -211,7 +213,6 @@
     "category": "manual",
     "voltageRangeV": "estimated",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -243,14 +244,16 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.panavision.com/lighting/lighting-products/heads/product-detail/xonffa5-ax3-lightdrop"

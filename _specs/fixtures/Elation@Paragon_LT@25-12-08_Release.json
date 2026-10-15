@@ -6,7 +6,7 @@
   "gdtfName": "Paragon LT",
   "longName": "Paragon LT",
   "shortName": "PrgnLT",
-  "description": "The PARAGON LT™ is a powerful IP54-rated LED profile fixture offering outstanding projection and beam qualities. Fully sealed from dust and moisture it is an ideal fixture for any show or temporary outdoor events.\n\nProviding up to 5000 lumens output from its custom-designed Variable CRI LED engine, the PARAGON LT is the ideal fixture for a variety of application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors.",
+  "description": "The PARAGON LT is a powerful IP54-rated LED profile fixture offering outstanding projection and beam qualities. Fully sealed from dust and moisture it is an ideal fixture for any show or temporary outdoor events.\n\nProviding up to 5000 lumens output from its custom-designed Variable CRI LED engine, the PARAGON LT is the ideal fixture for a variety of application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -23,9 +23,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1900,
-  "maxLuminousIntensityCd": 9619100.0,
+  "maxLuminousIntensityCd": 9600000.0,
   "luminousFluxLm": 50000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 43.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -123,6 +123,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Paragon LT",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -170,14 +172,15 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/paragon-lt"

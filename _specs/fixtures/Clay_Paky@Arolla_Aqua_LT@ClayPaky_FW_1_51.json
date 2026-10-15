@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 1400,
-  "maxLuminousIntensityCd": 8046900.0,
+  "maxLuminousIntensityCd": 8000000.0,
   "luminousFluxLm": 44000,
   "noiseLevelDb": 46.3,
   "weightKg": 41.0,
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Clay Paky Arolla Aqua LT",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,7 +161,8 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorOut": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

@@ -29,7 +29,7 @@
   "powerConsumptionW": 60.0,
   "maxLuminousIntensityCd": 22000.0,
   "luminousFluxLm": 3000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -64,7 +64,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBALC+UV",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -105,6 +108,8 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "BeamZ Pro BAC322 ProPar",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -112,7 +117,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -146,14 +150,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ]
 }

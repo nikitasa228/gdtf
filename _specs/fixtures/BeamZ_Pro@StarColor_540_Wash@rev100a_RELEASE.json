@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 451,
-  "maxLuminousIntensityCd": 132000.0,
+  "maxLuminousIntensityCd": 130000.0,
   "luminousFluxLm": 18000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 13.05,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -128,6 +128,8 @@
     }
   ],
   "pixelCount": 36,
+  "fullName": "BeamZ Pro StarColor540Wash",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -135,7 +137,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -167,18 +168,19 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/starcolor540-wash-light-36x-15w-rgbw-outdoor-mkii/"

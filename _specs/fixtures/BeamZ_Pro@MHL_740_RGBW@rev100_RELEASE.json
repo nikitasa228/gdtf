@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 276,
-  "maxLuminousIntensityCd": 722500.0,
+  "maxLuminousIntensityCd": 720000.0,
   "luminousFluxLm": 5000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 9.15,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -101,6 +101,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "BeamZ Pro MHL740 RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -145,15 +147,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/mhl740-led-wash-moving-head-with-zoom/"

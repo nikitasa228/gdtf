@@ -4,7 +4,7 @@
   "fixtureTypeId": "A7907E4F-AD53-48AA-A048-533C2E8E756F",
   "gdtfDataVersion": "1.0",
   "gdtfName": "DOT XL FW",
-  "longName": "GSARC_DOT XL FW",
+  "longName": "DOT XL FW",
   "shortName": "DOT XL FW",
   "description": "DOT is a new architectural outdoor projector lighting series. 5 models all with the same aesthetic and fully customizable with multiple white and color variants,beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": 11700.0,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.5,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -84,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural projector",
+  "fullName": "GSARC DOT XL FW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,14 +126,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "No per-model data published; power/weight scaled within the series from the documented models."
+    "No per-model data published; power/weight scaled within the series from the documented models.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 220.0,
-  "maxLuminousIntensityCd": 575900.0,
+  "maxLuminousIntensityCd": 580000.0,
   "luminousFluxLm": 2842.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 6.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -91,6 +91,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "BOS Lighting HP7 QUAD 350",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -135,11 +137,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

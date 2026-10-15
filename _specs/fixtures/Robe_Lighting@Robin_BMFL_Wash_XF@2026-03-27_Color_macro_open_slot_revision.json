@@ -6,7 +6,7 @@
   "gdtfName": "Robin BMFL Wash XF",
   "longName": "Robin BMFL Wash XF",
   "shortName": "BMFL Wash XF",
-  "description": "The Optional XF module expands the features of the BMFL™ Wash with innovative internal Scrim having a graduated filter, which can be inserted to the light path and allowing rotation of the whole assembly +/- 180° to achieve even wash coverage when projecting onto a non-perpendicular surface and internal motorised barndoors for creating different unique shapes and chases which also simulate barndoor effects.",
+  "description": "The Optional XF module expands the features of the BMFL Wash with innovative internal Scrim having a graduated filter, which can be inserted to the light path and allowing rotation of the whole assembly +/- 180° to achieve even wash coverage when projecting onto a non-perpendicular surface and internal motorised barndoors for creating different unique shapes and chases which also simulate barndoor effects.",
   "manufacturer": "Robe Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -23,9 +23,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 2000.0,
-  "maxLuminousIntensityCd": 4448000.0,
+  "maxLuminousIntensityCd": 4400000.0,
   "luminousFluxLm": 38000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 35.8,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -91,6 +91,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin BMFL Wash XF",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -135,11 +137,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

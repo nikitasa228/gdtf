@@ -6,7 +6,7 @@
   "gdtfName": "SIXPAR 100 IP",
   "longName": "SIXPAR 100 IP",
   "shortName": "Sixpar100IP",
-  "description": "The IP65 rated SIXPAR 100IP™ features (7) 12W 6-IN-1 RGBAW+UV LEDs, 15° beam and 25° field angles, electronic strobe and dimming (0-100%), 5 variable dimming curve modes, dual yoke / floor stand, multiple unit power linking, RDM (remote device management), rugged die-cast aluminum exterior, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-250v).",
+  "description": "The IP65 rated SIXPAR 100IP features (7) 12W 6-IN-1 RGBAW+UV LEDs, 15° beam and 25° field angles, electronic strobe and dimming (0-100%), 5 variable dimming curve modes, dual yoke / floor stand, multiple unit power linking, RDM (remote device management), rugged die-cast aluminum exterior, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-250v).",
   "manufacturer": "Elation",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 89,
-  "maxLuminousIntensityCd": 41300.0,
+  "maxLuminousIntensityCd": 41000.0,
   "luminousFluxLm": 3175.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -101,6 +101,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation SIXPAR 100 IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -142,14 +144,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://device.report/elation-professional/SIXPAR-100IP"

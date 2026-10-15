@@ -29,7 +29,7 @@
   "powerConsumptionW": 30.0,
   "maxLuminousIntensityCd": 3700.0,
   "luminousFluxLm": 282.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.5,
   "powerConnectorIn": "DIN3 (low-voltage DC)",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclDisplayUNFCWash15-30",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -139,13 +141,15 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

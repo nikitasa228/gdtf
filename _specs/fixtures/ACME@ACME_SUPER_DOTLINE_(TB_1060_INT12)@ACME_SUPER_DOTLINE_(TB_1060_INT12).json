@@ -4,7 +4,7 @@
   "fixtureTypeId": "49938845-8AAF-40BF-9464-8EAD30EC81C4",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME SUPER DOTLINE (TB 1060 INT12)",
-  "longName": "ACME SUPER DOTLINE (TB 1060 INT12)",
+  "longName": "SUPER DOTLINE (TB 1060 INT12)",
   "shortName": "TB 1060 INT12",
   "description": "ACME SUPER DOTLINE(TB 1060 NIT12)12*60W LED",
   "manufacturer": "ACME",
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 1155,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 8600000.0,
   "luminousFluxLm": 23000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 24.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 202,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -111,6 +111,8 @@
     }
   ],
   "pixelCount": 42,
+  "fullName": "ACME SUPER DOTLINE (TB 1060 INT12)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -146,23 +148,23 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
-    "panRangeDeg": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Tilt-only bar."
+    "Tilt-only bar.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/SUPER-DOTLINE"

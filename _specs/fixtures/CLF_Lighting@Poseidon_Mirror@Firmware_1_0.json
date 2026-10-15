@@ -29,7 +29,7 @@
   "powerConsumptionW": 850.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 15.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -82,6 +82,8 @@
   ],
   "pixelCount": 0,
   "subType": "Moving-mirror attachment",
+  "fullName": "CLF Lighting Poseidon Mirror",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -122,19 +124,20 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "lightSourceType",
-    "beamAngleDeg",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "lensType"
+    "beamAngleDeg",
+    "colorTemperatureK",
+    "lensType",
+    "lightSourceType",
+    "maxLuminousIntensityCd"
   ],
   "_issues": [
-    "Motorised mirror accessory, no light source."
+    "Moving mirror head without its own light source (reflects external beams).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

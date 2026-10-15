@@ -4,7 +4,7 @@
   "fixtureTypeId": "161BB73E-9F90-4768-B56E-F44467FD02D7",
   "gdtfDataVersion": "1.2",
   "gdtfName": "RoboSpot MotionCamera",
-  "longName": "RoboSpot™ MotionCamera",
+  "longName": "RoboSpot MotionCamera",
   "shortName": "MotionCamera",
   "description": "The RoboSpot MotionCamera is a revolutionary moving head fixture featuring an integrated HD camera remotely controlled via DMX to pan, tilt, zoom and autofocus.\nFeaturing a full HD camera with high light sensitivity capabilities down to 0.3 Lux illumination levels, the fixture provides a “first person view” for the followspot operator to track the performer across the stage. Video signals are instantly transferred to the RoboSpot BaseStation via a high-speed Ethernet cat5 cable.",
   "manufacturer": "Robe Lighting",
@@ -71,7 +71,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -85,6 +85,8 @@
   ],
   "pixelCount": 0,
   "subType": "Follow-spot tracking camera (RoboSpot)",
+  "fullName": "Robe Lighting RoboSpot MotionCamera",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,11 +126,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
-  "_missing": [
+  "_missing": [],
+  "_notApplicable": [
     "noiseLevelDb"
   ],
-  "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "Dimmer Pack 4",
   "longName": "Dimmer Pack 4",
   "shortName": "DP4",
-  "description": "Compact Dimmer Pack 4 with 20A",
+  "description": "PRstage Dimmer Pack 4: device (4-channel dimmer pack).",
   "manufacturer": "PRstage",
   "category": "OTHER",
   "supportedPowerNetworks": [
@@ -94,10 +94,14 @@
   ],
   "pixelCount": 0,
   "subType": "4-channel dimmer pack",
+  "maxLoadW": 4600,
+  "fullName": "PRstage Dimmer Pack 4",
+  "gdtfDescription": "Compact Dimmer Pack 4 with 20A",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "gdtf",
@@ -125,17 +129,19 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "lightSourceType": "manual",
+    "maxLoadW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
+  "_missing": [],
+  "_notApplicable": [
+    "noiseLevelDb",
     "powerConsumptionW"
   ],
-  "_notApplicable": [
-    "lensType",
-    "noiseLevelDb"
-  ],
-  "_issues": []
+  "_issues": [
+    "4-channel dimmer pack, 20 A total (about 4600 W of connected load at 230 V); its own consumption is negligible."
+  ]
 }

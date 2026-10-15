@@ -6,7 +6,7 @@
   "gdtfName": "Fuze SFX",
   "longName": "Fuze SFX",
   "shortName": "FuzeSFX",
-  "description": "The FUZE SFX™ is a new concept LED Spot FX fixture designed for a variety of applications requiring a compact and powerful multi-purpose luminaire. The SFX is capable of projecting tight beams to wide washes using a highly efficient optical design while providing over 12,000 lumens of output from its 300W white LED engine.\nHousing 18 carefully designed gobos and a 4.5° to 38° zoom, the FUZE SFX can create stunning mid-air FX as easily as precise image projections. The SFX allows for even stage washes utilizing its variable frost filter while a wide array of beautiful colors is possible from a seamless CMY color-mixing system plus color wheel. Dual independent rotating and overlaying prisms plus a fast iris round out the comprehensive feature set.\nA truly remarkable compact powerhouse for any application, the FUZE SFX is sure to create amazing effects, outstanding projections and beautiful bright washes on any stage.",
+  "description": "The FUZE SFX is a new concept LED Spot FX fixture designed for a variety of applications requiring a compact and powerful multi-purpose luminaire. The SFX is capable of projecting tight beams to wide washes using a highly efficient optical design while providing over 12,000 lumens of output from its 300W white LED engine.\nHousing 18 carefully designed gobos and a 4.5° to 38° zoom, the FUZE SFX can create stunning mid-air FX as easily as precise image projections. The SFX allows for even stage washes utilizing its variable frost filter while a wide array of beautiful colors is possible from a seamless CMY color-mixing system plus color wheel. Dual independent rotating and overlaying prisms plus a fast iris round out the comprehensive feature set.\nA truly remarkable compact powerhouse for any application, the FUZE SFX is sure to create amazing effects, outstanding projections and beautiful bright washes on any stage.",
   "manufacturer": "Elation",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 432,
-  "maxLuminousIntensityCd": 1753600.0,
+  "maxLuminousIntensityCd": 1800000.0,
   "luminousFluxLm": 12135.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 20.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -97,7 +97,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze SFX",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,14 +161,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/fuze-sfx"

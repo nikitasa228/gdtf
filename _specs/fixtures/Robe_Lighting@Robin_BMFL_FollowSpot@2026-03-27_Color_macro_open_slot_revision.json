@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 2000.0,
-  "maxLuminousIntensityCd": 4655200.0,
+  "maxLuminousIntensityCd": 4700000.0,
   "luminousFluxLm": 39770.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 35.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -95,6 +95,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin BMFL FollowSpot",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,11 +140,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

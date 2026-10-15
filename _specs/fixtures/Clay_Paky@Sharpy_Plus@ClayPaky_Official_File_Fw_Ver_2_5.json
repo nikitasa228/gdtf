@@ -6,7 +6,7 @@
   "gdtfName": "Sharpy Plus",
   "longName": "Sharpy Plus",
   "shortName": "SharP",
-  "description": "Official ClayPaky File\nSHARPY PLUS is the first true 100% HYBRID unit, able to be a perfect beam light and a perfect spotlight. It is suitable for every occasion, with an extraordinary luminous efficiency which ensures substantial savings through lower power consumption.\nThe SHARPY PLUS has no match. With its wide range of effects and high light output, it beats all the lights in the same category and comes very close to those of higher wattages",
+  "description": "Clay Paky Sharpy Plus: moving-head Discharge Lamp beam/spot/wash hybrid, with 3-36 deg zoom, CMY colour mixing, colour wheel, 26 gobos, prism, frost.",
   "manufacturer": "Clay Paky",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -110,10 +110,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Clay Paky Sharpy Plus",
+  "gdtfDescription": "Official ClayPaky File\nSHARPY PLUS is the first true 100% HYBRID unit, able to be a perfect beam light and a perfect spotlight. It is suitable for every occasion, with an extraordinary luminous efficiency which ensures substantial savings through lower power consumption.\nThe SHARPY PLUS has no match. With its wide range of effects and high light output, it beats all the lights in the same category and comes very close to those of higher wattages",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -158,7 +161,8 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

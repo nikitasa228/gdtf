@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 220.0,
-  "maxLuminousIntensityCd": 463600.0,
+  "maxLuminousIntensityCd": 460000.0,
   "luminousFluxLm": 2288.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 5.7,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -94,6 +94,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin LEDBeam 150 FW RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,11 +140,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

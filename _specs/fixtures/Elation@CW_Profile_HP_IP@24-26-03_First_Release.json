@@ -6,7 +6,7 @@
   "gdtfName": "CW Profile HP IP",
   "longName": "CW Profile HP IP",
   "shortName": "CWProfHPIP",
-  "description": "The IP65 rated CW Profile HP IP™ ellipsoidal features a High Power 130W Cool White 5,600K LED engine producing >90CRI 12,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, supports B size metal gobos (2 sample gobos included, single gobo holder not included) and an optional IP65 rated DMX controlled dual gobo rotator (sold separately), manual focus, DMX controlled electronic strobe, 16bit dimming and selectable dimming curve modes, flicker free operation for TV and FILM, adjustable refresh frequency and gamma brightness, IP rated 5pin DMX and IP65 Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The IP65 rated CW Profile HP IP ellipsoidal features a High Power 130W Cool White 5,600K LED engine producing >90CRI 12,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, supports B size metal gobos (2 sample gobos included, single gobo holder not included) and an optional IP65 rated DMX controlled dual gobo rotator (sold separately), manual focus, DMX controlled electronic strobe, 16bit dimming and selectable dimming curve modes, flicker free operation for TV and FILM, adjustable refresh frequency and gamma brightness, IP rated 5pin DMX and IP65 Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 160,
-  "maxLuminousIntensityCd": 468800.0,
-  "luminousFluxLm": 36000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 83000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -97,6 +97,8 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "Elation CW Profile HP IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -104,8 +106,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -137,14 +137,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Power assumed equal to the IP20 CW Profile HP (same 130 W engine)."
+    "Power assumed equal to the IP20 CW Profile HP (same 130 W engine).",
+    "GDTF luminous flux 36000 lm is implausible for 160 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

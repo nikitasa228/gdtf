@@ -29,7 +29,7 @@
   "powerConsumptionW": 24.0,
   "maxLuminousIntensityCd": 1700.0,
   "luminousFluxLm": 330.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.25,
   "powerConnectorIn": "Schuko",
   "powerConnectorOut": null,
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -136,6 +136,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclMiniFresnelFC",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -177,13 +179,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

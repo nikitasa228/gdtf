@@ -6,7 +6,7 @@
   "gdtfName": "Robin LEDBeam 350",
   "longName": "Robin LEDBeam 350",
   "shortName": "LEDBeam 350",
-  "description": "Bigger, bolder, brighter! Building on the highly successful LEDBeam 150™ the big brother LEDBeam 350™ has arrived, delivering more punch and presence to create even more fast sweeping beams and gorgeous washes.",
+  "description": "Bigger, bolder, brighter! Building on the highly successful LEDBeam 150 the big brother LEDBeam 350 has arrived, delivering more punch and presence to create even more fast sweeping beams and gorgeous washes.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": 1332200.0,
+  "maxLuminousIntensityCd": 1300000.0,
   "luminousFluxLm": 6574.0,
   "noiseLevelDb": 31,
   "weightKg": 9.85,
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -96,6 +96,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin LEDBeam 350",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -141,12 +143,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "noiseLevelDb": "manual"
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 31 dB(A) @1 m in Quiet fan mode."
+    "Noise 31 dB(A) @1 m in Quiet fan mode.",
+    "Typical-value estimates (no published data): ipRating"
   ],
   "_refs": [
     "https://www.robe.cz/api/support-files/download/downloads/standards/Robin_series/Noise/ROBIN_LEDBeam_350_Noise_Measurement.pdf"

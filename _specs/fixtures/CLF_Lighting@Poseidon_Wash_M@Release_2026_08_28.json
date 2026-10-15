@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 600.0,
-  "maxLuminousIntensityCd": 54900.0,
+  "maxLuminousIntensityCd": 55000.0,
   "luminousFluxLm": 300.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 19.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -95,6 +95,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Poseidon Wash M",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -140,11 +142,13 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
-    "description": "manual"
+    "description": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

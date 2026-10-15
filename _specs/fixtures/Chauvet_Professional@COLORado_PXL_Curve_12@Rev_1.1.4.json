@@ -35,7 +35,7 @@
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 200.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -135,6 +135,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional COLORado PXL Curve 12",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -174,12 +176,12 @@
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

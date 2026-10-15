@@ -4,7 +4,7 @@
   "fixtureTypeId": "E6BD2A44-9192-4A29-B852-9C7713EB64E3",
   "gdtfDataVersion": "1.2",
   "gdtfName": "StudioCobPlusTW_53",
-  "longName": "StudioCobPlusTW_53",
+  "longName": "StudioCobPlusTW 53",
   "shortName": "STCOBPTW_53",
   "description": "StudioCob PlusTW is a powerful, incredibly versatile and IP65 rated LED PAR. Fusing the old and the new, it pairs a COB LED source with a traditional parabolic reflector to deliver a proper PAR replacement with a homogenised output, single shadow and flexible lens options.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 157,
   "maxLuminousIntensityCd": 3700.0,
   "luminousFluxLm": 3516.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 4.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -100,6 +100,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights StudioCobPlusTW 53",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,14 +145,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/STUDIOCOBPLUSTW"

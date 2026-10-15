@@ -29,7 +29,7 @@
   "powerConsumptionW": 235,
   "maxLuminousIntensityCd": 12200,
   "luminousFluxLm": 12248.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 6.8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "ADJ Encore Burst 200",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -113,7 +115,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -145,16 +146,18 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "2-cell warm-white COB blinder/strobe."
+    "2-cell warm-white COB blinder/strobe.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/encore-burst-200"

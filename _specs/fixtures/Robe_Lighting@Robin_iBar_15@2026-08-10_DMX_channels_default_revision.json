@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 170.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 1400.0,
   "luminousFluxLm": 418.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 11.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -49,7 +49,10 @@
     "XLR5"
   ],
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 30.0,
+    "max": 30.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Wash",
@@ -105,6 +108,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iBar 15",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,15 +148,16 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

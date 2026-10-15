@@ -4,9 +4,9 @@
   "fixtureTypeId": "704BDFBC-AE71-4596-8FA0-F5B37D1B0C7A",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iTetra2",
-  "longName": "Robin iTetra2™",
+  "longName": "Robin iTetra2",
   "shortName": "iTetra2",
-  "description": "The impressive IP65-rated iTetra2™ moving linear LED bar joins the Robe iSeries, retaining all the coolness and functionality of the indoor version with the added benefit of Robe’s self-managing, low-maintenance ingress protection technology which very efficiently stops rain, dust, humidity, smoke or haze damage.\nWith an identical DMX map, features and performance to Tetra2™, the outdoor iTetra2™ also has the onboard patented RAINS™ (Robe Automatic Ingress Neutralization System) which manages humidity, temperature and pressure control. As an active monitoring system, RAINS™ automatically removes any moisture detected within the fixture.\niTetra2™ automatically runs a self-test whenever it senses a cover is removed and replaced which provides an error message if gaskets or covers are not replaced correctly or locking screws are not tightened, ensuring maximum protection.\nThe lightweight aluminium alloy structure provides a dust-free environment for the optics, eliminating the need for frequent cleaning and routine maintenance, also reducing UV damage to the plastic parts.",
+  "description": "The impressive IP65-rated iTetra2 moving linear LED bar joins the Robe iSeries, retaining all the coolness and functionality of the indoor version with the added benefit of Robe’s self-managing, low-maintenance ingress protection technology which very efficiently stops rain, dust, humidity, smoke or haze damage.\nWith an identical DMX map, features and performance to Tetra2, the outdoor iTetra2 also has the onboard patented RAINS (Robe Automatic Ingress Neutralization System) which manages humidity, temperature and pressure control. As an active monitoring system, RAINS automatically removes any moisture detected within the fixture.\niTetra2 automatically runs a self-test whenever it senses a cover is removed and replaced which provides an error message if gaskets or covers are not replaced correctly or locking screws are not tightened, ensuring maximum protection.\nThe lightweight aluminium alloy structure provides a dust-free environment for the optics, eliminating the need for frequent cleaning and routine maintenance, also reducing UV damage to the plastic parts.",
   "manufacturer": "Robe Lighting",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 600.0,
-  "maxLuminousIntensityCd": 136100.0,
+  "maxLuminousIntensityCd": 140000.0,
   "luminousFluxLm": 744.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 29.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 191.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -109,6 +109,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Robe Lighting Robin iTetra2",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -119,7 +121,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -153,11 +154,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ]
 }

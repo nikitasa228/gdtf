@@ -29,7 +29,7 @@
   "powerConsumptionW": 372,
   "maxLuminousIntensityCd": 7000.0,
   "luminousFluxLm": 22508.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 17.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -141,6 +141,8 @@
   ],
   "pixelCount": 1,
   "subType": "Soft light panel",
+  "fullName": "Chauvet Professional onAir Panel 2 IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -182,13 +184,15 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/onair-ip-panel-2/"
   ]

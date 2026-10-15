@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 660.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 220000.0,
   "luminousFluxLm": 1837.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 25.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -107,6 +107,8 @@
     }
   ],
   "pixelCount": 5,
+  "fullName": "LIGHT SKY IP1940DII",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,14 +151,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "estimated",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

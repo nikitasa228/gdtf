@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 450,
-  "maxLuminousIntensityCd": 10240800.0,
+  "maxLuminousIntensityCd": 10000000.0,
   "luminousFluxLm": 14000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 25.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -102,6 +102,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Hydro Beam CMY",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -148,15 +150,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Osram Sirius HRI 310 W lamp."
+    "Osram Sirius HRI 310 W lamp.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/hydro-beam-cmy"

@@ -72,6 +72,8 @@
   },
   "dmxModes": [],
   "pixelCount": 0,
+  "fullName": "Elation Quick Long Lock Omega Bracket",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -99,15 +101,16 @@
     "lightSourceType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
+    "controlSignal",
+    "noiseLevelDb",
     "powerConsumptionW",
     "powerSupplyType",
-    "controlSignal",
-    "supportedPowerNetworks",
-    "noiseLevelDb"
+    "supportedPowerNetworks"
   ],
   "_issues": []
 }

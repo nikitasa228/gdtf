@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 55,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 730000.0,
   "luminousFluxLm": 1000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.65,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": "IEC C14",
@@ -61,7 +61,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBWAV",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -69,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -83,6 +86,8 @@
   ],
   "pixelCount": 1,
   "subType": "LED effect (rotating sphere)",
+  "fullName": "ADJ Starburst",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -120,17 +125,19 @@
     "supportedPowerNetworks": "manual",
     "beamAngleDeg": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/starburst"

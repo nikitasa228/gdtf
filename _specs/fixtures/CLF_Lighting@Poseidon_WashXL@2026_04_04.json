@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 800,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 2900000.0,
   "luminousFluxLm": 20000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 27.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -95,6 +95,8 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "CLF Lighting Poseidon WashXL",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -139,16 +141,17 @@
     "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.clf-lighting.com/product/poseidon-wash-xl/"

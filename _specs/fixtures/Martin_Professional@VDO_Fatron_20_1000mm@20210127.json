@@ -6,7 +6,7 @@
   "gdtfName": "VDO Fatron 20 1000mm",
   "longName": "VDO Fatron 20 1000mm",
   "shortName": "VDOFat20 1000",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VDO Fatron 20 1000mm: LED bar, with 110 deg beam, RGB colour mixing.",
   "manufacturer": "Martin Professional",
   "category": "LED BAR",
   "supportedPowerNetworks": null,
@@ -15,7 +15,7 @@
   "powerConsumptionW": 60,
   "maxLuminousIntensityCd": 1200.0,
   "luminousFluxLm": 4500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.5,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -58,7 +58,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -159,14 +159,16 @@
     }
   ],
   "pixelCount": 600,
+  "fullName": "Martin Professional VDO Fatron 20 1000mm",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -194,18 +196,21 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "supportedPowerNetworks",
-    "lensType"
+    "lensType",
+    "supportedPowerNetworks"
   ],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/vdo-fatron-20"

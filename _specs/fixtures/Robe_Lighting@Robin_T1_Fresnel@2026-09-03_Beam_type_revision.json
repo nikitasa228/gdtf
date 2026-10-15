@@ -4,7 +4,7 @@
   "fixtureTypeId": "681CD12F-CF51-4227-89FD-722FE8D497E0",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T1 Fresnel",
-  "longName": "Robin T1 Fresnel™",
+  "longName": "Robin T1 Fresnel",
   "shortName": "T1 Fresnel",
   "description": "T1 Fresnel. The new ONE and only wash fixture you need for theatre, television and touring.",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 750.0,
-  "maxLuminousIntensityCd": 616400.0,
+  "maxLuminousIntensityCd": 620000.0,
   "luminousFluxLm": 10320.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 22.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -108,6 +108,8 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "Robe Lighting Robin T1 Fresnel",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -153,11 +155,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -4,7 +4,7 @@
   "fixtureTypeId": "E2C431F0-E74D-4FEB-931F-0BD0D4C3E945",
   "gdtfDataVersion": "1.1",
   "gdtfName": "SkyPanel S120C",
-  "longName": "ARRI SkyPanel S120C",
+  "longName": "SkyPanel S120C",
   "shortName": "S120C",
   "description": "SkyPanel S120-C RGBW Soft Light with ECC",
   "manufacturer": "ARRI",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 400,
-  "maxLuminousIntensityCd": 14500.0,
+  "maxLuminousIntensityCd": 14000.0,
   "luminousFluxLm": 50000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 16.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -260,6 +260,8 @@
   ],
   "pixelCount": 3,
   "subType": "Soft light panel",
+  "fullName": "ARRI SkyPanel S120C",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -267,7 +269,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -300,15 +301,18 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Lamphead powered by external PSU (approx. 4 kg, powerCON TRUE1 in/thru). GDTF power 900 W invalid."
+    "Lamphead powered by external PSU (approx. 4 kg, powerCON TRUE1 in/thru). GDTF power 900 W invalid.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.arri.com:443/resource/blob/31138/118c7a57a99da102b01e9240037faf02/arri-skypanel-s120-c-data-sheet-de-data.pdf"

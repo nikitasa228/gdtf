@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 800.0,
-  "maxLuminousIntensityCd": 21556000.0,
+  "maxLuminousIntensityCd": 22000000.0,
   "luminousFluxLm": 53706.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 31.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 200.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "Infinity Furion FX402 Bar",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -116,7 +118,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -150,11 +151,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ]
 }

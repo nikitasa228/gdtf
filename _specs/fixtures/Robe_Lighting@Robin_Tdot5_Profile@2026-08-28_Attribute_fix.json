@@ -6,7 +6,7 @@
   "gdtfName": "Robin Tdot5 Profile",
   "longName": "Robin T.5 Profile",
   "shortName": "T.5 Profile",
-  "description": "T.5 Profile™\nCan a classic be miniaturized without compromising performance? Introducing the T.5 Profile™ — the latest member of the Robe T-Series, offering all the features loved by theatre and broadcast professionals in a more compact form.\nIn response to high demand for a smaller version of the renowned T1 Profile™, the T.5 Profile™ delivers the same top-tier performance, from advanced controls to its powerful, nuanced output.\nPowered by a 350W MSL™ Multi-Spectral light source, the T.5 Profile™ delivers rich, precise colour with an impressive 7.500 lm output and a seamless CCT range of 2.700-8.000K, extendable up to 10.000K. You’ll also enjoy virtual CRI control (80-95) and linear green content adjustment, giving you total control over every shade.\nBeam control is razor-sharp thanks to our patented Plano4 FC™ system, featuring four independent shutter planes and 120-degree module rotation. Each blade offers full curtain ability, providing precision and increased flexibility.\nDespite its smaller size, the T.5 is packed with familiar features, including a 5°-55° zoom range for shorter throws, a rotatable and indexable gobo wheel with replaceable gobos, iris, animation wheel, and interchangeable MagFrost™ filters for visual effects. The multi-6-facet prism further enhances dynamic imagery.\nDesigned for the most noise-sensitive environments, the T.5 incorporates innovative noise-reduction technology, comprehensive fan control, and our Robe AirLOC™ system, which keeps key components cool while reducing surface airflow noise and minimizing the need for frequent optical cleaning.\nTechnologies like Cpulse™ flicker-free management, EMS™ stabilization, and onboard RCC™ colour calibration ensure flawless performance, whether in the spotlight or on camera.\nWith the T.5 Profile, you get the power, control, and versatility of the T1, now in a lighter, more agile design.",
+  "description": "T.5 Profile\nCan a classic be miniaturized without compromising performance? Introducing the T.5 Profile — the latest member of the Robe T-Series, offering all the features loved by theatre and broadcast professionals in a more compact form.\nIn response to high demand for a smaller version of the renowned T1 Profile, the T.5 Profile delivers the same top-tier performance, from advanced controls to its powerful, nuanced output.\nPowered by a 350W MSL Multi-Spectral light source, the T.5 Profile delivers rich, precise colour with an impressive 7.500 lm output and a seamless CCT range of 2.700-8.000K, extendable up to 10.000K. You’ll also enjoy virtual CRI control (80-95) and linear green content adjustment, giving you total control over every shade.\nBeam control is razor-sharp thanks to our patented Plano4 FC system, featuring four independent shutter planes and 120-degree module rotation. Each blade offers full curtain ability, providing precision and increased flexibility.\nDespite its smaller size, the T.5 is packed with familiar features, including a 5°-55° zoom range for shorter throws, a rotatable and indexable gobo wheel with replaceable gobos, iris, animation wheel, and interchangeable MagFrost filters for visual effects. The multi-6-facet prism further enhances dynamic imagery.\nDesigned for the most noise-sensitive environments, the T.5 incorporates innovative noise-reduction technology, comprehensive fan control, and our Robe AirLOC system, which keeps key components cool while reducing surface airflow noise and minimizing the need for frequent optical cleaning.\nTechnologies like Cpulse flicker-free management, EMS stabilization, and onboard RCC colour calibration ensure flawless performance, whether in the spotlight or on camera.\nWith the T.5 Profile, you get the power, control, and versatility of the T1, now in a lighter, more agile design.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 480.0,
-  "maxLuminousIntensityCd": 877900.0,
+  "maxLuminousIntensityCd": 880000.0,
   "luminousFluxLm": 7500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 20.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -88,7 +88,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -117,6 +117,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T.5 Profile",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -164,11 +166,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

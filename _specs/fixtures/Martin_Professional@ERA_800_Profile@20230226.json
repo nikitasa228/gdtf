@@ -6,7 +6,7 @@
   "gdtfName": "ERA 800 Profile",
   "longName": "ERA 800 Profile",
   "shortName": "ERA800Pro",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional ERA 800 Profile: moving-head LED spot, with 6.1-48.9 deg zoom, CMY colour mixing, colour wheel, 19 gobos, prism, frost.",
   "manufacturer": "Martin Professional",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1270.0,
-  "maxLuminousIntensityCd": 2752700.0,
+  "maxLuminousIntensityCd": 2800000.0,
   "luminousFluxLm": 35000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 40.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -100,7 +100,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -113,10 +113,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional ERA 800 Profile",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -159,11 +162,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

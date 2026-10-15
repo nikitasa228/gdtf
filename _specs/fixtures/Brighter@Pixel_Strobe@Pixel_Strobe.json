@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 30.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 56546.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 270.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
   "weightKg": 14.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -66,7 +66,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -74,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -107,6 +110,8 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "Brighter Pixel Strobe",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -116,7 +121,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -145,13 +149,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "estimated"
+    "description": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "GDTF luminous flux 56546 lm is implausible for 30 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+  ]
 }

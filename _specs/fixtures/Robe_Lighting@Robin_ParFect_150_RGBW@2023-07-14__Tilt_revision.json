@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 220.0,
-  "maxLuminousIntensityCd": 575900.0,
+  "maxLuminousIntensityCd": 580000.0,
   "luminousFluxLm": 2842.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 5.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -92,6 +92,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin ParFect 150 RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -134,11 +136,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

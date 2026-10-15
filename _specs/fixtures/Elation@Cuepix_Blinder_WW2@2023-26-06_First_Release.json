@@ -6,7 +6,7 @@
   "gdtfName": "Cuepix Blinder WW2",
   "longName": "Cuepix Blinder WW2",
   "shortName": "CuepixWW2",
-  "description": "The CUEPIX Blinder WW2™ features (2) long life 100W Warm White 3,200K COB LEDs, a 60° beam angle, RDM (Remote Device Management), individual control of each COB module including manual pan focus, variable and selectable dimming curves, strobe effects, flicker free operation for TV and Film, 3pin and 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 4 button control panel, integrated rigging bracket, and a multi-voltage universal auto switching power supply (100-250v).",
+  "description": "The CUEPIX Blinder WW2 features (2) long life 100W Warm White 3,200K COB LEDs, a 60° beam angle, RDM (Remote Device Management), individual control of each COB module including manual pan focus, variable and selectable dimming curves, strobe effects, flicker free operation for TV and Film, 3pin and 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 4 button control panel, integrated rigging bracket, and a multi-voltage universal auto switching power supply (100-250v).",
   "manufacturer": "Elation",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 229,
-  "maxLuminousIntensityCd": 19600.0,
+  "maxLuminousIntensityCd": 20000.0,
   "luminousFluxLm": 23600.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 5.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -15.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation Cuepix Blinder WW2",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -105,7 +107,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -137,14 +138,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/cuepix-blinder-ww2"

@@ -4,7 +4,7 @@
   "fixtureTypeId": "7848AF59-DA35-4171-889F-988BADD44564",
   "gdtfDataVersion": "1.1",
   "gdtfName": "EclFS_36",
-  "longName": "EclipseFS_36",
+  "longName": "EclipseFS 36",
   "shortName": "ECLFS_36",
   "description": "High power RGBL full spectrum ellipsoidal LED.\nEclipse FS is a full colour elipsoidal LED, designed to deliver a full range of pastels, saturates and whites, both with or without gobos. The Eclipse FS’ RGB + Lime LED engine has been specially engineered to provide a full spectrum and full output in the most discerning environments, regardless of which role the Eclipse FS is playing.",
   "manufacturer": "Prolights",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 14300.0,
+  "maxLuminousIntensityCd": 14000.0,
   "luminousFluxLm": 5970.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -140,6 +140,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclipseFS 36",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -182,11 +184,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 82200.0,
+  "maxLuminousIntensityCd": 82000.0,
   "luminousFluxLm": 3216.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.7,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": null,
@@ -102,6 +102,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcSpotMVW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,14 +145,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCSPOTMVW"

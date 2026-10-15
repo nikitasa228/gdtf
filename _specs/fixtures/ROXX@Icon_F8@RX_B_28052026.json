@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 594.0,
-  "maxLuminousIntensityCd": 487300.0,
+  "maxLuminousIntensityCd": 490000.0,
   "luminousFluxLm": 19411.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 13.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -131,6 +131,8 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "ROXX Icon F8",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -172,11 +174,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "description": "estimated"
+    "description": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

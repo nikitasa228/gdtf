@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Linear Pro Graze CTC 1ft",
   "longName": "Exterior Linear Pro Graze CTC 1ft",
   "shortName": "EXTLinProGrCTC 1ft",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior Linear Pro Graze CTC 1ft: LED bar, with 9 deg beam, Tunable White (CW/WW) colour mixing.",
   "manufacturer": "Martin Professional",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 24.0,
-  "maxLuminousIntensityCd": 187900.0,
-  "luminousFluxLm": 5200.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 35000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
   "weightKg": 0.85,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -94,18 +94,19 @@
     }
   ],
   "pixelCount": 24,
+  "fullName": "Martin Professional Exterior Linear Pro Graze CTC 1ft",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -133,11 +134,16 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "GDTF luminous flux 5200 lm is implausible for 24 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

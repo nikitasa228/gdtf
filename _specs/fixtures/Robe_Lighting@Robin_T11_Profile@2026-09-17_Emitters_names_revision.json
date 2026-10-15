@@ -4,9 +4,9 @@
   "fixtureTypeId": "8C68FF3C-9B1F-4C3E-8CC9-681DE9C4D593",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T11 Profile",
-  "longName": "Robin T11 Profile™",
+  "longName": "Robin T11 Profile",
   "shortName": "T11Profile",
-  "description": "Our unique T11 Profile™ delivers both superb performance and total generic flexibility!",
+  "description": "Our unique T11 Profile delivers both superb performance and total generic flexibility!",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 440.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 2100000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 15.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -94,7 +94,7 @@
   "iris": true,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -135,6 +135,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T11 Profile",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -175,13 +177,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 600.0,
-  "maxLuminousIntensityCd": 66800.0,
+  "maxLuminousIntensityCd": 67000.0,
   "luminousFluxLm": 10720.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 19.1,
   "powerConnectorIn": "DC Jack / powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -208,6 +208,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclFresnelCTPLIP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -249,11 +251,13 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

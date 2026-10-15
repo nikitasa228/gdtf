@@ -4,7 +4,7 @@
   "fixtureTypeId": "80DBFFB7-DD24-43AE-B9DE-EE7EAAD79420",
   "gdtfDataVersion": "1.0",
   "gdtfName": "T200C IP 26Deg",
-  "longName": "Terbly T200C IP 26Degree",
+  "longName": "T200C IP 26Degree",
   "shortName": "T200CIP 26Deg",
   "description": "230W LED Profile with R/G/B/Amber/Mint, and IP65.",
   "manufacturer": "Terbly",
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 250.0,
-  "maxLuminousIntensityCd": 34800.0,
+  "maxLuminousIntensityCd": 35000.0,
   "luminousFluxLm": 8000.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 35,
+  "weightKg": 8.0,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -97,6 +97,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Terbly T200C IP 26Degree",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -134,15 +136,18 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "weightKg": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
   ]
 }

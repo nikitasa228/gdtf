@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 1000,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 190000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 22.3,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540,
   "tiltRangeDeg": 270,
@@ -47,7 +47,10 @@
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
   "fieldAngleDeg": null,
   "zoom": true,
   "lensType": "Wash",
@@ -59,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBLCMY",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -104,6 +110,8 @@
     }
   ],
   "pixelCount": 5,
+  "fullName": "Briteq BTI-BLIZZARD WASH2",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -141,19 +149,22 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "beamAngleDeg",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "GDTF wheel slots counted as gobos; category corrected to wash."
+    "GDTF wheel slots counted as gobos; category corrected to wash.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://briteq-lighting.com/bti-blizzard-wash2"

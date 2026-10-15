@@ -4,9 +4,9 @@
   "fixtureTypeId": "DDBA9EF8-8E23-48AB-B9D0-F715029F1248",
   "gdtfDataVersion": "1.1",
   "gdtfName": "SkyPanel S30C",
-  "longName": "ARRI SkyPanel S30C",
+  "longName": "SkyPanel S30C",
   "shortName": "S30C",
-  "description": "SkyPanel S60-C RGBW Soft Light with ECC",
+  "description": "ARRI SkyPanel S30C: LED wash (soft light panel), with 105 deg beam, RGBW colour mixing, colour wheel.",
   "manufacturer": "ARRI",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 220,
-  "maxLuminousIntensityCd": 14500.0,
-  "luminousFluxLm": 50000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 2500.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -260,15 +260,16 @@
   ],
   "pixelCount": 3,
   "subType": "Soft light panel",
+  "fullName": "ARRI SkyPanel S30C",
+  "gdtfDescription": "SkyPanel S60-C RGBW Soft Light with ECC",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
@@ -300,15 +301,19 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 50000 lm is implausible for 220 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://cdn01.4wall.com/cms/rentals/files/f699736a2c5fa0.pdf"

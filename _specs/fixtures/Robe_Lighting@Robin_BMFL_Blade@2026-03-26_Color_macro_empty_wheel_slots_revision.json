@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 2000.0,
-  "maxLuminousIntensityCd": 4682100.0,
+  "maxLuminousIntensityCd": 4700000.0,
   "luminousFluxLm": 40000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 37.9,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin BMFL Blade",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,11 +163,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

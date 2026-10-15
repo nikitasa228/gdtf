@@ -4,7 +4,7 @@
   "fixtureTypeId": "2DE6797B-1465-407A-9E42-23244221B988",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LitePanels Studio X2",
-  "longName": "LitePanels Studio X2",
+  "longName": "Studio X2",
   "shortName": "Studio X2",
   "description": "The Studio X2 Bi-Color 60W Fresnel has a 5” lens in a practical compact chassis with a spot-to-flood beam angle range of 10° - 49°. With a maximum output of 2,300 lux at 10ft/3m (spot 5,600K), its output at 3,200K is similar to a 300W traditional tungsten Fresnel. Advanced thermal management ensures 50,000+ hours of LED engine life, while individual burn-in and calibration tests ensure quality and consistency.",
   "manufacturer": "Litepanels",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 60,
-  "maxLuminousIntensityCd": 175700.0,
+  "maxLuminousIntensityCd": 180000.0,
   "luminousFluxLm": 6000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.5,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": null,
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -100,6 +100,8 @@
   ],
   "pixelCount": 3,
   "subType": "Fresnel",
+  "fullName": "Litepanels Studio X2",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -107,7 +109,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -140,14 +141,17 @@
     "subType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.litepanels.com/en/product/studio-x2-bi-color-60w/"

@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 35783500.0,
+  "maxLuminousIntensityCd": 8900000.0,
   "luminousFluxLm": 12230.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 22.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -101,7 +101,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY FF42S",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,16 +161,18 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Values of the Lunar BSW (same 420 W lamp platform); no F420BSW page found."
+    "Values of the Lunar BSW (same 420 W lamp platform); no F420BSW page found.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/lunar-bsw/"

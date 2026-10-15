@@ -29,7 +29,7 @@
   "powerConsumptionW": 85,
   "maxLuminousIntensityCd": 8600.0,
   "luminousFluxLm": 418.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.84,
   "powerConnectorIn": "Battery (internal) + powerCON TRUE1 TOP",
   "powerConnectorOut": "Battery (internal) + powerCON TRUE1 TOP",
@@ -100,6 +100,8 @@
   ],
   "pixelCount": 1,
   "subType": "Battery PAR",
+  "fullName": "Prolights SmartParNEO",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -141,14 +143,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/SMARTPARNEO"

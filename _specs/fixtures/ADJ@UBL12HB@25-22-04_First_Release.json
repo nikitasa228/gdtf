@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 50,
-  "maxLuminousIntensityCd": 40600.0,
+  "maxLuminousIntensityCd": 41000.0,
   "luminousFluxLm": 4000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ UBL12HB",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -150,15 +152,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Battery-powered version."
+    "Battery-powered version.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/ubl12hb"

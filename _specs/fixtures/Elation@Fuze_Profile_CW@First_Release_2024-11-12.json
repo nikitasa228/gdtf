@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Profile CW",
   "longName": "Fuze Profile CW",
   "shortName": "FzProCW",
-  "description": "The FUZE PROFILE CW™ is an automated LED framing fixture designed for trade show, stages, television and a wide array of AV event applications. The 91CRI 380W White LED engine ensures accurate color reproduction while delivering a powerful output of 11,000 lumens. Designed to illuminate objects like exhibits and banners, texture areas and key light persons with its flat field and accurate framing it has many practical applications where a fully automated ellipsoidal fixture is required. A rotating gobo wheel of breakups,two color wheels featuring solid colors and correction filters plus and Iris round out its comprehensive feature set.",
+  "description": "The FUZE PROFILE CW is an automated LED framing fixture designed for trade show, stages, television and a wide array of AV event applications. The 91CRI 380W White LED engine ensures accurate color reproduction while delivering a powerful output of 11,000 lumens. Designed to illuminate objects like exhibits and banners, texture areas and key light persons with its flat field and accurate framing it has many practical applications where a fully automated ellipsoidal fixture is required. A rotating gobo wheel of breakups,two color wheels featuring solid colors and correction filters plus and Iris round out its comprehensive feature set.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 590,
-  "maxLuminousIntensityCd": 669000.0,
+  "maxLuminousIntensityCd": 670000.0,
   "luminousFluxLm": 11200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 23.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -79,7 +79,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -104,6 +104,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Profile CW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,14 +151,16 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/fuze-profile-cw"

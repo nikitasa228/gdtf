@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 500.0,
-  "maxLuminousIntensityCd": 3840600.0,
+  "maxLuminousIntensityCd": 3800000.0,
   "luminousFluxLm": 21000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 13.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -90,7 +90,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -103,6 +103,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Brighter Smart Hybrid 280 Pro",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,11 +151,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "estimated"
+    "description": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -4,7 +4,7 @@
   "fixtureTypeId": "076B8125-3E7A-4310-BE6C-A64D7034C43A",
   "gdtfDataVersion": "1.1",
   "gdtfName": "SkyPanel S360C",
-  "longName": "ARRI SkyPanel S360C",
+  "longName": "SkyPanel S360C",
   "shortName": "S360C",
   "description": "SkyPanel S360-C RGBW Soft Light with ECC",
   "manufacturer": "ARRI",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1600,
-  "maxLuminousIntensityCd": 72500.0,
-  "luminousFluxLm": 250000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 18000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 41.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -261,6 +261,8 @@
   ],
   "pixelCount": 3,
   "subType": "Soft light panel",
+  "fullName": "ARRI SkyPanel S360C",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -268,8 +270,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -301,15 +301,19 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "External PSU 10.7 kg. GDTF power 3125 W invalid."
+    "External PSU 10.7 kg. GDTF power 3125 W invalid.",
+    "GDTF luminous flux 250000 lm is implausible for 1600 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://bpm-media.imgbolt.de/media/pdf/9b/27/32/EN_ARRI_SkyPanel_S360-C_Datasheet.pdf"

@@ -4,9 +4,9 @@
   "fixtureTypeId": "A553FF0A-1A8B-40A7-BA63-DC0634B3FC06",
   "gdtfDataVersion": "1.2",
   "gdtfName": "FINE 4019 WASH PLUS",
-  "longName": "FINE 4019 WASH PLUS",
+  "longName": "4019 WASH PLUS",
   "shortName": "FINE 4019 WASH PLUS",
-  "description": "FINE 4019 WASH PLUS是一款专业的大功率LED摇头染色灯。它采用全新的光学设计，在达到混色均匀、效果绵柔的同时，光学效率仍能维持在高水平，小角度时6米照度可达30000lux。4°~60°变焦范围，不论距离远近均适应用光需求。调光平滑、细腻、低亮度起光无抖动，完全满足苛刻的戏剧类调光要求。2500k-8000k线性色温可调，色温变化时，亮度基本维持稳定，且Ra、R9均达90以上。隐藏式折叠灯钩，大大方便吊挂装配操作，适用于大型演唱会、电视台、剧场剧院、租赁市场等各类演出场所。",
+  "description": "Fine Art 4019 WASH PLUS: moving-head LED wash, with 4-60 deg zoom, RGBW colour mixing.",
   "manufacturer": "Fine Art",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 760.0,
-  "maxLuminousIntensityCd": 2338500.0,
+  "maxLuminousIntensityCd": 2300000.0,
   "luminousFluxLm": 12787.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 43,
+  "weightKg": 26.1,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 252.0,
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -97,14 +97,16 @@
     }
   ],
   "pixelCount": 19,
+  "fullName": "Fine Art 4019 WASH PLUS",
+  "gdtfDescription": "FINE 4019 WASH PLUS是一款专业的大功率LED摇头染色灯。它采用全新的光学设计，在达到混色均匀、效果绵柔的同时，光学效率仍能维持在高水平，小角度时6米照度可达30000lux。4°~60°变焦范围，不论距离远近均适应用光需求。调光平滑、细腻、低亮度起光无抖动，完全满足苛刻的戏剧类调光要求。2500k-8000k线性色温可调，色温变化时，亮度基本维持稳定，且Ra、R9均达90以上。隐藏式折叠灯钩，大大方便吊挂装配操作，适用于大型演唱会、电视台、剧场剧院、租赁市场等各类演出场所。",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -136,16 +138,21 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "weightKg": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

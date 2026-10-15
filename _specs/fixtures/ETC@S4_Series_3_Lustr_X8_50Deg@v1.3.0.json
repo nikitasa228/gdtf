@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 307,
-  "maxLuminousIntensityCd": 12900.0,
+  "maxLuminousIntensityCd": 13000.0,
   "luminousFluxLm": 10889,
   "noiseLevelDb": 34,
   "weightKg": 8.87,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ETC Source Four LED Series 3 Lustr X8 50 Degree",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -147,13 +149,16 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Manual shutters and gobo slot. GDTF says tungsten lamp - it is an LED engine. Noise 34 dB(A) avg @1 m."
+    "Manual shutters and gobo slot. GDTF says tungsten lamp - it is an LED engine. Noise 34 dB(A) avg @1 m.",
+    "Typical-value estimates (no published data): ipRating"
   ],
   "_refs": [
     "https://www.fullcompass.com/prod/599947-etc-source-four-led-series-3-s4-led-series-3-light-engine-only-lustr-x8-black",

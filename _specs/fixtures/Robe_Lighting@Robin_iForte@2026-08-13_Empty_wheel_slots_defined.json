@@ -6,7 +6,7 @@
   "gdtfName": "Robin iForte",
   "longName": "Robin iForte",
   "shortName": "iFORTE",
-  "description": "Even the mighty need the right protection! With unique game-changing patented technology, you can shift the power outside, rain or shine, dust, smoke and haze, with the iFORTE™!",
+  "description": "Even the mighty need the right protection! With unique game-changing patented technology, you can shift the power outside, rain or shine, dust, smoke and haze, with the iFORTE!",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1250.0,
-  "maxLuminousIntensityCd": 4850000.0,
+  "maxLuminousIntensityCd": 4800000.0,
   "luminousFluxLm": 41434.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 42.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -97,7 +97,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -50.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iForte",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -160,11 +162,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

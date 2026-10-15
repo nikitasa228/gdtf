@@ -6,7 +6,7 @@
   "gdtfName": "P3 Motion",
   "longName": "P3 Motion",
   "shortName": "P3Motion",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional P3 Motion: device (p3 video processor / controller).",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
@@ -67,10 +67,13 @@
   ],
   "pixelCount": 0,
   "subType": "P3 video processor / controller",
+  "fullName": "Martin Professional P3 Motion",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "gdtf",
@@ -94,7 +97,8 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [

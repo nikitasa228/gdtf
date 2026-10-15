@@ -4,9 +4,9 @@
   "fixtureTypeId": "535A3A95-4F2A-4369-87D3-BF28DCE3E042",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iBeam 350",
-  "longName": "Robin iBeam 350™",
+  "longName": "Robin iBeam 350",
   "shortName": "iBeam 350",
-  "description": "Robe’s massively successful LEDBeam 350™ is now weatherproof in the iBeam 350™ which will be a big hit with everyone working on outdoor lighting projects.\nThe iBeam 350™ has all the qualities and features that have made LEDBeam 350 such a great choice including the self-regulating, low-maintenance ingress protection technology.\nAs with other iSeries fixtures like the iPAINTE®, iBeam 350™ has an identical footprint, DMX map and resemblance to the LEDBeam 350™, making for smooth integration of both types of fixtures on the same lighting rig!\nRobe’s ingenious RAINS™ (Robe Automatic Ingress Neutralization System) manages humidity, temperature and pressure control, while the fixture’s lightweight aluminium alloy structure provides a dust-free environment for the optics so there is no need for frequent cleaning and the chance of UV damage to plastic parts is reduced.",
+  "description": "Robe’s massively successful LEDBeam 350 is now weatherproof in the iBeam 350 which will be a big hit with everyone working on outdoor lighting projects.\nThe iBeam 350 has all the qualities and features that have made LEDBeam 350 such a great choice including the self-regulating, low-maintenance ingress protection technology.\nAs with other iSeries fixtures like the iPAINTE, iBeam 350 has an identical footprint, DMX map and resemblance to the LEDBeam 350, making for smooth integration of both types of fixtures on the same lighting rig!\nRobe’s ingenious RAINS (Robe Automatic Ingress Neutralization System) manages humidity, temperature and pressure control, while the fixture’s lightweight aluminium alloy structure provides a dust-free environment for the optics so there is no need for frequent cleaning and the chance of UV damage to plastic parts is reduced.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 460.0,
-  "maxLuminousIntensityCd": 1332200.0,
+  "maxLuminousIntensityCd": 1300000.0,
   "luminousFluxLm": 6574.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 15.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iBeam 350",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -141,11 +143,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

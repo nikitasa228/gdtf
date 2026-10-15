@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 503,
-  "maxLuminousIntensityCd": 1627000.0,
+  "maxLuminousIntensityCd": 2500000.0,
   "luminousFluxLm": 13900.0,
   "noiseLevelDb": 40,
   "weightKg": 8.6,
@@ -122,6 +122,8 @@
     }
   ],
   "pixelCount": 24,
+  "fullName": "Cameo Azor W2 Wash (CLAZORW2)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -129,7 +131,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
@@ -168,12 +169,15 @@
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/azor-w2"

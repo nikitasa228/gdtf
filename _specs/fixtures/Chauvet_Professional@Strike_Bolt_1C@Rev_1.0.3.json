@@ -29,7 +29,7 @@
   "powerConsumptionW": 329,
   "maxLuminousIntensityCd": 18200,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Chauvet Professional Strike Bolt 1C",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -152,15 +154,16 @@
     "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "manual"
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/strike-bolt-1c/"

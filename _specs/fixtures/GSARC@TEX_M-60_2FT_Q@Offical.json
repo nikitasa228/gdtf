@@ -4,7 +4,7 @@
   "fixtureTypeId": "D6F3B708-2ABA-4961-920B-1AF6F503E41A",
   "gdtfDataVersion": "1.0",
   "gdtfName": "TEX M-60 2FT Q",
-  "longName": "GSARC TEX M-60 2FT Q",
+  "longName": "TEX M-60 2FT Q",
   "shortName": "TEX M-60 2FT Q",
   "description": "TEX is a new architectural outdoor graze lighting series. 3 models with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 46,
   "maxLuminousIntensityCd": 2900.0,
   "luminousFluxLm": 25.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.86,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -62,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -85,6 +88,8 @@
   ],
   "pixelCount": 1,
   "subType": "Linear graze light",
+  "fullName": "GSARC TEX M-60 2FT Q",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,15 +129,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft."
+    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft.",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://en.gsarc.com/en/products/841.html?t=1"

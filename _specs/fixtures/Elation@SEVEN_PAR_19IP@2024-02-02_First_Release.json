@@ -6,7 +6,7 @@
   "gdtfName": "SEVEN PAR 19IP",
   "longName": "SEVEN PAR 19IP",
   "shortName": "SIXP19IP",
-  "description": "The SEVEN PAR 19IP™ is an IP65 outdoor rated seven color par wash luminaire with (19) 25W 7-in-1 RGBAW + Lime + UV LEDs (Red, Green, Blue, White, Amber, Lime, and a 395nm UV) producing up to 9,300 total output lumens and 90CRI. Features include individual hue, saturation, and intensity control, RGB + seven color 3 channel DMX mode, smooth color mixing, 12 internal programs with speed and fade control, 64 unique 7-color macros, selectable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX and RDM (Remote Device Management) protocol support, IP65 rated 5pin XLR and power in/out connections, dual adjustable yoke / floor stand, multiple unit power linking, OLED menu display with a 4-button control panel, a multi-voltage universal auto switching power supply (100-240v), and a rugged powder coated die-cast aluminum exterior. Gel frame and gel frame holder included, optional 4-leaf barn door available.",
+  "description": "The SEVEN PAR 19IP is an IP65 outdoor rated seven color par wash luminaire with (19) 25W 7-in-1 RGBAW + Lime + UV LEDs (Red, Green, Blue, White, Amber, Lime, and a 395nm UV) producing up to 9,300 total output lumens and 90CRI. Features include individual hue, saturation, and intensity control, RGB + seven color 3 channel DMX mode, smooth color mixing, 12 internal programs with speed and fade control, 64 unique 7-color macros, selectable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX and RDM (Remote Device Management) protocol support, IP65 rated 5pin XLR and power in/out connections, dual adjustable yoke / floor stand, multiple unit power linking, OLED menu display with a 4-button control panel, a multi-voltage universal auto switching power supply (100-240v), and a rugged powder coated die-cast aluminum exterior. Gel frame and gel frame holder included, optional 4-leaf barn door available.",
   "manufacturer": "Elation",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 500,
-  "maxLuminousIntensityCd": 52700.0,
+  "maxLuminousIntensityCd": 53000.0,
   "luminousFluxLm": 5071.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 11.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -113,6 +113,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation SEVEN PAR 19IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -154,14 +156,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/seven-par-19ip"

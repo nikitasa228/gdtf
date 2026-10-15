@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Pendant",
   "longName": "Fuze Pendant",
   "shortName": "FuzPdnt",
-  "description": "The FUZE PENDANT™ provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 11,000 lumens, the FUZE PENDANT is ideal for large areas and high-ceiling applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
+  "description": "The FUZE PENDANT provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 11,000 lumens, the FUZE PENDANT is ideal for large areas and high-ceiling applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 230,
-  "maxLuminousIntensityCd": 19200.0,
+  "maxLuminousIntensityCd": 19000.0,
   "luminousFluxLm": 13142.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 7.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Pendant",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -153,14 +155,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://d295jznhem2tn9.cloudfront.net/ItemRelatedFiles/13537/Elation%20Fuze%20Pendant%20%20WH%20-%20Spec%20Sheet.pdf"

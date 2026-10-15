@@ -6,7 +6,7 @@
   "gdtfName": "ACL 360 Bar",
   "longName": "ACL 360 Bar",
   "shortName": "ACL 360B",
-  "description": "The ACL 360 BAR™ is a versatile moving bar effect luminaire featuring (7) individual 15W RGBW 4-in-1 LEDs and the new advanced collimator optic lens, which combined produce a laser-like homogenized 4° color-changing beam from each lens which combined produce a 31° beam angle. Features include fast and precise16-bit continuous full 360° pan and tilt rotation, full individual pixel control, strobe, and selectable dimming curve effects, DMX, RDM (Remote Device Management), KlingNET™ and Art-NET support, 3/5pin XLR, Locking Power Cable, and RJ45 ethernet in/out connections, (6) button control full color 180° reversible menu display, 135W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The ACL 360 BAR is a versatile moving bar effect luminaire featuring (7) individual 15W RGBW 4-in-1 LEDs and the new advanced collimator optic lens, which combined produce a laser-like homogenized 4° color-changing beam from each lens which combined produce a 31° beam angle. Features include fast and precise16-bit continuous full 360° pan and tilt rotation, full individual pixel control, strobe, and selectable dimming curve effects, DMX, RDM (Remote Device Management), KlingNET and Art-NET support, 3/5pin XLR, Locking Power Cable, and RJ45 ethernet in/out connections, (6) button control full color 180° reversible menu display, 135W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 135,
-  "maxLuminousIntensityCd": 19300.0,
+  "maxLuminousIntensityCd": 19000.0,
   "luminousFluxLm": 6285.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 10.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -63,7 +63,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -71,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -92,6 +95,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation ACL 360 Bar",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -134,15 +139,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/acl-360-bar"

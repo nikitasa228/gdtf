@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": 327000.0,
+  "maxLuminousIntensityCd": 330000.0,
   "luminousFluxLm": 17448.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 5.3,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -167,6 +167,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "flashPRO LedBar L1810 45°",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -177,7 +179,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -207,13 +208,16 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "18 x 10 W; GDTF power 1200 W invalid."
+    "18 x 10 W; GDTF power 1200 W invalid.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 85.0,
+  "maxLuminousIntensityCd": 55000.0,
   "luminousFluxLm": 307400.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.0,
-  "powerConnectorIn": "DC Jack (external PSU / battery)",
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "DC Jack (external PSU / battery)",
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -743,13 +743,15 @@
   ],
   "pixelCount": 53,
   "subType": "Battery LED tube",
+  "fullName": "Astera LED Technology AX1 PixelTube",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "manual",
+    "powerConsumptionW": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -783,16 +785,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Battery powered; mains via external charger/PSU. GDTF power 4876 W invalid."
+    "Battery powered; mains via external charger/PSU. GDTF power 4876 W invalid.",
+    "Typical-value estimates (no published data): powerConsumptionW, maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

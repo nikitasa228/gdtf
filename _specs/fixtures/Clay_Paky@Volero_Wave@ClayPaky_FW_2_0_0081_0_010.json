@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 400,
-  "maxLuminousIntensityCd": 94900.0,
+  "maxLuminousIntensityCd": 95000.0,
   "luminousFluxLm": 292.0,
   "noiseLevelDb": 41.8,
   "weightKg": 20.8,
@@ -35,7 +35,7 @@
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 220.0,
   "infinitePan": null,
   "infiniteTilt": true,
@@ -103,6 +103,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Clay Paky Volero Wave",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -141,13 +143,13 @@
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
-    "panRangeDeg": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

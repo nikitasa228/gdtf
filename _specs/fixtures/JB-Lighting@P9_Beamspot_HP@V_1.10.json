@@ -6,7 +6,7 @@
   "gdtfName": "P9 Beamspot HP",
   "longName": "P9 Beamspot HP",
   "shortName": "P9BSPHP",
-  "description": "P9 Beamspot HP (High Power) 330W",
+  "description": "JB-Lighting P9 Beamspot HP: moving-head LED beam/spot/wash hybrid, with 5.7-60 deg zoom, CMY colour mixing, colour wheel, 18 gobos, prism, frost.",
   "manufacturer": "JB-Lighting",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 460,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 4100000.0,
   "luminousFluxLm": 46000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 17.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -93,7 +93,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -110,10 +110,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "JB-Lighting P9 Beamspot HP",
+  "gdtfDescription": "P9 Beamspot HP (High Power) 330W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -154,16 +157,18 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.jb-lighting.de/index.php?lang=EN&product=P9+Spot&page=produkte"

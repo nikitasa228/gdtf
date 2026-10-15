@@ -6,7 +6,7 @@
   "gdtfName": "Prisma Par 50",
   "longName": "Prisma Par 50",
   "shortName": "PrsmP50",
-  "description": "PRISMA PAR 50™ is an exterior IP65 rated UV wash par luminaire that produces 365nm peak true UV output with zero visible light, and an impressive 50 degree wide beam angle from the large internal LED reflector. Features includes a user friendly digital 2.5 inch LCD touch screen control panel, intuitive DMX-512 and RDM control, dual adjustable mounting yokes, a durable aluminum housing, and IP65 DMX 5pin XLR and locking power in/out connections.",
+  "description": "PRISMA PAR 50 is an exterior IP65 rated UV wash par luminaire that produces 365nm peak true UV output with zero visible light, and an impressive 50 degree wide beam angle from the large internal LED reflector. Features includes a user friendly digital 2.5 inch LCD touch screen control panel, intuitive DMX-512 and RDM control, dual adjustable mounting yokes, a durable aluminum housing, and IP65 DMX 5pin XLR and locking power in/out connections.",
   "manufacturer": "Magmatic",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 32.0,
-  "maxLuminousIntensityCd": 113500.0,
+  "maxLuminousIntensityCd": 110000.0,
   "luminousFluxLm": 1900.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -65,7 +65,10 @@
   "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -98,6 +101,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Magmatic Prisma Par 50",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,14 +143,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ]
 }

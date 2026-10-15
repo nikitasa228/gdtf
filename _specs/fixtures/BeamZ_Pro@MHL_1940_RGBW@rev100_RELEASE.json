@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 683,
-  "maxLuminousIntensityCd": 7730900.0,
+  "maxLuminousIntensityCd": 7700000.0,
   "luminousFluxLm": 95100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 16.15,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,6 +105,8 @@
     }
   ],
   "pixelCount": 20,
+  "fullName": "BeamZ Pro MHL1940 RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -112,7 +114,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -149,15 +150,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/mhl1940-led-bee-eye-moving-head-with-zoom/"

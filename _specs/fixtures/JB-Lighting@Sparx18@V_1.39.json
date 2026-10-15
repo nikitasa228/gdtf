@@ -6,7 +6,7 @@
   "gdtfName": "Sparx18",
   "longName": "Sparx18",
   "shortName": "SP18",
-  "description": "Sparx18",
+  "description": "JB-Lighting Sparx18: moving-head LED wash-beam, with 3-70 deg zoom, RGBW colour mixing, colour wheel.",
   "manufacturer": "JB-Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1300,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 7500000.0,
   "luminousFluxLm": 23000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 22.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -98,10 +98,13 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "JB-Lighting Sparx18",
+  "gdtfDescription": "Sparx18",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
@@ -140,17 +143,19 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF beam-sum power invalid, removed."
+    "GDTF beam-sum power invalid, removed.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.jb-lighting.de/index.php?lang=EN&product=Sparx+18&page=produkte"

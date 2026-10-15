@@ -29,7 +29,7 @@
   "powerConsumptionW": 198,
   "maxLuminousIntensityCd": 3800.0,
   "luminousFluxLm": 5982,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.85,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -123,6 +123,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Encore LB15IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -163,15 +165,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF weight 4.1 kg contradicts spec sheet (8.85 kg)."
+    "GDTF weight 4.1 kg contradicts spec sheet (8.85 kg).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/encore-lb15ip"

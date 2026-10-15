@@ -6,7 +6,7 @@
   "gdtfName": "ACME AECO 30 IP (AECO 30 IP)",
   "longName": "AECO 30 IP",
   "shortName": "AECO 30 IP",
-  "description": "ACME (AECO 30 IP)1800W",
+  "description": "ACME AECO 30 IP: moving-head LED profile, with 4-48 deg zoom, CMY colour mixing, colour wheel, 12 gobos, framing shutters, prism, frost, IP66 rated.",
   "manufacturer": "ACME",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -23,9 +23,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 2265,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 7900000.0,
   "luminousFluxLm": 43000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 52.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -115,10 +115,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME AECO 30 IP",
+  "gdtfDescription": "ACME (AECO 30 IP)1800W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -160,16 +163,17 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-30-IP"

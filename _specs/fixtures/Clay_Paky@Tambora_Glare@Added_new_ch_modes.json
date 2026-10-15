@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 480,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 120000.0,
   "luminousFluxLm": 19874,
   "noiseLevelDb": 38.2,
   "weightKg": 13.5,
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Clay Paky Tambora Glare",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -154,15 +156,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "RGBA zone 22 deg, white strobe 120 deg."
+    "RGBA zone 22 deg, white strobe 120 deg.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.claypaky.it/products/tambora-glare/"

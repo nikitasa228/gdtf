@@ -4,7 +4,7 @@
   "fixtureTypeId": "518F72B5-23E3-47C5-85E7-E693437A9B78",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Poseidon Hybrid",
-  "longName": "CLF Poseidon Hybrid",
+  "longName": "Poseidon Hybrid",
   "shortName": "Poseidon Hybrid",
   "description": "CLF Poseidon Hybrid: IP66 discharge beam/spot/wash hybrid moving head.",
   "manufacturer": "CLF Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 578.0,
-  "maxLuminousIntensityCd": 14629700.0,
+  "maxLuminousIntensityCd": 15000000.0,
   "luminousFluxLm": 20000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 35.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -113,6 +113,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Poseidon Hybrid",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,13 +161,14 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

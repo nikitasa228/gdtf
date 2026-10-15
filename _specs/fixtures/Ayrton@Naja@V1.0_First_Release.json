@@ -4,7 +4,7 @@
   "fixtureTypeId": "DC7AE59A-F43A-4A14-B6C5-266BE65E1881",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Naja",
-  "longName": "Ayrton Naja",
+  "longName": "Naja",
   "shortName": "Naja",
   "description": "Ayrton Naja: LED moving head with beam / spot functions, 0.6-21 deg zoom, CMY, large gobo complement and prisms.",
   "manufacturer": "Ayrton",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 700.0,
-  "maxLuminousIntensityCd": 138165900.0,
+  "maxLuminousIntensityCd": 12000000.0,
   "luminousFluxLm": 17000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 31.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -137,7 +137,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -150,6 +150,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Ayrton Naja",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -196,11 +198,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "estimated"
+    "description": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

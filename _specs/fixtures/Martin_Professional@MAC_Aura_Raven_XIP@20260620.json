@@ -6,7 +6,7 @@
   "gdtfName": "MAC Aura Raven XIP",
   "longName": "MAC Aura Raven XIP",
   "shortName": "MACAurRav",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional MAC Aura Raven XIP: moving-head LED wash, with 6.6-35.5 deg zoom, RGBL colour mixing, colour wheel.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1020.0,
-  "maxLuminousIntensityCd": 49200.0,
+  "maxLuminousIntensityCd": 49000.0,
   "luminousFluxLm": 732.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 28.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -110,17 +110,19 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Martin Professional MAC Aura Raven XIP",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -154,11 +156,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

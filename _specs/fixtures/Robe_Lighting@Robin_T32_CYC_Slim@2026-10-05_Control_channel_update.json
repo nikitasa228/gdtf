@@ -4,9 +4,9 @@
   "fixtureTypeId": "67C27E43-D5D2-49B7-A6D8-C586EEC4AEF7",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T32 CYC Slim",
-  "longName": "Robin T32 CYC™ Slim",
+  "longName": "Robin T32 CYC Slim",
   "shortName": "T32 CYC Slim",
-  "description": "Robin T32™ CYC Slim",
+  "description": "Robe Lighting Robin T32 CYC Slim: LED bar (cyclorama), with 35 deg beam, CMY colour mixing.",
   "manufacturer": "Robe Lighting",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 500.0,
   "maxLuminousIntensityCd": 2400.0,
   "luminousFluxLm": 990.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 21.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -99,10 +99,13 @@
   ],
   "pixelCount": 1,
   "subType": "Cyclorama",
+  "fullName": "Robe Lighting Robin T32 CYC Slim",
+  "gdtfDescription": "Robin T32 CYC Slim",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -140,11 +143,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "CLUSTER B2-FC",
   "longName": "CLUSTER B2-FC",
   "shortName": "CL-B2FC",
-  "description": "LED 2lite Blinder RGBA+WW",
+  "description": "ROXX CLUSTER B2-FC: LED blinder, with 50 deg beam, RGBA+WW colour mixing, colour wheel.",
   "manufacturer": "ROXX",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 620,
-  "maxLuminousIntensityCd": 16600.0,
+  "maxLuminousIntensityCd": 17000.0,
   "luminousFluxLm": 14000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 10.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -152,14 +152,16 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "ROXX CLUSTER B2-FC",
+  "gdtfDescription": "LED 2lite Blinder RGBA+WW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -192,15 +194,18 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "620 W boost mode, 220 W constant."
+    "620 W boost mode, 220 W constant.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://roxxlight.com/wp-content/uploads/2024/09/roxx-data-sheet-cluster-B2-FC-rev04.pdf"

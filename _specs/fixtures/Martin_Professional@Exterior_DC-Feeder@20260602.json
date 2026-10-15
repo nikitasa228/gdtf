@@ -6,7 +6,7 @@
   "gdtfName": "Exterior DC-Feeder",
   "longName": "Exterior DC-Feeder",
   "shortName": "EXTDCFee",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior DC-Feeder: device (dc feeder (power/data injector)).",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
@@ -57,7 +57,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -71,10 +71,13 @@
   ],
   "pixelCount": 0,
   "subType": "DC feeder (power/data injector)",
+  "fullName": "Martin Professional Exterior DC-Feeder",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "voltageRangeV": "gdtf",
@@ -103,7 +106,9 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -112,6 +117,7 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless.",
+    "Typical-value estimates (no published data): ipRating"
   ]
 }

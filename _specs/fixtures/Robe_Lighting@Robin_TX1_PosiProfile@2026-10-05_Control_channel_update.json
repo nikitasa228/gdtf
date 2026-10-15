@@ -4,9 +4,9 @@
   "fixtureTypeId": "1136C09F-A668-4C76-AFE4-E528E36BBAD4",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin TX1 PosiProfile",
-  "longName": "Robin TX1 PosiProfile™",
+  "longName": "Robin TX1 PosiProfile",
   "shortName": "TX1 PosiProfile",
-  "description": "Preliminary physical and color measurements.\nBridging the divide between manual generic and fully automated fixtures, the TX1 PosiProfile™ combines both worlds into one revolutionary luminaire.",
+  "description": "Preliminary physical and color measurements.\nBridging the divide between manual generic and fully automated fixtures, the TX1 PosiProfile combines both worlds into one revolutionary luminaire.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 640.0,
-  "maxLuminousIntensityCd": 1064200.0,
+  "maxLuminousIntensityCd": 1100000.0,
   "luminousFluxLm": 11000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 24.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -89,7 +89,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -138,6 +138,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin TX1 PosiProfile",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -183,11 +185,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "FUZE PAR Z120 IP",
   "longName": "FUZE PAR Z120 IP",
   "shortName": "FuzPrZ60",
-  "description": "The IP65 rated FUZE PAR Z120 IP™ is a single source par luminaire with a 120W Quad Color RGBW COB LED. Features 7° to 55° motorized zoom, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, IP rated 5pin XLR and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, dual adjustable yokes, multiple unit power linking, flicker free operation for TV and FILM, a multi-voltage universal auto switching power supply (110-240v), and removable gel frame and barn doors included.",
+  "description": "The IP65 rated FUZE PAR Z120 IP is a single source par luminaire with a 120W Quad Color RGBW COB LED. Features 7° to 55° motorized zoom, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, IP rated 5pin XLR and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, dual adjustable yokes, multiple unit power linking, flicker free operation for TV and FILM, a multi-voltage universal auto switching power supply (110-240v), and removable gel frame and barn doors included.",
   "manufacturer": "Elation",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 158,
-  "maxLuminousIntensityCd": 544300.0,
+  "maxLuminousIntensityCd": 540000.0,
   "luminousFluxLm": 9112.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -130,6 +130,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation FUZE PAR Z120 IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -170,14 +172,15 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.fullcompass.com/common/files/28369-ElationProLightingFUZEPARZ120SpecSheet.pdf"

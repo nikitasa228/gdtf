@@ -6,7 +6,7 @@
   "gdtfName": "Poseidon Laser Beam XS",
   "longName": "Poseidon Laser Beam XS",
   "shortName": "Laser Beam XS",
-  "description": "Small",
+  "description": "CLF Lighting Poseidon Laser Beam XS: moving-head Laser beam, with 1.1 deg beam, CMY colour mixing, colour wheel, 17 gobos, prism, frost, IP66 rated.",
   "manufacturer": "CLF Lighting",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 233.0,
-  "maxLuminousIntensityCd": 22246400.0,
+  "maxLuminousIntensityCd": 6700000.0,
   "luminousFluxLm": 9200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 16.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -103,10 +103,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Poseidon Laser Beam XS",
+  "gdtfDescription": "Small",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -150,13 +153,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "ipRating": "manual"
+    "ipRating": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Laser-phosphor light source."
+    "Laser-phosphor light source.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1310,
-  "maxLuminousIntensityCd": 5368400.0,
+  "maxLuminousIntensityCd": 5400000.0,
   "luminousFluxLm": 77500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 37.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -94,7 +94,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 20.0,
@@ -107,6 +107,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY F1000 Spot",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -152,13 +154,15 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Assumed equal to the F1000 Profile (same 1000 W platform)."
+    "Assumed equal to the F1000 Profile (same 1000 W platform).",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

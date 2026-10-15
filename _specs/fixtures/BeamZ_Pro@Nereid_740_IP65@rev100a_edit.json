@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 330,
-  "maxLuminousIntensityCd": 2845200.0,
+  "maxLuminousIntensityCd": 2800000.0,
   "luminousFluxLm": 35000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 11.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -97,6 +97,8 @@
     }
   ],
   "pixelCount": 7,
+  "fullName": "BeamZ Pro Nereid740IP65",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -104,7 +106,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -141,15 +142,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "7 x 40 W LEDs; mains draw estimated."
+    "7 x 40 W LEDs; mains draw estimated.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/nereid740-outdoor-led-bee-eye-moving-head-with-zoom/"

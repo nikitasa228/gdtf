@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 850.0,
-  "maxLuminousIntensityCd": 56036000.0,
+  "maxLuminousIntensityCd": 44000000.0,
   "luminousFluxLm": 60000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 22.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,7 +105,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -118,6 +118,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY DOPHINE SMART",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -164,11 +166,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

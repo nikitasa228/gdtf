@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 280,
-  "maxLuminousIntensityCd": 264400.0,
+  "maxLuminousIntensityCd": 260000.0,
   "luminousFluxLm": 13000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 16.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Hydro Spot 1",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -156,14 +158,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/hydro-spot-1"

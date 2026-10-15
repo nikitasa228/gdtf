@@ -4,7 +4,7 @@
   "fixtureTypeId": "F7881C6F-DAC6-46A8-A470-CD2C3A6B13F6",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Sidewinder",
-  "longName": "Magmatic Sidewinder",
+  "longName": "Sidewinder",
   "shortName": "Sidewinder",
   "description": "SIDEWINDER 1450W HIGH VELOCITY CO2 SIMULATOR\n\nSIDEWINDER is a professional-grade lighting solution. Equipped with an easy to use onboard LCD touch screen control panel, intuitive DMX-512, RDM control, durable aluminum housing, and optional wired and wireless remote control options. 50,000 cu.ft per minute Four, 8-second 20-ft bursts 180° multi position fog burst 22, 3#160; watt RGBA LED's (Red X5 Green X6 Blue X6 Amber X5) Use of LEDs even without the use of Fog Durable, tour-ready, aluminum housing#160;.",
   "manufacturer": "Magmatic",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 66.0,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 6600.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 60,
   "weightKg": 13.4,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -69,7 +69,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -91,6 +91,8 @@
   ],
   "pixelCount": 1,
   "subType": "Fog jet with LED illumination",
+  "fullName": "Magmatic Sidewinder",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -127,18 +129,20 @@
     "subType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "maxLuminousIntensityCd",
     "beamAngleDeg",
-    "colorTemperatureK"
+    "colorTemperatureK",
+    "maxLuminousIntensityCd"
   ],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

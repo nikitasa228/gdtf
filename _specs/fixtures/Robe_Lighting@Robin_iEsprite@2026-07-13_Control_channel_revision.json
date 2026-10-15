@@ -4,9 +4,9 @@
   "fixtureTypeId": "A5095440-DC81-47FB-B32E-BB51D8D46883",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iEsprite",
-  "longName": "Robin iESPRITE®",
+  "longName": "Robin iESPRITE",
   "shortName": "iESPRITE",
-  "description": "The IP65-rated version of one Robe’s most popular products, the iESPRITE®, delivers consistent, hassle-free performance without needing complex maintenance whatever the weather or atmospheric conditions!\nThis and all other Robe iSeries fixtures dramatically reduce the stress and complications associated with outdoor lighting!\nThe IP65-rated iESPRITE® combines Robe’s latest protection technology with the very in-demand ESPRITE® product maintaining identical aesthetics, output and features enabling seamless integration between the two different models if desired!\nThe ingenious ingress protection system is specifically designed to facilitate standard maintenance and preparation procedures – e.g., TRANSFERABLE ENGINE exchange and gobo replacement – on site and without any additional tools.\nTo maintain a consistently high lumen output, water, dirt, dust, haze, and smoke are repelled from the front lens with Robe’s unique ParCoat™ hydrophobic, oleophobic-resistant coating which allows easy cleaning / removal without scratching or damage.",
+  "description": "The IP65-rated version of one Robe’s most popular products, the iESPRITE, delivers consistent, hassle-free performance without needing complex maintenance whatever the weather or atmospheric conditions!\nThis and all other Robe iSeries fixtures dramatically reduce the stress and complications associated with outdoor lighting!\nThe IP65-rated iESPRITE combines Robe’s latest protection technology with the very in-demand ESPRITE product maintaining identical aesthetics, output and features enabling seamless integration between the two different models if desired!\nThe ingenious ingress protection system is specifically designed to facilitate standard maintenance and preparation procedures – e.g., TRANSFERABLE ENGINE exchange and gobo replacement – on site and without any additional tools.\nTo maintain a consistently high lumen output, water, dirt, dust, haze, and smoke are repelled from the front lens with Robe’s unique ParCoat hydrophobic, oleophobic-resistant coating which allows easy cleaning / removal without scratching or damage.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": 3160400.0,
+  "maxLuminousIntensityCd": 3200000.0,
   "luminousFluxLm": 27000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 34.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -126,6 +126,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iESPRITE",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -173,11 +175,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

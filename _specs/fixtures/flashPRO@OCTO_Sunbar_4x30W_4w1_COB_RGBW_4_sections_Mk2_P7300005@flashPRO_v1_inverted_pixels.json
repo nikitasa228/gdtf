@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 120,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 34000.0,
   "luminousFluxLm": 10400.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 5.3,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -48,7 +48,10 @@
     "XLR3"
   ],
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 30.0,
+    "max": 30.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Wash",
@@ -71,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -164,6 +167,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "flashPRO OCTO Sunbar 4x30W 4w1 COB RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -201,16 +206,18 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "4 x 30 W; GDTF power 770 W invalid."
+    "4 x 30 W; GDTF power 770 W invalid.",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

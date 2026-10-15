@@ -6,7 +6,7 @@
   "gdtfName": "AL-Q4IP Vibrant 800W IP",
   "longName": "AL-Q4IP Vibrant 800W IP",
   "shortName": "AL-Q4IP",
-  "description": "AL-Q4IP Vibrant 800W IP",
+  "description": "AML Lighting AL-Q4IP Vibrant 800W IP: LED strobe, with RGBWL colour mixing, frost, IP65 rated.",
   "manufacturer": "AML Lighting",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -26,16 +26,16 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 697,
+  "maxLuminousIntensityCd": 11000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 22.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 270.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -46,7 +46,10 @@
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 90.0,
+    "max": 90.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Wash",
@@ -98,10 +101,13 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "AML Lighting AL-Q4IP Vibrant 800W IP",
+  "gdtfDescription": "AL-Q4IP Vibrant 800W IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "estimated",
     "weightKg": "gdtf",
@@ -129,22 +135,24 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
     "ipRating": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerConsumptionW": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "No public spec sheet found; tilt-only IP LED fixture."
+    "No public spec sheet found; tilt-only IP LED fixture.",
+    "Typical-value estimates (no published data): powerConsumptionW, powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

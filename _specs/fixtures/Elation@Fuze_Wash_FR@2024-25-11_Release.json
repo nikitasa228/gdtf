@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Wash FR",
   "longName": "Fuze Wash FR",
   "shortName": "FzwshFR",
-  "description": "The FUZE WASH FR™ is an automated LED Fresnel wash fixture designed for theater, television, events and a wide array of other precision lighting applications. A High-CRI engine utilizes a 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction while delivering a powerful output of up to 15,000 lumens and maximum CRI of 92. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
+  "description": "The FUZE WASH FR is an automated LED Fresnel wash fixture designed for theater, television, events and a wide array of other precision lighting applications. A High-CRI engine utilizes a 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction while delivering a powerful output of up to 15,000 lumens and maximum CRI of 92. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 631,
-  "maxLuminousIntensityCd": 1504000.0,
+  "maxLuminousIntensityCd": 1500000.0,
   "luminousFluxLm": 25180.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 28.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Wash FR",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -158,14 +160,16 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/fuze-wash-fr"

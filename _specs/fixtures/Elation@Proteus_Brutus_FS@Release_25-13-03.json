@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1500,
-  "maxLuminousIntensityCd": 22931000.0,
+  "maxLuminousIntensityCd": 23000000.0,
   "luminousFluxLm": 96000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 54.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -100,6 +100,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Brutus FS",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -145,14 +147,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/proteus-brutus-fs"

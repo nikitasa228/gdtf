@@ -29,13 +29,13 @@
   "powerConsumptionW": 422,
   "maxLuminousIntensityCd": 302700,
   "luminousFluxLm": 3503.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 11.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 200.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -123,6 +123,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional COLORado PXL Bar 8",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,19 +163,19 @@
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
     "ipRating": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/colorado-pxl-bar-8/"

@@ -6,7 +6,7 @@
   "gdtfName": "Artiste Mondrian",
   "longName": "Artiste Mondrian",
   "shortName": "ArtMon",
-  "description": "The Artiste Mondrian™ is an extremely bright, full-featured LED profile FX fixture offering high center intensity, narrow-beam angles and a wide color-mixing gamut through its variable SpectraColor engine.\nProviding up to 51,000 lumens from its efficient 950W 6,500K LED engine, the Mondrian is the ideal fixture for any application requiring superior output, bright and powerful narrow beams, and quiet operation, as well as stunning effects and colors. Mondrian integrates Elation's new SpectraColor system, which offers traditional CMY mixing but adds a variable RGB color mix for rich, saturated primaries. In combination with the variable CTO, the Mondrian allows for colors that were previously impossible to achieve, from theatrical pastels to the most vibrant red or blues ever produced by a color mixing system. The Artiste Mondrian’s wide color gamut is achieved by seven color-mixing flags with 16-bit precision for artistic possibilities that are truly inspiring. The fixed color wheel offers UV and high CRI options to round out the amazing color range of the fixture.",
+  "description": "The Artiste Mondrian is an extremely bright, full-featured LED profile FX fixture offering high center intensity, narrow-beam angles and a wide color-mixing gamut through its variable SpectraColor engine.\nProviding up to 51,000 lumens from its efficient 950W 6,500K LED engine, the Mondrian is the ideal fixture for any application requiring superior output, bright and powerful narrow beams, and quiet operation, as well as stunning effects and colors. Mondrian integrates Elation's new SpectraColor system, which offers traditional CMY mixing but adds a variable RGB color mix for rich, saturated primaries. In combination with the variable CTO, the Mondrian allows for colors that were previously impossible to achieve, from theatrical pastels to the most vibrant red or blues ever produced by a color mixing system. The Artiste Mondrian’s wide color gamut is achieved by seven color-mixing flags with 16-bit precision for artistic possibilities that are truly inspiring. The fixed color wheel offers UV and high CRI options to round out the amazing color range of the fixture.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1500,
-  "maxLuminousIntensityCd": 25033800.0,
+  "maxLuminousIntensityCd": 25000000.0,
   "luminousFluxLm": 77000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 47.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -92,7 +92,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -117,6 +117,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Artiste Mondrian",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -163,14 +165,16 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/artiste-mondrian"

@@ -4,7 +4,7 @@
   "fixtureTypeId": "049E47ED-E254-42B5-8E82-4573BE2C23CE",
   "gdtfDataVersion": "1.0",
   "gdtfName": "PIX S TW",
-  "longName": "GSARC_PIX S TW",
+  "longName": "PIX S TW",
   "shortName": "PIX S TW",
   "description": "PIX is a new architectural outdoor matrix lighting series. 2 models all with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 140,
   "maxLuminousIntensityCd": 2000.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 8.0,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -84,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural pixel flood",
+  "fullName": "GSARC PIX S TW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,14 +126,15 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "colorTemperatureK": "estimated"
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "No per-model data published; power/weight scaled within the series from the documented models."
+    "No per-model data published; power/weight scaled within the series from the documented models.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

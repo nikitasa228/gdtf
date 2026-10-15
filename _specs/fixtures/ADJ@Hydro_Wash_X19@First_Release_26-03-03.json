@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 990,
-  "maxLuminousIntensityCd": 32100.0,
+  "maxLuminousIntensityCd": 32000.0,
   "luminousFluxLm": 7500,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 24.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -108,6 +108,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Hydro Wash X19",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -152,15 +154,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 40 W invalid (spec sheet: 990 W max)."
+    "GDTF power 40 W invalid (spec sheet: 990 W max).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/hydro-wash-x19"

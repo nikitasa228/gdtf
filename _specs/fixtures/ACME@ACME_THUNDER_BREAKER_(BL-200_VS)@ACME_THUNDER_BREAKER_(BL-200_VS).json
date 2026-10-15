@@ -6,7 +6,7 @@
   "gdtfName": "ACME THUNDER BREAKER (BL-200 VS)",
   "longName": "THUNDER BREAKER(BL-200 VS)",
   "shortName": "BL-200 VS",
-  "description": "ACME THUNDER BREAKER (BL-200 VS)",
+  "description": "ACME THUNDER BREAKER(BL-200 VS): LED strobe, with 110 deg beam, RGBW colour mixing, IPX4 rated.",
   "manufacturer": "ACME",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 395,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 4100.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 10.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -63,7 +63,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -84,10 +87,13 @@
     }
   ],
   "pixelCount": 12,
+  "fullName": "ACME THUNDER BREAKER(BL-200 VS)",
+  "gdtfDescription": "ACME THUNDER BREAKER (BL-200 VS)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "manual",
@@ -121,16 +127,17 @@
     "supportedPowerNetworks": "manual",
     "beamAngleDeg": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5589"

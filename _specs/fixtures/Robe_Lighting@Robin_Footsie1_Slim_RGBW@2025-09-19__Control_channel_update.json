@@ -4,7 +4,7 @@
   "fixtureTypeId": "43BBA8D5-678E-497F-95DC-797CFAE78899",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin Footsie1 Slim RGBW",
-  "longName": "Robin Footsie1™ Slim RGBW",
+  "longName": "Robin Footsie1 Slim RGBW",
   "shortName": "Footsie1 S RGBW",
   "description": "Footsie 1 Slim RGBW - Time to uplift your footlights and make those feet shine! With its sleek, low design, our IP65-rated FOOTSIE Slim, with reduced footprint takes footlights into the modern age.\nWithout the cable tray, while retaining all the popular features of the FOOTSIE range, the FOOTSIE Slim takes up even less stage space!",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 45.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 28000.0,
   "luminousFluxLm": 3830.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 7.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -97,6 +97,8 @@
   ],
   "pixelCount": 12,
   "subType": "Footlight",
+  "fullName": "Robe Lighting Robin Footsie1 Slim RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -137,14 +139,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lensType": "manual"
+    "lensType": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

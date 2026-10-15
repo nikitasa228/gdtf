@@ -4,7 +4,7 @@
   "fixtureTypeId": "A795985A-E254-4FAE-9C04-8A307432F501",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Eminere Inground 4",
-  "longName": "Eminere® Inground 4",
+  "longName": "Eminere Inground 4",
   "shortName": "Em In 4",
   "description": "A robust luminaire designed specifically to be installed into the ground. A stainless steel installation sleeve provides rust protection and as well as “armour” for the fixture itself. Available in three size with standard or Anti-skid glass. Built to exacting standards, these linear fixtures are tough enough to withstand extreme environments whilst producing beautiful colours from the RGBW, RGBA or PureWhite LED chips.",
   "manufacturer": "Anolis",
@@ -24,15 +24,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 90.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 140000.0,
   "luminousFluxLm": 3960.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 21.0,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
   "powerSupplyType": "Fixed Cable",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -154,6 +154,8 @@
   ],
   "pixelCount": 4,
   "subType": "Architectural in-ground",
+  "fullName": "Anolis Eminere Inground 4",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -194,14 +196,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "A12",
   "longName": "A12",
   "shortName": "A12",
-  "description": "A12",
+  "description": "JB-Lighting A12: moving-head LED wash, with 8-48 deg zoom, RGBW colour mixing, colour wheel.",
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 830,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 92000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 15.7,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -100,10 +100,13 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "JB-Lighting A12",
+  "gdtfDescription": "A12",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "manual",
@@ -142,15 +145,17 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.rockshop.de/en/jb-lighting-a12-rgbw"

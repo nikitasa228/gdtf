@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 900,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 7000000.0,
   "luminousFluxLm": 60000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 36.45,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "BeamZ Pro Nereid 700",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,16 +163,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "750 W LED module; mains draw estimated."
+    "750 W LED module; mains draw estimated.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.beamzlighting.com/product/nereid700-hybrid-outdoor-framing-moving-head/"

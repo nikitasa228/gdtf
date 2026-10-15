@@ -6,7 +6,7 @@
   "gdtfName": "KL Fresnel 4 CW",
   "longName": "KL Fresnel 4 CW",
   "shortName": "KLFrsnl4CW",
-  "description": "KL FRESNEL 4CW™ is a 50W 5,600K >97CRI Cool White LED fresnel, producing over 2,300 total lumen output. Features include 14° to 33° wide manual zoom, manual and DMX controlled dimmer and shutter, rotary dimmer and zoom dials, smooth 16-bit selectable dimming modes and curves, LED refresh rate frequency adjustment for flicker free operation for TV and FILM, RDM (remote device management) protocol support, 5pin DMX and IP65 Locking Power Cable in/out connections, 4 button control panel, LCD menu display, multiple unit power linking, a universal auto switching power supply (100-240v), gel frame and rotating barn doors (included), and a 3 clamp position adjustable mounting yoke.",
+  "description": "KL FRESNEL 4CW is a 50W 5,600K >97CRI Cool White LED fresnel, producing over 2,300 total lumen output. Features include 14° to 33° wide manual zoom, manual and DMX controlled dimmer and shutter, rotary dimmer and zoom dials, smooth 16-bit selectable dimming modes and curves, LED refresh rate frequency adjustment for flicker free operation for TV and FILM, RDM (remote device management) protocol support, 5pin DMX and IP65 Locking Power Cable in/out connections, 4 button control panel, LCD menu display, multiple unit power linking, a universal auto switching power supply (100-240v), gel frame and rotating barn doors (included), and a 3 clamp position adjustable mounting yoke.",
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 50,
-  "maxLuminousIntensityCd": 33800.0,
+  "maxLuminousIntensityCd": 34000.0,
   "luminousFluxLm": 2264.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.08,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,6 +105,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation KL Fresnel 4 CW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -146,14 +148,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/kl-fresnel-4-cw"

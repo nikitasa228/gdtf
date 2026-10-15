@@ -29,7 +29,7 @@
   "powerConsumptionW": 33,
   "maxLuminousIntensityCd": 7600.0,
   "luminousFluxLm": 1623.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.5,
   "powerConnectorIn": "DIN3 (low-voltage DC)",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclDisplayDAT4000Wash25-50",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,14 +140,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ECLDISPLAYDAT"

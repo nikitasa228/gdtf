@@ -4,7 +4,7 @@
   "fixtureTypeId": "ED4307C7-1AC9-497E-8FE6-7E4C2F92BB06",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T3 Profile",
-  "longName": "Robin T3 Profile™",
+  "longName": "Robin T3 Profile",
   "shortName": "T3 Profile",
   "description": "T3 Profile\nBuilding on the success of the acclaimed Robe T-Series, the T3 ProfileTM elevates high-power multispectral performance to the ultimate level. Designed for long-throw applications, it delivers unparalleled output, light quality and precise colour control. \nDelivering over 31.250 lumens (integrating sphere) from its 1.400W MSLTM (Multi-Spectral-Light) LED engine, the T3 ProfileTM stays true to its theatrical heritage. Excelling at nuanced colour work, it offers user selectable CMY, RGB or individual colour emitter control for advanced users. \nColour features include a DataSwatchTM virtual colour library; factory calibrated whites; extensive 2.700K to 8.000K CCT range; lamp selectable tungsten emulation; and MCETM multicoloured effects directly from the LED engine. The virtually controlled CRI of 80-95+ delivers perfect colour rendition and flawless skin tones.",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1700.0,
-  "maxLuminousIntensityCd": 2023100.0,
+  "maxLuminousIntensityCd": 2000000.0,
   "luminousFluxLm": 30111.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 45.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -131,6 +131,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T3 Profile",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -177,11 +179,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

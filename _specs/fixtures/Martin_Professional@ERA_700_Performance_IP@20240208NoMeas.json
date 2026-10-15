@@ -6,7 +6,7 @@
   "gdtfName": "ERA 700 Performance IP",
   "longName": "ERA 700 Performance IP",
   "shortName": "ERA700PerIP",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional ERA 700 Performance IP: moving-head LED profile, with 5.4-41.1 deg zoom, CMY colour mixing, colour wheel, 15 gobos, framing shutters, prism, frost.",
   "manufacturer": "Martin Professional",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 856.0,
-  "maxLuminousIntensityCd": 2609300.0,
+  "maxLuminousIntensityCd": 2600000.0,
   "luminousFluxLm": 26000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 39.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -97,7 +97,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -114,10 +114,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional ERA 700 Performance IP",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -161,11 +164,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

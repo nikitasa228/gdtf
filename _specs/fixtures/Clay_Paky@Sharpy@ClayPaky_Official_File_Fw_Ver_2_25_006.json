@@ -29,7 +29,7 @@
   "powerConsumptionW": 470,
   "maxLuminousIntensityCd": 40000000,
   "luminousFluxLm": 7940.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 19.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -84,7 +84,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -101,6 +101,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Clay Paky Sharpy",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -146,15 +148,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Classic Sharpy (Osram Sirius HRI 189 W). Lux value taken from the current Sharpy page; legacy model may differ."
+    "Classic Sharpy (Osram Sirius HRI 189 W). Lux value taken from the current Sharpy page; legacy model may differ.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.claypaky.it/products/sharpy/"

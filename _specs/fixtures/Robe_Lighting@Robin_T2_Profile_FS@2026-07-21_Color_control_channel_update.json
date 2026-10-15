@@ -4,9 +4,9 @@
   "fixtureTypeId": "47F6ED03-FE40-4071-AD93-701CECDA21FF",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T2 Profile FS",
-  "longName": "Robin T2 Profile™ FS",
+  "longName": "Robin T2 Profile FS",
   "shortName": "T2ProfileFS",
-  "description": "T2 FS. Taking Multispectral perfection even further! While simultaneously maintaining the absolute colour finesse of Robe’s phenomenally successful T1 series, featuring the MSL™ (Multi-Spectral) LED engine, our T2 Profile™ provides an enhanced output of more than 17.500 lumens, measured at the front lens, via its 850W MSL™ source, to throw their beautiful light even further than before. With a zoom range of 5–55°, T2 Profile™ is ideally suited to its longer-throw role in theatre, television, and touring.",
+  "description": "T2 FS. Taking Multispectral perfection even further! While simultaneously maintaining the absolute colour finesse of Robe’s phenomenally successful T1 series, featuring the MSL (Multi-Spectral) LED engine, our T2 Profile provides an enhanced output of more than 17.500 lumens, measured at the front lens, via its 850W MSL source, to throw their beautiful light even further than before. With a zoom range of 5–55°, T2 Profile is ideally suited to its longer-throw role in theatre, television, and touring.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1150.0,
-  "maxLuminousIntensityCd": 601800.0,
+  "maxLuminousIntensityCd": 600000.0,
   "luminousFluxLm": 10075.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 38.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -97,7 +97,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -126,6 +126,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T2 Profile FS",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -172,11 +174,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

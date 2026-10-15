@@ -6,7 +6,7 @@
   "gdtfName": "F-Spot 800 CMY",
   "longName": "Framing Spot 800 CMY",
   "shortName": "F-Spot 800 CMY",
-  "description": "Professional Framing Moving Head Spot.",
+  "description": "PRstage Framing Spot 800 CMY: LED profile, with 5-50 deg zoom, CMY colour mixing, colour wheel, 13 gobos, framing shutters, prism, frost.",
   "manufacturer": "PRstage",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,16 +27,16 @@
     "max": 60.0
   },
   "powerConsumptionW": 850.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 120000.0,
   "luminousFluxLm": 1000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 32.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -91,7 +91,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -108,10 +108,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "PRstage Framing Spot 800 CMY",
+  "gdtfDescription": "Professional Framing Moving Head Spot.",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -151,16 +154,18 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "panRangeDeg": "estimated",
+    "tiltRangeDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "panRangeDeg",
-    "tiltRangeDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): panRangeDeg, tiltRangeDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

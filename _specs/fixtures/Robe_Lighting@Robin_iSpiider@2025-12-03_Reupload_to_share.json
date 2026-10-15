@@ -4,9 +4,9 @@
   "fixtureTypeId": "9B811C7C-4D2C-4AD7-9EAC-3533BE07E92F",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iSpiider",
-  "longName": "Robin iSpiider™",
+  "longName": "Robin iSpiider",
   "shortName": "iSpiider",
-  "description": "Unlike other spiders, our new IP65 rated iSpiider®, with its highly advanced protective design, is perfectly happy to play in the rain!",
+  "description": "Unlike other spiders, our new IP65 rated iSpiider, with its highly advanced protective design, is perfectly happy to play in the rain!",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 660.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 420000.0,
   "luminousFluxLm": 2316.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 24.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -127,6 +127,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Robe Lighting Robin iSpiider",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -169,14 +171,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

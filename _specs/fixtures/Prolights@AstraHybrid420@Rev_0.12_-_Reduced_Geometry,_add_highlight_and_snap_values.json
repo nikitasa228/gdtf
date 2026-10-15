@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 590,
-  "maxLuminousIntensityCd": 14375100.0,
+  "maxLuminousIntensityCd": 14000000.0,
   "luminousFluxLm": 35815.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 28.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -97,7 +97,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights AstraHybrid420",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -155,14 +157,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ASTRAHYB420"

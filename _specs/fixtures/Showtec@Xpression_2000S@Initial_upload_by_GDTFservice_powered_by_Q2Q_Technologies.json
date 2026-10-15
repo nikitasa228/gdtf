@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 221.0,
-  "maxLuminousIntensityCd": 56200.0,
+  "maxLuminousIntensityCd": 56000.0,
   "luminousFluxLm": 4488.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 10.6,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -70,7 +70,10 @@
   "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -87,7 +90,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -104,6 +107,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Showtec Xpression 2000S",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,12 +154,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): colorTemperatureK, ipRating, noiseLevelDb"
+  ]
 }

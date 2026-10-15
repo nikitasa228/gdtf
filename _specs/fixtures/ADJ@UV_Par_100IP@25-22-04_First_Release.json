@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 100.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 980.0,
   "luminousFluxLm": 4400.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 6.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -65,7 +65,10 @@
   "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -98,6 +101,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ UV Par 100IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,7 +129,7 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "manual",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "manual",
+    "colorTemperatureK": "estimated",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
@@ -138,17 +143,17 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "395 nm UV COB; CCT not applicable."
+    "395 nm UV COB; CCT not applicable.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/uv-par-100ip"

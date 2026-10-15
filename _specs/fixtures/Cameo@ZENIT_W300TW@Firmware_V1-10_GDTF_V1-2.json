@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 300,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 5300.0,
   "luminousFluxLm": 24000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -110,6 +110,8 @@
   ],
   "pixelCount": 1,
   "subType": "Outdoor flood",
+  "fullName": "Cameo ZENIT W300 TW (CLZW300TW)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -150,18 +152,18 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "ipRating": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Assumed equal to ZENIT W300."
+    "Assumed equal to ZENIT W300.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "Aquaray 500 SBW",
   "longName": "Aquaray 500 SBW",
   "shortName": "AQUA500SBW",
-  "description": "Cyclops Lighting Official Library",
+  "description": "Cyclops Lighting Aquaray 500 SBW: moving-head Discharge Lamp beam/spot/wash hybrid, with 3-21.2 deg zoom, CMY colour mixing, frost, IP66 rated.",
   "manufacturer": "Cyclops Lighting",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 600,
-  "maxLuminousIntensityCd": 103386300.0,
-  "luminousFluxLm": 318000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 8800000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 47,
   "weightKg": 28.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -92,14 +92,15 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cyclops Lighting Aquaray 500 SBW",
+  "gdtfDescription": "Cyclops Lighting Official Library",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -134,15 +135,20 @@
     "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Weight is 0 in GDTF"
+    "Weight is 0 in GDTF",
+    "GDTF luminous flux 318000 lm is implausible for 600 W and was dropped",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.cyclopslighting.com/product/aquaray-500sbw-cmy-outdoor-spot-beam-wash-moving-head/"

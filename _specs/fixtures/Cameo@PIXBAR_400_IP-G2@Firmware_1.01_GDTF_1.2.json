@@ -6,7 +6,7 @@
   "gdtfName": "PIXBAR 400 IP-G2",
   "longName": "PIXBAR 400 IP G2 (CLPB400IPG2)",
   "shortName": "PIXBAR 400",
-  "description": "IP65 RGBW-LED Bar",
+  "description": "Cameo PIXBAR 400 IP G2 (CLPB400IPG2): LED bar, with 25 deg beam, RGBW colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Cameo",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -35,7 +35,7 @@
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -147,10 +147,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cameo PIXBAR 400 IP G2 (CLPB400IPG2)",
+  "gdtfDescription": "IP65 RGBW-LED Bar",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -188,10 +191,10 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

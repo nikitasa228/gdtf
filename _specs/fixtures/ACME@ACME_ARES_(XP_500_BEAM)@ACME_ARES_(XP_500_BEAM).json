@@ -6,7 +6,7 @@
   "gdtfName": "ACME ARES (XP 500 BEAM)",
   "longName": "ARES(XP 500 BEAM)",
   "shortName": "(XP 500 BEAM)",
-  "description": "ACME ARES(XP 500 BEAM)500W",
+  "description": "ACME ARES(XP 500 BEAM): moving-head Discharge Lamp beam, with 1.3 deg beam, colour wheel, 18 gobos, prism, frost.",
   "manufacturer": "ACME",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 570,
   "maxLuminousIntensityCd": 88200000,
   "luminousFluxLm": 9900,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 28.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -134,10 +134,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME ARES(XP 500 BEAM)",
+  "gdtfDescription": "ACME ARES(XP 500 BEAM)500W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "maxLuminousIntensityCd": "manual",
@@ -180,13 +183,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
   "_refs": [
     "https://en.acmelighting.com/item/ARES"
   ]

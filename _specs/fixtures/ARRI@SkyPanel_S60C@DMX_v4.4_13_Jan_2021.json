@@ -4,9 +4,9 @@
   "fixtureTypeId": "E28CDA58-2C9D-41E7-BDE3-31BA6DE92F9A",
   "gdtfDataVersion": "1.1",
   "gdtfName": "SkyPanel S60C",
-  "longName": "ARRI SkyPanel S60C",
+  "longName": "SkyPanel S60C",
   "shortName": "S60C",
-  "description": "SkyPanel S60-C RGBW Soft Light with ECC",
+  "description": "ARRI SkyPanel S60C: LED wash (soft light panel), with 105 deg beam, RGBW colour mixing, colour wheel.",
   "manufacturer": "ARRI",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 450,
-  "maxLuminousIntensityCd": 14500.0,
+  "maxLuminousIntensityCd": 14000.0,
   "luminousFluxLm": 50000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 12.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -260,14 +260,16 @@
   ],
   "pixelCount": 3,
   "subType": "Soft light panel",
+  "fullName": "ARRI SkyPanel S60C",
+  "gdtfDescription": "SkyPanel S60-C RGBW Soft Light with ECC",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -300,16 +302,19 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "External PSU 3.5 kg."
+    "External PSU 3.5 kg.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.arri.com/en/lighting/led/skypanel/s60-c"

@@ -6,7 +6,7 @@
   "gdtfName": "MAC Encore Performance CLD",
   "longName": "MAC Encore Performance CLD",
   "shortName": "MACEncPerCLD",
-  "description": "Official Martin Professional File (no measurements)",
+  "description": "Martin Professional MAC Encore Performance CLD: moving-head LED profile, with 8.9-37.6 deg zoom, CMY colour mixing, colour wheel, 5 gobos, framing shutters, frost.",
   "manufacturer": "Martin Professional",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -24,9 +24,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 590.0,
-  "maxLuminousIntensityCd": 428700.0,
+  "maxLuminousIntensityCd": 430000.0,
   "luminousFluxLm": 11600.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 31.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
@@ -91,10 +91,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional MAC Encore Performance CLD",
+  "gdtfDescription": "Official Martin Professional File (no measurements)",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -136,11 +139,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

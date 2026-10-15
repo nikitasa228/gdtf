@@ -29,7 +29,7 @@
   "powerConsumptionW": 1150,
   "maxLuminousIntensityCd": 3900.0,
   "luminousFluxLm": 300.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 49.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -89,6 +89,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY IPL7215",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -129,14 +131,15 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "72 x 15 W LEDs; mains draw estimated from emitter load."
+    "72 x 15 W LEDs; mains draw estimated from emitter load.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

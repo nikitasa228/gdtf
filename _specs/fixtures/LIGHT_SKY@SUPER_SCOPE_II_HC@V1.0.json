@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 850.0,
-  "maxLuminousIntensityCd": 4052800.0,
+  "maxLuminousIntensityCd": 4100000.0,
   "luminousFluxLm": 20000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 26.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY SUPER SCOPE II HC",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -162,11 +164,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "framingShutterType": "gdtf-derived",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

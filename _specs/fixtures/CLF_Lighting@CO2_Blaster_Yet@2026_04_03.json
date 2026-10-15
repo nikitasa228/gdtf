@@ -6,7 +6,7 @@
   "gdtfName": "CO2 Blaster Yet",
   "longName": "CO2 Blaster Yet",
   "shortName": "Blaster Yet",
-  "description": "Vertical Fogger",
+  "description": "CLF Lighting CO2 Blaster Yet: LED fog machine (co2 jet with led), with 10 deg beam, RGBA colour mixing, colour wheel.",
   "manufacturer": "CLF Lighting",
   "category": "FOG",
   "supportedPowerNetworks": [
@@ -23,9 +23,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 3100.0,
-  "maxLuminousIntensityCd": 585500.0,
+  "maxLuminousIntensityCd": 3600000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 60,
   "weightKg": 33.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -68,7 +68,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -86,17 +86,19 @@
   ],
   "pixelCount": 2,
   "subType": "CO2 jet with LED",
+  "fullName": "CLF Lighting CO2 Blaster Yet",
+  "gdtfDescription": "Vertical Fogger",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -124,13 +126,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

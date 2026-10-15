@@ -4,7 +4,7 @@
   "fixtureTypeId": "307E6E41-640D-411B-8419-83AC6F31B283",
   "gdtfDataVersion": "1.0",
   "gdtfName": "TEX L-30 1FT FW",
-  "longName": "GSARC TEX L-30 1FT FW",
+  "longName": "TEX L-30 1FT FW",
   "shortName": "TEX L-30 1FT FW",
   "description": "TEX is a new architectural outdoor graze lighting series. 3 models with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 50,
-  "maxLuminousIntensityCd": 11700.0,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.7,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -84,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Linear graze light",
+  "fullName": "GSARC TEX L-30 1FT FW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,15 +126,16 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "colorTemperatureK": "manual"
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft."
+    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.gsarc.com/Uploads/download/file2/1567066341.pdf"

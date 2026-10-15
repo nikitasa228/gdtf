@@ -6,7 +6,7 @@
   "gdtfName": "Robin iEsprite LTL WB",
   "longName": "Robin iESPRITE LTL WB",
   "shortName": "LTL WB",
-  "description": "Inspired by the award-winning iFORTE® LTX WB and maintaining the renowned design and durability of the iSERIES, the smaller and lighter iESPRITE® LTL WB WashBeam luminaire delivers a powerful advantage in its class for live concert-touring, theatrical productions, and broadcast designs, indoors or out.\nWith exceptional form-factor, impressive output, optical precision with an imposing 200mm front lens and rich feature set, this fixture will fit deliver high performance without occupying excessive space or overloading your truss, at just 37 kg.\nThe iESPRITE® LTL WB is available with a choice of patented, IP65-rated iSE-TE™ 750W White LED TRANSFERABLE ENGINES. Choose between the XP (High Performance) engine, which delivers a 6.700 K colour temperature, a fixture output of 35.000 lm (integrating sphere), for an impressive 250.000 lx at 5 m with a CRI of 70 for maximum brightness; or the HCF (High Colour Fidelity) engine, offering a 6.000K colour temperature, 22.750 lm output (integrating sphere), for illuminance of 140.000 lx at 5 m with an exceptional CRI of 96 for superior colour rendition.",
+  "description": "Inspired by the award-winning iFORTE LTX WB and maintaining the renowned design and durability of the iSERIES, the smaller and lighter iESPRITE LTL WB WashBeam luminaire delivers a powerful advantage in its class for live concert-touring, theatrical productions, and broadcast designs, indoors or out.\nWith exceptional form-factor, impressive output, optical precision with an imposing 200mm front lens and rich feature set, this fixture will fit deliver high performance without occupying excessive space or overloading your truss, at just 37 kg.\nThe iESPRITE LTL WB is available with a choice of patented, IP65-rated iSE-TE 750W White LED TRANSFERABLE ENGINES. Choose between the XP (High Performance) engine, which delivers a 6.700 K colour temperature, a fixture output of 35.000 lm (integrating sphere), for an impressive 250.000 lx at 5 m with a CRI of 70 for maximum brightness; or the HCF (High Colour Fidelity) engine, offering a 6.000K colour temperature, 22.750 lm output (integrating sphere), for illuminance of 140.000 lx at 5 m with an exceptional CRI of 96 for superior colour rendition.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": 6449300.0,
+  "maxLuminousIntensityCd": 6400000.0,
   "luminousFluxLm": 27000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 37.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iESPRITE LTL WB",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,11 +163,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

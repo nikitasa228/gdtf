@@ -6,7 +6,7 @@
   "gdtfName": "Chorus Line 16",
   "longName": "Chorus Line 16",
   "shortName": "ChrsL16",
-  "description": "CHORUS LINE 16™ is a 16 pixel bar wash luminaire featuring 40W 4-in-1 RGBW LEDs, motorized 4° to 40° zoom and 220° tilt movement, full pixel control, 2,700K - 7,000K adjustable linear color temperature, 64 color presets and 14 unique color macros, electronic strobe and 16-bit variable dimming curve modes, adjustable LED refresh rate frequency and gamma brightness for flicker free operation for TV and FILM, DMX, RDM, Kling-NET, and Art-NET protocol support, DMX, RJ45 ethernet, and Locking Power Cable in/out connections, 4 button LCD control panel display, dual quick-lock omega bracket rigging, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "CHORUS LINE 16 is a 16 pixel bar wash luminaire featuring 40W 4-in-1 RGBW LEDs, motorized 4° to 40° zoom and 220° tilt movement, full pixel control, 2,700K - 7,000K adjustable linear color temperature, 64 color presets and 14 unique color macros, electronic strobe and 16-bit variable dimming curve modes, adjustable LED refresh rate frequency and gamma brightness for flicker free operation for TV and FILM, DMX, RDM, Kling-NET, and Art-NET protocol support, DMX, RJ45 ethernet, and Locking Power Cable in/out connections, 4 button LCD control panel display, dual quick-lock omega bracket rigging, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 739,
-  "maxLuminousIntensityCd": 17556900.0,
+  "maxLuminousIntensityCd": 18000000.0,
   "luminousFluxLm": 96000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 21.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -95,6 +95,8 @@
     }
   ],
   "pixelCount": 32,
+  "fullName": "Elation Chorus Line 16",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -102,7 +104,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -136,14 +137,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/chorus-line-16"

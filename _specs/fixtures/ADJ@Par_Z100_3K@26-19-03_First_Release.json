@@ -4,7 +4,7 @@
   "fixtureTypeId": "83334F11-4282-4EF5-A957-DE4C7A922F42",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Par Z100 3K",
-  "longName": "ADJ Par Z100 3K",
+  "longName": "Par Z100 3K",
   "shortName": "ParZ1003K",
   "description": "The Par Z100 3K is a modern LED twist to the traditional halogen Par Can. It is powered by a potent 100W warm white C.O.B. (Chip On Board) LED with a color temperature of 3000K. Its output is comparable to a 1000W halogen sealed beam Par. It is equipped with 5 different beam angle options that may be changed by hand. Locking Power In/Out allows for the fixture to be daisy chained, while 5-pin DMX control offers a variable strobe rate and 5 different dimming curve options.",
   "manufacturer": "ADJ",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 115,
-  "maxLuminousIntensityCd": 23300.0,
+  "maxLuminousIntensityCd": 23000.0,
   "luminousFluxLm": 7135.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Par Z100 3K",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -137,15 +139,17 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "LED (COB), not halogen as GDTF states; manual zoom."
+    "LED (COB), not halogen as GDTF states; manual zoom.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/par-z100-3k"

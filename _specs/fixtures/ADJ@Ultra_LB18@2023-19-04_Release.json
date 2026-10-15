@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 130,
-  "maxLuminousIntensityCd": 79700.0,
-  "luminousFluxLm": 43143.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 53000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
   "weightKg": 5.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -125,14 +125,14 @@
     }
   ],
   "pixelCount": 12,
+  "fullName": "ADJ Ultra LB18",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -164,14 +164,18 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Elliptical beam 17 x 40 deg."
+    "Elliptical beam 17 x 40 deg.",
+    "GDTF luminous flux 43143 lm is implausible for 130 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/ultra-lb18"

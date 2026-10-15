@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 160000.0,
   "luminousFluxLm": 24000.0,
   "noiseLevelDb": 0,
   "weightKg": 8.0,
@@ -35,7 +35,7 @@
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -117,6 +117,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cameo ZENIT B200 (CLZB200)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -157,18 +159,18 @@
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
     "ipRating": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Convection cooled (silent)."
+    "Convection cooled (silent).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/zenit-b200"

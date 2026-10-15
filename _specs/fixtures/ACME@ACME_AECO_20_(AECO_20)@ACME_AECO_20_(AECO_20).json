@@ -4,9 +4,9 @@
   "fixtureTypeId": "B5479C3F-E2B6-44F1-BC22-77423A0AD6EB",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME AECO 20 (AECO 20)",
-  "longName": "ACME AECO 20 (AECO 20)",
+  "longName": "AECO 20 (AECO 20)",
   "shortName": "AECO 20",
-  "description": "ACME AECO 20 1400W LED",
+  "description": "ACME AECO 20 (AECO 20): moving-head LED profile, with 5-50 deg zoom, CMY colour mixing, colour wheel, 16 gobos, framing shutters, prism, frost.",
   "manufacturer": "ACME",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 1580,
   "maxLuminousIntensityCd": 2100000,
   "luminousFluxLm": 36000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 47.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -119,10 +119,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME AECO 20 (AECO 20)",
+  "gdtfDescription": "ACME AECO 20 1400W LED",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "manual",
@@ -165,14 +168,15 @@
     "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-20"

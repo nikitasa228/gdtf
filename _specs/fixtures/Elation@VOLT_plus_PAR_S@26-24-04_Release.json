@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 40,
-  "maxLuminousIntensityCd": 13800.0,
+  "maxLuminousIntensityCd": 14000.0,
   "luminousFluxLm": 1877.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.85,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -76,7 +76,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -15.0,
@@ -118,6 +118,8 @@
   ],
   "pixelCount": 1,
   "subType": "Battery PAR",
+  "fullName": "Elation VOLT+ PAR S",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,14 +161,16 @@
     "subType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/volt-par-s"

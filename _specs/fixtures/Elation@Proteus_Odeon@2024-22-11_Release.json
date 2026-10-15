@@ -6,7 +6,7 @@
   "gdtfName": "Proteus Odeon",
   "longName": "Proteus Odeon",
   "shortName": "Proteus Odeon",
-  "description": "The PROTEUS ODEON™ is a powerful yet compact IP66-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\n\nProviding up to 30800 lumens output from its custom-designed Variable CRI LED engine, the PROTEUS ODEON is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. \nThe TruTone variable CRI allows selecting the best blend of light output and color accuracy, depending on the requirement of the show or scene. It is seamlessly adjustable from CRI 70 to CRI 93.\n\nPROTEUS ODEON provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.\n\nWith a fast zoom range from 5.5° to 50° out of an impressively compact fixture design, the PROTEUS ODEON has the power to cut through and make a statement on any stage. Fully sealed from dust and water, it is a rugged fixture for a wide variety of applications.\n\nThe PROTEUS ODEON ships in a cardboard box with a custom-fitted polyurethane foam FIL (Foam In Lay) insert. The foam insert easily fits into a custom flight case (not included) and provides enhanced impact protection during transport.",
+  "description": "The PROTEUS ODEON is a powerful yet compact IP66-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\n\nProviding up to 30800 lumens output from its custom-designed Variable CRI LED engine, the PROTEUS ODEON is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. \nThe TruTone variable CRI allows selecting the best blend of light output and color accuracy, depending on the requirement of the show or scene. It is seamlessly adjustable from CRI 70 to CRI 93.\n\nPROTEUS ODEON provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.\n\nWith a fast zoom range from 5.5° to 50° out of an impressively compact fixture design, the PROTEUS ODEON has the power to cut through and make a statement on any stage. Fully sealed from dust and water, it is a rugged fixture for a wide variety of applications.\n\nThe PROTEUS ODEON ships in a cardboard box with a custom-fitted polyurethane foam FIL (Foam In Lay) insert. The foam insert easily fits into a custom flight case (not included) and provides enhanced impact protection during transport.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1000,
-  "maxLuminousIntensityCd": 2979600.0,
+  "maxLuminousIntensityCd": 3000000.0,
   "luminousFluxLm": 30800.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 42.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -127,6 +127,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Odeon",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -174,14 +176,15 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://goknight.com/elation-pro621-proteus-odeon-ip66-rated-led-profile-fixture/"

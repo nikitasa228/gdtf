@@ -4,7 +4,7 @@
   "fixtureTypeId": "9B181200-F6E3-4EE6-B385-FCE095B46424",
   "gdtfDataVersion": "1.2",
   "gdtfName": "JDC 1",
-  "longName": "GLP JDC 1",
+  "longName": "JDC 1",
   "shortName": "JDC 1",
   "description": "GLP JDC1: hybrid LED strobe with a white strobe tube and RGB pixel plates, 185 deg tilt.",
   "manufacturer": "GLP",
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 1200,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 16000.0,
   "luminousFluxLm": 41700.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 11.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 185.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -48,7 +48,10 @@
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 90.0,
+    "max": 90.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Rectangle",
@@ -104,6 +107,8 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "GLP JDC 1",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -136,7 +141,6 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
     "powerSupplyType": "estimated",
     "ipRating": "manual",
     "description": "estimated",
@@ -144,18 +148,19 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 3545 W invalid, removed."
+    "GDTF power 3545 W invalid, removed.",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.tsllighting.com/equipment/static-intelligent-fixtures/static-effect/glp-jdc1/"

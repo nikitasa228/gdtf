@@ -29,7 +29,7 @@
   "powerConsumptionW": 216,
   "maxLuminousIntensityCd": 212000,
   "luminousFluxLm": 145.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 12.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -99,6 +99,8 @@
   ],
   "pixelCount": 1,
   "subType": "Moving batten",
+  "fullName": "Prolights Air6Pix",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,14 +145,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
-    "colorTemperatureK": "estimated"
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/AIR6PIX"

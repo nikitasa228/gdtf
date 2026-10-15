@@ -4,7 +4,7 @@
   "fixtureTypeId": "E3BD5003-C35C-4C69-AD69-E63ECF0FFB6B",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin MegaPointe",
-  "longName": "Robin MegaPointe®",
+  "longName": "Robin MegaPointe",
   "shortName": "MegaPointe",
   "description": "MEGA bright with MEGA features and still compact. The MegaPointe from Robe.",
   "manufacturer": "Robe Lighting",
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 670.0,
-  "maxLuminousIntensityCd": 18399900.0,
+  "maxLuminousIntensityCd": 15000000.0,
   "luminousFluxLm": 20375.0,
   "noiseLevelDb": 46,
   "weightKg": 22.0,
@@ -118,7 +118,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -135,6 +135,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin MegaPointe",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -181,12 +183,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "noiseLevelDb": "manual"
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 46 dB(A) @1 m, Auto fan mode."
+    "Noise 46 dB(A) @1 m, Auto fan mode.",
+    "Typical-value estimates (no published data): ipRating"
   ],
   "_refs": [
     "https://monaco.novelty.fr/download/materiel_certificat_de_conformite/robe_mega-pointe_noise-measurement.pdf"

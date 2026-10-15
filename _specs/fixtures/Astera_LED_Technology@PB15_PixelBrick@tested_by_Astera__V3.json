@@ -29,9 +29,9 @@
   "powerConsumptionW": 15,
   "maxLuminousIntensityCd": 4800,
   "luminousFluxLm": 950.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.12,
-  "powerConnectorIn": "DC Jack / PWB CAB Connector",
+  "powerConnectorIn": "DC Jack / PWB-CAB Connector",
   "powerConnectorOut": "PWB-CAB Connector",
   "powerSupplyType": "DC Jack LINK",
   "motorizedPanTilt": false,
@@ -203,6 +203,8 @@
   ],
   "pixelCount": 2,
   "subType": "Battery uplight",
+  "fullName": "Astera LED Technology PB15 PixelBrick",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -211,7 +213,6 @@
     "category": "manual",
     "voltageRangeV": "estimated",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -244,14 +245,16 @@
     "subType": "manual",
     "ipRating": "manual",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://lsionline.com/news/pl-s-2022-astera-highlights-latest-innovations"

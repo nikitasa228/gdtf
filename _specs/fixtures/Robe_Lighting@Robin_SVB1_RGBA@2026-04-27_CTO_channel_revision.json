@@ -4,9 +4,9 @@
   "fixtureTypeId": "75C094AF-2E18-4E16-9D29-5F5D71AFBE02",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin SVB1 RGBA",
-  "longName": "Robin SVB1™ RGBA",
+  "longName": "Robin SVB1 RGBA",
   "shortName": "SVB1 RGBA",
-  "description": "Are you in search of a small, lightweight, high-impact lighting fixture that gives you\nan edge over the competition? Look no further! Introducing the eye-catching\nSVB1™ effect, beam, and wash luminaire!\nThis versatile, compact powerhouse, built on the heritage of its SVOPATT™ lineage, delivers highoutput\nand extreme speed with continuous pan and tilt rotation, ensuring a captivating performance\nfor your audience.\nEquipped with seven individual 40W RGBW LED cells and a central pixel featuring both RGBW and\na powerful 200W white strobe LED module, the SVB1™ offers full pixel mapping capabilities for\nunlimited creative looks and effects, boasting an impressive 11.000 lm output.\nHelping to maintain this high level of performance, the RLCT™ lens coating protects against scratches\nand scuffs while preventing particle adhesion, ensuring your optics stay cleaner for far longer.\nThe SVB1™ stands out with its motorized zoom range, offering precise 3.8° beams to expansive 50°\nwashes, all while operating with remarkable quietness. Its rapid speed and wide coverage are further\nenhanced by the fixture’s 360° continuous pan and rotation capabilities, making it an impressive choice for\nany lighting setup.",
+  "description": "Are you in search of a small, lightweight, high-impact lighting fixture that gives you\nan edge over the competition? Look no further! Introducing the eye-catching\nSVB1 effect, beam, and wash luminaire!\nThis versatile, compact powerhouse, built on the heritage of its SVOPATT lineage, delivers highoutput\nand extreme speed with continuous pan and tilt rotation, ensuring a captivating performance\nfor your audience.\nEquipped with seven individual 40W RGBW LED cells and a central pixel featuring both RGBW and\na powerful 200W white strobe LED module, the SVB1 offers full pixel mapping capabilities for\nunlimited creative looks and effects, boasting an impressive 11.000 lm output.\nHelping to maintain this high level of performance, the RLCT lens coating protects against scratches\nand scuffs while preventing particle adhesion, ensuring your optics stay cleaner for far longer.\nThe SVB1 stands out with its motorized zoom range, offering precise 3.8° beams to expansive 50°\nwashes, all while operating with remarkable quietness. Its rapid speed and wide coverage are further\nenhanced by the fixture’s 360° continuous pan and rotation capabilities, making it an impressive choice for\nany lighting setup.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 220.0,
-  "maxLuminousIntensityCd": 1748800.0,
+  "maxLuminousIntensityCd": 1700000.0,
   "luminousFluxLm": 8630.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 7.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -102,6 +102,8 @@
     }
   ],
   "pixelCount": 9,
+  "fullName": "Robe Lighting Robin SVB1 RGBA",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -112,7 +114,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -146,11 +147,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

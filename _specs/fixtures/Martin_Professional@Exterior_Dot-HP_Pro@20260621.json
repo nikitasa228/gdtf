@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Dot-HP Pro",
   "longName": "Exterior Dot-HP Pro",
   "shortName": "EXTDotHPPro",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior Dot-HP Pro: LED wash (architectural rgbw dot / flood), with 114 deg beam, RGBW colour mixing, colour wheel.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": null,
@@ -16,7 +16,7 @@
   },
   "frequencyRangeHz": null,
   "powerConsumptionW": 6.0,
-  "maxLuminousIntensityCd": 0.0,
+  "maxLuminousIntensityCd": 4.5,
   "luminousFluxLm": 18.0,
   "noiseLevelDb": null,
   "weightKg": 0.4,
@@ -63,7 +63,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -93,10 +93,13 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural RGBW dot / flood",
+  "fullName": "Martin Professional Exterior Dot-HP Pro",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "voltageRangeV": "gdtf",
@@ -130,7 +133,9 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -139,6 +144,7 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless.",
+    "Typical-value estimates (no published data): ipRating"
   ]
 }

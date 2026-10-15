@@ -29,7 +29,7 @@
   "powerConsumptionW": 460,
   "maxLuminousIntensityCd": 132000000,
   "luminousFluxLm": 33000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 32.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -152,6 +152,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cameo ORON H2",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -198,15 +200,16 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "maxLuminousIntensityCd": "manual"
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/oron-h2"

@@ -4,7 +4,7 @@
   "fixtureTypeId": "41A5C4F0-9C42-4068-BEE8-4478B2283F98",
   "gdtfDataVersion": "1.2",
   "gdtfName": "pixelPATT",
-  "longName": "pixelPATT™",
+  "longName": "pixelPATT",
   "shortName": "pixelPATT",
   "description": "Joining Robe’s line of retro style lighting products is pixelPATT, the latest addition to the PATT family. In spite of its eye catching retro design, pixelPATT is based on modern LED pixel controlled technology.\n\nFor full data (consuption, voltage etc.) please add PATT Driver.",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 210.0,
-  "maxLuminousIntensityCd": 400.0,
+  "maxLuminousIntensityCd": 430.0,
   "luminousFluxLm": 480.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 12.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -116,6 +116,8 @@
   ],
   "pixelCount": 2,
   "subType": "Retro LED",
+  "fullName": "Robe Lighting pixelPATT",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,7 +126,6 @@
     "category": "manual",
     "voltageRangeV": "estimated",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -156,11 +157,15 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

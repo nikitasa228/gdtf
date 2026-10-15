@@ -112,6 +112,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional Maverick Force 3 Profile",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -160,7 +162,8 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

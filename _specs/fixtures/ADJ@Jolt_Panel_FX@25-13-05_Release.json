@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 330,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 9300.0,
   "luminousFluxLm": 24000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 6.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -122,6 +122,8 @@
     }
   ],
   "pixelCount": 10,
+  "fullName": "ADJ Jolt Panel FX",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -159,17 +161,19 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "colorTemperatureK": "manual"
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "RGB 121 deg, white 89 deg."
+    "RGB 121 deg, white 89 deg.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/jolt-panel-fx"

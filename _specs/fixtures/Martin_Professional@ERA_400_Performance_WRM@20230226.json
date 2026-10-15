@@ -6,7 +6,7 @@
   "gdtfName": "ERA 400 Performance WRM",
   "longName": "ERA 400 Performance WRM",
   "shortName": "ERA400PerWRM",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional ERA 400 Performance WRM: moving-head LED profile, with 9.4-27.8 deg zoom, CMY colour mixing, colour wheel, 16 gobos, framing shutters, prism.",
   "manufacturer": "Martin Professional",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 455.0,
-  "maxLuminousIntensityCd": 198800.0,
+  "maxLuminousIntensityCd": 200000.0,
   "luminousFluxLm": 6000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 22.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -92,7 +92,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -109,10 +109,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional ERA 400 Performance WRM",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -156,11 +159,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

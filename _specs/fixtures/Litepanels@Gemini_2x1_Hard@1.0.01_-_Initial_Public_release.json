@@ -4,7 +4,7 @@
   "fixtureTypeId": "6D5063F5-9B6A-42D2-8D8C-21BCF5B06BF8",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Gemini 2x1 Hard",
-  "longName": "LitePanels Gemini 2x1 Hard",
+  "longName": "Gemini 2x1 Hard",
   "shortName": "Gemini 2x1 Hard",
   "description": "Power your imagination to create the extraordinary on screen. With an incredibly bright output of over 3000 lux @10ft/3m, Gemini 1x1 Hard delivers the brightest and most accurate 1x1 light ever. Blast through a silk, build layers of diffusion or bounce light off a board, with precision control of hue, saturation, intensity, gels and effects, Gemini 1x1 Hard gives you the power to control and create your own extraordinary.",
   "manufacturer": "Litepanels",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 325,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 5100.0,
   "luminousFluxLm": 1079.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 10.1,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": null,
@@ -51,7 +51,10 @@
     "XLR5"
   ],
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 25.0,
+    "max": 25.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Rectangle",
@@ -74,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -156,6 +159,8 @@
   ],
   "pixelCount": 1,
   "subType": "Soft light panel",
+  "fullName": "Litepanels Gemini 2x1 Hard",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -193,16 +198,18 @@
     "subType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF weight 6 kg contradicts spec (10.1 kg)."
+    "GDTF weight 6 kg contradicts spec (10.1 kg).",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

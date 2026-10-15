@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 160.0,
-  "maxLuminousIntensityCd": 58700.0,
+  "maxLuminousIntensityCd": 59000.0,
   "luminousFluxLm": 8000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 3.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -64,7 +64,10 @@
   "framingShutterType": null,
   "colorMixing": "RGB+CW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -101,6 +104,8 @@
     }
   ],
   "pixelCount": 16,
+  "fullName": "BeamZ Pro StarColor128Flood",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -108,7 +113,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -142,14 +146,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ]
 }

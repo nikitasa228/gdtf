@@ -4,9 +4,9 @@
   "fixtureTypeId": "64BB109A-7EC0-49F2-BC60-AA200C0FAE12",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin WTF",
-  "longName": "Robin WTF!™",
+  "longName": "Robin WTF!",
   "shortName": "WTF",
-  "description": "Illuminate your beat like never before with the ultra-modern, high-energy Robe WTF!™. Whatever you call it, the Wash Twist Flash delivers turbocharged strobe, wash, and blinder effects, targeting anywhere on the stage or into audience, built for any environment. Get ready to elevate your show with unmatched brilliance and intensity!",
+  "description": "Illuminate your beat like never before with the ultra-modern, high-energy Robe WTF!. Whatever you call it, the Wash Twist Flash delivers turbocharged strobe, wash, and blinder effects, targeting anywhere on the stage or into audience, built for any environment. Get ready to elevate your show with unmatched brilliance and intensity!",
   "manufacturer": "Robe Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1300.0,
-  "maxLuminousIntensityCd": 131700.0,
+  "maxLuminousIntensityCd": 130000.0,
   "luminousFluxLm": 7600.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 32.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Robe Lighting Robin WTF!",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -116,7 +118,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -149,11 +150,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

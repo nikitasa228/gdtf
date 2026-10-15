@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 350.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 2600000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 12.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -99,6 +99,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Poseidon Wash XS",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,14 +145,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
-    "description": "manual"
+    "description": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF 'gobo' wheels are pixel-effect macros."
+    "GDTF 'gobo' wheels are pixel-effect macros.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

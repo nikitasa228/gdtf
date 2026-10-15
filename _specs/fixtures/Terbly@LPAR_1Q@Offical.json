@@ -4,7 +4,7 @@
   "fixtureTypeId": "AE555494-AAB0-4235-B0DC-B89B7C6D31D0",
   "gdtfDataVersion": "1.0",
   "gdtfName": "LPAR 1Q",
-  "longName": "Terbly LPAR 1Q",
+  "longName": "LPAR 1Q",
   "shortName": "LPAR 1Q",
   "description": "RGBW LED color mixing, and protection rating: IP65.",
   "manufacturer": "Terbly",
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 15.0,
-  "maxLuminousIntensityCd": 20900.0,
+  "maxLuminousIntensityCd": 21000.0,
   "luminousFluxLm": 350.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 30,
+  "weightKg": 0.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -62,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -80,6 +83,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Terbly LPAR 1Q",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -114,16 +119,19 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "weightKg": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, noiseLevelDb"
   ]
 }

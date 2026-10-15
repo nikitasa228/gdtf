@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1240.0,
-  "maxLuminousIntensityCd": 10600.0,
+  "maxLuminousIntensityCd": 11000.0,
   "luminousFluxLm": 8200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 11.35,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -139,6 +139,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "BeamZ Pro SB250FC IP65",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,7 +151,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -180,11 +181,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ]
 }

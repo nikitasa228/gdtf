@@ -420,6 +420,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional COLORado Solo Bar 6",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -459,7 +461,8 @@
     "maxLuminousIntensityCd": "manual",
     "beamAngleDeg": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],

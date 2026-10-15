@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 112,
-  "maxLuminousIntensityCd": 78400.0,
+  "maxLuminousIntensityCd": 78000.0,
   "luminousFluxLm": 1312.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 7.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -91,6 +91,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights PixieWash",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -135,14 +137,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/PIXIEWASH"

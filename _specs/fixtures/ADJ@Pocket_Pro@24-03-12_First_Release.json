@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 53,
-  "maxLuminousIntensityCd": 39100.0,
+  "maxLuminousIntensityCd": 39000.0,
   "luminousFluxLm": 3000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 3.6,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -95,6 +95,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Pocket Pro",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -139,14 +141,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/pocket-pro"

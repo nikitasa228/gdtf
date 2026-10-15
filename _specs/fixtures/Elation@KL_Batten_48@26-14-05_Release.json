@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 800,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 31000.0,
   "luminousFluxLm": 39400,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 19.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -76,7 +76,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -15.0,
@@ -197,6 +197,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation KL Batten 48",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -236,15 +238,17 @@
     "luminousFluxLm": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/kl-batten-48"

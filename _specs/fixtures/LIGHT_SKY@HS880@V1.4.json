@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1400,
-  "maxLuminousIntensityCd": 3095700.0,
+  "maxLuminousIntensityCd": 3100000.0,
   "luminousFluxLm": 32000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 37.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -97,7 +97,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY HS880",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -160,15 +162,17 @@
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "880 W white LED engine; mains draw assumed as Super Scope Plus (same 37.5 kg platform)."
+    "880 W white LED engine; mains draw assumed as Super Scope Plus (same 37.5 kg platform).",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.lightsky.com.cn/product/hs880for-south-korean-only/"

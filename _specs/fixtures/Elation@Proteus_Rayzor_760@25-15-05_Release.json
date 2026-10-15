@@ -6,7 +6,7 @@
   "gdtfName": "Proteus Rayzor 760",
   "longName": "Proteus Rayzor 760",
   "shortName": "ProRay760",
-  "description": "The Proteus Rayzor 760™ is a compact yet extremely powerful IP65 rated Wash Effects fixture featuring Elation’s unique SparkLED™ system and fast continuous Pan and Tilt motion. With its wide zoom range from 5 to 77 degrees it provides intense and well-defined mid-air beams at over 7,200 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
+  "description": "The Proteus Rayzor 760 is a compact yet extremely powerful IP65 rated Wash Effects fixture featuring Elation’s unique SparkLED system and fast continuous Pan and Tilt motion. With its wide zoom range from 5 to 77 degrees it provides intense and well-defined mid-air beams at over 7,200 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
   "manufacturer": "Elation",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 700,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 20000000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 18.6,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation Proteus Rayzor 760",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -151,15 +153,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/proteus-rayzor-760-wmg"

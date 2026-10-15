@@ -4,9 +4,9 @@
   "fixtureTypeId": "B5A9026E-98BD-41D7-9430-61660363A6D3",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME ORION (XP-260 BEAM)",
-  "longName": "ACME ORION (XP-260 BEAM)",
+  "longName": "ORION (XP-260 BEAM)",
   "shortName": "XP-260 BEAM",
-  "description": "ACME ORION (XP-260 BEAM) 260W",
+  "description": "ACME ORION (XP-260 BEAM): moving-head Discharge Lamp beam, with 2 deg beam, colour wheel, 16 gobos, prism, frost.",
   "manufacturer": "ACME",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 375,
-  "maxLuminousIntensityCd": 14629400.0,
+  "maxLuminousIntensityCd": 3700000.0,
   "luminousFluxLm": 5000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 18.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,10 +105,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME ORION (XP-260 BEAM)",
+  "gdtfDescription": "ACME ORION (XP-260 BEAM) 260W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -151,15 +154,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/ORION"

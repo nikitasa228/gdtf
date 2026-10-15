@@ -4,7 +4,7 @@
   "fixtureTypeId": "A0C06683-55F6-40C3-994B-3B7A66E6DB86",
   "gdtfDataVersion": "1.0",
   "gdtfName": "TEX M-60 2FT FW",
-  "longName": "GSARC TEX M-60 2FT FW",
+  "longName": "TEX M-60 2FT FW",
   "shortName": "TEX M-60 2FT FW",
   "description": "TEX is a new architectural outdoor graze lighting series. 3 models with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 46,
   "maxLuminousIntensityCd": 2900.0,
   "luminousFluxLm": 25.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.86,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -88,6 +88,8 @@
   ],
   "pixelCount": 1,
   "subType": "Linear graze light",
+  "fullName": "GSARC TEX M-60 2FT FW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -128,14 +130,15 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "colorTemperatureK": "manual"
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft."
+    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.gsarc.com/en/products/841.html?t=1"

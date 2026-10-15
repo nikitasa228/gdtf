@@ -6,7 +6,7 @@
   "gdtfName": "Robin 300 LEDWash",
   "longName": "Robin 300 LEDWash",
   "shortName": "300 LEDWash",
-  "description": "Utilizing 19 multichip LEDs and motorized linear zoom 15 – 60 degrees the ROBIN® 300 LEDWash offers great flexibility with superior homogenization of the light source.",
+  "description": "Utilizing 19 multichip LEDs and motorized linear zoom 15 – 60 degrees the ROBIN 300 LEDWash offers great flexibility with superior homogenization of the light source.",
   "manufacturer": "Robe Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 200.0,
   "maxLuminousIntensityCd": 1800.0,
   "luminousFluxLm": 141.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 8.2,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -107,6 +107,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin 300 LEDWash",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -150,11 +152,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

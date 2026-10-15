@@ -6,7 +6,7 @@
   "gdtfName": "Artiste Van Gogh",
   "longName": "Artiste Van Gogh",
   "shortName": "ArtVanGogh",
-  "description": "The Artiste Van Gogh™ is a compact powerful framing Wash fixture with outstanding light quality. It is an ideal partner to the Profile fixtures in Elation’s Artiste fixture range.\nProviding up to 16.000 total lumens from its efficient 380W 6,500K LED engine allows the fixture to be utilized in many applications. Due to its high 91 color rendering index and its whisper quiet operation it is ideally suited for Television, Theater and Corporate Events, or any application where powerful and even coverage is desired. Illuminating objects and people with precise color reproduction is the perfect application for the Artiste Van Gogh. A 16bit CMY color system with a seamless CTO filter offers the designer a wide color range from subtle pastels to vibrant primaries. A seven position color wheel is provided for additional effects and includes a dedicated UV filter.",
+  "description": "The Artiste Van Gogh is a compact powerful framing Wash fixture with outstanding light quality. It is an ideal partner to the Profile fixtures in Elation’s Artiste fixture range.\nProviding up to 16.000 total lumens from its efficient 380W 6,500K LED engine allows the fixture to be utilized in many applications. Due to its high 91 color rendering index and its whisper quiet operation it is ideally suited for Television, Theater and Corporate Events, or any application where powerful and even coverage is desired. Illuminating objects and people with precise color reproduction is the perfect application for the Artiste Van Gogh. A 16bit CMY color system with a seamless CTO filter offers the designer a wide color range from subtle pastels to vibrant primaries. A seven position color wheel is provided for additional effects and includes a dedicated UV filter.",
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 600,
-  "maxLuminousIntensityCd": 2225000.0,
+  "maxLuminousIntensityCd": 2200000.0,
   "luminousFluxLm": 23000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 28.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Artiste Van Gogh",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -142,14 +144,16 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/artiste-van-gogh"

@@ -4,7 +4,7 @@
   "fixtureTypeId": "E947FFFC-8F5A-4D88-B706-689AF1FF34D6",
   "gdtfDataVersion": "1.2",
   "gdtfName": "StudioCobPlusDY2_54",
-  "longName": "StudioCobPlusDY2_54",
+  "longName": "StudioCobPlusDY2 54",
   "shortName": "STCOBPDY2_54",
   "description": "StudioCob PlusDY2 is a powerful, incredibly versatile and IP65 rated LED PAR. Fusing the old and the new, it pairs a COB LED source with a traditional parabolic reflector to deliver a proper Par replacement with a homogenised output, single shadow and flexible lens options.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 165,
   "maxLuminousIntensityCd": 9500.0,
   "luminousFluxLm": 9191.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 4.95,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -96,6 +96,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights StudioCobPlusDY2 54",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -139,14 +141,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/STUDIOCOBPDY2"

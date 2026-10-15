@@ -6,7 +6,7 @@
   "gdtfName": "P12 Wash WW",
   "longName": "P12 Wash WW",
   "shortName": "P12WAWW",
-  "description": "P12 Wash WW (Warm White) 640W",
+  "description": "JB-Lighting P12 Wash WW: moving-head LED wash (framing wash), with 11-66 deg zoom, CMY colour mixing, colour wheel, 6 gobos, framing shutters, frost.",
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 800,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 390000.0,
   "luminousFluxLm": 16300,
   "noiseLevelDb": 29,
   "weightKg": 23.0,
@@ -83,7 +83,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -101,10 +101,13 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "JB-Lighting P12 Wash WW",
+  "gdtfDescription": "P12 Wash WW (Warm White) 640W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -147,15 +150,17 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
     "https://www.focon-showtechnic.com/artikeldetails.aspx?WPParams=50C9D4C6C5D2E6BDA5A9879AA798",

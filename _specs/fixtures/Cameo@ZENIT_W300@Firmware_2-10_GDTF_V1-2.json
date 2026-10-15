@@ -6,7 +6,7 @@
   "gdtfName": "ZENIT W300",
   "longName": "ZENIT W300 (CLZW300)",
   "shortName": "W300",
-  "description": "Outdoor Wash Light - RGBW-Version",
+  "description": "Cameo ZENIT W300 (CLZW300): LED wash (outdoor flood), with 120 deg beam, RGBW colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Cameo",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 300,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 2400.0,
   "luminousFluxLm": 10661,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -118,10 +118,13 @@
   ],
   "pixelCount": 1,
   "subType": "Outdoor flood",
+  "fullName": "Cameo ZENIT W300 (CLZW300)",
+  "gdtfDescription": "Outdoor Wash Light - RGBW-Version",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -158,19 +161,19 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "ipRating": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF weight 3 kg / power 600 W contradict spec sheet."
+    "GDTF weight 3 kg / power 600 W contradict spec sheet.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/zenit-w300"

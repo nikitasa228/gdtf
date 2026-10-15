@@ -4,7 +4,7 @@
   "fixtureTypeId": "4DC5639F-E69E-443D-AFA9-25C88CD585AF",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Apollo",
-  "longName": "CLF Apollo",
+  "longName": "Apollo",
   "shortName": "Apollo",
   "description": "The CLF Apollo is a retro style ‘on stage eye-candy’ effect with various, separately controllable, LED segments. A powerful warm white / amber LED center effect is surrounded by eight RGB segments which illuminate the iconic golden inside reflector. Around the parabolic reflector, eight different RGB segments provide even more creative possibilities.\n\nCombine a vintage tungsten look with modern, colourful, LED animation effects. Pre-programmed pixel effects make it easy to create impressive and attractive effects, but different DMX modes allows precise control of all different LED segments for extensive control.",
   "manufacturer": "CLF Lighting",
@@ -25,15 +25,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 2000.0,
-  "maxLuminousIntensityCd": 71700.0,
+  "maxLuminousIntensityCd": 72000.0,
   "luminousFluxLm": 49000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 8.25,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": false,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
@@ -62,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBWA+WW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -70,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -103,6 +106,8 @@
     }
   ],
   "pixelCount": 18,
+  "fullName": "CLF Lighting Apollo",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -113,7 +118,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -144,12 +148,15 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
+  ]
 }

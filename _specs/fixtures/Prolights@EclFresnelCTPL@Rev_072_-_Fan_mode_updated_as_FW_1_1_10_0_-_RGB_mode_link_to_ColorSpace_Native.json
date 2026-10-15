@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 600.0,
-  "maxLuminousIntensityCd": 66800.0,
+  "maxLuminousIntensityCd": 67000.0,
   "luminousFluxLm": 10720.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 17.4,
   "powerConnectorIn": "DC Jack / powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -208,6 +208,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclFresnelCTPL",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -248,11 +250,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -4,7 +4,7 @@
   "fixtureTypeId": "8AB33F1C-16BB-4BEE-B167-E0BD3D4BC496",
   "gdtfDataVersion": "1.0",
   "gdtfName": "IVL_Square",
-  "longName": "IVL_Square",
+  "longName": "IVL Square",
   "shortName": "IVL Square",
   "description": "The square shape of the IVL lighting range by Minuit Une.",
   "manufacturer": "Minuit Une",
@@ -26,17 +26,17 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 300,
+  "maxLuminousIntensityCd": 5700.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 43,
+  "weightKg": 10.3,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
   "infinitePan": null,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -69,7 +69,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
@@ -84,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Kinetic LED panel",
+  "fullName": "Minuit Une IVL Square",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",
@@ -116,18 +118,24 @@
     "subType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerConsumptionW": "estimated",
+    "weightKg": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "panRangeDeg": "estimated",
+    "tiltRangeDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "panRangeDeg",
-    "tiltRangeDeg",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): powerConsumptionW, weightKg, powerSupplyType, powerConnectorIn, powerConnectorOut, panRangeDeg, tiltRangeDeg, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ]
 }

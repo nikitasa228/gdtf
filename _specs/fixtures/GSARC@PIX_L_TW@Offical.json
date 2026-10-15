@@ -4,7 +4,7 @@
   "fixtureTypeId": "6CF624E4-47FC-4C79-B2B8-C9775E1B691F",
   "gdtfDataVersion": "1.0",
   "gdtfName": "PIX L TW",
-  "longName": "GSARC_PIX L TW",
+  "longName": "PIX L TW",
   "shortName": "PIX L TW",
   "description": "PIX is a new architectural outdoor matrix lighting series. 2 models all with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 420,
   "maxLuminousIntensityCd": 4100.0,
   "luminousFluxLm": 200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 19.9,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -92,6 +92,8 @@
   ],
   "pixelCount": 2,
   "subType": "Architectural pixel flood",
+  "fullName": "GSARC PIX L TW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -99,7 +101,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "estimated",
@@ -132,14 +133,16 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "colorTemperatureK": "estimated"
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.gsarc.com/en/products/849.html?t=1"

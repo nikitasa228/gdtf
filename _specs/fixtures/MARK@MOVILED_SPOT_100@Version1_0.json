@@ -6,7 +6,7 @@
   "gdtfName": "MOVILED SPOT 100",
   "longName": "MOVILED SPOT 100",
   "shortName": "MoviledSpo",
-  "description": "80W LED Spot with RGB Ring",
+  "description": "MARK MOVILED SPOT 100: moving-head LED spot, with 15 deg beam, colour wheel, 9 gobos, prism.",
   "manufacturer": "MARK",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 120,
-  "maxLuminousIntensityCd": 45600.0,
+  "maxLuminousIntensityCd": 46000.0,
   "luminousFluxLm": 3500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 6.1,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -67,7 +67,10 @@
   "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -80,7 +83,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -97,14 +100,16 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "MARK MOVILED SPOT 100",
+  "gdtfDescription": "80W LED Spot with RGB Ring",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
@@ -138,17 +143,22 @@
     "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.masquesonido.com/moviled-spot-100.html"

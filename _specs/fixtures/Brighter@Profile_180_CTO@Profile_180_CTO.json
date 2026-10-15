@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 182800.0,
+  "maxLuminousIntensityCd": 180000.0,
   "luminousFluxLm": 22500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 6.4,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -87,6 +87,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Brighter Profile 180 CTO",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -127,11 +129,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "description": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 3624400.0,
+  "powerConsumptionW": 530,
+  "maxLuminousIntensityCd": 3600000.0,
   "luminousFluxLm": 11148.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 23.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -100,13 +100,15 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Infinity Furion W602 WashBeam",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "manual",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -144,15 +146,15 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 45 W invalid, removed."
+    "GDTF power 45 W invalid, removed.",
+    "Typical-value estimates (no published data): powerConsumptionW, noiseLevelDb"
   ]
 }

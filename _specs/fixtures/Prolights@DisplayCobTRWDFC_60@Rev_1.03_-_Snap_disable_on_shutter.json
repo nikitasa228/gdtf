@@ -4,7 +4,7 @@
   "fixtureTypeId": "050A16FB-372F-4BDC-A803-1B9C511F9D8D",
   "gdtfDataVersion": "1.2",
   "gdtfName": "DisplayCobTRWDFC_60",
-  "longName": "DisplayCobTRWDFC_60",
+  "longName": "DisplayCobTRWDFC 60",
   "shortName": "DCOB_TRWDFC_60",
   "description": "DisplayCob TRWDFC is a track mounted 60 W RGB / FC COB spotlight, designed with electronic and user interface on board being able to be implemented with any existing lighting track easily. The on board Wireless DMX receiver allow users to control this luminaire without any cable, so it doesn't need a specific track with data wirings, or it can be hanged without its track adaptor, anywhere using the onboard bracket and controlling via wired DMX protocol. DisplayCob TRWDFC optical systems is composed by a powerful 60 W COB LED source and a parabolic reflector, with swappable lenses allowing a beam angle from 15° up to 60° for a perfect focusing. DisplayCob TRWDFC features are an ideal solution to add dynamics and creativity in any installations such as commercials, hotels, restaurants and art galleries.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 75,
   "maxLuminousIntensityCd": 1400.0,
   "luminousFluxLm": 1726.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.85,
   "powerConnectorIn": "Track adapter",
   "powerConnectorOut": null,
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -96,6 +96,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights DisplayCobTRWDFC 60",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,14 +140,16 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "estimated"
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/DISPLAYCOBTRWDFC"

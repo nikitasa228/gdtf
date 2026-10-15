@@ -6,7 +6,7 @@
   "gdtfName": "PROTRON ECLYPSE",
   "longName": "PROTRON ECLYPSe",
   "shortName": "PrtnEclypse",
-  "description": "The PROTRON ECLYPSE™ is a versatile high powered 1000W air cooled IPX4 outdoor rated color blinder, strobe, wash luminaire. Features include (96) 10W CREE RGBW 4-in-1 LEDs, 31° beam / 63° field angles, 27,000+ total lumen output, brilliant eye candy effects, selectable pixel mapping zones, strobe intensity, duration, rate, and FX control, super high speed (1-25fps) adjustable strobe, DMX, RDM, Kling-NET, and Art-NET protocol support, 8/16 bit RGB and RGBW smooth color mixing modes, adjustable/removable yoke bracket with 3-position holes, interlocking system for multiple unit matrix designs, IP65 3/5pin DMX, RJ45 ethernet, IP65 Locking power in/out connections, 4-button control pane with OLED menu display, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The PROTRON ECLYPSE is a versatile high powered 1000W air cooled IPX4 outdoor rated color blinder, strobe, wash luminaire. Features include (96) 10W CREE RGBW 4-in-1 LEDs, 31° beam / 63° field angles, 27,000+ total lumen output, brilliant eye candy effects, selectable pixel mapping zones, strobe intensity, duration, rate, and FX control, super high speed (1-25fps) adjustable strobe, DMX, RDM, Kling-NET, and Art-NET protocol support, 8/16 bit RGB and RGBW smooth color mixing modes, adjustable/removable yoke bracket with 3-position holes, interlocking system for multiple unit matrix designs, IP65 3/5pin DMX, RJ45 ethernet, IP65 Locking power in/out connections, 4-button control pane with OLED menu display, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 843,
-  "maxLuminousIntensityCd": 4797000.0,
-  "luminousFluxLm": 1566000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 100000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 15.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -179,6 +179,8 @@
     }
   ],
   "pixelCount": 58,
+  "fullName": "Elation PROTRON ECLYPSe",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -186,8 +188,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -219,14 +219,17 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 1.566e+06 lm is implausible for 843 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/protron-eclypse"

@@ -4,9 +4,9 @@
   "fixtureTypeId": "84A69D08-4E4A-1002-1C41-0DBFF4FFEFDD",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Nexon M",
-  "longName": "NXT Nexon M",
+  "longName": "Nexon M",
   "shortName": "Nexon M",
-  "description": "NXT Lights NXT Nexon M: moving-head Discharge Lamp beam/spot/wash hybrid, with 0.9-25.5 deg zoom, CMY colour mixing, colour wheel, 38 gobos, prism, frost.",
+  "description": "NXT Lights Nexon M: moving-head Discharge Lamp beam/spot/wash hybrid, with 0.9-25.5 deg zoom, CMY colour mixing, colour wheel, 38 gobos, prism, frost.",
   "manufacturer": "NXT Lights",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 606.0,
-  "maxLuminousIntensityCd": 55989000.0,
+  "maxLuminousIntensityCd": 11000000.0,
   "luminousFluxLm": 15500.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 32.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,7 +105,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -122,6 +122,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "NXT Lights Nexon M",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -168,11 +170,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "Mini Xtylos HPE",
   "longName": "minixtylosHPE",
   "shortName": "minixtyosHPE",
-  "description": "Official ClayPaky File\nNew MINI XTYLOS HPE opens opportunities to bring this unique technology where smaller, energy efficient, yet powerful fixtures are required for small and large venues and events.\nMINI XTYLOS HPE is a small form factor fixture with Claypaky’s innovative and proprietary RGB laser source, lasting 20,000 hours, that produces saturated, deep colors without any visible hotspots with its exclusive TURBO COLOR system.",
+  "description": "Clay Paky minixtylosHPE: moving-head LED wash-beam, with 1-4 deg zoom, RGB colour mixing, prism.",
   "manufacturer": "Clay Paky",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 854400.0,
+  "maxLuminousIntensityCd": 210000.0,
   "luminousFluxLm": 292.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 9.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -89,7 +89,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -102,10 +102,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Clay Paky minixtylosHPE",
+  "gdtfDescription": "Official ClayPaky File\nNew MINI XTYLOS HPE opens opportunities to bring this unique technology where smaller, energy efficient, yet powerful fixtures are required for small and large venues and events.\nMINI XTYLOS HPE is a small form factor fixture with Claypaky’s innovative and proprietary RGB laser source, lasting 20,000 hours, that produces saturated, deep colors without any visible hotspots with its exclusive TURBO COLOR system.",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -147,11 +150,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -4,7 +4,7 @@
   "fixtureTypeId": "D776D1C5-54B6-478E-B67D-1130FFAB75C5",
   "gdtfDataVersion": "1.1",
   "gdtfName": "SkyPanel S30RP",
-  "longName": "ARRI SkyPanel S30RP",
+  "longName": "SkyPanel S30RP",
   "shortName": "S30-RP",
   "description": "SkyPanel S30-RP (Remote Phosphor) Soft Light\nPhosphor Panels available in 2700k, 3200k, 4300k, 5600k, 6500k, 10000k, and Chroma Green",
   "manufacturer": "ARRI",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 220,
   "maxLuminousIntensityCd": 5000.0,
   "luminousFluxLm": 18000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -92,6 +92,8 @@
   ],
   "pixelCount": 1,
   "subType": "Soft light panel",
+  "fullName": "ARRI SkyPanel S30RP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -132,15 +134,17 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Remote-phosphor 5600 K version; same housing as S30-C."
+    "Remote-phosphor 5600 K version; same housing as S30-C.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

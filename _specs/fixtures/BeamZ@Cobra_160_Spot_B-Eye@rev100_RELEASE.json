@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 228300.0,
+  "powerConsumptionW": 530,
+  "maxLuminousIntensityCd": 230000.0,
   "luminousFluxLm": 1950.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 5.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -100,6 +100,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "BeamZ Cobra 160 Spot",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -109,8 +111,7 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
@@ -146,14 +147,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 850 W implausible, removed."
+    "GDTF power 850 W implausible, removed.",
+    "Typical-value estimates (no published data): powerConsumptionW, maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

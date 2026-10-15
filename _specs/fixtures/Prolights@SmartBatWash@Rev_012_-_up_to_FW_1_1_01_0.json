@@ -6,7 +6,7 @@
   "gdtfName": "SmartBatWash",
   "longName": "SmartBatWash",
   "shortName": "SMBWash",
-  "description": "The Smart BatWash is a high-powered LED Wash light that can be operated wirelessly or wired. \nThis IP65 Wash Light has 15 x 20W RGB + Warm White LED emitters, and it's Spektra™ calibrated to guarantee consistency, high-quality white values (CRI >93), a dynamic array of true colours with smooth colour mixing, and a powerful 6,282-lumen output. \nThe Smart BatWash is very flexible - it can be used wirelessly with the built-in battery, using CRMX or W-DMX or, alternatively, wired with power and data cables, bypassing the battery and enabling higher brightness levels. \nThe beam angle can easily be adjustable through a magnetic beam shaper filter, allowing a broader coverage whilst keeping a high output. The Smart BatWash has all the software features of the Ecl range, sharing the same user settings and capabilities.",
+  "description": "The Smart BatWash is a high-powered LED Wash light that can be operated wirelessly or wired. \nThis IP65 Wash Light has 15 x 20W RGB + Warm White LED emitters, and it's Spektra calibrated to guarantee consistency, high-quality white values (CRI >93), a dynamic array of true colours with smooth colour mixing, and a powerful 6,282-lumen output. \nThe Smart BatWash is very flexible - it can be used wirelessly with the built-in battery, using CRMX or W-DMX or, alternatively, wired with power and data cables, bypassing the battery and enabling higher brightness levels. \nThe beam angle can easily be adjustable through a magnetic beam shaper filter, allowing a broader coverage whilst keeping a high output. The Smart BatWash has all the software features of the Ecl range, sharing the same user settings and capabilities.",
   "manufacturer": "Prolights",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 180,
   "maxLuminousIntensityCd": 7600.0,
   "luminousFluxLm": 420.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.8,
   "powerConnectorIn": "Battery (internal) + powerCON TRUE1 TOP",
   "powerConnectorOut": "Battery (internal) + powerCON TRUE1 TOP",
@@ -104,6 +104,8 @@
   ],
   "pixelCount": 1,
   "subType": "Battery wash",
+  "fullName": "Prolights SmartBatWash",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -146,14 +148,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/SMARTBATWASH"

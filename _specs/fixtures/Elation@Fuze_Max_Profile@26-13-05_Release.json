@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Max Profile",
   "longName": "Fuze Max Profile",
   "shortName": "FuzeMaxProf",
-  "description": "The FUZE MAX PROFILE™ is a full spectrum automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes an 800W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of over 21,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
+  "description": "The FUZE MAX PROFILE is a full spectrum automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes an 800W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of over 21,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1126,
-  "maxLuminousIntensityCd": 836200.0,
+  "maxLuminousIntensityCd": 840000.0,
   "luminousFluxLm": 14000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 34.6,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -93,7 +93,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -134,6 +134,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Max Profile",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -180,14 +182,16 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/fuze-profile-max"

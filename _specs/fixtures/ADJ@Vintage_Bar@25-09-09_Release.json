@@ -28,7 +28,7 @@
   "powerConsumptionW": 780,
   "maxLuminousIntensityCd": 16200,
   "luminousFluxLm": 6732.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 19.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -118,6 +118,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "ADJ Vintage Bar",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -158,15 +160,16 @@
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "4 x 150 W amber COB + RGBL pixels. GDTF power 39 W invalid."
+    "4 x 150 W amber COB + RGBL pixels. GDTF power 39 W invalid.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/vintage-bar"

@@ -4,7 +4,7 @@
   "fixtureTypeId": "3BA4F53C-CD2C-4796-9E37-9E45B78DFC63",
   "gdtfDataVersion": "1.2",
   "gdtfName": "EclProfileFWIPDY_26",
-  "longName": "EclProfileFWIPDY_26",
+  "longName": "EclProfileFWIPDY 26",
   "shortName": "EclFWIPDY_26",
   "description": "EclProfile FWIP is the IP Full White version of the new generation of Ecl Profile LED ellipsoidals, and it is available in the TU (tungsten) and DY (daylight) source variants. The EclProfile FWIP has been engineered in the same housing and optical design of the colour mixing versions and for those users who require higher brightness and quality on a specific white point, offering a superior evenness and crisp focus of the new EclProfile range, or simply prefer to operate LED fixtures in a classical way. The LED source for both versions has been selected to achieve the finest quality of whites, having high scores of CRI, R9 and TM30 and being ideal for applications like corporate events, advertising, exhibitions, among others.",
   "manufacturer": "Prolights",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 270,
-  "maxLuminousIntensityCd": 42400.0,
+  "maxLuminousIntensityCd": 42000.0,
   "luminousFluxLm": 9876.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -81,7 +81,7 @@
   "iris": true,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -122,6 +122,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclProfileFWIPDY 26",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -163,14 +165,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://musiclights.it/en/product/ECLFW"

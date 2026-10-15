@@ -4,7 +4,7 @@
   "fixtureTypeId": "EAC276A0-F1E7-4E7D-B32B-761BCFF254A6",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Serius",
-  "longName": "CLF Serius",
+  "longName": "Serius",
   "shortName": "Serius",
   "description": "CLF Serius: tilting LED batten with zoom.",
   "manufacturer": "CLF Lighting",
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 900.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 29000000.0,
   "luminousFluxLm": 121920.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 17.0,
   "powerConnectorIn": "powerCON / powerCON TRUE1",
   "powerConnectorOut": "powerCON / powerCON TRUE1",
   "powerSupplyType": "powerCON LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 210.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -71,7 +71,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -79,7 +82,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -96,6 +99,8 @@
     }
   ],
   "pixelCount": 13,
+  "fullName": "CLF Lighting Serius",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -136,16 +141,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
-    "description": "manual"
+    "description": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ]
 }

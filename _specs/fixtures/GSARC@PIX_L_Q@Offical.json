@@ -4,7 +4,7 @@
   "fixtureTypeId": "D74A60D7-79FF-4F85-8427-6439AB163EF0",
   "gdtfDataVersion": "1.0",
   "gdtfName": "PIX L Q",
-  "longName": "GSARC_PIX L Q",
+  "longName": "PIX L Q",
   "shortName": "PIX L Q",
   "description": "PIX is a new architectural outdoor matrix lighting series. 2 models all with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 420,
   "maxLuminousIntensityCd": 4100.0,
   "luminousFluxLm": 200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 19.9,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -62,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -89,6 +92,8 @@
   ],
   "pixelCount": 2,
   "subType": "Architectural pixel flood",
+  "fullName": "GSARC PIX L Q",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -96,7 +101,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "estimated",
@@ -128,15 +132,17 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://www.gsarc.com/en/products/849.html?t=1"

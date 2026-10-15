@@ -29,7 +29,7 @@
   "powerConsumptionW": 36,
   "maxLuminousIntensityCd": 8600,
   "luminousFluxLm": 1317.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.0,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": "IEC C14",
@@ -109,6 +109,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Dotz Par RGBL",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -150,15 +152,16 @@
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF weight 7.5 kg / 56 W contradicts spec sheet (2 kg / 36 W)."
+    "GDTF weight 7.5 kg / 56 W contradicts spec sheet (2 kg / 36 W).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/dotz-par-rgbl"

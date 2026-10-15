@@ -4,7 +4,7 @@
   "fixtureTypeId": "6D8F504F-75F1-4F92-9CEF-0FED6F379985",
   "gdtfDataVersion": "1.0",
   "gdtfName": "POT S Q",
-  "longName": "GSARC_POT S Q",
+  "longName": "POT S Q",
   "shortName": "POT S Q",
   "description": "POT is a new architectural outdoor inground lighting series. 3 models all with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 15,
-  "maxLuminousIntensityCd": 11700.0,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.0,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -62,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -81,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural projector",
+  "fullName": "GSARC POT S Q",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -120,15 +125,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "No per-model data published; power/weight scaled within the series from the documented models."
+    "No per-model data published; power/weight scaled within the series from the documented models.",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ]
 }

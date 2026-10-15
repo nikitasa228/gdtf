@@ -29,7 +29,7 @@
   "powerConsumptionW": 450.0,
   "maxLuminousIntensityCd": 42200000,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 38.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -122,6 +122,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY IP3500BSW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -167,14 +169,15 @@
     "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.lightsky.com.cn/product/ip3500bsw/"

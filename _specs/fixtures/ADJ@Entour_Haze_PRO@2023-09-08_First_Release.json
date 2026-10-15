@@ -6,7 +6,7 @@
   "gdtfName": "Entour Haze Pro",
   "longName": "Entour Haze Pro",
   "shortName": "EntourHzPro",
-  "description": "Part of the expanding ADJ Entour Series of atmospheric machines, the Entour Haze Pro is a touring-grade haze machine built into a durable flight case. It requires no warm-up time and, with an air pressure of 101psi, is able to generate an impressive output of 3,000 cubic ft. per minute. This allows large stages and venues to be easily and quickly filled with lightshow-enhancing haze whenever it is required. The machine uses Haze/G™ oil-based liquid and has an external fluid tank capacity of 2.5 Liters. It has an extremely efficient fluid consumption rate of 15 hours continuous output per Liter, which means that 37.5 hours of haze can be generated from a single tank of fluid.",
+  "description": "Part of the expanding ADJ Entour Series of atmospheric machines, the Entour Haze Pro is a touring-grade haze machine built into a durable flight case. It requires no warm-up time and, with an air pressure of 101psi, is able to generate an impressive output of 3,000 cubic ft. per minute. This allows large stages and venues to be easily and quickly filled with lightshow-enhancing haze whenever it is required. The machine uses Haze/G oil-based liquid and has an external fluid tank capacity of 2.5 Liters. It has an extremely efficient fluid consumption rate of 15 hours continuous output per Liter, which means that 37.5 hours of haze can be generated from a single tank of fluid.",
   "manufacturer": "ADJ",
   "category": "HAZE",
   "supportedPowerNetworks": [
@@ -26,7 +26,7 @@
   "powerConsumptionW": 660,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 50,
   "weightKg": 31.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -63,7 +63,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -84,6 +84,8 @@
     }
   ],
   "pixelCount": 0,
+  "fullName": "ADJ Entour Haze Pro",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -117,14 +119,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Output 3000 cfm; voltage-specific fusing."
+    "Output 3000 cfm; voltage-specific fusing.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/entour-haze-pro"

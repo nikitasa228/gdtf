@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 550.0,
-  "maxLuminousIntensityCd": 10500800.0,
+  "maxLuminousIntensityCd": 8500000.0,
   "luminousFluxLm": 11628.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 38.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -131,6 +131,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iPointe",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -177,11 +179,13 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

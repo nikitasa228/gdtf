@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Profile",
   "longName": "Fuze Profile",
   "shortName": "Fuze Profile",
-  "description": "The FUZE PROFILE™ is an automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes a 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction while delivering a powerful output of over 10,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
+  "description": "The FUZE PROFILE is an automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes a 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction while delivering a powerful output of over 10,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 603300.0,
+  "maxLuminousIntensityCd": 600000.0,
   "luminousFluxLm": 10100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 25.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -89,7 +89,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -130,6 +130,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Profile",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -176,14 +178,16 @@
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.illuminationdynamics.com/automated-lighting/elation-fuze-profile"

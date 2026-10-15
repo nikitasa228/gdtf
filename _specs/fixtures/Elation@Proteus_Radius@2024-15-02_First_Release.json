@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 300,
-  "maxLuminousIntensityCd": 7899900.0,
+  "maxLuminousIntensityCd": 2000000.0,
   "luminousFluxLm": 2700.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 20.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,10 @@
   "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -144,6 +147,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Radius",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -189,15 +194,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/proteus-radius"

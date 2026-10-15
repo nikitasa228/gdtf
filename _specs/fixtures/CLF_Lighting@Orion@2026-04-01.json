@@ -4,7 +4,7 @@
   "fixtureTypeId": "AB74CFF6-37EF-40BA-A579-D1867CFE75B1",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Orion",
-  "longName": "CLF Lighting Orion",
+  "longName": "Orion",
   "shortName": "Orion",
   "description": "CLF Orion: discharge-lamp beam/spot/wash hybrid with CMY, gobos, prisms and 3-42 deg zoom.",
   "manufacturer": "CLF Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 670.0,
-  "maxLuminousIntensityCd": 6624200.0,
+  "maxLuminousIntensityCd": 6600000.0,
   "luminousFluxLm": 20375.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 29.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -103,7 +103,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -116,6 +116,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Orion",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -162,11 +164,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "manual"
+    "description": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

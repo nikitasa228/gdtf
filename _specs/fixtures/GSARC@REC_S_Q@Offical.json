@@ -4,7 +4,7 @@
   "fixtureTypeId": "3FFAE841-9F36-4AA3-B40C-5C479257F88B",
   "gdtfDataVersion": "1.0",
   "gdtfName": "REC S Q",
-  "longName": "GSARC_REC S Q",
+  "longName": "REC S Q",
   "shortName": "REC S Q",
   "description": "REC is a new architectural outdoor flood lighting series. 2 models fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 140,
-  "maxLuminousIntensityCd": 11700.0,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 8.83,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -62,7 +62,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -81,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural floodlight",
+  "fullName": "GSARC REC S Q",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -120,15 +125,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "http://en.gsarc.com/Product/detail/article_id/287.html"

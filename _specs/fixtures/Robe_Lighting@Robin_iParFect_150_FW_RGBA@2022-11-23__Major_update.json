@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 180.0,
-  "maxLuminousIntensityCd": 363900.0,
+  "maxLuminousIntensityCd": 360000.0,
   "luminousFluxLm": 1796.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 7.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -98,6 +98,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iParFect 150 FW RGBA",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -139,11 +141,13 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

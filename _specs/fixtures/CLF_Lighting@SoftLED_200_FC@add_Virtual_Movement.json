@@ -29,7 +29,7 @@
   "powerConsumptionW": 200.0,
   "maxLuminousIntensityCd": 22000.0,
   "luminousFluxLm": 15000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 10.0,
   "powerConnectorIn": "DC Jack / powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -15.0,
@@ -105,6 +105,8 @@
   ],
   "pixelCount": 1,
   "subType": "Soft light",
+  "fullName": "CLF Lighting SoftLED 200 FC",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -148,11 +150,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "description": "manual"
+    "description": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "DTW BLINDER 350 IP",
   "longName": "DTW BLINDER 350 IP",
   "shortName": "DTW350",
-  "description": "The IP65 rated DTW Blinder 350 IP™ features (2) high powered 175W 2-in-1 Warm White / Amber COB LEDs, 65° wide beam angle, full color temperature range control plus independent Dim-to-Warm channel control (1,800K - 3,200K), easily attachable 15° narrow beam filters (included), pixel control, manual adjustable pan focus, variable dimming curve modes, strobe effects, flicker free operation for TV and Film, RDM (Remote Device Management), IP rated DMX and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, integrated yoke and side mounting brackets, and a multi-voltage universal auto switching power supply (100-250v).",
+  "description": "The IP65 rated DTW Blinder 350 IP features (2) high powered 175W 2-in-1 Warm White / Amber COB LEDs, 65° wide beam angle, full color temperature range control plus independent Dim-to-Warm channel control (1,800K - 3,200K), easily attachable 15° narrow beam filters (included), pixel control, manual adjustable pan focus, variable dimming curve modes, strobe effects, flicker free operation for TV and Film, RDM (Remote Device Management), IP rated DMX and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, integrated yoke and side mounting brackets, and a multi-voltage universal auto switching power supply (100-250v).",
   "manufacturer": "Elation",
   "category": "BLINDER",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 310,
-  "maxLuminousIntensityCd": 28500.0,
+  "maxLuminousIntensityCd": 8800.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.2,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -110,13 +110,14 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation DTW BLINDER 350 IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -149,14 +150,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Dim-to-warm COB LED (GDTF lamp type Tungsten is a CCT-emulation)."
+    "Dim-to-warm COB LED (GDTF lamp type Tungsten is a CCT-emulation).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/dtw-blinder-350-ip"

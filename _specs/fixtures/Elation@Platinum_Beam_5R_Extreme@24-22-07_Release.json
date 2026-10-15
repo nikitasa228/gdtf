@@ -6,7 +6,7 @@
   "gdtfName": "Platinum Beam 5R Extreme",
   "longName": "Platinum Beam 5R Extreme",
   "shortName": "PlatBeam5rExt",
-  "description": "The Platinum Beam 5R EXTREME™ features the 189W Platinum 5R lamp, a 3° sharp pin spot beam, 8 facet rotating prism and frost effects, super fast 16 bit 3-phase pan/tilt motors, strobe (1-18 fps), dimming 0-100%, and focus, (12) colors including UV, CTO, CTB, and white, (8) metal rotating, indexing, interchangeable gobos, flicker free operation for TV and FILM, internal EWDMX wireless DMX receiver, remote device management protocol support, 3pin and 5pin DMX in/out and power in connections, (6) button touch control panel, 350W max power consumption, and a multi-voltage universal auto switching power supply (120-240v).",
+  "description": "The Platinum Beam 5R EXTREME features the 189W Platinum 5R lamp, a 3° sharp pin spot beam, 8 facet rotating prism and frost effects, super fast 16 bit 3-phase pan/tilt motors, strobe (1-18 fps), dimming 0-100%, and focus, (12) colors including UV, CTO, CTB, and white, (8) metal rotating, indexing, interchangeable gobos, flicker free operation for TV and FILM, internal EWDMX wireless DMX receiver, remote device management protocol support, 3pin and 5pin DMX in/out and power in connections, (6) button touch control panel, 350W max power consumption, and a multi-voltage universal auto switching power supply (120-240v).",
   "manufacturer": "Elation",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 350,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 330000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 20.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -69,7 +69,10 @@
   "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 7000.0,
+    "max": 7000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": true,
@@ -77,7 +80,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -98,6 +101,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Platinum Beam 5R Extreme",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -139,16 +144,18 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/platinum-beam-5r-extreme"

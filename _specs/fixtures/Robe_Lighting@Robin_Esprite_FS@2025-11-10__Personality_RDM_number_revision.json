@@ -6,7 +6,7 @@
   "gdtfName": "Robin Esprite FS",
   "longName": "Robin Esprite FS",
   "shortName": "EspriteFS",
-  "description": "This very bright and precise moving light is the first to use Robe’s ground-breaking new generation 650W TE™ (Transferrable Engine) light source. Now with the option to be connected to the Robe innovative RoboSpot system.",
+  "description": "This very bright and precise moving light is the first to use Robe’s ground-breaking new generation 650W TE (Transferrable Engine) light source. Now with the option to be connected to the Robe innovative RoboSpot system.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": 3160400.0,
+  "maxLuminousIntensityCd": 3200000.0,
   "luminousFluxLm": 27000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 29.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -127,6 +127,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin Esprite FS",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -173,11 +175,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

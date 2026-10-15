@@ -6,7 +6,7 @@
   "gdtfName": "Proteus Beam",
   "longName": "Proteus Beam",
   "shortName": "ProBeam",
-  "description": "PROTEUS BEAM™ is an IP65 rated moving head beam luminaire with the Philips™ MSD Platinum 14R 80CRI 7,800K lamp producing over 12,000 total lumens. Features include an advanced optical system producing a precise 2.5° beam aperture, a revolutionary internal thermal cooling system, full CMY color mixing, 13 dichroic colors including CTB, CTO, and UV, 8 rotating interchangeable metal and 13 static-stamped metal gobos, 5 and 32 facet rotating prisms, frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM, Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 etherCON in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "PROTEUS BEAM is an IP65 rated moving head beam luminaire with the Philips MSD Platinum 14R 80CRI 7,800K lamp producing over 12,000 total lumens. Features include an advanced optical system producing a precise 2.5° beam aperture, a revolutionary internal thermal cooling system, full CMY color mixing, 13 dichroic colors including CTB, CTO, and UV, 8 rotating interchangeable metal and 13 static-stamped metal gobos, 5 and 32 facet rotating prisms, frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM, Art-NET, and sACN protocol support, Elation’s E-FLY internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 etherCON in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 500,
-  "maxLuminousIntensityCd": 4944000.0,
-  "luminousFluxLm": 136800.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 810000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 47,
   "weightKg": 35.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -136,6 +136,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Beam",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,8 +145,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -182,14 +182,17 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 136800 lm is implausible for 500 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://elationlighting.com/proteus-beam"

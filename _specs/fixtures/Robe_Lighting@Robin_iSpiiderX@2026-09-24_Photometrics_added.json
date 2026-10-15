@@ -4,9 +4,9 @@
   "fixtureTypeId": "AC70980B-8E18-4355-AD16-05441F030039",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iSpiiderX",
-  "longName": "Robin iSpiiderX®",
+  "longName": "Robin iSpiiderX",
   "shortName": "iSpiiderX",
-  "description": "Introducing the iSpiiderX®, a pinnacle of cutting-edge design, construction, and protection technology. Evolving from the esteemed legacy of its predecessor, the original iSpiider®, this high-performance fixture boasts an IP65 rating, ensuring resilience against any weather conditions.",
+  "description": "Introducing the iSpiiderX, a pinnacle of cutting-edge design, construction, and protection technology. Evolving from the esteemed legacy of its predecessor, the original iSpiider, this high-performance fixture boasts an IP65 rating, ensuring resilience against any weather conditions.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 660.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 420000.0,
   "luminousFluxLm": 2316.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 18.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -126,6 +126,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Robe Lighting Robin iSpiiderX",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -168,14 +170,15 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ]
 }

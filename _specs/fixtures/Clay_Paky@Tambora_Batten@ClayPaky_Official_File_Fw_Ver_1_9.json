@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 660,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 3600000.0,
   "luminousFluxLm": 19800.0,
   "noiseLevelDb": 40.5,
   "weightKg": 15.5,
@@ -35,7 +35,7 @@
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 215.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Clay Paky Tambora Batten Square",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -150,22 +152,22 @@
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
-    "panRangeDeg": "manual",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "manual"
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
     "https://www.claypaky.it/products/tambora-batten/"

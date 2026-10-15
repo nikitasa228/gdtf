@@ -6,7 +6,7 @@
   "gdtfName": "VDO Sceptron XB 1000mm",
   "longName": "VDO Sceptron XB 1000mm",
   "shortName": "VDOSceXB 1000",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VDO Sceptron XB 1000mm: LED bar, with 122 deg beam, RGBW colour mixing, colour wheel.",
   "manufacturer": "Martin Professional",
   "category": "LED BAR",
   "supportedPowerNetworks": null,
@@ -16,7 +16,7 @@
   },
   "frequencyRangeHz": null,
   "powerConsumptionW": 30.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 5.0,
   "luminousFluxLm": 23.0,
   "noiseLevelDb": null,
   "weightKg": 1.6,
@@ -63,7 +63,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -120,10 +120,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional VDO Sceptron XB 1000mm",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "voltageRangeV": "gdtf",
@@ -155,17 +158,19 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [
     "lensType",
     "noiseLevelDb",
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ]
 }

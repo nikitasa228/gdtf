@@ -29,7 +29,7 @@
   "powerConsumptionW": 247,
   "maxLuminousIntensityCd": 17100,
   "luminousFluxLm": 18008.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 13.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional Strike Array 4",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -150,13 +152,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/strike-array-4/"
   ]

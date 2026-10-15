@@ -4,7 +4,7 @@
   "fixtureTypeId": "618C2AFC-1951-4AB0-BD64-1660845B329F",
   "gdtfDataVersion": "1.0",
   "gdtfName": "REC L TW",
-  "longName": "GSARC_REC L TW",
+  "longName": "REC L TW",
   "shortName": "REC L TW",
   "description": "REC is a new architectural outdoor flood lighting series. 1 model fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 280,
-  "maxLuminousIntensityCd": 17600.0,
+  "maxLuminousIntensityCd": 18000.0,
   "luminousFluxLm": 150.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 15.0,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -84,6 +84,8 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural floodlight",
+  "fullName": "GSARC REC L TW",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -124,14 +126,15 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "colorTemperatureK": "estimated"
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "No per-model data published; power/weight scaled within the series from the documented models."
+    "No per-model data published; power/weight scaled within the series from the documented models.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

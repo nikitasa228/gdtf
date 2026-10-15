@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 350.0,
-  "maxLuminousIntensityCd": 15500.0,
+  "maxLuminousIntensityCd": 15000.0,
   "luminousFluxLm": 2108.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -15.0,
@@ -97,6 +97,8 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "Eagle Lite TA200CZ PRO - 200W RGBALC Fresnel With Zoom",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -138,13 +140,15 @@
     "subType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

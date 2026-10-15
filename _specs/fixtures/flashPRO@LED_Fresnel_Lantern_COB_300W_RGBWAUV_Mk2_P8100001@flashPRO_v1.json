@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 300.0,
-  "maxLuminousIntensityCd": 149000.0,
+  "maxLuminousIntensityCd": 150000.0,
   "luminousFluxLm": 5089.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 10.6,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -124,6 +124,8 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "flashPRO LED Fresnel Lantern RGBWA+UV",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -165,11 +167,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

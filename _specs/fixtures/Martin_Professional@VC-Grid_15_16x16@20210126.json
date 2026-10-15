@@ -6,16 +6,16 @@
   "gdtfName": "VC-Grid 15 16x16",
   "longName": "VC-Grid 15 16x16",
   "shortName": "VCG15 16x16",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VC-Grid 15 16x16: device (led video pixel / matrix), with 110 deg beam, RGB colour mixing.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
   "powerConsumptionW": 100,
-  "maxLuminousIntensityCd": 500.0,
+  "maxLuminousIntensityCd": 450.0,
   "luminousFluxLm": 1728.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 0.31,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
@@ -58,7 +58,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -160,14 +160,16 @@
   ],
   "pixelCount": 512,
   "subType": "LED video pixel / matrix",
+  "fullName": "Martin Professional VC-Grid 15 16x16",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -196,19 +198,21 @@
     "subType": "manual",
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "supportedPowerNetworks",
     "lensType",
-    "lensType"
+    "supportedPowerNetworks"
   ],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"

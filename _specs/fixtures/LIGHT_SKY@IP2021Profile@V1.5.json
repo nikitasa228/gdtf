@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1200.0,
-  "maxLuminousIntensityCd": 4121500.0,
+  "maxLuminousIntensityCd": 4100000.0,
   "luminousFluxLm": 50700.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 55.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY IP2021Profile",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -157,13 +159,14 @@
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
     "framingShutterType": "gdtf-derived",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

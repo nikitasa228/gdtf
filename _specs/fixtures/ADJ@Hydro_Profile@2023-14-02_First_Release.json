@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1088,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 2000000.0,
   "luminousFluxLm": 25000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 38.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
@@ -79,7 +79,10 @@
   "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -117,6 +120,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Hydro Profile",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -162,16 +167,17 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF weight 84.9 is in lbs, not kg (38.5 kg)."
+    "GDTF weight 84.9 is in lbs, not kg (38.5 kg).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/hydro-profile"

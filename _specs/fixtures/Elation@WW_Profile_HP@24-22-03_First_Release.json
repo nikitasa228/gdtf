@@ -6,7 +6,7 @@
   "gdtfName": "WW Profile HP",
   "longName": "WW Profile HP",
   "shortName": "WWProfHP",
-  "description": "The WW Profile HP™ ellipsoidal features a High Powered 130W Warm White >91CRI 3,000K LED engine producing 10,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, manual focus, supports B size metal HT transparency gobos, DMX controlled electronic strobe, and variable dimming curve modes, adjustable refresh frequency and gamma brightness for flicker free operation for TV and FILM, 3/5pin DMX and IP65 Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The WW Profile HP ellipsoidal features a High Powered 130W Warm White >91CRI 3,000K LED engine producing 10,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, manual focus, supports B size metal HT transparency gobos, DMX controlled electronic strobe, and variable dimming curve modes, adjustable refresh frequency and gamma brightness for flicker free operation for TV and FILM, 3/5pin DMX and IP65 Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 160,
-  "maxLuminousIntensityCd": 429700.0,
+  "maxLuminousIntensityCd": 130000.0,
   "luminousFluxLm": 10000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -89,6 +89,8 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "Elation WW Profile HP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -96,7 +98,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -129,14 +130,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.stagespot.com/elation-ww-profile-hp.html"

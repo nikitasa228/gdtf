@@ -6,7 +6,7 @@
   "gdtfName": "ELP PAR IP",
   "longName": "ELP PAR IP",
   "shortName": "ELPPARIP",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional ELP PAR IP: LED PAR, with 4.4-33.3 deg zoom, RGB colour mixing, colour wheel.",
   "manufacturer": "Martin Professional",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 300.0,
-  "maxLuminousIntensityCd": 506300.0,
+  "maxLuminousIntensityCd": 510000.0,
   "luminousFluxLm": 3350.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -92,10 +92,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional ELP PAR IP",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -134,11 +137,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

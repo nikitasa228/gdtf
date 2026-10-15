@@ -6,7 +6,7 @@
   "gdtfName": "MagicPanel 602",
   "longName": "MagicPanel 602",
   "shortName": "MP602",
-  "description": "MagicPanel 602",
+  "description": "Ayrton MagicPanel 602: moving-head LED wash-beam (matrix panel (infinite pan/tilt)), with 7.5 deg beam, RGBW colour mixing, colour wheel.",
   "manufacturer": "Ayrton",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 600,
-  "maxLuminousIntensityCd": 20300.0,
+  "maxLuminousIntensityCd": 20000.0,
   "luminousFluxLm": 390.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 20.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -63,7 +63,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -71,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -93,10 +96,13 @@
   ],
   "pixelCount": 1,
   "subType": "Matrix panel (infinite pan/tilt)",
+  "fullName": "Ayrton MagicPanel 602",
+  "gdtfDescription": "MagicPanel 602",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -132,21 +138,22 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "estimated",
-    "colorTemperatureK": "manual",
+    "colorTemperatureK": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power 10 W invalid, removed."
+    "GDTF power 10 W invalid, removed.",
+    "Typical-value estimates (no published data): colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.ayrton.eu/wp-content/uploads/2014/06/MagicPanel-602-12162014.pdf"

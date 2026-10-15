@@ -6,7 +6,7 @@
   "gdtfName": "Bora",
   "longName": "Bora",
   "shortName": "Bora",
-  "description": "New Option from V221",
+  "description": "Ayrton Bora: moving-head LED profile, with 8-64 deg zoom, CMY colour mixing, colour wheel, 6 gobos, framing shutters, frost.",
   "manufacturer": "Ayrton",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -24,9 +24,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1150.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 1800000.0,
   "luminousFluxLm": 40000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 37.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -81,7 +81,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -102,10 +102,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Ayrton Bora",
+  "gdtfDescription": "New Option from V221",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -145,14 +148,16 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

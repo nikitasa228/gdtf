@@ -4,7 +4,7 @@
   "fixtureTypeId": "8F84E9B4-32CF-4ACD-A913-2389C3C11879",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ColorSpot 250 AT",
-  "longName": "ColorSpot 250 AT™",
+  "longName": "ColorSpot 250 AT",
   "shortName": "250 AT",
   "description": "The ColorSpot 250 AT \nThis GDTF file does not contain measured photometric data and 3D models are not 100% accurate.",
   "manufacturer": "Robe Lighting",
@@ -23,9 +23,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 410.0,
-  "maxLuminousIntensityCd": 35200.0,
+  "maxLuminousIntensityCd": 35000.0,
   "luminousFluxLm": 2700.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 20.5,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -82,7 +82,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -107,6 +107,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting ColorSpot 250 AT",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -152,11 +154,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

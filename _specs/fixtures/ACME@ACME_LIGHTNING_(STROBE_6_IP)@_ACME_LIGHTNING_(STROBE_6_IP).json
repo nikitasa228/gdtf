@@ -4,9 +4,9 @@
   "fixtureTypeId": "2C3B403E-2C82-4704-AC20-7F735C20B2DA",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME LIGHTNING (STROBE 6 IP)",
-  "longName": "ACME LIGHTNING (STROBE 6 IP)",
+  "longName": "LIGHTNING (STROBE 6 IP)",
   "shortName": "STROBE 6 IP",
-  "description": "ACME LIGHTNING (STROBE 6 IP)",
+  "description": "ACME LIGHTNING (STROBE 6 IP): LED strobe, with 3.5 deg beam, RGBW colour mixing, colour wheel, frost, IP66 rated.",
   "manufacturer": "ACME",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1610,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 3150000.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 15000000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 13.3,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -123,13 +123,15 @@
     }
   ],
   "pixelCount": 420,
+  "fullName": "ACME LIGHTNING (STROBE 6 IP)",
+  "gdtfDescription": "ACME LIGHTNING (STROBE 6 IP)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -162,15 +164,17 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Two zones: RGBW wash 102 deg, cool-white strobe 3.5 deg."
+    "Two zones: RGBW wash 102 deg, cool-white strobe 3.5 deg.",
+    "GDTF luminous flux 3.15e+06 lm is implausible for 1610 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/LIGHTNING"

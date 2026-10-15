@@ -4,7 +4,7 @@
   "fixtureTypeId": "EE022E9B-13E6-4E88-BD6E-3F75B93E311D",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ArcShineM9VW_8",
-  "longName": "ArcShineM9VW_8",
+  "longName": "ArcShineM9VW 8",
   "shortName": "ASM9VW_8",
   "description": "The ArcShine M18VW and ArcShine M9VW are a series of linear LED fixtures, designed for interior and exterior applications (IP66) such as flood lighting, wall washing and accent lighting.\nThere are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 4W each, with Variable White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings. \nOptic: 8° lenses capable of delivering multiple angles with optional holographic filters.\nOptional holographic symmetric and elliptical filters available: 20°, 40°, 60°, 10°x60°, 30°x60°.\nThe ArcShine range has an on-board power supply and DMX/RDM control. The 100 cm version is controllable in two sections.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 40,
   "maxLuminousIntensityCd": 9000.0,
   "luminousFluxLm": 273.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.0,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
@@ -102,6 +102,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcShineM9VW 8",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,13 +145,14 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power assumed equal to the M9FC."
+    "Power assumed equal to the M9FC.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ]
 }

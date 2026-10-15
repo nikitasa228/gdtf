@@ -4,9 +4,9 @@
   "fixtureTypeId": "AD52D6E1-0F72-447F-9BC7-5DB6DE7538F3",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME DOTLINE360 (TB-1230 QW)",
-  "longName": "ACME DOTLINE360 (TB-1230 QW)",
+  "longName": "DOTLINE360 (TB-1230 QW)",
   "shortName": "TB 1230 QW",
-  "description": "ACME TB-1230QW 30W",
+  "description": "ACME DOTLINE360 (TB-1230 QW): LED bar, with 3.5-38 deg zoom, RGBW colour mixing.",
   "manufacturer": "ACME",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,15 +27,15 @@
     "max": 60.0
   },
   "powerConsumptionW": 440,
-  "maxLuminousIntensityCd": 4299600.0,
+  "maxLuminousIntensityCd": 4300000.0,
   "luminousFluxLm": 18000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 17.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
-  "panRangeDeg": 0,
+  "panRangeDeg": null,
   "tiltRangeDeg": 220.0,
   "infinitePan": null,
   "infiniteTilt": false,
@@ -61,7 +61,10 @@
   "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -69,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -90,13 +93,15 @@
     }
   ],
   "pixelCount": 36,
+  "fullName": "ACME DOTLINE360 (TB-1230 QW)",
+  "gdtfDescription": "ACME TB-1230QW 30W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -123,22 +128,26 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
     "powerConsumptionW": "manual",
     "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Tilt-only LED bar (no pan)."
+    "Tilt-only LED bar (no pan).",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=1812"

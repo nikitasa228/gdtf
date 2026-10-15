@@ -6,7 +6,7 @@
   "gdtfName": "BTX-Hawk",
   "longName": "BTX-Hawk",
   "shortName": "BTX-Hawk",
-  "description": "180W LED Moving head spot",
+  "description": "Briteq BTX-Hawk: moving-head LED spot, with 12 deg beam, colour wheel, 16 gobos, prism.",
   "manufacturer": "Briteq",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 180.0,
-  "maxLuminousIntensityCd": 1006700.0,
-  "luminousFluxLm": 49500.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 150000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 38,
   "weightKg": 15.5,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -75,7 +75,10 @@
   "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -96,7 +99,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -113,15 +116,16 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Briteq BTX-Hawk",
+  "gdtfDescription": "180W LED Moving head spot",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -157,14 +161,18 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF luminous flux 49500 lm is implausible for 180 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, ipRating, noiseLevelDb"
   ]
 }

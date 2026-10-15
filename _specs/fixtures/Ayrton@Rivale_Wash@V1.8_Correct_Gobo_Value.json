@@ -6,7 +6,7 @@
   "gdtfName": "Rivale Wash",
   "longName": "Rivale Wash",
   "shortName": "RVL Wsh",
-  "description": "Classical 3 Series",
+  "description": "Ayrton Rivale Wash: moving-head LED wash (framing wash), with 4-57 deg zoom, CMY colour mixing, colour wheel, 7 gobos, framing shutters, frost.",
   "manufacturer": "Ayrton",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 700.0,
-  "maxLuminousIntensityCd": 5120800.0,
+  "maxLuminousIntensityCd": 5100000.0,
   "luminousFluxLm": 28000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 30.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -83,7 +83,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -101,10 +101,13 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "Ayrton Rivale Wash",
+  "gdtfDescription": "Classical 3 Series",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -147,13 +150,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Wash with integrated framing shutters."
+    "Wash with integrated framing shutters.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "FUZE PAR Z60 IP",
   "longName": "FUZE PAR Z60 IP",
   "shortName": "FuzPrZ60",
-  "description": "The IP65 rated FUZE PAR Z60 IP™ is a single source par luminaire with a 60W Quad Color RGBW COB LED. Features 7° to 39° motorized zoom, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, IP rated 5pin XLR and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, dual adjustable yokes, multiple unit power linking, flicker free operation for TV and FILM, a multi-voltage universal auto switching power supply (110-240v), and removable gel frame and barn doors included.",
+  "description": "The IP65 rated FUZE PAR Z60 IP is a single source par luminaire with a 60W Quad Color RGBW COB LED. Features 7° to 39° motorized zoom, RGBW color mixing, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, IP rated 5pin XLR and IP65 Locking Power Cable in/out connections, LCD menu display with 4 touch button control panel, dual adjustable yokes, multiple unit power linking, flicker free operation for TV and FILM, a multi-voltage universal auto switching power supply (110-240v), and removable gel frame and barn doors included.",
   "manufacturer": "Elation",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -25,9 +25,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 78,
-  "maxLuminousIntensityCd": 446300.0,
+  "maxLuminousIntensityCd": 450000.0,
   "luminousFluxLm": 3813.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -128,6 +128,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation FUZE PAR Z60 IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -168,14 +170,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://shop.ccisolutions.com/StoreFront/jsp/pdf/ELA-FUZPARZ60IP_specifications.pdf"

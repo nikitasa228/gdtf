@@ -4,7 +4,7 @@
   "fixtureTypeId": "56FE028A-93C4-4904-927F-0D52E8200697",
   "gdtfDataVersion": "1.0",
   "gdtfName": "ELV-G4-RGB",
-  "longName": "Terbly ELV-G4-RGB",
+  "longName": "ELV-G4-RGB",
   "shortName": "ELV-G4-RGB",
   "description": "The DynaGraze Exterior HO DMX is a high power, color changing, outdoor linear fixture\nAvailable in 1'and 4' sections, it offers multiple configuration, including RGB, RGBW or RGBA or DW.Featuring a robust IP66 housing, a multi-voltage switching power supply, and a glare shield, it is the perfect option for any structure that calls for outdoor linear grazing.",
   "manufacturer": "Terbly",
@@ -29,11 +29,11 @@
   "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 5900.0,
   "luminousFluxLm": 200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 6.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -85,6 +85,8 @@
   ],
   "pixelCount": 1,
   "subType": "Linear graze light",
+  "fullName": "Terbly ELV-G4-RGB",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -121,15 +123,20 @@
     "weightKg": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
+  ],
   "_refs": [
     "http://en.terbly.com/index.php/Product/detail/goods_id/113"
   ]

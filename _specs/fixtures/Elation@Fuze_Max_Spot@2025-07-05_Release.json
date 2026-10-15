@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Max Spot",
   "longName": "Fuze Max Spot",
   "shortName": "FzMxSpot",
-  "description": "The FUZE MAX SPOT™ is a full spectrum automated LED Spot fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes a 800W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of over 21,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.\nThe FUZE SPOT MAX is designed for any application where fully automated spot fixture with outstanding and compelling color range and quality is required. Two rotating gobo wheels, one fixed gobo wheel, animation wheel, dual frost, prism and iris round out its comprehensive feature set in this quiet and extremely powerful automated spot fixture.",
+  "description": "The FUZE MAX SPOT is a full spectrum automated LED Spot fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes a 800W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of over 21,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.\nThe FUZE SPOT MAX is designed for any application where fully automated spot fixture with outstanding and compelling color range and quality is required. Two rotating gobo wheels, one fixed gobo wheel, animation wheel, dual frost, prism and iris round out its comprehensive feature set in this quiet and extremely powerful automated spot fixture.",
   "manufacturer": "Elation",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1214,
-  "maxLuminousIntensityCd": 1254300.0,
+  "maxLuminousIntensityCd": 1300000.0,
   "luminousFluxLm": 21000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 34.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -139,6 +139,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Max Spot",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -184,14 +186,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/fuze-max-spot"

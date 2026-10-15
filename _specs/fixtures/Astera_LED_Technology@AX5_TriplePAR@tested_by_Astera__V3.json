@@ -29,7 +29,7 @@
   "powerConsumptionW": 45,
   "maxLuminousIntensityCd": 49000.0,
   "luminousFluxLm": 2826.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 3.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -205,6 +205,8 @@
   ],
   "pixelCount": 2,
   "subType": "Battery uplight",
+  "fullName": "Astera LED Technology AX5 TriplePAR",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -215,7 +217,6 @@
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
@@ -247,14 +248,16 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "ipRating": "manual"
+    "ipRating": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 460 W invalid."
+    "GDTF power 460 W invalid.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://uk.panavision.com/lighting/lighting-products/heads/product-detail/xonoga5-ax5-triplepar"

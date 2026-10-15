@@ -6,7 +6,7 @@
   "gdtfName": "P18 Wash HC",
   "longName": "P18 Wash HC",
   "shortName": "P18WAHC",
-  "description": "P18 Wash HC (High CRI) 1000W",
+  "description": "JB-Lighting P18 Wash HC: moving-head LED wash (framing wash), with 13-65 deg zoom, RGB colour mixing, colour wheel, framing shutters, frost.",
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 1500,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 820000.0,
   "luminousFluxLm": 47500.0,
   "noiseLevelDb": 28,
   "weightKg": 32.0,
@@ -76,7 +76,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -94,10 +94,13 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "JB-Lighting P18 Wash HC",
+  "gdtfDescription": "P18 Wash HC (High CRI) 1000W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "manual",
@@ -139,14 +142,16 @@
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "noiseLevelDb": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
     "https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"

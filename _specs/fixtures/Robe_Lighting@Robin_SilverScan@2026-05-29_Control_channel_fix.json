@@ -4,7 +4,7 @@
   "fixtureTypeId": "E61EB1E1-78AE-4977-96CB-045A04831AFF",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin SilverScan",
-  "longName": "Robin SilverScan™",
+  "longName": "Robin SilverScan",
   "shortName": "SilverScan",
   "description": "With super-fast mirror movement, the bright and colorful SilverScan utilizes all the massive improvements technology has made and brings it back to its roots.",
   "manufacturer": "Robe Lighting",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 326000.0,
+  "maxLuminousIntensityCd": 330000.0,
   "luminousFluxLm": 9020.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 16.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin SilverScan",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -160,11 +162,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

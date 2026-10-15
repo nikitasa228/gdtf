@@ -4,9 +4,9 @@
   "fixtureTypeId": "8198A47D-55D0-4946-9B68-C6CC153FBB2F",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iForte LTX WB",
-  "longName": "Robin iForte® LTX WB",
+  "longName": "Robin iForte LTX WB",
   "shortName": "iFORTE LTX WB",
-  "description": "Are you looking for the ultimate long throw, high output, all-environment LED WashBeam for true, stadium-level reach capable of outperforming all others? You have only one choice – The Robe iFORTE® LTX WB!",
+  "description": "Are you looking for the ultimate long throw, high output, all-environment LED WashBeam for true, stadium-level reach capable of outperforming all others? You have only one choice – The Robe iFORTE LTX WB!",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1250.0,
-  "maxLuminousIntensityCd": 10050900.0,
+  "maxLuminousIntensityCd": 10000000.0,
   "luminousFluxLm": 42078.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 48.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -92,7 +92,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -50.0,
@@ -105,6 +105,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iForte LTX WB",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -151,11 +153,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

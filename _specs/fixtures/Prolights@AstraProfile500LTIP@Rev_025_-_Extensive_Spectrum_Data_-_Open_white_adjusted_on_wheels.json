@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 670.0,
-  "maxLuminousIntensityCd": 4274700.0,
+  "maxLuminousIntensityCd": 4300000.0,
   "luminousFluxLm": 25769.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 34.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights AstraProfile500LTIP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -158,11 +160,13 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

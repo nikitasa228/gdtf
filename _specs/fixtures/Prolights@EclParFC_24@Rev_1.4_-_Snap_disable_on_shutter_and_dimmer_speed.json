@@ -4,7 +4,7 @@
   "fixtureTypeId": "E6E3230D-180D-49B8-BAA4-C0F49ABFB772",
   "gdtfDataVersion": "1.2",
   "gdtfName": "EclParFC_24",
-  "longName": "EclParFC_24",
+  "longName": "EclParFC 24",
   "shortName": "EclParFC_24",
   "description": "EclPar FC is a range of multipurpose LED fixtures with a single source, delivering silent operation, high quality of light and optical flexibility, designed to redefine the standard for theatrical, TVs and corporate applications.\nEclPar FC features a 150W RGB + Warm White and delivers a superior white CTC with +/- tint control, red-shift (CRI > 95 and R9 > 98 @3.200 K) and colour mixing.\nThe fixture includes an extensive range of accessories including barn doors, filter frame, egg crate and a multitude of interchangeable lenses.\nEclPar FC features a smooth 16-bit dimming as well as RDM control and adjustable PWM providing eye-candy.",
   "manufacturer": "Prolights",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 150,
-  "maxLuminousIntensityCd": 27900.0,
+  "maxLuminousIntensityCd": 28000.0,
   "luminousFluxLm": 5983.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 5.7,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
@@ -76,7 +76,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -133,6 +133,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclParFC 24",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -175,14 +177,16 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ECLPARFC"

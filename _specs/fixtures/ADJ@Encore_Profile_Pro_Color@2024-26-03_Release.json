@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 250,
-  "maxLuminousIntensityCd": 401400.0,
+  "maxLuminousIntensityCd": 90000.0,
   "luminousFluxLm": 6000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -106,6 +106,8 @@
     }
   ],
   "pixelCount": 5,
+  "fullName": "ADJ Encore Profile Pro Color",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -113,7 +115,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -147,15 +148,17 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Interchangeable lens tubes 14/19/26/36/50 deg or 15-30 / 25-50 zoom; manual shutters and gobo slot. GDTF power 922 W contradicts spec sheet (250 W)."
+    "Interchangeable lens tubes 14/19/26/36/50 deg or 15-30 / 25-50 zoom; manual shutters and gobo slot. GDTF power 922 W contradicts spec sheet (250 W).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/encore-profile-pro-color"

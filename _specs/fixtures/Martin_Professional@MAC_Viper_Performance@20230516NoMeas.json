@@ -6,7 +6,7 @@
   "gdtfName": "MAC Viper Performance",
   "longName": "MAC Viper Performance",
   "shortName": "MACVipPer",
-  "description": "Official Martin Professional File (no measurements)",
+  "description": "Martin Professional MAC Viper Performance: moving-head Discharge Lamp profile, with 10-44 deg zoom, CMY colour mixing, colour wheel, 13 gobos, framing shutters, prism, frost.",
   "manufacturer": "Martin Professional",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -24,9 +24,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1225.0,
-  "maxLuminousIntensityCd": 761200.0,
+  "maxLuminousIntensityCd": 760000.0,
   "luminousFluxLm": 26000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 37.9,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
@@ -88,7 +88,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
@@ -105,10 +105,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional MAC Viper Performance",
+  "gdtfDescription": "Official Martin Professional File (no measurements)",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -151,11 +154,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

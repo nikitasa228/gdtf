@@ -6,7 +6,7 @@
   "gdtfName": "MOVILED 340",
   "longName": "MOVILED 340",
   "shortName": "MOVILED340",
-  "description": "Moving Head Wash Zoom 3x40W RGBW",
+  "description": "MARK MOVILED 340: moving-head LED wash, with 8-55 deg zoom, RGBW colour mixing, colour wheel.",
   "manufacturer": "MARK",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 120.0,
-  "maxLuminousIntensityCd": 411600.0,
+  "maxLuminousIntensityCd": 410000.0,
   "luminousFluxLm": 9000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 5.8,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
@@ -72,7 +72,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -89,14 +89,16 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "MARK MOVILED 340",
+  "gdtfDescription": "Moving Head Wash Zoom 3x40W RGBW",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "weightKg": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
@@ -129,14 +131,19 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

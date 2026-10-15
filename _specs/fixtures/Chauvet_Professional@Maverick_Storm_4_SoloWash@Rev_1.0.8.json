@@ -29,7 +29,7 @@
   "powerConsumptionW": 1720,
   "maxLuminousIntensityCd": 4060200,
   "luminousFluxLm": 61373.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 45.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -99,6 +99,8 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "Chauvet Professional Maverick Storm 4 SoloWash",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -146,14 +148,15 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/maverick-storm-4-solowash/"

@@ -6,7 +6,7 @@
   "gdtfName": "Robin iBeam 250",
   "longName": "Robin iBeam 250",
   "shortName": "iBeam250",
-  "description": "It's time to move outside with the iBeam 250™! Whatever the weather, it's always ready to get your party started.\nA member of the Robe iSeries, this IP65 rated luminaire gives you those compact WashBeam loved attributes of speed, colour and zoom range while capable of handling all the challenges of being outdoors.",
+  "description": "It's time to move outside with the iBeam 250! Whatever the weather, it's always ready to get your party started.\nA member of the Robe iSeries, this IP65 rated luminaire gives you those compact WashBeam loved attributes of speed, colour and zoom range while capable of handling all the challenges of being outdoors.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 280.0,
-  "maxLuminousIntensityCd": 653300.0,
+  "maxLuminousIntensityCd": 650000.0,
   "luminousFluxLm": 3224.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 13.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -99,6 +99,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iBeam 250",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -144,11 +146,13 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ]
 }

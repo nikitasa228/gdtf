@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 128,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 190000.0,
   "luminousFluxLm": 1643.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 11.0,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -130,6 +130,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ 7PZ IP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -168,17 +170,18 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "ADJ WiFLY EXR wireless DMX built in."
+    "ADJ WiFLY EXR wireless DMX built in.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/7pz-ip"

@@ -6,7 +6,7 @@
   "gdtfName": "BSW 400 CMY",
   "longName": "LED BSW 400 CMY",
   "shortName": "BSW 400 CMY",
-  "description": "Beam Spot Wash CMY with 400w LED",
+  "description": "PRstage LED BSW 400 CMY: moving-head LED beam/spot/wash hybrid, with 2-53 deg zoom, CMY colour mixing, 17 gobos, prism, frost.",
   "manufacturer": "PRstage",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 850.0,
-  "maxLuminousIntensityCd": 731500.0,
+  "maxLuminousIntensityCd": 730000.0,
   "luminousFluxLm": 1000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 16.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -91,7 +91,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -104,10 +104,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "PRstage LED BSW 400 CMY",
+  "gdtfDescription": "Beam Spot Wash CMY with 400w LED",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -150,11 +153,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

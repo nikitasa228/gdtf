@@ -6,7 +6,7 @@
   "gdtfName": "Rayzor 760",
   "longName": "Rayzor 760",
   "shortName": "Ray760",
-  "description": "The Rayzor 760™ is a compact yet extremely powerful Wash Effects fixture featuring Elation’s unique SparkLED™ system and fast continuous Pan and Tilt motion. With its wide zoom range from 5° to 77° it provides intense and well-defined mid-air beams at over 8,000 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
+  "description": "The Rayzor 760 is a compact yet extremely powerful Wash Effects fixture featuring Elation’s unique SparkLED system and fast continuous Pan and Tilt motion. With its wide zoom range from 5° to 77° it provides intense and well-defined mid-air beams at over 8,000 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
   "manufacturer": "Elation",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 700,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 8500000.0,
   "luminousFluxLm": 11615.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 12.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -110,6 +110,8 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation Rayzor 760",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -151,16 +153,18 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/rayzor-760"

@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Wash Pro S QUAD",
   "longName": "Exterior Wash Pro S QUAD",
   "shortName": "EXTWasProSQUAD",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior Wash Pro S QUAD: LED wash, with 8 deg beam, CMY colour mixing.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 35.0,
-  "maxLuminousIntensityCd": 20600.0,
+  "maxLuminousIntensityCd": 21000.0,
   "luminousFluxLm": 450.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 4.4,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
@@ -102,10 +102,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional Exterior Wash Pro S QUAD",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "supportedPowerNetworks": "gdtf-derived",
@@ -142,11 +145,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

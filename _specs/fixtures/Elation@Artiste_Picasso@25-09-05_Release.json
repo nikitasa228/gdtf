@@ -6,7 +6,7 @@
   "gdtfName": "Artiste Picasso",
   "longName": "Artiste Picasso",
   "shortName": "ArtPic",
-  "description": "The Artiste Picasso™ is a full-featured innovative theatrical-grade luminaire featuring a new 620W 6,800K Cool White LED engine with advanced optics that deliver over 23,000 total lumen output, ultra wide and fast 7° to 55° zoom, a full CMY color mixing system producing a full spectrum of shades from pastels to rich saturated colors, linear CTO color correction, 6 dichroic colors including a high 87 CRI filter, 7 rotating/indexing glass and 7 static-stamped metal interchangeable gobos, 4 rotating full blackout framing blades with +/- 45° individual blade rotation, full 360° bi-directional animation wheel, 4-facet and linear rotating prisms and 2 frost filters, internal color, framing, prism, and frost macros, motorized iris with variable pulse effects, motorized focus and auto-focus feature, 16-bit pan, tilt, and dimming control, variable dimming curve modes, high speed electronic shutter and strobe, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, silent fan mode for noise-sensitive applications, DMX, RDM (Remote Device Management), Art-NET™, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, and power connections, full color 180° reversible LCD control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The Artiste Picasso is a full-featured innovative theatrical-grade luminaire featuring a new 620W 6,800K Cool White LED engine with advanced optics that deliver over 23,000 total lumen output, ultra wide and fast 7° to 55° zoom, a full CMY color mixing system producing a full spectrum of shades from pastels to rich saturated colors, linear CTO color correction, 6 dichroic colors including a high 87 CRI filter, 7 rotating/indexing glass and 7 static-stamped metal interchangeable gobos, 4 rotating full blackout framing blades with +/- 45° individual blade rotation, full 360° bi-directional animation wheel, 4-facet and linear rotating prisms and 2 frost filters, internal color, framing, prism, and frost macros, motorized iris with variable pulse effects, motorized focus and auto-focus feature, 16-bit pan, tilt, and dimming control, variable dimming curve modes, high speed electronic shutter and strobe, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, silent fan mode for noise-sensitive applications, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation’s E-FLY internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, and power connections, full color 180° reversible LCD control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1000,
-  "maxLuminousIntensityCd": 2090500.0,
+  "maxLuminousIntensityCd": 2100000.0,
   "luminousFluxLm": 35000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 38.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -98,7 +98,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -123,6 +123,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Artiste Picasso",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -169,14 +171,16 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/artiste-picasso"

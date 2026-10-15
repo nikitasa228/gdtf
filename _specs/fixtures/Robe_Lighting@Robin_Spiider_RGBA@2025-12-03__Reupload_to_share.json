@@ -6,7 +6,7 @@
   "gdtfName": "Robin Spiider RGBA",
   "longName": "Robin Spiider RGBA",
   "shortName": "Spiider RGBA",
-  "description": "RGBA version of the popular Spiider",
+  "description": "Robe Lighting Robin Spiider RGBA: moving-head LED wash-beam, with 4-50 deg zoom, RGBA colour mixing, colour wheel.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 660.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 420000.0,
   "luminousFluxLm": 2316.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 13.25,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -127,10 +127,13 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Robe Lighting Robin Spiider RGBA",
+  "gdtfDescription": "RGBA version of the popular Spiider",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
@@ -168,14 +171,16 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ]
 }

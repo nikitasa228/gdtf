@@ -6,7 +6,7 @@
   "gdtfName": "LED COB 200 RGBW",
   "longName": "LED COB 200 RGBW",
   "shortName": "COB 200",
-  "description": "PRstage. COB 200 RGBW official file.",
+  "description": "PRstage LED COB 200 RGBW: LED PAR, with 60 deg beam, RGBW colour mixing.",
   "manufacturer": "PRstage",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -29,7 +29,7 @@
   "powerConsumptionW": 200.0,
   "maxLuminousIntensityCd": 2800.0,
   "luminousFluxLm": 3400.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -94,10 +94,13 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "PRstage LED COB 200 RGBW",
+  "gdtfDescription": "PRstage. COB 200 RGBW official file.",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
@@ -134,13 +137,15 @@
     "pixelCount": "gdtf-derived",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

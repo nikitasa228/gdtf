@@ -9,20 +9,34 @@
   "description": "Pangolin FB4: network laser show controller / DAC used to control laser projectors via DMX/Art-Net.",
   "manufacturer": "Pangolin Laser Systems",
   "category": "OTHER",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 10,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "weightKg": 0.6,
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "DC Jack",
   "motorizedPanTilt": true,
-  "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "panRangeDeg": 540.0,
+  "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -52,7 +66,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -66,6 +80,8 @@
   ],
   "pixelCount": 0,
   "subType": "Laser controller (Pangolin FB4 network DAC)",
+  "fullName": "Pangolin Laser Systems FB4",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",
@@ -94,20 +110,27 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "powerConsumptionW": "estimated",
+    "weightKg": "estimated",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "panRangeDeg": "estimated",
+    "tiltRangeDeg": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "panRangeDeg",
-    "tiltRangeDeg"
+  "_missing": [],
+  "_notApplicable": [
+    "noiseLevelDb"
   ],
-  "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Not a light source: controller interface. Power / weight values are those of the laser it is mounted in."
+    "Network laser controller (external 12 V PSU).",
+    "Typical-value estimates (no published data): panRangeDeg, tiltRangeDeg, ipRating"
   ]
 }

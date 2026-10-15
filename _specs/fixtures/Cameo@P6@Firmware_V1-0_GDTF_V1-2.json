@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 620,
-  "maxLuminousIntensityCd": 1872800.0,
+  "maxLuminousIntensityCd": 1900000.0,
   "luminousFluxLm": 16000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 40,
   "weightKg": 20.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -151,6 +151,8 @@
   ],
   "pixelCount": 1,
   "subType": "Static LED profile / moving yoke",
+  "fullName": "Cameo P6 (CLP6)",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -196,14 +198,15 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://adamhall.com/shop/en/brands/p6"

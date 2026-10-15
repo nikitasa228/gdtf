@@ -6,7 +6,7 @@
   "gdtfName": "Sparx30",
   "longName": "Sparx30",
   "shortName": "SP30",
-  "description": "Sparx30",
+  "description": "JB-Lighting Sparx30: moving-head LED wash-beam, with 3-70 deg zoom, RGBW colour mixing, colour wheel.",
   "manufacturer": "JB-Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 2200,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 12000000.0,
   "luminousFluxLm": 36000,
   "noiseLevelDb": 29,
   "weightKg": 28.4,
@@ -77,7 +77,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -98,10 +98,13 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "JB-Lighting Sparx30",
+  "gdtfDescription": "Sparx30",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
@@ -141,16 +144,18 @@
     "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF beam-sum power invalid, removed."
+    "GDTF beam-sum power invalid, removed.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
     "https://www.jb-lighting.de/download/Prospekt/JB_Sparx30_brochure_en.pdf",

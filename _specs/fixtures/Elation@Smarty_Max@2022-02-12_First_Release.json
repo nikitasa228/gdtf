@@ -6,7 +6,7 @@
   "gdtfName": "Smarty Max",
   "longName": "Smarty Max",
   "shortName": "Smarty Max",
-  "description": "The SMARTY MAX™ combines high output and long lamp life in a feature packed compact and lightweight Hybrid fixture. SMARTY MAX is the Extreme Output Hybrid featuring the new Philips MSD Platinum FLEX 400 lamp and Elation’s 2 year / 4,000 hours Ultimate Warranty.** Rated at 480W and up to 4,000 hours smart lamp life the SMARTY MAX includes CMY and variable CTO and is the world’s first Hybrid incorporating a full Iris for dynamic beam effects. Four prisms on two planes, dual frosts plus dual gobo wheel and the unique dual track animation round out the comprehensive FX package in a compact and lightweight housing. Delivering 21,000 lumens from its large 160mm front aperture, the SMARTY MAX has a crisp output for extremely powerful beams, sharp gobos and bright washes, making it a flexible fixture for almost any application, while providing an excellent return on investment.",
+  "description": "The SMARTY MAX combines high output and long lamp life in a feature packed compact and lightweight Hybrid fixture. SMARTY MAX is the Extreme Output Hybrid featuring the new Philips MSD Platinum FLEX 400 lamp and Elation’s 2 year / 4,000 hours Ultimate Warranty.** Rated at 480W and up to 4,000 hours smart lamp life the SMARTY MAX includes CMY and variable CTO and is the world’s first Hybrid incorporating a full Iris for dynamic beam effects. Four prisms on two planes, dual frosts plus dual gobo wheel and the unique dual track animation round out the comprehensive FX package in a compact and lightweight housing. Delivering 21,000 lumens from its large 160mm front aperture, the SMARTY MAX has a crisp output for extremely powerful beams, sharp gobos and bright washes, making it a flexible fixture for almost any application, while providing an excellent return on investment.",
   "manufacturer": "Elation",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 700,
-  "maxLuminousIntensityCd": 6827400.0,
+  "maxLuminousIntensityCd": 6800000.0,
   "luminousFluxLm": 21000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 27.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -101,7 +101,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -126,6 +126,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Smarty Max",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -171,14 +173,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/smarty-max"

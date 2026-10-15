@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 220,
-  "maxLuminousIntensityCd": 258500.0,
+  "maxLuminousIntensityCd": 260000.0,
   "luminousFluxLm": 10684.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 11.9,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": null,
@@ -102,6 +102,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcSpotXLFC",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,14 +145,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.prolights.it/en/product/ARCSPOTXLFC"

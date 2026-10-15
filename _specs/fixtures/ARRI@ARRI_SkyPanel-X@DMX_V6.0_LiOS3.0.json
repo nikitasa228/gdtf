@@ -4,7 +4,7 @@
   "fixtureTypeId": "4CA71FED-2E5D-4EB0-9EE6-22C06825EDBA",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ARRI SkyPanel-X",
-  "longName": "ARRI SkyPanel-X",
+  "longName": "SkyPanel-X",
   "shortName": "SkyPanel-X",
   "description": "Modular and Configurable RGBACL Panel Fixture",
   "manufacturer": "ARRI",
@@ -28,8 +28,8 @@
   },
   "powerConsumptionW": 800,
   "maxLuminousIntensityCd": 480000,
-  "luminousFluxLm": 250000.0,
-  "noiseLevelDb": null,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 18.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -125,6 +125,8 @@
   ],
   "pixelCount": 3,
   "subType": "Soft light panel (modular)",
+  "fullName": "ARRI SkyPanel-X",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",
@@ -132,8 +134,6 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "estimated",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -165,16 +165,19 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "Values for SkyPanel X21 (1 x 2 engines); X22/X23 = 2x/3x power. GDTF power 3125 W invalid."
+    "Values for SkyPanel X21 (1 x 2 engines); X22/X23 = 2x/3x power. GDTF power 3125 W invalid.",
+    "GDTF luminous flux 250000 lm is implausible for 800 W and was dropped",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.arri.com/en/lighting/led/skypanel/x-series/tech-data"

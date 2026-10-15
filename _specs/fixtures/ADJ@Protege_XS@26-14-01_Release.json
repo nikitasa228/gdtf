@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 616,
-  "maxLuminousIntensityCd": 2032100.0,
+  "maxLuminousIntensityCd": 2000000.0,
   "luminousFluxLm": 9800,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 17.85,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
@@ -115,6 +115,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Protégé XS",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,14 +163,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/protege-xs"

@@ -5,8 +5,8 @@
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin Esprite PC",
   "longName": "Robin Esprite PC",
-  "shortName": "ESPRITE™ PC",
-  "description": "The ESPRITE PC offers you a dynamic, high performance wash light, whilst enjoying the many advantages of our TE™ Transferable Engine technology.",
+  "shortName": "ESPRITE PC",
+  "description": "The ESPRITE PC offers you a dynamic, high performance wash light, whilst enjoying the many advantages of our TE Transferable Engine technology.",
   "manufacturer": "Robe Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": 1166400.0,
+  "maxLuminousIntensityCd": 1200000.0,
   "luminousFluxLm": 19528.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 26.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -78,7 +78,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -104,6 +104,8 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "Robe Lighting Robin Esprite PC",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -149,11 +151,14 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

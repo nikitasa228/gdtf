@@ -4,7 +4,7 @@
   "fixtureTypeId": "FAFD90A2-0DFD-4D1C-BD27-D57D58425FD3",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ArcShineS9VW_15",
-  "longName": "ArcShineS9VW_15",
+  "longName": "ArcShineS9VW 15",
   "shortName": "ASS9VW_15",
   "description": "The ArcShine S18VW and ArcShine S9VW are a series of slim linear LED fixtures, designed for interior and exterior applications (IP66) such as flood lighting, wall washing and accent lighting.\nThere are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 2W each, with Variable White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings. \nOptic: 15° lenses capable of delivering multiple angles with optional holographic filters.\nOptional holographic symmetric and elliptical filters available: 20°, 60°, 10°x60°, 30°x60°.\nThe ArcShine range has an on-board power supply and DMX/RDM control. The 100 cm version is controllable in two sections.",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 17.5,
   "maxLuminousIntensityCd": 1400.0,
   "luminousFluxLm": 133.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.9,
   "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": "IP moulded connector",
@@ -102,6 +102,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcShineS9VW 15",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -143,13 +145,15 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
   "_refs": [
     "https://aclighting.com/arcshine-s9vw"
   ]

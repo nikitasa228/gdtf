@@ -4,9 +4,9 @@
   "fixtureTypeId": "58A6CD9B-01CE-4D33-BA7D-D41ED53D1070",
   "gdtfDataVersion": "1.1",
   "gdtfName": "L7C",
-  "longName": "ARRI L7C",
+  "longName": "L7C",
   "shortName": "L7C",
-  "description": "Arri L7C Fresnel",
+  "description": "ARRI L7C: LED wash (fresnel), with 15-50 deg zoom, RGBW colour mixing.",
   "manufacturer": "ARRI",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 220,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 110000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 8.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
@@ -123,10 +123,13 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "ARRI L7C",
+  "gdtfDescription": "Arri L7C Fresnel",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
@@ -161,15 +164,17 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.markertek.com/Attachments/Specifications/ARRI/L7-Specifications.pdf"

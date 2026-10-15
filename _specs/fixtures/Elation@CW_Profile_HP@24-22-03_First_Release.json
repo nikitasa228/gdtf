@@ -6,7 +6,7 @@
   "gdtfName": "CW Profile HP",
   "longName": "CW Profile HP",
   "shortName": "CWProfHP",
-  "description": "The CW Profile HP™ ellipsoidal features a High Powered 130W Cool White >90CRI 5,600K LED engine producing 11,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, manual focus, supports B size metal HT transparency gobos, DMX controlled electronic strobe, and variable dimming curve modes, adjustable refresh frequency and gamma brightness for flicker free operation for TV and FILM, 3/5pin DMX and Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The CW Profile HP ellipsoidal features a High Powered 130W Cool White >90CRI 5,600K LED engine producing 11,000+ total lumens, 19°, 26°, 36°, and 50° interchangeable lens options (sold separately), (4) blade manual framing shutters, manual focus, supports B size metal HT transparency gobos, DMX controlled electronic strobe, and variable dimming curve modes, adjustable refresh frequency and gamma brightness for flicker free operation for TV and FILM, 3/5pin DMX and Locking Power Cable in/out connections, (4) button LCD control display panel, an integrated rigging yoke, quiet fan cooling, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 160,
-  "maxLuminousIntensityCd": 429700.0,
+  "maxLuminousIntensityCd": 140000.0,
   "luminousFluxLm": 11000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 9.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -89,6 +89,8 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "Elation CW Profile HP",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -96,7 +98,6 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
@@ -129,14 +130,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/cw-profile-hp"

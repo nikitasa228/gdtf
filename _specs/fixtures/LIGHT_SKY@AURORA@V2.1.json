@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 670.0,
-  "maxLuminousIntensityCd": 6624200.0,
+  "maxLuminousIntensityCd": 6600000.0,
   "luminousFluxLm": 20375.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 29.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -106,7 +106,7 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -119,6 +119,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY Aurora",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -164,11 +166,14 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "description": "gdtf-derived"
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

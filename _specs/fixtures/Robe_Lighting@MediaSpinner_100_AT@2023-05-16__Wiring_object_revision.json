@@ -36,7 +36,7 @@
   "powerSupplyType": "Fixed Cable LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 450.0,
-  "tiltRangeDeg": null,
+  "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": null,
   "manualPanRangeDeg": null,
@@ -69,7 +69,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -83,6 +83,8 @@
   ],
   "pixelCount": 0,
   "subType": "Rotating screen / media spinner",
+  "fullName": "Robe Lighting MediaSpinner 100 AT",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -120,11 +122,16 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived",
+    "tiltRangeDeg": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
+  "_missing": [],
+  "_notApplicable": [
     "noiseLevelDb"
   ],
-  "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): tiltRangeDeg, ipRating"
+  ]
 }

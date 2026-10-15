@@ -6,7 +6,7 @@
   "gdtfName": "VDO Dual Header",
   "longName": "VDO Dual Header",
   "shortName": "VDODual",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VDO Dual Header: device (vdo cable header / adapter).",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
@@ -66,10 +66,13 @@
   ],
   "pixelCount": 0,
   "subType": "VDO cable header / adapter",
+  "fullName": "Martin Professional VDO Dual Header",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "gdtf",
@@ -93,15 +96,16 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
+    "controlSignal",
+    "noiseLevelDb",
     "powerConsumptionW",
     "powerSupplyType",
-    "controlSignal",
-    "supportedPowerNetworks",
-    "noiseLevelDb"
+    "supportedPowerNetworks"
   ],
   "_issues": [
     "Passive accessory (no power)."

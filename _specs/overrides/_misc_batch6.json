@@ -50,7 +50,7 @@
  "PRstage@BLINDER_4100@ver_1_1.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
  "PRstage@Beam_295_Ring@ver_1.28.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
  "PRstage@Beam_LED_200_Ring@Ver_1.1.gdtf": {"lightSourceType": "LED", "mains": "100-240", "powerConsumptionW": null, "_estimated": ["mains"], "_notes": "GDTF said discharge lamp / 295 W (copied from Beam 295); LED 200 W model."},
- "PRstage@Dimmer_Pack_4@Ver_1_02.gdtf": {"category": "OTHER", "subType": "4-channel dimmer pack", "lightSourceType": null, "mains": "220-240/50", "powerSupplyType": "Schuko", "_estimated": ["mains", "powerSupplyType"], "_na": ["lensType", "noiseLevelDb"]},
+ "PRstage@Dimmer_Pack_4@Ver_1_02.gdtf": {"category": "OTHER", "subType": "4-channel dimmer pack", "lightSourceType": null, "mains": "220-240/50", "powerSupplyType": "Schuko", "_estimated": ["mains", "powerSupplyType"], "_na": ["powerConsumptionW", "noiseLevelDb"], "maxLoadW": 4600, "_notes": "4-channel dimmer pack, 20 A total (about 4600 W of connected load at 230 V); its own consumption is negligible."},
  "PRstage@F-Spot_800_CMY@Ver_121.gdtf": {"category": "PROFILE", "lensType": "Ellipsoidal (Profile)"},
  "PRstage@F400Z@Ver_1.71.gdtf": {"category": "WASH", "mains": "100-240", "_estimated": ["mains"]},
  "PRstage@FOG_1500@Ver_1.2.gdtf": {"powerConsumptionW": 1500, "mains": "220-240/50", "powerSupplyType": "Schuko", "_estimated": ["mains", "powerSupplyType"]},

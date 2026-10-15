@@ -4,7 +4,7 @@
   "fixtureTypeId": "319BA4CF-845C-44ED-A942-06A438852EE8",
   "gdtfDataVersion": "1.1",
   "gdtfName": "DisplayCobWW_30",
-  "longName": "DisplayCobWW_30",
+  "longName": "DisplayCobWW 30",
   "shortName": "DCOBWW_30",
   "description": "DisplayCob WW is the compact version of the popular StudioCob WW - perfect for an installation or indoor venues. DisplayCob WW employs a 45 W COB LED source tungsten white 3.200 K, combined with a special parabolic reflector built in aluminium which develops an extremely bright and homogeneous output of 96 CRI and interchangeable lens systems to switch from 60° (incl.) to 30° (incl.) and 15° (opt.).",
   "manufacturer": "Prolights",
@@ -29,7 +29,7 @@
   "powerConsumptionW": 52.0,
   "maxLuminousIntensityCd": 1900.0,
   "luminousFluxLm": 2309.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.85,
   "powerConnectorIn": "Schuko",
   "powerConnectorOut": null,
@@ -74,7 +74,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -95,6 +95,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights DisplayCobWW 30",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -136,11 +138,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

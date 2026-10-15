@@ -6,7 +6,7 @@
   "gdtfName": "MAC One VDO Grid Mount Ring",
   "longName": "MAC One VDO Grid Mount Ring",
   "shortName": "MACOneGrid",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional MAC One VDO Grid Mount Ring: device (mounting accessory).",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
@@ -66,10 +66,13 @@
   ],
   "pixelCount": 0,
   "subType": "Mounting accessory",
+  "fullName": "Martin Professional MAC One VDO Grid Mount Ring",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "gdtf",
@@ -93,15 +96,16 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [
+    "controlSignal",
+    "noiseLevelDb",
     "powerConsumptionW",
     "powerSupplyType",
-    "controlSignal",
-    "supportedPowerNetworks",
-    "noiseLevelDb"
+    "supportedPowerNetworks"
   ],
   "_issues": [
     "Passive accessory (no power)."

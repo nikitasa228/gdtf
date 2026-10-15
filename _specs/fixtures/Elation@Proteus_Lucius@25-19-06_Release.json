@@ -6,7 +6,7 @@
   "gdtfName": "Proteus Lucius",
   "longName": "Proteus Lucius",
   "shortName": "Proteus Lucius",
-  "description": "The PROTEUS LUCIUS™ is a powerful yet compact IP65-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\nProviding up to 33,500 lumens output from its custom-designed Peak Field 580W 6,500K LED engine, the PROTEUS LUCIUS is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. PROTEUS LUCIUS provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.",
+  "description": "The PROTEUS LUCIUS is a powerful yet compact IP65-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\nProviding up to 33,500 lumens output from its custom-designed Peak Field 580W 6,500K LED engine, the PROTEUS LUCIUS is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. PROTEUS LUCIUS provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.",
   "manufacturer": "Elation",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 1000,
-  "maxLuminousIntensityCd": 4159900.0,
+  "maxLuminousIntensityCd": 4200000.0,
   "luminousFluxLm": 43000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 40.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -127,6 +127,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Lucius",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -174,14 +176,15 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.com/products/proteus-lucius"

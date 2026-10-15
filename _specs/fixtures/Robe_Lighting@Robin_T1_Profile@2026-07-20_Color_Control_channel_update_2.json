@@ -4,7 +4,7 @@
   "fixtureTypeId": "F067E11C-F3E9-485B-B60D-5A15580DC6B0",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T1 Profile",
-  "longName": "Robin T1 Profile™",
+  "longName": "Robin T1 Profile",
   "shortName": "T1Profile",
   "description": "T1. The new ONE and only fixture you need for theatre, television and touring.",
   "manufacturer": "Robe Lighting",
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 750.0,
-  "maxLuminousIntensityCd": 601800.0,
+  "maxLuminousIntensityCd": 600000.0,
   "luminousFluxLm": 10075.0,
   "noiseLevelDb": 24,
   "weightKg": 24.3,
@@ -89,7 +89,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
@@ -118,6 +118,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T1 Profile",
+  "powerLinkable": false,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -165,12 +167,15 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto)."
+    "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto).",
+    "Typical-value estimates (no published data): ipRating"
   ],
   "_refs": [
     "https://www.robe.cz/res/downloads/standards/Robin_series/Noise/ROBIN_T1_Profile_Noise_Measurement.pdf"

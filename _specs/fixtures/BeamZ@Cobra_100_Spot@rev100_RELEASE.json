@@ -26,10 +26,10 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 140500.0,
+  "powerConsumptionW": 554,
+  "maxLuminousIntensityCd": 140000.0,
   "luminousFluxLm": 1200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 5.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -105,6 +105,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "BeamZ Cobra 100",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -114,7 +116,7 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "manual",
+    "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "gdtf",
@@ -152,14 +154,14 @@
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 850 W implausible for a 100 W LED spot, removed."
+    "GDTF power 850 W implausible for a 100 W LED spot, removed.",
+    "Typical-value estimates (no published data): powerConsumptionW, noiseLevelDb"
   ]
 }

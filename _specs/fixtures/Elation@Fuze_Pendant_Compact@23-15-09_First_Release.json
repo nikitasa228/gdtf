@@ -6,7 +6,7 @@
   "gdtfName": "Fuze Pendant Compact",
   "longName": "Fuze Pendant Compact",
   "shortName": "FuzPdntCmpt",
-  "description": "The FUZE PENDANT Compact™ provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 7,200 lumens, the FUZE PENDANT Compact is ideal for a variety of ceiling height applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
+  "description": "The FUZE PENDANT Compact provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 7,200 lumens, the FUZE PENDANT Compact is ideal for a variety of ceiling height applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
   "manufacturer": "Elation",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 145,
-  "maxLuminousIntensityCd": 10500.0,
+  "maxLuminousIntensityCd": 11000.0,
   "luminousFluxLm": 7200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 5.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -73,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -114,6 +114,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Pendant Compact",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -153,14 +155,16 @@
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.elationlighting.eu/fuze-pendant-compact"

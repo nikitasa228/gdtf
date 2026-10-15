@@ -4,7 +4,7 @@
   "fixtureTypeId": "7C1BAC31-45EF-44C7-8B54-CFB7EE588504",
   "gdtfDataVersion": "1.2",
   "gdtfName": "EclProfileFWVW_50",
-  "longName": "EclProfileFWVW_50",
+  "longName": "EclProfileFWVW 50",
   "shortName": "ECLFWVW50",
   "description": "EclProfile FWVW is the Variable White version of the new generation of Ecl Profile LED ellipsoidals, offering linear CCT control  from 2'700 K to 5'600 K. The EclProfile FWVW has been engineered in the same housing and optical design of the colour mixing versions and for those users who require higher brightness and quality on whites, offering a superior evenness and crisp focus of the new EclProfile range. The LED source  has been selected to achieve the finest quality of whites, having high scores of CRI, R9 and TM30 and being ideal for applications like corporate events, advertising, exhibitions, among others.",
   "manufacturer": "Prolights",
@@ -27,9 +27,9 @@
     "max": 60.0
   },
   "powerConsumptionW": 265.0,
-  "maxLuminousIntensityCd": 10500.0,
+  "maxLuminousIntensityCd": 10000.0,
   "luminousFluxLm": 8118.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 7.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
@@ -75,7 +75,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
@@ -104,6 +104,8 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights EclProfileFWVW 50",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -147,13 +149,15 @@
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
   ]
 }

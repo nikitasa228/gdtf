@@ -6,7 +6,7 @@
   "gdtfName": "P18 Wash HP",
   "longName": "P18 Wash HP",
   "shortName": "P18WAHP",
-  "description": "P18 Wash HP (High Power) 1000W",
+  "description": "JB-Lighting P18 Wash HP: moving-head LED wash (framing wash), with 13-65 deg zoom, CMY colour mixing, colour wheel, framing shutters, frost.",
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 1500,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 1100000.0,
   "luminousFluxLm": 61500.0,
   "noiseLevelDb": 28,
   "weightKg": 32.0,
@@ -76,7 +76,7 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
   "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
@@ -94,10 +94,13 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "JB-Lighting P18 Wash HP",
+  "gdtfDescription": "P18 Wash HP (High Power) 1000W",
+  "powerLinkable": true,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "estimated",
@@ -139,15 +142,17 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "framingShutterType": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
   ],
   "_refs": [
     "https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"
