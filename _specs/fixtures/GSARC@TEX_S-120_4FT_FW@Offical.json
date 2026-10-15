@@ -8,18 +8,32 @@
   "shortName": "TEX S-120 4FT FW",
   "description": "TEX is a new architectural outdoor graze lighting series. 3 models with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 277.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 80,
   "maxLuminousIntensityCd": 3500.0,
   "luminousFluxLm": 30.0,
   "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "weightKg": 4.85,
+  "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Fixed Cable",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -49,8 +63,8 @@
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
-    "min": 5600.0,
-    "max": 5600.0
+    "min": 4000.0,
+    "max": 4000.0
   },
   "prism": false,
   "prisms": [],
@@ -59,7 +73,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
@@ -73,16 +87,17 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Linear graze light",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
+    "category": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
-    "controlSignal": "gdtf-derived",
+    "controlSignal": "estimated",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
@@ -94,7 +109,7 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf",
+    "colorTemperatureK": "manual",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
@@ -103,15 +118,26 @@
     "animationWheel": "gdtf-derived",
     "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "subType": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft."
+  ],
+  "_refs": [
+    "https://www.gsarc.com/en/products/842.html?t=1"
+  ]
 }

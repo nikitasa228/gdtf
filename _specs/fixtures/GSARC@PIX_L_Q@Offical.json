@@ -9,17 +9,31 @@
   "description": "PIX is a new architectural outdoor matrix lighting series. 2 models all with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 20.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 277.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 420,
   "maxLuminousIntensityCd": 4100.0,
   "luminousFluxLm": 200.0,
   "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "weightKg": 19.9,
+  "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Fixed Cable",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -56,7 +70,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
@@ -74,17 +88,18 @@
     }
   ],
   "pixelCount": 2,
+  "subType": "Architectural pixel flood",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
     "motorizedPanTilt": "gdtf-derived",
-    "controlSignal": "gdtf-derived",
+    "controlSignal": "estimated",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
@@ -104,17 +119,26 @@
     "animationWheel": "gdtf-derived",
     "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "subType": "manual",
+    "weightKg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
     "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+  ],
+  "_refs": [
+    "https://www.gsarc.com/en/products/849.html?t=1"
   ]
 }

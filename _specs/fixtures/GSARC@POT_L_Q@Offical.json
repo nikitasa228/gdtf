@@ -9,17 +9,31 @@
   "description": "POT is a new architectural outdoor inground lighting series. 3 models all with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 10.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 277.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 60,
   "maxLuminousIntensityCd": 11700.0,
   "luminousFluxLm": 100.0,
   "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "weightKg": 3.2,
+  "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Fixed Cable",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -56,7 +70,7 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
   "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
@@ -66,17 +80,18 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Architectural projector",
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
+    "category": "manual",
     "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "motorizedPanTilt": "gdtf-derived",
-    "controlSignal": "gdtf-derived",
+    "controlSignal": "estimated",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
@@ -96,17 +111,24 @@
     "animationWheel": "gdtf-derived",
     "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "subType": "manual",
+    "weightKg": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "supportedPowerNetworks",
     "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
     "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "No per-model data published; power/weight scaled within the series from the documented models."
   ]
 }
