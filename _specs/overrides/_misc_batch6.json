@@ -1,515 +1,70 @@
 {
- "BeamZ_Pro@BAC320_LED_ProPAR_RGBW@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "PAR"
- },
- "BeamZ_Pro@BAC322_LED_ProPAR_RGBALC@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "PAR"
- },
- "BeamZ_Pro@BAC324_LED_ProPAR_RGBWAuv@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "PAR"
- },
- "BeamZ_Pro@BAC330_LED_ProPAR_RGBW@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "PAR"
- },
- "BeamZ_Pro@BAC332_LED_ProPAR_RGBALC@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "PAR"
- },
- "BeamZ_Pro@BAC334_LED_ProPAR_RGBWAuv@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "PAR"
- },
- "BeamZ_Pro@BS_1100_IP65@rev100a_edit.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "STROBE",
-  "goboSlots": 0,
-  "goboWheels": [],
-  "_notes": "GDTF \"gobo\" wheels are effect macros.",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@BS_1500_RGBW_IP65@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "STROBE",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@BS_1500_W_IP65@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "STROBE",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@DOT_BAR_Bat1_IP65@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@DOT_BAR_Cyc1_IP65@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@DOT_BAR_Pix1_IP65@rev_100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "category": "LED BAR",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Ignite_300_A_BSW@rev100_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed."
- },
- "BeamZ_Pro@Ignite_300_BSW@rev100a_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed."
- },
- "BeamZ_Pro@Ignite_400_BSW_CMY@rev100_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed."
- },
- "BeamZ_Pro@LCB_400_IP65@rev100a.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "powerConsumptionW": null,
-  "_notes": "GDTF power value implausible, removed.",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@LMB_1040_IP65@rev100_RELEASE.gdtf": {
-  "panRangeDeg": 0,
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@MHL_1940_RGBW@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@MHL_740_RGBW@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "powerConsumptionW": null,
-  "_notes": "GDTF power value implausible, removed."
- },
- "BeamZ_Pro@Nereid_1940_IP65@rev101bravo_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nereid_380B_IP65@rev101_NEW_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "category": "BEAM",
-  "colorMixing": "None",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nereid_500_IP65@rev101_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed.",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nereid_700_IP65@rev101_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed.",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nereid_740_IP65@rev100a_edit.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nereid_760_IP65@rev101_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "powerConsumptionW": null,
-  "_notes": "GDTF power value implausible, removed.",
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Neutron_Dot_WW_IP65@rev100a_EDIT_added_8Ch_DMX_mode.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nuke_1_IP65@rev100b_edit.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nuke_2_IP65@rev100c_EDIT_Repaired_Virtual_Dimmer_Relation.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nuke_3_IP65@rev100B.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Nuke_4_IP65@rev100_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@StarColor_1280_Wash@rev101_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "category": "LED BAR"
- },
- "BeamZ_Pro@StarColor_128_Flood@rev100a_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@StarColor_135_Flood@rev100a_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@StarColor_200_Flood@rev100a.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@StarColor_205_Flood@rev100a_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@StarColor_540_Wash@rev100a_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "category": "LED BAR"
- },
- "BeamZ_Pro@StarColor_54_Tour_WallWash@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "category": "LED BAR"
- },
- "BeamZ_Pro@StarColor_54_WallWash@rev100c_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "panRangeDeg": 0,
-  "category": "LED BAR"
- },
- "BeamZ_Pro@StarColor_72_Flood@rev100b_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@StarColor_75_Flood@rev100A_RELEASE.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ_Pro@Tiger_7RC@rev103_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed.",
-  "category": "BEAM",
-  "colorMixing": "None"
- },
- "BeamZ_Pro@Tiger_9R@rev103_RELEASE.gdtf": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W is an exporter template value, removed.",
-  "category": "BEAM",
-  "colorMixing": "None"
- },
- "BeamZ_Pro@BWA_550_Z_ProPar_Zoom_IP65@rev100_RELEASE.gdtf": {
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@SB_250_FC_RGBAL_IP65@rev100_RELEASE.gdtf": {
-  "ipRating": "IP65"
- },
- "BeamZ_Pro@Neutron_Atom_FC_IP65@rev100_RELEASE.gdtf": {
-  "ipRating": "IP65",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "_estimated": [
-   "powerSupplyType"
-  ],
-  "category": "WASH",
-  "subType": "Outdoor flood"
- },
- "BeamZ_Pro@Neutron_Atom_TM_IP65@rev100_RELEASE.gdtf": {
-  "ipRating": "IP65",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "_estimated": [
-   "powerSupplyType"
-  ],
-  "category": "WASH",
-  "subType": "Outdoor flood"
- },
- "BeamZ_Pro@Neutron_Bold_FC_RGBAL_IP65@rev_101_RELEASE.gdtf": {
-  "ipRating": "IP65",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "_estimated": [
-   "powerSupplyType"
-  ],
-  "category": "WASH",
-  "subType": "Outdoor flood"
- },
- "BeamZ_Pro@Neutron_Bold_TM_wW_IP65@rev101_RELEASE.gdtf": {
-  "ipRating": "IP65",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "_estimated": [
-   "powerSupplyType"
-  ],
-  "category": "WASH",
-  "subType": "Outdoor flood"
- },
- "PRstage@BLINDER_4100@ver_1_1.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "PRstage@Beam_295_Ring@ver_1.28.gdtf": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "PRstage@Beam_LED_200_Ring@Ver_1.1.gdtf": {
-  "lightSourceType": "LED",
-  "mains": "100-240",
-  "powerConsumptionW": null,
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF said discharge lamp / 295 W (copied from Beam 295); LED 200 W model."
- },
- "PRstage@Dimmer_Pack_4@Ver_1_02.gdtf": {
-  "category": "OTHER",
-  "subType": "4-channel dimmer pack",
-  "lightSourceType": null,
-  "mains": "220-240/50",
-  "powerSupplyType": "Schuko",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ],
-  "_na": [
-   "lensType",
-   "noiseLevelDb"
-  ]
- },
- "PRstage@F-Spot_800_CMY@Ver_121.gdtf": {
-  "category": "PROFILE",
-  "lensType": "Ellipsoidal (Profile)"
- },
- "PRstage@F400Z@Ver_1.71.gdtf": {
-  "category": "WASH",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "PRstage@FOG_1500@Ver_1.2.gdtf": {
-  "powerConsumptionW": 1500,
-  "mains": "220-240/50",
-  "powerSupplyType": "Schuko",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "PRstage@FRESNEL_300_RGBAL@Ver_2.0.gdtf": {
-  "subType": "Fresnel",
-  "lensType": "Fresnel",
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF power 400 W copied from 400 model, removed."
- },
- "PRstage@FRESNEL_400_RGBALC@Ver_2.0_-_Update_3D_Geometry.gdtf": {
-  "subType": "Fresnel",
-  "lensType": "Fresnel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "PRstage@Haze_Tour_1500_Oil@Ver_1.1.gdtf": {
-  "powerConsumptionW": 1500,
-  "mains": "220-240/50",
-  "powerSupplyType": "Schuko",
-  "_estimated": [
-   "powerConsumptionW",
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "PRstage@LED_BAR_424_RGBUV@Ver1.6.gdtf": {
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF power 1096 W invalid, removed."
- },
- "PRstage@LED_COB_200_RGBW@Ver_1_01.gdtf": {
-  "category": "PAR",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "PRstage@LOWFOG_3000@Ver_1_3.gdtf": {
-  "subType": "Low fog",
-  "powerConsumptionW": 3000,
-  "mains": "220-240/50",
-  "powerSupplyType": "CEE 16A",
-  "_estimated": [
-   "powerConsumptionW",
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "PRstage@Led_Followspot_300@Ver_1_03.gdtf": {
-  "mains": "100-240",
-  "description": "PRstage LED Follow Spot 300: 300 W white LED follow spot with 1-9 deg zoom.",
-  "_estimated": [
-   "mains",
-   "description"
-  ]
- },
- "PRstage@PAR_2410_RGBW+UV@Ver_1.3.gdtf": {
-  "powerConsumptionW": 240,
-  "mains": "100-240",
-  "_estimated": [
-   "powerConsumptionW",
-   "mains"
-  ],
-  "_notes": "24 x 10 W; GDTF power 375 W invalid."
- },
- "PRstage@PAR_543_RGBW@Ver_1_4.gdtf": {
-  "powerConsumptionW": 160,
-  "mains": "100-240",
-  "_estimated": [
-   "powerConsumptionW",
-   "mains"
-  ],
-  "_notes": "54 x 3 W; GDTF power 375 W invalid."
- },
- "PRstage@PROFILE_300_RGBAL@Ver_1.1.gdtf": {
-  "lensType": "Ellipsoidal (Profile)",
-  "framingShutters": true,
-  "framingShutterBlades": 4,
-  "mains": "100-240",
-  "_estimated": [
-   "mains",
-   "framingShutters",
-   "framingShutterBlades"
-  ]
- },
- "PRstage@PROFILE_PRO_300_RGBALC@Ver_2_03.gdtf": {
-  "lensType": "Ellipsoidal (Profile)",
-  "framingShutters": true,
-  "framingShutterBlades": 4,
-  "mains": "100-240",
-  "_estimated": [
-   "mains",
-   "framingShutters",
-   "framingShutterBlades"
-  ]
- },
- "PRstage@SPOT_460_CMY@Ver_1_4.gdtf": {
-  "mains": "100-240",
-  "description": "PRstage Spot 460 CMY: LED moving-head spot with CMY, gobos and 6-42 deg zoom.",
-  "_estimated": [
-   "mains",
-   "description"
-  ]
- },
- "PRstage@WALL1810@Final.gdtf": {
-  "category": "LED BAR",
-  "subType": "Wall washer",
-  "lightSourceType": "LED",
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF power 18055 W invalid."
- }
+ "BeamZ_Pro@BAC320_LED_ProPAR_RGBW@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "PAR", "powerConsumptionW": 82, "weightKg": 1.6, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/bac320-led-propar-rgbw/"]},
+ "BeamZ_Pro@BAC322_LED_ProPAR_RGBALC@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "PAR"},
+ "BeamZ_Pro@BAC324_LED_ProPAR_RGBWAuv@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "PAR"},
+ "BeamZ_Pro@BAC330_LED_ProPAR_RGBW@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "PAR"},
+ "BeamZ_Pro@BAC332_LED_ProPAR_RGBALC@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "PAR"},
+ "BeamZ_Pro@BAC334_LED_ProPAR_RGBWAuv@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "PAR"},
+ "BeamZ_Pro@BS_1100_IP65@rev100a_edit.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "category": "STROBE", "goboSlots": 0, "goboWheels": [], "_notes": "GDTF \"gobo\" wheels are effect macros.", "ipRating": "IP65", "weightKg": 7.05, "_refs": ["https://www.beamzlighting.com/product/bs1100ip-outdoor-stroboscope-led-rgb-cw/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@BS_1500_RGBW_IP65@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "category": "STROBE", "ipRating": "IP65", "powerConsumptionW": 702, "weightKg": 12.65, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/bs1500-stroboscope-led-rgbw-ip65/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@BS_1500_W_IP65@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "category": "STROBE", "ipRating": "IP65", "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@DOT_BAR_Bat1_IP65@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "ipRating": "IP65"},
+ "BeamZ_Pro@DOT_BAR_Cyc1_IP65@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "panRangeDeg": 0, "ipRating": "IP65"},
+ "BeamZ_Pro@DOT_BAR_Pix1_IP65@rev_100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "panRangeDeg": 0, "category": "LED BAR", "ipRating": "IP65"},
+ "BeamZ_Pro@Ignite_300_A_BSW@rev100_RELEASE.gdtf": {"powerConsumptionW": 304, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "weightKg": 15.6, "_refs": ["https://www.beamzlighting.com/product/ignite300a-led-bsw-moving-head-with-animation/"]},
+ "BeamZ_Pro@Ignite_300_BSW@rev100a_RELEASE.gdtf": {"powerConsumptionW": 400, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "weightKg": 15.6, "_refs": ["https://www.beamzlighting.com/product/ignite300-led-bsw-moving-head/"]},
+ "BeamZ_Pro@Ignite_400_BSW_CMY@rev100_RELEASE.gdtf": {"powerConsumptionW": 449, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "weightKg": 20.6, "_refs": ["https://www.beamzlighting.com/product/ignite400-led-bsw-moving-head-with-cmy/"]},
+ "BeamZ_Pro@LCB_400_IP65@rev100a.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "panRangeDeg": 0, "powerConsumptionW": 290, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "ipRating": "IP65", "category": "LED BAR", "weightKg": 9.8, "_refs": ["https://www.beamzlighting.com/product/lcb400ip-outdoor-led-bar/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@LMB_1040_IP65@rev100_RELEASE.gdtf": {"panRangeDeg": 0, "ipRating": "IP65"},
+ "BeamZ_Pro@MHL_1940_RGBW@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "powerConsumptionW": 683, "weightKg": 16.15, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/mhl1940-led-bee-eye-moving-head-with-zoom/"], "powerSupplyType": "powerCON TRUE1 LINK"},
+ "BeamZ_Pro@MHL_740_RGBW@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "powerConsumptionW": 276, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "weightKg": 9.15, "_refs": ["https://www.beamzlighting.com/product/mhl740-led-wash-moving-head-with-zoom/"], "powerSupplyType": "powerCON TRUE1 LINK"},
+ "BeamZ_Pro@Nereid_1940_IP65@rev101bravo_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerConsumptionW", "powerSupplyType"], "ipRating": "IP65", "powerConsumptionW": 800, "weightKg": 22.15, "_notes": "19 x 40 W LEDs; mains draw estimated.", "_refs": ["https://www.beamzlighting.com/product/nereid1940-outdoor-led-bee-eye-moving-head-with-zoom/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@Nereid_380B_IP65@rev101_NEW_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "category": "BEAM", "colorMixing": "None", "ipRating": "IP65", "powerConsumptionW": 380, "weightKg": 22.1, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/nereid380b-outdoor-moving-head-beam-2pcs-in-flightcase/"]},
+ "BeamZ_Pro@Nereid_500_IP65@rev101_RELEASE.gdtf": {"powerConsumptionW": 607, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "ipRating": "IP65", "category": "BSW", "weightKg": 29.8, "_refs": ["https://www.beamzlighting.com/product/nereid500-hybrid-outdoor-moving-head/"]},
+ "BeamZ_Pro@Nereid_700_IP65@rev101_RELEASE.gdtf": {"powerConsumptionW": 900, "_notes": "750 W LED module; mains draw estimated.", "ipRating": "IP65", "weightKg": 36.45, "_estimated": ["powerConsumptionW"], "_refs": ["https://www.beamzlighting.com/product/nereid700-hybrid-outdoor-framing-moving-head/"]},
+ "BeamZ_Pro@Nereid_740_IP65@rev100a_edit.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerConsumptionW", "powerSupplyType"], "ipRating": "IP65", "powerConsumptionW": 330, "weightKg": 11.0, "_notes": "7 x 40 W LEDs; mains draw estimated.", "_refs": ["https://www.beamzlighting.com/product/nereid740-outdoor-led-bee-eye-moving-head-with-zoom/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@Nereid_760_IP65@rev101_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerConsumptionW", "powerSupplyType"], "powerConsumptionW": 500, "_notes": "7 x 60 W LEDs; mains draw estimated.", "ipRating": "IP65", "weightKg": 17.2, "_refs": ["https://www.beamzlighting.com/product/nereid760-outdoor-led-bee-eye-moving-head-with-zoom/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@Neutron_Dot_WW_IP65@rev100a_EDIT_added_8Ch_DMX_mode.gdtf": {"mains": "100-240", "_estimated": ["mains"], "ipRating": "IP65", "powerConsumptionW": 60, "weightKg": 2.3, "_refs": ["https://www.beamzlighting.com/product/neutron-dot-linkable-60w-ww-rgb/"]},
+ "BeamZ_Pro@Nuke_1_IP65@rev100b_edit.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "panRangeDeg": 0, "ipRating": "IP65", "category": "STROBE", "powerConsumptionW": 697, "weightKg": 22.35, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.licht-produktiv.de/en/beamz-pro-nuke1-motorized-strobe/beam-outdoor"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@Nuke_2_IP65@rev100c_EDIT_Repaired_Virtual_Dimmer_Relation.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "panRangeDeg": 0, "ipRating": "IP65", "category": "STROBE", "powerConsumptionW": 699, "weightKg": 22.3, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.avecorp.com.au/product/beamz-pro-nuke2-outdoor-motorized-strobe-blinder/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@Nuke_3_IP65@rev100B.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "panRangeDeg": 0, "ipRating": "IP65", "category": "STROBE", "powerConsumptionW": 665, "weightKg": 20.15, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://reverb.com/en-nl/item/92414259-beamzpro-nuke3-mh-twin-strobe-ip65"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@Nuke_4_IP65@rev100_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains", "powerSupplyType"], "panRangeDeg": 0, "ipRating": "IP65", "category": "BEAM", "powerConsumptionW": 1099, "weightKg": 20.65, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.avecorp.com.au/product/beamz-pro-nuke4-motorized-beam-outdoor/"], "powerSupplyType": "powerCON TRUE1 TOP LINK"},
+ "BeamZ_Pro@StarColor_1280_Wash@rev101_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "panRangeDeg": 0, "category": "LED BAR", "powerConsumptionW": 883, "weightKg": 15.6, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/starcolor1280-wash-light-32x-40w-outdoor/"]},
+ "BeamZ_Pro@StarColor_128_Flood@rev100a_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ_Pro@StarColor_135_Flood@rev100a_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ_Pro@StarColor_200_Flood@rev100a.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ_Pro@StarColor_205_Flood@rev100a_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ_Pro@StarColor_540_Wash@rev100a_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "panRangeDeg": 0, "category": "LED BAR", "powerConsumptionW": 451, "weightKg": 13.05, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/starcolor540-wash-light-36x-15w-rgbw-outdoor-mkii/"]},
+ "BeamZ_Pro@StarColor_54_Tour_WallWash@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "panRangeDeg": 0, "category": "LED BAR", "powerConsumptionW": 51, "weightKg": 2.65, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/starcolor54-tour-wall-wash-54x-1w-rgb-outdoor/"]},
+ "BeamZ_Pro@StarColor_54_WallWash@rev100c_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"], "panRangeDeg": 0, "category": "LED BAR", "powerConsumptionW": 51, "weightKg": 2.65, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "_refs": ["https://www.beamzlighting.com/product/starcolor54-wall-wash-54x-1w-rgb-outdoor/"]},
+ "BeamZ_Pro@StarColor_72_Flood@rev100b_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ_Pro@StarColor_75_Flood@rev100A_RELEASE.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ_Pro@Tiger_7RC@rev103_RELEASE.gdtf": {"powerConsumptionW": 270, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "category": "BEAM", "colorMixing": "None", "weightKg": 11.55, "_refs": ["https://www.beamzlighting.com/product/tiger-7rc-230w-beam-moving-head/"]},
+ "BeamZ_Pro@Tiger_9R@rev103_RELEASE.gdtf": {"powerConsumptionW": 374, "_notes": "Power derived from the manufacturer rated current at 230-240 V (I x 230 V).", "category": "BEAM", "colorMixing": "None", "weightKg": 13.65, "_refs": ["https://www.beamzlighting.com/product/tiger-9r-260w-beam-moving-head/"]},
+ "BeamZ_Pro@BWA_550_Z_ProPar_Zoom_IP65@rev100_RELEASE.gdtf": {"ipRating": "IP65"},
+ "BeamZ_Pro@SB_250_FC_RGBAL_IP65@rev100_RELEASE.gdtf": {"ipRating": "IP65"},
+ "BeamZ_Pro@Neutron_Atom_FC_IP65@rev100_RELEASE.gdtf": {"ipRating": "IP65", "powerSupplyType": "powerCON TRUE1 TOP LINK", "_estimated": ["powerSupplyType"], "category": "WASH", "subType": "Outdoor flood"},
+ "BeamZ_Pro@Neutron_Atom_TM_IP65@rev100_RELEASE.gdtf": {"ipRating": "IP65", "powerSupplyType": "powerCON TRUE1 TOP LINK", "_estimated": ["powerSupplyType"], "category": "WASH", "subType": "Outdoor flood"},
+ "BeamZ_Pro@Neutron_Bold_FC_RGBAL_IP65@rev_101_RELEASE.gdtf": {"ipRating": "IP65", "powerSupplyType": "powerCON TRUE1 TOP LINK", "_estimated": ["powerSupplyType"], "category": "WASH", "subType": "Outdoor flood"},
+ "BeamZ_Pro@Neutron_Bold_TM_wW_IP65@rev101_RELEASE.gdtf": {"ipRating": "IP65", "powerSupplyType": "powerCON TRUE1 TOP LINK", "_estimated": ["powerSupplyType"], "category": "WASH", "subType": "Outdoor flood"},
+ "PRstage@BLINDER_4100@ver_1_1.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "PRstage@Beam_295_Ring@ver_1.28.gdtf": {"mains": "100-240", "_estimated": ["mains"]},
+ "PRstage@Beam_LED_200_Ring@Ver_1.1.gdtf": {"lightSourceType": "LED", "mains": "100-240", "powerConsumptionW": null, "_estimated": ["mains"], "_notes": "GDTF said discharge lamp / 295 W (copied from Beam 295); LED 200 W model."},
+ "PRstage@Dimmer_Pack_4@Ver_1_02.gdtf": {"category": "OTHER", "subType": "4-channel dimmer pack", "lightSourceType": null, "mains": "220-240/50", "powerSupplyType": "Schuko", "_estimated": ["mains", "powerSupplyType"], "_na": ["lensType", "noiseLevelDb"]},
+ "PRstage@F-Spot_800_CMY@Ver_121.gdtf": {"category": "PROFILE", "lensType": "Ellipsoidal (Profile)"},
+ "PRstage@F400Z@Ver_1.71.gdtf": {"category": "WASH", "mains": "100-240", "_estimated": ["mains"]},
+ "PRstage@FOG_1500@Ver_1.2.gdtf": {"powerConsumptionW": 1500, "mains": "220-240/50", "powerSupplyType": "Schuko", "_estimated": ["mains", "powerSupplyType"]},
+ "PRstage@FRESNEL_300_RGBAL@Ver_2.0.gdtf": {"subType": "Fresnel", "lensType": "Fresnel", "powerConsumptionW": null, "mains": "100-240", "_estimated": ["mains"], "_notes": "GDTF power 400 W copied from 400 model, removed."},
+ "PRstage@FRESNEL_400_RGBALC@Ver_2.0_-_Update_3D_Geometry.gdtf": {"subType": "Fresnel", "lensType": "Fresnel", "mains": "100-240", "_estimated": ["mains"]},
+ "PRstage@Haze_Tour_1500_Oil@Ver_1.1.gdtf": {"powerConsumptionW": 1500, "mains": "220-240/50", "powerSupplyType": "Schuko", "_estimated": ["powerConsumptionW", "mains", "powerSupplyType"]},
+ "PRstage@LED_BAR_424_RGBUV@Ver1.6.gdtf": {"powerConsumptionW": null, "mains": "100-240", "_estimated": ["mains"], "_notes": "GDTF power 1096 W invalid, removed."},
+ "PRstage@LED_COB_200_RGBW@Ver_1_01.gdtf": {"category": "PAR", "mains": "100-240", "_estimated": ["mains"]},
+ "PRstage@LOWFOG_3000@Ver_1_3.gdtf": {"subType": "Low fog", "powerConsumptionW": 3000, "mains": "220-240/50", "powerSupplyType": "CEE 16A", "_estimated": ["powerConsumptionW", "mains", "powerSupplyType"]},
+ "PRstage@Led_Followspot_300@Ver_1_03.gdtf": {"mains": "100-240", "description": "PRstage LED Follow Spot 300: 300 W white LED follow spot with 1-9 deg zoom.", "_estimated": ["mains", "description"]},
+ "PRstage@PAR_2410_RGBW+UV@Ver_1.3.gdtf": {"powerConsumptionW": 240, "mains": "100-240", "_estimated": ["powerConsumptionW", "mains"], "_notes": "24 x 10 W; GDTF power 375 W invalid."},
+ "PRstage@PAR_543_RGBW@Ver_1_4.gdtf": {"powerConsumptionW": 160, "mains": "100-240", "_estimated": ["powerConsumptionW", "mains"], "_notes": "54 x 3 W; GDTF power 375 W invalid."},
+ "PRstage@PROFILE_300_RGBAL@Ver_1.1.gdtf": {"lensType": "Ellipsoidal (Profile)", "framingShutters": true, "framingShutterBlades": 4, "mains": "100-240", "_estimated": ["mains", "framingShutters", "framingShutterBlades"]},
+ "PRstage@PROFILE_PRO_300_RGBALC@Ver_2_03.gdtf": {"lensType": "Ellipsoidal (Profile)", "framingShutters": true, "framingShutterBlades": 4, "mains": "100-240", "_estimated": ["mains", "framingShutters", "framingShutterBlades"]},
+ "PRstage@SPOT_460_CMY@Ver_1_4.gdtf": {"mains": "100-240", "description": "PRstage Spot 460 CMY: LED moving-head spot with CMY, gobos and 6-42 deg zoom.", "_estimated": ["mains", "description"]},
+ "PRstage@WALL1810@Final.gdtf": {"category": "LED BAR", "subType": "Wall washer", "lightSourceType": "LED", "powerConsumptionW": null, "mains": "100-240", "_estimated": ["mains"], "_notes": "GDTF power 18055 W invalid."}
 }

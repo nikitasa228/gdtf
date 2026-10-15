@@ -8,7 +8,7 @@
   "shortName": "Nuke3",
   "description": "Motorized Hybrid Twin Strobe :: IP65 / 14 x 64 x 0.5 W RGBW / 28 x 10 W 6500K / Tilt 180 degree / Electronic Frost",
   "manufacturer": "BeamZ Pro",
-  "category": "WASH",
+  "category": "STROBE",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 665,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 72981.0,
   "noiseLevelDb": null,
-  "weightKg": 21.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "weightKg": 20.15,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 0,
   "tiltRangeDeg": 180.0,
@@ -115,9 +115,9 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
+    "category": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -146,16 +146,23 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "panRangeDeg": "manual",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+  ],
+  "_refs": [
+    "https://reverb.com/en-nl/item/92414259-beamzpro-nuke3-mh-twin-strobe-ip65"
+  ]
 }

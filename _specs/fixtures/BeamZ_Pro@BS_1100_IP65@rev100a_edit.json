@@ -31,9 +31,9 @@
   "luminousFluxLm": null,
   "noiseLevelDb": null,
   "weightKg": 7.05,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
@@ -98,7 +98,7 @@
     "category": "manual",
     "powerConsumptionW": "estimated",
     "maxLuminousIntensityCd": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -124,18 +124,23 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
     "noiseLevelDb",
-    "powerSupplyType",
     "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
     "GDTF \"gobo\" wheels are effect macros."
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/bs1100ip-outdoor-stroboscope-led-rgb-cw/"
   ]
 }

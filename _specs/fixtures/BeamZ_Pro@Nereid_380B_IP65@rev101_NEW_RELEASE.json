@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 400.0,
+  "powerConsumptionW": 380,
   "maxLuminousIntensityCd": 29551400.0,
   "luminousFluxLm": 10100.0,
   "noiseLevelDb": null,
@@ -48,7 +48,7 @@
   "dataConnectors": [
     "XLR3"
   ],
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
     "min": 1.0,
     "max": 1.0
@@ -117,10 +117,10 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "estimated",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -164,6 +164,10 @@
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/nereid380b-outdoor-moving-head-beam-2pcs-in-flightcase/"
   ]
 }

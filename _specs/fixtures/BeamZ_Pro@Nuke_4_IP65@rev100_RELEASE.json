@@ -8,7 +8,7 @@
   "shortName": "Nuke4",
   "description": "Motorized Hybrid Triple Strobe / Wash / Pixel :: IP65 / 21 x 40 W RGBW / 21 x 3 W RGBA / 32 x 1 W RGBA / Tilt 180 degree / Electronic Frost",
   "manufacturer": "BeamZ Pro",
-  "category": "WASH",
+  "category": "BEAM",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 932.0,
+  "powerConsumptionW": 1099,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 96000.0,
   "noiseLevelDb": null,
-  "weightKg": 14.1,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "weightKg": 20.65,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 0,
   "tiltRangeDeg": 180.0,
@@ -97,10 +97,10 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -126,20 +126,26 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "panRangeDeg": "manual",
+    "powerSupplyType": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
     "maxLuminousIntensityCd",
     "noiseLevelDb",
-    "powerSupplyType",
     "beamAngleDeg",
     "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+  ],
+  "_refs": [
+    "https://www.avecorp.com.au/product/beamz-pro-nuke4-motorized-beam-outdoor/"
   ]
 }

@@ -8,7 +8,7 @@
   "shortName": "Nuke1",
   "description": "Motorized Hybrid Strobe/Beam :: IP65 / 14 x 40W RGBW / 12 x 8 10 W 6500K / Tilt 180 degrees",
   "manufacturer": "BeamZ Pro",
-  "category": "WASH",
+  "category": "STROBE",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1520.0,
+  "powerConsumptionW": 697,
   "maxLuminousIntensityCd": 67900.0,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
   "weightKg": 22.35,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 0,
   "tiltRangeDeg": 180.0,
@@ -106,10 +106,10 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "estimated",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -138,16 +138,22 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "panRangeDeg": "manual",
+    "powerSupplyType": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType"
+    "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)"
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+  ],
+  "_refs": [
+    "https://www.licht-produktiv.de/en/beamz-pro-nuke1-motorized-strobe/beam-outdoor"
   ]
 }

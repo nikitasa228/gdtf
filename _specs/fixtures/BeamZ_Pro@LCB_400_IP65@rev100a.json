@@ -8,7 +8,7 @@
   "shortName": "LCB400",
   "description": "Hybrid LED Batten :: IP65 / 36 x 14 x SMD LED RGB / 84 x LED Amber / 168 x LED CoolWhite / Electronic Frost",
   "manufacturer": "BeamZ Pro",
-  "category": "WASH",
+  "category": "LED BAR",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,14 +26,14 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 290,
   "maxLuminousIntensityCd": 13021400.0,
   "luminousFluxLm": 36468000.0,
   "noiseLevelDb": null,
   "weightKg": 9.8,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 0,
   "tiltRangeDeg": 360.0,
@@ -128,11 +128,11 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
+    "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -160,19 +160,23 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "panRangeDeg": "manual",
+    "powerSupplyType": "estimated",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated"
   },
   "_missing": [
-    "powerConsumptionW",
     "noiseLevelDb",
-    "powerSupplyType",
     "colorTemperatureK"
   ],
   "_notApplicable": [],
   "_issues": [
     "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
-    "GDTF power value implausible, removed."
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/lcb400ip-outdoor-led-bar/"
   ]
 }

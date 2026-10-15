@@ -8,7 +8,7 @@
   "shortName": "Nereid500",
   "description": "rev 101: EDIT: Channel Sets / RDM \n\nHybrid Moving Head Beam / Spot :: IP65 / 542 W 6500K / CMY ColorMix / 12 x fixed color / 7 x Rotating Gobo / 12 x Fixed Gobo / 1 x prism Linear / 1 x prism Circular / 1 x frost / zoom 2 - 44 degrees",
   "manufacturer": "BeamZ Pro",
-  "category": "SPOT",
+  "category": "BSW",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,11 +26,11 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
+  "powerConsumptionW": 607,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 4000.0,
   "noiseLevelDb": null,
-  "weightKg": 34.25,
+  "weightKg": 29.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -114,13 +114,13 @@
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
+    "category": "manual",
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
     "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -157,13 +157,15 @@
     "pixelCount": "gdtf-derived"
   },
   "_missing": [
-    "powerConsumptionW",
     "maxLuminousIntensityCd",
     "noiseLevelDb"
   ],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "GDTF power 850 W is an exporter template value, removed."
+    "Power derived from the manufacturer rated current at 230-240 V (I x 230 V)."
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/nereid500-hybrid-outdoor-moving-head/"
   ]
 }
