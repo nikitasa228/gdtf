@@ -28,7 +28,7 @@
   },
   "powerConsumptionW": 200.0,
   "maxLuminousIntensityCd": 190000.0,
-  "luminousFluxLm": 3219.0,
+  "luminousFluxLm": 3220.0,
   "noiseLevelDb": 38,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON",
@@ -116,15 +116,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -163,5 +163,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ledbeam-100"
   ]
 }

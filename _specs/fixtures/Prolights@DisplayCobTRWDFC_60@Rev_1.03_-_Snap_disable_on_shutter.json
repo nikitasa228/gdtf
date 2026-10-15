@@ -65,7 +65,7 @@
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": {
-    "min": 2800.0,
+    "min": 3200.0,
     "max": 10000.0
   },
   "prism": false,
@@ -142,7 +142,7 @@
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
-    "colorTemperatureK": "estimated",
+    "colorTemperatureK": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],

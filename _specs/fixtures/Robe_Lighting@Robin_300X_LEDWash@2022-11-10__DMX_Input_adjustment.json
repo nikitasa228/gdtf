@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 12000.0,
-  "luminousFluxLm": 258.0,
+  "maxLuminousIntensityCd": 122400.0,
+  "luminousFluxLm": 5580.0,
   "noiseLevelDb": 38,
   "weightKg": 8.2,
-  "powerConnectorIn": "powerCON",
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON",
+  "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
   "panRangeDeg": 450.0,
   "tiltRangeDeg": 300.0,
@@ -115,15 +115,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -153,13 +153,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ledwash-300x"
   ]
 }

@@ -94,7 +94,7 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "powerConsumptionW": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
@@ -133,5 +133,8 @@
   ],
   "_issues": [
     "Typical-value estimates (no published data): tiltRangeDeg, ipRating"
+  ],
+  "_refs": [
+    "https://www.robe.cz/mediaspinner-100-at"
   ]
 }

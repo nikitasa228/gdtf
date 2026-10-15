@@ -27,13 +27,13 @@
     "max": 60.0
   },
   "powerConsumptionW": 430.0,
-  "maxLuminousIntensityCd": 8700.0,
-  "luminousFluxLm": 190.0,
+  "maxLuminousIntensityCd": 244500.0,
+  "luminousFluxLm": 8990.0,
   "noiseLevelDb": 43,
-  "weightKg": 11.0,
-  "powerConnectorIn": "powerCON",
+  "weightKg": 10.7,
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON",
+  "powerSupplyType": "powerCON TRUE1",
   "motorizedPanTilt": true,
   "panRangeDeg": 450.0,
   "tiltRangeDeg": 300.0,
@@ -119,15 +119,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -157,13 +157,17 @@
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerConnectorOut": "manual",
     "fullName": "gdtf-derived",
-    "ipRating": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ledwash-800x"
   ]
 }

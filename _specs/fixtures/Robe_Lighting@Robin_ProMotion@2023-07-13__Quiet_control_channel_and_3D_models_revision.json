@@ -36,7 +36,7 @@
   "powerSupplyType": "powerCON TRUE1 LINK",
   "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 260.0,
+  "tiltRangeDeg": 250.0,
   "infinitePan": false,
   "infiniteTilt": false,
   "manualPanRangeDeg": null,
@@ -114,19 +114,19 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -163,5 +163,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/promotion"
   ]
 }

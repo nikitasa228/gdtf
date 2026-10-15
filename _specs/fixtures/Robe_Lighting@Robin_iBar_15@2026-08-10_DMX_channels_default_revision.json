@@ -27,8 +27,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 170.0,
-  "maxLuminousIntensityCd": 1400.0,
-  "luminousFluxLm": 418.0,
+  "maxLuminousIntensityCd": 148000.0,
+  "luminousFluxLm": 6280.0,
   "noiseLevelDb": 35,
   "weightKg": 11.1,
   "powerConnectorIn": "powerCON TRUE1",
@@ -50,8 +50,8 @@
   ],
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 30.0,
-    "max": 30.0
+    "min": 7.5,
+    "max": 70.0
   },
   "fieldAngleDeg": null,
   "zoom": false,
@@ -116,15 +116,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
@@ -144,20 +144,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
+    "maxLuminousIntensityCd": "manual",
+    "beamAngleDeg": "manual",
     "fullName": "gdtf-derived",
-    "beamAngleDeg": "estimated",
-    "maxLuminousIntensityCd": "estimated",
     "noiseLevelDb": "estimated"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ibar-15"
   ]
 }

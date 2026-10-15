@@ -26,9 +26,9 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 415.0,
-  "maxLuminousIntensityCd": 1700.0,
-  "luminousFluxLm": 130.0,
+  "powerConsumptionW": 450.0,
+  "maxLuminousIntensityCd": 83500.0,
+  "luminousFluxLm": 4820.0,
   "noiseLevelDb": 43,
   "weightKg": 10.6,
   "powerConnectorIn": "powerCON TRUE1",
@@ -119,13 +119,13 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -165,5 +165,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ledwash-600"
   ]
 }

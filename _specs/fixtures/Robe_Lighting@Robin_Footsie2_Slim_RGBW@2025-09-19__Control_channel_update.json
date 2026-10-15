@@ -10,16 +10,13 @@
   "manufacturer": "Robe Lighting",
   "category": "LED BAR",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 120.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
@@ -27,8 +24,8 @@
     "max": 60.0
   },
   "powerConsumptionW": 85.0,
-  "maxLuminousIntensityCd": 28000.0,
-  "luminousFluxLm": 3856.0,
+  "maxLuminousIntensityCd": 52000.0,
+  "luminousFluxLm": 7115.0,
   "noiseLevelDb": 30,
   "weightKg": 13.3,
   "powerConnectorIn": "powerCON TRUE1",
@@ -105,12 +102,12 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "estimated",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -133,7 +130,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
     "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
@@ -149,5 +146,8 @@
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
     "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/footsie2-slim"
   ]
 }

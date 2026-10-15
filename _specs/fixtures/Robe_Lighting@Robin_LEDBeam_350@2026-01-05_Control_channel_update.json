@@ -27,10 +27,10 @@
     "max": 60.0
   },
   "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": 1300000.0,
-  "luminousFluxLm": 6574.0,
-  "noiseLevelDb": 31,
-  "weightKg": 9.85,
+  "maxLuminousIntensityCd": 705000.0,
+  "luminousFluxLm": 8200.0,
+  "noiseLevelDb": 34.0,
+  "weightKg": 9.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
@@ -104,13 +104,13 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
@@ -144,16 +144,16 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 31 dB(A) @1 m in Quiet fan mode.",
-    "Typical-value estimates (no published data): ipRating"
+    "Noise 31 dB(A) @1 m in Quiet fan mode."
   ],
   "_refs": [
+    "https://www.robe.cz/ledbeam-350",
     "https://www.robe.cz/api/support-files/download/downloads/standards/Robin_series/Noise/ROBIN_LEDBeam_350_Noise_Measurement.pdf"
   ]
 }

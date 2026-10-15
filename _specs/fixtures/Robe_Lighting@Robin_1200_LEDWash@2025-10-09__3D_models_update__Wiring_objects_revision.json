@@ -20,17 +20,17 @@
   ],
   "voltageRangeV": {
     "min": 100.0,
-    "max": 250.0
+    "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 550.0,
-  "maxLuminousIntensityCd": 7800.0,
-  "luminousFluxLm": 170.0,
+  "powerConsumptionW": 680.0,
+  "maxLuminousIntensityCd": 375000.0,
+  "luminousFluxLm": 10360.0,
   "noiseLevelDb": 43,
-  "weightKg": 18.2,
+  "weightKg": 18.6,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
   "powerSupplyType": "Fixed Cable",
@@ -119,13 +119,13 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -165,5 +165,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ledwash-1200"
   ]
 }

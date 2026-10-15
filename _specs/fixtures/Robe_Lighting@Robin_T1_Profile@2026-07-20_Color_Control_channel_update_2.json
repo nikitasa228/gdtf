@@ -28,8 +28,8 @@
   },
   "powerConsumptionW": 750.0,
   "maxLuminousIntensityCd": 600000.0,
-  "luminousFluxLm": 10075.0,
-  "noiseLevelDb": 24,
+  "luminousFluxLm": 12600.0,
+  "noiseLevelDb": 30.0,
   "weightKg": 24.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
@@ -126,15 +126,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -167,17 +167,18 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
+    "ipRating": "manual",
+    "powerConnectorOut": "manual",
     "framingShutterType": "gdtf-derived",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto).",
-    "Typical-value estimates (no published data): ipRating"
+    "Noise 24 dB(A) @1 m in Quiet fan mode (sound power 38 dB(A) in Auto)."
   ],
   "_refs": [
+    "https://www.robe.cz/t1-profile",
     "https://www.robe.cz/res/downloads/standards/Robin_series/Noise/ROBIN_T1_Profile_Noise_Measurement.pdf"
   ]
 }

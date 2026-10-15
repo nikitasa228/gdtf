@@ -118,10 +118,10 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
     "motorizedPanTilt": "gdtf-derived",
@@ -163,5 +163,8 @@
   "_notApplicable": [],
   "_issues": [
     "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/colorspot-250-at"
   ]
 }

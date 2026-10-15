@@ -27,7 +27,7 @@
     "max": 60.0
   },
   "powerConsumptionW": 670.0,
-  "maxLuminousIntensityCd": 15000000.0,
+  "maxLuminousIntensityCd": 55000000.0,
   "luminousFluxLm": 20375.0,
   "noiseLevelDb": 46,
   "weightKg": 22.0,
@@ -143,15 +143,15 @@
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
     "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
@@ -184,16 +184,17 @@
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
-    "fullName": "gdtf-derived",
-    "ipRating": "estimated"
+    "ipRating": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Noise 46 dB(A) @1 m, Auto fan mode.",
-    "Typical-value estimates (no published data): ipRating"
+    "Noise 46 dB(A) @1 m, Auto fan mode."
   ],
   "_refs": [
+    "https://www.robe.cz/megapointe",
     "https://monaco.novelty.fr/download/materiel_certificat_de_conformite/robe_mega-pointe_noise-measurement.pdf"
   ]
 }
