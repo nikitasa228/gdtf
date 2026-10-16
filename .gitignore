@@ -1,1 +1,9 @@
 __pycache__/
+bin/
+obj/
+*.user
+.vs/
+.idea/
+TestResults/
+artifacts/
+*.swp

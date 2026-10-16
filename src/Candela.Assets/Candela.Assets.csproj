@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Candela.Core/Candela.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AssimpNet" />
+    <PackageReference Include="SharpGLTF.Core" />
+    <PackageReference Include="StbImageSharp" />
+    <PackageReference Include="StbImageWriteSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Candela.Assets.Tests" />
+  </ItemGroup>
+</Project>

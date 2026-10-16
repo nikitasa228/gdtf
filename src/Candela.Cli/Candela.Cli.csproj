@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Candela.Engine/Candela.Engine.csproj" />
+    <ProjectReference Include="../Candela.Rendering.Vulkan/Candela.Rendering.Vulkan.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Candela.Cli.Tests" />
+  </ItemGroup>
+</Project>

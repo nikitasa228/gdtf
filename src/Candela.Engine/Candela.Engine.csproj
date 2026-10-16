@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Candela.Core/Candela.Core.csproj" />
+    <ProjectReference Include="../Candela.Photometry/Candela.Photometry.csproj" />
+    <ProjectReference Include="../Candela.Gdtf/Candela.Gdtf.csproj" />
+    <ProjectReference Include="../Candela.Dmx/Candela.Dmx.csproj" />
+    <ProjectReference Include="../Candela.Protocols/Candela.Protocols.csproj" />
+    <ProjectReference Include="../Candela.Electrical/Candela.Electrical.csproj" />
+    <ProjectReference Include="../Candela.Simulation/Candela.Simulation.csproj" />
+    <ProjectReference Include="../Candela.Mvr/Candela.Mvr.csproj" />
+    <ProjectReference Include="../Candela.Assets/Candela.Assets.csproj" />
+    <ProjectReference Include="../Candela.Project/Candela.Project.csproj" />
+    <ProjectReference Include="../Candela.Rendering/Candela.Rendering.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Candela.Engine.Tests" />
+  </ItemGroup>
+</Project>

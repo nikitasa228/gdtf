@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Candela.Photometry/Candela.Photometry.csproj" />
+  </ItemGroup>
+</Project>

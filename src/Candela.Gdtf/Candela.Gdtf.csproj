@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Candela.Core/Candela.Core.csproj" />
+    <ProjectReference Include="../Candela.Photometry/Candela.Photometry.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SharpGLTF.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Candela.Gdtf.Tests" />
+  </ItemGroup>
+</Project>

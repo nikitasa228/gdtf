@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Candela.Core/Candela.Core.csproj" />
+    <ProjectReference Include="../Candela.Assets/Candela.Assets.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Candela.Project.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Candela.Rendering.Vulkan/Candela.Rendering.Vulkan.csproj" />
+  </ItemGroup>
+</Project>

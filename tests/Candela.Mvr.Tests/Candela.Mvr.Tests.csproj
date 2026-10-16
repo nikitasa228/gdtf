@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Candela.Mvr/Candela.Mvr.csproj" />
+  </ItemGroup>
+</Project>
