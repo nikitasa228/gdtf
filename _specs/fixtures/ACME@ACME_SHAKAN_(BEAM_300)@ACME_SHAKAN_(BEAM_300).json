@@ -124,6 +124,12 @@
   "fullName": "ACME SHAKAN (BEAM 300)",
   "gdtfDescription": "ACME SHAKAN (BEAM 300)300W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

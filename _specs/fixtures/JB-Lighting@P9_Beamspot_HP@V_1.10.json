@@ -113,6 +113,12 @@
   "fullName": "JB-Lighting P9 Beamspot HP",
   "gdtfDescription": "P9 Beamspot HP (High Power) 330W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

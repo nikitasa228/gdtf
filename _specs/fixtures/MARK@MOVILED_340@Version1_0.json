@@ -92,6 +92,12 @@
   "fullName": "MARK MOVILED 340",
   "gdtfDescription": "Moving Head Wash Zoom 3x40W RGBW",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

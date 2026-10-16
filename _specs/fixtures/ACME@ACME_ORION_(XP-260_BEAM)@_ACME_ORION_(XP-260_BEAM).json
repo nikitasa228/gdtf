@@ -108,6 +108,12 @@
   "fullName": "ACME ORION (XP-260 BEAM)",
   "gdtfDescription": "ACME ORION (XP-260 BEAM) 260W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

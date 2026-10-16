@@ -117,6 +117,12 @@
   "fullName": "JB-Lighting M18 Profile",
   "gdtfDescription": "M18 Profile HP 1200W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

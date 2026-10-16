@@ -116,6 +116,12 @@
   "fullName": "MARK MOVILED BEAM 150",
   "gdtfDescription": "Moving head with 150W LED",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

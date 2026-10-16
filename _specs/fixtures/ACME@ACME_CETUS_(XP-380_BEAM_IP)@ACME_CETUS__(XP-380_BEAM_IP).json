@@ -112,6 +112,12 @@
   "fullName": "ACME CETUS (XP-380 BEAM IP)",
   "gdtfDescription": "ACME CETUS (XP-380 BEAM IP) 380W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

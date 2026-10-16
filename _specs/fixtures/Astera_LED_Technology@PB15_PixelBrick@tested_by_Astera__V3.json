@@ -205,6 +205,12 @@
   "subType": "Battery uplight",
   "fullName": "Astera LED Technology PB15 PixelBrick",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

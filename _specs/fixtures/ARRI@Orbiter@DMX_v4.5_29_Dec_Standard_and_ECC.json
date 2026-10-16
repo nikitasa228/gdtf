@@ -296,6 +296,12 @@
   "fullName": "ARRI Orbiter",
   "gdtfDescription": "ARRI Orbiter Illumination|Reshaped",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

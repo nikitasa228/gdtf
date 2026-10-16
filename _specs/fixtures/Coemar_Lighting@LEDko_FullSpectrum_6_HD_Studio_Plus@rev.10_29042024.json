@@ -112,6 +112,12 @@
   "pixelCount": 1,
   "fullName": "Coemar Lighting LEDko FullSpectrum 6 HD Studio Plus",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",

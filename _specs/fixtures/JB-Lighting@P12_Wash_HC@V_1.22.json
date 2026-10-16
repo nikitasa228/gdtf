@@ -104,6 +104,12 @@
   "fullName": "JB-Lighting P12 Wash HC",
   "gdtfDescription": "P12 Wash HC (High CRI) 640W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

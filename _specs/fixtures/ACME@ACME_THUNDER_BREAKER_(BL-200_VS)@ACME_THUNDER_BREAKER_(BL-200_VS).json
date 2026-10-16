@@ -90,6 +90,12 @@
   "fullName": "ACME THUNDER BREAKER(BL-200 VS)",
   "gdtfDescription": "ACME THUNDER BREAKER (BL-200 VS)",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

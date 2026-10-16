@@ -108,6 +108,12 @@
   "fullName": "Martin Professional MAC Viper Performance",
   "gdtfDescription": "Official Martin Professional File (no measurements)",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

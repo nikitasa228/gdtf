@@ -101,6 +101,12 @@
   "fullName": "Terbly GLW1940",
   "gdtfDescription": "19 pcs High Power RGBW 4 in 1 LED",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

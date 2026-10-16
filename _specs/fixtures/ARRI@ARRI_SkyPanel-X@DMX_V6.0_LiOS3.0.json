@@ -127,6 +127,12 @@
   "subType": "Soft light panel (modular)",
   "fullName": "ARRI SkyPanel-X",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",

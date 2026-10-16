@@ -107,6 +107,12 @@
   "fullName": "ACME CHIRON (XP 380 BEAM II)",
   "gdtfDescription": "ACME XP-380 BEAM II 380W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

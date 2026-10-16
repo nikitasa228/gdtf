@@ -137,6 +137,12 @@
   "fullName": "ACME ARES(XP 500 BEAM)",
   "gdtfDescription": "ACME ARES(XP 500 BEAM)500W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

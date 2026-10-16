@@ -101,6 +101,12 @@
   "pixelCount": 13,
   "fullName": "CLF Lighting Serius",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

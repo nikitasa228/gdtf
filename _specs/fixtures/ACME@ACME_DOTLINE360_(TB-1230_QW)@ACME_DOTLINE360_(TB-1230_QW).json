@@ -96,6 +96,12 @@
   "fullName": "ACME DOTLINE360 (TB-1230 QW)",
   "gdtfDescription": "ACME TB-1230QW 30W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

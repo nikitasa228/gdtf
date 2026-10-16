@@ -113,6 +113,12 @@
   "fullName": "Clay Paky Sharpy Plus",
   "gdtfDescription": "Official ClayPaky File\nSHARPY PLUS is the first true 100% HYBRID unit, able to be a perfect beam light and a perfect spotlight. It is suitable for every occasion, with an extraordinary luminous efficiency which ensures substantial savings through lower power consumption.\nThe SHARPY PLUS has no match. With its wide range of effects and high light output, it beats all the lights in the same category and comes very close to those of higher wattages",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

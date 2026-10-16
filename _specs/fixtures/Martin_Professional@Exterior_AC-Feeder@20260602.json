@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 115.0,
+  "powerConsumptionW": 6,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 0,
@@ -82,9 +82,15 @@
   ],
   "pixelCount": 0,
   "subType": "AC feeder (power/data injector)",
+  "maxInputPowerW": 115,
+  "outputChannels": 1,
+  "outputVoltage": "15 VDC",
   "fullName": "Martin Professional Exterior AC-Feeder",
   "gdtfDescription": "Official Martin Professional File",
   "powerLinkable": true,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -122,6 +128,9 @@
     "lightSourceType": "manual",
     "ipRating": "manual",
     "noiseLevelDb": "manual",
+    "maxInputPowerW": "manual",
+    "outputChannels": "manual",
+    "outputVoltage": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],
@@ -129,7 +138,7 @@
     "lensType"
   ],
   "_issues": [
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent. Own consumption = idle (connected Exterior Dot Pro string at zero). 115 W = mains draw at full load including the string."
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/exterior-ac-feeder"

@@ -94,6 +94,12 @@
   "fullName": "Martin Professional MAC Encore Performance WRM",
   "gdtfDescription": "Official Martin Professional File (no measurements)",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

@@ -263,6 +263,12 @@
   "fullName": "ARRI SkyPanel S60C",
   "gdtfDescription": "SkyPanel S60-C RGBW Soft Light with ECC",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

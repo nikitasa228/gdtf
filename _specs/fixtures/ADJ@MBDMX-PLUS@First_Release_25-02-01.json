@@ -83,6 +83,12 @@
   "subType": "Mirror ball motor (DMX)",
   "fullName": "ADJ (Eliminator Lighting) Eliminator Lighting MBDMX-PLUS",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

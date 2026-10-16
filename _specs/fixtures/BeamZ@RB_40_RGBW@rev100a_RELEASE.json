@@ -100,6 +100,12 @@
   "fullName": "BeamZ RB40 RGBW",
   "gdtfDescription": "Retro COB LED Par :: IP20 / 1 x 40 RGBW",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

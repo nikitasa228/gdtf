@@ -142,6 +142,12 @@
   "pixelCount": 2,
   "fullName": "Chauvet Professional Maverick Storm 3 Beamwash-2",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

@@ -103,6 +103,12 @@
   "fullName": "MARK MOVILED BEAM 100",
   "gdtfDescription": "Moving Head Beam 80W LED",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 240.0,
+  "powerConsumptionW": 3,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 0,
@@ -81,6 +81,12 @@
   ],
   "pixelCount": 0,
   "subType": "DC power supply",
+  "maxInputPowerW": 240,
+  "maxLoadW": 240,
+  "maxLoadCurrentA": 5,
+  "maxLoadPerChannelA": 5,
+  "outputChannels": 1,
+  "outputVoltage": "48 VDC",
   "fullName": "Martin Professional DCE PSU 240 IP",
   "gdtfDescription": "Official Martin Professional File",
   "powerLinkable": false,
@@ -121,6 +127,12 @@
     "lightSourceType": "manual",
     "ipRating": "manual",
     "noiseLevelDb": "manual",
+    "maxInputPowerW": "manual",
+    "maxLoadW": "manual",
+    "maxLoadCurrentA": "manual",
+    "maxLoadPerChannelA": "manual",
+    "outputChannels": "manual",
+    "outputVoltage": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],
@@ -128,7 +140,7 @@
     "lensType"
   ],
   "_issues": [
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent. Own consumption = idle. Max mains draw 240 W with the output fully loaded (48 VDC / 5 A)."
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/dce-psu-240-ip"

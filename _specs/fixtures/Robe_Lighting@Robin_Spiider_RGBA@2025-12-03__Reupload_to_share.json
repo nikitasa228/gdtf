@@ -130,6 +130,12 @@
   "fullName": "Robe Lighting Robin Spiider RGBA",
   "gdtfDescription": "RGBA version of the popular Spiider",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

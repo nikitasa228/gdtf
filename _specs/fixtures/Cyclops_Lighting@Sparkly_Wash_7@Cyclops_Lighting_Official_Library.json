@@ -95,6 +95,12 @@
   "fullName": "Cyclops Lighting Sparkly Wash 7",
   "gdtfDescription": "www.cyclopslighting.com",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

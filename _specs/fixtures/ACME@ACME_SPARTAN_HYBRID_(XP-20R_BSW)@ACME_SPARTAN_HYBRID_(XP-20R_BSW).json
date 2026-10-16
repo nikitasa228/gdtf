@@ -120,6 +120,12 @@
   "fullName": "ACME SPARTAN HYBRID(XP-20R BSW)",
   "gdtfDescription": "ACME SPARTAN HYBRID(XP-20R BSW) 470W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

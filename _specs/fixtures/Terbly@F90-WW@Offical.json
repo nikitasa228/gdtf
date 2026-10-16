@@ -95,6 +95,12 @@
   "fullName": "Terbly F90-WW",
   "gdtfDescription": "150W LED Fresnel(3200K)",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

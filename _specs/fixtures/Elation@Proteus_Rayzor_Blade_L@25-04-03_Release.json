@@ -113,6 +113,12 @@
   "subType": "Tilting multi-source batten (beam/wash/strobe)",
   "fullName": "Elation Proteus Rayzor Blade L",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

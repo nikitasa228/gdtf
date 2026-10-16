@@ -111,6 +111,12 @@
   "fullName": "PRstage Framing Spot 800 CMY",
   "gdtfDescription": "Professional Framing Moving Head Spot.",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

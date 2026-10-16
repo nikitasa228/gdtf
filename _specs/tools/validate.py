@@ -50,11 +50,15 @@ def check(x):
                 if c not in CONNECTORS: err.append(f"{k} part {c!r}")
     num("powerConsumptionW", 0.5, 20000); num("weightKg", 0.01, 200); num("noiseLevelDb", 0, 120)
     num("maxLuminousIntensityCd", 1, 5e8); num("panRangeDeg", 1, 720); num("tiltRangeDeg", 1, 720)
+    num("maxInputPowerW", 0.5, 50000); num("maxLoadW", 1, 50000); num("maxLoadCurrentA", 0.1, 400)
+    num("maxLoadPerChannelA", 0.1, 400); num("outputChannels", 1, 256)
+    if x.get("maxLoadW") and x.get("powerConsumptionW") and x["powerConsumptionW"] > x["maxLoadW"]:
+        err.append("powerConsumptionW (own draw) exceeds maxLoadW")
     rng("beamAngleDeg", 0.1, 360); rng("colorTemperatureK", 1000, 20000); rng("voltageRangeV", 5, 480)
     if x.get("ipRating") is not None and not re.fullmatch(r"IP[0-6X][0-9X]", x["ipRating"]): err.append(f"ipRating={x['ipRating']!r}")
     for k, v in x["_source"].items():
         if v not in SOURCES: err.append(f"_source[{k}]={v!r}")
-    for k in REQUIRED:
+    for k in REQUIRED + ["maxInputPowerW", "maxLoadW", "maxLoadCurrentA", "maxLoadPerChannelA", "outputChannels", "outputVoltage"]:
         if k not in x: err.append(f"field {k} absent")
     na = set(x["_notApplicable"])
     moving = x.get("motorizedPanTilt")

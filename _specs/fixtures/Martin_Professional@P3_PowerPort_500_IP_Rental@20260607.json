@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 500.0,
+  "powerConsumptionW": 5,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": 0,
@@ -84,6 +84,12 @@
   ],
   "pixelCount": 0,
   "subType": "P3 PowerPort (DC power + data distribution)",
+  "maxInputPowerW": 500,
+  "maxLoadW": 480,
+  "maxLoadCurrentA": 10,
+  "maxLoadPerChannelA": 10,
+  "outputChannels": 1,
+  "outputVoltage": "48 VDC",
   "fullName": "Martin Professional P3 PowerPort 500 IP Rental",
   "gdtfDescription": "Official Martin Professional File",
   "powerLinkable": true,
@@ -125,6 +131,12 @@
     "lightSourceType": "manual",
     "ipRating": "manual",
     "noiseLevelDb": "manual",
+    "maxInputPowerW": "manual",
+    "maxLoadW": "manual",
+    "maxLoadCurrentA": "manual",
+    "maxLoadPerChannelA": "manual",
+    "outputChannels": "manual",
+    "outputVoltage": "manual",
     "fullName": "gdtf-derived"
   },
   "_missing": [],
@@ -132,7 +144,7 @@
     "lensType"
   ],
   "_issues": [
-    "Fan-free (passive cooling): silent."
+    "Fan-free (passive cooling): silent. Own consumption = idle. Max mains draw 500 W with the output fully loaded (48 VDC / 10 A)."
   ],
   "_refs": [
     "https://www.martin.com/en-US/products/p3-powerport-500-ip-rental"

@@ -99,6 +99,12 @@
   "fullName": "PRstage WALL1810",
   "gdtfDescription": "RGBW1 - 18 Cells",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

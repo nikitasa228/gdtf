@@ -100,6 +100,12 @@
   "fullName": "Fine Art 4019 WASH PLUS",
   "gdtfDescription": "FINE 4019 WASH PLUS是一款专业的大功率LED摇头染色灯。它采用全新的光学设计，在达到混色均匀、效果绵柔的同时，光学效率仍能维持在高水平，小角度时6米照度可达30000lux。4°~60°变焦范围，不论距离远近均适应用光需求。调光平滑、细腻、低亮度起光无抖动，完全满足苛刻的戏剧类调光要求。2500k-8000k线性色温可调，色温变化时，亮度基本维持稳定，且Ra、R9均达90以上。隐藏式折叠灯钩，大大方便吊挂装配操作，适用于大型演唱会、电视台、剧场剧院、租赁市场等各类演出场所。",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

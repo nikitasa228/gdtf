@@ -88,6 +88,12 @@
   "fullName": "MARK MOVILED 1210 B MKII",
   "gdtfDescription": "Moving Head Wash 12x10W RGBW",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

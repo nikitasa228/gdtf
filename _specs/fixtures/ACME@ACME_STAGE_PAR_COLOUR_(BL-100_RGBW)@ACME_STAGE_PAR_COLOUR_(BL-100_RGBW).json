@@ -96,6 +96,12 @@
   "fullName": "ACME STAGE PAR COLOUR (BL-100 RGBW)",
   "gdtfDescription": "ACME BL-100 RGBW 100W LED",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

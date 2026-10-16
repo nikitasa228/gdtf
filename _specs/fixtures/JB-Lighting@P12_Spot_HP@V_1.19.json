@@ -116,6 +116,12 @@
   "fullName": "JB-Lighting P12 Spot HP",
   "gdtfDescription": "P12 Spot HP (High Power) 640W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

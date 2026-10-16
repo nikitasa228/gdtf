@@ -169,6 +169,12 @@
   "pixelCount": 2,
   "fullName": "flashPRO OCTO Sunbar 4x30W 4w1 COB RGBW",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

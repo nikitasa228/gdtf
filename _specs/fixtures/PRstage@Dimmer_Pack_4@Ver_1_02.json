@@ -26,7 +26,7 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 4400,
+  "powerConsumptionW": 10,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
   "noiseLevelDb": null,
@@ -99,7 +99,12 @@
   ],
   "pixelCount": 0,
   "subType": "4-channel dimmer pack",
-  "maxLoadW": 4600,
+  "maxLoadW": 4400,
+  "maxInputPowerW": 4400,
+  "maxLoadCurrentA": 20,
+  "maxLoadPerChannelA": 10,
+  "outputChannels": 4,
+  "outputVoltage": "230 VAC (dimmed / switched)",
   "fullName": "PRstage Dimmer Pack 4",
   "gdtfDescription": "Compact Dimmer Pack 4 with 20A",
   "powerLinkable": false,
@@ -135,7 +140,12 @@
     "subType": "manual",
     "lightSourceType": "manual",
     "maxLoadW": "manual",
-    "powerConsumptionW": "manual",
+    "powerConsumptionW": "estimated",
+    "maxInputPowerW": "manual",
+    "maxLoadCurrentA": "manual",
+    "maxLoadPerChannelA": "manual",
+    "outputChannels": "manual",
+    "outputVoltage": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
@@ -149,7 +159,7 @@
     "powerConsumptionW"
   ],
   "_issues": [
-    "4400 W is the stated maximum consumption, i.e. the load capacity (10 A/channel, 20 A total). It is not the device's own draw.",
+    "4400 W is the stated maximum consumption, i.e. the load capacity (10 A/channel, 20 A total). It is not the device's own draw. 4-channel dimmer: up to 10 A per channel, 20 A total, 'power consumption up to 4400 W' = the full connected load. The unit's own draw is not published; 10 W is a typical value for the control electronics.",
     "Typical-value estimates (no published data): ipRating"
   ],
   "_refs": [

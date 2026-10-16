@@ -89,6 +89,12 @@
   "fullName": "CLF Lighting CO2 Blaster Yet",
   "gdtfDescription": "Vertical Fogger",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

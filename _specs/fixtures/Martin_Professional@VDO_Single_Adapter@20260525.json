@@ -69,6 +69,12 @@
   "fullName": "Martin Professional VDO Single Adapter",
   "gdtfDescription": "Official Martin Professional File",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

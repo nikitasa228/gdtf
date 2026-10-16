@@ -130,6 +130,12 @@
   "fullName": "Martin Professional VC-Strip 25 16x1",
   "gdtfDescription": "Official Martin Professional File",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

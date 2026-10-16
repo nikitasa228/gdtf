@@ -745,6 +745,12 @@
   "subType": "Battery LED tube",
   "fullName": "Astera LED Technology FP3 Hyperion Tube",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

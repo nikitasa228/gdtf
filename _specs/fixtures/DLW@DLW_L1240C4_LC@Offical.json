@@ -96,6 +96,12 @@
   "fullName": "DLW L1240C4 LC",
   "gdtfDescription": "40WX12 4IN1 RGBW.",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

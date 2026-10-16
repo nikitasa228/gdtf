@@ -117,6 +117,12 @@
   "fullName": "JB-Lighting P12 Profile WW",
   "gdtfDescription": "P12 Profile WW (Warm White) 640W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

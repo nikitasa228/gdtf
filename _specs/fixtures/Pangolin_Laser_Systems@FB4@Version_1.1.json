@@ -82,6 +82,12 @@
   "subType": "Laser controller (Pangolin FB4 network DAC)",
   "fullName": "Pangolin Laser Systems FB4",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",

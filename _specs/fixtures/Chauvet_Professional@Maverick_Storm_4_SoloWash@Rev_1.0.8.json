@@ -101,6 +101,12 @@
   "subType": "Framing wash",
   "fullName": "Chauvet Professional Maverick Storm 4 SoloWash",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

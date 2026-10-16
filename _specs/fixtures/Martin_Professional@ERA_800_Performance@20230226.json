@@ -111,6 +111,12 @@
   "fullName": "Martin Professional ERA 800 Performance",
   "gdtfDescription": "Official Martin Professional File",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

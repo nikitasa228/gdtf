@@ -708,6 +708,9 @@ def typical_noise(rec, text):
     return 30 if w < 150 else 35 if w < 600 else 40
 
 
+LOAD_FIELDS = ("maxInputPowerW", "maxLoadW", "maxLoadCurrentA", "maxLoadPerChannelA", "outputChannels", "outputVoltage")
+
+
 def apply_fallbacks(rec, src, issues, na, stats):
     filled = []
 
@@ -780,6 +783,10 @@ def apply_fallbacks(rec, src, issues, na, stats):
         else:
             put("noiseLevelDb", n)
     rec["powerLinkable"] = bool(rec.get("powerConnectorOut")) or str(rec.get("powerSupplyType") or "").endswith("LINK")
+    # power distribution (dimmers, distros, PSUs, feeders): what the device passes on to connected loads is kept
+    # apart from its own consumption, so a load calculation does not count the connected fixtures twice
+    for k in LOAD_FIELDS:
+        rec.setdefault(k, None)
     if filled:
         issues.append("Typical-value estimates (no published data): " + ", ".join(filled))
 

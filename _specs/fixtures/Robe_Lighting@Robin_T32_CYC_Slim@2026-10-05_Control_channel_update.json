@@ -102,6 +102,12 @@
   "fullName": "Robe Lighting Robin T32 CYC Slim",
   "gdtfDescription": "Robin T32 CYC Slim",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

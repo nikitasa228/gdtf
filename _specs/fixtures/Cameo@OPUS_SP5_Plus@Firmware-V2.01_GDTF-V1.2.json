@@ -119,6 +119,12 @@
   "fullName": "Cameo OPUS SP5+ (CLOSP5PLUS)",
   "gdtfDescription": "Profile Moving Head with 22.000 lm",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

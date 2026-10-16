@@ -118,6 +118,12 @@
   "fullName": "ACME AECO 30 IP",
   "gdtfDescription": "ACME (AECO 30 IP)1800W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

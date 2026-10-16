@@ -104,6 +104,12 @@
   "fullName": "AML Lighting AL-Q4IP Vibrant 800W IP",
   "gdtfDescription": "AL-Q4IP Vibrant 800W IP",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

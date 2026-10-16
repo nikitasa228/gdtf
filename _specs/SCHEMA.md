@@ -64,10 +64,19 @@ Never edit `fixtures/*.json` by hand. Researched values go into `overrides/*.jso
 |---|---|---|
 | `supportedPowerNetworks` | string[] | from `100 V - 50 Hz`, `100 V - 60 Hz`, `110/120 V - 60 Hz`, `110/120 V - 50 Hz`, `220/230 V - 50 Hz`, `220/230 V - 60 Hz`, `240/245 V - 50 Hz` |
 | `voltageRangeV`, `frequencyRangeHz` | `{min,max}` | mains input range |
-| `powerConsumptionW` | number | maximum mains draw (strobes: peak; see `_issues` for static/peak notes) |
+| `powerConsumptionW` | number | maximum mains draw of the device itself (strobes: peak; see `_issues` for static/peak notes). For power-distribution devices (dimmers, PSUs, feeders, distros) this is the device's **own** draw only, without the connected loads |
 | `powerSupplyType` | string | input connector, `+ LINK` when the fixture has a power output for daisy-chaining |
 | `powerConnectorIn` / `powerConnectorOut` | string / null | connector names: `powerCON`, `powerCON TRUE1`, `powerCON TRUE1 TOP` (IP65 TRUE1-compatible, incl. Seetronic), `Schuko`, `IEC C14`, `IEC C20`, `CEE 16A`, `Fixed Cable`, `DC Jack`, `DC (external PSU)`, `DIN3 (low-voltage DC)`, `XLR4 (DC)`, `XLR5`, `Terminal Block`, `Martin proprietary (P3/PDE)`, `Martin 8-pin`, `IP moulded connector`, `4-pin power/data connector`, `Track adapter`, `E27 lamp socket`, `Battery (internal)`, `PWB-CAB Connector`. `A / B` = alternative inputs, `A + B` = both |
 | `powerLinkable` | bool | power output present |
+| `maxInputPowerW` | number / null | power-distribution devices: maximum input draw with all outputs fully loaded (own draw + loads + losses) |
+| `maxLoadW` | number / null | power-distribution devices: maximum power the device can deliver to connected loads |
+| `maxLoadCurrentA`, `maxLoadPerChannelA` | number / null | total and per-output current limit of the outputs |
+| `outputChannels` | number / null | number of power outputs / dimmer channels |
+| `outputVoltage` | string / null | what the outputs supply, e.g. `230 VAC (dimmed / switched)`, `48 VDC` |
+
+Load calculation for a circuit: Σ `powerConsumptionW` of every device on it, where the loads behind a dimmer/PSU are counted as
+their own devices (their `powerConsumptionW`) and must stay within that dimmer/PSU's `maxLoadW` / `maxLoadPerChannelA`;
+`maxInputPowerW` is the worst case the dimmer/PSU itself puts on the mains.
 | `batteryPowered` | bool | runs from an internal battery |
 
 ### Physical

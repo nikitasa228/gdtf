@@ -111,6 +111,12 @@
   "pixelCount": 2,
   "fullName": "Briteq BTI-BLINDER 1FX",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",

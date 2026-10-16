@@ -205,6 +205,12 @@
   "subType": "LED bulb (E27)",
   "fullName": "Astera LED Technology FP5 NYX Bulb",
   "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

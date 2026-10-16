@@ -99,6 +99,12 @@
   "subType": "Fresnel",
   "fullName": "Eagle Lite TA200CZ PRO - 200W RGBALC Fresnel With Zoom",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

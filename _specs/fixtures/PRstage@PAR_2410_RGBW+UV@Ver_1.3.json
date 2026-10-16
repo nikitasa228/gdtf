@@ -93,6 +93,12 @@
   "fullName": "PRstage PAR 2410 RGBW+UV",
   "gdtfDescription": "Classic PAR 24*10w RGBW+UV",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

@@ -126,6 +126,12 @@
   "pixelCount": 40,
   "fullName": "CLF Lighting SERA",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",

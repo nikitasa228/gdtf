@@ -159,6 +159,12 @@
   "fullName": "ROXX CLUSTER B4-FC",
   "gdtfDescription": "LED 4lite Blinder RGBA+WW",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

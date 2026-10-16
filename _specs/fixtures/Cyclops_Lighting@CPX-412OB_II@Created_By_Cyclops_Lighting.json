@@ -105,6 +105,12 @@
   "fullName": "Cyclops Lighting CPX-412OB II",
   "gdtfDescription": "Cyclops Lighting Official Library",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

@@ -122,6 +122,12 @@
   "fullName": "ACME AECO 20 (AECO 20)",
   "gdtfDescription": "ACME AECO 20 1400W LED",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

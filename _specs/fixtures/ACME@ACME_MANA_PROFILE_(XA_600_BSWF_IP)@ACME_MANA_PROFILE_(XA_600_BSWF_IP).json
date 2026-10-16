@@ -122,6 +122,12 @@
   "fullName": "ACME MANA PROFILE(XA 600 BSWF IP)",
   "gdtfDescription": "ACME MANA PROFILE(XA 600 BSWF IP)",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

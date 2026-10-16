@@ -97,6 +97,12 @@
   "fullName": "ACME AM-WASH300",
   "gdtfDescription": "ACME AM-WASH300 15W*19PCS",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

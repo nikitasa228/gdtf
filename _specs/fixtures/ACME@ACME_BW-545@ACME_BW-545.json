@@ -97,6 +97,12 @@
   "fullName": "ACME COOLIE 545 (BW-545)",
   "gdtfDescription": "ACME BW-545 3W LED",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "manual",
     "shortName": "gdtf",

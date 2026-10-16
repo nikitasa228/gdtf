@@ -116,6 +116,12 @@
   "fullName": "ACME THETA FX(CM 1000 Z)",
   "gdtfDescription": "ACME THETA FX(CM 1000 Z) 1600W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

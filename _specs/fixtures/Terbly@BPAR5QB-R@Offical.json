@@ -98,6 +98,12 @@
   "fullName": "Terbly BPAR5QB-R",
   "gdtfDescription": "5x15W RGBW LED WASH",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

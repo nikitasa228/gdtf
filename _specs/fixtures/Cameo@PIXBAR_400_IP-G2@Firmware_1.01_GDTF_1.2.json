@@ -150,6 +150,12 @@
   "fullName": "Cameo PIXBAR 400 IP G2 (CLPB400IPG2)",
   "gdtfDescription": "IP65 RGBW-LED Bar",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

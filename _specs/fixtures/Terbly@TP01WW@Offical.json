@@ -91,6 +91,12 @@
   "fullName": "Terbly TP01WW",
   "gdtfDescription": "180W High CRI LED Panel.",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",

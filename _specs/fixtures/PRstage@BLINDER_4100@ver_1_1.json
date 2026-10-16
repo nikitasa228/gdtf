@@ -96,6 +96,12 @@
   "fullName": "PRstage BLINDER 4100",
   "gdtfDescription": "LED, 5600K, 400W",
   "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
