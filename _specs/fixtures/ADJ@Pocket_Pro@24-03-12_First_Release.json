@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 53,
-  "maxLuminousIntensityCd": 39100.0,
+  "powerConsumptionW": 53.0,
+  "maxLuminousIntensityCd": 39000.0,
   "luminousFluxLm": 3000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 3.6,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -61,6 +64,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -74,7 +78,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -90,6 +95,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Pocket Pro",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -97,9 +110,9 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -124,6 +137,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -132,16 +146,19 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/pocket-pro",
     "https://www.adj.com/pocket-pro"
   ]
 }

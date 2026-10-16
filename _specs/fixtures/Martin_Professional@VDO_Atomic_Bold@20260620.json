@@ -6,7 +6,7 @@
   "gdtfName": "VDO Atomic Bold",
   "longName": "VDO Atomic Bold",
   "shortName": "VDOAtoBLD",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VDO Atomic Bold: LED strobe, with 12 deg beam, RGB colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "Martin Professional",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 400.0,
-  "maxLuminousIntensityCd": 640700.0,
-  "luminousFluxLm": 31502.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 260000.0,
+  "luminousFluxLm": 13000.0,
+  "noiseLevelDb": 25.9,
   "weightKg": 9.32,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE) LINK",
-  "panRangeDeg": 360.0,
-  "tiltRangeDeg": 360.0,
-  "infinitePan": false,
-  "infiniteTilt": false,
+  "motorizedPanTilt": false,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": 360.0,
+  "manualTiltRangeDeg": 360.0,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -70,7 +74,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -102,26 +107,33 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Martin Professional VDO Atomic Bold",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
-    "infinitePan": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualPanRangeDeg": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -141,13 +153,21 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vdo-atomic-bold"
+  ]
 }

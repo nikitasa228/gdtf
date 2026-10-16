@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 7000.0,
-  "luminousFluxLm": 22508.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 370,
+  "maxLuminousIntensityCd": 8700,
+  "luminousFluxLm": 22508,
+  "noiseLevelDb": 7.8,
   "weightKg": 17.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -58,6 +61,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB+WW",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -72,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -136,15 +141,24 @@
   ],
   "pixelCount": 1,
   "subType": "Soft light panel",
+  "fullName": "Chauvet Professional onAir Panel 2 IP",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",
@@ -165,21 +179,28 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
+    "powerConsumptionW": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "HTML spec page at chauvetprofessional.com/product/onair-panel-2-ip/. Power 372 W max @120 V; 370 W @230 V."
+  ],
+  "_refs": [
+    "https://chauvetprofessional.com/product/onair-panel-2-ip/",
+    "https://www.chauvetprofessional.com/products/onair-ip-panel-2/"
+  ]
 }

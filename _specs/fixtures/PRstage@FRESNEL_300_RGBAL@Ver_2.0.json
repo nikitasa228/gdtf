@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 350,
+  "maxLuminousIntensityCd": 160000,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 13.4,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 35,
+  "weightKg": 8,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBAL",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -69,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -86,6 +91,14 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "PRstage FRESNEL 300 RGBAL",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -93,7 +106,8 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf-derived",
@@ -112,24 +126,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF power 400 W copied from 400 model, removed."
+    "Value from the official user manual (PDF linked on the product page): lux 6400 @5 m (15 deg), manual zoom 15-50, IP20 (https://prstage.pro/wp-content/uploads/2025/12/Fresnel_300_RGBAL_Rus_Ver1_2.pdf). 8 kg net, 10 kg packed.",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://prstage.pro/prstage-led-fresnel-300-rgbal/"
   ]
 }

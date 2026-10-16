@@ -6,7 +6,7 @@
   "gdtfName": "H1",
   "longName": "H1",
   "shortName": "H1",
-  "description": "EK HI 480BSW",
+  "description": "EK Lights H1: moving-head LED beam/spot/wash hybrid, with 2.2-42 deg zoom, CMY colour mixing, colour wheel, 32 gobos, prism, frost.",
   "manufacturer": "EK Lights",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 650.0,
-  "maxLuminousIntensityCd": 18136000.0,
-  "luminousFluxLm": 30000.0,
-  "noiseLevelDb": null,
-  "weightKg": 25.5,
-  "powerConnectorIn": null,
+  "powerConsumptionW": 650,
+  "maxLuminousIntensityCd": 52000000,
+  "luminousFluxLm": 16300,
+  "noiseLevelDb": 43,
+  "weightKg": 25,
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -72,6 +75,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -94,7 +98,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -106,16 +111,26 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "EK Lights H1",
+  "gdtfDescription": "EK HI 480BSW",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -141,19 +156,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Philips 480W 6500K HID lamp. Lux 130000 @20 m at 2.1 deg beam mode (datasheet table; ~52 Mcd, page headline rounds to 20000 lux @50 m). 16300 lm from user manual (https://www.eklights.com/wp-content/uploads/product-downloads/H1/H1-user-manual.pdf). Zoom 2.1-29 beam mode, 2.2-42 spot mode. No IP rating stated for non-IP H1. Product page: https://www.eklights.com/products/h1/",
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.eklights.com/wp-content/uploads/product-downloads/H1/EK-H1-Datasheet.pdf"
   ]
 }

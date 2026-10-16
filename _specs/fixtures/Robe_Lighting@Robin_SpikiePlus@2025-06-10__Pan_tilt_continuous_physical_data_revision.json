@@ -6,7 +6,7 @@
   "gdtfName": "Robin SpikiePlus",
   "longName": "Robin Spikie+",
   "shortName": "Spikie+",
-  "description": "Retaining the fast-moving, compact design of the original, the new Spikie+® generates 25% more lumen output from its single 60W RGBW source, giving you even more impact!",
+  "description": "Retaining the fast-moving, compact design of the original, the new Spikie+ generates 25% more lumen output from its single 60W RGBW source, giving you even more impact!",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 100.0,
-  "maxLuminousIntensityCd": 205000.0,
-  "luminousFluxLm": 1121.0,
-  "noiseLevelDb": null,
-  "weightKg": 7.5,
+  "maxLuminousIntensityCd": 275000.0,
+  "luminousFluxLm": 1550.0,
+  "noiseLevelDb": 38,
+  "weightKg": 7.3,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 360.0,
   "infinitePan": true,
   "infiniteTilt": true,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -60,6 +63,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -90,7 +94,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -106,22 +111,31 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin Spikie+",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -147,13 +161,20 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/spikie-plus"
+  ]
 }

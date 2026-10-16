@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 228300.0,
+  "powerConsumptionW": 174,
+  "maxLuminousIntensityCd": 75900.0,
   "luminousFluxLm": 1950.0,
-  "noiseLevelDb": null,
-  "weightKg": 5.0,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": "powerCON TRUE1",
-  "powerSupplyType": "powerCON TRUE1 LINK",
+  "noiseLevelDb": 38,
+  "weightKg": 4.65,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 190.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Ethernet (Art-Net/sACN)"
@@ -66,6 +69,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -80,6 +84,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -95,22 +100,30 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "BeamZ Cobra 160 Spot",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "estimated",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -136,17 +149,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF power 850 W implausible, removed."
+    "Power = rated current at 230 V (0.757 A, beamzlighting.com) x 230 V.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.beamzlighting.com/product/cobra-160-led-spot-moving-head-with-bee-eye/"
   ]
 }

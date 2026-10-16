@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 198,
-  "maxLuminousIntensityCd": 3800.0,
-  "luminousFluxLm": 5982,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 198.0,
+  "maxLuminousIntensityCd": 140000.0,
+  "luminousFluxLm": 5900.0,
+  "noiseLevelDb": 35,
   "weightKg": 8.85,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBL",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -71,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -118,6 +123,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Encore LB15IP",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -125,9 +138,9 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "beamAngleDeg": "manual",
@@ -148,6 +161,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -156,17 +170,19 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF weight 4.1 kg contradicts spec sheet (8.85 kg)."
+    "GDTF weight 4.1 kg contradicts spec sheet (8.85 kg).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/encore-lb15ip",
     "https://www.adj.com/encore-lb15ip"
   ]
 }

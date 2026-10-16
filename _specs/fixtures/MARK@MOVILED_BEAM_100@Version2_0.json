@@ -6,7 +6,7 @@
   "gdtfName": "MOVILED BEAM 100",
   "longName": "MOVILED BEAM 100",
   "shortName": "MOVLB100",
-  "description": "Moving Head Beam 80W LED",
+  "description": "MARK MOVILED BEAM 100: moving-head LED beam, with 4 deg beam, colour wheel, 11 gobos, prism.",
   "manufacturer": "MARK",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 80.0,
-  "maxLuminousIntensityCd": 731500.0,
+  "powerConsumptionW": 120,
+  "maxLuminousIntensityCd": 730000.0,
   "luminousFluxLm": 4000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 38,
   "weightKg": 6.14,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -61,6 +64,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -79,7 +83,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -95,18 +100,28 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "MARK MOVILED BEAM 100",
+  "gdtfDescription": "Moving Head Beam 80W LED",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -130,19 +145,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Record had tilt 220; official page and manual say 270.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.equipson.es/producto/moviled-beam-100"
   ]
 }

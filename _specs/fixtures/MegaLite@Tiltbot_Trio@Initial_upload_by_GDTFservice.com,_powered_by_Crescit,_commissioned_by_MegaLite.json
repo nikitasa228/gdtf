@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 64900.0,
+  "powerConsumptionW": 713,
+  "maxLuminousIntensityCd": 7700.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 10.4,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
-  "panRangeDeg": 0,
+  "noiseLevelDb": 43,
+  "weightKg": 10.43,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": null,
   "tiltRangeDeg": 190.0,
   "infinitePan": null,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -55,9 +58,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -65,7 +72,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP64",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -97,6 +105,14 @@
     }
   ],
   "pixelCount": 24,
+  "fullName": "MegaLite Tiltbot Trio",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -104,8 +120,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -126,23 +142,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF power 17112 W invalid."
+    "User manual states 713 W / 6.22 A; weight 23 lb (10.43 kg) and IP64 from spec sheet https://www.mega.lighting/_files/ugd/e740dc_7c4a4cb1b0d145bfb671f42ec23dc091.pdf. 572x1W RGB + 144x8W white LEDs. Index had 80 W / IP20.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.mega.lighting/_files/ugd/e740dc_79f49506ac1b4791a3fd1975db03d587.pdf"
   ]
 }

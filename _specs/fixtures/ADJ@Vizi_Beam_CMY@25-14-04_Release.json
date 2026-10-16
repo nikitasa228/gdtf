@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 410,
-  "maxLuminousIntensityCd": 504000.0,
+  "powerConsumptionW": 410.0,
+  "maxLuminousIntensityCd": 4500000.0,
   "luminousFluxLm": 6200.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 18.7,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -62,6 +65,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -84,7 +88,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -100,6 +105,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Vizi Beam CMY",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -107,9 +120,9 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -135,23 +148,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "Osram Sirius HRI 310 W lamp (GDTF wrongly says LED)."
+    "Osram Sirius HRI 310 W lamp (GDTF wrongly says LED).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
     "https://www.adj.com/products/vizi-beam-cmy"

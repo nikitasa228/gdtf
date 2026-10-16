@@ -4,7 +4,7 @@
   "fixtureTypeId": "4CE2C7A5-25E5-40FB-8769-56A4EF387700",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T1 Profile FS",
-  "longName": "Robin T1 Profile FS™",
+  "longName": "Robin T1 Profile FS",
   "shortName": "T1ProfileFS",
   "description": "T1. The new ONE and only fixture you need for theatre, television and touring and now with the option to be connected to the Robe innovative RoboSpot system. The T1 Profile FollowSpot is equipped with the digital camera on the head and can be connected with the RoboSpot BaseStation for off-stage follow spot operation.",
   "manufacturer": "Robe Lighting",
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 750.0,
-  "maxLuminousIntensityCd": 601800.0,
-  "luminousFluxLm": 10075.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 750000.0,
+  "luminousFluxLm": 12600.0,
+  "noiseLevelDb": 30.0,
   "weightKg": 25.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 263.6,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -67,6 +70,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -85,7 +89,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -113,21 +118,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T1 Profile FS",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -154,13 +167,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.robe.cz/t1-profile-fs"
+  ]
 }

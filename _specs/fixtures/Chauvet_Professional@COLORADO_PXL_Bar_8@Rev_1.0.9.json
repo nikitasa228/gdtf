@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 422,
+  "powerConsumptionW": 407,
   "maxLuminousIntensityCd": 302700,
-  "luminousFluxLm": 3503.0,
-  "noiseLevelDb": null,
+  "luminousFluxLm": 3503,
+  "noiseLevelDb": 43,
   "weightKg": 11.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "panRangeDeg": 0,
+  "motorizedPanTilt": true,
+  "panRangeDeg": null,
   "tiltRangeDeg": 200.0,
   "infinitePan": null,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -71,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -118,6 +123,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional COLORado PXL Bar 8",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -126,8 +139,9 @@
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -149,24 +163,25 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "manual",
     "ipRating": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power 422 W max (100/120 V); 407 W @230 V. No noise or CCT range published.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/colorado-pxl-bar-8/"

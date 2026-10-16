@@ -4,9 +4,9 @@
   "fixtureTypeId": "EF8FAF72-E13D-4CE1-AD98-9460D38E1C01",
   "gdtfDataVersion": "1.1",
   "gdtfName": "GLW1940",
-  "longName": "Terbly GLW1940",
+  "longName": "GLW1940",
   "shortName": "GLW1940",
-  "description": "19 pcs High Power RGBW 4 in 1 LED",
+  "description": "Terbly GLW1940: moving-head LED wash, with 5.3-37.3 deg zoom, RGBW colour mixing, colour wheel.",
   "manufacturer": "Terbly",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 15.8,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConsumptionW": 900,
+  "maxLuminousIntensityCd": 1300000.0,
+  "luminousFluxLm": 12000,
+  "noiseLevelDb": 48,
+  "weightKg": 16,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 260.0,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -69,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -93,15 +98,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Terbly GLW1940",
+  "gdtfDescription": "19 pcs High Power RGBW 4 in 1 LED",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -122,21 +137,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerConsumptionW": "manual",
+    "ipRating": "manual",
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Pan 540 deg (630 optional). Output stated as >=12,000 lm. Non-IP version (goods_id 163); IP version is a separate page.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.terbly.com/index.php/Product/detail/goods_id/163"
   ]
 }

@@ -8,22 +8,39 @@
   "shortName": "PulsbrL",
   "description": "Ignite excitement and get the crowd pumping with the new Pulse Bar L! The first in an innovative Pulse line of strobe lights, the Pulse Bar is a highly impactful strobe and visual effect bar that injects dynamism and spark into any performance!\nMeasuring a meter in length, the Pulse Bar L incorporates 960 1.5W RGB LEDs distributed across 40 zones along its perimeter. Additionally, it features a central strobe line equipped with 400 5W cool-white LEDs across 40 zones, complemented by 160 1.5W RGB LEDs arranged in 20 zones at its core.",
   "manufacturer": "Elation",
-  "category": "LED BAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 3380.0,
-  "maxLuminousIntensityCd": 106400.0,
-  "luminousFluxLm": 163223.0,
-  "noiseLevelDb": null,
-  "weightKg": 12.25,
-  "powerConnectorIn": null,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1300.0,
+  "maxLuminousIntensityCd": 16000.0,
+  "luminousFluxLm": 25191.0,
+  "noiseLevelDb": 40,
+  "weightKg": 12.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,9 +59,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB+CW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -52,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -96,16 +118,25 @@
     }
   ],
   "pixelCount": 26,
+  "subType": "Strobe pixel bar",
+  "fullName": "Elation Pulse Bar L",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -124,18 +155,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/pulse-bar-l"
   ]
 }

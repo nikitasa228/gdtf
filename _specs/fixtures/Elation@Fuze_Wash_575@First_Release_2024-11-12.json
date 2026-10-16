@@ -6,24 +6,41 @@
   "gdtfName": "Fuze Wash 575",
   "longName": "Fuze Wash 575",
   "shortName": "FzWsh575",
-  "description": "The FUZE WASH 575™ is a single source par moving head luminaire with a high output 350W Cool White / Daylight 6,800K 95CRI COB LED engine, 11° to 40° motorized zoom, smooth 16-bit pan and tilt movement, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The FUZE WASH 575 is a single source par moving head luminaire with a high output 350W Cool White / Daylight 6,800K 95CRI COB LED engine, 11° to 40° motorized zoom, smooth 16-bit pan and tilt movement, electronic strobe and selectable dimming curve effects, DMX and RDM (remote device management) protocol support, 5pin DMX and Locking Power Cable in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 350.0,
-  "maxLuminousIntensityCd": 157300.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 425.0,
+  "maxLuminousIntensityCd": 160000.0,
   "luminousFluxLm": 6502.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 12.2,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP30",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -71,16 +90,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Wash 575",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -104,17 +132,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/fuze-wash-575",
+    "https://www.elationlighting.eu/fuze-wash-575"
   ]
 }

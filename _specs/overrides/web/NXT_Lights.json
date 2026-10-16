@@ -1,0 +1,3 @@
+{
+ "NXT_Lights@Nexon_M@V_1.1_-_3D_and_SVG_corrected.gdtf": {"powerConsumptionW": 650, "weightKg": 32.5, "ipRating": "IP65", "luminousFluxLm": 23000, "mains": "110-240", "lux": [760000, 10], "powerSupplyType": "powerCON TRUE1 LINK", "_refs": ["https://www.nxtlights.com/nexon"], "_notes": "500W 8100K laser engine. Rated power 650 W on product page; data sheet PDF says 606 W. Lux from official photometric report (https://cdn.prod.website-files.com/67adbfcb8ba24761898e3b55/68cddfdff5f23755089cfb04_NEXON-M-photometrics.pdf) at 0.9 deg, 10 m (= 7600 lux @100 m, ~76 Mcd). Pan also has infinite-pan feature."}
+}

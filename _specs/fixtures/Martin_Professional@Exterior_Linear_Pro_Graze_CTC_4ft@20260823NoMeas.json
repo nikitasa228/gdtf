@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Linear Pro Graze CTC 4ft",
   "longName": "Exterior Linear Pro Graze CTC 4ft",
   "shortName": "EXTLinProGrCTC 4ft",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior Linear Pro Graze CTC 4ft: LED bar, with 9 deg beam, Tunable White (CW/WW) colour mixing, IP66 rated.",
   "manufacturer": "Martin Professional",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -20,24 +20,27 @@
   ],
   "voltageRangeV": {
     "min": 100.0,
-    "max": 240.0
+    "max": 277.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
   "powerConsumptionW": 144.0,
-  "maxLuminousIntensityCd": 1127600.0,
-  "luminousFluxLm": 31200.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 130000.0,
+  "luminousFluxLm": 3730.0,
+  "noiseLevelDb": 0,
   "weightKg": 2.8,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE) LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "Tunable White (CW/WW)",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -69,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
     "max": 45.0
@@ -93,22 +98,31 @@
     }
   ],
   "pixelCount": 144,
+  "fullName": "Martin Professional Exterior Linear Pro Graze CTC 4ft",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -128,13 +142,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-linear-pro-graze-ctc"
+  ]
 }

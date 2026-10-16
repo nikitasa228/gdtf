@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 92,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 475600.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 1600,
+  "luminousFluxLm": 5800,
+  "noiseLevelDb": 30,
   "weightKg": 2.9,
-  "powerConnectorIn": "DC Jack (external PSU / battery)",
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "DC Jack (external PSU / battery)",
+  "powerSupplyType": "DC Jack",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Wireless DMX (CRMX/W-DMX)"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWA",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -70,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -738,6 +743,14 @@
   ],
   "pixelCount": 82,
   "subType": "Battery LED tube",
+  "fullName": "Astera LED Technology FP3 Hyperion Tube",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -745,8 +758,9 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",
@@ -766,6 +780,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -775,18 +790,19 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/hyperion-tube/specs/",
     "https://astera-led.com/wp-content/uploads/Datasheet_Hyperion_Tube_V4-1.pdf"
   ]
 }

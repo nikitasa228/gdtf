@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 200.0,
-  "maxLuminousIntensityCd": 3560500.0,
-  "luminousFluxLm": 7000,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 170000.0,
+  "luminousFluxLm": 7000.0,
+  "noiseLevelDb": 38,
   "weightKg": 10.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -62,6 +65,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -84,7 +88,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -25.0,
     "max": 45.0
@@ -116,16 +121,24 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Focus Spot 4Z",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "estimated",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -143,7 +156,6 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "estimated",
     "prism": "gdtf-derived",
     "prisms": "gdtf-derived",
     "frost": "gdtf-derived",
@@ -151,25 +163,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF weight 14.1 kg contradicts spec sheet (10 kg); GDTF CCT 21333 K invalid."
+    "Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)",
+    "GDTF weight 14.1 kg contradicts spec sheet (10 kg); GDTF CCT 21333 K invalid.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/focus-spot-4z",
     "https://www.adj.com/focus-spot-4z"
   ]
 }

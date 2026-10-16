@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 39013700.0,
-  "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 590,
+  "maxLuminousIntensityCd": 800000.0,
+  "luminousFluxLm": 2459,
+  "noiseLevelDb": 43,
   "weightKg": 17.4,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
-  "panRangeDeg": 0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": null,
   "tiltRangeDeg": 210.0,
   "infinitePan": null,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -55,9 +58,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6958.0,
+    "max": 6958.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -65,7 +72,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 266.0
@@ -81,6 +89,14 @@
     }
   ],
   "pixelCount": 12,
+  "fullName": "MegaLite Linebot Q480",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -88,8 +104,8 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "weightKg": "gdtf",
+    "weightKg": "estimated",
+    "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -110,23 +126,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF power 7080 W invalid."
+    "GDTF power 7080 W invalid. Official Mega-Lite spec sheet (product page https://www.mega.lighting/out-of-produccion/linebot-q480, discontinued). Weight converted from 38.3 lb. 2459 lm as published (seems low for 12x40W). 590 W / 5.04 A.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.mega.lighting/_files/ugd/e740dc_d463a741a1c544b2869c4a3591fd704b.pdf",
+    "https://www.mega.lighting/linebotq480"
   ]
 }

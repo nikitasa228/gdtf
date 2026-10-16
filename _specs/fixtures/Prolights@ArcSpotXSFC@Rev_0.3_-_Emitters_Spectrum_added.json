@@ -9,21 +9,38 @@
   "description": "The ArcSpot series offers a range of IP66-rated dynamic luminaires, designed for exterior lighting of landscapes, trees, architectural features, and facades. This series provides a variety of fixture sizes and accessories, enabling precise targeting of the desired light intensity and quality for any application.\nAmong the series, the ArcSpot XSFC stands out as an extra small round spot. It is equipped with 3x 4W RGB+WarmWhite LED source, delivering 10° beam angle with a fixture output of 600 lumens.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
   "powerConsumptionW": 17.0,
-  "maxLuminousIntensityCd": 15100.0,
+  "maxLuminousIntensityCd": 9800.0,
   "luminousFluxLm": 600.0,
-  "noiseLevelDb": null,
-  "weightKg": 1.3,
-  "powerConnectorIn": null,
+  "noiseLevelDb": 30,
+  "weightKg": 1.0,
+  "powerConnectorIn": "IP moulded connector",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "IP moulded connector",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
-  "tiltRangeDeg": 180.0,
+  "tiltRangeDeg": null,
   "infinitePan": null,
-  "infiniteTilt": false,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": 180.0,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB+WW",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -56,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -83,18 +102,26 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcSpotXSFC",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "tiltRangeDeg": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -114,19 +141,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "panRangeDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCSPOTXSFC"
   ]
 }

@@ -6,24 +6,41 @@
   "gdtfName": "Paladin",
   "longName": "Paladin",
   "shortName": "Paladn",
-  "description": "PALADIN™ is an IP65 rated strobe wash blinder luminaire with motorized zoom. Featuring (24) high power 40W 4-in-1 RGBW LEDs, 6° to 32° motorized zoom, manual tilt adjustment, pixel zone control, 64 color presets and 15 unique color macros, electronic strobe, 16-bit dimming and variable dimming curve modes, DMX and RDM (Remote Device Management) protocol support, IP rated 5pin DMX and IP65 Power Cable in/out connections, (4) button LCD control display panel, and a multi-voltage universal auto switching power supply (100-240v). Optional barn doors, egg crate, and dual quick-lock omega bracket rigging accessories available.",
+  "description": "PALADIN is an IP65 rated strobe wash blinder luminaire with motorized zoom. Featuring (24) high power 40W 4-in-1 RGBW LEDs, 6° to 32° motorized zoom, manual tilt adjustment, pixel zone control, 64 color presets and 15 unique color macros, electronic strobe, 16-bit dimming and variable dimming curve modes, DMX and RDM (Remote Device Management) protocol support, IP rated 5pin DMX and IP65 Power Cable in/out connections, (4) button LCD control display panel, and a multi-voltage universal auto switching power supply (100-240v). Optional barn doors, egg crate, and dual quick-lock omega bracket rigging accessories available.",
   "manufacturer": "Elation",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 720.0,
-  "maxLuminousIntensityCd": 19509700.0,
-  "luminousFluxLm": 239994.0,
-  "noiseLevelDb": null,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 990.0,
+  "maxLuminousIntensityCd": 3200000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 20.9,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,9 +59,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -53,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -72,16 +94,24 @@
     }
   ],
   "pixelCount": 18,
+  "subType": "Strobe/wash/blinder hybrid",
+  "fullName": "Elation Paladin",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf-derived",
@@ -100,19 +130,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "GDTF luminous flux 239994 lm is implausible for 990 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/paladin",
+    "https://www.venuesupply.com/detail/elation-professional-paladin-ip65-outdoor-rated-strobe-wash-blinder-with-motorized-zoom-6951"
   ]
 }

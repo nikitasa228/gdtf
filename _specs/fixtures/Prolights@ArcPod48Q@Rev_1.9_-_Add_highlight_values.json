@@ -9,21 +9,38 @@
   "description": "ArcPod 48Q is a compact high-power exterior wash light featuring an outstanding brightness of 23'000 lumens. It is equipped with 48x10W RGBW / FC LEDs, delivering a limitless reproduction of colours and whites. ArcPod 48Q is designed slim and fanless, and it's completed by a wide selection of available optics, making the ArcPod 48Q an incredibly flexible and versatile device for any outdoor install.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1391.0,
-  "maxLuminousIntensityCd": 797900.0,
-  "luminousFluxLm": 61272.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 540.0,
+  "maxLuminousIntensityCd": 336300.0,
+  "luminousFluxLm": 23000.0,
+  "noiseLevelDb": 0,
   "weightKg": 14.0,
-  "powerConnectorIn": "Schuko",
-  "powerConnectorOut": "Schuko",
-  "powerSupplyType": "Schuko LINK",
+  "powerConnectorIn": "IP moulded connector",
+  "powerConnectorOut": "IP moulded connector",
+  "powerSupplyType": "IP moulded connector LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
-  "tiltRangeDeg": 130.0,
+  "tiltRangeDeg": null,
   "infinitePan": null,
-  "infiniteTilt": false,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": 130.0,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -44,9 +61,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -54,7 +75,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -82,21 +104,28 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "Prolights ArcPod48Q",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -116,18 +145,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "panRangeDeg",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCPOD48Q",
+    "https://musiclights.it/product/ARCPOD48Q"
   ]
 }

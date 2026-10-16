@@ -4,7 +4,7 @@
   "fixtureTypeId": "518F72B5-23E3-47C5-85E7-E693437A9B78",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Poseidon Hybrid",
-  "longName": "CLF Poseidon Hybrid",
+  "longName": "Poseidon Hybrid",
   "shortName": "Poseidon Hybrid",
   "description": "CLF Poseidon Hybrid: IP66 discharge beam/spot/wash hybrid moving head.",
   "manufacturer": "CLF Lighting",
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 578.0,
-  "maxLuminousIntensityCd": 14629700.0,
+  "powerConsumptionW": 578,
+  "maxLuminousIntensityCd": 30444000,
   "luminousFluxLm": 20000.0,
-  "noiseLevelDb": null,
-  "weightKg": 35.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "noiseLevelDb": 47,
+  "weightKg": 35,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 231.5,
+  "tiltRangeDeg": 240,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -66,6 +69,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -96,7 +100,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": "IP66",
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -108,17 +113,26 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "CLF Lighting Poseidon Hybrid",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -142,23 +156,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "ipRating": "manual",
     "description": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Lux is beam mode @10 m.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.clf-lighting.com/product/poseidon-hybrid/"
   ]
 }

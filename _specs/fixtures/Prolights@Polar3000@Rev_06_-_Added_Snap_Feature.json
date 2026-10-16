@@ -8,22 +8,39 @@
   "shortName": "Polar3000",
   "description": "POLAR3000 is a revolutionary LED strobe, engineered to offer a true explosion of light and a range of dynamic effects - all in a unique fixture. The light source is composed by 892 SMD 6.500 K x 0,5 W LEDs allows a full-ON continuous operation with 6 independent section controls. Fully capable to offer an equal output of conventional 3.000 W Xenon strobe from just a sixth of the nominal power.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 539.0,
-  "maxLuminousIntensityCd": 5400.0,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 462.0,
+  "maxLuminousIntensityCd": 16200.0,
   "luminousFluxLm": 17321.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 4.5,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
-  "panRangeDeg": 360.0,
-  "tiltRangeDeg": 360.0,
-  "infinitePan": false,
-  "infiniteTilt": false,
+  "motorizedPanTilt": false,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": 360.0,
+  "manualTiltRangeDeg": 360.0,
   "controlSignal": [
     "DMX512"
   ],
@@ -44,6 +61,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -57,7 +75,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP44",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -81,23 +100,29 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Prolights Polar3000",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
-    "infinitePan": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualPanRangeDeg": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -118,16 +143,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/POLAR3000"
   ]
 }

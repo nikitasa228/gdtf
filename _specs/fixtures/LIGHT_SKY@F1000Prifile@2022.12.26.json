@@ -4,9 +4,9 @@
   "fixtureTypeId": "BB6AF8ED-7498-4BE4-8E71-585A664E0573",
   "gdtfDataVersion": "1.2",
   "gdtfName": "F1000Prifile",
-  "longName": "F1000Prifile",
+  "longName": "F1000 Profile",
   "shortName": "F1000Prifile",
-  "description": "LIGHT SKY F1000Prifile: moving-head LED profile, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 14 gobos, framing shutters, prism, frost.",
+  "description": "LIGHT SKY F1000 Profile: moving-head LED profile, with 6.5-44 deg zoom, CMY colour mixing, colour wheel, 14 gobos, framing shutters, prism, frost.",
   "manufacturer": "LIGHT SKY",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 2770800.0,
+  "powerConsumptionW": 1310,
+  "maxLuminousIntensityCd": 2800000.0,
   "luminousFluxLm": 40000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 39.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -67,6 +70,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -89,7 +93,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 40.0
@@ -101,14 +106,23 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "LIGHT SKY F1000 Profile",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
-    "longName": "gdtf",
+    "longName": "manual",
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -134,21 +148,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerSupplyType": "estimated",
+    "powerConsumptionW": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
     "supportedPowerNetworks": "estimated",
     "powerConnectorIn": "estimated",
     "powerConnectorOut": "estimated",
-    "description": "gdtf-derived"
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.manualslib.com/manual/1794053/Tourpro-Lighting-Light-Sky-F1000-Profile-50R-Series.html"
+  ]
 }

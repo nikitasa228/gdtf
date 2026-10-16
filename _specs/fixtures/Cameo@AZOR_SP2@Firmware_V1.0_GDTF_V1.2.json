@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 550,
-  "maxLuminousIntensityCd": 1521700.0,
-  "luminousFluxLm": 13000.0,
-  "noiseLevelDb": null,
-  "weightKg": 24.0,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "maxLuminousIntensityCd": 3700000.0,
+  "luminousFluxLm": 11326,
+  "noiseLevelDb": 43,
+  "weightKg": 24,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": 630,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -67,6 +70,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -94,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -113,6 +118,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cameo AZOR SP2 (CLAZORSP2)",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -120,13 +133,13 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -151,6 +164,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -158,17 +172,20 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF weight 23 kg vs spec 24 kg."
+    "GDTF weight 23 kg vs spec 24 kg.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/rental/moving-lights/profile-moving-heads/30571/azor-sp2",
     "https://adamhall.com/shop/en/brands/azor-sp2"
   ]
 }

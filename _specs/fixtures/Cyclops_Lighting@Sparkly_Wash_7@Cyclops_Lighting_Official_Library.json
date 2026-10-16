@@ -6,12 +6,10 @@
   "gdtfName": "Sparkly Wash 7",
   "longName": "Sparkly Wash 7",
   "shortName": "SPW7",
-  "description": "www.cyclopslighting.com",
+  "description": "Cyclops Lighting Sparkly Wash 7: moving-head LED wash, with 11-58 deg zoom, RGBW colour mixing.",
   "manufacturer": "Cyclops Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -19,25 +17,28 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 110.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 180,
+  "maxLuminousIntensityCd": 170000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 38,
+  "weightKg": 5.5,
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,9 +57,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -66,7 +71,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -86,12 +92,22 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Cyclops Lighting Sparkly Wash 7",
+  "gdtfDescription": "www.cyclopslighting.com",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -113,24 +129,33 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Product page: 180 W, 5.5 kg. The linked data sheet (Sparkly-7-Data-Sheet-1.pdf) says 600 W and 5.2 kg, which looks like a copy error from another model; page values used.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.cyclopslighting.com/product/sparkly-wash-7/"
   ]
 }

@@ -4,9 +4,9 @@
   "fixtureTypeId": "29F65CA1-0BCB-4661-B177-320FD3496EC5",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME STAGE PAR COLOUR (BL-100 RGBW)",
-  "longName": "ACME STAGE PAR COLOUR (BL-100 RGBW)",
+  "longName": "STAGE PAR COLOUR (BL-100 RGBW)",
   "shortName": "BL-100 RGBW",
-  "description": "ACME BL-100 RGBW 100W LED",
+  "description": "ACME STAGE PAR COLOUR (BL-100 RGBW): LED PAR, with 37 deg beam, RGBW colour mixing, colour wheel, IP65 rated.",
   "manufacturer": "ACME",
   "category": "PAR",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 100.0,
+  "powerConsumptionW": 125,
   "maxLuminousIntensityCd": 2200.0,
   "luminousFluxLm": 1000.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 30,
+  "weightKg": 3.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -55,9 +58,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -65,7 +72,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -85,15 +93,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME STAGE PAR COLOUR (BL-100 RGBW)",
+  "gdtfDescription": "ACME BL-100 RGBW 100W LED",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",
@@ -112,22 +130,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Discontinued-product page (BL-100 RGBW). Weight 3.5 kg on page, 4.2 kg in user manual F. IP65 from user manual.",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=3910"
   ]
 }

@@ -8,22 +8,39 @@
   "shortName": "PulsPnlFX",
   "description": "PULSE PANEL FX! A highly versatile and expressive fixture in the innovative Pulse line of strobe lights, the PULSE PANEL FX adds a burst of dynamism and inspiration to any show!\nDesigners have asked for effect lights that are more than a one-trick pony and the PULSE PANEL FX delivers with multi-functionality as a powerful strobe, bright blinder, high-output wash light or creative eye candy effect all in one.",
   "manufacturer": "Elation",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1611.0,
-  "maxLuminousIntensityCd": 145100.0,
-  "luminousFluxLm": 222618.0,
-  "noiseLevelDb": null,
-  "weightKg": 17.0,
-  "powerConnectorIn": null,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1750.0,
+  "maxLuminousIntensityCd": 71000.0,
+  "luminousFluxLm": 108574.0,
+  "noiseLevelDb": 48,
+  "weightKg": 17.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 360.0,
+  "tiltRangeDeg": 180.0,
   "infinitePan": true,
   "infiniteTilt": true,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -52,7 +70,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -108,18 +127,27 @@
     }
   ],
   "pixelCount": 32,
+  "subType": "Strobe pixel panel",
+  "fullName": "Elation Pulse Panel FX",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -140,18 +168,32 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Values from the unlabelled comparison table on the Pulse Panel page.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/pulse-panel-fx",
+    "https://www.elationlighting.com/products/pulse-panel"
   ]
 }

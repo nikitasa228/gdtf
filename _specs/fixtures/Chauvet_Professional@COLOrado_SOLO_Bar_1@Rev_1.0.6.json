@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 110,
+  "powerConsumptionW": 105,
   "maxLuminousIntensityCd": 21800,
-  "luminousFluxLm": null,
+  "luminousFluxLm": 4285,
   "noiseLevelDb": 8.9,
   "weightKg": 6.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -58,6 +61,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWL",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -72,6 +76,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -223,12 +228,21 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Chauvet Professional COLORado Solo Bar 1",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "zoom": "manual",
@@ -247,6 +261,7 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -254,20 +269,22 @@
     "weightKg": "manual",
     "noiseLevelDb": "manual",
     "powerSupplyType": "manual",
+    "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "maxLuminousIntensityCd": "manual",
     "beamAngleDeg": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters."
+    "Noise 8.9 dB(A) as published (likely a typo by the manufacturer). Beam with optional diffusion filters. Fixed 16.5 deg beam; 27.3 deg only with CYC diffusion accessory. Power 110 W max @100 V; 105 W @230 V. Cooling 'Convection' per UM Rev3."
   ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/colorado-solo-bar-1/"

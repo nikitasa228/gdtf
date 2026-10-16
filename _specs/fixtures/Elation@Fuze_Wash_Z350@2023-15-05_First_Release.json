@@ -6,24 +6,39 @@
   "gdtfName": "Fuze Wash Z350",
   "longName": "Fuze Wash Z350",
   "shortName": "FzWshZ350",
-  "description": "The FUZE WASH Z350™ is a single source par moving head luminaire featuring a 350W Quad Color RGBW COB LED, 6° to 46° motorized zoom, pan and tilt, RGBW color mixing, variable dimming curve and strobe effects, DMX and RDM (remote device management) protocol support, DMX and Locking Power Cable in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
+  "description": "The FUZE WASH Z350 is a single source par moving head luminaire featuring a 350W Quad Color RGBW COB LED, 6° to 46° motorized zoom, pan and tilt, RGBW color mixing, variable dimming curve and strobe effects, DMX and RDM (remote device management) protocol support, DMX and Locking Power Cable in/out connections, LCD menu display with 7 button control panel, multiple unit power linking, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
   "manufacturer": "Elation",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 350.0,
-  "maxLuminousIntensityCd": 4900300.0,
-  "luminousFluxLm": 60280.0,
-  "noiseLevelDb": null,
-  "weightKg": 45.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 110.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 399.0,
+  "maxLuminousIntensityCd": 1300000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 39.4,
+  "weightKg": 20.4,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
-  "tiltRangeDeg": 270.0,
+  "tiltRangeDeg": 250.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +57,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -55,7 +71,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP30",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -95,18 +112,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Wash Z350",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -128,17 +152,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "GDTF weight (45) was in lbs.",
+    "GDTF luminous flux 60280 lm is implausible for 399 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/fuze-wash-z350",
+    "https://assets.centryngroup.com/dl/files/FUZ035__DL__003.pdf",
+    "https://www.elationlighting.com/fuze-wash-z350"
   ]
 }

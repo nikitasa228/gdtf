@@ -8,22 +8,39 @@
   "shortName": "PulsPnl",
   "description": "The PULSE PANEL features the same LED layout found on the Pulse Panel FX. 1,152 1.5W RGB LEDs spread across 24 zones around its perimeter, arranged in a grid of 6 zones wide and 4 zones tall. In addition to this, it includes a central strobe line comprising 288 5W cool-white LEDs organized into 24 zones, with 12 zones across and 2 zones tall. These are separated by a line of 96 1.5W RGB LEDs divided into 12 zones. Furthermore, there are 144 additional 5W cool-white LEDs divided into 24 zones, with 12 zones at the top and 12 at the bottom of the fixture's face. These outer LEDs utilize a linear prismatic lens similar to those used in our Rayzor Blade fixtures. When combined, these components deliver an astonishing output exceeding 100,000 total lumens.",
   "manufacturer": "Elation",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1611.0,
-  "maxLuminousIntensityCd": 145100.0,
-  "luminousFluxLm": 222618.0,
-  "noiseLevelDb": null,
-  "weightKg": 13.0,
-  "powerConnectorIn": null,
+  "category": "STROBE",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400.0,
+  "maxLuminousIntensityCd": 72000.0,
+  "luminousFluxLm": 110709.0,
+  "noiseLevelDb": 40,
+  "weightKg": 13.4,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -52,7 +70,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -96,16 +115,25 @@
     }
   ],
   "pixelCount": 32,
+  "subType": "Strobe pixel panel",
+  "fullName": "Elation Pulse Panel",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -124,18 +152,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/pulse-panel"
   ]
 }

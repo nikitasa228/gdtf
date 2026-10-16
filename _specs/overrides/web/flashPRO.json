@@ -1,0 +1,5 @@
+{
+ "flashPRO@LED_Fresnel_Lantern_COB_300W_RGBWAUV_Mk2_P8100001@flashPRO_v1.gdtf": {"powerConsumptionW": 300, "weightKg": 11.6, "ipRating": "IP20", "mains": "100-245", "powerSupplyType": "powerCON LINK", "_refs": ["https://flashpro.pl/oswietlenie-ekspozycyjne/reflektory-pc/fresnel-led-f300-auv"], "_notes": "Product code P8100001 = FRESNEL LED F300 +AUV on flashpro.pl. Cooling active."},
+ "flashPRO@LedBar_L1810_45@FLASH_v1.gdtf": {"powerConsumptionW": 200, "weightKg": 4.4, "ipRating": "IP20", "mains": "100-245", "powerSupplyType": "powerCON LINK", "_refs": ["https://flashpro.pl/reflektory-led/reflektory-led-bar/ledbar-l1810-45"], "_notes": "Product code P7200146. Cooling active."},
+ "flashPRO@OCTO_Sunbar_4x30W_4w1_COB_RGBW_4_sections_Mk2_P7300005@flashPRO_v1_inverted_pixels.gdtf": {"powerConsumptionW": 120, "weightKg": 5.2, "ipRating": "IP20", "mains": "100-245", "powerSupplyType": "powerCON LINK", "_refs": ["https://flashpro.pl/reflektory-retro/octo-sunbar-430"], "_notes": "Product code P7300005 = OCTO SUNBAR 430. Cooling active."}
+}

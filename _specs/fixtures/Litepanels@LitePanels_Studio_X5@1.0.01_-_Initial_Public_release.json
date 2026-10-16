@@ -4,7 +4,7 @@
   "fixtureTypeId": "1926F5CF-C601-402C-9D66-3B23004B33CA",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LitePanels Studio X5",
-  "longName": "LitePanels Studio X5",
+  "longName": "Studio X5",
   "shortName": "Studio X5",
   "description": "The Studio X5 Bi-Color 200W has a 10” lens with a wide spot-to-flood beam angle range of 16°-70°. With a maximum output of 11,704 lux at 10ft/3m (spot 5,600K), its output at 3,200K is similar to a 1KW traditional tungsten Fresnel. Advanced thermal management ensures 50,000+ hours of LED engine life, while individual burn-in and calibration tests ensure quality and consistency.",
   "manufacturer": "Litepanels",
@@ -19,25 +19,28 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
-    "max": 240.0
+    "min": 90.0,
+    "max": 260.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 600.0,
-  "maxLuminousIntensityCd": 152800.0,
+  "powerConsumptionW": 200,
+  "maxLuminousIntensityCd": 105300,
   "luminousFluxLm": 13350.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 12.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -70,7 +74,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -103,18 +108,26 @@
   ],
   "pixelCount": 3,
   "subType": "Fresnel",
+  "fullName": "Litepanels Studio X5",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -135,19 +148,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Lux: spot, 5600K, 10ft/3m. Weight standard (manual) yoke. Fan: convection + super silent fan with 3 speed presets.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.litepanels.com/wp-content/uploads/2023/06/1_studio-x5-bi-color-200w.pdf",
+    "https://www.litepanels.com/en/product/studio-x5-bi-color-200w-pole-us/"
   ]
 }

@@ -4,7 +4,7 @@
   "fixtureTypeId": "94583236-B920-4FD7-9248-EE5E825733FD",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin Arianne 6",
-  "longName": "Robin Arianne 6™",
+  "longName": "Robin Arianne 6",
   "shortName": "Arianne6",
   "description": "If you are looking for a refreshingly simple, no-fuss, robust wash light with superior colour mixing, increased output, and full IP65/66 ingress protection - plus simplified maintenance - the Arianne 6 is the fixture for you!\nBy eliminating sometimes unnecessary complexities such as pixel mapping, layers and background effects, yet upholding Robe’s renowned quality, Arianne 6 delivers all the essential attributes for exceptional wash and beam effects in any environment.\n\nFeaturing a 19 x 55W RGB Lime LED multichip source, Arianne 6 produces striking colours, alongside remarkable brightness.",
   "manufacturer": "Robe Lighting",
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 18029.0,
-  "noiseLevelDb": null,
-  "weightKg": 18.0,
+  "powerConsumptionW": 750.0,
+  "maxLuminousIntensityCd": 2250000.0,
+  "luminousFluxLm": 18000.0,
+  "noiseLevelDb": 38.0,
+  "weightKg": 17.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 541.2,
   "tiltRangeDeg": 216.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -60,6 +63,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBL",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -74,6 +78,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -50.0,
     "max": 50.0
@@ -93,20 +98,29 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Robe Lighting Robin Arianne 6",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -130,17 +144,21 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.robe.cz/arianne-6"
   ]
 }

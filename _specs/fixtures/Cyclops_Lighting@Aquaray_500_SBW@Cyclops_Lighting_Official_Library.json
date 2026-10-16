@@ -6,7 +6,7 @@
   "gdtfName": "Aquaray 500 SBW",
   "longName": "Aquaray 500 SBW",
   "shortName": "AQUA500SBW",
-  "description": "Cyclops Lighting Official Library",
+  "description": "Cyclops Lighting Aquaray 500 SBW: moving-head Discharge Lamp beam/spot/wash hybrid, with 3-21.2 deg zoom, CMY colour mixing, frost, IP55 rated.",
   "manufacturer": "Cyclops Lighting",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -26,24 +26,27 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 103386300.0,
-  "luminousFluxLm": 318000.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "powerConsumptionW": 600,
+  "maxLuminousIntensityCd": 8800000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 47,
+  "weightKg": 28,
+  "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
-  "tiltRangeDeg": 270.0,
+  "tiltRangeDeg": 280,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 3.0,
     "max": 21.2
@@ -62,6 +65,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -75,7 +79,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": "IP66",
+  "ipRating": "IP55",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -87,20 +92,28 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cyclops Lighting Aquaray 500 SBW",
+  "gdtfDescription": "Cyclops Lighting Official Library",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "estimated",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -119,22 +132,32 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "ipRating": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "ipRating": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Weight is 0 in GDTF"
+    "Weight is 0 in GDTF",
+    "Page and data sheet state IP rating 55 (record had IP66). Beam 2-7 deg; spot 2.4-33 deg, wash 6-43 deg. CCT given as lamp/CTO \"3200K - 2500K\" (Yodn MSD 440 W discharge lamp).",
+    "GDTF luminous flux 318000 lm is implausible for 600 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.cyclopslighting.com/product/aquaray-500sbw-cmy-outdoor-spot-beam-wash-moving-head/"
   ]
 }

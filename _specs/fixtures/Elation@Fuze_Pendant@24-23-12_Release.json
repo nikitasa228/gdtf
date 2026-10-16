@@ -6,24 +6,41 @@
   "gdtfName": "Fuze Pendant",
   "longName": "Fuze Pendant",
   "shortName": "FuzPdnt",
-  "description": "The FUZE PENDANT™ provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 11,000 lumens, the FUZE PENDANT is ideal for large areas and high-ceiling applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
+  "description": "The FUZE PENDANT provides powerful illumination for a variety of house and area lighting applications. Crisp whites with a high CRI, plus subtle pastels and powerful pure colors with 16-bit dimming, allow for a wide range of smooth illumination and dynamic effects for any environment. At up to 11,000 lumens, the FUZE PENDANT is ideal for large areas and high-ceiling applications yet is compact enough to be adaptable to smaller spaces. It is convection cooled for absolute silence and has no fans or other moving parts for a long maintenance free product life.",
   "manufacturer": "Elation",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 258.0,
-  "maxLuminousIntensityCd": 19200.0,
-  "luminousFluxLm": 13142.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 230.0,
+  "maxLuminousIntensityCd": 5490.0,
+  "luminousFluxLm": 11000.0,
+  "noiseLevelDb": 0,
   "weightKg": 7.2,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWL",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -95,16 +114,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Pendant",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -124,17 +152,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/fuze-pendant",
+    "https://assets.centryngroup.com/dl/files/FUZ260__DL__001.pdf",
+    "https://d295jznhem2tn9.cloudfront.net/ItemRelatedFiles/13537/Elation%20Fuze%20Pendant%20%20WH%20-%20Spec%20Sheet.pdf"
   ]
 }

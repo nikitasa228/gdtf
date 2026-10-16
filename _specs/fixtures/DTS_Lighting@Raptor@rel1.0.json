@@ -19,25 +19,28 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 90.0,
-    "max": 260.0
+    "min": 100.0,
+    "max": 240.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 450.0,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 450,
+  "maxLuminousIntensityCd": 35280000,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 15.4,
+  "noiseLevelDb": 47,
+  "weightKg": 17,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -47,7 +50,10 @@
     "XLR5"
   ],
   "lightSourceType": "Discharge Lamp",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 3.4,
+    "max": 3.4
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Spot",
@@ -62,9 +68,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 7500.0,
+    "max": 7500.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -77,7 +87,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -89,20 +100,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "DTS Lighting Raptor FPR",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -126,18 +146,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "beamAngleDeg": "manual",
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "beamAngleDeg",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "DTS Raptor FPR: discharge hybrid (beam/spot) with framing-free optics."
+    "Osram Sirius HRI 330 W lamp (16500 lm lamp lumens). Pan is limitless (FPR system), so panRangeDeg omitted.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://dts-lighting.it/product/entertainment/raptor/"
   ]
 }

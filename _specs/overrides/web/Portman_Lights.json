@@ -1,0 +1,3 @@
+{
+ "Portman_Lights@P2_EVO@0.92.gdtf": {"powerConsumptionW": 300, "weightKg": 12.5, "ipRating": "IP20", "mains": "100-240", "powerSupplyType": "powerCON TRUE1", "_refs": ["https://portmanlights.com/luminaires/p2-evo/"], "_notes": "6x60W dim-to-warm haloLED + 6x12W RGBW glow. CCT is the dim-to-warm range. Index had 456 W / 13.2 kg."}
+}

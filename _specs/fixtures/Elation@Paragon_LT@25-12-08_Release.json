@@ -6,24 +6,37 @@
   "gdtfName": "Paragon LT",
   "longName": "Paragon LT",
   "shortName": "PrgnLT",
-  "description": "The PARAGON LT™ is a powerful IP54-rated LED profile fixture offering outstanding projection and beam qualities. Fully sealed from dust and moisture it is an ideal fixture for any show or temporary outdoor events.\n\nProviding up to 5000 lumens output from its custom-designed Variable CRI LED engine, the PARAGON LT is the ideal fixture for a variety of application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors.",
+  "description": "The PARAGON LT is a powerful IP54-rated LED profile fixture offering outstanding projection and beam qualities. Fully sealed from dust and moisture it is an ideal fixture for any show or temporary outdoor events.\n\nProviding up to 5000 lumens output from its custom-designed Variable CRI LED engine, the PARAGON LT is the ideal fixture for a variety of application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1300.0,
-  "maxLuminousIntensityCd": 9619100.0,
+  "supportedPowerNetworks": [
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 200.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1900.0,
+  "maxLuminousIntensityCd": 9600000.0,
   "luminousFluxLm": 50000.0,
-  "noiseLevelDb": null,
-  "weightKg": 43.5,
-  "powerConnectorIn": "powerCON TRUE1",
+  "noiseLevelDb": 48,
+  "weightKg": 43.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 263.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -62,6 +75,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -85,6 +99,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP54",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -108,18 +123,27 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Paragon LT",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -146,17 +170,25 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/paragon-lt"
   ]
 }

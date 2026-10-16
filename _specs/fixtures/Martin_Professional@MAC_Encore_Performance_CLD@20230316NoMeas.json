@@ -6,7 +6,7 @@
   "gdtfName": "MAC Encore Performance CLD",
   "longName": "MAC Encore Performance CLD",
   "shortName": "MACEncPerCLD",
-  "description": "Official Martin Professional File (no measurements)",
+  "description": "Martin Professional MAC Encore Performance CLD: moving-head LED profile, with 8.9-37.6 deg zoom, CMY colour mixing, colour wheel, 5 gobos, framing shutters, frost.",
   "manufacturer": "Martin Professional",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -23,18 +23,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 590.0,
-  "maxLuminousIntensityCd": 428700.0,
+  "powerConsumptionW": 596.0,
+  "maxLuminousIntensityCd": 430000.0,
   "luminousFluxLm": 11600.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 31.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 268.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -61,6 +64,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -74,7 +78,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
     "max": 40.0
@@ -86,21 +91,30 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional MAC Encore Performance CLD",
+  "gdtfDescription": "Official Martin Professional File (no measurements)",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -126,13 +140,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-encore-performance-cld"
+  ]
 }

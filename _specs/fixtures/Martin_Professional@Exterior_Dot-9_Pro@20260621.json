@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Dot-9 Pro",
   "longName": "Exterior Dot-9 Pro",
   "shortName": "EXTDot9Pro",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior Dot-9 Pro: LED wash (architectural rgbw dot / flood), with 112 deg beam, RGBW colour mixing, colour wheel, IP67 rated.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": null,
@@ -16,17 +16,20 @@
   },
   "frequencyRangeHz": null,
   "powerConsumptionW": 100.0,
-  "maxLuminousIntensityCd": 0.0,
-  "luminousFluxLm": 21.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 17.0,
+  "luminousFluxLm": 68.0,
+  "noiseLevelDb": 0,
   "weightKg": 2.75,
   "powerConnectorIn": "Martin 8-pin",
   "powerConnectorOut": null,
   "powerSupplyType": "Martin 8-pin",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -45,6 +48,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -58,7 +62,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP67",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
     "max": 55.0
@@ -103,19 +108,28 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural RGBW dot / flood",
+  "fullName": "Martin Professional Exterior Dot-9 Pro",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "voltageRangeV": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -134,10 +148,15 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -146,6 +165,10 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-dot-9-pro"
   ]
 }

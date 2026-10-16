@@ -1,620 +1,71 @@
 {
- "Martin_Professional@DCE_DataSplitterBooster_IP@20260607.gdtf": {
-  "category": "OTHER",
-  "subType": "Data splitter / booster",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "powerConsumptionW": null,
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@DCE_PSU_240_IP@20260609.gdtf": {
-  "category": "OTHER",
-  "subType": "DC power supply",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType"
-  ]
- },
- "Martin_Professional@ELP_PAR@20241107NoMeas.gdtf": {
-  "category": "PAR"
- },
- "Martin_Professional@ELP_PAR_IP@20241107NoMeas.gdtf": {
-  "category": "PAR"
- },
- "Martin_Professional@ERA_150_Wash@20230226NoMeas.gdtf": {
-  "category": "WASH"
- },
- "Martin_Professional@ERA_300_Profile@20230226.gdtf": {
-  "category": "SPOT"
- },
- "Martin_Professional@ERA_600_Profile@20230226.gdtf": {
-  "category": "SPOT"
- },
- "Martin_Professional@ERA_800_Profile@20230226.gdtf": {
-  "category": "SPOT"
- },
- "Martin_Professional@Exterior_AC-Feeder@20260602.gdtf": {
-  "category": "OTHER",
-  "subType": "AC feeder (power/data injector)",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType"
-  ]
- },
- "Martin_Professional@Exterior_DC-Feeder@20260602.gdtf": {
-  "category": "OTHER",
-  "subType": "DC feeder (power/data injector)",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@Exterior_Dot-1_Pro@20260621.gdtf": {
-  "category": "WASH",
-  "subType": "Architectural RGBW dot / flood",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@Exterior_Dot-4_Pro@20260621.gdtf": {
-  "category": "WASH",
-  "subType": "Architectural RGBW dot / flood",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@Exterior_Dot-9_Pro@20260621.gdtf": {
-  "category": "WASH",
-  "subType": "Architectural RGBW dot / flood",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@Exterior_Dot-HP_Pro@20260621.gdtf": {
-  "category": "WASH",
-  "subType": "Architectural RGBW dot / flood",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@Exterior_Linear_Pro_Cove_CTC_1ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Cove_CTC_4ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Cove_QUAD_1ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Cove_QUAD_4ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_DV_QUAD_1ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_DV_QUAD_4ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Graze_CTC_1ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Graze_CTC_4ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Graze_QUAD_1ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Linear_Pro_Graze_QUAD_4ft@20260823NoMeas.gdtf": {
-  "category": "LED BAR"
- },
- "Martin_Professional@Exterior_Projection_Pro_Compact@20260621.gdtf": {
-  "category": "PROFILE",
-  "subType": "Gobo projector (architectural)"
- },
- "Martin_Professional@MAC_Allure_Profile@20240515NoMeas.gdtf": {
-  "category": "SPOT"
- },
- "Martin_Professional@MAC_Allure_Wash_PC@20230316NoMeas.gdtf": {
-  "category": "WASH"
- },
- "Martin_Professional@MAC_Encore_Wash_CLD@20230316NoMeas.gdtf": {
-  "category": "WASH"
- },
- "Martin_Professional@MAC_Encore_Wash_WRM@20230316NoMeas.gdtf": {
-  "category": "WASH"
- },
- "Martin_Professional@MAC_One_Fourbar@20260525.gdtf": {
-  "category": "OTHER",
-  "subType": "Mounting accessory (four-bar clamp)",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "powerSupplyType",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "Passive accessory (no power)."
- },
- "Martin_Professional@MAC_One_VDO_Grid_Mount_Ring@20260525.gdtf": {
-  "category": "OTHER",
-  "subType": "Mounting accessory",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "powerSupplyType",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "Passive accessory (no power)."
- },
- "Martin_Professional@MAC_Quantum_Profile@20230316NoMeas.gdtf": {
-  "category": "SPOT"
- },
- "Martin_Professional@MAC_Viper_AirFX@20230516NoMeas.gdtf": {
-  "category": "BSW"
- },
- "Martin_Professional@MAC_Viper_Wash@20230516NoMeas.gdtf": {
-  "category": "WASH"
- },
- "Martin_Professional@MAC_Viper_Wash_DX@20230516NoMeas.gdtf": {
-  "category": "WASH"
- },
- "Martin_Professional@P3_Global@20210406.gdtf": {
-  "category": "OTHER",
-  "subType": "P3 video processor / controller",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "powerSupplyType",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "P3 video system device; power/mains not given in GDTF."
- },
- "Martin_Professional@P3_Motion@20210406.gdtf": {
-  "category": "OTHER",
-  "subType": "P3 video processor / controller",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "powerSupplyType",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "P3 video system device; power/mains not given in GDTF."
- },
- "Martin_Professional@P3_PowerPort_2000@20260607.gdtf": {
-  "category": "OTHER",
-  "subType": "P3 PowerPort (DC power + data distribution)",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType"
-  ]
- },
- "Martin_Professional@P3_PowerPort_500_IP_Install@20260607.gdtf": {
-  "category": "OTHER",
-  "subType": "P3 PowerPort (DC power + data distribution)",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType"
-  ]
- },
- "Martin_Professional@P3_PowerPort_500_IP_Rental@20260607.gdtf": {
-  "category": "OTHER",
-  "subType": "P3 PowerPort (DC power + data distribution)",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Grid_15_16x16@20210126.gdtf": {
-  "category": "OTHER",
-  "subType": "LED video pixel / matrix",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Grid_25_8x8@20210125.gdtf": {
-  "category": "OTHER",
-  "subType": "LED video pixel / matrix",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Grid_30_8x8@20210123.gdtf": {
-  "category": "OTHER",
-  "subType": "LED video pixel / matrix",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Grid_60_4x4@20210122.gdtf": {
-  "category": "OTHER",
-  "subType": "LED video pixel / matrix",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Grid_60_8x8@20210122.gdtf": {
-  "category": "OTHER",
-  "subType": "LED video pixel / matrix",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_15_16x1@20210126.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_15_32x1@20210126.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_25_16x1@20210125.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_25_8x1@20210125.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_30_16x1@20210123.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_30_8x1@20210123.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_60_4x1@20210122.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VC-Strip_60_8x1@20210122.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Atomic_Bold@20260620.gdtf": {
-  "category": "STROBE"
- },
- "Martin_Professional@VDO_Atomic_Dot_CLD@20260621.gdtf": {
-  "category": "BLINDER"
- },
- "Martin_Professional@VDO_Atomic_Dot_WRM@20260621.gdtf": {
-  "category": "BLINDER"
- },
- "Martin_Professional@VDO_Dotron@20210407.gdtf": {
-  "category": "OTHER",
-  "subType": "LED video pixel / matrix",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Dual_Header@20260525.gdtf": {
-  "category": "OTHER",
-  "subType": "VDO cable header / adapter",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "powerSupplyType",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "Passive accessory (no power)."
- },
- "Martin_Professional@VDO_Fatron_20_1000mm@20210127.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Fatron_20_320mm@20201222.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_10_1000mm@20201223.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_10_320mm@20201223.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_20_1000mm@20201223.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_20_320mm@20201223.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_40_1000mm@20201223.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_40_320mm@20201223.gdtf": {
-  "category": "LED BAR",
-  "powerSupplyType": "Martin proprietary (P3/PDE)",
-  "powerConnectorIn": "Martin proprietary (P3/PDE)",
-  "powerConnectorOut": "Martin proprietary (P3/PDE)",
-  "controlSignal": [
-   "Ethernet (Martin P3)"
-  ],
-  "_notes": "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort.",
-  "_na": [
-   "supportedPowerNetworks",
-   "lensType"
-  ]
- },
- "Martin_Professional@VDO_Sceptron_XB_1000mm@20260621.gdtf": {
-  "category": "LED BAR",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@VDO_Sceptron_XB_320mm@20260621.gdtf": {
-  "category": "LED BAR",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
- },
- "Martin_Professional@VDO_Single_Adapter@20260525.gdtf": {
-  "category": "OTHER",
-  "subType": "VDO cable header / adapter",
-  "lightSourceType": null,
-  "colorMixing": "None",
-  "_na": [
-   "lensType",
-   "noiseLevelDb",
-   "powerConsumptionW",
-   "powerSupplyType",
-   "supportedPowerNetworks"
-  ],
-  "_notes": "Passive accessory (no power)."
- }
+ "Martin_Professional@DCE_DataSplitterBooster_IP@20260607.gdtf": {"category": "OTHER", "subType": "Data splitter / booster", "lightSourceType": null, "colorMixing": "None", "powerConsumptionW": null, "_na": ["lensType", "noiseLevelDb", "powerConsumptionW", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@DCE_PSU_240_IP@20260609.gdtf": {"category": "OTHER", "subType": "DC power supply", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType"]},
+ "Martin_Professional@ELP_PAR@20241107NoMeas.gdtf": {"category": "PAR"},
+ "Martin_Professional@ELP_PAR_IP@20241107NoMeas.gdtf": {"category": "PAR"},
+ "Martin_Professional@ERA_150_Wash@20230226NoMeas.gdtf": {"category": "WASH"},
+ "Martin_Professional@ERA_300_Profile@20230226.gdtf": {"category": "SPOT"},
+ "Martin_Professional@ERA_600_Profile@20230226.gdtf": {"category": "SPOT"},
+ "Martin_Professional@ERA_800_Profile@20230226.gdtf": {"category": "SPOT"},
+ "Martin_Professional@Exterior_AC-Feeder@20260602.gdtf": {"category": "OTHER", "subType": "AC feeder (power/data injector)", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType"]},
+ "Martin_Professional@Exterior_DC-Feeder@20260602.gdtf": {"category": "OTHER", "subType": "DC feeder (power/data injector)", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@Exterior_Dot-1_Pro@20260621.gdtf": {"category": "WASH", "subType": "Architectural RGBW dot / flood", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@Exterior_Dot-4_Pro@20260621.gdtf": {"category": "WASH", "subType": "Architectural RGBW dot / flood", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@Exterior_Dot-9_Pro@20260621.gdtf": {"category": "WASH", "subType": "Architectural RGBW dot / flood", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@Exterior_Dot-HP_Pro@20260621.gdtf": {"category": "WASH", "subType": "Architectural RGBW dot / flood", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@Exterior_Linear_Pro_Cove_CTC_1ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Cove_CTC_4ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Cove_QUAD_1ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Cove_QUAD_4ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_DV_QUAD_1ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_DV_QUAD_4ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Graze_CTC_1ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Graze_CTC_4ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Graze_QUAD_1ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Linear_Pro_Graze_QUAD_4ft@20260823NoMeas.gdtf": {"category": "LED BAR"},
+ "Martin_Professional@Exterior_Projection_Pro_Compact@20260621.gdtf": {"category": "PROFILE", "subType": "Gobo projector (architectural)"},
+ "Martin_Professional@MAC_Allure_Profile@20240515NoMeas.gdtf": {"category": "SPOT"},
+ "Martin_Professional@MAC_Allure_Wash_PC@20230316NoMeas.gdtf": {"category": "WASH"},
+ "Martin_Professional@MAC_Encore_Wash_CLD@20230316NoMeas.gdtf": {"category": "WASH"},
+ "Martin_Professional@MAC_Encore_Wash_WRM@20230316NoMeas.gdtf": {"category": "WASH"},
+ "Martin_Professional@MAC_One_Fourbar@20260525.gdtf": {"category": "OTHER", "subType": "Mounting accessory (four-bar clamp)", "lightSourceType": null, "colorMixing": "None", "_na": ["powerConsumptionW", "powerSupplyType", "controlSignal", "supportedPowerNetworks", "noiseLevelDb"], "_notes": "Passive accessory (no power)."},
+ "Martin_Professional@MAC_One_VDO_Grid_Mount_Ring@20260525.gdtf": {"category": "OTHER", "subType": "Mounting accessory", "lightSourceType": null, "colorMixing": "None", "_na": ["powerConsumptionW", "powerSupplyType", "controlSignal", "supportedPowerNetworks", "noiseLevelDb"], "_notes": "Passive accessory (no power)."},
+ "Martin_Professional@MAC_Quantum_Profile@20230316NoMeas.gdtf": {"category": "SPOT"},
+ "Martin_Professional@MAC_Viper_AirFX@20230516NoMeas.gdtf": {"category": "BSW"},
+ "Martin_Professional@MAC_Viper_Wash@20230516NoMeas.gdtf": {"category": "WASH"},
+ "Martin_Professional@MAC_Viper_Wash_DX@20230516NoMeas.gdtf": {"category": "WASH"},
+ "Martin_Professional@P3_Global@20210406.gdtf": {"category": "OTHER", "subType": "P3 video processor / controller", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType", "noiseLevelDb", "powerConsumptionW", "powerSupplyType", "supportedPowerNetworks"], "_notes": "P3 video system device; power/mains not given in GDTF."},
+ "Martin_Professional@P3_Motion@20210406.gdtf": {"category": "OTHER", "subType": "P3 video processor / controller", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType", "noiseLevelDb", "powerConsumptionW", "powerSupplyType", "supportedPowerNetworks"], "_notes": "P3 video system device; power/mains not given in GDTF."},
+ "Martin_Professional@P3_PowerPort_2000@20260607.gdtf": {"category": "OTHER", "subType": "P3 PowerPort (DC power + data distribution)", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType"]},
+ "Martin_Professional@P3_PowerPort_500_IP_Install@20260607.gdtf": {"category": "OTHER", "subType": "P3 PowerPort (DC power + data distribution)", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType"]},
+ "Martin_Professional@P3_PowerPort_500_IP_Rental@20260607.gdtf": {"category": "OTHER", "subType": "P3 PowerPort (DC power + data distribution)", "lightSourceType": null, "colorMixing": "None", "_na": ["lensType"]},
+ "Martin_Professional@VC-Grid_15_16x16@20210126.gdtf": {"category": "OTHER", "subType": "LED video pixel / matrix", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType", "lensType"], "powerConsumptionW": 100, "_refs": ["https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VC-Grid_25_8x8@20210125.gdtf": {"category": "OTHER", "subType": "LED video pixel / matrix", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType", "lensType"], "powerConsumptionW": 25, "_refs": ["https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"]},
+ "Martin_Professional@VC-Grid_30_8x8@20210123.gdtf": {"category": "OTHER", "subType": "LED video pixel / matrix", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType", "lensType"], "powerConsumptionW": 25, "_refs": ["https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"]},
+ "Martin_Professional@VC-Grid_60_4x4@20210122.gdtf": {"category": "OTHER", "subType": "LED video pixel / matrix", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType", "lensType"], "powerConsumptionW": 6.7, "_refs": ["https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"]},
+ "Martin_Professional@VC-Grid_60_8x8@20210122.gdtf": {"category": "OTHER", "subType": "LED video pixel / matrix", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType", "lensType"], "powerConsumptionW": 25, "_refs": ["https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"]},
+ "Martin_Professional@VC-Strip_15_16x1@20210126.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 6.7, "_refs": ["https://www.martin.com/en-US/products/vc-strip"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VC-Strip_15_32x1@20210126.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 13.4, "_refs": ["https://www.martin.com/en-US/products/vc-strip"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VC-Strip_25_16x1@20210125.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 6.7, "_refs": ["https://www.martin.com/en-US/products/vc-strip"]},
+ "Martin_Professional@VC-Strip_25_8x1@20210125.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 3.3, "_refs": ["https://www.martin.com/en-US/products/vc-strip"]},
+ "Martin_Professional@VC-Strip_30_16x1@20210123.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 6.7, "_refs": ["https://www.martin.com/en-US/products/vc-strip"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VC-Strip_30_8x1@20210123.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 3.3, "_refs": ["https://www.martin.com/en-US/products/vc-strip"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VC-Strip_60_4x1@20210122.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 1.7, "_refs": ["https://www.martin.com/en-US/products/vc-strip"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VC-Strip_60_8x1@20210122.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 3.3, "_refs": ["https://www.martin.com/en-US/products/vc-strip"], "_estimated": ["powerConsumptionW"]},
+ "Martin_Professional@VDO_Atomic_Bold@20260620.gdtf": {"category": "STROBE"},
+ "Martin_Professional@VDO_Atomic_Dot_CLD@20260621.gdtf": {"category": "BLINDER"},
+ "Martin_Professional@VDO_Atomic_Dot_WRM@20260621.gdtf": {"category": "BLINDER"},
+ "Martin_Professional@VDO_Dotron@20210407.gdtf": {"category": "OTHER", "subType": "LED video pixel / matrix", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType", "lensType"], "powerConsumptionW": 5, "_refs": ["https://www.martin.com/da/site_elements/vdo-dotron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Dual_Header@20260525.gdtf": {"category": "OTHER", "subType": "VDO cable header / adapter", "lightSourceType": null, "colorMixing": "None", "_na": ["powerConsumptionW", "powerSupplyType", "controlSignal", "supportedPowerNetworks", "noiseLevelDb"], "_notes": "Passive accessory (no power)."},
+ "Martin_Professional@VDO_Fatron_20_1000mm@20210127.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 60, "_refs": ["https://www.martin.com/en-US/products/vdo-fatron-20"]},
+ "Martin_Professional@VDO_Fatron_20_320mm@20201222.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 20, "_refs": ["https://www.martin.com/en-US/products/vdo-fatron-20"]},
+ "Martin_Professional@VDO_Sceptron_10_1000mm@20201223.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 30, "_refs": ["https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Sceptron_10_320mm@20201223.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 10, "_refs": ["https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Sceptron_20_1000mm@20201223.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 15, "_refs": ["https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Sceptron_20_320mm@20201223.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 5, "_refs": ["https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Sceptron_40_1000mm@20201223.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 7.5, "_refs": ["https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Sceptron_40_320mm@20201223.gdtf": {"category": "LED BAR", "powerSupplyType": "Martin proprietary (P3/PDE)", "powerConnectorIn": "Martin proprietary (P3/PDE)", "powerConnectorOut": "Martin proprietary (P3/PDE)", "controlSignal": ["Ethernet (Martin P3)"], "_notes": "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white.", "_na": ["supportedPowerNetworks", "lensType"], "powerConsumptionW": 2.5, "_refs": ["https://www.martin.com/en/site_elements/vdo-sceptron-family-spec-sheet"]},
+ "Martin_Professional@VDO_Sceptron_XB_1000mm@20260621.gdtf": {"category": "LED BAR", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@VDO_Sceptron_XB_320mm@20260621.gdtf": {"category": "LED BAR", "_na": ["lensType", "noiseLevelDb", "supportedPowerNetworks"], "_notes": "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."},
+ "Martin_Professional@VDO_Single_Adapter@20260525.gdtf": {"category": "OTHER", "subType": "VDO cable header / adapter", "lightSourceType": null, "colorMixing": "None", "_na": ["powerConsumptionW", "powerSupplyType", "controlSignal", "supportedPowerNetworks", "noiseLevelDb"], "_notes": "Passive accessory (no power)."}
 }

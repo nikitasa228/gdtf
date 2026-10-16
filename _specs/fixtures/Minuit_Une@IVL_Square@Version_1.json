@@ -4,7 +4,7 @@
   "fixtureTypeId": "8AB33F1C-16BB-4BEE-B167-E0BD3D4BC496",
   "gdtfDataVersion": "1.0",
   "gdtfName": "IVL_Square",
-  "longName": "IVL_Square",
+  "longName": "IVL Square",
   "shortName": "IVL Square",
   "description": "The square shape of the IVL lighting range by Minuit Une.",
   "manufacturer": "Minuit Une",
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 75,
+  "maxLuminousIntensityCd": 1400.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "noiseLevelDb": 38,
+  "weightKg": 16,
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": null,
-  "tiltRangeDeg": null,
+  "tiltRangeDeg": 360,
   "infinitePan": null,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -55,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -65,7 +69,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -79,12 +84,21 @@
   ],
   "pixelCount": 1,
   "subType": "Kinetic LED panel",
+  "fullName": "Minuit Une IVL Square",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf-derived",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -104,21 +118,33 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "tiltRangeDeg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Class 3R laser fixture, 4 independent tilting mirrors (0-360 deg each). Beam range 1-80 deg is the light-plane fan, so beam omitted. Index had 240 W / 8.6 kg.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://minuitune.com/products/ivl-square/"
+  ]
 }

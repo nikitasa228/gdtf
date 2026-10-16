@@ -9,28 +9,48 @@
   "description": "LaserLink is a stand-alone ILDA-Media Server allowing lighting designers to control laser projectors directly from their console via DMX or Art-Net in real-time.",
   "manufacturer": "Lightline",
   "category": "LASER",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 330,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 43,
+  "weightKg": 12.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 180.0,
   "tiltRangeDeg": 180.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Ethernet (Art-Net/sACN)"
   ],
   "dataConnectors": null,
   "lightSourceType": "Laser",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 1.0,
+    "max": 1.0
+  },
   "fieldAngleDeg": null,
   "zoom": true,
   "lensType": null,
@@ -45,6 +65,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": true,
   "colorTemperatureK": null,
@@ -55,7 +76,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -64,12 +86,21 @@
     }
   ],
   "pixelCount": 0,
+  "fullName": "Lightline LaserLink",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -89,24 +120,32 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "lightSourceType": "manual",
-    "lensType": "manual"
+    "lensType": "manual",
+    "fullName": "gdtf-derived",
+    "powerConsumptionW": "estimated",
+    "weightKg": "estimated",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "beamAngleDeg": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "beamAngleDeg",
+  "_missing": [],
+  "_notApplicable": [
+    "colorTemperatureK",
     "lensType",
-    "colorTemperatureK"
+    "maxLuminousIntensityCd"
   ],
-  "_notApplicable": [],
   "_issues": [
-    "Laser projector profile; no hardware spec sheet found."
+    "Laser projector: intensity is specified as optical power (mW), not candela.",
+    "Typical-value estimates (no published data): powerConsumptionW, weightKg, voltageRangeV, frequencyRangeHz, supportedPowerNetworks, powerSupplyType, powerConnectorIn, powerConnectorOut, beamAngleDeg, ipRating, noiseLevelDb"
   ]
 }

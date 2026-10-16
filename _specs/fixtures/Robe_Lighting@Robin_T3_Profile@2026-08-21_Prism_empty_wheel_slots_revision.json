@@ -4,22 +4,19 @@
   "fixtureTypeId": "ED4307C7-1AC9-497E-8FE6-7E4C2F92BB06",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T3 Profile",
-  "longName": "Robin T3 Profile™",
+  "longName": "Robin T3 Profile",
   "shortName": "T3 Profile",
   "description": "T3 Profile\nBuilding on the success of the acclaimed Robe T-Series, the T3 ProfileTM elevates high-power multispectral performance to the ultimate level. Designed for long-throw applications, it delivers unparalleled output, light quality and precise colour control. \nDelivering over 31.250 lumens (integrating sphere) from its 1.400W MSLTM (Multi-Spectral-Light) LED engine, the T3 ProfileTM stays true to its theatrical heritage. Excelling at nuanced colour work, it offers user selectable CMY, RGB or individual colour emitter control for advanced users. \nColour features include a DataSwatchTM virtual colour library; factory calibrated whites; extensive 2.700K to 8.000K CCT range; lamp selectable tungsten emulation; and MCETM multicoloured effects directly from the LED engine. The virtually controlled CRI of 80-95+ delivers perfect colour rendition and flawless skin tones.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
-    "100 V - 50 Hz",
-    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
-    "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
     "220/230 V - 60 Hz",
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 100.0,
+    "min": 120.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
@@ -27,17 +24,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 1700.0,
-  "maxLuminousIntensityCd": 2023100.0,
-  "luminousFluxLm": 30111.0,
-  "noiseLevelDb": null,
-  "weightKg": 45.6,
+  "maxLuminousIntensityCd": 2700000.0,
+  "luminousFluxLm": 40200.0,
+  "noiseLevelDb": 37.0,
+  "weightKg": 46.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 263.6,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -72,6 +72,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -94,7 +95,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -126,21 +128,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T3 Profile",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -167,13 +177,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.robe.cz/t3-profile"
+  ]
 }

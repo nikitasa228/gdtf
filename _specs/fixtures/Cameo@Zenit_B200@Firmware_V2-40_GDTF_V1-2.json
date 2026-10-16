@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 180,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 24000.0,
+  "maxLuminousIntensityCd": 44000.0,
+  "luminousFluxLm": 6600,
   "noiseLevelDb": 0,
-  "weightKg": 8.0,
+  "weightKg": 8,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
-  "panRangeDeg": 0,
-  "tiltRangeDeg": 170.0,
+  "motorizedPanTilt": false,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
   "infinitePan": null,
-  "infiniteTilt": false,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": 170.0,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -59,6 +62,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -73,6 +77,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -112,6 +117,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Cameo ZENIT B200 (CLZB200)",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -119,13 +132,13 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "powerSupplyType": "manual",
-    "tiltRangeDeg": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "manual",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "manual",
@@ -146,25 +159,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "noiseLevelDb": "manual",
     "ipRating": "manual",
-    "panRangeDeg": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "Convection cooled (silent)."
+    "Convection cooled (silent). Fan-free (passive cooling): silent. Battery-powered; 180 W is the rated mains power.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
   ],
   "_refs": [
+    "https://www.cameolight.com/en/solutions/theatre-broadcast/battery-powered-lights/19855/zenit-b200",
     "https://adamhall.com/shop/en/brands/zenit-b200"
   ]
 }

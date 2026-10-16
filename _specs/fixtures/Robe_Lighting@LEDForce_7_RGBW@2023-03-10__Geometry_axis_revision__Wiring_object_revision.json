@@ -4,7 +4,7 @@
   "fixtureTypeId": "AE92BE76-BDDA-4432-BDAA-06AD46F01BF3",
   "gdtfDataVersion": "1.2",
   "gdtfName": "LEDForce 7 RGBW",
-  "longName": "LEDForce 7™ RGBW",
+  "longName": "LEDForce 7 RGBW",
   "shortName": "LEDForce 7",
   "description": "GDTF info: 3D model does not match 100% physical appearance of the light. Proportions of 3D model are correct.\n\nThe LEDForce 7 RGB and LEDForce 7 RGBW are new compact TriColor and Quadcolor LED based Par Can fixtures in sturdy high-impact aluminum body equipped with 7 x 3 Watt Tri Color RGB LEDs and 7 x5 Watt Quad Color RGBW LEDs. Fitted with LED control display for easy setting up and with double hanging brackets – for truss mounting and floor standing. Powerful Tri-color and Quad-color LEDs will amaze you with bright saturated colors with no multicolor shadows. Special driving technology ensures flicker free operation while maintaining long 50.000 hours of LED‘s life time.",
   "manufacturer": "Robe Lighting",
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 38.0,
-  "maxLuminousIntensityCd": 200.0,
+  "maxLuminousIntensityCd": 160.0,
   "luminousFluxLm": 33.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 1.9,
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
   "powerSupplyType": "Fixed Cable",
-  "panRangeDeg": 0,
-  "tiltRangeDeg": 360.0,
+  "motorizedPanTilt": false,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
   "infinitePan": null,
-  "infiniteTilt": false,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": 360.0,
   "controlSignal": [
     "DMX512"
   ],
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -70,7 +74,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -86,6 +91,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting LEDForce 7 RGBW",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -101,8 +114,8 @@
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -123,14 +136,17 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual"
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

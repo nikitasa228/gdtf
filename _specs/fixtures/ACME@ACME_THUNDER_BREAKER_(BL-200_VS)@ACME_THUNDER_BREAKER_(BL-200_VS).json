@@ -6,7 +6,7 @@
   "gdtfName": "ACME THUNDER BREAKER (BL-200 VS)",
   "longName": "THUNDER BREAKER(BL-200 VS)",
   "shortName": "BL-200 VS",
-  "description": "ACME THUNDER BREAKER (BL-200 VS)",
+  "description": "ACME THUNDER BREAKER(BL-200 VS): LED strobe, with 110 deg beam, RGBW colour mixing, IPX4 rated.",
   "manufacturer": "ACME",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 395,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 4100.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 10.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,9 +60,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -68,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IPX4",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -79,13 +87,23 @@
     }
   ],
   "pixelCount": 12,
+  "fullName": "ACME THUNDER BREAKER(BL-200 VS)",
+  "gdtfDescription": "ACME THUNDER BREAKER (BL-200 VS)",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "zoom": "gdtf-derived",
@@ -102,6 +120,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -114,18 +133,21 @@
     "supportedPowerNetworks": "manual",
     "beamAngleDeg": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Discontinued-product page.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=5589",
     "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5589"
   ]
 }

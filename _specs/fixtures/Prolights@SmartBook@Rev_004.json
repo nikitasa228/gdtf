@@ -9,21 +9,38 @@
   "description": "96x3W high power and portable outdoor wireless battery wash light\nSmart Book is a wireless battery wash light, performing high output in a super-slim foldable housing. Smart Book, being IP rated, is an ideal tool for outdoor events to light up landscapes and buildings, all with a magnetic optical system (+50° included) to focus the light. Smart Book comes with a quick magnetic recharge flight case and control through wireless DMX.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 12.0,
-  "maxLuminousIntensityCd": 1600.0,
-  "luminousFluxLm": 321.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 424.0,
+  "maxLuminousIntensityCd": 14300.0,
+  "luminousFluxLm": 2117.0,
+  "noiseLevelDb": 0,
   "weightKg": 8.4,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "Battery (internal)",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Battery (internal)",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Wireless DMX (CRMX/W-DMX)"
@@ -42,9 +59,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW+WW",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 10000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -52,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 45.0
@@ -72,16 +94,25 @@
     }
   ],
   "pixelCount": 4,
+  "subType": "Battery decorative light",
+  "fullName": "Prolights SmartBook",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -100,18 +131,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "manual",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "colorTemperatureK": "estimated",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/SMARTBOOK"
   ]
 }

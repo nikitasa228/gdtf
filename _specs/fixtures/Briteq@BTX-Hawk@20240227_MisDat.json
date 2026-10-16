@@ -6,7 +6,7 @@
   "gdtfName": "BTX-Hawk",
   "longName": "BTX-Hawk",
   "shortName": "BTX-Hawk",
-  "description": "180W LED Moving head spot",
+  "description": "Briteq BTX-Hawk: moving-head LED spot, with 12 deg beam, colour wheel, 16 gobos, prism.",
   "manufacturer": "Briteq",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 180.0,
-  "maxLuminousIntensityCd": 1006700.0,
-  "luminousFluxLm": 49500.0,
-  "noiseLevelDb": null,
-  "weightKg": 15.5,
+  "powerConsumptionW": 230,
+  "maxLuminousIntensityCd": 207500,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 38,
+  "weightKg": 16.5,
   "powerConnectorIn": "powerCON",
-  "powerConnectorOut": null,
-  "powerSupplyType": "powerCON",
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 220.0,
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": 630,
+  "tiltRangeDeg": 270,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -69,9 +72,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6500.0,
+    "max": 6500.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -92,7 +99,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -108,20 +116,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Briteq BTX-Hawk",
+  "gdtfDescription": "180W LED Moving head spot",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -145,19 +162,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "power 230 W only in EN manual https://briteq-lighting.com/fileuploader/download/download/?d=0&file=custom%2Fupload%2FFile-1463576461.pdf&name=BTX-HAWK_Manual_English (manual also 15.5 kg, beam 12 deg, and \"49500 lux @ 1m\", which is inconsistent with page 8300 lux @ 5m; page value used); pan selectable 540 or 630 deg (default 540)",
+    "GDTF luminous flux 49500 lm is implausible for 230 W and was dropped",
+    "Typical-value estimates (no published data): colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://briteq-lighting.com/btx-hawk-4536"
   ]
 }

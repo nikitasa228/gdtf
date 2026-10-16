@@ -6,24 +6,41 @@
   "gdtfName": "SmartBatWash",
   "longName": "SmartBatWash",
   "shortName": "SMBWash",
-  "description": "The Smart BatWash is a high-powered LED Wash light that can be operated wirelessly or wired. \nThis IP65 Wash Light has 15 x 20W RGB + Warm White LED emitters, and it's Spektra™ calibrated to guarantee consistency, high-quality white values (CRI >93), a dynamic array of true colours with smooth colour mixing, and a powerful 6,282-lumen output. \nThe Smart BatWash is very flexible - it can be used wirelessly with the built-in battery, using CRMX or W-DMX or, alternatively, wired with power and data cables, bypassing the battery and enabling higher brightness levels. \nThe beam angle can easily be adjustable through a magnetic beam shaper filter, allowing a broader coverage whilst keeping a high output. The Smart BatWash has all the software features of the Ecl range, sharing the same user settings and capabilities.",
+  "description": "The Smart BatWash is a high-powered LED Wash light that can be operated wirelessly or wired. \nThis IP65 Wash Light has 15 x 20W RGB + Warm White LED emitters, and it's Spektra calibrated to guarantee consistency, high-quality white values (CRI >93), a dynamic array of true colours with smooth colour mixing, and a powerful 6,282-lumen output. \nThe Smart BatWash is very flexible - it can be used wirelessly with the built-in battery, using CRMX or W-DMX or, alternatively, wired with power and data cables, bypassing the battery and enabling higher brightness levels. \nThe beam angle can easily be adjustable through a magnetic beam shaper filter, allowing a broader coverage whilst keeping a high output. The Smart BatWash has all the software features of the Ecl range, sharing the same user settings and capabilities.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 20.0,
-  "maxLuminousIntensityCd": 7600.0,
-  "luminousFluxLm": 420.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 180.0,
+  "maxLuminousIntensityCd": 111300.0,
+  "luminousFluxLm": 6300.0,
+  "noiseLevelDb": 0,
   "weightKg": 9.8,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
-  "tiltRangeDeg": 180.0,
+  "tiltRangeDeg": null,
   "infinitePan": null,
-  "infiniteTilt": false,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": 180.0,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -43,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB+WW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -57,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 45.0
@@ -84,18 +103,27 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Battery wash",
+  "fullName": "Prolights SmartBatWash",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "tiltRangeDeg": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -115,19 +143,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "manual",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "panRangeDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/SMARTBATWASH"
   ]
 }

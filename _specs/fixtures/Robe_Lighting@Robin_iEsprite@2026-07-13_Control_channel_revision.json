@@ -4,9 +4,9 @@
   "fixtureTypeId": "A5095440-DC81-47FB-B32E-BB51D8D46883",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iEsprite",
-  "longName": "Robin iESPRITE®",
+  "longName": "Robin iESPRITE",
   "shortName": "iESPRITE",
-  "description": "The IP65-rated version of one Robe’s most popular products, the iESPRITE®, delivers consistent, hassle-free performance without needing complex maintenance whatever the weather or atmospheric conditions!\nThis and all other Robe iSeries fixtures dramatically reduce the stress and complications associated with outdoor lighting!\nThe IP65-rated iESPRITE® combines Robe’s latest protection technology with the very in-demand ESPRITE® product maintaining identical aesthetics, output and features enabling seamless integration between the two different models if desired!\nThe ingenious ingress protection system is specifically designed to facilitate standard maintenance and preparation procedures – e.g., TRANSFERABLE ENGINE exchange and gobo replacement – on site and without any additional tools.\nTo maintain a consistently high lumen output, water, dirt, dust, haze, and smoke are repelled from the front lens with Robe’s unique ParCoat™ hydrophobic, oleophobic-resistant coating which allows easy cleaning / removal without scratching or damage.",
+  "description": "The IP65-rated version of one Robe’s most popular products, the iESPRITE, delivers consistent, hassle-free performance without needing complex maintenance whatever the weather or atmospheric conditions!\nThis and all other Robe iSeries fixtures dramatically reduce the stress and complications associated with outdoor lighting!\nThe IP65-rated iESPRITE combines Robe’s latest protection technology with the very in-demand ESPRITE product maintaining identical aesthetics, output and features enabling seamless integration between the two different models if desired!\nThe ingenious ingress protection system is specifically designed to facilitate standard maintenance and preparation procedures – e.g., TRANSFERABLE ENGINE exchange and gobo replacement – on site and without any additional tools.\nTo maintain a consistently high lumen output, water, dirt, dust, haze, and smoke are repelled from the front lens with Robe’s unique ParCoat hydrophobic, oleophobic-resistant coating which allows easy cleaning / removal without scratching or damage.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 950.0,
-  "maxLuminousIntensityCd": 3160400.0,
+  "powerConsumptionW": 870.0,
+  "maxLuminousIntensityCd": 3200000.0,
   "luminousFluxLm": 27000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 42.0,
   "weightKg": 34.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 263.6,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -71,6 +74,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -94,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -50.0,
     "max": 50.0
@@ -121,21 +126,30 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iESPRITE",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -162,14 +176,19 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [],
+  "_refs": [
+    "https://www.robe.cz/iesprite"
+  ]
 }

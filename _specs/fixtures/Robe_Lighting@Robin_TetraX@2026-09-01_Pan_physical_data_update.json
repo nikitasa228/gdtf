@@ -4,9 +4,9 @@
   "fixtureTypeId": "A6EFD99B-A079-4CAE-A21B-C600DFDBBDD8",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin TetraX",
-  "longName": "Robin TetraX™",
+  "longName": "Robin TetraX",
   "shortName": "TetraX",
-  "description": "Need something exceptional to stand out from the crowd? Something very different to create a powerful signature effect. Lack that missing X factor? Then go to the extreme with the visually sensational TetraX™!",
+  "description": "Need something exceptional to stand out from the crowd? Something very different to create a powerful signature effect. Lack that missing X factor? Then go to the extreme with the visually sensational TetraX!",
   "manufacturer": "Robe Lighting",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 320.0,
-  "maxLuminousIntensityCd": 159000.0,
-  "luminousFluxLm": 869.0,
-  "noiseLevelDb": null,
-  "weightKg": 16.3,
+  "maxLuminousIntensityCd": 970000.0,
+  "luminousFluxLm": 5300.0,
+  "noiseLevelDb": 43,
+  "weightKg": 15.7,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 191.0,
   "infinitePan": true,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -61,6 +64,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -74,7 +78,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 40.0
@@ -106,21 +111,29 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Robe Lighting Robin TetraX",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -145,13 +158,21 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/tetrax"
+  ]
 }

@@ -8,7 +8,7 @@
   "shortName": "RaccoonS420-4",
   "description": "Raccoon S420-4 is a very powerful strobe/wash combination fixture with a beam angle of 110 degrees. It has ten individually controllable sections with 42 RGBW LEDs each that deliver wash effects of up to 30,400 lumens when combined. The white part of the RGBW LEDs has a CRI of 92, which is very high for a product of this type.\n\nThe strobe effect is created by a row of 35 ultra-bright CW LEDs, each capable of strobing at 20 W for a total of 700 W of LED strobe power (over 70,000 lumens)! The strobe LEDs have a special lens to optimise the output angle. The LEDs are positioned in a line in the centre of the fixture in between the wash LEDs. They can be used in continuous output mode, but are tuned down to 12 W (over 54,200 lumens) in this mode for thermal reasons.\n\nThe LEDs are soldered onto a black PCB, so the strobes are inconspicuous when switched off. The cooling fans can be set to a slow mode to keep them whisper quiet. With the optional L bracket, the IP65-rated housing can be mounted vertically or at an angle, while still being balanced (no torque force on the mount). Other optional accessories include a top hat, a barndoor and a range of diffusers.",
   "manufacturer": "Infinity",
-  "category": "WASH",
+  "category": "STROBE",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 144000.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 860,
+  "maxLuminousIntensityCd": 20758,
+  "luminousFluxLm": 96661,
+  "noiseLevelDb": 40,
   "weightKg": 17.8,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -70,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -101,15 +106,24 @@
     }
   ],
   "pixelCount": 2,
-  "subType": "Architectural flood",
+  "subType": "Strobe/wash hybrid",
+  "fullName": "Infinity Raccoon S420-4",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -129,21 +143,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "peakCd from official photometric report \"200600_Raccoon S420 - Full On.pdf\" (https://www.highlite.com/en/mwdownloads/download/link/id/17462856) (Full On; a 40 ms strobe flash measured 26,528 cd)",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.highlite.com/en/200600-raccoon-s420-4.html",
+    "https://www.licht-produktiv.de/infinity-raccoon-s420-4_1"
+  ]
 }

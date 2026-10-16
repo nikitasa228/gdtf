@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 740,
+  "powerConsumptionW": 696,
   "maxLuminousIntensityCd": 39800,
-  "luminousFluxLm": 72981.0,
-  "noiseLevelDb": null,
+  "luminousFluxLm": 71620,
+  "noiseLevelDb": 0,
   "weightKg": 12.1,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1 TOP",
-  "panRangeDeg": 0,
+  "motorizedPanTilt": true,
+  "panRangeDeg": null,
   "tiltRangeDeg": 180.0,
   "infinitePan": null,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -71,6 +75,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -118,15 +123,23 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "Chauvet Professional Color Strike M",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "manual",
@@ -149,23 +162,26 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
     "powerSupplyType": "manual",
-    "panRangeDeg": "manual",
+    "noiseLevelDb": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [],
+  "_issues": [
+    "Fan-free (passive cooling): silent. Values for combined plate+beam. Beam angles are asymmetric (combined 98x57 deg, plate 123 deg) so beam omitted. Power 740 W max @120 V; 696 W @230 V. Power out + 'Convection' cooling from UM Rev15."
+  ],
   "_refs": [
     "https://www.chauvetprofessional.com/products/color-strike-m/"
   ]

@@ -6,7 +6,7 @@
   "gdtfName": "Exterior Dot-HP Pro",
   "longName": "Exterior Dot-HP Pro",
   "shortName": "EXTDotHPPro",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional Exterior Dot-HP Pro: LED wash (architectural rgbw dot / flood), with 114 deg beam, RGBW colour mixing, colour wheel, IP67 rated.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": null,
@@ -16,17 +16,20 @@
   },
   "frequencyRangeHz": null,
   "powerConsumptionW": 6.0,
-  "maxLuminousIntensityCd": 0.0,
-  "luminousFluxLm": 18.0,
-  "noiseLevelDb": null,
-  "weightKg": 0.4,
+  "maxLuminousIntensityCd": 12.0,
+  "luminousFluxLm": 50.0,
+  "noiseLevelDb": 0,
+  "weightKg": 0.39,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE) LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -46,6 +49,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -59,7 +63,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP67",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -30.0,
     "max": 55.0
@@ -88,20 +93,29 @@
   ],
   "pixelCount": 1,
   "subType": "Architectural RGBW dot / flood",
+  "fullName": "Martin Professional Exterior Dot-HP Pro",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "voltageRangeV": "gdtf",
     "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -120,10 +134,15 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "subType": "manual"
+    "subType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
   "_missing": [],
   "_notApplicable": [
@@ -132,6 +151,10 @@
     "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC-fed device (powered from a Martin DCE PSU / Exterior feeder); fanless."
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/exterior-dot-hp-pro"
   ]
 }

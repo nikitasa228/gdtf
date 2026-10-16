@@ -1,322 +1,47 @@
 {
  "BeamZ@BS_1200_Combi_Strobe": {},
- "BeamZ@Cobra_100_Spot": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W implausible for a 100 W LED spot, removed."
- },
- "BeamZ@Cobra_160_Spot_B-Eye": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W implausible, removed."
- },
- "BeamZ@Cobra_720_Wash": {
-  "powerConsumptionW": null,
-  "_notes": "GDTF power 850 W implausible, removed."
- },
- "BeamZ@LCB_14_C": {
-  "category": "LED BAR",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ@LCB_246_IP65": {
-  "category": "LED BAR",
-  "mains": "100-240",
-  "ipRating": "IP65",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ@MSB_640": {
-  "category": "WASH BEAM",
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "_notes": "GDTF power 3412 W invalid, removed."
- },
- "BeamZ@RB_40_RGBW": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ@RB_90_wW_RGB": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "BeamZ@Rush_Moving_Bar_RGBWcWwW": {
-  "lightSourceType": "LED",
-  "panRangeDeg": 0,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Furion_B402_Beam": {
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Infinity@Furion_FX402_Bar": {
-  "panRangeDeg": 0
- },
- "Infinity@Furion_H402_Hybrid": {
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Infinity@Furion_P402_Profile": {
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Infinity@Furion_P602_Profile": {
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Infinity@Furion_S402_Spot": {
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Infinity@Furion_S602_Spot": {
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ]
- },
- "Infinity@Furion_W402_WashBeam": {
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ],
-  "_notes": "GDTF power 45 W invalid, removed."
- },
- "Infinity@Furion_W602_WashBeam": {
-  "powerConsumptionW": null,
-  "mains": "100-240",
-  "powerSupplyType": "powerCON TRUE1 LINK",
-  "_estimated": [
-   "mains",
-   "powerSupplyType"
-  ],
-  "_notes": "GDTF power 45 W invalid, removed."
- },
- "Infinity@Raccoon_Junior_P4-7": {
-  "category": "PAR",
-  "subType": "Architectural / outdoor",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_Junior_P7-4": {
-  "category": "PAR",
-  "subType": "Architectural / outdoor",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_P14-4": {
-  "category": "PAR",
-  "subType": "Architectural / outdoor",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_P7-7": {
-  "category": "PAR",
-  "subType": "Architectural / outdoor",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_S250-4_Junior": {
-  "subType": "Architectural flood",
-  "panRangeDeg": 0,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_S420-4": {
-  "subType": "Architectural flood",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_W18-4_Junior": {
-  "category": "LED BAR",
-  "subType": "Architectural wall-washer",
-  "panRangeDeg": 0,
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Infinity@Raccoon_W40-4": {
-  "category": "LED BAR",
-  "subType": "Architectural wall-washer",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ],
-  "description": "Infinity Raccoon W40-4: outdoor RGBL LED wall-washer / linear flood."
- },
- "Terbly@A51-E": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@A51C": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@BPAR3Q-R": {
-  "subType": "Battery PAR",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@BPAR5QB-R": {
-  "subType": "Battery PAR",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@C5": {
-  "category": "LED BAR",
-  "subType": "Cyclorama",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@ELV-G1-RGB": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@ELV-G1-RGBW": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@ELV-G4-RGB": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@ELV-G4-RGBW": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@F250": {
-  "subType": "Fresnel",
-  "lensType": "Fresnel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@F90-CW": {
-  "subType": "Fresnel",
-  "lensType": "Fresnel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@F90-WW": {
-  "subType": "Fresnel",
-  "lensType": "Fresnel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@GLW1940": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@LPAR7QZ": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@LPAR_1Q": {
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@T200C_IP_26Deg": {
-  "category": "PROFILE",
-  "lensType": "Ellipsoidal (Profile)",
-  "framingShutters": true,
-  "framingShutterBlades": 4,
-  "mains": "100-240",
-  "ipRating": "IP65",
-  "_estimated": [
-   "mains",
-   "framingShutters",
-   "framingShutterBlades"
-  ]
- },
- "Terbly@TP01CW": {
-  "subType": "Soft light panel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- },
- "Terbly@TP01WW": {
-  "subType": "Soft light panel",
-  "mains": "100-240",
-  "_estimated": [
-   "mains"
-  ]
- }
+ "BeamZ@Cobra_100_Spot": {"powerConsumptionW": null, "_notes": "GDTF power 850 W implausible for a 100 W LED spot, removed."},
+ "BeamZ@Cobra_160_Spot_B-Eye": {"powerConsumptionW": null, "_notes": "GDTF power 850 W implausible, removed."},
+ "BeamZ@Cobra_720_Wash": {"powerConsumptionW": null, "_notes": "GDTF power 850 W implausible, removed."},
+ "BeamZ@LCB_14_C": {"category": "LED BAR", "mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ@LCB_246_IP65": {"category": "LED BAR", "mains": "100-240", "ipRating": "IP65", "_estimated": ["mains"]},
+ "BeamZ@MSB_640": {"category": "WASH BEAM", "powerConsumptionW": null, "mains": "100-240", "_estimated": ["mains"], "_notes": "GDTF power 3412 W invalid, removed."},
+ "BeamZ@RB_40_RGBW": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ@RB_90_wW_RGB": {"mains": "100-240", "_estimated": ["mains"]},
+ "BeamZ@Rush_Moving_Bar_RGBWcWwW": {"lightSourceType": "LED", "panRangeDeg": 0, "mains": "100-240", "_estimated": ["mains"]},
+ "Infinity@Furion_B402_Beam": {"mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"]},
+ "Infinity@Furion_FX402_Bar": {"panRangeDeg": 0},
+ "Infinity@Furion_H402_Hybrid": {"mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"]},
+ "Infinity@Furion_P402_Profile": {"mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"]},
+ "Infinity@Furion_P602_Profile": {"mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"]},
+ "Infinity@Furion_S402_Spot": {"mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"]},
+ "Infinity@Furion_S602_Spot": {"mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"]},
+ "Infinity@Furion_W402_WashBeam": {"powerConsumptionW": null, "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"], "_notes": "GDTF power 45 W invalid, removed."},
+ "Infinity@Furion_W602_WashBeam": {"powerConsumptionW": null, "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "_estimated": ["mains", "powerSupplyType"], "_notes": "GDTF power 45 W invalid, removed."},
+ "Infinity@Raccoon_Junior_P4-7": {"category": "PAR", "subType": "Architectural / outdoor", "mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 90, "weightKg": 4.5, "_refs": ["https://www.highlite.com/en/200551-raccoon-junior-p4-7.html"]},
+ "Infinity@Raccoon_Junior_P7-4": {"category": "PAR", "subType": "Architectural / outdoor", "mains": "100-240", "_estimated": ["mains"]},
+ "Infinity@Raccoon_P14-4": {"category": "PAR", "subType": "Architectural / outdoor", "mains": "100-240", "_estimated": ["mains"]},
+ "Infinity@Raccoon_P7-7": {"category": "PAR", "subType": "Architectural / outdoor", "mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 150, "weightKg": 6.0, "_refs": ["https://www.highlite.com/en/200550-raccoon-p7-7.html"]},
+ "Infinity@Raccoon_S250-4_Junior": {"subType": "Architectural flood", "panRangeDeg": 0, "mains": "100-240", "_estimated": ["mains"]},
+ "Infinity@Raccoon_S420-4": {"subType": "Strobe/wash hybrid", "mains": "100-240", "_estimated": ["mains"], "category": "STROBE", "powerConsumptionW": 860, "weightKg": 17.8, "_refs": ["https://www.licht-produktiv.de/infinity-raccoon-s420-4_1"]},
+ "Infinity@Raccoon_W18-4_Junior": {"category": "LED BAR", "subType": "Architectural wall-washer", "panRangeDeg": 0, "mains": "100-240", "_estimated": ["mains"]},
+ "Infinity@Raccoon_W40-4": {"category": "LED BAR", "subType": "Architectural wall-washer", "mains": "100-240", "_estimated": ["mains"], "description": "Infinity Raccoon W40-4: outdoor RGBL LED wall-washer / linear flood.", "powerConsumptionW": 825, "weightKg": 16.8, "_refs": ["https://www.highlite.com/en/200610-raccoon-w40-4.html"]},
+ "Terbly@A51-E": {"mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@A51C": {"mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@BPAR3Q-R": {"subType": "Battery PAR", "mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@BPAR5QB-R": {"subType": "Battery PAR", "mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@C5": {"category": "LED BAR", "subType": "Cyclorama", "mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@ELV-G1-RGB": {"mains": "100-240", "_estimated": ["mains"], "category": "LED BAR", "subType": "Linear graze light", "powerConsumptionW": 20, "weightKg": 1.5, "ipRating": "IP66", "_refs": ["http://en.terbly.com/index.php/Product/detail/goods_id/113"]},
+ "Terbly@ELV-G1-RGBW": {"mains": "100-240", "_estimated": ["mains"], "category": "LED BAR", "subType": "Linear graze light", "powerConsumptionW": 20, "weightKg": 1.5, "ipRating": "IP66", "_refs": ["http://en.terbly.com/index.php/Product/detail/goods_id/113"]},
+ "Terbly@ELV-G4-RGB": {"mains": "100-240", "_estimated": ["mains"], "category": "LED BAR", "subType": "Linear graze light", "powerConsumptionW": 80, "weightKg": 6.0, "ipRating": "IP66", "_refs": ["http://en.terbly.com/index.php/Product/detail/goods_id/113"]},
+ "Terbly@ELV-G4-RGBW": {"mains": "100-240", "_estimated": ["mains"], "category": "LED BAR", "subType": "Linear graze light", "powerConsumptionW": 80, "weightKg": 6.0, "ipRating": "IP66", "_refs": ["http://en.terbly.com/index.php/Product/detail/goods_id/113"]},
+ "Terbly@F250": {"subType": "Fresnel", "lensType": "Fresnel", "mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@F90-CW": {"subType": "Fresnel", "lensType": "Fresnel", "mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 200, "weightKg": 12.5, "_refs": ["http://en.terbly.com/index.php/Product/detail/goods_id/64"]},
+ "Terbly@F90-WW": {"subType": "Fresnel", "lensType": "Fresnel", "mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 200, "weightKg": 12.5, "_refs": ["http://en.terbly.com/index.php/Product/detail/goods_id/64"]},
+ "Terbly@GLW1940": {"mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 900, "weightKg": 16.0, "_refs": ["https://en.terbly.com/index.php/Product/detail/goods_id/163"]},
+ "Terbly@LPAR7QZ": {"mains": "100-240", "_estimated": ["mains"], "powerConsumptionW": 290, "weightKg": 6.8, "_refs": ["https://www.bespokesolutions.co.za/LPAR7QZ-stage-lighting.html"]},
+ "Terbly@LPAR_1Q": {"mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@T200C_IP_26Deg": {"category": "PROFILE", "lensType": "Ellipsoidal (Profile)", "framingShutters": true, "framingShutterBlades": 4, "mains": "100-240", "ipRating": "IP65", "_estimated": ["mains", "framingShutters", "framingShutterBlades"]},
+ "Terbly@TP01CW": {"subType": "Soft light panel", "mains": "100-240", "_estimated": ["mains"]},
+ "Terbly@TP01WW": {"subType": "Soft light panel", "mains": "100-240", "_estimated": ["mains"]}
 }

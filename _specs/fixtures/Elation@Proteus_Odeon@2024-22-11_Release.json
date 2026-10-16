@@ -6,24 +6,38 @@
   "gdtfName": "Proteus Odeon",
   "longName": "Proteus Odeon",
   "shortName": "Proteus Odeon",
-  "description": "The PROTEUS ODEON™ is a powerful yet compact IP66-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\n\nProviding up to 30800 lumens output from its custom-designed Variable CRI LED engine, the PROTEUS ODEON is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. \nThe TruTone variable CRI allows selecting the best blend of light output and color accuracy, depending on the requirement of the show or scene. It is seamlessly adjustable from CRI 70 to CRI 93.\n\nPROTEUS ODEON provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.\n\nWith a fast zoom range from 5.5° to 50° out of an impressively compact fixture design, the PROTEUS ODEON has the power to cut through and make a statement on any stage. Fully sealed from dust and water, it is a rugged fixture for a wide variety of applications.\n\nThe PROTEUS ODEON ships in a cardboard box with a custom-fitted polyurethane foam FIL (Foam In Lay) insert. The foam insert easily fits into a custom flight case (not included) and provides enhanced impact protection during transport.",
+  "description": "The PROTEUS ODEON is a powerful yet compact IP66-rated LED profile fixture offering outstanding projection and beam qualities in any environment.\n\nProviding up to 30800 lumens output from its custom-designed Variable CRI LED engine, the PROTEUS ODEON is the ideal fixture for any outdoor or indoor application requiring superior output, bright and powerful beams, and quiet operation, as well as stunningly precise gobos and colors. \nThe TruTone variable CRI allows selecting the best blend of light output and color accuracy, depending on the requirement of the show or scene. It is seamlessly adjustable from CRI 70 to CRI 93.\n\nPROTEUS ODEON provides the designer a comprehensive FX package with 13 rotating and 7 fixed glass gobos, full animation wheel, overlapping dual prisms, dual frost and a high-speed iris. Its indexable framing system allows full-blackout shutter cuts for precise beam shape control.\n\nWith a fast zoom range from 5.5° to 50° out of an impressively compact fixture design, the PROTEUS ODEON has the power to cut through and make a statement on any stage. Fully sealed from dust and water, it is a rugged fixture for a wide variety of applications.\n\nThe PROTEUS ODEON ships in a cardboard box with a custom-fitted polyurethane foam FIL (Foam In Lay) insert. The foam insert easily fits into a custom flight case (not included) and provides enhanced impact protection during transport.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 850.0,
-  "maxLuminousIntensityCd": 2979600.0,
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 120.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1500.0,
+  "maxLuminousIntensityCd": 2073030.0,
   "luminousFluxLm": 30800.0,
-  "noiseLevelDb": null,
-  "weightKg": 42.0,
-  "powerConnectorIn": "powerCON TRUE1",
+  "noiseLevelDb": 48,
+  "weightKg": 43.4,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
-  "panRangeDeg": 540.0,
-  "tiltRangeDeg": 270.0,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": true,
+  "panRangeDeg": 630.0,
+  "tiltRangeDeg": 250.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -62,6 +76,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -85,6 +100,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -108,20 +124,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Odeon",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "panRangeDeg": "manual",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -146,17 +171,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-odeon",
+    "https://assets.centryngroup.com/dl/files/PRO621__DL__011.pdf",
+    "https://goknight.com/elation-pro621-proteus-odeon-ip66-rated-led-profile-fixture/"
   ]
 }

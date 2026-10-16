@@ -6,7 +6,7 @@
   "gdtfName": "MAC Quantum Profile",
   "longName": "MAC Quantum Profile",
   "shortName": "MACQuaPro",
-  "description": "Official Martin Professional File (no measurements)",
+  "description": "Martin Professional MAC Quantum Profile: moving-head LED spot, with 12-36 deg zoom, CMY colour mixing, colour wheel, 16 gobos, prism.",
   "manufacturer": "Martin Professional",
   "category": "SPOT",
   "supportedPowerNetworks": [
@@ -23,18 +23,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 575.0,
-  "maxLuminousIntensityCd": 260300.0,
-  "luminousFluxLm": 12800.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 750.0,
+  "maxLuminousIntensityCd": 260000.0,
+  "luminousFluxLm": 12700.0,
+  "noiseLevelDb": 43,
   "weightKg": 23.2,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 268.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -66,9 +69,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -81,7 +88,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
     "max": 40.0
@@ -97,21 +105,30 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional MAC Quantum Profile",
+  "gdtfDescription": "Official Martin Professional File (no measurements)",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -137,14 +154,23 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-quantum-profile"
+  ]
 }

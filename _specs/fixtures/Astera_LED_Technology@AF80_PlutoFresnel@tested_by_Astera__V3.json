@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 80,
-  "maxLuminousIntensityCd": 4000.0,
-  "luminousFluxLm": 4860.0,
-  "noiseLevelDb": null,
-  "weightKg": 4.5,
-  "powerConnectorIn": "powerCON TRUE1",
+  "maxLuminousIntensityCd": 38200,
+  "luminousFluxLm": 2847,
+  "noiseLevelDb": 30,
+  "weightKg": 4.637,
+  "powerConnectorIn": "DC Jack",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "DC Jack",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,6 +60,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWA",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -70,7 +74,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP55",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -319,6 +324,14 @@
   ],
   "pixelCount": 2,
   "subType": "Fresnel",
+  "fullName": "Astera LED Technology AF80 PlutoFresnel",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -326,9 +339,9 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",
@@ -348,25 +361,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Power consumption (max.) 80 W; DC input only (24 VDC). IP55 only with PB15-PLG / PWB cables. Weight with Fresnel lens and barndoor. Lux at 5500 K, 15°.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://astera-led.com/products/plutofresnel/specs/",
     "https://astera-led.com/casting-light-on-our-new-fresnel-range/"
   ]
 }

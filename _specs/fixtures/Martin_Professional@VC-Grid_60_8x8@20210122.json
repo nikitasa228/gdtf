@@ -6,24 +6,27 @@
   "gdtfName": "VC-Grid 60 8x8",
   "longName": "VC-Grid 60 8x8",
   "shortName": "VCG60 8x8",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VC-Grid 60 8x8: device (led video pixel / matrix), with 110 deg beam, RGB colour mixing.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
   "powerConsumptionW": 25.0,
-  "maxLuminousIntensityCd": 100.0,
+  "maxLuminousIntensityCd": 140.0,
   "luminousFluxLm": 518.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 0.5,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE)",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "Ethernet (Martin P3)"
   ],
@@ -41,6 +44,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -54,7 +58,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -139,16 +144,25 @@
   ],
   "pixelCount": 64,
   "subType": "LED video pixel / matrix",
+  "fullName": "Martin Professional VC-Grid 60 8x8",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -167,24 +181,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "supportedPowerNetworks",
     "lensType",
-    "lensType"
+    "supportedPowerNetworks"
   ],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white. Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vc-grid-60",
+    "https://www.martin.com/en-US/site_elements/martin-vc-grid-spec-sheet-english"
   ]
 }

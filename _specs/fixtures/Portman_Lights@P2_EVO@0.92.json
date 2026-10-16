@@ -26,24 +26,30 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 456.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 360000.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "powerConsumptionW": 300,
+  "maxLuminousIntensityCd": 10000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 35,
+  "weightKg": 12.5,
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 60.0,
+    "max": 60.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Wash",
@@ -52,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -65,7 +72,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -98,13 +106,21 @@
   ],
   "pixelCount": 12,
   "subType": "Retro LED",
+  "fullName": "Portman Lights P2 EVO",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
+    "powerConsumptionW": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
     "zoom": "gdtf-derived",
@@ -122,26 +138,35 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated",
-    "description": "gdtf-derived"
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "description": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Weight is 0 in GDTF",
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "6x60W dim-to-warm haloLED + 6x12W RGBW glow. CCT is the dim-to-warm range. Index had 456 W / 13.2 kg.",
+    "GDTF luminous flux 360000 lm is implausible for 300 W and was dropped",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://portmanlights.com/luminaires/p2-evo/"
   ]
 }

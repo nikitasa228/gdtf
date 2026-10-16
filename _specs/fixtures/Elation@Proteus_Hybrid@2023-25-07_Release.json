@@ -4,26 +4,43 @@
   "fixtureTypeId": "59B6703A-8D7F-41CC-B0FA-0A7451A72043",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Proteus Hybrid",
-  "longName": "Elation Professional Proteus_Hybrid",
+  "longName": "Professional Proteus Hybrid",
   "shortName": "Proteus_Hybrid",
-  "description": "PROTEUS HYBRID™ is an IP65 rated 3-in-1 hybrid moving head beam, spot, and wash luminaire with the Philips™ MSD Platinum 21R 470W 80 CRI 8,000K lamp producing up to14,000 lumens. Features include an advanced optical system with motorized zoom from 2° in beam mode to 38° in spot mode or 40° in wash mode, an advanced internal thermal cooling system, full CMY and linear CTO color mixing, 14 dichroic colors including CTB, CTO, and UV, 8 rotating glass interchangeable and 14 static-stamped metal gobos, full 360° bi-directional animation wheel, 8-facet and linear rotating prisms and frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 ethernet in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "PROTEUS HYBRID is an IP65 rated 3-in-1 hybrid moving head beam, spot, and wash luminaire with the Philips MSD Platinum 21R 470W 80 CRI 8,000K lamp producing up to14,000 lumens. Features include an advanced optical system with motorized zoom from 2° in beam mode to 38° in spot mode or 40° in wash mode, an advanced internal thermal cooling system, full CMY and linear CTO color mixing, 14 dichroic colors including CTB, CTO, and UV, 8 rotating glass interchangeable and 14 static-stamped metal gobos, full 360° bi-directional animation wheel, 8-facet and linear rotating prisms and frost filter, motorized focus and auto-focus, high speed mechanical shutter and strobe, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation’s E-FLY internal wireless DMX transceiver, IP rated 5pin XLR and RJ45 ethernet in/out connections, IP65 Locking Power Cable in, full color 180° reversible menu display with 6 button touch control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 470.0,
-  "maxLuminousIntensityCd": 9610200.0,
-  "luminousFluxLm": 13138.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 700.0,
+  "maxLuminousIntensityCd": 10000000.0,
+  "luminousFluxLm": 14000.0,
+  "noiseLevelDb": 47,
   "weightKg": 38.0,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -59,6 +76,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -86,6 +104,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -117,18 +136,26 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Professional Proteus Hybrid",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -155,17 +182,25 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-hybrid"
   ]
 }

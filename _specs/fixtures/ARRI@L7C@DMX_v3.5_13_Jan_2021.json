@@ -4,9 +4,9 @@
   "fixtureTypeId": "58A6CD9B-01CE-4D33-BA7D-D41ED53D1070",
   "gdtfDataVersion": "1.1",
   "gdtfName": "L7C",
-  "longName": "ARRI L7C",
+  "longName": "L7C",
   "shortName": "L7C",
-  "description": "Arri L7C Fresnel",
+  "description": "ARRI L7C: LED wash (fresnel), with 15-50 deg zoom, RGBW colour mixing.",
   "manufacturer": "ARRI",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 220,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 67600,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 8.7,
+  "noiseLevelDb": 35,
+  "weightKg": 8.2,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -69,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -118,17 +123,27 @@
   ],
   "pixelCount": 1,
   "subType": "Fresnel",
+  "fullName": "ARRI L7C",
+  "gdtfDescription": "Arri L7C Fresnel",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "manual",
-    "beamAngleDeg": "estimated",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "manual",
     "lensType": "manual",
@@ -145,26 +160,30 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Lux: spot 15 deg, 5600 K, 3 m (698 fc). Weight manual version; power connection wording from arri.com L7-C tech data.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.arri.com/resource/blob/31098/dcc9384184e8e310d186423d279f97df/arri-l-series-l7-data-sheet-en-data.pdf",
     "https://www.markertek.com/Attachments/Specifications/ARRI/L7-Specifications.pdf"
   ]
 }

@@ -34,10 +34,13 @@
   "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "Fixed Cable LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 450.0,
-  "tiltRangeDeg": null,
+  "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -55,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -65,7 +69,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -78,6 +83,14 @@
   ],
   "pixelCount": 0,
   "subType": "Rotating screen / media spinner",
+  "fullName": "Robe Lighting MediaSpinner 100 AT",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -87,11 +100,12 @@
     "supportedPowerNetworks": "gdtf-derived",
     "voltageRangeV": "gdtf",
     "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
+    "powerConsumptionW": "manual",
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerConnectorOut": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -109,16 +123,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "lightSourceType": "manual"
+    "lightSourceType": "manual",
+    "fullName": "gdtf-derived",
+    "tiltRangeDeg": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb",
-    "tiltRangeDeg"
+  "_missing": [],
+  "_notApplicable": [
+    "noiseLevelDb"
   ],
-  "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): tiltRangeDeg, ipRating"
+  ],
+  "_refs": [
+    "https://www.robe.cz/mediaspinner-100-at"
+  ]
 }

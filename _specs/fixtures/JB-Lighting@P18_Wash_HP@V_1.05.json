@@ -6,7 +6,7 @@
   "gdtfName": "P18 Wash HP",
   "longName": "P18 Wash HP",
   "shortName": "P18WAHP",
-  "description": "P18 Wash HP (High Power) 1000W",
+  "description": "JB-Lighting P18 Wash HP: moving-head LED wash (framing wash), with 13-65 deg zoom, CMY colour mixing, colour wheel, framing shutters, frost.",
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1100.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 61500.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 1200.0,
+  "maxLuminousIntensityCd": 590000.0,
+  "luminousFluxLm": 34000.0,
+  "noiseLevelDb": 29.0,
   "weightKg": 31.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": "powerCON TRUE1",
   "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 546.7,
   "tiltRangeDeg": 281.2,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "Ethernet (Art-Net/sACN)"
@@ -59,6 +62,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Barn doors",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -72,7 +76,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 45.0
@@ -89,18 +94,28 @@
   ],
   "pixelCount": 1,
   "subType": "Framing wash",
+  "fullName": "JB-Lighting P18 Wash HP",
+  "gdtfDescription": "P18 Wash HP (High Power) 1000W",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -124,21 +139,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating"
+  ],
+  "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/P18_Wash_Catalogue_engl.pdf",
+    "https://www.jb-lighting.de/index.php?lang=EN&product=P18+Profile&site=produkte"
   ]
 }

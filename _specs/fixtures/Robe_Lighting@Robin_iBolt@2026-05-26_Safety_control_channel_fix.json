@@ -4,9 +4,9 @@
   "fixtureTypeId": "FBFFF6D8-F564-434E-A9A0-20A2BA37063B",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iBolt",
-  "longName": "Robin iBolt™",
+  "longName": "Robin iBolt",
   "shortName": "iBolt",
-  "description": "Note: The iBolt cannot be programmed in the Stage mode and then used in the Sky mode and vice versa!\niBOLT™\nThe time has come to replace your antiquated discharge sourced outdoor aerial effect luminaires with a new generation Searchlight and Skyflower fixture, to make outdoor lighting statements like never before!",
+  "description": "Note: The iBolt cannot be programmed in the Stage mode and then used in the Sky mode and vice versa!\niBOLT\nThe time has come to replace your antiquated discharge sourced outdoor aerial effect luminaires with a new generation Searchlight and Skyflower fixture, to make outdoor lighting statements like never before!",
   "manufacturer": "Robe Lighting",
   "category": "BEAM",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 700.0,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 412500000.0,
   "luminousFluxLm": 26800.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 54.4,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": true,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -72,6 +75,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -110,7 +114,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -50.0,
     "max": 50.0
@@ -122,20 +127,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin iBolt",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -162,14 +176,21 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ibolt"
+  ]
 }

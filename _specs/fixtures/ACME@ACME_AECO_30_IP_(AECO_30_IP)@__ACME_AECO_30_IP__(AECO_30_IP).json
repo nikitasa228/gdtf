@@ -6,7 +6,7 @@
   "gdtfName": "ACME AECO 30 IP (AECO 30 IP)",
   "longName": "AECO 30 IP",
   "shortName": "AECO 30 IP",
-  "description": "ACME (AECO 30 IP)1800W",
+  "description": "ACME AECO 30 IP: moving-head LED profile, with 4-48 deg zoom, CMY colour mixing, colour wheel, 12 gobos, framing shutters, prism, frost, IP66 rated.",
   "manufacturer": "ACME",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -23,17 +23,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 2265,
-  "maxLuminousIntensityCd": null,
+  "maxLuminousIntensityCd": 2540000,
   "luminousFluxLm": 43000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 52.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": "powerCON TRUE1 TOP",
   "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -64,6 +67,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -87,6 +91,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -110,15 +115,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME AECO 30 IP",
+  "gdtfDescription": "ACME (AECO 30 IP)1800W",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -143,6 +158,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -151,17 +167,19 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Lux from AECO 30 IP Leaflet.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-30-IP"

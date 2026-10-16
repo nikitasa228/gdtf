@@ -6,24 +6,41 @@
   "gdtfName": "Artiste Picasso",
   "longName": "Artiste Picasso",
   "shortName": "ArtPic",
-  "description": "The Artiste Picasso™ is a full-featured innovative theatrical-grade luminaire featuring a new 620W 6,800K Cool White LED engine with advanced optics that deliver over 23,000 total lumen output, ultra wide and fast 7° to 55° zoom, a full CMY color mixing system producing a full spectrum of shades from pastels to rich saturated colors, linear CTO color correction, 6 dichroic colors including a high 87 CRI filter, 7 rotating/indexing glass and 7 static-stamped metal interchangeable gobos, 4 rotating full blackout framing blades with +/- 45° individual blade rotation, full 360° bi-directional animation wheel, 4-facet and linear rotating prisms and 2 frost filters, internal color, framing, prism, and frost macros, motorized iris with variable pulse effects, motorized focus and auto-focus feature, 16-bit pan, tilt, and dimming control, variable dimming curve modes, high speed electronic shutter and strobe, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, silent fan mode for noise-sensitive applications, DMX, RDM (Remote Device Management), Art-NET™, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, and power connections, full color 180° reversible LCD control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The Artiste Picasso is a full-featured innovative theatrical-grade luminaire featuring a new 620W 6,800K Cool White LED engine with advanced optics that deliver over 23,000 total lumen output, ultra wide and fast 7° to 55° zoom, a full CMY color mixing system producing a full spectrum of shades from pastels to rich saturated colors, linear CTO color correction, 6 dichroic colors including a high 87 CRI filter, 7 rotating/indexing glass and 7 static-stamped metal interchangeable gobos, 4 rotating full blackout framing blades with +/- 45° individual blade rotation, full 360° bi-directional animation wheel, 4-facet and linear rotating prisms and 2 frost filters, internal color, framing, prism, and frost macros, motorized iris with variable pulse effects, motorized focus and auto-focus feature, 16-bit pan, tilt, and dimming control, variable dimming curve modes, high speed electronic shutter and strobe, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, silent fan mode for noise-sensitive applications, DMX, RDM (Remote Device Management), Art-NET, and sACN protocol support, Elation’s E-FLY internal wireless DMX transceiver, locking 5pin XLR DMX, RJ45 ethernet, and power connections, full color 180° reversible LCD control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 620.0,
-  "maxLuminousIntensityCd": 2090500.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1000.0,
+  "maxLuminousIntensityCd": 1127376.0,
   "luminousFluxLm": 35000.0,
-  "noiseLevelDb": null,
-  "weightKg": 36.2,
+  "noiseLevelDb": 48,
+  "weightKg": 38.1,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 246.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -58,6 +75,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -80,7 +98,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -104,18 +123,27 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Artiste Picasso",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -142,16 +170,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/artiste-picasso",
+    "https://assets.centryngroup.com/dl/files/EAP325__DL__012.pdf"
   ]
 }

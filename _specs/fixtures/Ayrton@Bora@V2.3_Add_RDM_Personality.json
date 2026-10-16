@@ -6,7 +6,7 @@
   "gdtfName": "Bora",
   "longName": "Bora",
   "shortName": "Bora",
-  "description": "New Option from V221",
+  "description": "Ayrton Bora: moving-head LED profile, with 8-64 deg zoom, CMY colour mixing, colour wheel, 6 gobos, framing shutters, frost.",
   "manufacturer": "Ayrton",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -23,18 +23,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1150.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 40000.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 1150,
+  "maxLuminousIntensityCd": 2103400,
+  "luminousFluxLm": 40000,
+  "noiseLevelDb": 45.6,
   "weightKg": 37.8,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 542.1,
   "tiltRangeDeg": 263.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -64,6 +67,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -77,7 +81,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -97,20 +102,30 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Ayrton Bora",
+  "gdtfDescription": "New Option from V221",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -135,16 +150,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Bora S (standard) values: 40,000 lm, 6800K output (Bora TC: 31,000 lm, 6200K). Lux and auto-mode noise from Bora S photometry https://www.ayrton.eu/wp-content/uploads/2015/02/Bora-S_Photometry.pdf (min zoom, auto mode). Variable CTO, range not stated."
+  ],
+  "_refs": [
+    "https://www.ayrton.eu/produit/bora/"
   ]
 }

@@ -6,24 +6,41 @@
   "gdtfName": "Fuze Teatro",
   "longName": "Fuze Teatro",
   "shortName": "FzTeatro",
-  "description": "The FUZE TEATRO™ is a silent fanless full spectrum automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications.\nThe 92 CRI engine utilizes an 480W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of up to 15,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY or RGB emulation provide the designer with immediate access to the impressive LED color array.",
+  "description": "The FUZE TEATRO is a silent fanless full spectrum automated LED framing fixture designed for theater, television and a wide array of other precision lighting applications.\nThe 92 CRI engine utilizes an 480W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of up to 15,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY or RGB emulation provide the designer with immediate access to the impressive LED color array.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 480.0,
-  "maxLuminousIntensityCd": 895900.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 725.0,
+  "maxLuminousIntensityCd": 704185.0,
   "luminousFluxLm": 15000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 19.0,
   "weightKg": 36.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
-  "tiltRangeDeg": 270.0,
+  "tiltRangeDeg": 250.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -53,6 +70,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -75,7 +93,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -131,18 +150,27 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Teatro",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -166,17 +194,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+  "_issues": [],
+  "_refs": [
+    "https://www.elationlighting.com/products/fuze-teatro",
+    "https://assets.centryngroup.com/dl/files/FUZ625__DL__004.pdf"
   ]
 }

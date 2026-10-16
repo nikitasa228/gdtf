@@ -4,9 +4,9 @@
   "fixtureTypeId": "3D8B5A00-C2E6-46D0-973A-4E46E569F780",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME AECO 15",
-  "longName": "ACME AECO 15",
+  "longName": "AECO 15",
   "shortName": "AECO 15",
-  "description": "ACME AECO 15 1580W",
+  "description": "ACME AECO 15: moving-head LED profile, with 5-52 deg zoom, CMY colour mixing, colour wheel, 15 gobos, framing shutters, prism, frost.",
   "manufacturer": "ACME",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 1555,
-  "maxLuminousIntensityCd": 2718000.0,
+  "maxLuminousIntensityCd": 2047600,
   "luminousFluxLm": 33500,
-  "noiseLevelDb": null,
-  "weightKg": 43.0,
+  "noiseLevelDb": 48,
+  "weightKg": 43,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -67,6 +70,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -86,6 +90,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -109,16 +114,26 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME AECO 15",
+  "gdtfDescription": "ACME AECO 15 1580W",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -144,6 +159,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -153,14 +169,16 @@
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Lux from AECO 15 Leaflet (5 deg, 5 m).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/AECO-15"

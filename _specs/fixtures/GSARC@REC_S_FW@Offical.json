@@ -4,26 +4,43 @@
   "fixtureTypeId": "A9815D8D-60E1-455D-9D40-B0E9950EE7AD",
   "gdtfDataVersion": "1.0",
   "gdtfName": "REC S FW",
-  "longName": "GSARC_REC S FW",
+  "longName": "REC S FW",
   "shortName": "REC S FW",
   "description": "REC is a new architectural outdoor flood lighting series. 2 models fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 10.0,
-  "maxLuminousIntensityCd": 11700.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 277.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 140,
+  "maxLuminousIntensityCd": 12000.0,
   "luminousFluxLm": 100.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
+  "noiseLevelDb": 30,
+  "weightKg": 8.83,
+  "powerConnectorIn": "Fixed Cable",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "Fixed Cable",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -64,16 +83,26 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Architectural floodlight",
+  "fullName": "GSARC REC S FW",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
+    "category": "manual",
+    "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "estimated",
     "luminousFluxLm": "gdtf",
-    "controlSignal": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "controlSignal": "estimated",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
@@ -85,24 +114,34 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf",
+    "colorTemperatureK": "manual",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "ipRating": "manual",
+    "subType": "manual",
+    "weightKg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "http://en.gsarc.com/Product/detail/article_id/287.html"
   ]
 }

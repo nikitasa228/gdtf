@@ -6,10 +6,12 @@
   "gdtfName": "A8",
   "longName": "A8",
   "shortName": "A8",
-  "description": "A8",
+  "description": "JB-Lighting A8: moving-head LED wash, with 8-48 deg zoom, RGBW colour mixing, colour wheel.",
   "manufacturer": "JB-Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
     "110/120 V - 60 Hz",
     "110/120 V - 50 Hz",
     "220/230 V - 50 Hz",
@@ -17,7 +19,7 @@
     "240/245 V - 50 Hz"
   ],
   "voltageRangeV": {
-    "min": 110.0,
+    "min": 100.0,
     "max": 240.0
   },
   "frequencyRangeHz": {
@@ -25,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 500.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 92000.0,
-  "noiseLevelDb": null,
-  "weightKg": 10.5,
+  "maxLuminousIntensityCd": 910000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 43,
+  "weightKg": 11.0,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": "powerCON",
   "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 433.6,
   "tiltRangeDeg": 333.3,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -56,6 +61,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -69,7 +75,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 45.0
@@ -93,21 +100,30 @@
     }
   ],
   "pixelCount": 3,
+  "fullName": "JB-Lighting A8",
+  "gdtfDescription": "A8",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerConnectorOut": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -131,16 +147,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "GDTF luminous flux 92000 lm is implausible for 500 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.jb-lighting.de/download/Prospekt/JB-Lighting_A8_Catalog.pdf",
+    "https://saleswl.com/product/jb-lighting-a8-tw-rgbw/"
   ]
 }

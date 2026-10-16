@@ -9,21 +9,38 @@
   "description": "Unleash the full potential of LED batten lighting and ignite your creative spark with the new SIX+ BAR S! \nThe SIX+ BAR S represents an innovative line of creative LED batten solutions that harmonizes the latest in LED color technology with versatile design for greater artistic expression. An upgrade of Elation’s beloved SixBar 500, the SIX+ BAR S raises the bar with more output, a broader color spectrum and an overall superior quality of light. \nEquipped with 20W RGB+Lime+Amber+UV LEDs and boasting an impressive CRI of 93, the SIX+ BAR S offers a stunning array of colors, ensuring a beautifully homogenized wash of light with high-quality color reproduction. Its meticulously engineered optical system ensures even light distribution, and the proprietary RGBLA+UV engine delivers high-fidelity whites and intense primaries with no color fringing. Extra-large 50 mm lenses make it ideal for direct view applications and individual cell control opens up for a myriad of design possibilities.",
   "manufacturer": "Elation",
   "category": "LED BAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 240.0,
-  "maxLuminousIntensityCd": 57000.0,
-  "luminousFluxLm": 6792.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 110.0,
+  "maxLuminousIntensityCd": 34976.0,
+  "luminousFluxLm": 4000.0,
+  "noiseLevelDb": 30,
   "weightKg": 6.75,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -15.0,
     "max": 40.0
@@ -147,16 +166,24 @@
     }
   ],
   "pixelCount": 24,
+  "fullName": "Elation SIX+ BAR S",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -176,17 +203,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/six-bar-s",
+    "https://assets.centryngroup.com/dl/files/Six_BarS_OptionalLensesPhotometricTestReport.pdf",
+    "https://assets.centryngroup.com/dl/files/Six_BarS_PhotometricTestReport.pdf"
   ]
 }

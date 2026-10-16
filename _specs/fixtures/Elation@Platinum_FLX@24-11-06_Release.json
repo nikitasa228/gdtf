@@ -6,31 +6,48 @@
   "gdtfName": "Platinum FLX",
   "longName": "Platinum FLX",
   "shortName": "PlatFlx",
-  "description": "The award winning Platinum FLX™ is an innovative full featured patent pending design 3-in-1 luminaire which can be utilized as a beam, spot, or wash fixture, featuring the brand new Philips™ MSD Platinum 20R 470W 80CRI lamp, 7,800K, 23,000 total lumens delivering comparable output to 1,200W fixtures, 1.8° to 18° zoom in beam mode and 2.9° to 25° zoom in spot mode, 6° - 42° zoomable wash / frost effect, full CMY color mixing plus linear CTO color correction, 10 dichroic colors including UV, CTB, plus white (open), 8 rotating-interchangeable and 6 static-stamped gobos, 6-way linear and 8-facet rotating prisms, bi-directional animation wash frost effects, DMX, RDM (Remote Device Management), Art-NET and sACN support, 5pin DMX, RJ45 Ethernet, and power connections, (6) button control full color 180° reversible menu display, 740W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The award winning Platinum FLX is an innovative full featured patent pending design 3-in-1 luminaire which can be utilized as a beam, spot, or wash fixture, featuring the brand new Philips MSD Platinum 20R 470W 80CRI lamp, 7,800K, 23,000 total lumens delivering comparable output to 1,200W fixtures, 1.8° to 18° zoom in beam mode and 2.9° to 25° zoom in spot mode, 6° - 42° zoomable wash / frost effect, full CMY color mixing plus linear CTO color correction, 10 dichroic colors including UV, CTB, plus white (open), 8 rotating-interchangeable and 6 static-stamped gobos, 6-way linear and 8-facet rotating prisms, bi-directional animation wash frost effects, DMX, RDM (Remote Device Management), Art-NET and sACN support, 5pin DMX, RJ45 Ethernet, and power connections, (6) button control full color 180° reversible menu display, 740W max power consumption, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
-  "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 470.0,
-  "maxLuminousIntensityCd": 1869700.0,
-  "luminousFluxLm": 23000.0,
-  "noiseLevelDb": null,
+  "category": "BSW",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 700.0,
+  "maxLuminousIntensityCd": 1600000.0,
+  "luminousFluxLm": 19133.0,
+  "noiseLevelDb": 47,
   "weightKg": 34.0,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 248.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
     "Ethernet (Art-Net/sACN)"
   ],
   "dataConnectors": null,
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 6.0,
     "max": 42.0
@@ -54,6 +71,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -67,7 +85,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -87,22 +106,30 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Platinum FLX",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -114,24 +141,34 @@
     "framingShutterRotation": "gdtf-derived",
     "colorMixing": "gdtf-derived",
     "colorWheel": "gdtf-derived",
-    "colorTemperatureK": "gdtf-derived",
+    "colorTemperatureK": "manual",
     "prism": "gdtf-derived",
     "frost": "gdtf-derived",
     "frostFilters": "gdtf-derived",
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/platinum-flx"
   ]
 }

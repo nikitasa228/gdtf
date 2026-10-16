@@ -4,11 +4,11 @@
   "fixtureTypeId": "31380940-2ED1-4E0B-A16E-6421D92B05DF",
   "gdtfDataVersion": "1.0",
   "gdtfName": "ELV-G1-RGB",
-  "longName": "Terbly ELV-G1-RGB",
+  "longName": "ELV-G1-RGB",
   "shortName": "ELV-G1-RGB",
   "description": "The DynaGraze Exterior HO DMX is a high power, color changing, outdoor linear fixture\nAvailable in 1'and 4' sections, it offers multiple configuration, including RGB, RGBW or RGBA or DW.Featuring a robust IP66 housing, a multi-voltage switching power supply, and a glare shield, it is the perfect option for any structure that calls for outdoor linear grazing.",
   "manufacturer": "Terbly",
-  "category": "WASH",
+  "category": "LED BAR",
   "supportedPowerNetworks": [
     "100 V - 50 Hz",
     "100 V - 60 Hz",
@@ -20,24 +20,27 @@
   ],
   "voltageRangeV": {
     "min": 100.0,
-    "max": 240.0
+    "max": 277.0
   },
   "frequencyRangeHz": {
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 1900.0,
-  "luminousFluxLm": 66.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConsumptionW": 20,
+  "maxLuminousIntensityCd": 20000.0,
+  "luminousFluxLm": 700,
+  "noiseLevelDb": 30,
+  "weightKg": 1.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -67,6 +71,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -75,14 +80,23 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Linear graze light",
+  "fullName": "Terbly ELV-G1-RGB",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
+    "category": "manual",
+    "luminousFluxLm": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -101,20 +115,33 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "subType": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Shared page ELV-G1/G4 RGB/RGBW/RGBA; 1' = 20 W/700 lm/1.5 kg, 4' = 80 W/2800 lm/6 kg. Beam angle options 10, 60, 10x60, 30x60 deg (lens options, not zoom).",
+    "Typical-value estimates (no published data): powerSupplyType, powerConnectorIn, powerConnectorOut, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.terbly.com/index.php/Product/detail/goods_id/113",
+    "http://en.terbly.com/index.php/Product/detail/goods_id/113"
+  ]
 }

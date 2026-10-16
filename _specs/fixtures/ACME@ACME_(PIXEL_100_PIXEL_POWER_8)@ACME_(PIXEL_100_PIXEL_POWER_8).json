@@ -4,9 +4,9 @@
   "fixtureTypeId": "B39C6D36-6150-46D4-92DF-A440589E3E89",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME (PIXEL 100_PIXEL POWER 8)",
-  "longName": "ACME (PIXEL 100/PIXEL POWER 8)",
+  "longName": "PIXEL 100/PIXEL POWER 8",
   "shortName": "(PIXEL 100/PIXEL POWER 8)",
-  "description": "ACME(PIXEL 100/PIXEL POWER 8)",
+  "description": "ACME PIXEL 100/PIXEL POWER 8: LED bar, with 3.6-26.4 deg zoom, RGBWL colour mixing, colour wheel.",
   "manufacturer": "ACME",
   "category": "LED BAR",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 176000.0,
-  "noiseLevelDb": null,
-  "weightKg": 3.2,
-  "powerConnectorIn": null,
+  "powerConsumptionW": 75,
+  "maxLuminousIntensityCd": 262500,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 30,
+  "weightKg": 1.9,
+  "powerConnectorIn": "DC (external PSU)",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "DC (external PSU)",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -56,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWL",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -69,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -89,15 +94,24 @@
     }
   ],
   "pixelCount": 136,
+  "fullName": "ACME PIXEL 100/PIXEL POWER 8",
+  "gdtfDescription": "ACME(PIXEL 100/PIXEL POWER 8)",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "estimated",
     "powerConsumptionW": "manual",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf-derived",
@@ -116,23 +130,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF power value (112664 W) is invalid and was removed."
+    "24 V DC pixel bar fed by the PIXEL POWER 8 supply (530 W, up to 8 units). Values for PIXEL 100 head (DC 24 V from PIXEL POWER 8; power unit: 180-240 V, 530 W, 3.2 kg). Lux and IP20 from user manual D.",
+    "GDTF luminous flux 176000 lm is implausible for 75 W and was dropped",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://en.acmelighting.com/cms/old/productdetailold?cat_id=195&id=5890",
+    "https://en.acmelighting.com/old/index/productdetailold?cat_id=195&id=5890"
   ]
 }

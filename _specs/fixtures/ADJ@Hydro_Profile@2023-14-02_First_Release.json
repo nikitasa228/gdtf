@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 1088,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 1088.0,
+  "maxLuminousIntensityCd": 2000000.0,
   "luminousFluxLm": 25000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 38.5,
   "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -73,9 +76,13 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": false,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": false,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": true,
   "prisms": [
     {
@@ -93,6 +100,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -112,6 +120,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Hydro Profile",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -119,6 +135,7 @@
     "manufacturer": "gdtf",
     "category": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -144,28 +161,32 @@
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
     "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "powerSupplyType": "estimated",
+    "powerSupplyType": "manual",
     "luminousFluxLm": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorIn": "estimated",
-    "powerConnectorOut": "estimated"
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF weight 84.9 is in lbs, not kg (38.5 kg)."
+    "GDTF weight 84.9 is in lbs, not kg (38.5 kg).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/hydro-profile",
     "https://www.adj.com/hydro-profile"
   ]
 }

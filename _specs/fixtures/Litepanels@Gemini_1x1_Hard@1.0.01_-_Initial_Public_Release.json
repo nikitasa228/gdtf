@@ -4,7 +4,7 @@
   "fixtureTypeId": "C06B8887-F9CD-49B0-9A05-F735D19B228B",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Gemini 1x1 Hard",
-  "longName": "LitePanels Gemini 1x1 Hard",
+  "longName": "Gemini 1x1 Hard",
   "shortName": "Gemini 1x1 Hard",
   "description": "Power your imagination to create the extraordinary on screen. With an incredibly bright output of over 3000 lux @10ft/3m, Gemini 1x1 Hard delivers the brightest and most accurate 1x1 light ever. Blast through a silk, build layers of diffusion or bounce light off a board, with precision control of hue, saturation, intensity, gels and effects, Gemini 1x1 Hard gives you the power to control and create your own extraordinary.",
   "manufacturer": "Litepanels",
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 200,
-  "maxLuminousIntensityCd": 4200.0,
+  "maxLuminousIntensityCd": 27200,
   "luminousFluxLm": 3000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 35,
   "weightKg": 6.0,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": null,
   "powerSupplyType": "IEC C14",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -60,6 +63,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -73,7 +77,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -154,6 +159,14 @@
   ],
   "pixelCount": 1,
   "subType": "Soft light panel",
+  "fullName": "Litepanels Gemini 1x1 Hard",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -161,11 +174,12 @@
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
     "powerConsumptionW": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "estimated",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -186,19 +200,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Nominal power draw 200W. Lux 5600K no diffuser @10ft/3m. 46 deg no diffuser, >100 deg with domed diffuser. Weight incl. yoke and PSU.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.litepanels.com/wp-content/uploads/2023/06/1_gemini-1x1-hard_one-sheet.pdf"
   ]
 }

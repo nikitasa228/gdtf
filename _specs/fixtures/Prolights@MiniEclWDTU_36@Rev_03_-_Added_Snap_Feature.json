@@ -4,26 +4,43 @@
   "fixtureTypeId": "06962ED4-79B3-4E8F-BF24-BE037E5C326E",
   "gdtfDataVersion": "1.2",
   "gdtfName": "MiniEclWDTU_36",
-  "longName": "MiniEclWDTU_36",
+  "longName": "MiniEclWDTU 36",
   "shortName": "MECLWDTU_36",
   "description": "EclMiniProfile WDMX is a new concept of mini LED ellipsoidal. Showcasing a stylish design, ease of use, precise optics, sharp image projection and bright even projection all in a compact housing that is just a quarter of the size of traditional ellipsoidals. EclMiniProfile WDMX comes with a built-in Wireless DMX (WDMX) module for cable-free operation, extending the possible applications of this light. Designed for applications in commercial installtions, museums, restaurant, churches, educational theatres, and any other installation where size is an important factor. Available in Tungsten and Daylight versions, EclMiniProfile WDMX performs even field projection, high CRI at any level of brightness and linear dimmer over the entire ramp.",
   "manufacturer": "Prolights",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 28.0,
-  "maxLuminousIntensityCd": 1500.0,
-  "luminousFluxLm": 582.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 22.0,
+  "maxLuminousIntensityCd": 2400.0,
+  "luminousFluxLm": 743.0,
+  "noiseLevelDb": 0,
   "weightKg": 1.0,
   "powerConnectorIn": "Schuko",
   "powerConnectorOut": null,
   "powerSupplyType": "Schuko",
-  "panRangeDeg": 360.0,
-  "tiltRangeDeg": 270.0,
-  "infinitePan": false,
-  "infiniteTilt": false,
+  "motorizedPanTilt": false,
+  "panRangeDeg": null,
+  "tiltRangeDeg": null,
+  "infinitePan": null,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": 360.0,
+  "manualTiltRangeDeg": 270.0,
   "controlSignal": [
     "DMX512",
     "Wireless DMX (CRMX/W-DMX)"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "None",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -75,22 +94,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights MiniEclWDTU 36",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
-    "infinitePan": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualPanRangeDeg": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -110,16 +136,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Fan-free (passive cooling): silent."
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/MINIECLWD"
   ]
 }

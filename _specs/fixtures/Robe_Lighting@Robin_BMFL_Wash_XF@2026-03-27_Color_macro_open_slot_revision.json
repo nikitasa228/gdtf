@@ -6,7 +6,7 @@
   "gdtfName": "Robin BMFL Wash XF",
   "longName": "Robin BMFL Wash XF",
   "shortName": "BMFL Wash XF",
-  "description": "The Optional XF module expands the features of the BMFL™ Wash with innovative internal Scrim having a graduated filter, which can be inserted to the light path and allowing rotation of the whole assembly +/- 180° to achieve even wash coverage when projecting onto a non-perpendicular surface and internal motorised barndoors for creating different unique shapes and chases which also simulate barndoor effects.",
+  "description": "The Optional XF module expands the features of the BMFL Wash with innovative internal Scrim having a graduated filter, which can be inserted to the light path and allowing rotation of the whole assembly +/- 180° to achieve even wash coverage when projecting onto a non-perpendicular surface and internal motorised barndoors for creating different unique shapes and chases which also simulate barndoor effects.",
   "manufacturer": "Robe Lighting",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -23,17 +23,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 2000.0,
-  "maxLuminousIntensityCd": 4448000.0,
+  "maxLuminousIntensityCd": 4400000.0,
   "luminousFluxLm": 38000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 35.8,
   "powerConnectorIn": "powerCON",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -57,6 +60,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Barn doors",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -70,7 +74,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -86,6 +91,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin BMFL Wash XF",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -101,6 +114,7 @@
     "weightKg": "gdtf",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -125,13 +139,18 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): ipRating, noiseLevelDb"
+  ]
 }

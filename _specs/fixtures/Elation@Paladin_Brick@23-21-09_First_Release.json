@@ -6,24 +6,41 @@
   "gdtfName": "Paladin Brick",
   "longName": "Paladin Brick",
   "shortName": "PalBrck",
-  "description": "The PALADIN BRICK™ is a compact and powerful outdoor flood light for a wide variety of applications. Using 24x15W RGBW cells it provides a total output of up to 8,200 lumens. Certified to IP65 it features a rugged design with a solid build quality, eliminating the need to worry about dust and water ingress. IP rated connections make it an ideal product to illuminate large areas of any outdoor event with vibrant and powerful colors. It can be operated standing on the floor or be hung in any orientation using the provided omega brackets. Available cell control and strobe features make the PALADIN BRICK also a versatile effects fixture or audience blinder.",
+  "description": "The PALADIN BRICK is a compact and powerful outdoor flood light for a wide variety of applications. Using 24x15W RGBW cells it provides a total output of up to 8,200 lumens. Certified to IP65 it features a rugged design with a solid build quality, eliminating the need to worry about dust and water ingress. IP rated connections make it an ideal product to illuminate large areas of any outdoor event with vibrant and powerful colors. It can be operated standing on the floor or be hung in any orientation using the provided omega brackets. Available cell control and strobe features make the PALADIN BRICK also a versatile effects fixture or audience blinder.",
   "manufacturer": "Elation",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 720.0,
-  "maxLuminousIntensityCd": 79000.0,
-  "luminousFluxLm": 16800.0,
-  "noiseLevelDb": null,
+  "category": "BLINDER",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 390.0,
+  "maxLuminousIntensityCd": 39000.0,
+  "luminousFluxLm": 8200.0,
+  "noiseLevelDb": 35,
   "weightKg": 9.5,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,9 +59,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 6000.0,
+    "max": 6000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -53,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -104,16 +126,24 @@
     }
   ],
   "pixelCount": 12,
+  "fullName": "Elation Paladin Brick",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -132,19 +162,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "estimated",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "colorTemperatureK": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/paladin-brick"
   ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "Sharpy Plus",
   "longName": "Sharpy Plus",
   "shortName": "SharP",
-  "description": "Official ClayPaky File\nSHARPY PLUS is the first true 100% HYBRID unit, able to be a perfect beam light and a perfect spotlight. It is suitable for every occasion, with an extraordinary luminous efficiency which ensures substantial savings through lower power consumption.\nThe SHARPY PLUS has no match. With its wide range of effects and high light output, it beats all the lights in the same category and comes very close to those of higher wattages",
+  "description": "Clay Paky Sharpy Plus: moving-head Discharge Lamp beam/spot/wash hybrid, with 3-36 deg zoom, CMY colour mixing, colour wheel, 26 gobos, prism, frost.",
   "manufacturer": "Clay Paky",
   "category": "BSW",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 540,
-  "maxLuminousIntensityCd": 30000000,
-  "luminousFluxLm": 12000.0,
+  "maxLuminousIntensityCd": 26000000,
+  "luminousFluxLm": 12000,
   "noiseLevelDb": 49.0,
-  "weightKg": 23.0,
+  "weightKg": 23,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -71,6 +74,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -94,6 +98,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -105,18 +110,28 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Clay Paky Sharpy Plus",
+  "gdtfDescription": "Official ClayPaky File\nSHARPY PLUS is the first true 100% HYBRID unit, able to be a perfect beam light and a perfect spotlight. It is suitable for every occasion, with an extraordinary luminous efficiency which ensures substantial savings through lower power consumption.\nThe SHARPY PLUS has no match. With its wide range of effects and high light output, it beats all the lights in the same category and comes very close to those of higher wattages",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
     "powerConsumptionW": "manual",
     "maxLuminousIntensityCd": "manual",
-    "luminousFluxLm": "gdtf",
+    "luminousFluxLm": "manual",
     "weightKg": "manual",
     "powerConnectorIn": "manual",
     "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -143,6 +158,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -151,15 +167,16 @@
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived"
   },
   "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "Max 540 VA; noise 49 dB(A) Auto fan mode."
+    "Max 540 VA; noise 49 dB(A) Auto fan mode. Lux from official photometrics PDF (Id=2306), min zoom beam mode 260000 lx @10 m. Lamp CT 8000K +/-300."
   ],
   "_refs": [
+    "https://service.claypaky.it/servlet/checkDocumentsFile?Id=3109",
     "https://www.claypaky.it/products/sharpy-plus/"
   ]
 }

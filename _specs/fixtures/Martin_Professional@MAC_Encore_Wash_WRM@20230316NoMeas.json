@@ -6,7 +6,7 @@
   "gdtfName": "MAC Encore Wash WRM",
   "longName": "MAC Encore Wash WRM",
   "shortName": "MACEncWasWRM",
-  "description": "Official Martin Professional File (no measurements)",
+  "description": "Martin Professional MAC Encore Wash WRM: moving-head LED wash, with 8.8-46.8 deg zoom, CMY colour mixing, colour wheel, framing shutters.",
   "manufacturer": "Martin Professional",
   "category": "WASH",
   "supportedPowerNetworks": [
@@ -23,18 +23,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 590.0,
-  "maxLuminousIntensityCd": 321300.0,
-  "luminousFluxLm": 8500.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 596.0,
+  "maxLuminousIntensityCd": 360000.0,
+  "luminousFluxLm": 9500.0,
+  "noiseLevelDb": 0,
   "weightKg": 28.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 268.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -55,6 +58,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Barn doors",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -68,7 +72,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
     "max": 40.0
@@ -80,21 +85,30 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Martin Professional MAC Encore Wash WRM",
+  "gdtfDescription": "Official Martin Professional File (no measurements)",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -119,13 +133,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/mac-encore-wash-wrm"
+  ]
 }

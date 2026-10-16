@@ -6,24 +6,41 @@
   "gdtfName": "Proteus Rayzor 760 OPS",
   "longName": "Proteus Rayzor 760 OPS",
   "shortName": "ProRay760ops",
-  "description": "The Proteus Rayzor 760™ OPS is a compact yet extremely powerful IP65 rated Wash Effects fixture featuring Elation’s unique SparkLED™ system and fast continuous Pan and Tilt motion. With its wide zoom range from 5 to 77 degrees it provides intense and well-defined mid-air beams at over 7,200 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
+  "description": "The Proteus Rayzor 760 OPS is a compact yet extremely powerful IP65 rated Wash Effects fixture featuring Elation’s unique SparkLED system and fast continuous Pan and Tilt motion. With its wide zoom range from 5 to 77 degrees it provides intense and well-defined mid-air beams at over 7,200 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
   "manufacturer": "Elation",
   "category": "WASH BEAM",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 12.2,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
-  "panRangeDeg": 540.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 700.0,
+  "maxLuminousIntensityCd": 5300000.0,
+  "luminousFluxLm": 7200.0,
+  "noiseLevelDb": 43,
+  "weightKg": 18.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": 630.0,
   "tiltRangeDeg": 360.0,
   "infinitePan": true,
   "infiniteTilt": true,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": "IP65",
+  "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -91,14 +110,23 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation Proteus Rayzor 760 OPS",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
-    "panRangeDeg": "gdtf-derived",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "panRangeDeg": "manual",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -120,20 +148,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "estimated",
+    "luminousFluxLm": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "estimated",
+    "powerConnectorOut": "estimated",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-rayzor-760-ops",
+    "https://www.elationlighting.eu/proteus-rayzor-760-wmg"
   ]
 }

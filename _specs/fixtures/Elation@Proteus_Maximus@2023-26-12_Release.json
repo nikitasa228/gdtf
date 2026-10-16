@@ -9,21 +9,35 @@
   "description": "The PROTEUS EXCALIBUR is the newest member in the industry leading Proteus range of IP65 automated fixtures from Elation Professional. Excalibur is the brightest IP65 fully featured beam fixture ever created with incredible light output from a surprisingly compact fixture body. Rivaling existing Xenon searchlights or skytrackers, the extremely narrow 0.8° Beam ensures the fixture cuts effortlessly through the sky and is visible at great distances. The intense beam of the PROTEUS EXCALIBUR projects from the ultra-wide 260mm front Lens as a massive column of light that stuns the audience.\n A wide array of gobos and prism overlays allow animating the sky, and with its incredible light intensity all CMY colors remain strong and vibrant even when fully saturated. Beam control is provided through a precise internal focus lens, providing crisp projection without optical errors. Dual variable frosts allow to soften the beam when required. A remote-controlled Expander lens allows widening the beam to approximately 3.5 degrees. The fixture is ideally suited for theme parks, cruise ships, outdoor special events, large scale shows and concerts, and any situation where a massive beam or very powerful prism and flower effects are required. With its compact size and low power consumption the PROTEUS EXCALIBUR can be utilized in almost any application.",
   "manufacturer": "Elation",
   "category": "PROFILE",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 550.0,
-  "maxLuminousIntensityCd": 2515300.0,
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 120.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1400.0,
+  "maxLuminousIntensityCd": 3112490.0,
   "luminousFluxLm": 26000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 53.0,
-  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
-  "tiltRangeDeg": 270.0,
+  "tiltRangeDeg": 250.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -33,7 +47,7 @@
     "RJ45",
     "XLR5"
   ],
-  "lightSourceType": "Discharge Lamp",
+  "lightSourceType": "LED",
   "beamAngleDeg": {
     "min": 5.5,
     "max": 55.0
@@ -57,6 +71,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -80,6 +95,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -103,25 +119,34 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Maximus",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -141,17 +166,26 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-maximus",
+    "https://assets.centryngroup.com/dl/files/PRM992__DL__005.pdf"
   ]
 }

@@ -6,24 +6,41 @@
   "gdtfName": "Proteus Hybrid Max OPS",
   "longName": "Proteus Hybrid Max OPS",
   "shortName": "ProHybrdMxOPS",
-  "description": "The PROTEUS HYBRID MAX™ OPS combines high output and long lamp life in a feature packed compact IP66 Hybrid fixture. PROTEUS HYBRID MAX OPS is the Extreme Output Hybrid featuring the innovative Philips MSD Platinum FLEX 500 lamp.\n\n\nRated at 550W and up to 4,000 hours smart lamp life the HYBRID MAX includes CMY and variable CTO plus a full complement of projection and effects options.",
+  "description": "The PROTEUS HYBRID MAX OPS combines high output and long lamp life in a feature packed compact IP66 Hybrid fixture. PROTEUS HYBRID MAX OPS is the Extreme Output Hybrid featuring the innovative Philips MSD Platinum FLEX 500 lamp.\n\n\nRated at 550W and up to 4,000 hours smart lamp life the HYBRID MAX includes CMY and variable CTO plus a full complement of projection and effects options.",
   "manufacturer": "Elation",
   "category": "BSW",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 550.0,
-  "maxLuminousIntensityCd": 19867400.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 800.0,
+  "maxLuminousIntensityCd": 16000000.0,
   "luminousFluxLm": 22000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 47,
   "weightKg": 35.5,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
-  "panRangeDeg": 540.0,
+  "motorizedPanTilt": true,
+  "panRangeDeg": 630.0,
   "tiltRangeDeg": 253.0,
   "infinitePan": true,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -34,7 +51,7 @@
     "XLR3",
     "XLR5"
   ],
-  "lightSourceType": "LED",
+  "lightSourceType": "Discharge Lamp",
   "beamAngleDeg": {
     "min": 1.8,
     "max": 45.0
@@ -58,6 +75,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -89,6 +107,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -112,25 +131,33 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Proteus Hybrid Max OPS",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
-    "panRangeDeg": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
+    "panRangeDeg": "manual",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf-derived",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -150,17 +177,24 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/proteus-hybrid-max-hw"
   ]
 }

@@ -4,9 +4,9 @@
   "fixtureTypeId": "5B7E4C4D-BB0A-478B-BFCC-58D021C7671D",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ACME MANA PROFILE (XA 600 BSWF IP)",
-  "longName": "ACME MANA PROFILE(XA 600 BSWF IP)",
+  "longName": "MANA PROFILE(XA 600 BSWF IP)",
   "shortName": "MANA PROFILE(XA 600 BSWF IP)",
-  "description": "ACME MANA PROFILE(XA 600 BSWF IP)",
+  "description": "ACME MANA PROFILE(XA 600 BSWF IP): moving-head LED profile, with 3.5-45 deg zoom, CMY colour mixing, colour wheel, 17 gobos, framing shutters, prism, frost, IP66 rated.",
   "manufacturer": "ACME",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 910,
-  "maxLuminousIntensityCd": 1910900.0,
+  "maxLuminousIntensityCd": 3250000,
   "luminousFluxLm": 26000,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 48,
   "weightKg": 32.5,
-  "powerConnectorIn": "powerCON TRUE1 TOP",
-  "powerConnectorOut": "powerCON TRUE1 TOP",
-  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 260.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -68,6 +71,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -91,6 +95,7 @@
   "focus": true,
   "animationWheel": true,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 40.0
@@ -114,15 +119,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ACME MANA PROFILE(XA 600 BSWF IP)",
+  "gdtfDescription": "ACME MANA PROFILE(XA 600 BSWF IP)",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "manual",
     "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -148,6 +163,7 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
@@ -158,14 +174,16 @@
     "frequencyRangeHz": "manual",
     "supportedPowerNetworks": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "GDTF weight 46.5 kg contradicts spec sheet (32.5 kg)."
+    "GDTF weight 46.5 kg contradicts spec sheet (32.5 kg). Lux from MANA PROFILE Leaflet. Page gives fixture CCT 7,000K; CTO range not captured.",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
     "https://en.acmelighting.com/item/MANA-PROFILE"

@@ -6,24 +6,39 @@
   "gdtfName": "SIXBAR 1000 IP",
   "longName": "SIXBAR 1000 IP",
   "shortName": "SIXBR1000IP",
-  "description": "The IP65 rated SIXBAR 1000 IP™ features (12) 12W 6-IN-1 RGBAW+UV LEDs, 25° beam angle, pixel control, variable dimming curve modes, strobe and chase effects, a UV wavelength of 395nm, RDM (remote device management) protocol support, IP rated DMX and power in/out connections, LCD menu display with 4 touch button control panel, dual adjustable rigging/floor stand brackets, glare shield and frost filter included, multiple unit power linking, rugged die-cast aluminum exterior, flicker free operation for TV and FILM, 145W max power consumption, and a multi-voltage universal auto switching power supply (110-240v).",
+  "description": "The IP65 rated SIXBAR 1000 IP features (12) 12W 6-IN-1 RGBAW+UV LEDs, 25° beam angle, pixel control, variable dimming curve modes, strobe and chase effects, a UV wavelength of 395nm, RDM (remote device management) protocol support, IP rated DMX and power in/out connections, LCD menu display with 4 touch button control panel, dual adjustable rigging/floor stand brackets, glare shield and frost filter included, multiple unit power linking, rugged die-cast aluminum exterior, flicker free operation for TV and FILM, 145W max power consumption, and a multi-voltage universal auto switching power supply (110-240v).",
   "manufacturer": "Elation",
   "category": "LED BAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 5400.0,
-  "maxLuminousIntensityCd": 61700.0,
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 110.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 145.0,
+  "maxLuminousIntensityCd": 62000.0,
   "luminousFluxLm": 7920.0,
-  "noiseLevelDb": null,
-  "weightKg": 4.1,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "noiseLevelDb": 30,
+  "weightKg": 8.6,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
+  "powerConnectorOut": "powerCON TRUE1 TOP",
+  "powerSupplyType": "powerCON TRUE1 TOP LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,9 +57,13 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWA+UV",
   "colorWheel": true,
-  "colorTemperatureK": null,
+  "colorTemperatureK": {
+    "min": 2800.0,
+    "max": 8000.0
+  },
   "prism": false,
   "prisms": [],
   "frost": false,
@@ -53,6 +72,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -92,16 +112,24 @@
     }
   ],
   "pixelCount": 36,
+  "fullName": "Elation SIXBAR 1000 IP",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -120,19 +148,28 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "colorTemperatureK": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "colorTemperatureK"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, colorTemperatureK, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/sixbar-1000-ip"
   ]
 }

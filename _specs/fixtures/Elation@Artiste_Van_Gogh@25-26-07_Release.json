@@ -6,24 +6,41 @@
   "gdtfName": "Artiste Van Gogh",
   "longName": "Artiste Van Gogh",
   "shortName": "ArtVanGogh",
-  "description": "The Artiste Van Gogh™ is a compact powerful framing Wash fixture with outstanding light quality. It is an ideal partner to the Profile fixtures in Elation’s Artiste fixture range.\nProviding up to 16.000 total lumens from its efficient 380W 6,500K LED engine allows the fixture to be utilized in many applications. Due to its high 91 color rendering index and its whisper quiet operation it is ideally suited for Television, Theater and Corporate Events, or any application where powerful and even coverage is desired. Illuminating objects and people with precise color reproduction is the perfect application for the Artiste Van Gogh. A 16bit CMY color system with a seamless CTO filter offers the designer a wide color range from subtle pastels to vibrant primaries. A seven position color wheel is provided for additional effects and includes a dedicated UV filter.",
+  "description": "The Artiste Van Gogh is a compact powerful framing Wash fixture with outstanding light quality. It is an ideal partner to the Profile fixtures in Elation’s Artiste fixture range.\nProviding up to 16.000 total lumens from its efficient 380W 6,500K LED engine allows the fixture to be utilized in many applications. Due to its high 91 color rendering index and its whisper quiet operation it is ideally suited for Television, Theater and Corporate Events, or any application where powerful and even coverage is desired. Illuminating objects and people with precise color reproduction is the perfect application for the Artiste Van Gogh. A 16bit CMY color system with a seamless CTO filter offers the designer a wide color range from subtle pastels to vibrant primaries. A seven position color wheel is provided for additional effects and includes a dedicated UV filter.",
   "manufacturer": "Elation",
   "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 380.0,
-  "maxLuminousIntensityCd": 2225000.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 600.0,
+  "maxLuminousIntensityCd": 989901.0,
   "luminousFluxLm": 23000.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 43,
   "weightKg": 28.5,
-  "powerConnectorIn": null,
+  "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
-  "tiltRangeDeg": 270.0,
+  "tiltRangeDeg": 260.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": false,
+  "framingShutterType": "Barn doors",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -79,18 +98,27 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Artiste Van Gogh",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
-    "tiltRangeDeg": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
@@ -112,17 +140,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/artiste-van-gogh",
+    "https://assets.centryngroup.com/dl/files/EAV259__DL__001.pdf",
+    "https://www.elationlighting.com/artiste-van-gogh"
   ]
 }

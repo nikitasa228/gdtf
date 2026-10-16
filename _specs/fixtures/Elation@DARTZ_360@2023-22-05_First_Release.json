@@ -6,24 +6,41 @@
   "gdtfName": "Dartz 360",
   "longName": "Dartz 360",
   "shortName": "Dartz360",
-  "description": "The DARTZ 360™ is a unique, compact, narrow beam luminaire featuring a new patent pending single source 50W RGB LED engine producing an impressive 3° aperture, amazing high output level, and smooth color-mixed effects that can be used in a variety of applications requiring no minimum safe project distance as with typical discharge lamp beam fixtures, fast and precise 16-bit continuous 360° pan and tilt rotation, 14 static-stamped metal gobos, 6-facet linear and 8-facet independent rotating prisms, 0-100% linear frost filter for wash effects, high speed electronic shutter and strobe, electronic dimming and variable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX, RDM (Remote Device Management), Kling-Net, Art-NET, and sACN protocol support, Elation’s E-FLY™ internal wireless DMX transceiver, 5pin XLR, RJ45 ethernet, and Locking Power Cable in/out connections, full color 180° reversible menu display with multi-button control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
+  "description": "The DARTZ 360 is a unique, compact, narrow beam luminaire featuring a new patent pending single source 50W RGB LED engine producing an impressive 3° aperture, amazing high output level, and smooth color-mixed effects that can be used in a variety of applications requiring no minimum safe project distance as with typical discharge lamp beam fixtures, fast and precise 16-bit continuous 360° pan and tilt rotation, 14 static-stamped metal gobos, 6-facet linear and 8-facet independent rotating prisms, 0-100% linear frost filter for wash effects, high speed electronic shutter and strobe, electronic dimming and variable dimming curve modes, adjustable LED refresh rate and gamma brightness for flicker free operation for TV and FILM, DMX, RDM (Remote Device Management), Kling-Net, Art-NET, and sACN protocol support, Elation’s E-FLY internal wireless DMX transceiver, 5pin XLR, RJ45 ethernet, and Locking Power Cable in/out connections, full color 180° reversible menu display with multi-button control panel, battery backup for display power, and a multi-voltage universal auto switching power supply (100-240v).",
   "manufacturer": "Elation",
-  "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 50.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 29562.0,
-  "noiseLevelDb": null,
+  "category": "BEAM",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 154.0,
+  "maxLuminousIntensityCd": 2000000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 38,
   "weightKg": 12.7,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 270.0,
   "infinitePan": true,
   "infiniteTilt": true,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -32,7 +49,10 @@
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 3.0,
+    "max": 3.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Spot",
@@ -47,6 +67,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -66,7 +87,8 @@
   "iris": false,
   "focus": true,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": true,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -98,15 +120,23 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Dartz 360",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "category": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -129,21 +159,33 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "beamAngleDeg",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "GDTF luminous flux 29562 lm is implausible for 154 W and was dropped",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/dartz-360",
+    "https://www.elationlighting.eu/dartz-360"
   ]
 }

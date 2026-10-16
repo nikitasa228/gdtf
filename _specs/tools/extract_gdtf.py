@@ -54,6 +54,7 @@ def clean_text(s):
         return None
     s = re.sub(r"(\d)\s?�", r"\1°", s)      # "10� beam" -> "10° beam"
     s = s.replace("�", "")                   # "AT�" (™/®) -> "AT"
+    s = re.sub(r"\s*[™®©]", "", s)
     s = re.sub(r"[ \t]+", " ", s).replace("\r", "")
     return s.strip()
 
@@ -68,6 +69,11 @@ def fnum(v):
 
 def rnd(x, n=1):
     return None if x is None else round(x, n)
+
+
+def sig2(x):
+    """round to 2 significant figures (estimates should not look more precise than they are)"""
+    return float(f"{x:.2g}") if x else x
 
 
 def attr_base(name):
@@ -113,7 +119,8 @@ def pick_category(name, desc, attrs, has_pan, has_tilt, blades, gobo_wheels, zoo
     a = set(attrs)
     if re.search(r"\bfire|flame", n): return "GENERATOR FIRE"
     if re.search(r"\bhaz(e|er)\b|haze", n): return "HAZE"
-    if re.search(r"\bfog|smoke|\bmist|low fog|geyser|co2|jet", n) or "Fog1" in a or "Fog" in a: return "FOG"
+    if re.search(r"\bfog|smoke|\bmist|low fog|geyser|co2", n) or "Fog1" in a or "Fog" in a: return "FOG"
+    if re.search(r"\bjet\b", n) and not lamp: return "FOG"
     if re.search(r"\bfan\b|wind machine", n): return "FAN"
     if re.search(r"laser", n): return "LASER"
     if re.search(r"follow ?spot|followspot", n): return "FOLLOW SPOT"
@@ -122,6 +129,7 @@ def pick_category(name, desc, attrs, has_pan, has_tilt, blades, gobo_wheels, zoo
     if re.search(r"\bscan(ner)?\b|scanner", n): return "SCANER"
     if has_pan and has_tilt:
         if re.search(r"bswf?|hybrid|\b3[ -]?in[ -]?1\b", n): return "BSW"
+        if re.search(r"\bbracket\b|clamp|mount", n) and not lamp: return "OTHER"
         if re.search(r"wash ?beam|beam ?wash|b-eye|beye|\bbee\b", n): return "WASH BEAM"
         if re.search(r"\bbeam\b|beam", n) and not re.search(r"wash", n): return "BEAM"
         if blades and gobo_wheels: return "PROFILE"
@@ -130,9 +138,11 @@ def pick_category(name, desc, attrs, has_pan, has_tilt, blades, gobo_wheels, zoo
         if re.search(r"\bbar\b|batten|pixel ?bar", n): return "LED BAR"
         if zoom_rng and zoom_rng[0] is not None and zoom_rng[0] <= 5: return "WASH BEAM"
         return "WASH"
+    if re.search(r"\bbracket\b|clamp|mount", n) and not lamp: return "OTHER"
     if re.search(r"strobe|\bflash\b|atomic|lightning", n): return "STROBE"
-    if re.search(r"ellipsoidal|profile|leko|source four|\bpro(file)?\b", n) or blades: return "PROFILE"
-    if re.search(r"\bpar\b|par[ -]?\d|\bpar$|\bpar\d", n): return "PAR"
+    if re.search(r"wash|fresnel|\bmanet\b", n) and not re.search(r"profile|ellipsoidal", n): return "WASH"
+    if re.search(r"ellipsoidal|profile|leko|source four", n) or blades: return "PROFILE"
+    if re.search(r"\bpar\b|par[ -]?\d|\bpar$|\bpar\d|propar", n): return "PAR"
     if re.search(r"\bbar\b|batten|\bline\b|tube|strip|dotline|dotchain|pixel ?line|linear|bar\d|bar\b", n): return "LED BAR"
     if re.search(r"\bspot\b", n) or gobo_wheels: return "SPOT"
     if re.search(r"\bbeam\b", n): return "BEAM"
@@ -173,6 +183,14 @@ def extract(path):
             used_attrs.add(at)
             chf_by_attr.setdefault(at, []).append(cf)
     all_attrs = used_attrs or set(attrs)
+    # attributes reachable through an addressed DMX channel; channels with an empty Offset are virtual
+    # (e.g. Prolights files use them for manual yoke/bracket positioning in visualisers)
+    dmx_attrs = set()
+    for ch in ft.iter("DMXChannel"):
+        o = (ch.get("Offset") or "").strip()
+        if o and o.lower() != "none":
+            for cf in ch.iter("ChannelFunction"):
+                dmx_attrs.add((cf.get("Attribute") or "").split(".")[-1])
 
     def phys_range(attr):
         vals = []
@@ -283,6 +301,8 @@ def extract(path):
     tilt = span("Tilt")
     has_pan = "Pan" in all_attrs or "Pan" in attrs
     has_tilt = "Tilt" in all_attrs or "Tilt" in attrs
+    motor_pan = "Pan" in dmx_attrs
+    motor_tilt = "Tilt" in dmx_attrs
     infinite_pan = any(a in all_attrs for a in ("PanRotate", "PanMode")) and "PanRotate" in all_attrs
     infinite_tilt = "TiltRotate" in all_attrs
 
@@ -311,7 +331,7 @@ def extract(path):
         users = wheel_users.get(wn, set())
         slots = [s for s in w.findall("Slot") if (s.get("Name") or "").strip().lower() not in ("open", "empty", "")]
         if any(re.match(r"Gobo\d", u) for u in users):
-            gnum = next(re.match(r"Gobo(\d)", u).group(1) for u in users if re.match(r"Gobo\d", u))
+            gnum = next(re.match(r"Gobo(\d)", u).group(1) for u in sorted(users) if re.match(r"Gobo\d", u))
             rot = any(a.startswith(f"Gobo{gnum}Pos") for a in all_attrs)
             gobo_wheels.append({"wheel": clean_text(wn), "slots": len(slots), "rotating": rot})
         elif any(u.startswith("Prism") for u in users):
@@ -361,7 +381,7 @@ def extract(path):
     put(rec, "shortName", short_name, "gdtf")
     put(rec, "description", desc, "gdtf")
     put(rec, "manufacturer", manu, "gdtf")
-    cat = pick_category(f"{name} {long_name or ''}", desc or "", all_attrs, has_pan, has_tilt, blades,
+    cat = pick_category(f"{name} {long_name or ''}", desc or "", all_attrs, motor_pan, motor_tilt, blades,
                         gobo_wheels, (zoom_min, zoom_max) if zoom_min else None, beam_angle,
                         lamp_types, pixel_count, None)
     put(rec, "category", cat, "gdtf-derived")
@@ -381,18 +401,22 @@ def extract(path):
         power, power_src = wiring_payload, "gdtf"
     elif beam_power and not (len(beams) and all(fnum(b.get("PowerConsumption")) in (1000.0,) for b in beams)) \
             and beam_power >= 5:
-        power, power_src = beam_power, "gdtf-derived"
-        issues.append("Power consumption taken from beam geometry sum (unverified)")
+        # GDTF beam power is the emitter wattage, not the fixture's mains draw; summed over pixels it is unreliable
+        power, power_src = beam_power, "estimated"
+        issues.append("Power consumption taken from GDTF beam emitter wattage (unverified, usually below real mains draw)")
     put(rec, "powerConsumptionW", rnd(power, 0), power_src)
 
     cd = None
     ang = zoom_min or beam_angle
-    if beam_flux and ang and not beam_angle_is_default and beam_flux not in (10000.0,) and 0.5 < ang < 120:
+    # only single-beam fixtures: summed pixel fluxes overlap and overstate the on-axis intensity
+    if beam_flux and ang and len(beams) == 1 and not beam_angle_is_default and beam_flux not in (10000.0,) and 0.5 < ang < 120:
+        ang = max(ang, 2.0)  # GDTF beam angles below ~2 deg are nominal; real beams spread wider
         # on-axis intensity of a beam whose half-intensity cone is `ang`: I ≈ Φ / (2π(1-cos(θ/2))) * ~0.7 peak factor
         omega = 2 * math.pi * (1 - math.cos(math.radians(ang) / 2))
         cd = beam_flux / omega * 0.7
-    put(rec, "maxLuminousIntensityCd", rnd(cd, -2) if cd else None, "estimated")
-    put(rec, "luminousFluxLm", rnd(beam_flux, 0) if beam_flux and beam_flux != 10000.0 * max(1, len(beams)) else None, "gdtf")
+    put(rec, "maxLuminousIntensityCd", sig2(cd) if cd else None, "estimated")
+    put(rec, "luminousFluxLm", rnd(beam_flux, 0) if beam_flux and beam_flux != 10000.0 * max(1, len(beams)) else None,
+        "gdtf" if len(beams) <= 1 else "estimated")
     put(rec, "noiseLevelDb", None, None)
     put(rec, "weightKg", rnd(weight, 2), "gdtf")
 
@@ -405,16 +429,20 @@ def extract(path):
         pst = pin[0] + (" LINK" if pout else "")
     put(rec, "powerSupplyType", pst, "gdtf-derived")
 
-    put(rec, "panRangeDeg", rnd(pan) if has_pan else None, "gdtf-derived")
-    put(rec, "tiltRangeDeg", rnd(tilt) if has_tilt else None, "gdtf-derived")
-    put(rec, "infinitePan", infinite_pan if has_pan else None, "gdtf-derived")
-    put(rec, "infiniteTilt", infinite_tilt if has_tilt else None, "gdtf-derived")
+    # pan/tilt ranges describe the motorised movement; a manual yoke/bracket range goes to manual*RangeDeg
+    put(rec, "motorizedPanTilt", motor_pan or motor_tilt, "gdtf-derived")
+    put(rec, "panRangeDeg", rnd(pan) if motor_pan else None, "gdtf-derived")
+    put(rec, "tiltRangeDeg", rnd(tilt) if motor_tilt else None, "gdtf-derived")
+    put(rec, "infinitePan", infinite_pan if motor_pan else None, "gdtf-derived")
+    put(rec, "infiniteTilt", infinite_tilt if motor_tilt else None, "gdtf-derived")
+    put(rec, "manualPanRangeDeg", rnd(pan) if has_pan and not motor_pan and pan else None, "gdtf-derived")
+    put(rec, "manualTiltRangeDeg", rnd(tilt) if has_tilt and not motor_tilt and tilt else None, "gdtf-derived")
     put(rec, "controlSignal", signal or None, "gdtf-derived")
     put(rec, "dataConnectors", dmx_conn or None, "gdtf-derived")
 
     lamp = None
     if lamp_types:
-        lamp = max(set(lamp_types), key=lamp_types.count)
+        lamp = max(dict.fromkeys(lamp_types), key=lamp_types.count)  # ties: first listed beam wins
         lamp = {"LED": "LED", "Discharge": "Discharge Lamp", "Tungsten": "Tungsten Lamp",
                 "Halogen": "Halogen Lamp"}.get(lamp, lamp)
     put(rec, "lightSourceType", lamp, "gdtf")
@@ -440,11 +468,12 @@ def extract(path):
     put(rec, "framingShutters", bool(blades), "gdtf-derived")
     put(rec, "framingShutterBlades", len({b[:6] for b in blades}) if blades else 0, "gdtf-derived")
     put(rec, "framingShutterRotation", blade_rot if blades else False, "gdtf-derived")
+    put(rec, "framingShutterType", None, None)  # resolved in main() once the final category is known
     put(rec, "colorMixing", color_mixing(all_attrs), "gdtf-derived")
     put(rec, "colorWheel", color_wheel, "gdtf-derived")
     if cts:
         put(rec, "colorTemperatureK", {"min": min(cts), "max": max(cts)}, "gdtf-derived")
-    elif beam_ct and beam_ct not in (6000.0,) and lamp in ("Discharge Lamp", "Tungsten Lamp", "Halogen Lamp", "LED"):
+    elif beam_ct and 1000 <= beam_ct <= 20000 and beam_ct not in (6000.0,) and lamp in ("Discharge Lamp", "Tungsten Lamp", "Halogen Lamp", "LED"):
         put(rec, "colorTemperatureK", {"min": beam_ct, "max": beam_ct}, "gdtf")
     else:
         put(rec, "colorTemperatureK", None, None)
@@ -456,6 +485,8 @@ def extract(path):
     put(rec, "focus", focus, "gdtf-derived")
     put(rec, "animationWheel", animation, "gdtf-derived")
     put(rec, "ipRating", ip, "gdtf-derived")
+    battery = bool(re.search(r"\bbatter(y|ies)|\bbatt\b|\bbatt[a-z]*\b|wireless uplight", f"{name} {long_name or ''} {desc or ''}", re.I))
+    put(rec, "batteryPowered", battery, "gdtf-derived")
     put(rec, "operatingTemperatureC", {"min": op_lo, "max": op_hi} if op_hi else None, "gdtf")
     put(rec, "dmxModes", modes, "gdtf")
     put(rec, "pixelCount", pixel_count, "gdtf-derived")
@@ -481,10 +512,15 @@ NOT_FOR_ATMOS = {"maxLuminousIntensityCd", "beamAngleDeg", "lensType", "colorTem
 
 def missing_fields(rec, na=()):
     out = []
-    moving = rec.get("panRangeDeg") is not None or rec.get("tiltRangeDeg") is not None
+    moving = bool(rec.get("motorizedPanTilt"))
     atmos = rec.get("category") in ("HAZE", "FOG", "FAN", "OTHER") and rec.get("lightSourceType") is None
     for k in REQUIRED:
         if k in MOVING_ONLY and not moving:
+            continue
+        # tilt-only battens / pan-only effects: the axis without a motor is not missing
+        if k == "panRangeDeg" and moving and rec.get("infinitePan") is None and rec.get("tiltRangeDeg") is not None:
+            continue
+        if k == "tiltRangeDeg" and moving and rec.get("infiniteTilt") is None and rec.get("panRangeDeg") is not None:
             continue
         if atmos and k in NOT_FOR_ATMOS:
             continue
@@ -520,7 +556,8 @@ def expand_override(ov):
                       [lbl for lbl, vv, ff in POWER_NETWORKS if lo <= vv <= hi and fl <= ff <= fh] or None)
     lx = ov.pop("lux", None)
     if lx:
-        ov.setdefault("maxLuminousIntensityCd", round(lx[0] * lx[1] ** 2, -2))
+        cd = lx[0] * lx[1] ** 2
+        ov.setdefault("maxLuminousIntensityCd", round(cd, -2) if cd >= 1000 else round(cd, 1))
     b = ov.pop("beam", None)
     if b is not None:
         b = b if isinstance(b, list) else [b, b]
@@ -577,25 +614,230 @@ def auto_description(rec):
     return head + (", with " + ", ".join(parts) if parts else "") + "."
 
 
+# ---- normalisation -------------------------------------------------------------------------------
+CONN_ALIASES = {"DC Jack (external PSU / battery)": "DC Jack", "DC 24 V from PIXEL POWER 8": "DC (external PSU)",
+                "PWB CAB Connector": "PWB-CAB Connector"}
+WEAK_DESC = re.compile(r"^(official .*file|www\.|https?://)|\(no measurements", re.I)
+NON_ENGLISH = re.compile(r"[Ѐ-ӿ぀-ヿ一-鿿가-힯]")
+# Latin-script foreign text: two or more Spanish/Portuguese/Italian/French/German function words
+FOREIGN_WORDS = re.compile(r"\b(es|un|una|el|los|las|del|con|para|dispositivo|und|mit|für|ein|eine|einem|der|das|ist|"
+                           r"della|delle|il|questo|avec|pour|est|une|des|sur|não|uma)\b", re.I)
+
+
+def foreign(d):
+    return NON_ENGLISH.search(d) or len(set(w.lower() for w in FOREIGN_WORDS.findall(d))) >= 3
+
+
+def normalize_record(rec, src, meta, issues):
+    """Consistent names: longName = model name without the brand, spaces instead of underscores;
+    fullName = brand + model. Weak/boilerplate/non-English descriptions are replaced by a generated one."""
+    mfr = rec.get("manufacturer") or ""
+    ln = rec.get("longName") or meta.get("gdtfName") or ""
+    orig = ln
+    ln = ln.replace("_", " ")
+    tokens = {mfr, mfr.replace(" ", "_"), mfr.split(" ")[0], meta["file"].split("@")[0].replace("_", " ")}
+    for token in sorted(tokens, key=lambda t: (-len(t), t)):  # longest brand form first ("CLF Lighting" before "CLF")
+        if token and ln.lower().startswith(token.lower() + " "):
+            ln = ln[len(token):].lstrip()
+            break
+    ln = re.sub(r"\s+", " ", ln).strip()
+    if re.fullmatch(r"\(([^()]+)\)", ln):
+        ln = ln[1:-1].strip()
+    if ln != orig:
+        rec["longName"] = ln
+        src.setdefault("longName", "gdtf-derived")
+    if not rec.get("shortName"):
+        rec["shortName"] = ln[:24]
+        src["shortName"] = "gdtf-derived"
+    rec["fullName"] = ln if ln.lower().startswith(mfr.lower()) else f"{mfr} {ln}".strip()
+    src["fullName"] = "gdtf-derived"
+    d = rec.get("description") or ""
+    if (len(d) < 40 or WEAK_DESC.search(d) or foreign(d) or d.strip() == ln) and src.get("description") != "manual":
+        if d:
+            rec["gdtfDescription"] = d
+        rec["description"] = auto_description(rec)
+        src["description"] = "gdtf-derived"
+    for k in ("powerSupplyType", "powerConnectorIn", "powerConnectorOut"):
+        v = rec.get(k)
+        if isinstance(v, str):
+            for a, b in CONN_ALIASES.items():
+                v = v.replace(a, b)
+            rec[k] = v
+
+
+# ---- typical-value fallbacks ---------------------------------------------------------------------
+# Used only when neither the GDTF file nor the manufacturer data gives a value; every such value is
+# marked "estimated" in _source and listed in _issues, so the simulator can tell it apart.
+TYPICAL_BEAM = {"BEAM": 3, "SPOT": 15, "PROFILE": 19, "BSW": 4, "WASH": 25, "WASH BEAM": 8, "PAR": 25,
+                "LED BAR": 30, "BLINDER": 60, "STROBE": 90, "UV": 40, "FOLLOW SPOT": 10, "SCANER": 15, "LASER": 1}
+TYPICAL_LENS = {"BEAM": "Spot", "SPOT": "Spot", "PROFILE": "Ellipsoidal (Profile)", "BSW": "Spot", "WASH": "Wash",
+                "WASH BEAM": "Wash", "PAR": "Wash", "LED BAR": "Wash", "BLINDER": "Wash", "STROBE": "Wash", "UV": "Wash",
+                "FOLLOW SPOT": "Spot", "SCANER": "Spot"}
+EFFICACY_LM_PER_W = {"LED": 40.0, "Discharge Lamp": 45.0, "Laser": 30.0, "Tungsten Lamp": 15.0, "Halogen Lamp": 18.0}
+FANLESS = re.compile(r"fan[- ]?less|fan[- ]?free|no fan|passive(ly)? cool|convection[- ]cool|completely silent|silent operation|noiseless", re.I)
+
+
+def fallback_stats(recs, srcs):
+    """Median power and weight-per-watt per category, from values backed by GDTF properties or spec sheets."""
+    pw, kgw = {}, {}
+    for r, s in zip(recs, srcs):
+        c, w, kg = r.get("category"), r.get("powerConsumptionW"), r.get("weightKg")
+        good_w = w and s.get("powerConsumptionW") in ("gdtf", "manual")
+        if good_w:
+            pw.setdefault(c, []).append(w)
+        if good_w and kg and s.get("weightKg") in ("gdtf", "manual") and w >= 10:
+            kgw.setdefault(c, []).append(kg / w)
+    med = lambda v: sorted(v)[len(v) // 2]
+    allp = [x for v in pw.values() for x in v]
+    allk = [x for v in kgw.values() for x in v]
+    return {"power": {c: med(v) for c, v in pw.items() if len(v) >= 3}, "power_all": med(allp),
+            "kgw": {c: med(v) for c, v in kgw.items() if len(v) >= 3}, "kgw_all": med(allk)}
+
+
+def typical_noise(rec, text):
+    """dB(A) at 1 m: typical values per device class (manufacturers rarely publish them)."""
+    c, src, w = rec.get("category"), rec.get("lightSourceType"), rec.get("powerConsumptionW") or 0
+    if c == "FOG": return 60
+    if c == "HAZE": return 50
+    if c == "FAN": return 65
+    if c == "OTHER" and src is None: return None
+    if FANLESS.search(text): return 0
+    if rec.get("motorizedPanTilt"):
+        if src == "Discharge Lamp": return 47
+        return 38 if w < 300 else 43 if w < 800 else 48
+    return 30 if w < 150 else 35 if w < 600 else 40
+
+
+LOAD_FIELDS = ("maxInputPowerW", "maxLoadW", "maxLoadCurrentA", "maxLoadPerChannelA", "outputChannels", "outputVoltage")
+
+
+def apply_fallbacks(rec, src, issues, na, stats):
+    filled = []
+
+    def put(k, v):
+        if v is None or k in na or rec.get(k) not in (None, [], {}):
+            return
+        rec[k] = v
+        src[k] = "estimated"
+        filled.append(k)
+
+    # implausible GDTF photometry (> 150 lm/W of mains power) is dropped and re-estimated
+    fl, w0 = rec.get("luminousFluxLm"), rec.get("powerConsumptionW")
+    if fl and w0 and fl > 150 * w0 and src.get("luminousFluxLm") != "manual":
+        issues.append(f"GDTF luminous flux {fl:g} lm is implausible for {w0:g} W and was dropped")
+        rec["luminousFluxLm"] = None
+        src.pop("luminousFluxLm", None)
+        if src.get("maxLuminousIntensityCd") == "estimated":
+            rec["maxLuminousIntensityCd"] = None
+            src.pop("maxLuminousIntensityCd")
+    cat, ls = rec.get("category"), rec.get("lightSourceType")
+    device = not (cat == "OTHER" and ls is None and rec.get("powerConsumptionW") is None)
+    if device and "powerConsumptionW" not in na:
+        put("powerConsumptionW", stats["power"].get(cat, stats["power_all"]))
+    w = rec.get("powerConsumptionW")
+    if w:
+        put("weightKg", round(max(0.3, w * stats["kgw"].get(cat, stats["kgw_all"])), 1))
+    if device and rec.get("supportedPowerNetworks") is None and "supportedPowerNetworks" not in na:
+        put("voltageRangeV", {"min": 100.0, "max": 240.0})
+        put("frequencyRangeHz", {"min": 50.0, "max": 60.0})
+        put("supportedPowerNetworks", [lbl for lbl, v, f in POWER_NETWORKS if 100 <= v <= 240])
+    if device and rec.get("powerSupplyType") is None and "powerSupplyType" not in na:
+        top = (rec.get("ipRating") or "IP20") >= "IP54"
+        put("powerSupplyType", "powerCON TRUE1 TOP LINK" if top else "powerCON TRUE1 LINK")
+        put("powerConnectorIn", "powerCON TRUE1 TOP" if top else "powerCON TRUE1")
+        put("powerConnectorOut", "powerCON TRUE1 TOP" if top else "powerCON TRUE1")
+    if rec.get("motorizedPanTilt"):
+        if rec.get("infinitePan") is not None or rec.get("tiltRangeDeg") is None:
+            put("panRangeDeg", 540.0)
+        put("tiltRangeDeg", 270.0)
+    if ls:
+        if rec.get("beamAngleDeg") is None and cat in TYPICAL_BEAM:
+            b = float(TYPICAL_BEAM[cat])
+            put("beamAngleDeg", {"min": b, "max": b})
+        put("lensType", TYPICAL_LENS.get(cat))
+        if rec.get("maxLuminousIntensityCd") is None and ls in EFFICACY_LM_PER_W or ls == "LED":
+            if rec.get("maxLuminousIntensityCd") is None:
+                flux = rec.get("luminousFluxLm") or ((rec.get("powerConsumptionW") or 0) * EFFICACY_LM_PER_W.get(ls, 40.0))
+                b = rec.get("beamAngleDeg") or {}
+                ang = b.get("min") or rec.get("fieldAngleDeg") or TYPICAL_BEAM.get(cat, 25)
+                if flux and ang:
+                    omega = 2 * math.pi * (1 - math.cos(math.radians(min(max(ang, 2.0), 150)) / 2))
+                    put("maxLuminousIntensityCd", sig2(flux / omega * 0.7))
+        if rec.get("colorTemperatureK") is None and "colorTemperatureK" not in na:
+            mix = rec.get("colorMixing") or "None"
+            if ls == "Discharge Lamp":
+                put("colorTemperatureK", {"min": 7000.0, "max": 7000.0})
+            elif ls == "Laser" or mix in ("RGB", "RGB+UV"):
+                na.add("colorTemperatureK")  # no white emitter: CCT is not a property of the fixture
+            elif mix == "None":
+                put("colorTemperatureK", {"min": 6500.0, "max": 6500.0})
+            else:  # mixing with a white emitter: typical white-point presets
+                put("colorTemperatureK", {"min": 2800.0, "max": 8000.0})
+    if ls or rec.get("powerConsumptionW"):
+        put("ipRating", "IP20")  # nothing in the name, description or spec sheet points to an outdoor rating
+    text = f"{rec.get('description') or ''} {rec.get('gdtfDescription') or ''}"
+    if rec.get("noiseLevelDb") is None and "noiseLevelDb" not in na:
+        n = typical_noise(rec, text)
+        if n is None:
+            na.add("noiseLevelDb")
+        else:
+            put("noiseLevelDb", n)
+    rec["powerLinkable"] = bool(rec.get("powerConnectorOut")) or str(rec.get("powerSupplyType") or "").endswith("LINK")
+    # power distribution (dimmers, distros, PSUs, feeders): what the device passes on to connected loads is kept
+    # apart from its own consumption, so a load calculation does not count the connected fixtures twice
+    for k in LOAD_FIELDS:
+        rec.setdefault(k, None)
+    if filled:
+        issues.append("Typical-value estimates (no published data): " + ", ".join(filled))
+
+
 def main(src_dir, out_dir):
     os.makedirs(os.path.join(out_dir, "fixtures"), exist_ok=True)
     # manual research, one JSON per manufacturer: {"<gdtf file name>": {field: value, "_refs": [...]}}
+    # files are read in name order and entries for the same fixture are merged field by field, so a later
+    # layer (e.g. overrides/web/*.json, values parsed from the manufacturer's product pages) refines earlier ones
+    all_files = sorted(f for f in os.listdir(src_dir) if f.lower().endswith(".gdtf"))
+
+    def canon(k):
+        if k.endswith("@*") or k in all_files:
+            return k
+        pre = "@".join(k.split("@")[:2]) + "@"
+        hits = [f for f in all_files if f.startswith(pre)]
+        return hits[0] if len(hits) == 1 else k
+
     overrides = {}
     ov_dir = os.path.join(out_dir, "overrides")
-    if os.path.isdir(ov_dir):
-        for fn in sorted(os.listdir(ov_dir)):
-            if fn.endswith(".json"):
-                with open(os.path.join(ov_dir, fn), encoding="utf-8") as f:
-                    overrides.update(json.load(f))
-    # an override key may also be just "Manufacturer@Model" (or any unique "Manufacturer@Model@" prefix)
-    all_files = sorted(f for f in os.listdir(src_dir) if f.lower().endswith(".gdtf"))
-    for k in list(overrides):
-        if k not in all_files:
-            pre = "@".join(k.split("@")[:2]) + "@"
-            hits = [f for f in all_files if f.startswith(pre)]
-            if len(hits) == 1:
-                overrides.setdefault(hits[0], overrides.pop(k))
-    index = []
+    paths = []
+    for root, _, fns in os.walk(ov_dir):
+        paths += [os.path.join(root, fn) for fn in fns if fn.endswith(".json")]
+    for path in sorted(paths, key=lambda p: (p.count(os.sep), p)):
+        with open(path, encoding="utf-8") as f:
+            for k, v in json.load(f).items():
+                cur = overrides.setdefault(canon(k), {})
+                est = set(cur.get("_estimated", []))
+                if "_refs" in v and not cur.get("_refs") and "_notes" in v:
+                    cur.pop("_notes", None)  # notes of an unsourced (estimate) entry are superseded by the sourced one
+                if "_refs" in v:  # a sourced layer replaces earlier estimates of the fields it sets
+                    est -= {f for f in v if not f.startswith("_")}
+                    cur["_refs"] = list(dict.fromkeys(v["_refs"] + cur.get("_refs", [])))
+                est |= set(v.get("_estimated", []))
+                if est:
+                    cur["_estimated"] = sorted(est)
+                else:
+                    cur.pop("_estimated", None)
+                for kk, vv in v.items():
+                    if kk in ("_refs", "_estimated"):
+                        continue
+                    if kk == "_na":
+                        cur["_na"] = sorted(set(cur.get("_na", [])) | set(vv))
+                    elif kk == "_notes" and cur.get("_notes") and vv not in cur["_notes"]:
+                        cur["_notes"] = cur["_notes"] + " " + vv
+                    else:
+                        cur[kk] = vv
+    # an override key may also be just "Manufacturer@Model" (or any unique "Manufacturer@Model@" prefix);
+    # "Manufacturer@*" holds defaults for every fixture of that manufacturer (lowest priority)
+    mfr_defaults = {k[:-2]: overrides.pop(k) for k in list(overrides) if k.endswith("@*")}
+    index, rows = [], []
     for fn in sorted(os.listdir(src_dir)):
         if not fn.lower().endswith(".gdtf"):
             continue
@@ -604,7 +846,18 @@ def main(src_dir, out_dir):
         except Exception as e:  # keep going, report
             index.append({"file": fn, "error": str(e)})
             continue
-        ov = expand_override(overrides.get(fn) or overrides.get(meta["fixtureTypeId"]) or {})
+        own = overrides.get(fn) or overrides.get(meta["fixtureTypeId"]) or {}
+        dflt = dict(mfr_defaults.get(fn.split("@")[0], {}))
+        if dflt:
+            # defaults are generic for the brand: estimated unless the fixture's own entry says otherwise
+            dflt_est = set(dflt.pop("_estimated", [k for k in dflt if not k.startswith("_")]))
+            for k in ("_refs", "_notes", "_source"):
+                dflt.pop(k, None)
+            for k in list(dflt):
+                if k in own:
+                    dflt.pop(k)
+            own = {**dflt, **own, "_estimated": sorted(set(own.get("_estimated", [])) | (dflt_est & set(dflt)))}
+        ov = expand_override(own)
         # "_source": default source for the override ("manual" = manufacturer spec sheet),
         # "_estimated": fields filled from general knowledge / typical values, not a verified sheet
         est = set(ov.get("_estimated", []))
@@ -620,16 +873,40 @@ def main(src_dir, out_dir):
                 continue
             rec[k] = v
             src[k] = "estimated" if k in est else ov.get("_source", "manual")
+        issues = list(issues)
+        if src.get("powerConsumptionW") != "estimated":
+            issues = [i for i in issues if not i.startswith("Power consumption taken from GDTF beam")]
+        if src.get("maxLuminousIntensityCd") == "estimated" and "maxLuminousIntensityCd" not in ov \
+                and ({"luminousFluxLm", "beamAngleDeg"} & set(ov)):
+            rec["maxLuminousIntensityCd"] = None  # re-estimated below from the published flux / beam
+            src.pop("maxLuminousIntensityCd")
         if ov.get("_notes"):
-            issues = issues + [ov["_notes"]]
-        if not rec.get("description"):
-            rec["description"] = auto_description(rec)
-            src["description"] = "gdtf-derived"
+            issues.append(ov["_notes"])
+        for ax in ("panRangeDeg", "tiltRangeDeg"):
+            if rec.get(ax) == 0:  # older overrides wrote 0 for "no motor on this axis"
+                rec[ax] = None
+                src.pop(ax, None)
+        if "framingShutterType" not in ov:
+            # wash/fresnel optics shape the beam with barn doors, profiles/spots with framing shutters in the gate
+            kind = None
+            if rec.get("framingShutters"):
+                kind = "Barn doors" if rec.get("category") in ("WASH", "WASH BEAM", "PAR", "LED BAR") else "Framing shutters"
+            rec["framingShutterType"] = kind
+            if kind:
+                src["framingShutterType"] = "gdtf-derived"
+        rows.append((fn, meta, rec, src, issues, ov))
+
+    # ---- dataset-level passes: names, vocabularies, typical-value fallbacks ------------------------
+    stats = fallback_stats([r[2] for r in rows], [r[3] for r in rows])
+    for fn, meta, rec, src, issues, ov in rows:
+        normalize_record(rec, src, meta, issues)
+        na = set(ov.get("_na", []))
+        apply_fallbacks(rec, src, issues, na, stats)
         if rec.get("category") not in CATEGORIES:
-            issues = issues + [f"INVALID category {rec.get('category')!r}"]
+            issues.append(f"INVALID category {rec.get('category')!r}")
         if rec.get("lightSourceType") not in LIGHT_SOURCES:
-            issues = issues + [f"INVALID lightSourceType {rec.get('lightSourceType')!r}"]
-        na = list(ov.get("_na", []))  # fields that do not apply to this device
+            issues.append(f"INVALID lightSourceType {rec.get('lightSourceType')!r}")
+        na = sorted(na)  # fields that do not apply to this device
         miss = missing_fields(rec, na)
         doc = {"schemaVersion": SCHEMA_VERSION, **meta, **rec, "_source": src, "_missing": miss, "_notApplicable": na, "_issues": issues}
         if ov.get("_refs"):

@@ -4,9 +4,9 @@
   "fixtureTypeId": "AC70980B-8E18-4355-AD16-05441F030039",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin iSpiiderX",
-  "longName": "Robin iSpiiderX®",
+  "longName": "Robin iSpiiderX",
   "shortName": "iSpiiderX",
-  "description": "Introducing the iSpiiderX®, a pinnacle of cutting-edge design, construction, and protection technology. Evolving from the esteemed legacy of its predecessor, the original iSpiider®, this high-performance fixture boasts an IP65 rating, ensuring resilience against any weather conditions.",
+  "description": "Introducing the iSpiiderX, a pinnacle of cutting-edge design, construction, and protection technology. Evolving from the esteemed legacy of its predecessor, the original iSpiider, this high-performance fixture boasts an IP65 rating, ensuring resilience against any weather conditions.",
   "manufacturer": "Robe Lighting",
   "category": "WASH BEAM",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 660.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 2316.0,
-  "noiseLevelDb": null,
-  "weightKg": 18.0,
+  "powerConsumptionW": 700.0,
+  "maxLuminousIntensityCd": 1225000.0,
+  "luminousFluxLm": 13100.0,
+  "noiseLevelDb": 46.0,
+  "weightKg": 19.0,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 220.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -60,6 +63,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -74,6 +78,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -50.0,
     "max": 50.0
@@ -121,20 +126,29 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Robe Lighting Robin iSpiiderX",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -158,17 +172,21 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "noiseLevelDb": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "fullName": "gdtf-derived"
   },
-  "_missing": [
-    "maxLuminousIntensityCd",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in"
+  ],
+  "_refs": [
+    "https://www.robe.cz/ispiiderx"
   ]
 }

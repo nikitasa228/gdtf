@@ -6,24 +6,41 @@
   "gdtfName": "Fuze Max Spot",
   "longName": "Fuze Max Spot",
   "shortName": "FzMxSpot",
-  "description": "The FUZE MAX SPOT™ is a full spectrum automated LED Spot fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes a 800W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of over 21,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.\nThe FUZE SPOT MAX is designed for any application where fully automated spot fixture with outstanding and compelling color range and quality is required. Two rotating gobo wheels, one fixed gobo wheel, animation wheel, dual frost, prism and iris round out its comprehensive feature set in this quiet and extremely powerful automated spot fixture.",
+  "description": "The FUZE MAX SPOT is a full spectrum automated LED Spot fixture designed for theater, television and a wide array of other precision lighting applications. The 92 CRI engine utilizes a 800W 5-color homogenized LED array consisting of Red, Green, Blue, Mint, and Amber sources. The carefully tuned LEDs ensure accurate color reproduction and dynamic whites while delivering a powerful output of over 21,000 lumens. Virtual color temperature, Magenta / Green adjustment plus CMY emulation provide the designer with immediate access to the impressive LED color array.\nThe FUZE SPOT MAX is designed for any application where fully automated spot fixture with outstanding and compelling color range and quality is required. Two rotating gobo wheels, one fixed gobo wheel, animation wheel, dual frost, prism and iris round out its comprehensive feature set in this quiet and extremely powerful automated spot fixture.",
   "manufacturer": "Elation",
   "category": "SPOT",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 800.0,
-  "maxLuminousIntensityCd": 1254300.0,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 1214.0,
+  "maxLuminousIntensityCd": 860025.0,
   "luminousFluxLm": 21000.0,
-  "noiseLevelDb": null,
-  "weightKg": 25.9,
-  "powerConnectorIn": null,
+  "noiseLevelDb": 48,
+  "weightKg": 34.5,
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": true,
   "panRangeDeg": 630.0,
   "tiltRangeDeg": 250.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -58,6 +75,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -80,7 +98,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -120,16 +139,25 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Elation Fuze Max Spot",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
+    "powerConsumptionW": "manual",
+    "maxLuminousIntensityCd": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -155,17 +183,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/fuze-max-spot",
+    "https://assets.centryngroup.com/dl/files/FUZ528__DL__005.pdf"
   ]
 }

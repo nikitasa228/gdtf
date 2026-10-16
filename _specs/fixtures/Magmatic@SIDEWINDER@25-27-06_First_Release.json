@@ -4,7 +4,7 @@
   "fixtureTypeId": "F7881C6F-DAC6-46A8-A470-CD2C3A6B13F6",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Sidewinder",
-  "longName": "Magmatic Sidewinder",
+  "longName": "Sidewinder",
   "shortName": "Sidewinder",
   "description": "SIDEWINDER 1450W HIGH VELOCITY CO2 SIMULATOR\n\nSIDEWINDER is a professional-grade lighting solution. Equipped with an easy to use onboard LCD touch screen control panel, intuitive DMX-512, RDM control, durable aluminum housing, and optional wired and wireless remote control options. 50,000 cu.ft per minute Four, 8-second 20-ft bursts 180° multi position fog burst 22, 3#160; watt RGBA LED's (Red X5 Green X6 Blue X6 Amber X5) Use of LEDs even without the use of Fog Durable, tour-ready, aluminum housing#160;.",
   "manufacturer": "Magmatic",
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 66.0,
+  "powerConsumptionW": 1560,
   "maxLuminousIntensityCd": null,
   "luminousFluxLm": 6600.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 60,
   "weightKg": 13.4,
-  "powerConnectorIn": "powerCON",
+  "powerConnectorIn": "powerCON TRUE1 TOP",
   "powerConnectorOut": null,
-  "powerSupplyType": "powerCON",
+  "powerSupplyType": "powerCON TRUE1 TOP",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -55,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBA",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -65,7 +69,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -86,17 +91,26 @@
   ],
   "pixelCount": 1,
   "subType": "Fog jet with LED illumination",
+  "fullName": "Magmatic Sidewinder",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "manual",
-    "powerConsumptionW": "gdtf-derived",
+    "powerConsumptionW": "manual",
     "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "gdtf",
@@ -114,24 +128,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
+    "ipRating": "manual",
     "voltageRangeV": "estimated",
     "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "maxLuminousIntensityCd",
     "beamAngleDeg",
-    "colorTemperatureK"
+    "colorTemperatureK",
+    "maxLuminousIntensityCd"
   ],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "CO2-simulator fog machine with 22x3W RGBA LEDs. 1560 W max is the whole machine incl. heater (rated 1450 W); index 66 W likely LED-only. Page lists AC 100-120V plus a 230/240V version, so mains omitted. Approvals line lists IP20 although power inlet is IP65-type.",
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/sidewinder"
   ]
 }

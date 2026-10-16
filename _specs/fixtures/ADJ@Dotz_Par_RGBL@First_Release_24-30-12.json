@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 36,
+  "powerConsumptionW": 36.0,
   "maxLuminousIntensityCd": 8600,
   "luminousFluxLm": 1317.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.0,
   "powerConnectorIn": "IEC C14",
   "powerConnectorOut": "IEC C14",
   "powerSupplyType": "IEC C14 LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -59,6 +62,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBL",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -73,6 +77,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -15.0,
     "max": 45.0
@@ -104,6 +109,14 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "ADJ Dotz Par RGBL",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
@@ -117,6 +130,7 @@
     "powerConnectorIn": "manual",
     "powerConnectorOut": "manual",
     "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "dataConnectors": "gdtf-derived",
     "lightSourceType": "manual",
@@ -137,23 +151,25 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "ipRating": "manual",
     "voltageRangeV": "manual",
     "frequencyRangeHz": "manual",
-    "supportedPowerNetworks": "manual"
+    "supportedPowerNetworks": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)",
-    "GDTF weight 7.5 kg / 56 W contradicts spec sheet (2 kg / 36 W)."
+    "GDTF weight 7.5 kg / 56 W contradicts spec sheet (2 kg / 36 W).",
+    "Typical-value estimates (no published data): noiseLevelDb"
   ],
   "_refs": [
+    "https://www.adj.com/products/dotz-par-rgbl",
     "https://www.adj.com/dotz-par-rgbl"
   ]
 }

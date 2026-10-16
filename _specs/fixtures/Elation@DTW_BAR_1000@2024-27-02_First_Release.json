@@ -6,24 +6,39 @@
   "gdtfName": "DTW BAR 1000",
   "longName": "DTW BAR 1000",
   "shortName": "DTW1000",
-  "description": "The DTW BAR 1000™ features (12) 10W multi-chip Cool White / Warm White / Amber LEDs, 20° beam 40° field angles, selectable dim-to-warm control, cool white, warm white, and amber color mixing, full pixel and 1,600K - 6,500K color temperature control, variable 16-bit dimming curve modes, selectable color and program macros, strobe and chase effects, DMX, RDM, KlingNet, and Art-Net protocol support, DMX, RJ45, and Locking Power in/out connections, LCD menu display with 4 button control panel, integrated dual rigging brackets, multiple unit power linking, rugged die-cast aluminum exterior, included frost filter and glare shield, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
+  "description": "The DTW BAR 1000 features (12) 10W multi-chip Cool White / Warm White / Amber LEDs, 20° beam 40° field angles, selectable dim-to-warm control, cool white, warm white, and amber color mixing, full pixel and 1,600K - 6,500K color temperature control, variable 16-bit dimming curve modes, selectable color and program macros, strobe and chase effects, DMX, RDM, KlingNet, and Art-Net protocol support, DMX, RJ45, and Locking Power in/out connections, LCD menu display with 4 button control panel, integrated dual rigging brackets, multiple unit power linking, rugged die-cast aluminum exterior, included frost filter and glare shield, flicker free operation for TV and FILM, and a multi-voltage universal auto switching power supply (110-240v).",
   "manufacturer": "Elation",
   "category": "LED BAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1800.0,
-  "maxLuminousIntensityCd": 19400.0,
+  "supportedPowerNetworks": [
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 110.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 120.0,
+  "maxLuminousIntensityCd": 17878.0,
   "luminousFluxLm": 2640.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 6.4,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -43,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "Tunable White (CW/WW)",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -56,7 +72,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -116,16 +133,24 @@
     }
   ],
   "pixelCount": 12,
+  "fullName": "Elation DTW BAR 1000",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -145,17 +170,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/dtw-bar-1000",
+    "https://assets.centryngroup.com/dl/files/DTW392__DL__003.pdf",
+    "https://www.stagespot.com/elation-dtw-bar-1000.html"
   ]
 }

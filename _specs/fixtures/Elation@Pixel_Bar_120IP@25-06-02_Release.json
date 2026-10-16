@@ -6,30 +6,50 @@
   "gdtfName": "Pixel Bar 120IP",
   "longName": "Pixel Bar 120IP",
   "shortName": "PixBr120",
-  "description": "The PIXEL BAR 120IP™ is an outdoor IP65 rated LED pixel bar featuring (120) tri-color RGB SMD LEDs with a 16mm pixel pitch, a refresh rate of 44,000Hz for flicker free operation for broadcast TV and FILM applications, and measures 2 meter (6.6 feet) in length. Each pixel bar is housed in a lightweight IP65 rated aluminum housing featuring magnetic end caps which allow seamless end-to-end pixel spacing, an integrated adjustable mounting bracket, a safety cable loop, and includes square and rounded frosted lens attachments.",
+  "description": "The PIXEL BAR 120IP is an outdoor IP65 rated LED pixel bar featuring (120) tri-color RGB SMD LEDs with a 16mm pixel pitch, a refresh rate of 44,000Hz for flicker free operation for broadcast TV and FILM applications, and measures 2 meter (6.6 feet) in length. Each pixel bar is housed in a lightweight IP65 rated aluminum housing featuring magnetic end caps which allow seamless end-to-end pixel spacing, an integrated adjustable mounting bracket, a safety cable loop, and includes square and rounded frosted lens attachments.",
   "manufacturer": "Elation",
   "category": "LED BAR",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 24.0,
+  "maxLuminousIntensityCd": 3100.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 30,
   "weightKg": 2.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "4-pin power/data connector",
+  "powerConnectorOut": "4-pin power/data connector",
+  "powerSupplyType": "4-pin power/data connector LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 30.0,
+    "max": 30.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Rectangle",
@@ -38,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": null,
@@ -49,6 +70,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 0.0,
     "max": 40.0
@@ -84,13 +106,22 @@
     }
   ],
   "pixelCount": 5,
+  "fullName": "Elation Pixel Bar 120IP",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "weightKg": "gdtf",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "zoom": "gdtf-derived",
@@ -107,22 +138,33 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "estimated",
+    "frequencyRangeHz": "estimated",
+    "supportedPowerNetworks": "estimated",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "beamAngleDeg": "estimated",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "beamAngleDeg",
+  "_missing": [],
+  "_notApplicable": [
     "colorTemperatureK"
   ],
-  "_notApplicable": [],
   "_issues": [
-    "Beam angle equals the GDTF default (25°) - probably not filled in"
+    "Beam angle equals the GDTF default (25°) - probably not filled in",
+    "Typical-value estimates (no published data): beamAngleDeg, maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/pixel-bar-120ip",
+    "https://www.elationlighting.com/pixel-bar-120ip"
   ]
 }

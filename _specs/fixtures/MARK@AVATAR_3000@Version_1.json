@@ -6,7 +6,7 @@
   "gdtfName": "AVATAR 3000",
   "longName": "AVATAR 3000",
   "shortName": "Avatar3000",
-  "description": "AVATAR 3000 es un dispositivo que combina un flash estroboscópico con LEDs de color blanco y los efectos tipo Aura generados por una serie de LEDs RGB situados en la parte interna. Su tecnología avanzada y un amplio rango de funcionalidades permiten la creación de todo tipo de eventos de iluminación. Dispone de una pantalla táctil en color con acceso a todas sus funcionalidades y configuraciones, destacando el control manual de cada función, los diferentes modos de control (DMX, Auto, Audio y Manual), y acceso a información de funcionamiento. En el apartado de control DMX, cuenta con 3 modos (3, 4 y 14 canales), controlando los parámetros del efecto flash y la configuración tanto de los efectos Aura como del nivel de cada color individual.",
+  "description": "MARK AVATAR 3000: LED strobe, with 82 deg beam, RGB colour mixing.",
   "manufacturer": "MARK",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -26,18 +26,21 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": 740.0,
-  "maxLuminousIntensityCd": 90800.0,
-  "luminousFluxLm": 200000.0,
-  "noiseLevelDb": null,
+  "powerConsumptionW": 1250,
+  "maxLuminousIntensityCd": 23000.0,
+  "luminousFluxLm": null,
+  "noiseLevelDb": 40,
   "weightKg": 8.3,
-  "powerConnectorIn": "powerCON TRUE1",
-  "powerConnectorOut": null,
-  "powerSupplyType": "powerCON TRUE1",
+  "powerConnectorIn": "powerCON",
+  "powerConnectorOut": "powerCON",
+  "powerSupplyType": "powerCON LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
@@ -55,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -68,7 +72,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": 5.0,
     "max": 40.0
@@ -88,20 +93,28 @@
     }
   ],
   "pixelCount": 2,
+  "fullName": "MARK AVATAR 3000",
+  "gdtfDescription": "AVATAR 3000 es un dispositivo que combina un flash estroboscópico con LEDs de color blanco y los efectos tipo Aura generados por una serie de LEDs RGB situados en la parte interna. Su tecnología avanzada y un amplio rango de funcionalidades permiten la creación de todo tipo de eventos de iluminación. Dispone de una pantalla táctil en color con acceso a todas sus funcionalidades y configuraciones, destacando el control manual de cada función, los diferentes modos de control (DMX, Auto, Audio y Manual), y acceso a información de funcionamiento. En el apartado de control DMX, cuenta con 3 modos (3, 4 y 14 canales), controlando los parámetros del efecto flash y la configuración tanto de los efectos Aura como del nivel de cada color individual.",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "estimated",
-    "powerConsumptionW": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "powerConnectorIn": "gdtf-derived",
-    "powerSupplyType": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "powerConnectorIn": "manual",
+    "powerSupplyType": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
-    "lightSourceType": "gdtf",
+    "lightSourceType": "manual",
     "beamAngleDeg": "gdtf",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
@@ -119,18 +132,27 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "ipRating": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
-    "Power consumption taken from beam geometry sum (unverified)"
+    "MARK is a brand of Equipson S.A. (Spain). 1250 W is from the official product summary (\"Efecto Flash/Aura. 1250 W\", 240x5W white + 64x0.6W RGB); the tech table and the image-only manual give no consumption figure. Cooling: 4 fans.",
+    "GDTF luminous flux 200000 lm is implausible for 1250 W and was dropped",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, ipRating, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.equipson.es/producto/avatar-3000"
   ]
 }

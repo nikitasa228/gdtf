@@ -4,26 +4,43 @@
   "fixtureTypeId": "676EAB30-2B7A-4471-9AD8-7CA52BDEFB8B",
   "gdtfDataVersion": "1.0",
   "gdtfName": "TEX S-120 4FT RGBW",
-  "longName": "GSARC TEX S-120 4FT RGBW",
+  "longName": "TEX S-120 4FT RGBW",
   "shortName": "TEX S-120 4FT RGBW",
   "description": "TEX is a new architectural outdoor graze lighting series. 3 models with the same aesthetic and fully customizable with multiple white and color variants, beam options, color finishes and accessories. All models are factory color calibrated for perfect consistency and can be monitored through our proprietary VMS (Virtual Monitoring System)",
   "manufacturer": "GSARC",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 3500.0,
-  "luminousFluxLm": 30.0,
-  "noiseLevelDb": null,
-  "weightKg": null,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 277.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 80,
+  "maxLuminousIntensityCd": 39000.0,
+  "luminousFluxLm": 3033,
+  "noiseLevelDb": 0,
+  "weightKg": 4.85,
+  "powerConnectorIn": "IP moulded connector",
+  "powerConnectorOut": "IP moulded connector",
+  "powerSupplyType": "IP moulded connector LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -31,8 +48,8 @@
   "dataConnectors": null,
   "lightSourceType": "LED",
   "beamAngleDeg": {
-    "min": 5.0,
-    "max": 5.0
+    "min": 15.0,
+    "max": 15.0
   },
   "fieldAngleDeg": 10.0,
   "zoom": false,
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": null,
   "dmxModes": [
     {
@@ -68,17 +87,26 @@
     }
   ],
   "pixelCount": 1,
+  "subType": "Linear graze light",
+  "fullName": "GSARC TEX S-120 4FT RGBW",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "controlSignal": "gdtf-derived",
+    "category": "manual",
+    "luminousFluxLm": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "controlSignal": "estimated",
     "lightSourceType": "gdtf",
-    "beamAngleDeg": "gdtf",
+    "beamAngleDeg": "manual",
     "fieldAngleDeg": "gdtf",
     "zoom": "gdtf-derived",
     "lensType": "gdtf-derived",
@@ -95,16 +123,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "subType": "manual",
+    "powerConsumptionW": "manual",
+    "weightKg": "manual",
+    "ipRating": "manual",
+    "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "weightKg",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Power per manufacturer: TEX S 20 W/ft, TEX M 23 W/ft, TEX L 50 W/ft. Convection cooled (no fan): silent. Power/data via integrated cable with waterproof connector. Narrowest standard optic 15 deg (beam angle is chosen at order: up to 60 deg and elliptical options).",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://en.gsarc.com/en/products/842.html?t=1",
+    "https://www.gsarc.com/en/products/842.html?t=1"
+  ]
 }

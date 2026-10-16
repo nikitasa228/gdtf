@@ -4,26 +4,43 @@
   "fixtureTypeId": "E48328FD-13FA-40C0-93EC-FF825CC3C6A2",
   "gdtfDataVersion": "1.2",
   "gdtfName": "ArcShineM18VW_8",
-  "longName": "ArcShineM18VW_8",
+  "longName": "ArcShineM18VW 8",
   "shortName": "ASM18VW",
   "description": "The ArcShine M18VW and ArcShine M9VW are a series of linear LED fixtures, designed for interior and exterior applications (IP66) such as flood lighting, wall washing and accent lighting.\nThere are two sizes available, one with 18 LEDs (100 cm) and the other with 9 (50 cm) LED emitters, 4W each, with Variable White colour mixing. Its die-cast aluminium body with tempered glass make them perfect additions to urban structures or historical buildings. \nOptic: 8° lenses capable of delivering multiple angles with optional holographic filters.\nOptional holographic symmetric and elliptical filters available: 20°, 40°, 60°, 10°x60°, 30°x60°.",
   "manufacturer": "Prolights",
-  "category": "WASH",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 9500.0,
-  "luminousFluxLm": 208.0,
-  "noiseLevelDb": null,
+  "category": "LED BAR",
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 80.0,
+  "maxLuminousIntensityCd": 250000.0,
+  "luminousFluxLm": 5401.0,
+  "noiseLevelDb": 0,
   "weightKg": 4.9,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
+  "powerConnectorIn": "IP moulded connector",
+  "powerConnectorOut": "IP moulded connector",
+  "powerSupplyType": "IP moulded connector LINK",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
-  "tiltRangeDeg": 180.0,
+  "tiltRangeDeg": null,
   "infinitePan": null,
-  "infiniteTilt": false,
+  "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": 180.0,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "Tunable White (CW/WW)",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -56,6 +74,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP66",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 45.0
@@ -87,17 +106,24 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Prolights ArcShineM18VW 8",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
-    "category": "gdtf-derived",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "tiltRangeDeg": "gdtf-derived",
-    "infiniteTilt": "gdtf-derived",
+    "category": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "manualTiltRangeDeg": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -117,18 +143,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
-    "ipRating": "gdtf-derived",
+    "ipRating": "manual",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "noiseLevelDb": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "powerConsumptionW",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "panRangeDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.prolights.it/en/product/ARCSHINEM1808VW"
+  ]
 }

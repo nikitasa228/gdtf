@@ -1,0 +1,3 @@
+{
+ "ADB@Klemantis_AS1000@CP_FW_1_4_526.gdtf": {"powerConsumptionW": 280, "weightKg": 16, "ipRating": "IP20", "mains": "110-240", "powerSupplyType": "powerCON TRUE1 LINK", "noiseLevelDb": 24.5, "_refs": ["https://service.claypaky.it/servlet/checkDocumentsFile?Id=2360"], "_notes": "ADB by Claypaky (product page https://www.claypaky.it/products/klemantis-1000/ gives 15.9 kg). 280 VA at 230 V. Asymmetric optic: 49 deg horizontal x 108 deg vertical spread. Max noise 24.5 dB(A) @1 m. Current record weight 5.89 kg is far off. No lumen/lux published."}
+}

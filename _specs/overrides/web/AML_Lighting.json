@@ -1,0 +1,3 @@
+{
+ "AML_Lighting@AL-Q4IP_Vibrant_800W_IP@V003.gdtf": {"powerConsumptionW": 800, "weightKg": 19.5, "ipRating": "IP65", "mains": "100-240", "powerSupplyType": "powerCON TRUE1 LINK", "tiltRangeDeg": 180, "beam": [6, 22], "_refs": ["https://www.aml-lighting.com/en/ip65-rgbl-aura-strobe-wash-light-al-q4ip"], "_notes": "24x25W RGBL + 36x1.2W RGBA aura. Beam: 6 deg lens, 22 deg with electronic smart-glass frost. Index had 699 W / 22 kg / 90 deg beam."}
+}

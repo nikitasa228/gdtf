@@ -6,24 +6,27 @@
   "gdtfName": "VDO Dotron",
   "longName": "VDO Dotron",
   "shortName": "VDODot",
-  "description": "Official Martin Professional File",
+  "description": "Martin Professional VDO Dotron: device (led video pixel / matrix), with 110 deg beam, RGB colour mixing, IP65 rated.",
   "manufacturer": "Martin Professional",
   "category": "OTHER",
   "supportedPowerNetworks": null,
   "voltageRangeV": null,
   "frequencyRangeHz": null,
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": 0.0,
+  "powerConsumptionW": 5.0,
+  "maxLuminousIntensityCd": 31.0,
   "luminousFluxLm": 120.0,
-  "noiseLevelDb": null,
+  "noiseLevelDb": 0,
   "weightKg": 0.3,
   "powerConnectorIn": "Martin proprietary (P3/PDE)",
   "powerConnectorOut": "Martin proprietary (P3/PDE)",
   "powerSupplyType": "Martin proprietary (P3/PDE)",
+  "motorizedPanTilt": false,
   "panRangeDeg": null,
   "tiltRangeDeg": null,
   "infinitePan": null,
   "infiniteTilt": null,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "Ethernet (Martin P3)"
   ],
@@ -41,6 +44,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGB",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -54,7 +58,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 55.0
@@ -91,15 +96,24 @@
   ],
   "pixelCount": 16,
   "subType": "LED video pixel / matrix",
+  "fullName": "Martin Professional VDO Dotron",
+  "gdtfDescription": "Official Martin Professional File",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "manual",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "luminousFluxLm": "estimated",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
     "controlSignal": "manual",
     "lightSourceType": "gdtf",
     "beamAngleDeg": "gdtf",
@@ -118,24 +132,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
     "subType": "manual",
     "powerSupplyType": "manual",
     "powerConnectorIn": "manual",
-    "powerConnectorOut": "manual"
+    "powerConnectorOut": "manual",
+    "powerConsumptionW": "manual",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [
-    "supportedPowerNetworks",
     "lensType",
-    "lensType"
+    "supportedPowerNetworks"
   ],
   "_issues": [
-    "DC powered and fed with data from a Martin P3 PowerPort; mains networks belong to the PowerPort."
+    "48 V DC fed from a Martin P3 PowerPort; value is the max draw at full white. Fan-free (passive cooling): silent.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.martin.com/en-US/products/vdo-dotron",
+    "https://www.martin.com/da/site_elements/vdo-dotron-family-spec-sheet"
   ]
 }

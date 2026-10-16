@@ -6,24 +6,41 @@
   "gdtfName": "Rayzor 760",
   "longName": "Rayzor 760",
   "shortName": "Ray760",
-  "description": "The Rayzor 760™ is a compact yet extremely powerful Wash Effects fixture featuring Elation’s unique SparkLED™ system and fast continuous Pan and Tilt motion. With its wide zoom range from 5° to 77° it provides intense and well-defined mid-air beams at over 8,000 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
+  "description": "The Rayzor 760 is a compact yet extremely powerful Wash Effects fixture featuring Elation’s unique SparkLED system and fast continuous Pan and Tilt motion. With its wide zoom range from 5° to 77° it provides intense and well-defined mid-air beams at over 8,000 lumens as well as an exceptionally wide and even wash coverage, making it a perfect tool for any application, even in adverse outdoor conditions. SparkLEDs offer a prominent and innovative LED pixel effect with dedicated high brightness pixels inside the large front lenses for additional layers of creativity.",
   "manufacturer": "Elation",
   "category": "WASH BEAM",
-  "supportedPowerNetworks": null,
-  "voltageRangeV": null,
-  "frequencyRangeHz": null,
-  "powerConsumptionW": 1118.0,
-  "maxLuminousIntensityCd": null,
-  "luminousFluxLm": 11615.0,
-  "noiseLevelDb": null,
+  "supportedPowerNetworks": [
+    "100 V - 50 Hz",
+    "100 V - 60 Hz",
+    "110/120 V - 60 Hz",
+    "110/120 V - 50 Hz",
+    "220/230 V - 50 Hz",
+    "220/230 V - 60 Hz",
+    "240/245 V - 50 Hz"
+  ],
+  "voltageRangeV": {
+    "min": 100.0,
+    "max": 240.0
+  },
+  "frequencyRangeHz": {
+    "min": 50.0,
+    "max": 60.0
+  },
+  "powerConsumptionW": 700.0,
+  "maxLuminousIntensityCd": 454879.0,
+  "luminousFluxLm": 8000.0,
+  "noiseLevelDb": 43,
   "weightKg": 12.2,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
-  "panRangeDeg": 540.0,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": 630.0,
   "tiltRangeDeg": 360.0,
   "infinitePan": true,
   "infiniteTilt": true,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM"
@@ -42,6 +59,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBW",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -55,7 +73,8 @@
   "iris": false,
   "focus": false,
   "animationWheel": false,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -10.0,
     "max": 45.0
@@ -91,16 +110,25 @@
     }
   ],
   "pixelCount": 4,
+  "fullName": "Elation Rayzor 760",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "powerConsumptionW": "gdtf-derived",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
-    "panRangeDeg": "gdtf-derived",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "panRangeDeg": "manual",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
     "infiniteTilt": "gdtf-derived",
@@ -122,19 +150,29 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "powerSupplyType": "manual",
+    "ipRating": "manual",
+    "maxLuminousIntensityCd": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "supportedPowerNetworks",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "Power consumption taken from beam geometry sum (unverified)"
+    "Typical-value estimates (no published data): noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.elationlighting.com/products/rayzor-760",
+    "https://assets.centryngroup.com/dl/files/RAY760__DL__008.pdf"
   ]
 }

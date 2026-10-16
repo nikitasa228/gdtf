@@ -4,9 +4,9 @@
   "fixtureTypeId": "19B984E3-6098-4B2F-AD8B-3E1224334F3E",
   "gdtfDataVersion": "1.2",
   "gdtfName": "Robin T2 Profile",
-  "longName": "Robin T2 Profile™",
+  "longName": "Robin T2 Profile",
   "shortName": "T2 Profile",
-  "description": "T2. Taking Multispectral perfection even further! While simultaneously maintaining the absolute colour finesse of Robe’s phenomenally successful T1 series, featuring the MSL™ (Multi-Spectral) LED engine, our T2 Profile™ provides an enhanced output of more than 17.500 lumens, measured at the front lens, via its 850W MSL™ source, to throw their beautiful light even further than before. With a zoom range of 5–55°, T2 Profile™ is ideally suited to its longer-throw role in theatre, television, and touring.",
+  "description": "T2. Taking Multispectral perfection even further! While simultaneously maintaining the absolute colour finesse of Robe’s phenomenally successful T1 series, featuring the MSL (Multi-Spectral) LED engine, our T2 Profile provides an enhanced output of more than 17.500 lumens, measured at the front lens, via its 850W MSL source, to throw their beautiful light even further than before. With a zoom range of 5–55°, T2 Profile is ideally suited to its longer-throw role in theatre, television, and touring.",
   "manufacturer": "Robe Lighting",
   "category": "PROFILE",
   "supportedPowerNetworks": [
@@ -27,17 +27,20 @@
     "max": 60.0
   },
   "powerConsumptionW": 1150.0,
-  "maxLuminousIntensityCd": 601800.0,
-  "luminousFluxLm": 10075.0,
-  "noiseLevelDb": null,
+  "maxLuminousIntensityCd": 1300000.0,
+  "luminousFluxLm": 22000.0,
+  "noiseLevelDb": 29.0,
   "weightKg": 36.9,
   "powerConnectorIn": "powerCON TRUE1",
   "powerConnectorOut": null,
   "powerSupplyType": "powerCON TRUE1",
+  "motorizedPanTilt": true,
   "panRangeDeg": 540.0,
   "tiltRangeDeg": 280.0,
   "infinitePan": false,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512",
     "RDM",
@@ -72,6 +75,7 @@
   "framingShutters": true,
   "framingShutterBlades": 4,
   "framingShutterRotation": true,
+  "framingShutterType": "Framing shutters",
   "colorMixing": "CMY",
   "colorWheel": true,
   "colorTemperatureK": {
@@ -94,7 +98,8 @@
   "iris": true,
   "focus": true,
   "animationWheel": true,
-  "ipRating": null,
+  "ipRating": "IP20",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -5.0,
     "max": 45.0
@@ -122,21 +127,29 @@
     }
   ],
   "pixelCount": 1,
+  "fullName": "Robe Lighting Robin T2 Profile",
+  "powerLinkable": false,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
     "description": "gdtf",
     "manufacturer": "gdtf",
     "category": "gdtf-derived",
-    "supportedPowerNetworks": "gdtf-derived",
-    "voltageRangeV": "gdtf",
-    "frequencyRangeHz": "gdtf",
-    "powerConsumptionW": "gdtf",
-    "maxLuminousIntensityCd": "estimated",
-    "luminousFluxLm": "gdtf",
-    "weightKg": "gdtf",
+    "supportedPowerNetworks": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "powerConsumptionW": "manual",
+    "luminousFluxLm": "manual",
+    "weightKg": "manual",
     "powerConnectorIn": "gdtf-derived",
     "powerSupplyType": "gdtf-derived",
+    "motorizedPanTilt": "gdtf-derived",
     "panRangeDeg": "gdtf-derived",
     "tiltRangeDeg": "gdtf-derived",
     "infinitePan": "gdtf-derived",
@@ -163,13 +176,22 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
-    "pixelCount": "gdtf-derived"
+    "pixelCount": "gdtf-derived",
+    "ipRating": "manual",
+    "noiseLevelDb": "manual",
+    "framingShutterType": "gdtf-derived",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated"
   },
-  "_missing": [
-    "noiseLevelDb"
-  ],
+  "_missing": [],
   "_notApplicable": [],
-  "_issues": []
+  "_issues": [
+    "Typical-value estimates (no published data): maxLuminousIntensityCd"
+  ],
+  "_refs": [
+    "https://www.robe.cz/t2-profile"
+  ]
 }

@@ -6,7 +6,7 @@
   "gdtfName": "AL-Q4IP Vibrant 800W IP",
   "longName": "AL-Q4IP Vibrant 800W IP",
   "shortName": "AL-Q4IP",
-  "description": "AL-Q4IP Vibrant 800W IP",
+  "description": "AML Lighting AL-Q4IP Vibrant 800W IP: LED strobe, with 6 deg beam, RGBWL colour mixing, frost, IP65 rated.",
   "manufacturer": "AML Lighting",
   "category": "STROBE",
   "supportedPowerNetworks": [
@@ -26,24 +26,30 @@
     "min": 50.0,
     "max": 60.0
   },
-  "powerConsumptionW": null,
-  "maxLuminousIntensityCd": null,
+  "powerConsumptionW": 800,
+  "maxLuminousIntensityCd": 2600000.0,
   "luminousFluxLm": null,
-  "noiseLevelDb": null,
-  "weightKg": 22.0,
-  "powerConnectorIn": null,
-  "powerConnectorOut": null,
-  "powerSupplyType": null,
-  "panRangeDeg": 0,
-  "tiltRangeDeg": 270.0,
+  "noiseLevelDb": 48,
+  "weightKg": 19.5,
+  "powerConnectorIn": "powerCON TRUE1",
+  "powerConnectorOut": "powerCON TRUE1",
+  "powerSupplyType": "powerCON TRUE1 LINK",
+  "motorizedPanTilt": true,
+  "panRangeDeg": null,
+  "tiltRangeDeg": 180,
   "infinitePan": null,
   "infiniteTilt": false,
+  "manualPanRangeDeg": null,
+  "manualTiltRangeDeg": null,
   "controlSignal": [
     "DMX512"
   ],
   "dataConnectors": null,
   "lightSourceType": "LED",
-  "beamAngleDeg": null,
+  "beamAngleDeg": {
+    "min": 6.0,
+    "max": 22.0
+  },
   "fieldAngleDeg": null,
   "zoom": false,
   "lensType": "Wash",
@@ -52,6 +58,7 @@
   "framingShutters": false,
   "framingShutterBlades": 0,
   "framingShutterRotation": false,
+  "framingShutterType": null,
   "colorMixing": "RGBWL",
   "colorWheel": false,
   "colorTemperatureK": {
@@ -66,6 +73,7 @@
   "focus": false,
   "animationWheel": false,
   "ipRating": "IP65",
+  "batteryPowered": false,
   "operatingTemperatureC": {
     "min": -20.0,
     "max": 40.0
@@ -93,14 +101,24 @@
     }
   ],
   "pixelCount": 6,
+  "fullName": "AML Lighting AL-Q4IP Vibrant 800W IP",
+  "gdtfDescription": "AL-Q4IP Vibrant 800W IP",
+  "powerLinkable": true,
+  "maxInputPowerW": null,
+  "maxLoadW": null,
+  "maxLoadCurrentA": null,
+  "maxLoadPerChannelA": null,
+  "outputChannels": null,
+  "outputVoltage": null,
   "_source": {
     "longName": "gdtf",
     "shortName": "gdtf",
-    "description": "gdtf",
+    "description": "gdtf-derived",
     "manufacturer": "gdtf",
     "category": "estimated",
-    "weightKg": "gdtf",
-    "tiltRangeDeg": "gdtf-derived",
+    "weightKg": "manual",
+    "motorizedPanTilt": "gdtf-derived",
+    "tiltRangeDeg": "manual",
     "infiniteTilt": "gdtf-derived",
     "controlSignal": "gdtf-derived",
     "lightSourceType": "manual",
@@ -119,25 +137,31 @@
     "iris": "gdtf-derived",
     "focus": "gdtf-derived",
     "animationWheel": "gdtf-derived",
+    "batteryPowered": "gdtf-derived",
     "operatingTemperatureC": "gdtf",
     "dmxModes": "gdtf",
     "pixelCount": "gdtf-derived",
-    "panRangeDeg": "manual",
-    "ipRating": "estimated",
-    "voltageRangeV": "estimated",
-    "frequencyRangeHz": "estimated",
-    "supportedPowerNetworks": "estimated"
+    "ipRating": "manual",
+    "powerConsumptionW": "manual",
+    "powerSupplyType": "manual",
+    "voltageRangeV": "manual",
+    "frequencyRangeHz": "manual",
+    "supportedPowerNetworks": "manual",
+    "beamAngleDeg": "manual",
+    "powerConnectorIn": "manual",
+    "powerConnectorOut": "manual",
+    "fullName": "gdtf-derived",
+    "maxLuminousIntensityCd": "estimated",
+    "noiseLevelDb": "estimated"
   },
-  "_missing": [
-    "powerConsumptionW",
-    "maxLuminousIntensityCd",
-    "noiseLevelDb",
-    "powerSupplyType",
-    "beamAngleDeg"
-  ],
+  "_missing": [],
   "_notApplicable": [],
   "_issues": [
     "Beam angle equals the GDTF default (25°) - probably not filled in",
-    "No public spec sheet found; tilt-only IP LED fixture."
+    "24x25W RGBL + 36x1.2W RGBA aura. Beam: 6 deg lens, 22 deg with electronic smart-glass frost. Index had 699 W / 22 kg / 90 deg beam.",
+    "Typical-value estimates (no published data): maxLuminousIntensityCd, noiseLevelDb"
+  ],
+  "_refs": [
+    "https://www.aml-lighting.com/en/ip65-rgbl-aura-strobe-wash-light-al-q4ip"
   ]
 }
