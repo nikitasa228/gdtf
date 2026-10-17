@@ -150,12 +150,12 @@ public sealed class FixtureType
         where T : class
     {
         if (name is null) return null;
-        var dict = cache;
+        var dict = Volatile.Read(ref cache);
         if (dict is null)
         {
             dict = new Dictionary<string, T>(StringComparer.Ordinal);
             foreach (var item in source) dict.TryAdd(key(item), item);
-            cache = dict; // benign race: every thread builds the same content
+            Volatile.Write(ref cache, dict); // benign race: every thread builds the same content, published complete
         }
         return dict.TryGetValue(name, out var found) ? found : null;
     }

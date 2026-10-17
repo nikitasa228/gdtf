@@ -315,11 +315,17 @@ public sealed class PowerConsumption
     /// <summary>Power factor 0 … 1 (default 1).</summary>
     public float PowerFactor { get; set; } = 1f;
 
-    /// <summary>Name of the WiringObject the power flows through, as written.</summary>
+    /// <summary>Name of the connector the power flows through, as written.</summary>
     public string? ConnectorName { get; set; }
 
-    /// <summary>Resolved WiringObject geometry.</summary>
+    /// <summary>Resolved WiringObject geometry, when the name is that of a wiring object.</summary>
     public WiringObjectGeometry? Connector { get; set; }
+
+    /// <summary>
+    /// Resolved GDTF 1.0/1.1 connector (<see cref="PhysicalDescriptions.Connectors"/>), when the name is not a wiring
+    /// object but a legacy connector: files without wiring objects link their power input this way.
+    /// </summary>
+    public Connector? LegacyConnector { get; set; }
 
     /// <summary>Lowest supported mains voltage in V (default 90).</summary>
     public float VoltageLow { get; set; } = 90f;

@@ -115,18 +115,18 @@ internal sealed class ReadContext
         return true;
     }
 
-    /// <summary>Unsigned integer in decimal or <c>0x</c> hexadecimal (RDM ids).</summary>
-    public uint UInt(XElement e, XName name, uint fallback, string path)
+    /// <summary>
+    /// GDTF type <c>Hex</c> (RDM manufacturer, model, software and personality ids): hexadecimal with or without the
+    /// <c>0x</c> prefix that every file of the reference library writes.
+    /// </summary>
+    public uint Hex(XElement e, XName name, uint fallback, string path)
     {
         var a = e.Attribute(name);
         if (a is null || string.IsNullOrWhiteSpace(a.Value)) return fallback;
         var s = a.Value.AsSpan().Trim();
-        if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-        {
-            if (uint.TryParse(s[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint h)) return h;
-        }
-        else if (uint.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint d)) return d;
-        Warn(path, $"{name.LocalName}=\"{a.Value}\" is not an unsigned integer; using {fallback}.");
+        if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) s = s[2..];
+        if (uint.TryParse(s, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out uint h)) return h;
+        Warn(path, $"{name.LocalName}=\"{a.Value}\" is not a hexadecimal number; using {fallback}.");
         return fallback;
     }
 
@@ -154,9 +154,7 @@ internal sealed class ReadContext
     {
         var a = e.Attribute(name);
         if (a is null || string.IsNullOrWhiteSpace(a.Value)) return fallback;
-        if (DmxValue.TryParse(a.Value, out var v)) return v;
-        Warn(path, $"{name.LocalName}=\"{a.Value}\" is not a DMX value; using {fallback}.");
-        return fallback;
+        return ParseDmx(a.Value, fallback, path, name.LocalName);
     }
 
     /// <summary>DMX value or null for missing / "None".</summary>
@@ -164,9 +162,57 @@ internal sealed class ReadContext
     {
         var a = e.Attribute(name);
         if (a is null || string.IsNullOrWhiteSpace(a.Value) || a.Value.Trim().Equals("None", StringComparison.OrdinalIgnoreCase)) return null;
-        if (DmxValue.TryParse(a.Value, out var v)) return v;
+        if (TryParseDmxRepairing(a.Value, out var v, out bool clamped))
+        {
+            if (clamped) Warn(path, $"{name.LocalName}=\"{a.Value}\" does not fit its byte count; clamped to {v}.");
+            return v;
+        }
         Warn(path, $"{name.LocalName}=\"{a.Value}\" is not a DMX value; ignored.");
         return null;
+    }
+
+    /// <summary>Parses a DMX value attribute text, repairing overflows (see <see cref="TryParseDmxRepairing"/>).</summary>
+    public DmxValue ParseDmx(string text, DmxValue fallback, string path, string what)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return fallback;
+        if (TryParseDmxRepairing(text, out var v, out bool clamped))
+        {
+            if (clamped) Warn(path, $"{what}=\"{text}\" does not fit its byte count; clamped to {v}.");
+            return v;
+        }
+        Warn(path, $"{what}=\"{text}\" is not a DMX value; using {fallback}.");
+        return fallback;
+    }
+
+    /// <summary>
+    /// Parses a DMX value as written in a file. A value that does not fit its byte count is repaired: a moderate
+    /// overflow (e.g. <c>256/1</c>, written by some exporters for "end of range") is clamped to the largest value of that
+    /// byte count and <paramref name="clamped"/> is set; values of 2^31 and more (negative numbers written unsigned, such
+    /// as <c>4294967295/1</c> for "none") are rejected.
+    /// </summary>
+    public static bool TryParseDmxRepairing(string text, out DmxValue value, out bool clamped)
+    {
+        clamped = false;
+        if (DmxValue.TryParse(text, out value)) return true;
+        var s = text.AsSpan().Trim();
+        int slash = s.IndexOf('/');
+        if (slash <= 0) return false;
+        if (!ulong.TryParse(s[..slash].TrimEnd(), NumberStyles.None, CultureInfo.InvariantCulture, out ulong raw) || raw > int.MaxValue)
+            return false;
+        var rest = s[(slash + 1)..].Trim();
+        var conversion = DmxConversion.ByteMirroring;
+        if (rest.Length > 0 && (rest[^1] == 's' || rest[^1] == 'S'))
+        {
+            conversion = DmxConversion.ByteShifting;
+            rest = rest[..^1].TrimEnd();
+        }
+        if (!int.TryParse(rest, NumberStyles.None, CultureInfo.InvariantCulture, out int bytes) || bytes is < 1 or > DmxValue.MaxByteCount)
+            return false;
+        uint max = DmxValue.MaxFor(bytes);
+        if (raw <= max) return false; // well-formed values were accepted above; anything else here is malformed
+        value = new DmxValue(max, bytes, conversion);
+        clamped = true;
+        return true;
     }
 
     public CieColor Color(XElement e, XName name, CieColor fallback, string path) =>

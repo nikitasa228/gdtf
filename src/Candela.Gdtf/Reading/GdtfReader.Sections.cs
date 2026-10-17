@@ -613,17 +613,17 @@ public static partial class GdtfReader
             {
                 var rdm = new RdmInfo
                 {
-                    ManufacturerId = ctx.UInt(pe, X.ManufacturerId, 0, "Protocols/FTRDM"),
-                    DeviceModelId = ctx.UInt(pe, X.DeviceModelId, 0, "Protocols/FTRDM"),
+                    ManufacturerId = ctx.Hex(pe, X.ManufacturerId, 0, "Protocols/FTRDM"),
+                    DeviceModelId = ctx.Hex(pe, X.DeviceModelId, 0, "Protocols/FTRDM"),
                 };
                 foreach (var sv in pe.Elements(X.SoftwareVersionId))
                 {
-                    var version = new RdmSoftwareVersion { Value = ctx.UInt(sv, X.Value, 0, "Protocols/FTRDM") };
+                    var version = new RdmSoftwareVersion { Value = ctx.Hex(sv, X.Value, 0, "Protocols/FTRDM") };
                     foreach (var p in sv.Elements(X.DmxPersonality))
                     {
                         version.Personalities.Add(new RdmPersonality
                         {
-                            Value = ctx.UInt(p, X.Value, 0, "Protocols/FTRDM"),
+                            Value = ctx.Hex(p, X.Value, 0, "Protocols/FTRDM"),
                             DmxModeName = ReadContext.Text(p, X.DmxMode),
                         });
                     }

@@ -77,12 +77,12 @@ public sealed class DmxMode
     public DmxChannel? FindChannel(string? name)
     {
         if (name is null) return null;
-        var dict = _channelsByName;
+        var dict = Volatile.Read(ref _channelsByName);
         if (dict is null)
         {
             dict = new Dictionary<string, DmxChannel>(StringComparer.Ordinal);
             foreach (var c in Channels) dict.TryAdd(c.Name, c);
-            _channelsByName = dict;
+            Volatile.Write(ref _channelsByName, dict);
         }
         return dict.TryGetValue(name, out var ch) ? ch : null;
     }
@@ -91,14 +91,14 @@ public sealed class DmxMode
     public ChannelFunction? FindFunction(string? fullName)
     {
         if (fullName is null) return null;
-        var dict = _functionsByName;
+        var dict = Volatile.Read(ref _functionsByName);
         if (dict is null)
         {
             dict = new Dictionary<string, ChannelFunction>(StringComparer.Ordinal);
             foreach (var c in Channels)
                 foreach (var f in c.Functions)
                     dict.TryAdd(f.FullName, f);
-            _functionsByName = dict;
+            Volatile.Write(ref _functionsByName, dict);
         }
         return dict.TryGetValue(fullName, out var fn) ? fn : null;
     }

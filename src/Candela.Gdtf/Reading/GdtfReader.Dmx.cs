@@ -241,13 +241,8 @@ public static partial class GdtfReader
         return macro;
     }
 
-    private static DmxValue ParseDmxText(ReadContext ctx, string text, DmxValue fallback, string path, string what)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return fallback;
-        if (DmxValue.TryParse(text, out var v)) return v;
-        ctx.Warn(path, $"{what}=\"{text}\" is not a DMX value; using {fallback}.");
-        return fallback;
-    }
+    private static DmxValue ParseDmxText(ReadContext ctx, string text, DmxValue fallback, string path, string what) =>
+        ctx.ParseDmx(text, fallback, path, what);
 
     private static string? NullIfBlank(string v) => string.IsNullOrWhiteSpace(v) ? null : v;
 }

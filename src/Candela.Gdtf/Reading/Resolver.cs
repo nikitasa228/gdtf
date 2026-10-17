@@ -241,12 +241,18 @@ internal static class Resolver
 
     private static void ResolveProperties(ReadContext ctx, GeometryIndex index)
     {
-        foreach (var pc in ctx.FixtureType.PhysicalDescriptions.Properties.PowerConsumptions)
+        var pd = ctx.FixtureType.PhysicalDescriptions;
+        NameIndex<Connector>? legacy = null;
+        foreach (var pc in pd.Properties.PowerConsumptions)
         {
             if (pc.ConnectorName is null) continue;
             pc.Connector = index.WiringObjects.Find(pc.ConnectorName);
-            if (pc.Connector is null)
-                ctx.Warn("Properties/PowerConsumption", $"Connector '{pc.ConnectorName}' is not a wiring object.");
+            if (pc.Connector is not null) continue;
+            // Files without wiring objects (most GDTF 1.2 files of the library) name a legacy <Connector> instead.
+            legacy ??= new NameIndex<Connector>(pd.Connectors, c => c.Name);
+            pc.LegacyConnector = legacy.Find(pc.ConnectorName);
+            if (pc.LegacyConnector is null)
+                ctx.Warn("Properties/PowerConsumption", $"Connector '{pc.ConnectorName}' is neither a wiring object nor a connector.");
         }
     }
 

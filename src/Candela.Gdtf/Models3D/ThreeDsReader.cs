@@ -276,67 +276,67 @@ public static class ThreeDsReader
             switch (id)
             {
                 case VertexList:
-                {
-                    int n = BinaryPrimitives.ReadUInt16LittleEndian(d[body..]);
-                    n = System.Math.Min(n, (chunkEnd - body - 2) / 12);
-                    vertices = new Vector3[n];
-                    for (int i = 0; i < n; i++) vertices[i] = ReadVec3(d, body + 2 + 12 * i);
-                    break;
-                }
+                    {
+                        int n = BinaryPrimitives.ReadUInt16LittleEndian(d[body..]);
+                        n = System.Math.Min(n, (chunkEnd - body - 2) / 12);
+                        vertices = new Vector3[n];
+                        for (int i = 0; i < n; i++) vertices[i] = ReadVec3(d, body + 2 + 12 * i);
+                        break;
+                    }
                 case TexCoordList:
-                {
-                    int n = BinaryPrimitives.ReadUInt16LittleEndian(d[body..]);
-                    n = System.Math.Min(n, (chunkEnd - body - 2) / 8);
-                    uvs = new Vector2[n];
-                    for (int i = 0; i < n; i++)
                     {
-                        float u = BinaryPrimitives.ReadSingleLittleEndian(d[(body + 2 + 8 * i)..]);
-                        float v = BinaryPrimitives.ReadSingleLittleEndian(d[(body + 6 + 8 * i)..]);
-                        uvs[i] = new Vector2(float.IsFinite(u) ? u : 0, float.IsFinite(v) ? 1f - v : 0);
-                    }
-                    break;
-                }
-                case FaceList:
-                {
-                    faceCount = BinaryPrimitives.ReadUInt16LittleEndian(d[body..]);
-                    faceCount = System.Math.Min(faceCount, (chunkEnd - body - 2) / 8);
-                    faces = new int[faceCount * 3];
-                    for (int i = 0; i < faceCount; i++)
-                    {
-                        int p = body + 2 + 8 * i;
-                        faces[3 * i] = BinaryPrimitives.ReadUInt16LittleEndian(d[p..]);
-                        faces[3 * i + 1] = BinaryPrimitives.ReadUInt16LittleEndian(d[(p + 2)..]);
-                        faces[3 * i + 2] = BinaryPrimitives.ReadUInt16LittleEndian(d[(p + 4)..]);
-                    }
-                    faceMaterial = new int[faceCount];
-                    Array.Fill(faceMaterial, -1);
-                    int sub = body + 2 + 8 * faceCount;
-                    while (NextChunk(d, ref sub, chunkEnd, out var sid, out var sbody, out var send))
-                    {
-                        if (sid == FaceMaterial)
+                        int n = BinaryPrimitives.ReadUInt16LittleEndian(d[body..]);
+                        n = System.Math.Min(n, (chunkEnd - body - 2) / 8);
+                        uvs = new Vector2[n];
+                        for (int i = 0; i < n; i++)
                         {
-                            int p = ReadCString(d, sbody, send, out var matName);
-                            if (p + 2 > send) continue;
-                            int n = BinaryPrimitives.ReadUInt16LittleEndian(d[p..]);
-                            n = System.Math.Min(n, (send - p - 2) / 2);
-                            // Exporters often reference a material block they never wrote ("Material - 0");
-                            // such faces simply get the default material.
-                            if (!s.MaterialIndex.TryGetValue(matName, out int slot)) slot = -1;
-                            for (int i = 0; i < n; i++)
+                            float u = BinaryPrimitives.ReadSingleLittleEndian(d[(body + 2 + 8 * i)..]);
+                            float v = BinaryPrimitives.ReadSingleLittleEndian(d[(body + 6 + 8 * i)..]);
+                            uvs[i] = new Vector2(float.IsFinite(u) ? u : 0, float.IsFinite(v) ? 1f - v : 0);
+                        }
+                        break;
+                    }
+                case FaceList:
+                    {
+                        faceCount = BinaryPrimitives.ReadUInt16LittleEndian(d[body..]);
+                        faceCount = System.Math.Min(faceCount, (chunkEnd - body - 2) / 8);
+                        faces = new int[faceCount * 3];
+                        for (int i = 0; i < faceCount; i++)
+                        {
+                            int p = body + 2 + 8 * i;
+                            faces[3 * i] = BinaryPrimitives.ReadUInt16LittleEndian(d[p..]);
+                            faces[3 * i + 1] = BinaryPrimitives.ReadUInt16LittleEndian(d[(p + 2)..]);
+                            faces[3 * i + 2] = BinaryPrimitives.ReadUInt16LittleEndian(d[(p + 4)..]);
+                        }
+                        faceMaterial = new int[faceCount];
+                        Array.Fill(faceMaterial, -1);
+                        int sub = body + 2 + 8 * faceCount;
+                        while (NextChunk(d, ref sub, chunkEnd, out var sid, out var sbody, out var send))
+                        {
+                            if (sid == FaceMaterial)
                             {
-                                int f = BinaryPrimitives.ReadUInt16LittleEndian(d[(p + 2 + 2 * i)..]);
-                                if (f < faceCount) faceMaterial[f] = slot;
+                                int p = ReadCString(d, sbody, send, out var matName);
+                                if (p + 2 > send) continue;
+                                int n = BinaryPrimitives.ReadUInt16LittleEndian(d[p..]);
+                                n = System.Math.Min(n, (send - p - 2) / 2);
+                                // Exporters often reference a material block they never wrote ("Material - 0");
+                                // such faces simply get the default material.
+                                if (!s.MaterialIndex.TryGetValue(matName, out int slot)) slot = -1;
+                                for (int i = 0; i < n; i++)
+                                {
+                                    int f = BinaryPrimitives.ReadUInt16LittleEndian(d[(p + 2 + 2 * i)..]);
+                                    if (f < faceCount) faceMaterial[f] = slot;
+                                }
+                            }
+                            else if (sid == SmoothGroups)
+                            {
+                                int n = System.Math.Min(faceCount, (send - sbody) / 4);
+                                smoothing = new uint[faceCount];
+                                for (int i = 0; i < n; i++) smoothing[i] = BinaryPrimitives.ReadUInt32LittleEndian(d[(sbody + 4 * i)..]);
                             }
                         }
-                        else if (sid == SmoothGroups)
-                        {
-                            int n = System.Math.Min(faceCount, (send - sbody) / 4);
-                            smoothing = new uint[faceCount];
-                            for (int i = 0; i < n; i++) smoothing[i] = BinaryPrimitives.ReadUInt32LittleEndian(d[(sbody + 4 * i)..]);
-                        }
+                        break;
                     }
-                    break;
-                }
             }
         }
 
