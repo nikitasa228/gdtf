@@ -2,4 +2,17 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Candela.Rendering.Vulkan/Candela.Rendering.Vulkan.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="StbImageSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Golden/*.png" CopyToOutputDirectory="PreserveNewest" LinkBase="Golden" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Lets the golden-image tests regenerate the reference images in the source tree (CANDELA_UPDATE_GOLDEN=1). -->
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>GoldenSourceDirectory</_Parameter1>
+      <_Parameter2>$(MSBuildProjectDirectory)/Golden</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
