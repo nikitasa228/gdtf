@@ -65,22 +65,33 @@ public static class Acoustics
         return (float)(max + 10.0 * Math.Log10(sum));
     }
 
-    /// <summary>Total SPL at <paramref name="point"/> from all <paramref name="sources"/>, dB(A); allocation-free.</summary>
+    /// <summary>
+    /// Total SPL at <paramref name="point"/> from all <paramref name="sources"/>, dB(A): the energetic sum of each
+    /// source's free-field level at its distance. Sources with a non-finite level are ignored; no sources (or only
+    /// ignored ones) give <see cref="Silence"/>. Single pass and allocation-free.
+    /// </summary>
     public static float SplAt(Vector3 point, ReadOnlySpan<SoundSource> sources)
     {
+        // Streaming form of the overflow-safe sum: running maximum M and Σ 10^((Lᵢ − M)/10), rescaled when M grows,
+        // so each source costs one distance, one logarithm and one power.
         float max = float.NegativeInfinity;
-        foreach (var s in sources)
-            max = MathF.Max(max, SplAtDistance(s.LevelAt1MetreDb, Vector3.Distance(point, s.Position)));
-        if (float.IsNegativeInfinity(max) || float.IsNaN(max))
-            return Silence;
         double sum = 0;
         foreach (var s in sources)
         {
-            float l = SplAtDistance(s.LevelAt1MetreDb, Vector3.Distance(point, s.Position));
-            if (!float.IsNegativeInfinity(l))
-                sum += Math.Pow(10.0, (l - max) / 10.0);
+            float level = SplAtDistance(s.LevelAt1MetreDb, Vector3.Distance(point, s.Position));
+            if (!float.IsFinite(level))
+                continue;
+            if (level > max)
+            {
+                sum = sum * Math.Pow(10.0, (max - level) / 10.0) + 1.0;
+                max = level;
+            }
+            else
+            {
+                sum += Math.Pow(10.0, (level - max) / 10.0);
+            }
         }
 
-        return (float)(max + 10.0 * Math.Log10(sum));
+        return float.IsNegativeInfinity(max) ? Silence : (float)(max + 10.0 * Math.Log10(sum));
     }
 }

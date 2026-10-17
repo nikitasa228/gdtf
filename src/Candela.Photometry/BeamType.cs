@@ -44,6 +44,13 @@ public static class BeamTypes
         var trimmed = value.AsSpan().Trim();
         if (trimmed.Length == 0 || char.IsDigit(trimmed[0]) || trimmed[0] == '-')
             return false;
-        return Enum.TryParse(trimmed, ignoreCase: true, out type) && Enum.IsDefined(type);
+        return Enum.TryParse(trimmed, ignoreCase: true, out type) && IsKnown(type);
     }
+
+    /// <summary>
+    /// True for the named <see cref="BeamType"/> values. A plain range check: unlike <see cref="Enum.IsDefined{TEnum}(TEnum)"/>
+    /// it never touches the reflection cache, so per-frame code (<see cref="BeamDistribution.Create"/>) cannot allocate
+    /// when the runtime has trimmed that cache.
+    /// </summary>
+    public static bool IsKnown(BeamType type) => (uint)type <= (uint)BeamType.Glow;
 }

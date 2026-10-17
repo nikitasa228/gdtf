@@ -140,7 +140,7 @@ public readonly struct BeamDistribution : IEquatable<BeamDistribution>
     {
         if (type is BeamType.Glow or BeamType.None)
             return Lambertian(type);
-        if (!Enum.IsDefined(type))
+        if (!BeamTypes.IsKnown(type))
             type = BeamType.Wash;
 
         float halfBeam = float.IsFinite(beamAngleRad) && beamAngleRad > 0f ? 0.5f * beamAngleRad : MinHalfAngle;

@@ -46,7 +46,21 @@ public readonly struct SpotLight
         float d = v.Length();
         if (!(d > 0f))
             return 0f;
-        float cosTheta = Math.Clamp(Vector3.Dot(Direction, v) / d, -1f, 1f);
-        return PeakCandela * Distribution.Relative(MathF.Acos(cosTheta));
+        return PeakCandela * Distribution.Relative(AngleFromAxis(Direction, v));
     }
+
+    /// <summary>
+    /// Angle θ between the beam axis and the direction from the light to <paramref name="point"/>, rad (0..π); 0 when
+    /// the point coincides with the source. Accurate near the axis, see <see cref="AngleFromAxis"/>.
+    /// </summary>
+    public float OffAxisAngle(Vector3 point) => AngleFromAxis(Direction, point - Position);
+
+    /// <summary>
+    /// Angle between unit vector <paramref name="unitAxis"/> and vector <paramref name="v"/> (any length), rad (0..π),
+    /// as atan2(|a × v|, a · v). Unlike acos of the normalised dot product this keeps full precision near the axis:
+    /// in single precision the cosine of a small angle is quantised in steps of 6·10⁻⁸, so acos cannot resolve angles
+    /// below ≈ 3·10⁻⁴ rad and misplaces small ones by up to that much — 23 % of the on-axis intensity of a 0.2° beam.
+    /// </summary>
+    internal static float AngleFromAxis(Vector3 unitAxis, Vector3 v) =>
+        MathF.Atan2(Vector3.Cross(unitAxis, v).Length(), Vector3.Dot(unitAxis, v));
 }

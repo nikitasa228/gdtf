@@ -7,8 +7,9 @@ namespace Candela.Photometry;
 /// cosine law, without occlusion or inter-reflection. It is the ground truth the GPU lux overlay is tested against.
 /// </summary>
 /// <remarks>
-/// For each light: d = |P − L|, θ = angle between the beam axis and P − L, α = angle between the surface normal and
-/// L − P; E = I₀·I_rel(θ)·max(cos α, 0)/max(d, <see cref="Photometrics.MinDistance"/>)². A zero normal means "a meter
+/// For each light: d = |P − L|, θ = angle between the beam axis and P − L (computed as atan2(|axis × (P − L)|,
+/// axis · (P − L)), which stays accurate for the 0.2° beams found in real fixture files, where acos of the cosine does
+/// not), α = angle between the surface normal and L − P; E = I₀·I_rel(θ)·max(cos α, 0)/max(d, <see cref="Photometrics.MinDistance"/>)². A zero normal means "a meter
 /// aimed at each light" (cos α = 1 for every light). A point exactly at a light's position receives nothing from it.
 /// All methods are allocation-free.
 /// </remarks>
@@ -94,12 +95,10 @@ public static class LightMeter
         float d = toPoint.Length();
         if (!(d > 0f))
             return 0f;
-        var dir = toPoint / d;
-        float cosTheta = Math.Clamp(Vector3.Dot(light.Direction, dir), -1f, 1f);
-        float relative = light.Distribution.Relative(MathF.Acos(cosTheta));
+        float relative = light.Distribution.Relative(SpotLight.AngleFromAxis(light.Direction, toPoint));
         if (relative <= 0f)
             return 0f;
-        float cosIncidence = unitNormal == Vector3.Zero ? 1f : -Vector3.Dot(unitNormal, dir);
+        float cosIncidence = unitNormal == Vector3.Zero ? 1f : -Vector3.Dot(unitNormal, toPoint) / d;
         return Photometrics.Illuminance(light.PeakCandela * relative, d, cosIncidence);
     }
 

@@ -4,7 +4,8 @@ All colour science and light math of the engine: spectra, CIE colorimetry, colou
 additive and subtractive colour, beam intensity distributions, illuminance and the reference light meter, blackbody
 emission (fire) and free-field acoustics for the noise overlay. The renderer, DMX evaluation, the lux overlay and the
 path tracer build on it, so every model is checked against published reference values in
-`tests/Candela.Photometry.Tests` (≈ 200 tests, a few seconds).
+`tests/Candela.Photometry.Tests` (≈ 200 tests, a few seconds; the colours and beams of all 1091 bundled GDTF files
+and the `_specs` fixture index are run through the code as a robustness check).
 
 ## Units and conventions
 
@@ -28,9 +29,10 @@ defaults, values are clamped to valid ranges, and nothing on a per-frame path th
 programming errors (a spectrum grid with step ≤ 0, a LUT with fewer than two entries) do throw.
 
 **Performance.** Everything DMX evaluation or overlays call per frame is allocation-free (checked by a test with
-`GC.GetAllocatedBytesForCurrentThread`): `BeamDistribution` (struct, ≈ 3 µs to build and integrate),
-`ColorMixing.Mix`, `SubtractiveFilterModel.Evaluate` (≈ 0.6 µs, ≈ 1.7 µs with a CTO), `LightColor.From*`,
-`Cct.FromXy` (≈ 0.4 µs), `LightMeter`, `Acoustics`.
+`GC.GetAllocatedBytesForCurrentThread`) and avoids reflection: `BeamDistribution` (struct, ≈ 3 µs to build and
+integrate), `ColorMixing.Mix` (≈ 0.05 µs for RGBW), `SubtractiveFilterModel.Evaluate` (≈ 0.7 µs, ≈ 2.3 µs with a CTO),
+`LightColor.From*` (≈ 0.02 µs), `Cct.FromXy` (≈ 0.5 µs), `LightMeter`, `Acoustics` (timings: one desktop core,
+Release build).
 
 ## Colorimetry
 
