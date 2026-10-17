@@ -10,13 +10,17 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [x] Core scene model: entities, transforms, components, selection, undo/redo, issues, presets, settings, key bindings
 
 ## M1 — Data core
-- [ ] GDTF reader: fixture type, geometry tree, models (3DS/glTF), DMX modes/channels/functions/sets, wheels (colour,
-      gobo images, prisms), emitters, filters, physical descriptions, wiring objects
-- [ ] Fixture library: scan folders, categories (PROFILE … GENERATOR FIRE), `_specs` physical data, caching,
-      MVR stub GDTF → library match
+- [x] GDTF reader: fixture type, geometry tree, models (3DS/glTF), DMX modes/channels/functions/sets, wheels (colour,
+      gobo images, prisms), emitters, filters, physical descriptions, wiring objects — all 1091 files parse, channel
+      counts match `_specs` for 7272 modes, all 4982 models load (docs/gdtf.md)
+- [~] Fixture library: scan folders, categories (PROFILE … GENERATOR FIRE), `_specs` physical data, caching,
+      MVR stub GDTF → library match — done; binary disk cache not yet. 4 of the 6 types in `stages/Фокина.mvr`
+      (Ayrton Rivale Profile, MagicBlade R, Zonda 3 Wash, Martin Atomic 3000 LED) are not in the library, so
+      same-brand substitutes are used until those GDTF files are added
 - [ ] MVR import (layers, fixtures, scene objects, trusses, supports, groups, addresses, embedded GDTF/3D) and export;
       `stages/Фокина.mvr` loads with all 91 fixtures resolved
-- [ ] Photometry: CIE colour science, CCT, emitter mixing, CMY/gels, beam distribution, cd/lux, light meter
+- [x] Photometry: CIE colour science, CCT, emitter mixing, CMY/gels, beam distribution, cd/lux, light meter,
+      acoustics, blackbody (docs/photometry.md)
 - [ ] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics
 - [ ] Art-Net receiver (ArtDmx, ArtPoll/PollReply discovery, ArtTimeCode, ArtSync), sACN receiver; DMX input hub
 
