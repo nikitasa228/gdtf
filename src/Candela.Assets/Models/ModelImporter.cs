@@ -116,7 +116,7 @@ public static class ModelImporter
         Roughness = 0.6f,
     };
 
-    private static void CheckExtension(string fileName)
+    internal static void CheckExtension(string fileName)
     {
         var ext = Path.GetExtension(fileName ?? "");
         if (string.Equals(ext, ".skp", StringComparison.OrdinalIgnoreCase)) throw new AssetImportException(AssetFormats.SketchUpMessage);

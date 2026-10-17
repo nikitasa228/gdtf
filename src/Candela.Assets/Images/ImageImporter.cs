@@ -222,7 +222,7 @@ public static class ImageImporter
         return width > 0 && height > 0 && bits is 8 or 15 or 16 or 24 or 32;
     }
 
-    private static string DescribeUnsupported(ReadOnlySpan<byte> data)
+    internal static string DescribeUnsupported(ReadOnlySpan<byte> data)
     {
         if (data.Length >= 4 && (data[..4].SequenceEqual("II*\0"u8) || data[..4].SequenceEqual("MM\0*"u8)))
             return "TIFF images are not supported; save the image as PNG or JPEG.";
