@@ -210,6 +210,42 @@ public sealed unsafe class VulkanContext : IDisposable
     /// <summary>Runs <paramref name="destroy"/> once no frame in flight can use the objects it destroys.</summary>
     public void DeferDestroy(Action destroy) => DeferDispose(new DisposeAction(destroy));
 
+    /// <summary>The frame being recorded (between <see cref="BeginFrame"/> and <see cref="SubmitFrame(VulkanFrame)"/>), or null.</summary>
+    public VulkanFrame? CurrentFrame => Frames.Current;
+
+    /// <summary>GPU time per render pass of the most recently completed frame (empty without timestamp support).</summary>
+    public ReadOnlySpan<GpuTiming> LastGpuTimings => Frames.LastTimings;
+
+    /// <summary>
+    /// Begins a frame: waits only for the frame that used the same slot <see cref="FramesInFlight"/> frames ago,
+    /// recycles its staging space, destroys objects retired before it and starts recording the slot's command buffer.
+    /// The editor calls this once per displayed frame, renders its viewports (<see cref="IRenderer.Render"/> records
+    /// into the open frame), records Dear ImGui and submits through <see cref="VulkanSwapchain.Present"/>. Callers
+    /// that never begin a frame (CLI, tests) get one per <see cref="IRenderer.Render"/> call automatically.
+    /// </summary>
+    public VulkanFrame BeginFrame()
+    {
+        ThrowIfDisposed();
+        return Frames.Begin();
+    }
+
+    /// <summary>Ends and submits <paramref name="frame"/> (no semaphores).</summary>
+    public void SubmitFrame(VulkanFrame frame) => Frames.Submit(frame, default, default);
+
+    /// <summary>Ends and submits <paramref name="frame"/>, waiting on and signalling the given semaphores.</summary>
+    /// <param name="frame">The open frame.</param>
+    /// <param name="waits">Semaphores to wait on (e.g. swapchain image acquired, at colour-attachment output).</param>
+    /// <param name="signals">Semaphores to signal (e.g. rendering finished, for presentation).</param>
+    public void SubmitFrame(VulkanFrame frame, ReadOnlySpan<SemaphoreSubmitInfo> waits, ReadOnlySpan<SemaphoreSubmitInfo> signals) =>
+        Frames.Submit(frame, waits, signals);
+
+    /// <summary>Waits until all submitted frames have completed (blocking readbacks). Never needed per frame.</summary>
+    public void WaitForSubmittedFrames()
+    {
+        ThrowIfDisposed();
+        Frames.WaitAll();
+    }
+
     /// <summary>Waits until the device is idle (shutdown, swapchain recreation). Never used per frame.</summary>
     public void WaitIdle()
     {

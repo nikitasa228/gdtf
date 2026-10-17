@@ -6,16 +6,13 @@ namespace Candela.Rendering.Vulkan;
 /// </summary>
 internal static class ShaderConstants
 {
-    // Set 0: scene (one per frame slot; bindless textures last because their count is variable).
+    // Set 0: scene (one per frame slot; the bindless texture array is last because its count is variable).
     public const int SetScene = 0;
     public const uint BindingMaterials = 0;
     public const uint BindingInstances = 1;
     public const uint BindingMaterialSlots = 2;
     public const uint BindingLights = 3;
-    public const uint BindingVertices = 4;
-    public const uint BindingEdges = 5;
-    public const uint BindingLines = 6;
-    public const uint BindingTextures = 7;
+    public const uint BindingTextures = 4;
 
     // Set 1: view (one per render target and frame slot).
     public const int SetView = 1;
@@ -24,7 +21,6 @@ internal static class ShaderConstants
     public const uint BindingClusterLights = 2;
     public const uint BindingClusterCounter = 3;
     public const uint BindingHdr = 4;
-    public const uint BindingDepth = 5;
 
     // Clustered light assignment: 16 × 9 screen tiles × 24 logarithmic depth slices.
     public const uint ClusterCountX = 16;
@@ -69,7 +65,13 @@ internal static class ShaderConstants
 
     // Frame flags.
     public const uint FrameOrthographic = 1u << 0;
-    public const uint FrameOverlayDepthTest = 1u << 1;
+
+    // Draw modes (push constant `mode`).
+    public const uint DrawModeDefault = 0;
+    public const uint DrawModeSelected = 1;
+
+    /// <summary>Exposed value below which a light's contribution counts as negligible (sets its range).</summary>
+    public const float LightRangeEpsilon = 2e-5f;
 
     /// <summary>All values as GLSL #define pairs.</summary>
     public static IEnumerable<(string Name, long Value)> Defines => new (string, long)[]
@@ -79,9 +81,6 @@ internal static class ShaderConstants
         ("BINDING_INSTANCES", BindingInstances),
         ("BINDING_MATERIAL_SLOTS", BindingMaterialSlots),
         ("BINDING_LIGHTS", BindingLights),
-        ("BINDING_VERTICES", BindingVertices),
-        ("BINDING_EDGES", BindingEdges),
-        ("BINDING_LINES", BindingLines),
         ("BINDING_TEXTURES", BindingTextures),
         ("SET_VIEW", SetView),
         ("BINDING_FRAME", BindingFrame),
@@ -89,7 +88,6 @@ internal static class ShaderConstants
         ("BINDING_CLUSTER_LIGHTS", BindingClusterLights),
         ("BINDING_CLUSTER_COUNTER", BindingClusterCounter),
         ("BINDING_HDR", BindingHdr),
-        ("BINDING_DEPTH", BindingDepth),
         ("CLUSTER_COUNT_X", ClusterCountX),
         ("CLUSTER_COUNT_Y", ClusterCountY),
         ("CLUSTER_COUNT_Z", ClusterCountZ),
@@ -119,7 +117,8 @@ internal static class ShaderConstants
         ("TONE_NEUTRAL", ToneNeutral),
         ("TONE_PASSTHROUGH", TonePassthrough),
         ("FRAME_ORTHOGRAPHIC", FrameOrthographic),
-        ("FRAME_OVERLAY_DEPTH_TEST", FrameOverlayDepthTest),
+        ("DRAW_MODE_DEFAULT", DrawModeDefault),
+        ("DRAW_MODE_SELECTED", DrawModeSelected),
         ("INSTANCE_FLAG_NOT_PICKABLE", (long)InstanceFlags.NotPickable),
         ("INSTANCE_FLAG_REFERENCE", (long)InstanceFlags.Reference),
         ("INSTANCE_FLAG_SELECTED", (long)InstanceFlags.Selected),
