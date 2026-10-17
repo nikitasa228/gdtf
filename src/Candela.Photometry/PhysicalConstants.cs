@@ -27,7 +27,10 @@ public static class PhysicalConstants
     /// <summary>First radiation constant for spectral exitance c₁ = 2·π·h·c², W·m².</summary>
     public const double FirstRadiationConstant = System.Math.PI * FirstRadiationConstantRadiance;
 
-    /// <summary>Stefan–Boltzmann constant σ, W·m⁻²·K⁻⁴ (derived from the exact constants above).</summary>
+    /// <summary>
+    /// Stefan–Boltzmann constant σ = 2π⁵k⁴/(15h³c²), W·m⁻²·K⁻⁴ — exact in the SI 2019, quoted here to the ten
+    /// significant digits of CODATA 2018.
+    /// </summary>
     public const double StefanBoltzmannConstant = 5.670374419e-8;
 
     /// <summary>Wien displacement constant b for the wavelength of peak spectral radiance, m·K.</summary>

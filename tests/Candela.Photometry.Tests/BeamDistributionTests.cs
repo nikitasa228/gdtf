@@ -194,6 +194,9 @@ public class BeamDistributionTests
         }
 
         Assert.Equal(BeamType.Wash, BeamDistribution.Create((BeamType)42, 0.3f, 0.6f).Type);
+        Assert.Equal(BeamType.Wash, BeamDistribution.Create((BeamType)(-1), 0.3f, 0.6f).Type);
+        Assert.All(Enum.GetValues<BeamType>(), t => Assert.True(BeamTypes.IsKnown(t)));
+        Assert.False(BeamTypes.IsKnown((BeamType)7));
     }
 
     [Fact]
