@@ -153,6 +153,14 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
 
     internal GpuBuffer LineBuffer => _lineBuffer.Buffer;
 
+    internal GpuBuffer MaterialBuffer => _materialBuffer.Buffer;
+
+    internal GpuBuffer InstanceBuffer => _instanceBuffer.Buffer;
+
+    internal GpuBuffer MaterialSlotBuffer => _slotBuffer.Buffer;
+
+    internal GpuBuffer LightBuffer => _lightBuffer.Buffer;
+
     internal bool BuildsEdges => _buildEdges;
 
     internal ReadOnlySpan<int> LiveInstances => _live.AsSpan(0, _liveCount);

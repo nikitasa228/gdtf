@@ -261,7 +261,13 @@ public sealed unsafe class VulkanContext : IDisposable
         DisposeCore();
     }
 
+    /// <summary>True after <see cref="Dispose"/>.</summary>
+    public bool IsDisposed => _disposed;
+
     internal ulong AdvanceFrameNumber() => ++_frameNumber;
+
+    /// <summary>Destroys every deferred object now (the device must be idle and no frame recorded).</summary>
+    internal void DrainDeferred() => Deletion.DrainAll();
 
     internal void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
