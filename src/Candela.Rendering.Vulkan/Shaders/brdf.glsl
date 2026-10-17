@@ -2,9 +2,9 @@
 //   f = (1 - F) (1 - metallic) albedo / pi                         Lambert diffuse, weighted by the energy not reflected
 //     + D_GGX(h) V_SmithGGXCorrelated(v, l) F_Schlick(v.h)         specular (Trowbridge-Reitz, height-correlated Smith)
 // alpha = roughness^2 (perceptual roughness), F0 = mix(dielectric f0 from the IOR, albedo, metallic), F90 = sat(50 F0)
-// so a material with IOR 1 (f0 = 0) has no specular at all and is exactly Lambertian. The (1 - F) weight keeps
-// diffuse + specular <= 1 for every direction (single scattering; the multiple-scattering energy of very rough
-// metals is not compensated).
+// so a material with IOR 1 (f0 = 0) has no specular at all and is exactly Lambertian (albedo / pi). The (1 - F)
+// weight keeps diffuse + specular <= 1 for every direction (single scattering; the multiple-scattering energy of
+// very rough metals is not compensated).
 #ifndef CANDELA_BRDF_GLSL
 #define CANDELA_BRDF_GLSL
 
@@ -39,7 +39,8 @@ vec3 fresnelSchlick(vec3 f0, float f90, float VdotH)
     return f0 + (vec3(f90) - f0) * f;
 }
 
-vec3 evaluateBrdf(SurfaceBrdf s, vec3 N, vec3 V, vec3 L)
+// Diffuse and specular parts of the BRDF separately (premultiplied blending needs them apart).
+void evaluateBrdf(SurfaceBrdf s, vec3 N, vec3 V, vec3 L, out vec3 diffuse, out vec3 specular)
 {
     float NdotL = clamp(dot(N, L), 0.0, 1.0);
     float NdotV = clamp(abs(dot(N, V)), 1e-4, 1.0);
@@ -52,9 +53,8 @@ vec3 evaluateBrdf(SurfaceBrdf s, vec3 N, vec3 V, vec3 L)
     vec3 F = fresnelSchlick(f0, f90, VdotH);
     // alpha >= 0.002 keeps the highlight of a point light finite on mirror-like surfaces.
     float alpha = max(s.roughness * s.roughness, 0.002);
-    vec3 specular = distributionGgx(NdotH, alpha) * visibilitySmithGgxCorrelated(NdotV, NdotL, alpha) * F;
-    vec3 diffuse = (vec3(1.0) - F) * (1.0 - s.metallic) * s.albedo * INV_PI;
-    return diffuse + specular;
+    specular = distributionGgx(NdotH, alpha) * visibilitySmithGgxCorrelated(NdotV, NdotL, alpha) * F;
+    diffuse = (vec3(1.0) - F) * (1.0 - s.metallic) * s.albedo * INV_PI;
 }
 
 #endif

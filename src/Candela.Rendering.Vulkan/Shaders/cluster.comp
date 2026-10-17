@@ -1,0 +1,123 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Clustered light assignment. One work group per cluster (CLUSTER_COUNT_X x _Y screen tiles x _Z logarithmic depth
+// slices); its threads test contiguous chunks of the light list against the cluster's view-space bounds, a prefix
+// sum over the per-thread counts gives every thread its output position, and the cluster's list is written in light
+// order - deterministic output independent of thread scheduling. Lists are compacted into clusterLights[] with one
+// atomic per cluster; overflow (capacity or MAX_LIGHTS_PER_CLUSTER) is counted so the CPU can grow the buffer.
+
+#define CLUSTER_BUFFERS_WRITABLE
+#include "scene.glsl"
+#include "view.glsl"
+#include "photometry.glsl"
+
+layout(local_size_x = CLUSTER_THREADS) in;
+
+shared uint sPrefix[CLUSTER_THREADS];
+shared uint sOffset;
+shared uint sStored;
+
+// View-space bounds (camera at the origin looking down -Z) of cluster (x, y, z).
+void clusterBounds(uint index, out vec3 bmin, out vec3 bmax)
+{
+    uint x = index % frame.clusterCountX;
+    uint y = (index / frame.clusterCountX) % frame.clusterCountY;
+    uint z = index / (frame.clusterCountX * frame.clusterCountY);
+    float d0 = exp((float(z) - frame.clusterLogBias) / frame.clusterLogScale);
+    float d1 = exp((float(z + 1u) - frame.clusterLogBias) / frame.clusterLogScale);
+    if (z == 0u)
+        d0 = 0.0; // fragments nearer than the first slice boundary are clamped into slice 0
+    if (z + 1u == frame.clusterCountZ)
+        d1 = 1e9; // ... and those beyond the last boundary into the last slice
+    vec2 ndc0 = vec2(x, y) / vec2(frame.clusterCountX, frame.clusterCountY) * 2.0 - 1.0;
+    vec2 ndc1 = vec2(x + 1u, y + 1u) / vec2(frame.clusterCountX, frame.clusterCountY) * 2.0 - 1.0;
+    vec2 invScale = vec2(1.0 / frame.projection[0][0], 1.0 / frame.projection[1][1]);
+    bool ortho = isOrthographic();
+    bmin = vec3(1e30);
+    bmax = vec3(-1e30);
+    for (int i = 0; i < 2; ++i)
+    {
+        float d = i == 0 ? d0 : d1;
+        float s = ortho ? 1.0 : d;
+        vec2 a = ndc0 * invScale * s;
+        vec2 b = ndc1 * invScale * s;
+        bmin = min(bmin, vec3(min(a, b), -d));
+        bmax = max(bmax, vec3(max(a, b), -d));
+    }
+}
+
+// Conservative test of a light's cone (cut-off angle, range) against the cluster bounds.
+bool lightTouches(Light light, vec3 bmin, vec3 bmax)
+{
+    vec3 position = (frame.view * vec4(light.position, 1.0)).xyz;
+    vec3 direction = normalize(mat3(frame.view) * light.direction);
+    float rangeSq = lightRangeSquared(light);
+    vec3 nearest = clamp(position, bmin, bmax);
+    vec3 delta = nearest - position;
+    if (dot(delta, delta) > rangeSq)
+        return false;
+    float cosA = clamp(light.cosCutoff, -1.0, 1.0);
+    if (cosA <= 0.0)
+        return true; // cones of 90 degrees or more: the range test is all we do
+    float sinA = sqrt(1.0 - cosA * cosA);
+    vec3 centre = 0.5 * (bmin + bmax);
+    float radius = 0.5 * length(bmax - bmin);
+    vec3 v = centre - position;
+    float along = dot(v, direction);
+    float across = sqrt(max(dot(v, v) - along * along, 0.0));
+    if (cosA * across - along * sinA > radius)
+        return false; // bounding sphere entirely outside the cone
+    return along >= -radius; // not entirely behind the light
+}
+
+void main()
+{
+    uint cluster = gl_WorkGroupID.x;
+    uint tid = gl_LocalInvocationIndex;
+    vec3 bmin, bmax;
+    clusterBounds(cluster, bmin, bmax);
+
+    uint n = frame.lightCount;
+    uint chunk = (n + CLUSTER_THREADS - 1u) / CLUSTER_THREADS;
+    uint begin = min(tid * chunk, n);
+    uint end = min(begin + chunk, n);
+    uint count = 0u;
+    for (uint i = begin; i < end; ++i)
+    {
+        if (lightTouches(lights[i], bmin, bmax))
+            ++count;
+    }
+
+    sPrefix[tid] = count;
+    barrier();
+    if (tid == 0u)
+    {
+        uint total = 0u;
+        for (uint t = 0u; t < CLUSTER_THREADS; ++t)
+        {
+            uint c = sPrefix[t];
+            sPrefix[t] = total;
+            total += c;
+        }
+
+        uint wanted = min(total, MAX_LIGHTS_PER_CLUSTER);
+        uint offset = wanted > 0u ? atomicAdd(clusterIndexCount, wanted) : 0u;
+        uint stored = offset < frame.clusterIndexCapacity ? min(wanted, frame.clusterIndexCapacity - offset) : 0u;
+        if (stored < total)
+            atomicAdd(clusterOverflow, 1u);
+        sOffset = offset;
+        sStored = stored;
+        clusters[cluster] = uvec2(offset, stored);
+    }
+
+    barrier();
+    uint dst = sPrefix[tid];
+    for (uint i = begin; i < end && dst < sStored; ++i)
+    {
+        if (lightTouches(lights[i], bmin, bmax))
+        {
+            clusterLights[sOffset + dst] = i;
+            ++dst;
+        }
+    }
+}
