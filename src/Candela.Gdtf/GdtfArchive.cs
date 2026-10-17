@@ -18,6 +18,12 @@ public sealed class GdtfArchive : IDisposable
     /// <summary>Name of the fixture description inside the archive.</summary>
     public const string DescriptionEntry = "description.xml";
 
+    /// <summary>
+    /// Largest entry that is decompressed (256 MiB; real descriptions are below 10 MiB, models below 20 MiB). Larger
+    /// entries are treated as unreadable so a corrupt or hostile size field cannot exhaust memory.
+    /// </summary>
+    public const long MaxEntryBytes = 256L << 20;
+
     private readonly ZipArchive _zip;
     private readonly Stream _stream;
     private readonly Dictionary<string, ZipArchiveEntry> _entries = new(StringComparer.OrdinalIgnoreCase);
@@ -103,27 +109,20 @@ public sealed class GdtfArchive : IDisposable
             return _entries.TryGetValue(Normalize(path), out var e) ? e.Length : -1;
     }
 
-    /// <summary>Reads an entry; null when it does not exist or cannot be decompressed.</summary>
+    /// <summary>Reads an entry; null when it does not exist, is larger than <see cref="MaxEntryBytes"/> or cannot be decompressed.</summary>
     public byte[]? TryReadBytes(string path)
     {
         string key = Normalize(path);
         lock (_gate)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
-            if (!_entries.TryGetValue(key, out var entry)) return null;
+            if (!_entries.TryGetValue(key, out var entry) || entry.Length is < 0 or > MaxEntryBytes) return null;
             try
             {
                 using var s = entry.Open();
-                long len = entry.Length;
-                if (len is >= 0 and <= int.MaxValue)
-                {
-                    var buffer = new byte[len];
-                    s.ReadExactly(buffer);
-                    return buffer;
-                }
-                using var ms = new MemoryStream();
-                s.CopyTo(ms);
-                return ms.ToArray();
+                var buffer = new byte[entry.Length];
+                s.ReadExactly(buffer);
+                return buffer;
             }
             catch (Exception e) when (e is InvalidDataException or IOException or NotSupportedException)
             {

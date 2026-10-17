@@ -11,8 +11,8 @@ public sealed class PhysicalDescriptions
     /// <summary>Subtractive filters (CMY flags, colour wheel slots) with transmission measurements.</summary>
     public List<Filter> Filters { get; } = new();
 
-    /// <summary>Colour space of RGB control channels (defaults to sRGB when the file has none).</summary>
-    public ColorSpace ColorSpace { get; set; } = ColorSpace.Create(ColorSpaceMode.Srgb);
+    /// <summary>Colour space of RGB control channels (defaults to sRGB named "Default" when the file has none).</summary>
+    public ColorSpace ColorSpace { get; set; } = ColorSpace.Create(ColorSpaceMode.Srgb, ColorSpace.DefaultName);
 
     /// <summary>Further named colour spaces that channel functions can select (GDTF 1.2).</summary>
     public List<ColorSpace> AdditionalColorSpaces { get; } = new();
@@ -135,8 +135,11 @@ public enum ColorSpaceMode
 /// <summary>An RGB colour space: primaries and white point as CIE 1931 xyY with Y normalised so that white is Y = 1.</summary>
 public sealed class ColorSpace
 {
-    /// <summary>Name (GDTF 1.2; empty for the unnamed main colour space of older files).</summary>
-    public string Name { get; set; } = "";
+    /// <summary>GDTF default name of a colour space without a <c>Name</c> attribute (older files).</summary>
+    public const string DefaultName = "Default";
+
+    /// <summary>Name (GDTF 1.2; <see cref="DefaultName"/> for the unnamed main colour space of older files).</summary>
+    public string Name { get; set; } = DefaultName;
 
     /// <summary>Which definition the primaries come from.</summary>
     public ColorSpaceMode Mode { get; set; } = ColorSpaceMode.Srgb;
@@ -157,7 +160,7 @@ public sealed class ColorSpace
     /// A colour space of a predefined <paramref name="mode"/> with primaries from the GDTF spec; the luminance of each
     /// primary is derived so that R + G + B gives the white point with Y = 1. Custom returns sRGB primaries as a start.
     /// </summary>
-    public static ColorSpace Create(ColorSpaceMode mode, string name = "")
+    public static ColorSpace Create(ColorSpaceMode mode, string name = DefaultName)
     {
         (double x, double y)[] p = mode switch
         {
@@ -202,7 +205,7 @@ public sealed class ColorSpace
     }
 
     /// <inheritdoc />
-    public override string ToString() => string.IsNullOrEmpty(Name) ? Mode.ToString() : $"{Name} ({Mode})";
+    public override string ToString() => $"{Name} ({Mode})";
 }
 
 /// <summary>A colour gamut: polygon of CIE 1931 xyY points (GDTF 1.2).</summary>

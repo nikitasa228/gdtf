@@ -64,7 +64,8 @@ internal sealed class ReadContext
     {
         text = text.Trim();
         if (float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) && float.IsFinite(value)) return true;
-        if (text.IndexOf(',') >= 0 && text.IndexOf('.') < 0)
+        // A number is short; anything longer is not worth a second attempt (and must not size a stack buffer).
+        if (text.Length <= 64 && text.IndexOf(',') >= 0 && text.IndexOf('.') < 0)
         {
             Span<char> copy = stackalloc char[text.Length];
             text.CopyTo(copy);
@@ -84,6 +85,34 @@ internal sealed class ReadContext
         if (TryParseFloat(s, out float f) && f >= int.MinValue && f <= int.MaxValue && f == MathF.Round(f)) return (int)f;
         Warn(path, $"{name.LocalName}=\"{a.Value}\" is not an integer; using {fallback}.");
         return fallback;
+    }
+
+    /// <summary>
+    /// GDTF <c>DMXAddress</c>: an absolute address as an integer, or the alternative form <c>Universe.Address</c>
+    /// (universe from 1, address 1 … 512), which is converted to <c>(Universe − 1) · 512 + Address</c>.
+    /// </summary>
+    public int DmxAddress(XElement e, XName name, int fallback, string path)
+    {
+        var a = e.Attribute(name);
+        if (a is null || string.IsNullOrWhiteSpace(a.Value)) return fallback;
+        if (TryParseDmxAddress(a.Value, out int address)) return address;
+        Warn(path, $"{name.LocalName}=\"{a.Value}\" is not a DMX address; using {fallback}.");
+        return fallback;
+    }
+
+    /// <summary>Parses an absolute DMX address or <c>Universe.Address</c>; false for anything else.</summary>
+    public static bool TryParseDmxAddress(ReadOnlySpan<char> text, out int address)
+    {
+        address = 0;
+        text = text.Trim();
+        int dot = text.IndexOf('.');
+        if (dot < 0) return int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out address);
+        if (!int.TryParse(text[..dot], NumberStyles.None, CultureInfo.InvariantCulture, out int universe) ||
+            !int.TryParse(text[(dot + 1)..], NumberStyles.None, CultureInfo.InvariantCulture, out int local) ||
+            universe < 1 || local is < 1 or > 512 || universe > (int.MaxValue - local) / 512 + 1)
+            return false;
+        address = (universe - 1) * 512 + local;
+        return true;
     }
 
     /// <summary>Unsigned integer in decimal or <c>0x</c> hexadecimal (RDM ids).</summary>

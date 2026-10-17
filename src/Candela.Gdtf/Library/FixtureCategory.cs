@@ -84,26 +84,55 @@ public static class FixtureCategories
 
     /// <summary>
     /// Parses a display name (as in <c>_specs</c>), an enum member name, or a spelling variant ("Wash/Beam", "scanner",
-    /// "follow_spot"), case-insensitively.
+    /// "follow_spot"), case-insensitively. Unknown text gives false and <see cref="FixtureCategory.Other"/>.
     /// </summary>
     public static bool TryParse(string? text, out FixtureCategory category)
     {
+        if (!string.IsNullOrWhiteSpace(text) && Lookup.TryGetValue(Key(text), out category)) return true;
         category = FixtureCategory.Other;
-        if (string.IsNullOrWhiteSpace(text)) return false;
-        return Lookup.TryGetValue(Key(text), out category);
+        return false;
     }
 
     /// <summary>Like <see cref="TryParse"/> but returns <see cref="FixtureCategory.Other"/> for unknown text.</summary>
     public static FixtureCategory Parse(string? text) => TryParse(text, out var c) ? c : FixtureCategory.Other;
 
-    private static string Key(string text)
+    /// <summary>
+    /// Best guess of the category from words of a model name, for files without a specs record ("Robin T1 Profile" →
+    /// PROFILE, "COLORado Solo Bar 6" → LED BAR, "Hazer 1000" → HAZE). Returns <see cref="FixtureCategory.Other"/> when
+    /// no word gives a hint. The order of the checks resolves names with several hints ("Beam Wash" → WASH BEAM).
+    /// </summary>
+    public static FixtureCategory Guess(string? modelName)
     {
-        Span<char> buffer = stackalloc char[text.Length];
-        int n = 0;
-        foreach (char c in text)
-            if (char.IsLetterOrDigit(c)) buffer[n++] = char.ToUpperInvariant(c);
-        return new string(buffer[..n]);
+        var words = new HashSet<string>(FixtureNames.Words(modelName), StringComparer.Ordinal);
+        if (words.Count == 0) return FixtureCategory.Other;
+        bool Any(params string[] w)
+        {
+            foreach (var x in w)
+                if (words.Contains(x)) return true;
+            return false;
+        }
+        if (Any("follow", "followspot")) return FixtureCategory.FollowSpot;
+        if (Any("laser", "lasers")) return FixtureCategory.Laser;
+        if (Any("haze", "hazer", "hazers")) return FixtureCategory.Haze;
+        if (Any("fog", "fogger", "smoke", "fogmachine")) return FixtureCategory.Fog;
+        if (Any("flame", "fire", "flamer")) return FixtureCategory.GeneratorFire;
+        if (Any("fan", "fans", "wind")) return FixtureCategory.Fan;
+        if (Any("blinder", "molefay")) return FixtureCategory.Blinder;
+        if (Any("strobe", "strobes")) return FixtureCategory.Strobe;
+        if (Any("uv", "blacklight")) return FixtureCategory.Uv;
+        if (Any("scanner", "scaner", "scan")) return FixtureCategory.Scanner;
+        if (Any("bsw", "hybrid")) return FixtureCategory.Bsw;
+        if (Any("bar", "batten", "tube", "pixelbar", "linear", "strip")) return FixtureCategory.LedBar;
+        if (Any("par", "pars", "parcan")) return FixtureCategory.Par;
+        if (Any("profile", "ellipsoidal", "leko", "framing")) return FixtureCategory.Profile;
+        if (Any("beam") && Any("wash")) return FixtureCategory.WashBeam;
+        if (Any("spot")) return FixtureCategory.Spot;
+        if (Any("beam")) return FixtureCategory.Beam;
+        if (Any("wash", "fresnel", "cyc", "panel")) return FixtureCategory.Wash;
+        return FixtureCategory.Other;
     }
+
+    private static string Key(string text) => FixtureNames.Key(text);
 
     private static Dictionary<string, FixtureCategory> BuildLookup()
     {
@@ -113,14 +142,14 @@ public static class FixtureCategories
             d[Key(c.ToString())] = c;
             d[Key(c.DisplayName())] = c;
         }
-        d["SCANNER"] = FixtureCategory.Scanner;
-        d["FOLLOWSPOTS"] = FixtureCategory.FollowSpot;
-        d["LEDBARS"] = FixtureCategory.LedBar;
-        d["BATTEN"] = FixtureCategory.LedBar;
-        d["HAZER"] = FixtureCategory.Haze;
-        d["FOGGER"] = FixtureCategory.Fog;
-        d["FLAME"] = FixtureCategory.GeneratorFire;
-        d["FIRE"] = FixtureCategory.GeneratorFire;
+        d["scanner"] = FixtureCategory.Scanner;
+        d["followspots"] = FixtureCategory.FollowSpot;
+        d["ledbars"] = FixtureCategory.LedBar;
+        d["batten"] = FixtureCategory.LedBar;
+        d["hazer"] = FixtureCategory.Haze;
+        d["fogger"] = FixtureCategory.Fog;
+        d["flame"] = FixtureCategory.GeneratorFire;
+        d["fire"] = FixtureCategory.GeneratorFire;
         return d;
     }
 }

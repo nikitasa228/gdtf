@@ -295,7 +295,7 @@ public static partial class GdtfReader
 
     private static ColorSpace ParseColorSpace(ReadContext ctx, XElement e)
     {
-        string name = ReadContext.Text(e, X.Name);
+        string name = ReadContext.NonEmpty(e, X.Name) ?? ColorSpace.DefaultName;
         string path = $"ColorSpace/{name}";
         var mode = ctx.Enum(e, X.Mode, ColorSpaceModes, ColorSpaceMode.Srgb, path);
         var cs = ColorSpace.Create(mode, name);
@@ -447,7 +447,7 @@ public static partial class GdtfReader
             if (g is GeometryReference gr && n == "Break")
             {
                 int brk = ctx.Int(child, X.DmxBreak, 1, path);
-                int offset = ctx.Int(child, X.DmxOffset, 1, path);
+                int offset = ctx.DmxAddress(child, X.DmxOffset, 1, path);
                 if (offset < 1)
                 {
                     ctx.Warn(path, $"Break DMXOffset {offset} is not a DMX address; 1 used.");
