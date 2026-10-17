@@ -30,7 +30,10 @@ public enum ModelFormat
     /// <summary>Binary glTF 2.0 (.glb). Y-up metres by specification.</summary>
     Glb,
 
-    /// <summary>Any other format AssimpNet reads (.3mf, .x, .ase, .lwo, .off, .ac, .x3d, …); treated as Y-up metres unless stated.</summary>
+    /// <summary>3D Manufacturing Format (.3mf). Z-up; the unit is in the file (default millimetres).</summary>
+    ThreeMf,
+
+    /// <summary>Any other format AssimpNet reads (.x, .ase, .lwo, .off, .ac, .x3d, .ms3d, .zae); read in Assimp's Y-up convention.</summary>
     OtherAssimp,
 
     /// <summary>SketchUp (.skp): closed format, detected only to be rejected with a helpful message.</summary>
@@ -55,7 +58,7 @@ public static class AssetFormats
         [".glb"] = ModelFormat.Glb,
         [".skp"] = ModelFormat.SketchUp,
         // Further formats handled by the bundled Assimp build that are reasonably common for set and prop models.
-        [".3mf"] = ModelFormat.OtherAssimp,
+        [".3mf"] = ModelFormat.ThreeMf,
         [".x"] = ModelFormat.OtherAssimp,
         [".ase"] = ModelFormat.OtherAssimp,
         [".lwo"] = ModelFormat.OtherAssimp,
@@ -63,7 +66,6 @@ public static class AssetFormats
         [".ac"] = ModelFormat.OtherAssimp,
         [".x3d"] = ModelFormat.OtherAssimp,
         [".ms3d"] = ModelFormat.OtherAssimp,
-        [".ifc"] = ModelFormat.OtherAssimp,
         [".zae"] = ModelFormat.OtherAssimp,
     };
 
