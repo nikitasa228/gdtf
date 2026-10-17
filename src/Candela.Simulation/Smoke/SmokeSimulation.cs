@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Candela.Core.Diagnostics;
 using Candela.Core.Math;
@@ -64,6 +65,7 @@ public sealed partial class SmokeSimulation
     private double _accumulator;
     private long _stepCount;
     private SmokeStepStatistics _statistics;
+    private SmokeStageTimings _timings;
     private int _obstacleCount;
 
     /// <summary>Creates a simulation for <paramref name="settings"/> (invalid values are replaced and reported in <see cref="Issues"/>).</summary>
@@ -152,6 +154,9 @@ public sealed partial class SmokeSimulation
 
     /// <summary>Diagnostics of the last step.</summary>
     public SmokeStepStatistics LastStatistics => _statistics;
+
+    /// <summary>Wall-clock time of each stage of the last fixed sub-step (for profiling overlays; not part of the state).</summary>
+    public SmokeStageTimings LastTimings => _timings;
 
     /// <summary>Number of obstacle boxes applied by the last <see cref="SetObstacles"/> call.</summary>
     public int ObstacleCount => _obstacleCount;
@@ -431,20 +436,29 @@ public sealed partial class SmokeSimulation
     private void RunSubStep(ReadOnlySpan<SmokeEmitter> emitters)
     {
         float dt = (float)_dt;
+        long t0 = Stopwatch.GetTimestamp();
         int ignored = ApplySources(emitters, dt);
+        long t1 = Stopwatch.GetTimestamp();
         ApplyBuoyancy(dt);
         ApplyFans(dt);
+        long t2 = Stopwatch.GetTimestamp();
         AdvectVelocity(dt);
         if (_settings.Viscosity > 0f)
             DiffuseVelocity(dt);
+        long t3 = Stopwatch.GetTimestamp();
         var (iterations, before, after) = Project();
+        long t4 = Stopwatch.GetTimestamp();
         AdvectScalars(dt);
         if (_settings.Diffusivity > 0f)
             DiffuseScalars(dt);
         Dissipate(dt);
+        long t5 = Stopwatch.GetTimestamp();
         _time += _dt;
         _stepCount++;
         _statistics = new SmokeStepStatistics(1, iterations, before, after, ignored, 0);
+        _timings = new SmokeStageTimings(Ms(t1 - t0), Ms(t2 - t1), Ms(t3 - t2), Ms(t4 - t3), Ms(t5 - t4));
+
+        static float Ms(long ticks) => (float)(ticks * 1000.0 / Stopwatch.Frequency);
     }
 
     private double SumDensity()

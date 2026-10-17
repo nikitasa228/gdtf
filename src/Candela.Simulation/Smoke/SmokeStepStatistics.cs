@@ -17,3 +17,16 @@ public readonly record struct SmokeStepStatistics(
     float MaxDivergenceAfter,
     int IgnoredEmitters,
     double DroppedTime);
+
+/// <summary>Wall-clock milliseconds spent in each stage of the last fixed sub-step.</summary>
+/// <param name="Sources">Emitter injection.</param>
+/// <param name="Forces">Buoyancy and fans.</param>
+/// <param name="VelocityAdvection">Velocity self-advection and viscosity.</param>
+/// <param name="Projection">Pressure solve and velocity correction.</param>
+/// <param name="ScalarAdvection">Density/temperature advection, diffusion and dissipation.</param>
+public readonly record struct SmokeStageTimings(float Sources, float Forces, float VelocityAdvection, float Projection,
+    float ScalarAdvection)
+{
+    /// <summary>Sum of all stages, ms.</summary>
+    public float Total => Sources + Forces + VelocityAdvection + Projection + ScalarAdvection;
+}
