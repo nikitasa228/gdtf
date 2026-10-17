@@ -184,6 +184,37 @@ public class PhotometricsTests
     }
 
     [Fact]
+    public void LightMeter_IsAccurateOnTheAxisOfVeryNarrowBeams()
+    {
+        // Real GDTF data has beams down to 0.2° (field 1°, p ≈ 0.75, a cusp at the axis). The off-axis angle used to be
+        // acos(dot) in single precision, which cannot resolve angles below ≈ 3·10⁻⁴ rad: on the axis of a slanted light
+        // the meter read up to 23 % low. With atan2(|a × v|, a · v) only the float rounding of the positions remains.
+        var beam = BeamDistribution.FromDegrees(BeamType.Spot, 0.2f, 1f);
+        var rng = new Random(7);
+        for (int i = 0; i < 500; i++)
+        {
+            var direction = Vector3.Normalize(new Vector3(rng.NextSingle() * 2f - 1f, rng.NextSingle() * 2f - 1f, rng.NextSingle() * 2f - 1f));
+            var position = new Vector3(rng.NextSingle() * 20f - 10f, rng.NextSingle() * 20f - 10f, rng.NextSingle() * 10f);
+            var light = new SpotLight(position, direction, 1000f, beam);
+            var onAxis = position + light.Direction * 12.345f;
+            double expected = 1000.0 / (onAxis - position).LengthSquared();
+            Assert.Equal(1.0, LightMeter.IlluminanceAt([light], onAxis, Vector3.Zero) / expected, 2e-3);
+            Assert.Equal(1.0, light.IntensityToward(onAxis) / 1000.0, 2e-3);
+
+            // A point at half the beam angle receives exactly half the peak intensity.
+            var side = Vector3.Normalize(Vector3.Cross(light.Direction, MathF.Abs(light.Direction.Z) < 0.9f ? Vector3.UnitZ : Vector3.UnitX));
+            double half = beam.BeamAngle / 2.0;
+            var atHalf = position + 15f * ((float)Math.Cos(half) * light.Direction + (float)Math.Sin(half) * side);
+            Assert.Equal(half, light.OffAxisAngle(atHalf), half * 1e-3);
+            Assert.Equal(0.5, light.IntensityToward(atHalf) / 1000.0, 1e-3);
+        }
+
+        Assert.Equal(0f, new SpotLight(Vector3.Zero, Vector3.UnitX, 1f, beam).OffAxisAngle(Vector3.Zero));
+        Assert.Equal(MathF.PI, new SpotLight(Vector3.Zero, Vector3.UnitX, 1f, beam).OffAxisAngle(-Vector3.UnitX), 1e-6);
+        Assert.Equal(MathF.PI / 2f, new SpotLight(Vector3.Zero, Vector3.UnitX, 1f, beam).OffAxisAngle(5f * Vector3.UnitY), 1e-6);
+    }
+
+    [Fact]
     public void SpotLight_SanitisesInput()
     {
         var light = new SpotLight(Vector3.One, Vector3.Zero, float.NaN, Wash);
