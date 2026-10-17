@@ -1,7 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Candela.Core/Candela.Core.csproj" />
     <ProjectReference Include="../Candela.Gdtf/Candela.Gdtf.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SharpGLTF.Core" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Candela.Mvr.Tests" />
