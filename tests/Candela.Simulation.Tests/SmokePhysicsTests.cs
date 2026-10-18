@@ -179,6 +179,63 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void FanJets_DoNotBlowThroughWalls()
+    {
+        // Regression: the jet of a fan was imposed on every face in its cone, including faces behind walls, so a fan in
+        // one sealed room drove the air of the next room at 4 m/s and carried its smoke away.
+        SmokeSimulation Box(params ObstacleBox[] obstacles)
+        {
+            var sim = SmokeTestScenes.ClosedBox(new Vector3(8f, 4f, 3f), 0.2f);
+            sim.SetObstacles(obstacles);
+            return sim;
+        }
+
+        float MaxSpeed(SmokeSimulation sim, Func<Vector3, bool> region)
+        {
+            float max = 0f;
+            for (float x = -3.9f; x < 4f; x += 0.2f)
+            {
+                for (float y = -1.9f; y < 2f; y += 0.2f)
+                {
+                    for (float z = 0.1f; z < 3f; z += 0.2f)
+                    {
+                        var p = new Vector3(x, y, z);
+                        if (region(p))
+                            max = MathF.Max(max, sim.VelocityAt(p).Length());
+                    }
+                }
+            }
+
+            return max;
+        }
+
+        // A fan blowing at the wall between two sealed rooms.
+        var across = Box(ObstacleBox.FromAabb(new Aabb(new Vector3(-0.1f, -3f, -1f), new Vector3(0.1f, 3f, 4f))));
+        across.AddSmoke(new Vector3(2.5f, 0f, 1.5f), 0.8f, 1f);
+        var c0 = across.SmokeCentreOfMass();
+        var fan = SmokeEmitter.Fan(new Vector3(-3f, 0f, 1.5f), Vector3.UnitX, 1f);
+        SmokeTestScenes.Run(across, 60, fan);
+        float far = MaxSpeed(across, p => p.X > 0.3f);
+        output.WriteLine($"fan at a wall: far room max speed {far:F4} m/s, its smoke moved {Vector3.Distance(c0, across.SmokeCentreOfMass()):F4} m");
+        Assert.True(far < 0.05f, $"the air of the sealed far room moves at {far:F3} m/s");
+        Assert.True(Vector3.Distance(c0, across.SmokeCentreOfMass()) < 0.02f);
+        Assert.True(across.VelocityAt(new Vector3(-2f, 0f, 1.5f)).X > 3f, "the jet still blows in its own room");
+
+        // A fan blowing along a wall 0.5 m beside its axis: the spreading jet must not reach behind the wall.
+        var along = Box(ObstacleBox.FromAabb(new Aabb(new Vector3(-5f, 0.5f, -1f), new Vector3(5f, 0.6f, 4f))));
+        SmokeTestScenes.Run(along, 60, SmokeEmitter.Fan(new Vector3(-3.5f, 0f, 1.5f), Vector3.UnitX, 1f));
+        float behind = MaxSpeed(along, p => p.Y > 0.75f);
+        output.WriteLine($"fan along a wall: max speed behind it {behind:F4} m/s");
+        Assert.True(behind < 0.05f, $"the air behind the wall moves at {behind:F3} m/s");
+        Assert.True(along.VelocityAt(new Vector3(0f, 0f, 1.5f)).X > 3f);
+
+        // The fan's own body as an obstacle (outlet on its front face) does not stop its jet.
+        var withBody = Box(ObstacleBox.FromAabb(new Aabb(new Vector3(-3.6f, -0.3f, 1.2f), new Vector3(-3f, 0.3f, 1.8f))));
+        SmokeTestScenes.Run(withBody, 45, SmokeEmitter.Fan(new Vector3(-3f, 0f, 1.5f), Vector3.UnitX, 1f, 0.5f));
+        Assert.True(withBody.VelocityAt(new Vector3(-2f, 0f, 1.5f)).X > 3f);
+    }
+
+    [Fact]
     public void FanAtZeroSpeed_DoesNothing()
     {
         var withFan = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 4f), 0.25f);

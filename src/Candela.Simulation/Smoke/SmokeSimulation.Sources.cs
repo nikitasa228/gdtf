@@ -46,6 +46,12 @@ public sealed partial class SmokeSimulation
 
         /// <summary>Length over which a jet is imposed, m.</summary>
         public float Reach;
+
+        /// <summary>Distance along the axis at which a jet leaves the solids around its outlet, m (0 in the open).</summary>
+        public float Exit;
+
+        /// <summary>Distance along the axis to the first obstacle, m (= <see cref="Reach"/> when nothing is in the way).</summary>
+        public float Clear;
     }
 
     /// <summary>
@@ -239,6 +245,7 @@ public sealed partial class SmokeSimulation
         var max = Vector3.Max(position + new Vector3(diameter + _h), end + new Vector3(endWidth));
         if (!Overlaps(min, max))
             return false;
+        var (exit, clear) = CentrelineClearance(position, direction, diameter, reach);
         if (_sourceCount == _sources.Length)
             Array.Resize(ref _sources, _sources.Length * 2);
         _sources[_sourceCount++] = new ResolvedSource
@@ -249,6 +256,8 @@ public sealed partial class SmokeSimulation
             Speed = speed,
             Diameter = diameter,
             Reach = reach,
+            Exit = exit,
+            Clear = clear,
         };
         return true;
     }
@@ -330,7 +339,7 @@ public sealed partial class SmokeSimulation
                 var p = _origin + (new Vector3(i, j, k) + offset) * _h;
                 var rel = p - jet.Center;
                 float x = Vector3.Dot(rel, jet.Direction);
-                if (x < -0.5f * _h || x > jet.Reach)
+                if (x < -0.5f * _h || x > jet.Reach || x > jet.Clear)
                     continue;
                 float xa = MathF.Max(x, 0f);
                 float r2 = MathF.Max(0f, rel.LengthSquared() - x * x);
@@ -347,6 +356,15 @@ public sealed partial class SmokeSimulation
                 float profile = MathF.Exp(-ln2 * r2 / (b * b));
                 if (profile < 0.02f)
                     continue;
+                // Occlusion: only faces the jet can reach — the straight line from its axis to the face crosses no solid
+                // (regression: jets were imposed straight through walls, blowing the air of a sealed neighbouring room).
+                if (_hasObstacles)
+                {
+                    var axis = (jet.Center + jet.Direction * MathF.Max(xa, jet.Exit) - _origin) * _invH;
+                    if (!SegmentClear(axis, new Vector3(i, j, k) + offset))
+                        continue;
+                }
+
                 float target = centreline * profile * axisComponent;
                 f[idx] += (target - f[idx]) * rate * profile;
             }
