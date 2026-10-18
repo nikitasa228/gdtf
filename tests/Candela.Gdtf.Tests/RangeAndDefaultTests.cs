@@ -226,6 +226,33 @@ public sealed class RangeAndDefaultTests
         }
     }
 
+    /// <summary>
+    /// Prolights Eclipse: in RGB colour mode (ColorModelMode 10–19) ColorEffects3 is the blue channel; in CTC mode it
+    /// selects the CTC range, and ColorEffects1 is the colour temperature of that range. A gel function elsewhere on
+    /// the channel depends on a gel-brand function that is itself only active in gel mode. Exclusivity has to follow
+    /// such master chains: compared one level deep, blue ended at 19 and the colour temperature at 89.
+    /// </summary>
+    [Fact]
+    public void Mode_master_chains_make_functions_exclusive_transitively()
+    {
+        var ft = GdtfReader.ReadFile(TestData.Fixture("Prolights@EclFresnelCTPL@"));
+        var mode = ft.FindMode("Multimode 8bit Dual_25ch")!;
+        var effects3 = mode.FindChannel("Light Engine_ColorEffects3")!.Functions.ToDictionary(f => f.Name);
+        Assert.Equal((0u, 255u), (effects3["ColorAdd_B"].DmxFromValue, effects3["ColorAdd_B"].DmxToValue));
+        Assert.Equal((0u, 255u), (effects3["CTCRangeSelector"].DmxFromValue, effects3["CTCRangeSelector"].DmxToValue));
+        Assert.Equal(255u, effects3["CTCRangeSelector"].ChannelSets[^1].DmxToValue);
+        // Functions of the same gel brand still split the channel between them.
+        Assert.Equal((0u, 67u), (effects3["RC Color Correction"].DmxFromValue, effects3["RC Color Correction"].DmxToValue));
+        Assert.Equal((68u, 255u), (effects3["NoFeature 1"].DmxFromValue, effects3["NoFeature 1"].DmxToValue));
+
+        var effects1 = mode.FindChannel("Light Engine_ColorEffects1")!.Functions.ToDictionary(f => f.Name);
+        Assert.Equal((0u, 255u), (effects1["1850K-20000K"].DmxFromValue, effects1["1850K-20000K"].DmxToValue));
+        Assert.Equal(255u, effects1["1850K-20000K"].ChannelSets.Single(s => s.Name == "20000K").DmxToValue);
+        Assert.Equal((0u, 89u), (effects1["GelSource"].DmxFromValue, effects1["GelSource"].DmxToValue)); // same master range as NoFeature
+        Assert.False(Resolver.CanBeActiveTogether(effects1["1850K-20000K"], effects1["NoFeature"]));
+        Assert.True(Resolver.CanBeActiveTogether(effects1["GelSource"], effects1["NoFeature"]));
+    }
+
     [Fact]
     public void Function_and_set_ranges_tile_every_channel_without_mode_masters_in_the_library()
     {

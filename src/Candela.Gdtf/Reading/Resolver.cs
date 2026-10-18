@@ -536,6 +536,8 @@ internal static class Resolver
         foreach (var f in functions) f.DmxFromValue = ch.ToChannelValue(f.DmxFrom);
 
         var order = Enumerable.Range(0, functions.Count).OrderBy(i => functions[i].DmxFromValue).ThenBy(i => i).ToArray();
+        var conditions = new Condition[functions.Count][];
+        for (int i = 0; i < functions.Count; i++) conditions[i] = Conditions(functions[i]);
         for (int oi = 0; oi < order.Length; oi++)
         {
             var f = functions[order[oi]];
@@ -543,7 +545,11 @@ internal static class Resolver
             for (int oj = oi + 1; oj < order.Length; oj++)
             {
                 var g = functions[order[oj]];
-                if (g.DmxFromValue <= f.DmxFromValue || !CanBeActiveTogether(f, g)) continue;
+                if (g.DmxFromValue <= f.DmxFromValue) continue;
+                bool together = f.ModeMasterChannel is null || g.ModeMasterChannel is null
+                    ? CanBeActiveTogether(f, g) // no master, or one that did not resolve (compared by spelling)
+                    : !Exclusive(conditions[order[oi]], conditions[order[oj]]);
+                if (!together) continue;
                 to = g.DmxFromValue - 1;
                 break;
             }
@@ -567,26 +573,62 @@ internal static class Resolver
     }
 
     /// <summary>
-    /// Two functions of one channel compete for DMX ranges unless only one of them can be active at a time: both depend
-    /// on the same mode-master channel (however the master is spelled: by channel name or as a function node of that
-    /// channel) and either their mode ranges are disjoint or they name two different functions of the master channel
-    /// (a channel has one active function at a time).
+    /// Two functions of one channel compete for DMX ranges unless only one of them can be active at a time, which their
+    /// mode-master conditions decide — followed through master functions, whose own conditions must hold as well (a
+    /// colour temperature function mastered by a "CTC range" function that is itself mastered by a colour-mode channel
+    /// is only active in that colour mode). They are exclusive when, for some channel, both require values from
+    /// disjoint ranges, or both require it to run two different functions (a channel has one active function at a
+    /// time). Masters are compared as resolved channels, however they are spelled (channel or function node).
     /// </summary>
     internal static bool CanBeActiveTogether(ChannelFunction a, ChannelFunction b)
     {
         if (a.ModeMasterName is null || b.ModeMasterName is null) return true;
-        var ma = a.ModeMasterChannel;
-        var mb = b.ModeMasterChannel;
-        if (ma is null || mb is null)
+        if (a.ModeMasterChannel is null || b.ModeMasterChannel is null)
         {
             // Unresolved master: only the spelling can tell whether both depend on the same thing.
             if (!string.Equals(a.ModeMasterName.Trim(), b.ModeMasterName.Trim(), StringComparison.OrdinalIgnoreCase)) return true;
             return a.ModeFrom.ToResolution(DmxValue.MaxByteCount) <= b.ModeTo.ToRangeEnd(DmxValue.MaxByteCount) &&
                    b.ModeFrom.ToResolution(DmxValue.MaxByteCount) <= a.ModeTo.ToRangeEnd(DmxValue.MaxByteCount);
         }
-        if (!ReferenceEquals(ma, mb)) return true;
-        if (a.ModeMasterFunction is { } fa && b.ModeMasterFunction is { } fb && !ReferenceEquals(fa, fb)) return false;
-        return a.ModeFromValue <= b.ModeToValue && b.ModeFromValue <= a.ModeToValue;
+        return !Exclusive(Conditions(a), Conditions(b));
+    }
+
+    /// <summary>True when two condition lists cannot hold at the same time (see <see cref="CanBeActiveTogether"/>).</summary>
+    private static bool Exclusive(Condition[] ca, Condition[] cb)
+    {
+        foreach (var x in ca)
+            foreach (var y in cb)
+            {
+                if (!ReferenceEquals(x.Channel, y.Channel)) continue;
+                if (x.From > y.To || y.From > x.To) return true;
+                if (x.Function is { } fx && y.Function is { } fy && !ReferenceEquals(fx, fy)) return true;
+            }
+        return false;
+    }
+
+    /// <summary>Longest chain of master functions followed (real files chain at most three).</summary>
+    private const int MaxConditions = 8;
+
+    /// <summary>
+    /// One mode-master condition: <see cref="Channel"/> must be in <see cref="From"/> … <see cref="To"/> and, when
+    /// <see cref="Function"/> is set, run that function.
+    /// </summary>
+    private readonly record struct Condition(DmxChannel Channel, uint From, uint To, ChannelFunction? Function);
+
+    /// <summary>
+    /// The conditions under which <paramref name="f"/> is active: its own, then its master function's, and so on (empty
+    /// without a resolved master; cycles and chains longer than <see cref="MaxConditions"/> are cut).
+    /// </summary>
+    private static Condition[] Conditions(ChannelFunction f)
+    {
+        if (f.ModeMasterChannel is null) return Array.Empty<Condition>();
+        var list = new List<Condition>(2);
+        for (var current = f; current?.ModeMasterChannel is { } master && list.Count < MaxConditions; current = current.ModeMasterFunction)
+        {
+            if (list.Exists(c => ReferenceEquals(c.Channel, master) && ReferenceEquals(c.Function, current.ModeMasterFunction))) break; // cycle
+            list.Add(new Condition(master, current.ModeFromValue, current.ModeToValue, current.ModeMasterFunction));
+        }
+        return list.ToArray();
     }
 
     private static int VirtualResolution(DmxChannel ch)
