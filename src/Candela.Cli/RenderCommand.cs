@@ -20,6 +20,9 @@ internal enum RenderLook
 
     /// <summary>A DMX recording played from its start for --time seconds.</summary>
     DmxFile,
+
+    /// <summary>The demo look (<see cref="StageLooks.ApplyDemo"/>): fans and crossings, saturated colours, gobos, haze.</summary>
+    Demo,
 }
 
 /// <summary>Options of <c>candela render</c>.</summary>
@@ -118,12 +121,15 @@ internal sealed class RenderOptions
                         case "show":
                             o.Look = RenderLook.Show;
                             break;
+                        case "demo":
+                            o.Look = RenderLook.Demo;
+                            break;
                         case "dmx-file":
                             o.Look = RenderLook.DmxFile;
                             o.Recording = CliArgs.Value(args, ref i, "--look dmx-file");
                             break;
                         default:
-                            throw new UsageException($"Unknown look '{look}' (open-white, show, dmx-file <recording>).");
+                            throw new UsageException($"Unknown look '{look}' (open-white, demo, show, dmx-file <recording>).");
                     }
                     break;
                 case "--time":
@@ -207,6 +213,10 @@ internal static class RenderCommand
             case RenderLook.OpenWhite:
                 int changed = StageLooks.ApplyOpenWhite(engine, new OpenWhiteOptions { Undoable = false });
                 output.WriteLine($"Look:     open white on {changed} fixtures");
+                break;
+            case RenderLook.Demo:
+                int lit = StageLooks.ApplyDemo(engine, new DemoLookOptions { Undoable = false });
+                output.WriteLine($"Look:     demo on {lit} fixtures (fans and crossings, saturated colours, gobos, haze)");
                 break;
             case RenderLook.DmxFile:
                 try

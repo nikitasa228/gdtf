@@ -76,11 +76,15 @@ internal static class Program
         writer.WriteLine("  candela render <scene.mvr|scene.candela> --out <file.png> [--width W] [--height H]");
         writer.WriteLine("                 [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov <deg>]");
         writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]");
-        writer.WriteLine("                 [--look open-white|show|dmx-file <recording.cdmx>] [--time <s>] [--ev <EV100>|auto]");
+        writer.WriteLine("                 [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev <EV100>|auto]");
         writer.WriteLine("                 [--auto-exposure] [--frames N] [--grid] [--device <name>] [--library <dir>]... [--cache <dir>]");
         writer.WriteLine("      Loads the scene through the engine, applies the look, simulates --time seconds (DMX, motors, smoke,");
         writer.WriteLine("      fire), renders it and writes the PNG. Prints issues and timings. Defaults: 1280 x 720, auto view,");
         writer.WriteLine("      full shading, no overlay, the scene's haze, look open-white, time 0, exposure from an incident-light reading of the floor.");
+        writer.WriteLine("      Looks: open-white = every light at full in white, heads aimed at the stage; demo = a fixed show-like state for");
+        writer.WriteLine("      judging the picture (moving heads in symmetric fans and crossings over the stage and the audience, saturated");
+        writer.WriteLine("      colours and white, narrow beams, gobos on some spots, washes colouring the floor, hazers running);");
+        writer.WriteLine("      show = the manual values saved with the scene; dmx-file = a DMX recording played from its start.");
         writer.WriteLine();
         writer.WriteLine("  candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset O]");
         writer.WriteLine("                      [--scene <file>] [--library <dir>]...");

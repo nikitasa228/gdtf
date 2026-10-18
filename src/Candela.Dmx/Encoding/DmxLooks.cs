@@ -1,3 +1,6 @@
+using System.Numerics;
+using Candela.Photometry;
+
 namespace Candela.Dmx;
 
 /// <summary>
@@ -49,6 +52,197 @@ public static class DmxLooks
             if (wrote) written.Add(ch.Index);
         }
         return written.ToArray();
+    }
+
+    /// <summary>
+    /// Colours the fixture as close to <paramref name="target"/>'s chromaticity as its colour system allows, keeping the
+    /// rest of <paramref name="buffer"/> (call <see cref="OpenWhite"/> first). Every way the fixture can make colour is
+    /// tried — additive emitters (levels solved for the target in CIE XYZ), CMY or RGB/CMY filters, indirect RGB, HSB,
+    /// every slot of its colour wheels — each result is evaluated, and the closest colour (CIE 1931 xy) that still lets
+    /// light through wins. Returns the xy distance reached (0 = exact), or NaN when the fixture has no beam or no colour
+    /// system (then the buffer is unchanged).
+    /// </summary>
+    public static float SetColor(FixtureDmxBuffer buffer, LightColor target)
+    {
+        ArgumentNullException.ThrowIfNull(buffer);
+        var p = buffer.Profile;
+        if (p.Beams.Count == 0) return float.NaN;
+        var want = target.ToXy();
+        var start = new FixtureDmxBuffer(p);
+        start.CopyFrom(buffer);
+        float bestScore = float.PositiveInfinity, bestDistance = float.NaN;
+        FixtureDmxBuffer? best = null;
+        var trial = new FixtureDmxBuffer(p);
+
+        void Consider()
+        {
+            var beam = Brightest(FixtureEvaluator.Evaluate(p, trial));
+            if (beam is null || !(beam.ColorTransmission > 0.005f)) return;
+            float distance = Vector2.Distance(beam.Color.ToXy(), want);
+            // a little light lost is worth a better colour; a much darker result has to be clearly closer
+            float score = distance + 0.01f * (1f - beam.ColorTransmission);
+            if (score >= bestScore) return;
+            bestScore = score;
+            bestDistance = distance;
+            best ??= new FixtureDmxBuffer(p);
+            best.CopyFrom(trial);
+        }
+
+        var targetRgb = Normalized(target.Rgb);
+        if (Additive(start, trial, target)) Consider();
+        if (Filters(start, trial, targetRgb)) Consider();
+        if (IndirectRgb(start, trial, targetRgb)) Consider();
+        if (Hsb(start, trial, target)) Consider();
+        foreach (var f in p.Functions)
+        {
+            if (f.Class.Kind != AttributeKind.WheelSelect || f.Class.Wheel != WheelFamily.Color || f.Wheel < 0) continue;
+            int slots = p.Wheels[f.Wheel].SlotCount;
+            for (int slot = 1; slot <= slots; slot++)
+            {
+                trial.CopyFrom(start);
+                DmxEncoder.EncodeFunction(trial, f.Index, slot);
+                Consider();
+            }
+        }
+        if (best is null) return float.NaN;
+        buffer.CopyFrom(best);
+        return bestDistance;
+    }
+
+    private static BeamState? Brightest(FixtureState state)
+    {
+        BeamState? best = null;
+        foreach (var b in state.Beams)
+            if (best is null || b.PeakCandela > best.PeakCandela) best = b;
+        return best;
+    }
+
+    private static Vector3 Normalized(Vector3 rgb)
+    {
+        rgb = Vector3.Max(rgb, Vector3.Zero);
+        float max = MathF.Max(rgb.X, MathF.Max(rgb.Y, rgb.Z));
+        return max > 0f ? rgb / max : Vector3.One;
+    }
+
+    /// <summary>Additive emitters: non-negative levels whose XYZ mix has the target's chromaticity, the largest at full.</summary>
+    private static bool Additive(FixtureDmxBuffer start, FixtureDmxBuffer trial, LightColor target)
+    {
+        var p = start.Profile;
+        var emitters = p.Emitters;
+        if (emitters.Count == 0) return false;
+        bool any = false;
+        foreach (var f in p.Functions) any |= f.Class.Kind == AttributeKind.ColorAdd && f.Emitter >= 0;
+        if (!any) return false;
+        var xyz = new Vector3[emitters.Count];
+        for (int e = 0; e < xyz.Length; e++)
+        {
+            var c = emitters[e].Chromaticity;
+            float y = MathF.Max(c.Y, 1e-4f);
+            xyz[e] = new Vector3(c.X / y, 1f, MathF.Max(1f - c.X - c.Y, 0f) / y) * MathF.Max(emitters[e].Weight, 1e-4f);
+        }
+        var goal = target.ToXyz();
+        // non-negative least squares by projected coordinate descent (a handful of emitters)
+        var levels = new float[xyz.Length];
+        for (int iteration = 0; iteration < 400; iteration++)
+        {
+            for (int e = 0; e < levels.Length; e++)
+            {
+                var residual = goal;
+                for (int k = 0; k < levels.Length; k++)
+                    if (k != e) residual -= xyz[k] * levels[k];
+                float norm = Vector3.Dot(xyz[e], xyz[e]);
+                levels[e] = norm > 0f ? MathF.Max(0f, Vector3.Dot(residual, xyz[e]) / norm) : 0f;
+            }
+        }
+        float max = levels.Max();
+        if (!(max > 0f)) return false;
+        trial.CopyFrom(start);
+        foreach (var f in p.Functions)
+        {
+            if (f.Class.Kind != AttributeKind.ColorAdd || f.Emitter < 0) continue;
+            DmxEncoder.EncodeFunction(trial, f.Index, f.MinValue + levels[f.Emitter] / max * (f.MaxValue - f.MinValue));
+        }
+        return true;
+    }
+
+    /// <summary>CMY (and RGB-named subtractive) filters: each filter removes its complement in proportion.</summary>
+    private static bool Filters(FixtureDmxBuffer start, FixtureDmxBuffer trial, Vector3 rgb)
+    {
+        var p = start.Profile;
+        bool any = false;
+        trial.CopyFrom(start);
+        foreach (var f in p.Functions)
+        {
+            if (f.Class.Kind != AttributeKind.ColorSub) continue;
+            float level = f.ColorCode switch
+            {
+                3 => 1f - rgb.X,
+                4 => 1f - rgb.Y,
+                5 => 1f - rgb.Z,
+                0 => 1f - MathF.Max(rgb.Y, rgb.Z), // a red filter passes red only
+                1 => 1f - MathF.Max(rgb.X, rgb.Z),
+                2 => 1f - MathF.Max(rgb.X, rgb.Y),
+                _ => 0f,
+            };
+            DmxEncoder.EncodeFunction(trial, f.Index, f.MinValue + Math.Clamp(level, 0f, 1f) * (f.MaxValue - f.MinValue));
+            any = true;
+        }
+        return any;
+    }
+
+    private static bool IndirectRgb(FixtureDmxBuffer start, FixtureDmxBuffer trial, Vector3 rgb)
+    {
+        var p = start.Profile;
+        bool any = false;
+        trial.CopyFrom(start);
+        foreach (var f in p.Functions)
+        {
+            if (f.Class.Kind != AttributeKind.ColorRgb) continue;
+            float level = f.ColorCode switch
+            {
+                0 => rgb.X,
+                1 => rgb.Y,
+                2 => rgb.Z,
+                3 => 1f - rgb.X,
+                4 => 1f - rgb.Y,
+                5 => 1f - rgb.Z,
+                _ => 1f,
+            };
+            DmxEncoder.EncodeFunction(trial, f.Index, f.MinValue + Math.Clamp(level, 0f, 1f) * (f.MaxValue - f.MinValue));
+            any = true;
+        }
+        return any;
+    }
+
+    private static bool Hsb(FixtureDmxBuffer start, FixtureDmxBuffer trial, LightColor target)
+    {
+        var p = start.Profile;
+        bool any = false;
+        var srgb = Vector3.Max(target.ToRec709(), Vector3.Zero);
+        float max = MathF.Max(srgb.X, MathF.Max(srgb.Y, srgb.Z)), min = MathF.Min(srgb.X, MathF.Min(srgb.Y, srgb.Z));
+        float saturation = max > 0f ? (max - min) / max : 0f;
+        float hue = 0f;
+        if (max > min)
+        {
+            float d = max - min;
+            hue = max == srgb.X ? 60f * (((srgb.Y - srgb.Z) / d) % 6f) : max == srgb.Y ? 60f * ((srgb.Z - srgb.X) / d + 2f) : 60f * ((srgb.X - srgb.Y) / d + 4f);
+            if (hue < 0f) hue += 360f;
+        }
+        trial.CopyFrom(start);
+        foreach (var f in p.Functions)
+        {
+            float t = f.Class.Kind switch
+            {
+                AttributeKind.HsbHue => hue / 360f,
+                AttributeKind.HsbSaturation => saturation,
+                AttributeKind.HsbBrightness => 1f,
+                _ => float.NaN,
+            };
+            if (float.IsNaN(t)) continue;
+            DmxEncoder.EncodeFunction(trial, f.Index, f.MinValue + Math.Clamp(t, 0f, 1f) * (f.MaxValue - f.MinValue));
+            any = true;
+        }
+        return any;
     }
 
     /// <summary>What the channel is for in this look: its logical attribute, else the kind its functions share.</summary>

@@ -30,7 +30,7 @@ public sealed record OpenWhiteOptions
 /// Ready-made looks that set the fixtures' manual values (used when no console drives them), e.g. for a first render
 /// of an imported scene.
 /// </summary>
-public static class StageLooks
+public static partial class StageLooks
 {
     private const int PanSteps = 36;
     private const int TiltSteps = 18;
