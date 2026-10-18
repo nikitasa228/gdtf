@@ -61,8 +61,9 @@ public sealed class ProtocolManager : IDisposable
 
     /// <summary>
     /// Makes exactly <paramref name="enabledIds"/> run with <paramref name="options"/>: stops the others, starts new
-    /// ones and restarts running ones whose options changed (running ones with unchanged options keep running, so DMX
-    /// does not drop out). Unknown ids are ignored. Two UDP protocols configured on the same port are refused with an
+    /// ones and restarts running ones whose own options changed (see
+    /// <see cref="ExternalProtocolBase.OptionsSignature"/>; a running protocol whose options are unchanged keeps
+    /// running, so saving unrelated settings does not make DMX drop out). Unknown ids are ignored. Two UDP protocols configured on the same port are refused with an
     /// error status for the later one. Returns every protocol's status afterwards.
     /// </summary>
     public IReadOnlyList<ProtocolStatus> Apply(IEnumerable<string> enabledIds, ProtocolOptions options)
@@ -74,7 +75,6 @@ public sealed class ProtocolManager : IDisposable
             ObjectDisposedException.ThrowIf(_disposed, this);
             Options = options;
             var enabled = new HashSet<string>(enabledIds, StringComparer.OrdinalIgnoreCase);
-            string signature = Signature(options);
 
             foreach (var p in _protocols)
             {
@@ -98,6 +98,7 @@ public sealed class ProtocolManager : IDisposable
                     continue;
                 }
                 if (port is > 0) usedPorts[port.Value] = p.DisplayName;
+                string signature = Signature(p, options);
                 if (p.IsRunning && _startedWith.TryGetValue(p.Id, out var previous) && previous == signature) continue;
                 bool ok = p.Start(options);
                 if (ok) _startedWith[p.Id] = signature;
@@ -117,7 +118,7 @@ public sealed class ProtocolManager : IDisposable
             var p = Find(id);
             if (p is null) return false;
             bool ok = p.Start(Options);
-            if (ok) _startedWith[p.Id] = Signature(Options);
+            if (ok) _startedWith[p.Id] = Signature(p, Options);
             else _startedWith.Remove(p.Id);
             return ok;
         }
@@ -181,7 +182,9 @@ public sealed class ProtocolManager : IDisposable
         _ => null,
     };
 
-    private static string Signature(ProtocolOptions options) => JsonSerializer.Serialize(options);
+    /// <summary>The options that matter to <paramref name="protocol"/>: a change elsewhere does not restart it.</summary>
+    private static string Signature(IExternalProtocol protocol, ProtocolOptions options) =>
+        protocol is ExternalProtocolBase b ? b.OptionsSignature(options) : JsonSerializer.Serialize(options);
 
     private static void ForceError(IExternalProtocol protocol, string message)
     {

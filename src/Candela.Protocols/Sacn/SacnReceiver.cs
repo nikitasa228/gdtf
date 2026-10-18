@@ -129,6 +129,14 @@ public sealed class SacnReceiver : ExternalProtocolBase
     }
 
     /// <inheritdoc />
+    protected internal override string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Signature(options.NetworkInterface, options.SubscribedUniverses, options.AcceptUnsubscribedUniverses,
+            options.SacnPort, options.SacnAcceptPreviewData, options.SacnJoinMulticast);
+    }
+
+    /// <inheritdoc />
     protected override void OnStop()
     {
         Runtime? rt;

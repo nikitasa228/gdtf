@@ -45,6 +45,13 @@ public sealed class OscReceiver : OscReceiverBase
     protected override int PortFrom(ProtocolOptions options) => options.OscPort;
 
     /// <inheritdoc />
+    protected internal override string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Signature(options.NetworkInterface, options.OscPort, options.OscPatterns);
+    }
+
+    /// <inheritdoc />
     protected override void OnConfigure(ProtocolOptions options)
     {
         var patterns = new List<OscDmxPattern>();

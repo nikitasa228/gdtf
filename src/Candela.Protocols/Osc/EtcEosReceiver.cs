@@ -70,6 +70,13 @@ public sealed class EtcEosReceiver : OscReceiverBase
     protected override int PortFrom(ProtocolOptions options) => options.EosOscPort;
 
     /// <inheritdoc />
+    protected internal override string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Signature(options.NetworkInterface, options.EosOscPort);
+    }
+
+    /// <inheritdoc />
     protected override void OnConfigure(ProtocolOptions options) => Volatile.Write(ref _state, EosConsoleState.Empty);
 
     /// <inheritdoc />

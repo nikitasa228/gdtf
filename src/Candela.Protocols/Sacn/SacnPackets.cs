@@ -311,7 +311,12 @@ public static class SacnPacket
             error = "not a synchronisation packet";
             return false;
         }
-        if (!TryLayer(packet, FramingOffset, end, out _, out error)) return false;
+        if (!TryLayer(packet, FramingOffset, end, out var framingEnd, out error)) return false;
+        if (framingEnd < SacnProtocol.SyncPacketLength - 2)
+        {
+            error = "synchronisation framing layer too short";
+            return false;
+        }
         if (BinaryPrimitives.ReadUInt32BigEndian(packet[40..]) != SacnProtocol.VectorFramingSync)
         {
             error = "bad synchronisation framing vector";
@@ -338,13 +343,20 @@ public static class SacnPacket
             error = "not a universe-discovery packet";
             return false;
         }
-        if (!TryLayer(packet, FramingOffset, end, out _, out error)) return false;
+        if (!TryLayer(packet, FramingOffset, end, out var framingEnd, out error)) return false;
         if (BinaryPrimitives.ReadUInt32BigEndian(packet[40..]) != SacnProtocol.VectorFramingDiscovery)
         {
             error = "bad discovery framing vector";
             return false;
         }
-        if (!TryLayer(packet, 112, end, out var layerEnd, out error)) return false;
+        // The universe-discovery layer (flags/length, vector, page, last page = 8 bytes before the list) must lie
+        // inside the framing layer.
+        if (!TryLayer(packet, 112, framingEnd, out var layerEnd, out error)) return false;
+        if (layerEnd < 120)
+        {
+            error = "universe-discovery layer too short";
+            return false;
+        }
         if (BinaryPrimitives.ReadUInt32BigEndian(packet[114..]) != SacnProtocol.VectorDiscoveryUniverseList)
         {
             error = "bad discovery-layer vector";

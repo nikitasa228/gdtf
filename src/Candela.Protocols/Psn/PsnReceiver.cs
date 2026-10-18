@@ -109,6 +109,13 @@ public sealed class PsnReceiver : ExternalProtocolBase
     }
 
     /// <inheritdoc />
+    protected internal override string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Signature(options.NetworkInterface, options.PsnMulticastGroup, options.PsnPort);
+    }
+
+    /// <inheritdoc />
     protected override void OnStop()
     {
         var channel = _channel;

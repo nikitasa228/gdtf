@@ -127,6 +127,13 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
     }
 
     /// <inheritdoc />
+    protected internal override string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Signature(options.EnttecSerialPort, options.EnttecUniverse);
+    }
+
+    /// <inheritdoc />
     protected override void OnStop()
     {
         _running = false;

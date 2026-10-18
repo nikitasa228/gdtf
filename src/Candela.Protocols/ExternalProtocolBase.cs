@@ -1,3 +1,7 @@
+using System.Collections;
+using System.Globalization;
+using System.Text;
+using System.Text.Json;
 using Candela.Protocols.Networking;
 
 namespace Candela.Protocols;
@@ -203,7 +207,50 @@ public abstract class ExternalProtocolBase : IExternalProtocol
             _warnings.Add(warning);
             if (_state == ProtocolState.Running) _state = ProtocolState.Warning;
         }
-        if (StatusChanged is { } handler) handler(this, new ProtocolStatusEventArgs(this, Status));
+        RaiseStatusChanged();
+    }
+
+    /// <summary>
+    /// The part of <paramref name="options"/> this protocol uses. <see cref="ProtocolManager.Apply"/> restarts a running
+    /// protocol only when this signature changes, so saving unrelated settings (an OSC pattern, the EntTec port) does
+    /// not interrupt Art-Net or sACN reception. The default covers every option; overrides list the fields that
+    /// <see cref="OnStart"/> reads.
+    /// </summary>
+    protected internal virtual string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return JsonSerializer.Serialize(options);
+    }
+
+    /// <summary>Joins option values into a signature string for <see cref="OptionsSignature"/> (lists element by
+    /// element, numbers in the invariant culture).</summary>
+    protected static string Signature(params object?[] values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        var sb = new StringBuilder();
+        foreach (var value in values)
+        {
+            switch (value)
+            {
+                case string text:
+                    sb.Append(text.Length).Append(':').Append(text);
+                    break;
+                case IEnumerable list:
+                    sb.Append('[');
+                    foreach (var item in list)
+                    {
+                        string itemText = Convert.ToString(item, CultureInfo.InvariantCulture) ?? "";
+                        sb.Append(itemText.Length).Append(':').Append(itemText).Append(',');
+                    }
+                    sb.Append(']');
+                    break;
+                default:
+                    sb.Append(Convert.ToString(value, CultureInfo.InvariantCulture));
+                    break;
+            }
+            sb.Append('\u001F');
+        }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -335,7 +382,29 @@ public abstract class ExternalProtocolBase : IExternalProtocol
             _message = message;
             if (!keepError) _lastError = error;
         }
-        if (changed && StatusChanged is { } handler) handler(this, new ProtocolStatusEventArgs(this, Status));
+        if (changed) RaiseStatusChanged();
+    }
+
+    /// <summary>
+    /// Raises <see cref="IExternalProtocol.StatusChanged"/>. Status changes are often reported from receive threads,
+    /// timers and serial reader threads, where an exception thrown by a subscriber (a UI handler) would terminate the
+    /// process; such exceptions are therefore contained here, each subscriber being called on its own.
+    /// </summary>
+    private void RaiseStatusChanged()
+    {
+        if (StatusChanged is not { } handler) return;
+        var args = new ProtocolStatusEventArgs(this, Status);
+        foreach (var d in handler.GetInvocationList())
+        {
+            try
+            {
+                ((EventHandler<ProtocolStatusEventArgs>)d)(this, args);
+            }
+            catch (Exception)
+            {
+                // A faulty subscriber must not stop reception or make Start/Stop throw.
+            }
+        }
     }
 
     private sealed class UniverseCounter

@@ -99,6 +99,15 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
     }
 
     /// <inheritdoc />
+    protected internal override string OptionsSignature(ProtocolOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Signature(options.NetworkInterface, options.SubscribedUniverses, options.AcceptUnsubscribedUniverses,
+            options.ArtNetUniverseOffset, options.ArtNetPort, options.ArtNetBroadcastPollReply, options.ArtNetSync,
+            options.NodeShortName, options.NodeLongName, options.ArtNetOemCode, options.EstaManufacturerCode);
+    }
+
+    /// <inheritdoc />
     protected override void OnStop()
     {
         Runtime? rt;
