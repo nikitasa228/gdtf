@@ -443,6 +443,13 @@ internal static class ProjectReader
 
             IReadOnlyList<Guid> related = users.TryGetValue(record.Id, out var u) ? u : Array.Empty<Guid>();
             var label = string.IsNullOrEmpty(record.FileName) ? record.Id.ToString("D") : $"'{record.FileName}'";
+            if (!Enum.IsDefined(record.Kind) && raw is { } numericKind && record.Id != Guid.Empty && seen.Add(record.Id))
+            {
+                // A kind given as a number this version does not define: kept like an unknown kind name.
+                Keep(access, project, record.Id, numericKind, folders, users, options, issues,
+                    string.Create(CultureInfo.InvariantCulture, $"of a kind this version does not know ({(int)record.Kind})"));
+                continue;
+            }
             if (record.Id == Guid.Empty || !seen.Add(record.Id) || !Enum.IsDefined(record.Kind) || string.IsNullOrEmpty(record.Entry))
             {
                 issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetRecordInvalid,
@@ -574,7 +581,8 @@ internal static class ProjectReader
     /// Keeps an asset this version cannot load (<see cref="ProjectData.KeptAssetIds"/>): its index record verbatim and every
     /// file of its folder, so the next save writes them back unchanged. A damaged main file is reported instead.
     /// </summary>
-    private static void Keep(ArchiveAccess access, ProjectData project, Guid id, JsonElement record, Dictionary<Guid, List<string>> folders,
+    private static void Keep(ArchiveAccess access, ProjectData project, Guid id, JsonElement record,
+        Dictionary<Guid, List<(string Entry, string Relative)>> folders,
         Dictionary<Guid, List<Guid>> users, ProjectLoadOptions options, IssueCollector issues, string why)
     {
         IReadOnlyList<Guid> related = users.TryGetValue(id, out var u) ? u : Array.Empty<Guid>();
@@ -584,7 +592,7 @@ internal static class ProjectReader
         {
             if (folders.TryGetValue(id, out var entries))
             {
-                foreach (var entry in entries)
+                foreach (var (entry, _) in entries)
                     if (access.Read(entry) is { } bytes) files.Add((entry, bytes));
             }
             var main = SceneJsonReader.ReadString(record, "entry");
@@ -615,18 +623,21 @@ internal static class ProjectReader
             related);
     }
 
-    /// <summary>Asset id → every file entry under <c>assets/{id}/</c>, in name order.</summary>
-    private static Dictionary<Guid, List<string>> AssetFolders(ArchiveAccess access)
+    /// <summary>
+    /// Asset id → every file under <c>assets/{id}/</c> (entry name as stored, and the path below the folder), in name
+    /// order. The folder name is parsed leniently (any GUID spelling), so entries are always used exactly as stored.
+    /// </summary>
+    private static Dictionary<Guid, List<(string Entry, string Relative)>> AssetFolders(ArchiveAccess access)
     {
-        var folders = new Dictionary<Guid, List<string>>();
+        var folders = new Dictionary<Guid, List<(string, string)>>();
         foreach (var name in access.EntryNames.Order(StringComparer.Ordinal))
         {
             if (!name.StartsWith(ArchivePaths.AssetsFolder, StringComparison.Ordinal)) continue;
             var rest = name[ArchivePaths.AssetsFolder.Length..];
             int slash = rest.IndexOf('/');
             if (slash <= 0 || slash == rest.Length - 1 || !Guid.TryParse(rest[..slash], out var id)) continue;
-            if (!folders.TryGetValue(id, out var files)) folders[id] = files = new List<string>();
-            files.Add(name);
+            if (!folders.TryGetValue(id, out var files)) folders[id] = files = new List<(string, string)>();
+            files.Add((name, rest[(slash + 1)..]));
         }
         return folders;
     }
@@ -710,8 +721,7 @@ internal static class ProjectReader
         foreach (var (id, entries) in AssetFolders(access))
         {
             if (only is not null && !only.Contains(id)) continue;
-            var folder = ArchivePaths.AssetFolder(id);
-            var files = entries.Select(e => e[folder.Length..]).ToList();
+            var files = entries.Select(e => e.Relative).ToList();
             string? main = null;
             AssetKind kind = AssetKind.Image;
             foreach (var preferred in new[] { AssetKind.Model, AssetKind.Image, AssetKind.Gdtf })
@@ -723,11 +733,11 @@ internal static class ProjectReader
                 break;
             }
             if (main is null) continue;
-            var record = new AssetRecord { Id = id, Kind = kind, FileName = main, Entry = folder + main };
+            var record = new AssetRecord { Id = id, Kind = kind, FileName = main, Entry = entries.First(e => e.Relative == main).Entry };
             if (kind == AssetKind.Model)
             {
-                record.Companions = files.Where(f => f != main)
-                    .Select(f => new CompanionRecord { Path = f, Entry = folder + f })
+                record.Companions = entries.Where(e => e.Relative != main)
+                    .Select(e => new CompanionRecord { Path = e.Relative, Entry = e.Entry })
                     .ToList();
             }
             records.Add(record);
@@ -750,9 +760,11 @@ internal static class ProjectReader
     private static void ReadFixtures(ArchiveAccess access, ProjectData project, ProjectLoadOptions options, IssueCollector issues)
     {
         var usage = ProjectData.CollectGdtfSpecs(project.Scene);
+        var attempted = new Dictionary<string, byte[]?>(StringComparer.Ordinal); // entry → its valid bytes, null when unusable
         foreach (var record in ReadFixtureIndex(access, issues))
         {
             var related = usage.EntitiesOf(record.Name);
+            attempted.TryAdd(record.Entry, null);
             if (project.GdtfFiles.ContainsKey(record.Name))
             {
                 issues.Add(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.GdtfIndexInvalid,
@@ -784,15 +796,46 @@ internal static class ProjectReader
                 continue;
             }
             project.GdtfFiles[record.Name] = data;
+            attempted[record.Entry] = data;
         }
 
         foreach (var name in usage.Keys)
         {
             if (project.FindGdtf(name) is not null) continue;
             var related = usage.EntitiesOf(name);
+            if (RecoverGdtf(access, name, attempted) is { } recovered)
+            {
+                // The record was damaged or the list rebuilt from file names, but the file is where the writer puts it.
+                project.GdtfFiles[name] = recovered.Data;
+                issues.Add(IssueSeverity.Warning, IssueCategory.Fixture, ProjectIssueCodes.GdtfIndexInvalid,
+                    $"'{name}' had no usable record in fixtures/index.json; its file was recovered from {recovered.Entry}.", related);
+                continue;
+            }
             issues.Add(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.GdtfNotEmbedded,
                 $"'{name}' (used by {related.Count} fixture(s)) is not stored in the project; it has to come from the fixture library.", related);
         }
+    }
+
+    /// <summary>
+    /// The GDTF stored for <paramref name="name"/> under the entry name the writer gives it
+    /// (<c>fixtures/{safe name}.gdtf</c>), when that entry is a valid GDTF and not a file whose record failed.
+    /// </summary>
+    private static (string Entry, byte[] Data)? RecoverGdtf(ArchiveAccess access, string name, Dictionary<string, byte[]?> attempted)
+    {
+        var file = ArchivePaths.SafeSegment(name, "fixture");
+        if (!file.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase)) file += ".gdtf";
+        var entry = ArchivePaths.FixturesFolder + file;
+        if (attempted.TryGetValue(entry, out var known)) return known is null ? null : (entry, known);
+        try
+        {
+            var data = access.Read(entry);
+            attempted[entry] = data is not null && GdtfCheck.Validate(data) is null ? data : null;
+        }
+        catch (EntryReadException)
+        {
+            attempted[entry] = null;
+        }
+        return attempted[entry] is { } bytes ? (entry, bytes) : null;
     }
 
     private static List<FixtureRecord> ReadFixtureIndex(ArchiveAccess access, IssueCollector issues)

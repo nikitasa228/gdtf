@@ -29,7 +29,7 @@ public sealed class ProjectSnapshot
         Options = options;
         Settings = project.Settings.Snapshot();
         Assets = project.Assets.Entries;
-        Thumbnail = project.Thumbnail;
+        Thumbnail = project.Thumbnail?.ToArray(); // the app may render the next preview into the same buffer while this is written
 
         var kept = new List<KeptAsset>(project.KeptAssetsMutable.Count);
         foreach (var k in project.KeptAssetsMutable.Values)
@@ -134,14 +134,15 @@ public sealed class ProjectSnapshot
     }
 
     /// <summary>
-    /// <c>scene.json</c>: Core's <see cref="SceneSerializer"/> layout, plus the components of unknown types kept from loading
+    /// <c>scene.json</c>: Core's <see cref="SceneSerializer"/> layout (written with <see cref="ProjectJson.Options"/>, so nulls
+    /// that differ from a default survive), plus the components of unknown types kept from loading
     /// (<see cref="ProjectData.UnknownComponents"/>) appended to the entities that still exist.
     /// </summary>
     private static byte[] SerializeScene(Core.SceneGraph.Scene scene, IReadOnlyDictionary<Guid, IReadOnlyList<JsonElement>> unknown)
     {
         var file = SceneSerializer.ToFile(scene);
-        if (unknown.Count == 0) return JsonSerializer.SerializeToUtf8Bytes(file, CandelaJson.Options);
-        var root = JsonSerializer.SerializeToNode(file, CandelaJson.Options)!.AsObject();
+        if (unknown.Count == 0) return JsonSerializer.SerializeToUtf8Bytes(file, ProjectJson.Options);
+        var root = JsonSerializer.SerializeToNode(file, ProjectJson.Options)!.AsObject();
         if (root["entities"] is JsonArray entities)
         {
             foreach (var node in entities)
@@ -155,7 +156,7 @@ public sealed class ProjectSnapshot
                 foreach (var component in kept) components.Add(JsonNode.Parse(component.GetRawText()));
             }
         }
-        return JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options);
+        return JsonSerializer.SerializeToUtf8Bytes(root, ProjectJson.Options);
     }
 
     /// <summary>

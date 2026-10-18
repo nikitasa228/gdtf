@@ -333,6 +333,60 @@ public sealed class DataSafetyTests : IDisposable
     }
 
     [Fact]
+    public void Asset_folders_in_another_guid_spelling_are_recovered_with_their_stored_names()
+    {
+        var id = Guid.NewGuid();
+        var png = TestData.Png();
+        var path = _dir.File("spelling.candela");
+        File.WriteAllBytes(path, TestData.Zip(
+            ("scene.json", TestData.Utf8("""{"name":"Spelling","entities":[]}""")),
+            ($"assets/{id.ToString("D").ToUpperInvariant()}/poster.png", png),
+            ($"assets/{Guid.NewGuid():N}/a", new byte[] { 1 }))); // shorter than a canonical folder name
+        var loaded = ProjectFile.Load(path);
+        Assert.Equal(png, loaded.Assets.GetBytes(id));
+        Assert.Contains(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.AssetIndexInvalid);
+    }
+
+    [Fact]
+    public void Gdtf_copies_whose_records_are_unusable_are_recovered_under_the_names_the_fixtures_use()
+    {
+        var project = new ProjectData(new Scene("Fixtures"));
+        foreach (var spec in new[] { "Robe/Robin:T1.gdtf", TestData.GdtfA })
+        {
+            var e = new Entity(spec);
+            e.Add(new FixtureComponent { GdtfSpec = spec });
+            project.Scene.Add(e);
+        }
+        byte[]? Provider(string name) => name == TestData.GdtfA ? TestData.LibraryGdtf(TestData.GdtfA) : TestData.LibraryGdtf(TestData.GdtfB);
+        var path = _dir.File("fixtures.candela");
+        ProjectFile.Save(path, project, new ProjectSaveOptions { GdtfProvider = Provider });
+
+        // One record damaged: that file is found where the writer puts it.
+        var oneRecord = _dir.File("one-record.candela");
+        File.Copy(path, oneRecord);
+        TestData.RewriteArchive(oneRecord, (name, data) =>
+            name == "fixtures/index.json" ? Replace(data, "\"name\": \"Robe/Robin:T1.gdtf\"", "\"name\": 5") : data);
+        var loaded = ProjectFile.Load(oneRecord);
+        Assert.Equal(TestData.LibraryGdtf(TestData.GdtfB), loaded.FindGdtf("Robe/Robin:T1.gdtf"));
+        Assert.Contains(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.GdtfIndexInvalid && i.Message.Contains("Robe/Robin:T1.gdtf"));
+        Assert.DoesNotContain(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.GdtfNotEmbedded);
+
+        // The whole list lost: files are recovered by file name and matched to the (sanitised) names the fixtures use.
+        var noIndex = _dir.File("no-index.candela");
+        File.Copy(path, noIndex);
+        TestData.RewriteArchive(noIndex, (name, data) => name == "fixtures/index.json" ? null : data);
+        loaded = ProjectFile.Load(noIndex);
+        foreach (var spec in project.UsedGdtfSpecs()) Assert.Equal(Provider(spec), loaded.FindGdtf(spec));
+
+        // Saved again without the library, both copies survive under their exact names.
+        var again = _dir.File("again.candela");
+        Assert.Empty(ProjectFile.Save(again, loaded).MissingGdtfs);
+        var reloaded = ProjectFile.Load(again);
+        Assert.Empty(reloaded.LoadIssues);
+        foreach (var spec in project.UsedGdtfSpecs()) Assert.Equal(Provider(spec), reloaded.GdtfFiles[spec]);
+    }
+
+    [Fact]
     public void A_damaged_library_file_never_replaces_the_copy_kept_in_the_project()
     {
         var project = new ProjectData(new Scene("Library"));
@@ -401,6 +455,32 @@ public sealed class DataSafetyTests : IDisposable
         Assert.Contains(repaired, i => i.Message.Contains("$.visible"));
         Assert.Contains(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.SceneSettingsInvalid && i.Message.Contains("$.gridSpacing"));
         Assert.DoesNotContain(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.SceneComponentInvalid);
+    }
+
+    [Fact]
+    public void A_null_that_differs_from_the_default_survives_saving_and_merging()
+    {
+        // ProtocolId = null means "no protocol input" (offline programming); its default is Art-Net.
+        var project = new ProjectData(new Scene("Offline"));
+        var desk = new Entity("Desk");
+        desk.Add(new ConsoleComponent { ProtocolId = null });
+        project.Scene.Add(desk);
+
+        var path = _dir.File("offline.candela");
+        ProjectFile.Save(path, project);
+        Assert.Contains("\"protocolId\": null", Encoding.UTF8.GetString(TestData.ReadEntry(path, "scene.json")));
+        Assert.DoesNotContain("\"label\": null", Encoding.UTF8.GetString(TestData.ReadEntry(path, "scene.json"))); // default-null values stay omitted
+        var loaded = ProjectFile.Load(path);
+        Assert.Null(loaded.Scene.Find(desk.Id)!.Get<ConsoleComponent>()!.ProtocolId);
+        Assert.Equal(TestData.SceneJson(project.Scene), TestData.SceneJson(loaded.Scene));
+
+        var merged = ProjectMerge.Import(loaded, loaded);
+        Assert.Null(loaded.Scene.Find(merged.EntityIds[desk.Id])!.Get<ConsoleComponent>()!.ProtocolId);
+
+        // A console that does use a protocol keeps it, of course.
+        desk.Get<ConsoleComponent>()!.ProtocolId = "sacn";
+        ProjectFile.Save(path, project);
+        Assert.Equal("sacn", ProjectFile.Load(path).Scene.Find(desk.Id)!.Get<ConsoleComponent>()!.ProtocolId);
     }
 
     [Fact]

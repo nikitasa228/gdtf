@@ -75,7 +75,10 @@ public static class ProjectIssueCodes
     /// <summary>An asset's file is damaged (unreadable entry, wrong checksum, too large); the asset was not loaded.</summary>
     public const string AssetCorrupt = "project.asset-corrupt";
 
-    /// <summary>The asset store rejected an asset's content (unsupported or invalid file).</summary>
+    /// <summary>
+    /// The asset store rejected the content of an asset recovered without its index record, so it could not be kept
+    /// verbatim either (with its record such an asset is kept: <see cref="AssetKept"/>); it was not loaded.
+    /// </summary>
     public const string AssetRejected = "project.asset-rejected";
 
     /// <summary>

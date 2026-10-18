@@ -5,6 +5,7 @@ using Candela.Core.Editing;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
+using Candela.Project.Internal;
 
 namespace Candela.Project;
 
@@ -222,7 +223,7 @@ public static class ProjectMerge
                 clone.Local = e.Local;
                 foreach (var c in e.Components)
                 {
-                    var copy = c.Clone();
+                    var copy = ProjectJson.Clone(c); // Component.Clone would turn a null that differs from the default into the default
                     remap.Apply(c, copy, clone);
                     clone.Add(copy);
                 }

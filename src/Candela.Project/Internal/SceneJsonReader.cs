@@ -172,17 +172,22 @@ internal static class SceneJsonReader
                 $"The placement of '{name}' contains invalid numbers; it was reset.", id);
             return Transform.Identity;
         }
-        float length = t.Rotation.Length();
-        if (length < 1e-6f)
+        // Scale by the largest component first: the length of a quaternion with components near float.MaxValue
+        // overflows to infinity, and normalising by it would produce the zero quaternion.
+        var q = t.Rotation;
+        float largest = MathF.Max(MathF.Max(MathF.Abs(q.X), MathF.Abs(q.Y)), MathF.Max(MathF.Abs(q.Z), MathF.Abs(q.W)));
+        if (largest < 1e-6f)
         {
             issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneTransformInvalid,
                 $"The rotation of '{name}' is degenerate; it was reset.", id);
             t.Rotation = Quaternion.Identity;
         }
-        else if (MathF.Abs(length - 1f) > 1e-3f)
+        else
         {
+            var scaled = Quaternion.Multiply(q, 1f / largest);
+            float length = scaled.Length() * largest;
             // Keep exact values of valid files (round trip), normalise only what is clearly not a rotation.
-            t.Rotation = Quaternion.Normalize(t.Rotation);
+            if (!float.IsFinite(length) || MathF.Abs(length - 1f) > 1e-3f) t.Rotation = Quaternion.Normalize(scaled);
         }
         return t;
     }
