@@ -210,3 +210,114 @@ public sealed unsafe class DockIniValidatorTests
         Assert.False(ImGuiP.DockBuilderGetNode(Candela.App.Docking.DockWorkspace.DockSpaceId).IsNull);
     }
 }
+
+/// <summary>Repeated failures neither flood the issues panel nor fill the disk with log text.</summary>
+[Collection(UiStateCollection.Name)]
+public sealed class FailureReportingTests : IDisposable
+{
+    private readonly TempDir _dir = new();
+    private readonly Candela.App.Diagnostics.AppLog _log = TestLog.Create();
+    private readonly Candela.App.Settings.SettingsStore _settings;
+    private readonly Candela.App.Session.EditorSession _session;
+
+    public FailureReportingTests()
+    {
+        Candela.App.Ui.Loc.SetLanguage("en");
+        _settings = new Candela.App.Settings.SettingsStore(_log, _dir.File("settings.json"));
+        _settings.Load();
+        _session = new Candela.App.Session.EditorSession(_log, _settings);
+    }
+
+    public void Dispose()
+    {
+        _session.Dispose();
+        _log.Dispose();
+        _dir.Dispose();
+    }
+
+    [Fact]
+    public void An_error_repeated_every_frame_is_one_issue()
+    {
+        for (int frame = 0; frame < 1000; frame++)
+            _session.ReportProgramError("app.frame-exception", "Unhandled error in frame: boom");
+        _session.ReportProgramError("app.frame-exception", "Unhandled error in frame: other");
+        Assert.Equal(2, _session.Issues.Current.Count);
+
+        // Distinct messages are capped.
+        for (int i = 0; i < 1000; i++)
+            _session.ReportProgramError("app.frame-exception", "message " + i);
+        Assert.Equal(Candela.App.Session.EditorSession.MaxProgramMessages, _session.Issues.Current.Count);
+    }
+
+    [Fact]
+    public void Clearing_the_messages_empties_the_issues_panel_and_allows_new_reports()
+    {
+        _session.ReportProgramError("app.panel-exception", "Panel failed");
+        _ = _session.Open(_dir.Write("scene.mvr", "x")); // a "not available" note
+        Assert.Equal(2, _session.Issues.Current.Count);
+
+        _session.ClearProgramMessages();
+        Assert.Empty(_session.Issues.Current); // the list the panel shows, not only the internal one
+
+        _session.ReportProgramError("app.panel-exception", "Panel failed");
+        Assert.Single(_session.Issues.Current);
+    }
+
+    [Fact]
+    public void The_same_exception_is_logged_in_full_once_then_counted()
+    {
+        var filter = new Candela.App.Diagnostics.RepeatedErrorFilter();
+        var kinds = new List<Candela.App.Diagnostics.ErrorLogKind>();
+        for (int i = 0; i < 1000; i++)
+            kinds.Add(filter.Record(Throw("boom")));
+        Assert.Equal(Candela.App.Diagnostics.ErrorLogKind.Full, kinds[0]);
+        Assert.Equal(1, kinds.Count(k => k == Candela.App.Diagnostics.ErrorLogKind.Full));
+        // Counted at 10, 100 and 1000 repeats.
+        Assert.Equal(new[] { 9, 99, 999 }, kinds.Select((k, i) => (k, i)).Where(t => t.k == Candela.App.Diagnostics.ErrorLogKind.Count).Select(t => t.i));
+        Assert.Equal(1000, filter.Repeats);
+
+        // A different failure is logged in full again.
+        Assert.Equal(Candela.App.Diagnostics.ErrorLogKind.Full, filter.Record(Throw("other")));
+        Assert.Equal(Candela.App.Diagnostics.ErrorLogKind.Full, filter.Record(new ArgumentException("boom")));
+    }
+
+    private static InvalidOperationException Throw(string message)
+    {
+        try
+        {
+            throw new InvalidOperationException(message);
+        }
+        catch (InvalidOperationException e)
+        {
+            return e;
+        }
+    }
+
+    [Fact]
+    public void The_log_file_keeps_the_previous_run_and_stops_at_its_size_limit()
+    {
+        string path = _dir.File("logs/app.log");
+        using (var first = new Candela.App.Diagnostics.AppLog { ConsoleLevel = Candela.App.Diagnostics.LogLevel.Error + 1 })
+        {
+            first.OpenFile(path);
+            first.Info("Test", "first run");
+        }
+
+        using (var second = new Candela.App.Diagnostics.AppLog { ConsoleLevel = Candela.App.Diagnostics.LogLevel.Error + 1, MaxFileBytes = 4096 })
+        {
+            second.OpenFile(path);
+            for (int i = 0; i < 1000; i++)
+                second.Error("Frame", "repeated failure " + i, new InvalidOperationException("detail"));
+            Assert.Equal(1000, second.Count); // the in-memory log keeps everything
+        }
+
+        string current = File.ReadAllText(path);
+        Assert.DoesNotContain("first run", current);
+        Assert.Contains("repeated failure 0", current);
+        Assert.DoesNotContain("repeated failure 999", current);
+        Assert.Contains("further messages are kept in memory only", current);
+        Assert.InRange(new FileInfo(path).Length, 1, 4096 + 512);
+        Assert.Contains("first run", File.ReadAllText(Candela.App.Diagnostics.AppLog.PreviousPathOf(path)));
+        Assert.EndsWith("app.previous.log", Candela.App.Diagnostics.AppLog.PreviousPathOf(path), StringComparison.Ordinal);
+    }
+}

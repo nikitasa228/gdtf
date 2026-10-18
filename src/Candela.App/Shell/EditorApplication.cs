@@ -41,6 +41,7 @@ internal sealed class EditorApplication : IDisposable
     private int _lastImageCount;
     private bool _swapchainDirty;
     private int _consecutiveFailures;
+    private readonly RepeatedErrorFilter _failures = new();
     private int _exitCode = ExitCodes.Ok;
     private bool _quitRequested;
     private float _appliedDpi;
@@ -229,7 +230,16 @@ internal sealed class EditorApplication : IDisposable
         catch (Exception e) when (!IsFatal(e))
         {
             _consecutiveFailures++;
-            _log.Error("Frame", "Unhandled exception in the frame loop", e);
+            switch (_failures.Record(e))
+            {
+                case ErrorLogKind.Full:
+                    _log.Error("Frame", "Unhandled exception in the frame loop", e);
+                    break;
+                case ErrorLogKind.Count:
+                    _log.Error("Frame", $"The same exception happened {_failures.Repeats} times: {e.GetType().Name}: {e.Message}");
+                    break;
+            }
+
             _session?.ReportProgramError("app.frame-exception", Loc.Format(Str.MsgUnhandled, "frame", e.Message));
             if (_consecutiveFailures > 120)
             {
@@ -361,6 +371,5 @@ internal sealed class EditorApplication : IDisposable
     private static bool IsFatal(Exception e) => e is OutOfMemoryException or StackOverflowException or AccessViolationException;
 
     /// <summary>Reports a program error to the issues panel (used by the workspace for panel failures).</summary>
-    internal void ReportProgramError(string code, string message) =>
-        _session?.Issues.Report(new Issue(IssueSeverity.Error, IssueCategory.Program, code, message));
+    internal void ReportProgramError(string code, string message) => _session?.ReportProgramError(code, message);
 }

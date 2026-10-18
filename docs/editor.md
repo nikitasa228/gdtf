@@ -52,7 +52,7 @@ Per-user files live in the Candela config folder (`%APPDATA%\Candela`, `~/.confi
 | `presets/keybindings/*.json` | named key binding presets |
 | `keybindings.custom.json` | the edited ("Custom") key bindings |
 | `recent-places.json` | recently used folders of the file browser |
-| `logs/candela-app.log` | the log of the last run (also shown in the Console panel) |
+| `logs/candela-app.log` | the log of the current run (also shown in the Console panel; at most 16 MB), `candela-app.previous.log` the one before |
 
 ## Workspace
 

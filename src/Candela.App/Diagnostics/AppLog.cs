@@ -28,17 +28,24 @@ internal readonly record struct LogEntry(DateTime Time, LogLevel Level, string S
 
 /// <summary>
 /// The editor's log: a bounded in-memory ring shown by the Console panel, mirrored to standard error (warnings and
-/// errors) and, when <see cref="OpenFile"/> was called, to a log file in the user config folder. Thread-safe: protocol
+/// errors) and, when <see cref="OpenFile"/> was called, to a log file in the user config folder. The file holds the
+/// current run (the previous run is kept next to it as <c>*.previous.log</c>, e.g. after a crash) and stops growing at
+/// <see cref="MaxFileBytes"/>, so an error repeated every frame cannot fill the disk. Thread-safe: protocol
 /// receivers and background jobs may log from any thread; the console panel reads a snapshot on the main thread.
 /// </summary>
 internal sealed class AppLog : IDisposable
 {
+    /// <summary>Largest log file written in one run (bytes, approximately; UTF-16 characters are counted).</summary>
+    public const long DefaultMaxFileBytes = 16L * 1024 * 1024;
+
     private readonly object _gate = new();
     private readonly LogEntry[] _ring;
     private int _start;
     private int _count;
     private long _version;
     private StreamWriter? _file;
+    private long _fileChars;
+    private bool _fileFull;
 
     /// <summary>Creates a log keeping the last <paramref name="capacity"/> entries in memory.</summary>
     public AppLog(int capacity = 2000)
@@ -66,20 +73,41 @@ internal sealed class AppLog : IDisposable
     /// <summary>Path of the log file, or null when logging to memory only.</summary>
     public string? FilePath { get; private set; }
 
+    /// <summary>Size limit of the log file of this run (bytes, approximately).</summary>
+    public long MaxFileBytes { get; init; } = DefaultMaxFileBytes;
+
+    /// <summary>The file that keeps the previous run's log next to <paramref name="path"/> (<c>name.previous.log</c>).</summary>
+    public static string PreviousPathOf(string path) =>
+        Path.Combine(Path.GetDirectoryName(Path.GetFullPath(path))!, Path.GetFileNameWithoutExtension(path) + ".previous" + Path.GetExtension(path));
+
     /// <summary>
-    /// Also appends messages to <paramref name="path"/> (created with its folder). Failure to open the file is not an
-    /// error: the editor logs to memory and standard error only.
+    /// Also writes messages to <paramref name="path"/> (created with its folder). An existing file — the previous run —
+    /// is renamed to <see cref="PreviousPathOf"/> first; when that fails (another editor is still writing it) the new
+    /// messages are appended instead. Failure to open the file is not an error: the editor logs to memory and standard
+    /// error only.
     /// </summary>
     public void OpenFile(string path)
     {
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-            var stream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            try
+            {
+                if (File.Exists(path))
+                    File.Move(path, PreviousPathOf(path), overwrite: true);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // In use by another editor instance: append to it.
+            }
+
+            var stream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
             lock (_gate)
             {
                 _file?.Dispose();
                 _file = new StreamWriter(stream, new UTF8Encoding(false)) { AutoFlush = true };
+                _fileChars = stream.Length;
+                _fileFull = false;
                 FilePath = path;
             }
         }
@@ -102,17 +130,7 @@ internal sealed class AppLog : IDisposable
             else
                 _start = (_start + 1) % _ring.Length;
             _version++;
-            if (_file is not null)
-            {
-                try
-                {
-                    _file.WriteLine(Format(entry));
-                }
-                catch (IOException)
-                {
-                    // A full disk must not break the editor; the in-memory log still has the message.
-                }
-            }
+            WriteFileLine(Format(entry));
         }
 
         if (level >= ConsoleLevel)
@@ -142,16 +160,7 @@ internal sealed class AppLog : IDisposable
     {
         Write(LogLevel.Error, source, $"{message}: {exception.GetType().Name}: {exception.Message}");
         lock (_gate)
-        {
-            try
-            {
-                _file?.WriteLine(exception.ToString());
-            }
-            catch (IOException)
-            {
-                // see Write
-            }
-        }
+            WriteFileLine(exception.ToString());
     }
 
     /// <summary>Copies the entries (oldest first) into <paramref name="destination"/>, which is cleared first.</summary>
@@ -189,6 +198,30 @@ internal sealed class AppLog : IDisposable
         {
             _file?.Dispose();
             _file = null;
+        }
+    }
+
+    /// <summary>Appends a line to the file while it is below its size limit (caller holds the lock).</summary>
+    private void WriteFileLine(string line)
+    {
+        if (_file is null || _fileFull)
+            return;
+        try
+        {
+            if (_fileChars + line.Length > MaxFileBytes)
+            {
+                _fileFull = true;
+                _file.WriteLine(string.Create(CultureInfo.InvariantCulture,
+                    $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} WRN [Log] The log file reached {MaxFileBytes / (1024 * 1024)} MB; further messages are kept in memory only."));
+                return;
+            }
+
+            _file.WriteLine(line);
+            _fileChars += line.Length + Environment.NewLine.Length;
+        }
+        catch (IOException)
+        {
+            // A full disk must not break the editor; the in-memory log still has the message.
         }
     }
 

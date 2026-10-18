@@ -156,7 +156,7 @@ internal sealed class IssuesPanel : Panel
         ImGui.InputTextWithHint("##search", Labels.With(Icons.Search, Str.IssuesSearch), ref _search, 128);
         ImGui.SameLine();
         if (ImGui.Button(Icons.Trash))
-            issues.ClearProgramMessages();
+            _ctx.Session.ClearProgramMessages();
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip(Loc.Get(Str.IssuesClearMessages));
     }

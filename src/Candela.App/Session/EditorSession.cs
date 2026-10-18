@@ -39,6 +39,13 @@ internal sealed class EditorSession : IDisposable
     }
 
     private readonly Func<Guid, bool> _entityExists;
+    private readonly HashSet<(string Code, string Message)> _reported = new();
+
+    /// <summary>
+    /// Most distinct program messages kept in the issues panel; an error repeated every frame is reported once, so
+    /// a recurring failure cannot flood the panel (each report copies the issue list).
+    /// </summary>
+    public const int MaxProgramMessages = 200;
 
     /// <summary>The scene being edited (main thread only).</summary>
     public SceneModel Scene { get; private set; }
@@ -157,9 +164,24 @@ internal sealed class EditorSession : IDisposable
         return SessionResult.NotAvailable(Loc.Get(Str.RenderNotAvailable));
     }
 
-    /// <summary>Reports a program error (exception caught by the frame loop, failed panel) in the issues panel.</summary>
+    /// <summary>
+    /// Reports a program error (exception caught by the frame loop, failed panel) in the issues panel — once per code
+    /// and message until the messages are cleared, and at most <see cref="MaxProgramMessages"/> different ones.
+    /// </summary>
     public void ReportProgramError(string code, string message) =>
-        Issues.Report(new Issue(IssueSeverity.Error, IssueCategory.Program, code, message));
+        ReportOnce(new Issue(IssueSeverity.Error, IssueCategory.Program, code, message));
+
+    /// <summary>
+    /// Issues panel → clear: removes the program messages (errors, "not available" notes) and shows the scene's own
+    /// issues again; the same messages can be reported anew afterwards.
+    /// </summary>
+    public void ClearProgramMessages()
+    {
+        _reported.Clear();
+        Issues.ClearProgramMessages();
+        // IssueLog keeps showing the old list until it is rebuilt.
+        Issues.Refresh(Scene);
+    }
 
     /// <summary>Adds a file to the recent-files list of the settings (after a successful open/save).</summary>
     public void RememberRecentFile(string path)
@@ -182,8 +204,15 @@ internal sealed class EditorSession : IDisposable
     {
         string message = Loc.Format(Str.MsgEngineMissing, operation);
         _log.Info("Session", message);
-        Issues.Report(new Issue(IssueSeverity.Note, IssueCategory.Program, "app.engine-not-available", message));
+        ReportOnce(new Issue(IssueSeverity.Note, IssueCategory.Program, "app.engine-not-available", message));
         return SessionResult.NotAvailable(message);
+    }
+
+    private void ReportOnce(Issue issue)
+    {
+        if (_reported.Count >= MaxProgramMessages || !_reported.Add((issue.Code, issue.Message)))
+            return;
+        Issues.Report(issue);
     }
 
     /// <summary>Marks the scene as saved (used by the engine-backed save, and tests).</summary>
