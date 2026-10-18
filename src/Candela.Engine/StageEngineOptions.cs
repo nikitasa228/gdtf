@@ -1,0 +1,106 @@
+using Candela.Core.Settings;
+using Candela.Gdtf;
+
+namespace Candela.Engine;
+
+/// <summary>
+/// How a <see cref="StageEngine"/> is set up: where fixtures, researched specs and caches live and how the isolated
+/// model importer is found. Built from the user's <see cref="AppSettings"/> by <see cref="FromSettings"/>; tests and
+/// tools set the properties directly.
+/// </summary>
+public sealed record StageEngineOptions
+{
+    /// <summary>Folders scanned for <c>.gdtf</c> files, in priority order. Empty: the development library (see <see cref="FromSettings"/>).</summary>
+    public IReadOnlyList<string> LibraryFolders { get; init; } = Array.Empty<string>();
+
+    /// <summary>Path of <c>_specs/fixtures_index.json</c>; null looks next to (and above) the first library folder.</summary>
+    public string? SpecsIndexPath { get; init; }
+
+    /// <summary>An already loaded fixture library to share (tests, several engines in one process); overrides <see cref="LibraryFolders"/>.</summary>
+    public FixtureLibrary? Library { get; init; }
+
+    /// <summary>
+    /// Folder for the engine's caches: decoded models of the import worker, GDTF files extracted from MVR files and
+    /// projects, thumbnails. Null uses <see cref="ConfigPaths.CacheDir"/>.
+    /// </summary>
+    public string? CacheDirectory { get; init; }
+
+    /// <summary>
+    /// Path of the program that imports 3D models in a separate process (<c>candela import-worker</c>): the
+    /// <c>candela</c> executable or <c>candela.dll</c>. Null searches next to the running program and in
+    /// <c>CANDELA_IMPORT_WORKER</c>; when nothing is found, models are imported inside the application process (see
+    /// docs/engine.md).
+    /// </summary>
+    public string? ImportWorkerPath { get; init; }
+
+    /// <summary>Longest time one model import may take in the worker before it is stopped and reported.</summary>
+    public TimeSpan ImportWorkerTimeout { get; init; } = TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// When true (the default) model formats read by the native Assimp library (OBJ, FBX, COLLADA, 3DS) are decoded in the
+    /// import worker; false decodes everything in-process (only for trusted files, e.g. in tests of other features).
+    /// </summary>
+    public bool IsolateNativeImports { get; init; } = true;
+
+    /// <summary>Threads used to evaluate fixtures (default: all cores). Results do not depend on it.</summary>
+    public int DmxParallelism { get; init; } = Math.Max(1, Environment.ProcessorCount);
+
+    /// <summary>Threads used by the smoke simulation (−1: all cores). Results do not depend on it.</summary>
+    public int SimulationParallelism { get; init; } = -1;
+
+    /// <summary>
+    /// Internal universe = Art-Net port-address + this offset (see <see cref="AppSettings.ArtNetUniverseOffset"/>).
+    /// </summary>
+    public int ArtNetUniverseOffset { get; init; } = 1;
+
+    /// <summary>Network interface for protocol input (IPv4 address or adapter name; empty = all).</summary>
+    public string NetworkInterface { get; init; } = "";
+
+    /// <summary>
+    /// Options for a program run: library folders and specs from the settings; when the settings list no library folder,
+    /// the folder that contains <c>Candela.sln</c> (searched upwards from the program and from the current directory) is
+    /// used, which is the bundled library during development.
+    /// </summary>
+    public static StageEngineOptions FromSettings(AppSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        var folders = settings.LibraryFolders.Where(f => !string.IsNullOrWhiteSpace(f)).ToList();
+        if (folders.Count == 0 && DevelopmentLibrary.FindRepositoryRoot() is { } root) folders.Add(root);
+        return new StageEngineOptions
+        {
+            LibraryFolders = folders,
+            SpecsIndexPath = string.IsNullOrWhiteSpace(settings.SpecsIndexPath) ? null : settings.SpecsIndexPath,
+            ArtNetUniverseOffset = settings.ArtNetUniverseOffset,
+            NetworkInterface = settings.NetworkInterface ?? "",
+        };
+    }
+}
+
+/// <summary>Finds the repository (the folder containing <c>Candela.sln</c>), which holds the bundled fixture library.</summary>
+public static class DevelopmentLibrary
+{
+    /// <summary>Marker file of the repository root.</summary>
+    public const string SolutionFile = "Candela.sln";
+
+    /// <summary>
+    /// The folder containing <see cref="SolutionFile"/>, searched upwards from <paramref name="startDirectory"/>, the
+    /// program's folder and the current directory; null when none of them is inside the repository.
+    /// </summary>
+    public static string? FindRepositoryRoot(string? startDirectory = null)
+    {
+        foreach (var start in new[] { startDirectory, AppContext.BaseDirectory, Environment.CurrentDirectory })
+        {
+            if (string.IsNullOrWhiteSpace(start)) continue;
+            try
+            {
+                for (var dir = new DirectoryInfo(start); dir is not null; dir = dir.Parent)
+                    if (File.Exists(Path.Combine(dir.FullName, SolutionFile))) return dir.FullName;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or System.Security.SecurityException)
+            {
+                // An unreadable folder on the way up ends the search from this start point.
+            }
+        }
+        return null;
+    }
+}
