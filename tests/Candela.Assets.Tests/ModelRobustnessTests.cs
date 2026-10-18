@@ -145,6 +145,28 @@ public class ModelRobustnessTests
     }
 
     [Fact]
+    public void ColladaPreflightAcceptsValidSpecialCases()
+    {
+        static byte[] Doc(string body) => Encoding.UTF8.GetBytes(
+            $"<?xml version=\"1.0\"?><COLLADA xmlns=\"http://www.collada.org/2005/11/COLLADASchema\" version=\"1.4.1\">{body}</COLLADA>");
+
+        // Skin weights use joint index −1 for the bind shape; adjacent <p> elements are each checked.
+        ModelPreflight.CheckCollada(Doc("<vertex_weights count=\"1\"><vcount>1</vcount><v>-1 0</v></vertex_weights>"));
+        ModelPreflight.CheckCollada(Doc("<polygons count=\"2\"><p>0 1 2</p><p>2 1 3</p></polygons>"));
+        // Accessors with a stride larger than their parameters read only the parameters of the last element.
+        ModelPreflight.CheckCollada(Doc(
+            "<source><float_array id=\"a\" count=\"7\">0 1 2 9 3 4 5</float_array><technique_common>"
+            + "<accessor source=\"#a\" count=\"2\" stride=\"4\"><param name=\"X\"/><param name=\"Y\"/><param name=\"Z\"/></accessor>"
+            + "</technique_common></source>"));
+        // …but a negative index in a second <p>, or an accessor running past its array, is rejected.
+        Assert.Throws<AssetImportException>(() => ModelPreflight.CheckCollada(Doc("<polygons count=\"2\"><p>0 1 2</p><p>2 -1 3</p></polygons>")));
+        Assert.Throws<AssetImportException>(() => ModelPreflight.CheckCollada(Doc(
+            "<source><float_array id=\"a\" count=\"6\">0 1 2 3 4 5</float_array><technique_common>"
+            + "<accessor source=\"#a\" count=\"3\" stride=\"3\"><param name=\"X\"/><param name=\"Y\"/><param name=\"Z\"/></accessor>"
+            + "</technique_common></source>")));
+    }
+
+    [Fact]
     public void TruncatedAndCorruptedColladaFilesDoNotCrash()
     {
         var dae = Encoding.UTF8.GetBytes(TestFiles.Collada());

@@ -122,8 +122,10 @@ internal static class ModelPreflight
                     case "v":
                     case "h":
                         {
+                            // Skin weights (<v>) use joint index −1 for the bind shape; primitive indices are never negative.
+                            bool allowNegative = reader.LocalName == "v";
                             string name = "<" + reader.LocalName + ">";
-                            CountNumbers(reader.ReadElementContentAsString(), isFloat: false, allowNegative: false, name);
+                            CountNumbers(reader.ReadElementContentAsString(), isFloat: false, allowNegative, name);
                             break;
                         }
                     case "accessor":

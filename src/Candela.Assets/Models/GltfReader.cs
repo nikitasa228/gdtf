@@ -28,8 +28,20 @@ internal static class GltfReader
         ModelRoot model;
         try
         {
-            using var stream = new MemoryStream(files.MainData, writable: false);
-            model = context.ReadSchema2(stream);
+            try
+            {
+                using var stream = new MemoryStream(files.MainData, writable: false);
+                model = context.ReadSchema2(stream);
+            }
+            catch (Exception e) when (e is not OutOfMemoryException and not AssetImportException
+                && AssetFormats.IsGlb(files.MainData) && RepackGlb(files.MainData) is { } repacked)
+            {
+                // Some exporters write GLB chunks without the 4-byte padding the specification requires; SharpGLTF
+                // rejects those, so the container is re-packed with aligned chunks and read again.
+                using var stream = new MemoryStream(repacked, writable: false);
+                model = context.ReadSchema2(stream);
+                ctx.Warn("The GLB container is not aligned as the glTF specification requires; it was repaired while reading.");
+            }
         }
         catch (Exception e) when (e is not OutOfMemoryException and not AssetImportException)
         {
@@ -110,6 +122,46 @@ internal static class GltfReader
         {
             return uri;
         }
+    }
+
+    /// <summary>
+    /// A GLB rewritten with every chunk padded to 4 bytes (JSON with spaces, binary with zeros), or null when the chunk
+    /// table itself is inconsistent or nothing needs re-packing.
+    /// </summary>
+    internal static byte[]? RepackGlb(byte[] data)
+    {
+        if (!AssetFormats.IsGlb(data) || data.Length < 20) return null;
+        var chunks = new List<(uint Type, int Offset, int Length)>();
+        int at = 12;
+        bool misaligned = false;
+        while (at + 8 <= data.Length)
+        {
+            uint length = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(at, 4));
+            uint type = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(at + 4, 4));
+            if (length > (uint)(data.Length - at - 8)) return null;
+            chunks.Add((type, at + 8, (int)length));
+            misaligned |= length % 4 != 0;
+            at += 8 + (int)length;
+            // Tolerate padding that is present but not counted in the chunk length.
+            while (at < data.Length && at % 4 != 0 && data[at] is 0 or 0x20) at++;
+        }
+        if (chunks.Count == 0 || !misaligned) return null;
+        using var ms = new MemoryStream(data.Length + 16);
+        ms.Write(new byte[12]);
+        Span<byte> head = stackalloc byte[8];
+        foreach (var (type, offset, length) in chunks)
+        {
+            int pad = (4 - length % 4) % 4;
+            BinaryPrimitives.WriteUInt32LittleEndian(head, (uint)(length + pad));
+            BinaryPrimitives.WriteUInt32LittleEndian(head[4..], type);
+            ms.Write(head);
+            ms.Write(data, offset, length);
+            for (int i = 0; i < pad; i++) ms.WriteByte(type == 0x4E4F534A ? (byte)' ' : (byte)0);
+        }
+        var result = ms.ToArray();
+        data.AsSpan(0, 8).CopyTo(result); // magic and version
+        BinaryPrimitives.WriteUInt32LittleEndian(result.AsSpan(8, 4), (uint)result.Length);
+        return result;
     }
 
     /// <summary>
