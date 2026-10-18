@@ -1,5 +1,6 @@
 using Candela.Core.Diagnostics;
 using Candela.Core.SceneGraph.Components;
+using Candela.Gdtf;
 
 namespace Candela.Electrical;
 
@@ -139,13 +140,16 @@ public sealed partial class NetworkSolver
                                 if (p.Direction == PortDirection.Output && p.Signal == SignalKind.Dmx512) dmxOutputs++;
                                 if (p.Direction != PortDirection.Output && p.Signal == SignalKind.Dmx512) dmxInput = true;
                             }
-                            bool splitter = dmx && dmxOutputs >= 2;
+                            bool splitter = dmx && IsDmxSplitter(target);
                             bool converter = f.Signal == SignalKind.Ethernet && !dmxInput && dmxOutputs > 0;
                             int convertedPort = 0;
                             foreach (var o in target.Info.Ports)
                             {
                                 if (ReferenceEquals(o, input) || o.Direction == PortDirection.Input || !o.Signal.CarriesData() ||
                                     o.Role is PortRole.Other or PortRole.PowerIn)
+                                    continue;
+                                // A DMX thru only repeats the break that arrives at its input (multi-break fixtures).
+                                if (dmx && input.Signal == SignalKind.Dmx512 && o.Signal == SignalKind.Dmx512 && o.DmxBreak != input.DmxBreak)
                                     continue;
                                 if (converter && o.Signal == SignalKind.Dmx512)
                                 {
@@ -231,5 +235,21 @@ public sealed partial class NetworkSolver
         }
 
         private static bool SameDataFamily(SignalKind a, SignalKind b) => a == b || a == SignalKind.Hybrid || b == SignalKind.Hybrid;
+
+        /// <summary>
+        /// True for a DMX splitter / booster, whose outputs each start a new, electrically isolated DMX segment. A
+        /// lighting fixture never is one: its DMX thru is the same line as its input, even when it offers the thru on
+        /// both an XLR 3-pin and an XLR 5-pin socket (a sixth of the library does). A distribution device (library
+        /// category OTHER) counts as a splitter when it has at least two DMX outputs with the same connector.
+        /// </summary>
+        private static bool IsDmxSplitter(Device device)
+        {
+            if (device.Info.Profile is not { Category: FixtureCategory.Other }) return false;
+            var families = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var p in device.Info.Ports)
+                if (p.Direction == PortDirection.Output && p.Signal == SignalKind.Dmx512 && !families.Add(p.Connector.Family))
+                    return true;
+            return false;
+        }
     }
 }

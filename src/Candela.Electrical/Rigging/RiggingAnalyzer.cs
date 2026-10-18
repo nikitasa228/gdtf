@@ -73,6 +73,22 @@ public sealed record TrussLoad
     /// <summary>Every weight on the truss.</summary>
     public required IReadOnlyList<TrussLoadItem> Items { get; init; }
 
+    /// <summary>
+    /// Largest bending moment the carried items cause, in kg·m (multiply by g for N·m), with the truss taken as a
+    /// beam simply supported at both ends of its length (the span its rated loads refer to). The truss's own weight is
+    /// not included: load tables give the load a truss carries in addition to itself.
+    /// </summary>
+    public double MaxBendingMomentKgM { get; init; }
+
+    /// <summary>
+    /// The single load at mid-span that bends the truss as much as the carried items do (4·M / L), in kg; compared
+    /// with <see cref="MaxPointLoadKg"/>. Two heavy fixtures side by side near mid-span count almost double.
+    /// </summary>
+    public double EquivalentCentrePointLoadKg { get; init; }
+
+    /// <summary>The uniformly distributed load that bends the truss as much as the carried items do (8·M / L), in kg.</summary>
+    public double EquivalentUniformLoadKg { get; init; }
+
     /// <summary>Load carried (fixtures + clamps + cables) in kg, without the truss's own weight.</summary>
     public double LoadKg => FixtureWeightKg + ClampWeightKg + CableWeightKg;
 
@@ -112,7 +128,9 @@ public sealed record RiggingSolution(IReadOnlyList<TrussLoad> Trusses, IReadOnly
 /// Rigging checks: fixtures above the floor that are not attached to a structure, mounts that point at nothing,
 /// truss load (fixture weights from specs/GDTF + a clamp per fixture + the cable weight along the truss) against the
 /// truss's maximum uniform and point loads, and rigging point capacity against the share of the trusses it carries
-/// (lever rule between neighbouring points along the truss).
+/// (lever rule between neighbouring points along the truss). Besides the total and the heaviest single fixture, the
+/// bending moment of all loads together is compared with the ratings (as the equivalent mid-span point load, or the
+/// equivalent uniform load when no point rating is given), so several heavy fixtures close together are caught.
 /// </summary>
 /// <remarks>
 /// A fixture counts as hanging on a truss when its <c>MountedOn</c> is the truss (or an entity under it), or — without
@@ -301,6 +319,9 @@ public sealed class RiggingAnalyzer
             var fixtureSet = fixtureIds.ToHashSet();
             var fixtureItems = items.Where(i => fixtureSet.Contains(i.EntityId)).ToList();
             var heaviest = fixtureItems.Count == 0 ? default : fixtureItems.MaxBy(i => i.WeightKg);
+            double moment = MaxBendingMoment(e, length, items);
+            double pointEq = length > 0 ? 4 * moment / length : 0;
+            double uniformEq = 2 * pointEq;
             var load = new TrussLoad
             {
                 TrussEntityId = e.Id,
@@ -319,19 +340,42 @@ public sealed class RiggingAnalyzer
                 MaxUniformLoadKg = t.MaxUniformLoadKg > 0 ? t.MaxUniformLoadKg : null,
                 MaxPointLoadKg = t.MaxPointLoadKg > 0 ? t.MaxPointLoadKg : null,
                 Items = items,
+                MaxBendingMomentKgM = moment,
+                EquivalentCentrePointLoadKg = pointEq,
+                EquivalentUniformLoadKg = uniformEq,
             };
             trussResults.Add(load);
             trussById[e.Id] = load;
 
             string what = $"truss '{e.Name}' ({(string.IsNullOrWhiteSpace(t.Profile) ? t.Kind.ToString() : t.Profile)}, {Fmt.M(length)})";
+            string heaviestFixtures = Fmt.List(fixtureItems.OrderByDescending(i => i.WeightKg).Select(i => $"{i.Description} {Fmt.Kg(i.WeightKg)}"), 4);
+            bool uniformReported = false;
             if (load.MaxUniformLoadKg is { } maxUniform && load.LoadKg > maxUniform + 1e-6)
+            {
+                uniformReported = true;
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussOverload,
-                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)} ({Fmt.Count(fixtureIds.Count, "fixture", "fixtures")} {Fmt.Kg(fixtureKg)}, clamps {Fmt.Kg(clamps)}, cables {Fmt.Kg(load.CableWeightKg)}) but its maximum uniform load is {Fmt.Kg(maxUniform)}.",
+                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)} ({Fmt.Count(fixtureIds.Count, "fixture", "fixtures")} {Fmt.Kg(fixtureKg)}, clamps {Fmt.Kg(clamps)}, cables {Fmt.Kg(load.CableWeightKg)}) but its maximum uniform load is {Fmt.Kg(maxUniform)}. Heaviest: {heaviestFixtures}.",
                     [e.Id, .. fixtureIds]));
-            if (load.MaxPointLoadKg is { } maxPoint && heaviest.WeightKg > maxPoint + 1e-6)
-                issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussPointOverload,
-                    $"{heaviest.Description} weighs {Fmt.Kg(heaviest.WeightKg)} with its clamp, more than the maximum point load of the {what} ({Fmt.Kg(maxPoint)}).",
-                    e.Id, heaviest.EntityId));
+            }
+            if (load.MaxPointLoadKg is { } maxPoint)
+            {
+                if (heaviest.WeightKg > maxPoint + 1e-6)
+                    issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussPointOverload,
+                        $"{heaviest.Description} weighs {Fmt.Kg(heaviest.WeightKg)} with its clamp, more than the maximum point load of the {what} ({Fmt.Kg(maxPoint)}).",
+                        e.Id, heaviest.EntityId));
+                else if (pointEq > maxPoint + 1e-6)
+                    issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussPointOverload,
+                        $"The {what} is overloaded: its loads bend it as much as {Fmt.Kg(pointEq)} hung at mid-span, more than its maximum point load of {Fmt.Kg(maxPoint)} ({heaviestFixtures}).",
+                        [e.Id, .. fixtureIds]));
+            }
+            else if (!uniformReported && load.MaxUniformLoadKg is { } maxUdl && uniformEq > maxUdl + 1e-6)
+            {
+                // Without a point-load rating, concentrated loads are judged by the uniform load that bends the truss
+                // as much (a load table's uniform rating is a bending limit for all but the shortest spans).
+                issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussOverload,
+                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)}, but concentrated near mid-span it bends the truss like {Fmt.Kg(uniformEq)} spread evenly, more than its maximum uniform load of {Fmt.Kg(maxUdl)} ({heaviestFixtures}).",
+                    [e.Id, .. fixtureIds]));
+            }
         }
 
         var pointResults = AnalyzePoints(scene, points, trusses, trussById, weightByFixture, fixtures, hungFromPoint, issues);
@@ -438,6 +482,39 @@ public sealed class RiggingAnalyzer
     }
 
     /// <summary>The entity or its nearest ancestor that is a truss, or null.</summary>
+    /// <summary>
+    /// Largest bending moment (kg·m) of the items on a truss of the given length, taken as a beam simply supported at
+    /// both ends; item positions are projected on the truss axis (local X) and clamped to the span. O(n log n).
+    /// </summary>
+    private static double MaxBendingMoment(Entity truss, float length, IReadOnlyList<TrussLoadItem> items)
+    {
+        if (!(length > 0) || items.Count == 0) return 0;
+        var origin = truss.WorldPosition;
+        var axis = Vector3.TransformNormal(Vector3.UnitX, truss.WorldMatrix);
+        axis = axis.LengthSquared() > 1e-12f && float.IsFinite(axis.X + axis.Y + axis.Z) ? Vector3.Normalize(axis) : Vector3.UnitX;
+        var loads = new (double X, double W)[items.Count];
+        int n = 0;
+        foreach (var item in items)
+        {
+            float x = Vector3.Dot(item.WorldPosition - origin, axis);
+            if (!float.IsFinite(x) || !(item.WeightKg > 0) || !double.IsFinite(item.WeightKg)) continue;
+            loads[n++] = (Math.Clamp(x, 0f, length), item.WeightKg);
+        }
+        if (n == 0) return 0;
+        Array.Sort(loads, 0, n, Comparer<(double X, double W)>.Create((a, b) => a.X.CompareTo(b.X)));
+        double reactionA = 0;
+        for (int i = 0; i < n; i++) reactionA += loads[i].W * (length - loads[i].X) / length;
+        double max = 0, leftW = 0, leftWx = 0;
+        for (int i = 0; i < n; i++)
+        {
+            double x = loads[i].X;
+            max = Math.Max(max, reactionA * x - (leftW * x - leftWx));
+            leftW += loads[i].W;
+            leftWx += loads[i].W * x;
+        }
+        return max;
+    }
+
     private static Entity? TrussOf(Entity? entity)
     {
         for (var e = entity; e is not null; e = e.Parent)

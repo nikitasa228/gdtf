@@ -86,6 +86,14 @@ public sealed partial class NetworkSolver
 
     private sealed record PowerResult(IReadOnlyList<PowerSourceLoad> Sources, IReadOnlyDictionary<Guid, PowerFeed> Feeds, IReadOnlyList<Guid> Unpowered);
 
+    /// <summary>
+    /// Line-to-neutral voltage of a source. A three-phase source entered with its line-to-line voltage (300 V or more,
+    /// e.g. 400 V or 415 V) supplies its single-phase loads with V / √3 (231 V, 240 V); values below 300 V are taken as
+    /// line-to-neutral already.
+    /// </summary>
+    internal static float PhaseVoltage(float voltageV, int phases) =>
+        phases == 3 && float.IsFinite(voltageV) && voltageV >= 300f ? voltageV / MathF.Sqrt(3f) : voltageV;
+
     private sealed partial class SolveRun
     {
         private readonly Dictionary<PortRef, List<PowerEdge>> _powerOut = new(PortRef.Comparer);
@@ -103,11 +111,12 @@ public sealed partial class NetworkSolver
             foreach (var d in _deviceOrder)
             {
                 if (d.Source is not { } src) continue;
+                int phases = Math.Clamp(src.Phases, 1, 3);
                 var s = new SourceState(d)
                 {
-                    VoltageV = src.VoltageV,
+                    VoltageV = PhaseVoltage(src.VoltageV, phases),
                     FrequencyHz = float.IsFinite(src.FrequencyHz) ? Math.Max(0f, src.FrequencyHz) : 0f,
-                    Phases = Math.Clamp(src.Phases, 1, 3),
+                    Phases = phases,
                 };
                 if (!(float.IsFinite(src.VoltageV) && src.VoltageV > 0))
                 {
@@ -115,7 +124,10 @@ public sealed partial class NetworkSolver
                     Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerSourceInvalid,
                         $"Power source '{d.Info.Name}' has an invalid voltage ({src.VoltageV} V); nothing it feeds is analysed.", d.Id);
                 }
-                s.IsFed = _powerIn.Contains(new PortRef(d.Id, PortResolver.MainsInPortName));
+                // A distro whose Mains In has a power cable is not a source of its own, even when that cable does
+                // not lead to a powered output (it is then reported unpowered instead of silently feeding its loads).
+                var mainsIn = new PortRef(d.Id, PortResolver.MainsInPortName);
+                s.IsFed = _powerIn.Contains(mainsIn) || (_plugged.TryGetValue(mainsIn, out var plug) && plug.Cable.Type is { IsPower: true });
                 _sources[d.Id] = s;
                 sourceOrder.Add(s);
             }
@@ -437,9 +449,16 @@ public sealed partial class NetworkSolver
                 cable.Info.PeakCurrentA = peak;
                 cable.Info.LoadW = watts;
                 if (cable.Type.RatedCurrentA is { } rated && peak > rated + 1e-6)
+                {
+                    var behind = cable.PowerEdges
+                        .Where(e => _fed.TryGetValue(e.Down.EntityId, out var n) && ReferenceEquals(n.Edge, e))
+                        .SelectMany(e => Subtree(_fed[e.Down.EntityId]))
+                        .Select(n => n.Device)
+                        .ToList();
                     Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerCableOverload,
-                        $"{cable.Type.DisplayName} '{cable.Label}' carries {Fmt.A(peak)} ({Fmt.W(watts)}) but is rated {Fmt.A(rated)}.",
-                        cable.Entity.Id);
+                        $"{cable.Type.DisplayName} '{cable.Label}' carries {Fmt.A(peak)} ({Fmt.W(watts)}) but is rated {Fmt.A(rated)}; it feeds {Fmt.List(behind.Select(d => d.Info.Label))}.",
+                        [cable.Entity.Id, .. behind.Select(d => d.Id)]);
+                }
             }
         }
 

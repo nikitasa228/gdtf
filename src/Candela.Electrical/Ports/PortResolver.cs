@@ -210,16 +210,27 @@ public sealed class PortResolver
                 WiringComponentType.NetworkInOut => PortDirection.Bidirectional,
                 _ => PortDirection.Output,
             };
+            // Some files type a thru socket as an input or consumer and an inlet as an output ("Power OUT 2" is a
+            // Consumer in the BeamZ DOT BAR files, "Network IN 2" a NetworkOutput): a name that says "in" or "out"
+            // outranks the component type.
+            if (w.ComponentType is not (WiringComponentType.NetworkInOut or WiringComponentType.NetworkProvider) &&
+                DirectionFromName(w.Name) is { } named)
+                direction = named;
             if (signal == SignalKind.Ethernet && direction != PortDirection.Bidirectional && w.ComponentType is not
                     (WiringComponentType.NetworkInput or WiringComponentType.NetworkOutput or WiringComponentType.Input or WiringComponentType.Output))
                 direction = PortDirection.Bidirectional;
 
             float? maxA = null;
             float? payload = w.MaxPayLoad > 0 && float.IsFinite(w.MaxPayLoad) ? w.MaxPayLoad : null;
-            if (signal.CarriesPower())
+            if (signal.CarriesPower() && direction != PortDirection.Input)
             {
+                // The fuse or payload of an output limits what it passes on, but never beyond its connector's rating:
+                // files that write the mains voltage into FuseCurrent (240 "A" on a TRUE1 thru) must not lift the
+                // 16 A limit. An inlet's fuse protects the device's own supply, not the thru wiring, so inlets keep
+                // their connector rating.
                 if (w.FuseCurrent > 0 && float.IsFinite(w.FuseCurrent)) maxA = w.FuseCurrent;
-                else if (payload is { } pl && w.Voltage > 0 && float.IsFinite(w.Voltage)) maxA = pl / w.Voltage;
+                if (payload is { } pl && w.Voltage > 0 && float.IsFinite(w.Voltage)) maxA = MathF.Min(maxA ?? float.MaxValue, pl / w.Voltage);
+                if (maxA is { } a && connector.RatedCurrentA is { } rated && a > rated) maxA = rated;
             }
             string name = string.IsNullOrWhiteSpace(w.Name) ? $"{signal.DisplayName()} {direction}" : w.Name.Trim();
             AddUnique(ports, new Port

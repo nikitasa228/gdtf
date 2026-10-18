@@ -311,7 +311,10 @@ public sealed class FixtureProfile
                 if (pc.Value > 0 && float.IsFinite(pc.Value)) gdtfPower += pc.Value * f;
                 if (pc.PowerFactor is > 0f and < 0.999f) pf = pc.PowerFactor;
             }
-            var consumers = WiringObjects(type, mode).Where(w => w.ComponentType == WiringComponentType.Consumer).ToList();
+            // A "consumer" named as an output is a mistyped thru socket, not a second load.
+            var consumers = WiringObjects(type, mode)
+                .Where(w => w.ComponentType == WiringComponentType.Consumer && PortResolver.DirectionFromName(w.Name) != PortDirection.Output)
+                .ToList();
             if (pf == DefaultPowerFactor)
                 foreach (var c in consumers)
                     if (c.CosPhi is > 0f and <= 1f && c.CosPhi < 0.999f)
