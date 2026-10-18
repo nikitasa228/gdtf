@@ -267,18 +267,39 @@ public sealed partial class SmokeSimulation
     /// </summary>
     private void ApplyJets(float dt)
     {
-        float alpha = 1f - MathF.Exp(-dt / FanResponseTime);
+        if (_sourceCount == 0)
+            return;
+        _jetAlpha = 1f - MathF.Exp(-dt / FanResponseTime);
+        // Parallel over Z slices; within a face every jet is applied in emitter order, so the result does not depend on
+        // the thread count. The u and v faces of slice k and the w faces of layer k are separate tasks.
+        RunSlices(_nz, _jetHorizontalSlice);
+        RunSlices(_nz + 1, _jetVerticalSlice);
+    }
+
+    private float _jetAlpha;
+
+    private void JetHorizontalSlice(int k)
+    {
         for (int n = 0; n < _sourceCount; n++)
         {
             ref readonly var jet = ref _sources[n];
-            ApplyJetComponent(jet, _u, _uFlags, _nx + 1, _ny, _nz, new Vector3(0f, 0.5f, 0.5f), jet.Direction.X, alpha);
-            ApplyJetComponent(jet, _v, _vFlags, _nx, _ny + 1, _nz, new Vector3(0.5f, 0f, 0.5f), jet.Direction.Y, alpha);
-            ApplyJetComponent(jet, _w, _wFlags, _nx, _ny, _nz + 1, new Vector3(0.5f, 0.5f, 0f), jet.Direction.Z, alpha);
+            ApplyJetComponent(jet, _u, _uFlags, _nx + 1, _ny, new Vector3(0f, 0.5f, 0.5f), jet.Direction.X, k);
+            ApplyJetComponent(jet, _v, _vFlags, _nx, _ny + 1, new Vector3(0.5f, 0f, 0.5f), jet.Direction.Y, k);
         }
     }
 
-    private void ApplyJetComponent(in ResolvedSource jet, float[] f, byte[] flags, int sx, int sy, int sz, Vector3 offset,
-        float axisComponent, float alpha)
+    private void JetVerticalSlice(int k)
+    {
+        for (int n = 0; n < _sourceCount; n++)
+        {
+            ref readonly var jet = ref _sources[n];
+            ApplyJetComponent(jet, _w, _wFlags, _nx, _ny, new Vector3(0.5f, 0.5f, 0f), jet.Direction.Z, k);
+        }
+    }
+
+    /// <summary>Applies one jet to the faces of one velocity component in layer <paramref name="k"/> of that component's grid.</summary>
+    private void ApplyJetComponent(in ResolvedSource jet, float[] f, byte[] flags, int sx, int sy, Vector3 offset,
+        float axisComponent, int k)
     {
         float weight = axisComponent * axisComponent;
         if (weight < 1e-6f)
@@ -288,43 +309,46 @@ public sealed partial class SmokeSimulation
         var pad = new Vector3(jet.Diameter + _h);
         var min = (Vector3.Min(jet.Center - pad, end - new Vector3(endWidth)) - _origin) * _invH - offset;
         var max = (Vector3.Max(jet.Center + pad, end + new Vector3(endWidth)) - _origin) * _invH - offset;
+        if (k < (int)MathF.Floor(min.Z) || k > (int)MathF.Ceiling(max.Z))
+            return;
         int i0 = Math.Max(0, (int)MathF.Floor(min.X)), i1 = Math.Min(sx - 1, (int)MathF.Ceiling(max.X));
         int j0 = Math.Max(0, (int)MathF.Floor(min.Y)), j1 = Math.Min(sy - 1, (int)MathF.Ceiling(max.Y));
-        int k0 = Math.Max(0, (int)MathF.Floor(min.Z)), k1 = Math.Min(sz - 1, (int)MathF.Ceiling(max.Z));
         float core = JetDecayConstant * jet.Diameter;
         float minWidth = _h;
-        float rate = alpha * weight;
+        float rate = _jetAlpha * weight;
         const float ln2 = 0.693147182f;
-        for (int k = k0; k <= k1; k++)
+        // exp(−ln2·r²/b²) < 0.02 for r² > ln(50)/ln2·b² ≈ 5.64·b²: such faces are skipped before the exponential
+        // (1 % margin, so exactly the faces the 0.02 test below rejects are left out).
+        const float cutoff = 5.644f * 1.01f;
+        for (int j = j0; j <= j1; j++)
         {
-            for (int j = j0; j <= j1; j++)
+            for (int i = i0; i <= i1; i++)
             {
-                for (int i = i0; i <= i1; i++)
+                int idx = i + sx * (j + sy * k);
+                if (flags[idx] != FaceFree)
+                    continue;
+                var p = _origin + (new Vector3(i, j, k) + offset) * _h;
+                var rel = p - jet.Center;
+                float x = Vector3.Dot(rel, jet.Direction);
+                if (x < -0.5f * _h || x > jet.Reach)
+                    continue;
+                float xa = MathF.Max(x, 0f);
+                float r2 = MathF.Max(0f, rel.LengthSquared() - x * x);
+                float b = HalfWidth(xa, jet.Diameter);
+                float centreline = xa < core ? jet.Speed : jet.Speed * core / xa;
+                if (b < minWidth)
                 {
-                    int idx = i + sx * (j + sy * k);
-                    if (flags[idx] != FaceFree)
-                        continue;
-                    var p = _origin + (new Vector3(i, j, k) + offset) * _h;
-                    var rel = p - jet.Center;
-                    float x = Vector3.Dot(rel, jet.Direction);
-                    if (x < -0.5f * _h || x > jet.Reach)
-                        continue;
-                    float xa = MathF.Max(x, 0f);
-                    float r2 = MathF.Max(0f, rel.LengthSquared() - x * x);
-                    float b = HalfWidth(xa, jet.Diameter);
-                    float centreline = xa < core ? jet.Speed : jet.Speed * core / xa;
-                    if (b < minWidth)
-                    {
-                        centreline *= b / minWidth;
-                        b = minWidth;
-                    }
-
-                    float profile = MathF.Exp(-ln2 * r2 / (b * b));
-                    if (profile < 0.02f)
-                        continue;
-                    float target = centreline * profile * axisComponent;
-                    f[idx] += (target - f[idx]) * rate * profile;
+                    centreline *= b / minWidth;
+                    b = minWidth;
                 }
+
+                if (r2 > cutoff * b * b)
+                    continue;
+                float profile = MathF.Exp(-ln2 * r2 / (b * b));
+                if (profile < 0.02f)
+                    continue;
+                float target = centreline * profile * axisComponent;
+                f[idx] += (target - f[idx]) * rate * profile;
             }
         }
     }

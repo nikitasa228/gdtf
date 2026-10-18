@@ -22,6 +22,8 @@ public sealed partial class SmokeSimulation
     private Action<int> _searchMultigridSlice = null!;
     private Action<int> _applyPressureSlice = null!;
     private Action<int> _jacobiStartSlice = null!;
+    private Action<int> _jetHorizontalSlice = null!;
+    private Action<int> _jetVerticalSlice = null!;
     private float _cgAlpha, _cgBeta;
 
     /// <summary>Creates the per-slice delegates once, so stepping does not allocate closures.</summary>
@@ -45,6 +47,8 @@ public sealed partial class SmokeSimulation
         _searchMultigridSlice = SearchMultigridSlice;
         _applyPressureSlice = ApplyPressureSlice;
         _jacobiStartSlice = JacobiStartSlice;
+        _jetHorizontalSlice = JetHorizontalSlice;
+        _jetVerticalSlice = JetVerticalSlice;
     }
 
     /// <summary>
