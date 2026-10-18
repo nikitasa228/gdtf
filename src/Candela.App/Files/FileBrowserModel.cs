@@ -100,6 +100,9 @@ internal sealed class FileBrowserModel
     /// <summary>Recently used folders, newest first.</summary>
     public IReadOnlyList<string> RecentPlaces => _recent;
 
+    /// <summary>Changes whenever <see cref="Entries"/> changes (new listing or new order), so views can cache row texts.</summary>
+    public int Version { get; private set; }
+
     /// <summary>Shows a folder; returns false (and sets <see cref="Error"/>) when it cannot be read.</summary>
     public bool Navigate(string path)
     {
@@ -108,7 +111,7 @@ internal sealed class FileBrowserModel
         string full;
         try
         {
-            full = Path.GetFullPath(Environment.ExpandEnvironmentVariables(path.Trim()));
+            full = Path.GetFullPath(ExpandHome(Environment.ExpandEnvironmentVariables(path.Trim())));
         }
         catch (Exception e) when (e is ArgumentException or NotSupportedException or PathTooLongException or System.Security.SecurityException)
         {
@@ -126,7 +129,9 @@ internal sealed class FileBrowserModel
         try
         {
             var dir = new DirectoryInfo(full);
-            foreach (var info in dir.EnumerateFileSystemInfos("*", new EnumerationOptions { IgnoreInaccessible = true, AttributesToSkip = 0, RecurseSubdirectories = false }))
+            // Not IgnoreInaccessible: for the folder itself it would turn "access denied" into an empty listing without
+            // an explanation; the entries are not opened (no recursion), so they cannot fail this way.
+            foreach (var info in dir.EnumerateFileSystemInfos("*", new EnumerationOptions { IgnoreInaccessible = false, AttributesToSkip = 0, RecurseSubdirectories = false }))
             {
                 bool isDir = (info.Attributes & FileAttributes.Directory) != 0;
                 if (!ShowHidden && IsHidden(info))
@@ -159,6 +164,15 @@ internal sealed class FileBrowserModel
         Sort();
         Error = "";
         return true;
+    }
+
+    /// <summary>"~" and "~/…" (typed into the path bar) stand for the user's home folder, as in a shell.</summary>
+    internal static string ExpandHome(string path)
+    {
+        if (path.Length == 0 || path[0] != '~' || (path.Length > 1 && path[1] != '/' && path[1] != Path.DirectorySeparatorChar))
+            return path;
+        string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return home.Length == 0 ? path : path.Length == 1 ? home : Path.Combine(home, path[2..]);
     }
 
     /// <summary>Re-reads the current folder.</summary>
@@ -229,7 +243,7 @@ internal sealed class FileBrowserModel
                         }
 
                         string path = Path.GetFullPath(Path.Combine(CurrentDirectory, name));
-                        if (File.Exists(path))
+                        if (IsReadableFile(path))
                             return path;
                         Error = $"'{path}' does not exist.";
                         return null;
@@ -273,6 +287,27 @@ internal sealed class FileBrowserModel
         {
             Error = e.Message;
             return null;
+        }
+    }
+
+    /// <summary>
+    /// True when <paramref name="path"/> is a file that can be opened: it exists and, when it is a symbolic link, the link
+    /// leads to an existing file (.NET reports a broken or looping link as an existing file).
+    /// </summary>
+    public static bool IsReadableFile(string path)
+    {
+        try
+        {
+            var info = new FileInfo(path);
+            if (!info.Exists)
+                return false;
+            if (info.LinkTarget is null)
+                return true;
+            return info.ResolveLinkTarget(returnFinalTarget: true) is FileInfo { Exists: true };
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return false; // a link loop, a vanished file, an unreadable folder on the way
         }
     }
 
@@ -345,6 +380,7 @@ internal sealed class FileBrowserModel
 
     private void Sort()
     {
+        Version++;
         int dir = SortDescending ? -1 : 1;
         _entries.Sort((a, b) =>
         {

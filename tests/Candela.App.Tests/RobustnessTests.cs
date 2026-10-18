@@ -716,3 +716,156 @@ public sealed class UiGuardTests
         Assert.Contains("10 times", errors[1].Message, StringComparison.Ordinal);
     }
 }
+
+/// <summary>The file browser on odd paths: unreadable folders, symbolic link loops, Unicode names, very large folders.</summary>
+[Collection(UiStateCollection.Name)]
+public sealed class FileBrowserOddPathTests : IDisposable
+{
+    private readonly TempDir _dir = new();
+
+    public void Dispose() => _dir.Dispose();
+
+    private static Candela.App.Files.FileBrowserModel Model(Candela.App.Files.FileBrowserMode mode = Candela.App.Files.FileBrowserMode.Open) =>
+        new(mode, new[] { new Candela.App.Files.FileFilter("All", "*") });
+
+    [Fact]
+    public void An_unreadable_folder_is_reported_not_shown_as_empty()
+    {
+        // As root most folders are readable; /proc/1/map_files is not (needs CAP_SYS_ADMIN). Elsewhere a folder without
+        // permissions is made (that works for normal users).
+        string? locked = null;
+        if (OperatingSystem.IsLinux() && Directory.Exists("/proc/1/map_files") && !CanList("/proc/1/map_files"))
+            locked = "/proc/1/map_files";
+        else if (!OperatingSystem.IsWindows())
+        {
+            locked = Path.Combine(_dir.Path, "locked");
+            Directory.CreateDirectory(locked);
+            File.WriteAllText(Path.Combine(locked, "secret.txt"), "x");
+            File.SetUnixFileMode(locked, UnixFileMode.None);
+            if (CanList(locked))
+                locked = null; // running with privileges that ignore permissions
+        }
+
+        if (locked is null)
+            return; // no unreadable folder can be made here
+
+        var model = Model();
+        Assert.True(model.Navigate(_dir.Path));
+        int before = model.Entries.Count;
+        Assert.False(model.Navigate(locked));
+        Assert.NotEmpty(model.Error);
+        Assert.Equal(_dir.Path, model.CurrentDirectory); // the previous listing stays
+        Assert.Equal(before, model.Entries.Count);
+        if (locked.StartsWith(_dir.Path, StringComparison.Ordinal))
+            File.SetUnixFileMode(locked, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+    }
+
+    private static bool CanList(string path)
+    {
+        try
+        {
+            _ = Directory.EnumerateFileSystemEntries(path).FirstOrDefault();
+            return true;
+        }
+        catch (Exception e) when (e is UnauthorizedAccessException or IOException)
+        {
+            return false;
+        }
+    }
+
+    [Fact]
+    public void Symbolic_link_loops_and_broken_links_are_listed_safely()
+    {
+        if (OperatingSystem.IsWindows())
+            return; // symbolic links need privileges there
+        string root = Path.Combine(_dir.Path, "links");
+        Directory.CreateDirectory(Path.Combine(root, "real"));
+        File.CreateSymbolicLink(Path.Combine(root, "self"), Path.Combine(root, "self")); // ELOOP
+        Directory.CreateSymbolicLink(Path.Combine(root, "up"), root); // a cycle back to the folder itself
+        File.CreateSymbolicLink(Path.Combine(root, "broken.mvr"), Path.Combine(root, "nowhere.mvr"));
+
+        var model = Model();
+        Assert.True(model.Navigate(root), model.Error);
+        var names = model.Entries.Select(e => e.Name).ToList();
+        Assert.Contains("real", names);
+        Assert.Contains("up", names);
+        Assert.Contains("broken.mvr", names);
+        Assert.True(model.Entries.Single(e => e.Name == "up").IsDirectory);
+
+        // Following the cycle is just another folder; the self-loop is refused with a message.
+        Assert.True(model.Navigate(Path.Combine(root, "up", "up", "up")));
+        Assert.False(model.Navigate(Path.Combine(root, "self")));
+        Assert.NotEmpty(model.Error);
+
+        // A broken link cannot be opened.
+        Assert.True(model.Navigate(root));
+        model.FileName = "broken.mvr";
+        Assert.Null(model.Resolve());
+    }
+
+    [Fact]
+    public void Unicode_names_are_listed_sorted_and_resolved()
+    {
+        string root = Path.Combine(_dir.Path, "Сцены 🎭");
+        Directory.CreateDirectory(root);
+        foreach (var name in new[] { "Фокина 2.mvr", "Фокина 10.mvr", "舞台.mvr", "éclairage.mvr", "notes.txt" })
+            File.WriteAllText(Path.Combine(root, name), "x");
+        var model = new Candela.App.Files.FileBrowserModel(Candela.App.Files.FileBrowserMode.Open, new[] { new Candela.App.Files.FileFilter("MVR", "*.mvr") });
+        Assert.True(model.Navigate(root), model.Error);
+        var names = model.Entries.Select(e => e.Name).ToList();
+        Assert.Equal(4, names.Count);
+        Assert.True(names.IndexOf("Фокина 2.mvr") < names.IndexOf("Фокина 10.mvr")); // natural order in Cyrillic too
+        model.FileName = "舞台.mvr";
+        Assert.Equal(Path.Combine(root, "舞台.mvr"), model.Resolve());
+    }
+
+    [Fact]
+    public void A_very_large_folder_draws_only_the_visible_rows()
+    {
+        string big = Path.Combine(_dir.Path, "big");
+        Directory.CreateDirectory(big);
+        const int count = 20000;
+        for (int i = 0; i < count; i++)
+            File.Create(Path.Combine(big, $"fixture {i}.gdtf")).Dispose();
+
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var model = Model();
+        Assert.True(model.Navigate(big));
+        Assert.Equal(count, model.Entries.Count);
+        Assert.True(watch.Elapsed.TotalSeconds < 20, $"listing took {watch.Elapsed.TotalSeconds:0.0} s");
+
+        Candela.App.Ui.Loc.SetLanguage("en");
+        using var ui = new HeadlessImGui(new Vector2(1600, 900));
+        var dialog = new Candela.App.Files.FileBrowserDialog(_dir.File("recent-places.json"));
+        dialog.Show(Candela.App.Files.FileBrowserMode.Open, "Open", new[] { new Candela.App.Files.FileFilter("All", "*") }, big, null, _ => { });
+        for (int i = 0; i < 3; i++)
+            ui.Frame(() => dialog.Draw(1f)); // first frames build the row texts once
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 10; i++)
+            ui.Frame(() => dialog.Draw(1f));
+        long perFrame = (GC.GetAllocatedBytesForCurrentThread() - before) / 10;
+        // Drawing all 20 000 rows built three strings per row per frame (megabytes); visible rows only, cached: almost nothing.
+        Assert.True(perFrame < 16 * 1024, $"{perFrame} bytes allocated per frame");
+        Assert.True(dialog.IsOpen);
+    }
+}
+
+public sealed class FileBrowserPathTextTests
+{
+    [Fact]
+    public void A_tilde_means_the_home_folder()
+    {
+        string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        Assert.Equal(home, Candela.App.Files.FileBrowserModel.ExpandHome("~"));
+        Assert.Equal(Path.Combine(home, "shows"), Candela.App.Files.FileBrowserModel.ExpandHome("~/shows"));
+        Assert.Equal("~shows", Candela.App.Files.FileBrowserModel.ExpandHome("~shows")); // another user's home is not guessed
+        Assert.Equal("/tmp/~", Candela.App.Files.FileBrowserModel.ExpandHome("/tmp/~"));
+        var model = new Candela.App.Files.FileBrowserModel(Candela.App.Files.FileBrowserMode.SelectFolder, Array.Empty<Candela.App.Files.FileFilter>());
+        if (Directory.Exists(home))
+        {
+            Assert.True(model.Navigate("~"), model.Error);
+            Assert.Equal(Path.GetFullPath(home), model.CurrentDirectory);
+        }
+    }
+}

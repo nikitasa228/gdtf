@@ -25,6 +25,11 @@ internal sealed class FileBrowserDialog
     private string _pendingPath = "";
     private int _selected = -1;
     private IReadOnlyList<(string Label, string Path)> _places = Array.Empty<(string, string)>();
+    private string[] _rowLabels = Array.Empty<string>();
+    private string[] _rowSizes = Array.Empty<string>();
+    private string[] _rowDates = Array.Empty<string>();
+    private FileBrowserModel? _rowsModel;
+    private int _rowsVersion = -1;
 
     /// <summary>Creates the dialog; recently used folders are kept in <paramref name="recentPlacesFile"/>.</summary>
     public FileBrowserDialog(string recentPlacesFile)
@@ -186,7 +191,7 @@ internal sealed class FileBrowserDialog
         }
     }
 
-    private void DrawEntries(FileBrowserModel model)
+    private unsafe void DrawEntries(FileBrowserModel model)
     {
         const ImGuiTableFlags flags = ImGuiTableFlags.Sortable | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY |
                                       ImGuiTableFlags.Resizable | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingStretchProp;
@@ -206,45 +211,80 @@ internal sealed class FileBrowserDialog
             sort.SpecsDirty = false;
         }
 
+        // Only the visible rows are submitted, and their texts are built once per listing: a folder with tens of
+        // thousands of entries costs the same per frame as a small one.
+        EnsureRowTexts(model);
         var entries = model.Entries;
+        bool navigated = false;
+        var clipper = new ImGuiListClipper();
+        clipper.Begin(entries.Count);
+        while (!navigated && clipper.Step())
+        {
+            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+            {
+                var e = entries[i];
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                if (e.IsDirectory)
+                    ImGui.PushStyleColor(ImGuiCol.Text, Theme.Warning);
+                bool clicked = ImGui.Selectable(_rowLabels[i], _selected == i, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick);
+                if (e.IsDirectory)
+                    ImGui.PopStyleColor();
+                if (clicked)
+                {
+                    _selected = i;
+                    if (!e.IsDirectory || model.Mode == FileBrowserMode.SelectFolder)
+                        model.FileName = e.Name;
+                    if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                    {
+                        if (e.IsDirectory)
+                        {
+                            Navigate(model, e.FullPath);
+                            navigated = true; // the listing changed under the loop
+                            break;
+                        }
+
+                        TryAccept(model, confirmOverwrite: true);
+                    }
+                }
+
+                ImGui.TableNextColumn();
+                if (!e.IsDirectory)
+                    ImGui.TextDisabled(_rowSizes[i]);
+                ImGui.TableNextColumn();
+                if (e.Modified != DateTime.MinValue)
+                    ImGui.TextDisabled(_rowDates[i]);
+            }
+        }
+
+        clipper.End();
+        ImGui.EndTable();
+    }
+
+    /// <summary>Builds the row texts (name with icon and row id, size, date) when the listing changed.</summary>
+    private void EnsureRowTexts(FileBrowserModel model)
+    {
+        if (ReferenceEquals(model, _rowsModel) && model.Version == _rowsVersion)
+            return;
+        var entries = model.Entries;
+        if (_rowLabels.Length < entries.Count)
+        {
+            int capacity = Math.Max(entries.Count, _rowLabels.Length * 2);
+            _rowLabels = new string[capacity];
+            _rowSizes = new string[capacity];
+            _rowDates = new string[capacity];
+        }
+
         for (int i = 0; i < entries.Count; i++)
         {
             var e = entries[i];
-            ImGui.TableNextRow();
-            ImGui.TableNextColumn();
-            string icon = e.IsDirectory ? Icons.Folder : Icons.File;
-            if (e.IsDirectory)
-                ImGui.PushStyleColor(ImGuiCol.Text, Theme.Warning);
-            bool clicked = ImGui.Selectable($"{icon}  {e.Name}##{i}", _selected == i,
-                ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick);
-            if (e.IsDirectory)
-                ImGui.PopStyleColor();
-            if (clicked)
-            {
-                _selected = i;
-                if (!e.IsDirectory || model.Mode == FileBrowserMode.SelectFolder)
-                    model.FileName = e.Name;
-                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                {
-                    if (e.IsDirectory)
-                    {
-                        Navigate(model, e.FullPath);
-                        break;
-                    }
-
-                    TryAccept(model, confirmOverwrite: true);
-                }
-            }
-
-            ImGui.TableNextColumn();
-            if (!e.IsDirectory)
-                ImGui.TextDisabled(FileBrowserModel.FormatSize(e.Size));
-            ImGui.TableNextColumn();
-            if (e.Modified != DateTime.MinValue)
-                ImGui.TextDisabled(e.Modified.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture));
+            _rowLabels[i] = string.Create(CultureInfo.InvariantCulture, $"{(e.IsDirectory ? Icons.Folder : Icons.File)}  {e.Name}##{i}");
+            _rowSizes[i] = e.IsDirectory ? "" : FileBrowserModel.FormatSize(e.Size);
+            _rowDates[i] = e.Modified == DateTime.MinValue ? "" : e.Modified.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
         }
 
-        ImGui.EndTable();
+        _rowsModel = model;
+        _rowsVersion = model.Version;
     }
 
     private void DrawFooter(FileBrowserModel model, float scale)
