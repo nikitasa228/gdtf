@@ -150,6 +150,7 @@ public sealed partial class NetworkSolver
                     FixtureId = fixture?.FixtureId ?? 0,
                     Profile = profile,
                     Ports = _owner.Ports.GetPorts(e),
+                    Addresses = fixture is null ? Array.Empty<DmxAddress>() : fixture.Addresses.ToArray(),
                 };
                 var device = new Device(e, info, fixture, console, source);
                 _devices[e.Id] = device;

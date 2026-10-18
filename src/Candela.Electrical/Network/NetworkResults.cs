@@ -1,4 +1,5 @@
 using Candela.Core.Diagnostics;
+using Candela.Core.SceneGraph.Components;
 
 namespace Candela.Electrical;
 
@@ -35,6 +36,9 @@ public sealed record DeviceInfo
 
     /// <summary>The device's ports.</summary>
     public required IReadOnlyList<Port> Ports { get; init; }
+
+    /// <summary>DMX patch of a fixture (one address per DMX break), empty for other devices.</summary>
+    public IReadOnlyList<DmxAddress> Addresses { get; init; } = Array.Empty<DmxAddress>();
 
     /// <summary>Label for messages: "#12 'Spot 12'" for fixtures with an id, "'Name'" otherwise.</summary>
     public string Label => Kind == DeviceKind.Fixture && FixtureId > 0 ? $"#{FixtureId} '{Name}'" : $"'{Name}'";
