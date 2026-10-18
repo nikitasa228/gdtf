@@ -4,6 +4,9 @@
     <ProjectReference Include="../Candela.Dmx/Candela.Dmx.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.IO.Ports" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="Candela.Protocols.Tests" />
   </ItemGroup>
 </Project>

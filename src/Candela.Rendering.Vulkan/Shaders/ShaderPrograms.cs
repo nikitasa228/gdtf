@@ -26,10 +26,34 @@ internal static class ShaderPrograms
     public static readonly ShaderVariant Tonemap = new("tonemap.frag");
     public static readonly ShaderVariant Grid = new("grid.frag");
     public static readonly ShaderVariant ClusterAssign = new("cluster.comp");
+    public static readonly ShaderVariant ShadowVertex = new("shadow.vert");
+    public static readonly ShaderVariant ShadowFragment = new("shadow.frag");
+    public static readonly ShaderVariant ShadowFragmentMask = new("shadow.frag", ("ALPHA_MASK", "1"));
+    public static readonly ShaderVariant ShadowFragmentRsm = new("shadow.frag", ("RSM", "1"));
+    public static readonly ShaderVariant ShadowFragmentRsmMask = new("shadow.frag", ("RSM", "1"), ("ALPHA_MASK", "1"));
+    public static readonly ShaderVariant Analysis = new("analysis.frag");
+    public static readonly ShaderVariant Selection = new("selection.frag");
+    public static readonly ShaderVariant Outline = new("outline.frag");
+    public static readonly ShaderVariant DepthUpsample = new("depth_upsample.frag");
+    public static readonly ShaderVariant FroxelInject = new("froxel_inject.comp");
+    public static readonly ShaderVariant FroxelIntegrate = new("froxel_integrate.comp");
+    public static readonly ShaderVariant VolumeComposite = new("volumetric.frag");
+    public static readonly ShaderVariant BloomDownsampleFirst = new("bloom_down.comp", ("FIRST", "1"));
+    public static readonly ShaderVariant BloomDownsample = new("bloom_down.comp");
+    public static readonly ShaderVariant BloomUpsample = new("bloom_up.comp");
+    public static readonly ShaderVariant Histogram = new("histogram.comp");
+    public static readonly ShaderVariant ExposureReduce = new("exposure.comp");
+    public static readonly ShaderVariant VplGenerate = new("vpl.comp");
+    public static readonly ShaderVariant IndirectGather = new("gather.comp");
+    public static readonly ShaderVariant RayTracedGi = new("rt_gi.comp");
+    public static readonly ShaderVariant IndirectFilter = new("gi_filter.comp");
 
     public static IReadOnlyList<ShaderVariant> All { get; } = new[]
     {
         MeshVertex, Prepass, PrepassAlphaMask, Forward, ForwardTransparent, Colorless, Wire, LinesVertex, EdgesVertex,
-        LinesFragment, FullscreenVertex, Tonemap, Grid, ClusterAssign,
+        LinesFragment, FullscreenVertex, Tonemap, Grid, ClusterAssign, ShadowVertex, ShadowFragment, ShadowFragmentMask,
+        ShadowFragmentRsm, ShadowFragmentRsmMask, Analysis, Selection, Outline, DepthUpsample, FroxelInject, FroxelIntegrate,
+        VolumeComposite, BloomDownsampleFirst, BloomDownsample, BloomUpsample, Histogram, ExposureReduce, VplGenerate,
+        IndirectGather, RayTracedGi, IndirectFilter,
     };
 }

@@ -1,0 +1,44 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Front-to-back integration of the froxel volume along each view ray: per slice of length dl (along the ray) with
+// source S and extinction sigma_t, the energy-conserving analytic step (Hillaire 2015)
+//   L += T * S * (1 - exp(-sigma_t dl)) / sigma_t,    T *= exp(-sigma_t dl)
+// and the running (L, T) is stored at every slice: texel k = in-scattering and transmittance from the camera to the
+// far boundary of slice k.
+
+#include "volume.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image3D outIntegrated;
+layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler3D injectedVolume;
+
+void main()
+{
+    uvec2 id = gl_GlobalInvocationID.xy;
+    if (any(greaterThanEqual(id, uvec2(frame.volumeGrid.xy))))
+        return;
+    vec2 uv = (vec2(id) + 0.5) / frame.volumeGrid.xy;
+    vec3 origin, direction;
+    viewRay(uv, origin, direction);
+    // Ray length per metre of view depth.
+    float stretch = 1.0 / max(dot(direction, frame.cameraForward.xyz), 1e-4);
+
+    vec3 L = vec3(0.0);
+    float T = 1.0;
+    int slices = int(frame.volumeGrid.z);
+    float z0 = froxelDepth(0.0);
+    for (int k = 0; k < slices; ++k)
+    {
+        float z1 = froxelDepth(float(k + 1));
+        float dl = (z1 - z0) * stretch;
+        z0 = z1;
+        vec4 inj = texelFetch(injectedVolume, ivec3(id, k), 0);
+        float sigmaT = max(inj.a, 0.0);
+        float stepT = exp(-sigmaT * dl);
+        vec3 integrated = sigmaT > 1e-6 ? inj.rgb * ((1.0 - stepT) / sigmaT) : inj.rgb * dl;
+        L += T * integrated;
+        T *= stepT;
+        imageStore(outIntegrated, ivec3(id, k), vec4(finiteLight(L), T));
+    }
+}

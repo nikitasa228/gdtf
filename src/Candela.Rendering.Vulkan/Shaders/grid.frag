@@ -41,7 +41,7 @@ vec4 over(vec4 dst, vec4 src)
 
 void main()
 {
-    vec2 ndc = gl_FragCoord.xy * frame.renderSize.zw * 2.0 - 1.0;
+    vec2 ndc = gl_FragCoord.xy * frame.displaySize.zw * 2.0 - 1.0;
     vec4 a = frame.inverseViewProjection * vec4(ndc, 1.0, 1.0); // on the near plane (reverse-Z depth 1)
     vec4 b = frame.inverseViewProjection * vec4(ndc, 0.5, 1.0);
     vec3 origin = a.xyz / a.w;
