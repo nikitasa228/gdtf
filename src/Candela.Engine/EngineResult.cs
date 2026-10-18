@@ -64,9 +64,6 @@ public static class EngineIssueCodes
     /// <summary>The scene holds several atmosphere volumes; only the first is simulated.</summary>
     public const string ExtraAtmosphere = "engine.extra-atmosphere";
 
-    /// <summary>A simulation reported a problem (bad settings, ignored emitters).</summary>
-    public const string Simulation = "engine.simulation";
-
     /// <summary>A part of a recording could not be read.</summary>
     public const string RecordingDamaged = "engine.recording-damaged";
 

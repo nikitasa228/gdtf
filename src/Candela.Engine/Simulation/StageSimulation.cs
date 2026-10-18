@@ -88,6 +88,9 @@ public sealed class StageSimulation
     /// <summary>Noise sources of the last step (for the renderer's noise overlay).</summary>
     public IReadOnlyList<Rendering.NoiseSource> NoiseSources => _noiseSources;
 
+    /// <summary>The noise sources of the last step as a span (no copy; valid until the next step).</summary>
+    public ReadOnlySpan<Rendering.NoiseSource> NoiseSourceSpan => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_noiseSources);
+
     /// <summary>Problems of the simulations (bad settings, ignored emitters, extra atmosphere volumes).</summary>
     public IReadOnlyList<Issue> Issues
     {
