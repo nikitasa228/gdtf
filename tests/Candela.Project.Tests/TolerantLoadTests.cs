@@ -136,7 +136,10 @@ public sealed class TolerantLoadTests : IDisposable
             return TestData.Utf8(index.ToJsonString());
         });
         var loaded = ProjectFile.Load(_path);
-        Assert.Equal(3, loaded.LoadIssues.Count(i => i.Code == ProjectIssueCodes.AssetRecordInvalid));
+        Assert.Equal(2, loaded.LoadIssues.Count(i => i.Code == ProjectIssueCodes.AssetRecordInvalid));
+        // The unknown "Hologram" kind would be kept verbatim, but its file is not in the archive.
+        Assert.Single(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.AssetMissing && i.Message.Contains("Hologram"));
+        Assert.Empty(loaded.KeptAssetIds);
         Assert.Equal(_project.Assets.Count, loaded.Assets.Count);
     }
 
@@ -194,7 +197,11 @@ public sealed class TolerantLoadTests : IDisposable
             {
                 var id = Guid.Parse(e["id"]!.GetValue<string>());
                 if (id == spot.Id) e["components"]!.AsArray()[0]!["addresses"] = "not a list";
-                if (id == console.Id) e["components"]!.AsArray().Add(JsonNode.Parse("""{"$type":"laserProjector","power":5}"""));
+                if (id == console.Id)
+                {
+                    e["components"]!.AsArray().Add(JsonNode.Parse("""{"$type":"laserProjector","power":5}"""));
+                    e["components"]!.AsArray().Add(JsonNode.Parse("""{"$type":17,"model":"no type"}"""));
+                }
                 if (id == atmosphere.Id) e["transform"] = JsonNode.Parse("""{"position":[1,"NaN",3]}""");
             }
             entities.Add(JsonNode.Parse("17"));
@@ -220,7 +227,14 @@ public sealed class TolerantLoadTests : IDisposable
         Assert.Contains(ProjectIssueCodes.SceneValueRepaired, codes);
 
         Assert.Equal(_project.Scene.Count + 5, loaded.Scene.Count);
-        Assert.Null(loaded.Scene.Find(spot.Id)!.Get<FixtureComponent>());
+        // One unreadable value costs that value, not the component: the patch is reset, the rest of the fixture is kept.
+        var spotFixture = loaded.Scene.Find(spot.Id)!.Get<FixtureComponent>()!;
+        Assert.Empty(spotFixture.Addresses);
+        Assert.Equal(TestData.GdtfB, spotFixture.GdtfSpec);
+        Assert.Equal(101, spotFixture.FixtureId);
+        Assert.Equal(spot.Get<FixtureComponent>()!.MountedOn, spotFixture.MountedOn);
+        Assert.Contains(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.SceneValueRepaired && i.Message.Contains("$.addresses") &&
+                                                i.Entities.SequenceEqual(new[] { spot.Id }));
         Assert.Single(loaded.Scene.Find(console.Id)!.Components);
         Assert.Equal(Core.Math.Transform.Identity, loaded.Scene.Find(atmosphere.Id)!.Local);
         Assert.Contains(loaded.Scene.Roots, e => e.Name == "Orphan");

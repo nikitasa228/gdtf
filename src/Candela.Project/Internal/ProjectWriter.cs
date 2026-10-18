@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.Serialization;
@@ -118,7 +119,27 @@ internal static class ProjectWriter
             }
             index.Assets.Add(record);
         }
-        WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(index, CandelaJson.Options), level, stamp);
+        if (snapshot.KeptAssets.Count == 0)
+        {
+            WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(index, CandelaJson.Options), level, stamp);
+            return;
+        }
+
+        // Assets this version could not load go back exactly as they were read: every file under its original entry name
+        // and the record verbatim (it may hold fields only a newer version understands).
+        var root = JsonSerializer.SerializeToNode(index, CandelaJson.Options)!.AsObject();
+        var records = root["assets"]!.AsArray();
+        foreach (var kept in snapshot.KeptAssets)
+        {
+            // Its folder assets/{id}/ belongs to it alone (an asset of the same id in the store replaces it at capture).
+            foreach (var (entry, data) in kept.Files)
+            {
+                used.Add(entry);
+                WriteEntry(zip, entry, data, LevelFor(entry, level), stamp);
+            }
+            records.Add(JsonNode.Parse(kept.Record.GetRawText()));
+        }
+        WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options), level, stamp);
     }
 
     private static void WriteFixtures(ZipArchive zip, ProjectSnapshot snapshot, CompressionLevel level, DateTimeOffset stamp,
@@ -128,8 +149,15 @@ internal static class ProjectWriter
         foreach (var name in snapshot.Gdtfs.Keys)
         {
             // Provider exceptions propagate on purpose: the save is aborted and the previous file stays untouched.
-            var bytes = snapshot.ResolveGdtf(name);
+            var bytes = snapshot.ResolveGdtf(name, out var problem);
             var users = snapshot.Gdtfs.EntitiesOf(name);
+            if (bytes is null && problem is not null)
+            {
+                missing.Add(name);
+                issues.Add(IssueSeverity.Warning, IssueCategory.Fixture, ProjectIssueCodes.SaveGdtfInvalid,
+                    $"'{name}' is not a valid GDTF file ({problem}) and is not stored in the project.", users);
+                continue;
+            }
             if (bytes is null)
             {
                 missing.Add(name);
@@ -138,12 +166,10 @@ internal static class ProjectWriter
                     users);
                 continue;
             }
-            if (GdtfCheck.Validate(bytes) is { } problem)
+            if (problem is not null)
             {
-                missing.Add(name);
                 issues.Add(IssueSeverity.Warning, IssueCategory.Fixture, ProjectIssueCodes.SaveGdtfInvalid,
-                    $"'{name}' is not a valid GDTF file ({problem}) and is not stored in the project.", users);
-                continue;
+                    $"The fixture library's '{name}' is not a valid GDTF file ({problem}); the copy kept in the project was stored instead.", users);
             }
             var fileName = ArchivePaths.SafeSegment(name, "fixture");
             if (!fileName.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase)) fileName += ".gdtf";

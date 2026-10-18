@@ -45,13 +45,19 @@ public static class ProjectIssueCodes
     /// <summary>Parent links formed a cycle; the cycle was broken by moving an entity to the scene root.</summary>
     public const string SceneParentCycle = "project.scene-parent-cycle";
 
+    /// <summary>An entity was nested deeper than the reader accepts (1000 levels); it was moved to the root, keeping its world placement.</summary>
+    public const string SceneTooDeep = "project.scene-too-deep";
+
     /// <summary>An entity's transform could not be read or was not finite; identity was used.</summary>
     public const string SceneTransformInvalid = "project.scene-transform-invalid";
 
     /// <summary>A component could not be read and was dropped (the rest of the entity loads).</summary>
     public const string SceneComponentInvalid = "project.scene-component-invalid";
 
-    /// <summary>A component of a type this program does not know (written by a newer version) was dropped.</summary>
+    /// <summary>
+    /// A component of a type this program does not know (written by a newer version): it is kept verbatim and saved again
+    /// (<see cref="ProjectData.UnknownComponents"/>); merging does not import it.
+    /// </summary>
     public const string SceneComponentUnknown = "project.scene-component-unknown";
 
     /// <summary>Required values were missing (null) in a component or layer and were replaced by defaults.</summary>
@@ -71,6 +77,13 @@ public static class ProjectIssueCodes
 
     /// <summary>The asset store rejected an asset's content (unsupported or invalid file).</summary>
     public const string AssetRejected = "project.asset-rejected";
+
+    /// <summary>
+    /// An asset with intact files that this version cannot load (a newer kind, content the store does not accept) is kept
+    /// verbatim and saved again (<see cref="ProjectData.KeptAssetIds"/>); objects using it show a missing asset; merging
+    /// does not import it.
+    /// </summary>
+    public const string AssetKept = "project.asset-kept";
 
     /// <summary>A companion file of a model (texture, MTL, buffer) is missing or damaged; the model loads without it.</summary>
     public const string AssetCompanionMissing = "project.asset-companion-missing";

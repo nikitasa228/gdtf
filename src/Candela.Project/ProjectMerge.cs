@@ -104,7 +104,8 @@ public sealed class ProjectMergeResult
 /// <item>GDTF copies are added; a name that this project (or its fixture library) uses for a different file is renamed
 /// ("Name (2).gdtf") and the imported fixtures are pointed to the new name.</item>
 /// <item>Layers are matched by id, then by name; missing ones are added. The imported project's settings sections,
-/// scene settings and thumbnail are not merged.</item>
+/// scene settings, thumbnail and components of unknown types (<see cref="ProjectData.UnknownComponents"/>) are not
+/// merged.</item>
 /// </list>
 /// Merging runs on the main thread (it reads and changes the scene); load the other project first, possibly in the
 /// background, with <see cref="ProjectFile.Load(string, ProjectLoadOptions?)"/>.
@@ -211,7 +212,7 @@ public static class ProjectMerge
             var staging = new Scene();
             staging.Add(group);
             var clones = new Dictionary<Guid, Entity>(sourceEntities.Count);
-            var remap = new ReferenceRemapper(entityIds, assetIds, target.Assets, source.Assets, gdtfNames, fixtureIds, groupWorld, issues);
+            var remap = new ReferenceRemapper(entityIds, assetIds, target, source.Assets, gdtfNames, fixtureIds, groupWorld, issues);
             foreach (var e in sourceEntities)
             {
                 var newId = entityIds[e.Id];
@@ -230,11 +231,28 @@ public static class ProjectMerge
             }
             staging.Remove(group);
 
-            // The imported project's own load issues, pointing at the new entities.
+            // The imported project's own load issues, pointing at the new entities. Components of unknown types stay in the
+            // imported file only: this version cannot translate the references they may hold, so they are not copied.
             foreach (var issue in source.LoadIssues)
             {
+                if (issue.Code == ProjectIssueCodes.SceneComponentUnknown && source.UnknownComponents.Count > 0) continue;
+                if (issue.Code == ProjectIssueCodes.AssetKept) continue;
                 var related = issue.Entities.Where(entityIds.ContainsKey).Select(id => entityIds[id]).ToArray();
                 issues.Add(issue with { Entities = related });
+            }
+            foreach (var (sourceId, kept) in source.UnknownComponents)
+            {
+                if (!entityIds.TryGetValue(sourceId, out var newId) || kept.Count == 0) continue;
+                var name = source.Scene.Find(sourceId)?.Name ?? sourceId.ToString("D");
+                issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentUnknown,
+                    $"'{name}' has {kept.Count} component(s) of a type this version of Candela does not know; they were not imported.", newId));
+            }
+            var notImported = source.KeptAssetIds.Where(id => !target.KeptAssetIds.Contains(id) && !target.Assets.Contains(id)).ToList();
+            if (notImported.Count > 0)
+            {
+                issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetKept,
+                    $"{notImported.Count} asset(s) of the imported project that this version of Candela cannot load were not imported; objects using them have no asset.",
+                    Array.Empty<Guid>()));
             }
 
             var result = new ProjectMergeResult(group, entityIds, assetIds, gdtfNames,
@@ -311,7 +329,7 @@ public static class ProjectMerge
             planned = new List<(string, byte[])>();
             var map = new Dictionary<string, string>(StringComparer.Ordinal);
             var taken = new HashSet<string>(target.GdtfFiles.Keys, StringComparer.OrdinalIgnoreCase);
-            var usage = ProjectData.CollectGdtfSpecs(source.Scene);
+            var users = UsersOfStoredGdtfs(source);
             foreach (var (name, data) in source.GdtfFiles)
             {
                 if (target.FindGdtf(name) is { } own)
@@ -336,9 +354,36 @@ public static class ProjectMerge
                 planned.Add((renamed, data));
                 issues.Add(new Issue(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.MergeGdtfRenamed,
                     $"The imported fixture file '{name}' differs from the file of the same name in this project; it was added as '{renamed}'.",
-                    usage.EntitiesOf(name).Select(id => entityIds[id]).ToArray()));
+                    users.TryGetValue(name, out var related) ? related.Select(id => entityIds[id]).ToArray() : Array.Empty<Guid>()));
             }
             return map;
+        }
+
+        /// <summary>
+        /// Stored GDTF name → the source entities whose fixtures use that copy: the exact name, or a name that differs only
+        /// in case and that <see cref="ProjectData.FindGdtf"/> binds to the copy (the first such copy in storage order).
+        /// </summary>
+        private static Dictionary<string, List<Guid>> UsersOfStoredGdtfs(ProjectData source)
+        {
+            var usage = ProjectData.CollectGdtfSpecs(source.Scene);
+            var result = new Dictionary<string, List<Guid>>(StringComparer.Ordinal);
+            Dictionary<string, string>? ignoringCase = null;
+            foreach (var spec in usage.Keys)
+            {
+                string? stored = source.GdtfFiles.ContainsKey(spec) ? spec : null;
+                if (stored is null)
+                {
+                    if (ignoringCase is null)
+                    {
+                        ignoringCase = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (var key in source.GdtfFiles.Keys) ignoringCase.TryAdd(key, key);
+                    }
+                    if (!ignoringCase.TryGetValue(spec, out stored)) continue;
+                }
+                if (!result.TryGetValue(stored, out var list)) result[stored] = list = new List<Guid>();
+                list.AddRange(usage.EntitiesOf(spec));
+            }
+            return result;
         }
 
         /// <summary>True when the library has no file of that name, or exactly the same file.</summary>
@@ -404,7 +449,7 @@ public static class ProjectMerge
     private sealed class ReferenceRemapper(
         Dictionary<Guid, Guid> entityIds,
         Dictionary<Guid, Guid> assetIds,
-        AssetStore targetAssets,
+        ProjectData target,
         AssetStore sourceAssets,
         Dictionary<string, string> gdtfNames,
         Dictionary<FixtureComponent, int>? fixtureIds,
@@ -420,7 +465,7 @@ public static class ProjectMerge
             {
                 case FixtureComponent f:
                     f.MountedOn = Entity(f.MountedOn, owner, "the object it is mounted on");
-                    if (gdtfNames.TryGetValue(f.GdtfSpec, out var gdtf)) f.GdtfSpec = gdtf;
+                    if (GdtfName(f.GdtfSpec) is { } gdtf) f.GdtfSpec = gdtf;
                     if (f.FocusPoint is { } focus && _moveWorldPoints) f.FocusPoint = Vector3.Transform(focus, groupWorld);
                     if (fixtureIds is not null && original is FixtureComponent source && fixtureIds.TryGetValue(source, out var fixtureId))
                         f.FixtureId = fixtureId;
@@ -452,6 +497,31 @@ public static class ProjectMerge
                     if (camera.Target is { } target && _moveWorldPoints) camera.Target = Vector3.Transform(target, groupWorld);
                     break;
             }
+        }
+
+        /// <summary>
+        /// The new name of the stored GDTF a fixture of the imported project used, or null to keep its name. A fixture
+        /// whose name differs from the stored copy's only in case (bound to it by <see cref="ProjectData.FindGdtf"/>) is
+        /// re-pointed too when that copy was renamed; otherwise it would bind to this project's different file of that name.
+        /// </summary>
+        private string? GdtfName(string spec)
+        {
+            if (string.IsNullOrEmpty(spec)) return null;
+            if (gdtfNames.TryGetValue(spec, out var exact)) return exact;
+            _gdtfNamesIgnoringCase ??= BuildCaseInsensitive(gdtfNames);
+            return _gdtfNamesIgnoringCase.TryGetValue(spec, out var stored) && !string.Equals(stored.Stored, stored.Mapped, StringComparison.Ordinal)
+                ? stored.Mapped
+                : null;
+        }
+
+        private Dictionary<string, (string Stored, string Mapped)>? _gdtfNamesIgnoringCase;
+
+        private static Dictionary<string, (string Stored, string Mapped)> BuildCaseInsensitive(Dictionary<string, string> names)
+        {
+            // First wins, in the stored copies' order: the copy ProjectData.FindGdtf binds a case-variant name to.
+            var map = new Dictionary<string, (string, string)>(StringComparer.OrdinalIgnoreCase);
+            foreach (var (stored, mapped) in names) map.TryAdd(stored, (stored, mapped));
+            return map;
         }
 
         private void RemapCable(CableComponent cable, Entity owner)
@@ -500,8 +570,9 @@ public static class ProjectMerge
         {
             if (id == Guid.Empty) return id;
             if (assetIds.TryGetValue(id, out var mapped)) return mapped;
-            // Not in the imported project. Keep it when this project has that asset (the file was a copy of this project).
-            if (!sourceAssets.Contains(id) && targetAssets.Contains(id)) return id;
+            // Not in the imported project. Keep it when this project has that asset (the file was a copy of this project),
+            // loaded or kept verbatim.
+            if (!sourceAssets.Contains(id) && (target.Assets.Contains(id) || target.KeptAssetIds.Contains(id))) return id;
             Dangling(owner, $"'{owner.Name}' referred to a {what} asset ({id:D}) that is not in the imported project; the reference was removed.");
             return null;
         }

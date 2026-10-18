@@ -1,7 +1,9 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Candela.Assets;
 using Candela.Core.SceneGraph.Components;
 using Candela.Core.Serialization;
+using Candela.Project.Internal;
 
 namespace Candela.Project;
 
@@ -16,7 +18,7 @@ public sealed class ProjectSnapshot
     private ProjectSnapshot(ProjectData project, ProjectSaveOptions options, TimeProvider clock)
     {
         var scene = project.Scene;
-        SceneJson = JsonSerializer.SerializeToUtf8Bytes(SceneSerializer.ToFile(scene), CandelaJson.Options);
+        SceneJson = SerializeScene(scene, project.UnknownComponents);
         ProjectId = project.Id;
         FilePath = project.FilePath;
         SceneName = scene.Name;
@@ -29,9 +31,15 @@ public sealed class ProjectSnapshot
         Assets = project.Assets.Entries;
         Thumbnail = project.Thumbnail;
 
+        var kept = new List<KeptAsset>(project.KeptAssetsMutable.Count);
+        foreach (var k in project.KeptAssetsMutable.Values)
+            if (project.Assets.Find(k.Id) is null) kept.Add(k);
+        KeptAssets = kept;
+
         Gdtfs = ProjectData.CollectGdtfSpecs(scene);
         var known = new HashSet<Guid>();
         foreach (var a in Assets) known.Add(a.Id);
+        foreach (var k in kept) known.Add(k.Id);
         var missing = new Dictionary<Guid, List<Guid>>();
         int fixtures = 0;
         foreach (var entity in scene.All())
@@ -89,8 +97,8 @@ public sealed class ProjectSnapshot
     /// <summary>When the snapshot was taken.</summary>
     public DateTimeOffset CapturedUtc { get; }
 
-    /// <summary>Number of assets captured.</summary>
-    public int AssetCount => Assets.Count;
+    /// <summary>Number of assets captured (including assets kept verbatim, see <see cref="ProjectData.KeptAssetIds"/>).</summary>
+    public int AssetCount => Assets.Count + KeptAssets.Count;
 
     /// <summary>GDTF names used by the scene, in order of first use.</summary>
     public IReadOnlyList<string> GdtfNames => Gdtfs.Keys;
@@ -102,6 +110,9 @@ public sealed class ProjectSnapshot
     internal IReadOnlyDictionary<string, JsonElement> Settings { get; }
 
     internal IReadOnlyList<AssetEntry> Assets { get; }
+
+    /// <summary>Assets kept verbatim from loading (not shadowed by an asset of the same id in the store).</summary>
+    internal IReadOnlyList<KeptAsset> KeptAssets { get; }
 
     internal byte[]? Thumbnail { get; }
 
@@ -122,17 +133,56 @@ public sealed class ProjectSnapshot
         return new ProjectSnapshot(project, options, options.TimeProvider);
     }
 
-    /// <summary>Resolves the bytes stored for a GDTF name: provider, then the project's copy, then a GDTF asset of that name.</summary>
-    internal byte[]? ResolveGdtf(string name)
+    /// <summary>
+    /// <c>scene.json</c>: Core's <see cref="SceneSerializer"/> layout, plus the components of unknown types kept from loading
+    /// (<see cref="ProjectData.UnknownComponents"/>) appended to the entities that still exist.
+    /// </summary>
+    private static byte[] SerializeScene(Core.SceneGraph.Scene scene, IReadOnlyDictionary<Guid, IReadOnlyList<JsonElement>> unknown)
     {
-        if (Options.GdtfProvider?.Invoke(name) is { Length: > 0 } provided) return provided;
-        if (GdtfCopies.TryGetValue(name, out var copy)) return copy;
+        var file = SceneSerializer.ToFile(scene);
+        if (unknown.Count == 0) return JsonSerializer.SerializeToUtf8Bytes(file, CandelaJson.Options);
+        var root = JsonSerializer.SerializeToNode(file, CandelaJson.Options)!.AsObject();
+        if (root["entities"] is JsonArray entities)
+        {
+            foreach (var node in entities)
+            {
+                if (node is not JsonObject entity || entity["id"] is not JsonValue idValue || !idValue.TryGetValue(out string? idText) ||
+                    !Guid.TryParse(idText, out var id) || !unknown.TryGetValue(id, out var kept))
+                {
+                    continue;
+                }
+                if (entity["components"] is not JsonArray components) entity["components"] = components = new JsonArray();
+                foreach (var component in kept) components.Add(JsonNode.Parse(component.GetRawText()));
+            }
+        }
+        return JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options);
+    }
+
+    /// <summary>
+    /// The bytes stored for a GDTF name: the first valid file of the provider, the project's copy and a GDTF asset of that
+    /// name, in that order. A damaged library file therefore never replaces a good copy kept in the project.
+    /// <paramref name="problem"/> describes the first invalid candidate (null when there was none).
+    /// </summary>
+    internal byte[]? ResolveGdtf(string name, out string? problem)
+    {
+        problem = null;
+        if (Options.GdtfProvider?.Invoke(name) is { Length: > 0 } provided)
+        {
+            if ((problem = GdtfCheck.Validate(provided)) is null) return provided;
+        }
+        if (GdtfCopies.TryGetValue(name, out var copy))
+        {
+            var p = GdtfCheck.Validate(copy);
+            if (p is null) return copy;
+            problem ??= p;
+        }
         AssetEntry? caseInsensitive = null;
         foreach (var a in Assets)
         {
             if (a.Kind != AssetKind.Gdtf) continue;
-            if (string.Equals(a.OriginalFileName, name, StringComparison.Ordinal)) return a.Data;
-            if (caseInsensitive is null && string.Equals(a.OriginalFileName, name, StringComparison.OrdinalIgnoreCase)) caseInsensitive = a;
+            if (string.Equals(a.OriginalFileName, name, StringComparison.Ordinal) && GdtfCheck.Validate(a.Data) is null) return a.Data;
+            if (caseInsensitive is null && string.Equals(a.OriginalFileName, name, StringComparison.OrdinalIgnoreCase) && GdtfCheck.Validate(a.Data) is null)
+                caseInsensitive = a;
         }
         return caseInsensitive?.Data;
     }

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.SceneGraph;
@@ -55,6 +56,25 @@ public sealed class ProjectData
     /// again. Byte arrays are shared and must not be modified.
     /// </summary>
     public Dictionary<string, byte[]> GdtfFiles { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Components of types this version does not know (written by a newer version), as raw JSON by entity id. Loading keeps
+    /// them and saving writes them back for every entity that still exists, so opening and saving a newer project here
+    /// does not destroy them; this version cannot show, change or merge them. Entities without such components are absent.
+    /// </summary>
+    public IReadOnlyDictionary<Guid, IReadOnlyList<JsonElement>> UnknownComponents => UnknownComponentsMutable;
+
+    internal Dictionary<Guid, IReadOnlyList<JsonElement>> UnknownComponentsMutable { get; } = new();
+
+    /// <summary>
+    /// Ids of assets whose files are intact but that this version cannot load (a kind written by a newer version, content
+    /// the asset store does not accept). They are kept verbatim — index record and every file of their folder — and
+    /// written back on save, so opening and saving does not destroy them; they are not in <see cref="Assets"/>, so objects
+    /// using them show a missing asset here.
+    /// </summary>
+    public IReadOnlyCollection<Guid> KeptAssetIds => KeptAssetsMutable.Keys;
+
+    internal Dictionary<Guid, KeptAsset> KeptAssetsMutable { get; } = new();
 
     /// <summary>PNG preview of the project (shown by Open dialogs), or null.</summary>
     public byte[]? Thumbnail { get; set; }
@@ -117,3 +137,9 @@ public sealed class ProjectData
         }
     }
 }
+
+/// <summary>An asset kept verbatim because this version cannot load it (see <see cref="ProjectData.KeptAssetIds"/>).</summary>
+/// <param name="Id">Asset id.</param>
+/// <param name="Record">Its record in <c>assets/index.json</c>, unchanged.</param>
+/// <param name="Files">Every entry of its folder <c>assets/{id}/</c> with its bytes.</param>
+internal sealed record KeptAsset(Guid Id, JsonElement Record, IReadOnlyList<(string Entry, byte[] Data)> Files);
