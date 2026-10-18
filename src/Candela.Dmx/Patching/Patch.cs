@@ -65,6 +65,7 @@ public sealed class PatchEntry
 public sealed class Patch
 {
     private readonly Dictionary<Guid, PatchEntry> _byEntity;
+    private readonly Dictionary<int, PatchEntry[][]> _slotIndex = new(); // per universe, built on first use: fixtures per slot
 
     private Patch(List<PatchEntry> entries)
     {
@@ -94,18 +95,36 @@ public sealed class Patch
     /// <summary>Entry of an entity, or null.</summary>
     public PatchEntry? Find(Guid entityId) => _byEntity.GetValueOrDefault(entityId);
 
-    /// <summary>Fixtures that occupy slot <paramref name="address"/> of <paramref name="universe"/>.</summary>
+    /// <summary>
+    /// Fixtures that occupy slot <paramref name="address"/> (1 … 512) of <paramref name="universe"/>, in scene order. The
+    /// first query of a universe indexes its slots once, so drawing a whole patch view costs O(slots + fixtures).
+    /// </summary>
     public IReadOnlyList<PatchEntry> At(int universe, int address)
     {
-        var result = new List<PatchEntry>();
+        if (address is < 1 or > 512) return Array.Empty<PatchEntry>();
+        lock (_slotIndex)
+        {
+            if (!_slotIndex.TryGetValue(universe, out var slots)) _slotIndex[universe] = slots = BuildSlotIndex(universe);
+            return slots[address - 1];
+        }
+    }
+
+    private PatchEntry[][] BuildSlotIndex(int universe)
+    {
+        var lists = new List<PatchEntry>?[512];
         foreach (var e in Entries)
             foreach (var r in e.Ranges)
-                if (r.Universe == universe && address >= r.Start && address <= r.End)
+            {
+                if (r.Universe != universe) continue;
+                for (int a = Math.Max(r.Start, 1); a <= Math.Min(r.End, 512); a++)
                 {
-                    result.Add(e);
-                    break;
+                    var list = lists[a - 1] ??= new List<PatchEntry>(1);
+                    if (list.Count == 0 || !ReferenceEquals(list[^1], e)) list.Add(e);
                 }
-        return result;
+            }
+        var slots = new PatchEntry[512][];
+        for (int i = 0; i < 512; i++) slots[i] = lists[i]?.ToArray() ?? Array.Empty<PatchEntry>();
+        return slots;
     }
 
     internal static PatchEntry CreateEntry(Entity entity, FixtureComponent fixture, ProfileResolution resolution)

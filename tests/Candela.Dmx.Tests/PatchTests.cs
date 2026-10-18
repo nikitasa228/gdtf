@@ -117,6 +117,18 @@ public class PatchTests
     }
 
     [Fact]
+    public void Two_breaks_of_one_fixture_patched_over_each_other_are_an_overlap()
+    {
+        var scene = new Scene();
+        Add(scene, "Zonda", 6, TestData.Entry(Zonda).FileName, "Extended Pixel 2", new DmxAddress(4, 1, 1), new DmxAddress(4, 41, 2));
+        var issue = Assert.Single(Issues(scene));
+        Assert.Equal("patch.overlap", issue.Code);
+        Assert.Equal(IssueSeverity.Error, issue.Severity);
+        Assert.Contains("Fixture 6 'Zonda'", issue.Message);
+        Assert.Contains("4.041–4.051", issue.Message);
+    }
+
+    [Fact]
     public void Mvr_stub_names_resolve_to_the_library_model()
     {
         var scene = new Scene();
@@ -145,5 +157,17 @@ public class PatchTests
         Assert.Equal(2, issues.Count(i => i.Code == "patch.overlap"));
         Assert.All(issues, i => Assert.Contains("Fixture 99999 'Intruder'", i.Message));
         Assert.True(sw.Elapsed < TimeSpan.FromSeconds(2), $"{n} fixtures took {sw.Elapsed.TotalMilliseconds:F0} ms");
+
+        // the patch view asks every slot of every universe for its fixtures
+        var patch = Patch.Build(scene, TestData.Profiles);
+        sw.Restart();
+        int occupied = 0;
+        for (int u = 1; u <= 250; u++)
+            for (int a = 1; a <= 512; a++)
+                occupied += patch.At(u, a).Count;
+        sw.Stop();
+        Assert.Equal(n * 26 + 26, occupied);
+        Assert.Equal(2, patch.At(125, 30).Count);
+        Assert.True(sw.Elapsed < TimeSpan.FromSeconds(1), $"slot queries took {sw.Elapsed.TotalMilliseconds:F0} ms");
     }
 }

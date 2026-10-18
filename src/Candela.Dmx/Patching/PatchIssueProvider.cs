@@ -110,7 +110,16 @@ public sealed class PatchIssueProvider : IIssueProvider
             active.RemoveAll(a => a.Range.End < cur.Range.Start);
             foreach (var other in active)
             {
-                if (ReferenceEquals(other.Entry, cur.Entry)) continue;
+                if (ReferenceEquals(other.Entry, cur.Entry))
+                {
+                    // two DMX breaks of one fixture patched over each other
+                    if (other.Range.Break == cur.Range.Break || ++count > MaxOverlapIssues) continue;
+                    int a = Math.Max(other.Range.Start, cur.Range.Start), b = Math.Min(other.Range.End, cur.Range.End);
+                    issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Patch, "patch.overlap",
+                        $"{cur.Entry.Label}: DMX break {other.Range.Break} ({other.Range}) overlaps its break {cur.Range.Break} ({cur.Range}) on slots " +
+                        $"{universe}.{a:D3}–{universe}.{b:D3}.", cur.Entry.Entity.Id));
+                    continue;
+                }
                 var key = Order(other.Entry.Entity.Id, cur.Entry.Entity.Id);
                 if (!reported.Add(key)) continue;
                 if (++count > MaxOverlapIssues) return;
