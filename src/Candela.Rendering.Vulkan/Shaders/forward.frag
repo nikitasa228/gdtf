@@ -41,6 +41,18 @@ void main()
         alpha = m.baseColor.a;
     }
 
+    // Reference drawings (InstanceFlags.Reference) and unlit materials show their base colour as a display-referred
+    // value, independent of the exposure and the stage lights.
+    if ((m.flags & MATERIAL_UNLIT) != 0u || (instances[inInstance].flags & INSTANCE_FLAG_REFERENCE) != 0u)
+    {
+#ifdef TRANSPARENT
+        outColor = vec4(albedo * alpha, alpha);
+#else
+        outColor = vec4(albedo, 1.0);
+#endif
+        return;
+    }
+
     float metallic = m.metallic;
     float roughness = m.roughness;
     if ((m.flags & MATERIAL_METALLIC_ROUGHNESS_TEXTURE) != 0u)
@@ -75,7 +87,7 @@ void main()
 
     vec3 diffuse = vec3(0.0);
     vec3 specular = vec3(0.0);
-    uvec2 cluster = clusters[clusterIndex(gl_FragCoord.xy, viewDepthOf(P))];
+    uvec2 cluster = frame.lightCount > 0u ? clusters[clusterIndex(gl_FragCoord.xy, viewDepthOf(P))] : uvec2(0u);
     for (uint i = 0u; i < cluster.y; ++i)
     {
         Light light = lights[clusterLights[cluster.x + i]];

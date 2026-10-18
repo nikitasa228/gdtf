@@ -462,10 +462,16 @@ public sealed unsafe class VulkanRenderer : IRenderer
         frustum = Frustum.FromViewProjection(viewProjection, finiteFar: ortho);
 
         var eye = inverseView.Translation;
-        var right = Vector3.Normalize(new Vector3(inverseView.M11, inverseView.M12, inverseView.M13));
         var up = Vector3.Normalize(new Vector3(inverseView.M21, inverseView.M22, inverseView.M23));
         var forward = -Vector3.Normalize(new Vector3(inverseView.M31, inverseView.M32, inverseView.M33));
-        var headlight = Vector3.Normalize(-forward + 0.45f * up - 0.3f * right);
+        // Colorless key light: from above, behind the camera and over its left shoulder (camera yaw only, so it does
+        // not swing with tilting); a top view uses the camera's up vector as "forward" on the floor.
+        var flatForward = new Vector3(forward.X, forward.Y, 0f);
+        if (flatForward.LengthSquared() < 1e-4f)
+            flatForward = new Vector3(up.X, up.Y, 0f);
+        flatForward = flatForward.LengthSquared() > 1e-8f ? Vector3.Normalize(flatForward) : Vector3.UnitY;
+        var flatRight = Vector3.Cross(flatForward, Vector3.UnitZ);
+        var keyLight = Vector3.Normalize(Vector3.UnitZ - 0.6f * flatForward - 0.35f * flatRight);
 
         bool full = shading == ViewShading.Full;
         float ev = (float.IsFinite(camera.Ev100) ? camera.Ev100 : 6f) + (float.IsFinite(settings.ExposureCompensation) ? settings.ExposureCompensation : 0f);
@@ -509,7 +515,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.GridFadeDistance = ortho ? 0f : 150f * spacing;
         d.RangeEpsilon = ShaderConstants.LightRangeEpsilon;
         d.ClusterIndexCapacity = target.ClusterIndexCapacity;
-        d.Headlight = new Vector4(headlight, 0f);
+        d.Headlight = new Vector4(keyLight, 0f);
     }
 
     private void CopyToBuffer(CommandBuffer cmd, GpuImage image, ImageAspectFlags aspect, int x, int y, uint width, uint height, GpuBuffer buffer,

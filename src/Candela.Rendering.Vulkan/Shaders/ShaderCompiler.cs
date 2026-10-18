@@ -40,6 +40,12 @@ internal sealed unsafe class ShaderCompiler : IDisposable
     /// <summary>Bump when compiler settings change in a way the hash does not capture.</summary>
     private const string SettingsTag = "candela-shaderc-v1;vulkan1.3;spirv1.6;O";
 
+    /// <summary>
+    /// The shaderc library is loaded once and stays loaded until the process exits: glslang registers process exit
+    /// handlers, so unloading it (Silk.NET's <c>Dispose</c> on the API object) makes the process crash at exit.
+    /// </summary>
+    private static readonly Lazy<Shaderc> SharedApi = new(Shaderc.GetApi, LazyThreadSafetyMode.ExecutionAndPublication);
+
     private readonly Shaderc _api;
     private readonly ShaderLibrary _library;
     private readonly string? _cacheDirectory;
@@ -53,7 +59,7 @@ internal sealed unsafe class ShaderCompiler : IDisposable
         _library = library;
         _cacheDirectory = cacheDirectory is null ? null : Path.Combine(cacheDirectory, "shaders");
         _log = log;
-        _api = Shaderc.GetApi();
+        _api = SharedApi.Value;
         _compiler = _api.CompilerInitialize();
         if (_compiler == null)
             throw new InvalidOperationException("shaderc_compiler_initialize failed.");
@@ -119,7 +125,6 @@ internal sealed unsafe class ShaderCompiler : IDisposable
 
         if (_libraryHandle.IsAllocated)
             _libraryHandle.Free();
-        _api.Dispose();
     }
 
     private uint[] CompileUncached(string file, string source, IReadOnlyList<(string Name, string Value)> defines)

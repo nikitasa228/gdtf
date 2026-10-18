@@ -101,7 +101,7 @@ struct FrameData
     float gridFadeDistance;  // metres; 0 = no distance fade
     float rangeEpsilon;      // exposed value at which a light's contribution counts as negligible
     uint clusterIndexCapacity;
-    vec4 headlight;          // Colorless: unit direction towards the headlight (world space)
+    vec4 headlight;          // Colorless: unit direction towards the key light (world space)
 };
 
 layout(set = SET_VIEW, binding = BINDING_FRAME, scalar) uniform FrameBlock
