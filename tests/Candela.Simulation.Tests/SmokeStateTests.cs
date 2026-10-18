@@ -242,6 +242,34 @@ public sealed class SmokeStateTests
     }
 
     [Fact]
+    public void LargeTimeStepsAndExtremeForcing_StayStable()
+    {
+        // 0.25 s sub-steps (CFL ≫ 1 near the fans), a 60 m/s fan, an 8 MW-class plume and a chilled jet at once.
+        var sim = new SmokeSimulation(new SmokeSimulationSettings
+        {
+            Bounds = new Aabb(new Vector3(-3f, -3f, 0f), new Vector3(3f, 3f, 4f)),
+            CellSize = 0.25f,
+            TimeStep = 0.25f,
+            OpenFaces = DomainFaces.ZMax,
+        });
+        var emitters = new[]
+        {
+            SmokeEmitter.Fan(new Vector3(-2.8f, 0f, 1f), Vector3.UnitX, 1f, 0.5f, 60f),
+            SmokeEmitter.Plume(new Vector3(0f, 0f, 0.3f), Vector3.UnitZ, 0.5f, 10f, 5e-3f, 900f),
+            SmokeEmitter.FogMachine(new Vector3(2f, 2f, 0.3f), -Vector3.UnitX, 1f, 3000f, lowFog: true),
+        };
+        for (int n = 0; n < 40; n++)
+        {
+            sim.StepOnce(emitters);
+            Assert.True(float.IsFinite(sim.LastStatistics.MaxDivergenceAfter));
+        }
+
+        Assert.All(sim.Density.ToArray(), d => Assert.True(float.IsFinite(d) && d >= 0f));
+        Assert.All(sim.TemperatureExcess.ToArray(), t => Assert.True(float.IsFinite(t) && MathF.Abs(t) <= 1000f));
+        Assert.True(sim.VelocityAt(new Vector3(0f, 0f, 2f)).Length() <= sim.Settings.MaxSpeed * 1.8f);
+    }
+
+    [Fact]
     public void Stepping_DoesNotAllocate()
     {
         // Single-threaded, so Parallel.For's own bookkeeping does not count; the solver itself must not allocate.
