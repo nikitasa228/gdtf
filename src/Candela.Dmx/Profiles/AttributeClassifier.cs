@@ -281,9 +281,19 @@ public static class AttributeClassifier
 {
     private static readonly string[] _strobeSuffixes =
     [
-        "StrobeRandomPulseOpen", "StrobeRandomPulseClose", "StrobeRandomPulse", "StrobeRandomBurstPulse", "StrobeRandom",
-        "StrobePulseOpen", "StrobePulseClose", "StrobePulse", "StrobeEffect", "StrobeBurstPulse", "StrobeBurst",
-        "StrobeSineWave", "Strobe",
+        "StrobeRandomPulseOpen",
+        "StrobeRandomPulseClose",
+        "StrobeRandomPulse",
+        "StrobeRandomBurstPulse",
+        "StrobeRandom",
+        "StrobePulseOpen",
+        "StrobePulseClose",
+        "StrobePulse",
+        "StrobeEffect",
+        "StrobeBurstPulse",
+        "StrobeBurst",
+        "StrobeSineWave",
+        "Strobe",
     ];
 
     private static readonly Dictionary<string, AttributeClass> _cache = new(StringComparer.Ordinal);

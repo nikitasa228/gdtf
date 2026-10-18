@@ -94,8 +94,22 @@ public class LibraryWideTests(ITestOutputHelper output)
                 Bad($"axis {a.PartIndex}: pan {a.Pan} tilt {a.Tilt}");
         foreach (var b in s.Beams)
         {
-            float[] values = [b.Intensity, b.Dimmer, b.Shutter, b.ColorTransmission, b.PeakCandela, b.Flux, b.BeamAngle, b.FieldAngle, b.Focus, b.Iris,
-                b.Frost, b.ShaperRotation, b.Color.Rgb.X, b.Color.Rgb.Y, b.Color.Rgb.Z, b.StrobeFrequency];
+            float[] values = [b.Intensity,
+                b.Dimmer,
+                b.Shutter,
+                b.ColorTransmission,
+                b.PeakCandela,
+                b.Flux,
+                b.BeamAngle,
+                b.FieldAngle,
+                b.Focus,
+                b.Iris,
+                b.Frost,
+                b.ShaperRotation,
+                b.Color.Rgb.X,
+                b.Color.Rgb.Y,
+                b.Color.Rgb.Z,
+                b.StrobeFrequency];
             if (values.Any(v => !F(v))) Bad($"beam {b.Name}: {string.Join(", ", values)}");
             if (b.Intensity is < 0f or > 1f || b.PeakCandela < 0f || b.ColorTransmission is < 0f or > 1f || b.Color.Rgb.X < 0f || b.Color.Rgb.Y < 0f ||
                 b.Color.Rgb.Z < 0f || b.BeamAngle <= 0f || b.FieldAngle < b.BeamAngle * 0.999f)
