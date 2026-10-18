@@ -46,8 +46,8 @@ void main()
 
     if (sigmaS > 0.0 && hasFeature(FEATURE_VOLUME_LIGHTS) && frame.lightCount > 0u)
     {
-        // A froxel spans 8 pixels: filter cookies over its footprint.
-        float footprint = 8.0 * pixelWorldSize(z);
+        // A froxel spans about 8 pixels (more where the grid hits the 3D image limit): filter cookies over its width.
+        float footprint = frame.renderSize.x / frame.volumeGrid.x * pixelWorldSize(z);
         float g = frame.media.y;
         vec3 scattered = vec3(0.0);
         uvec2 cluster = clusters[clusterIndexUv(uv, z)];

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -21,7 +22,8 @@ internal sealed partial class ShaderLibrary
     private static readonly Lazy<ShaderLibrary> _default = new(() => new ShaderLibrary(Environment.GetEnvironmentVariable("CANDELA_SHADER_DIR")));
     private readonly Assembly _assembly = typeof(ShaderLibrary).Assembly;
     private readonly string? _overrideDirectory;
-    private readonly Dictionary<string, string> _cache = new(StringComparer.Ordinal);
+    // Shared by every renderer of the process (Default), possibly on several threads at once.
+    private readonly ConcurrentDictionary<string, string> _cache = new(StringComparer.Ordinal);
 
     public ShaderLibrary(string? overrideDirectory)
     {
@@ -70,7 +72,7 @@ internal sealed partial class ShaderLibrary
         }
 
         if (_overrideDirectory is null)
-            _cache[name] = text; // embedded sources never change; files on disk are re-read for hot reload
+            _cache.TryAdd(name, text); // embedded sources never change; files on disk are re-read for hot reload
         return text;
     }
 

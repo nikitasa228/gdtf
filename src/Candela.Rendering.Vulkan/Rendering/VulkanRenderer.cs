@@ -720,9 +720,11 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
         if (d.Volumetrics)
         {
-            r.VolumeX = (rw + FroxelTileSize - 1) / FroxelTileSize;
-            r.VolumeY = (rh + FroxelTileSize - 1) / FroxelTileSize;
-            r.VolumeZ = Math.Clamp(settings.VolumetricSlices, 8, 256);
+            // 8 x 8 px froxels; beyond the device's 3D image limit the froxels grow (the shaders map them by uv).
+            int maxDimension = (int)Math.Min(Context.Capabilities.MaxImageDimension3D, 16384u);
+            r.VolumeX = Math.Min((rw + FroxelTileSize - 1) / FroxelTileSize, maxDimension);
+            r.VolumeY = Math.Min((rh + FroxelTileSize - 1) / FroxelTileSize, maxDimension);
+            r.VolumeZ = Math.Clamp(settings.VolumetricSlices, 8, Math.Min(256, maxDimension));
         }
 
         d.Requirements = r;
