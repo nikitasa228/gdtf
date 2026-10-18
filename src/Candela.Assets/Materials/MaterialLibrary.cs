@@ -114,7 +114,9 @@ public sealed class MaterialLibrary
 
     private readonly List<BuiltinMaterial> _materials = new();
     private readonly Dictionary<string, BuiltinMaterial> _byId = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, Lazy<ProceduralTextures.TextureSet>> _textures = new(StringComparer.Ordinal);
+    // Full texture key ("builtin:wood-stage/albedo") → generator and channel; filled by the constructor, read-only after,
+    // so lookups are lock- and allocation-free.
+    private readonly Dictionary<string, (Lazy<ProceduralTextures.TextureSet> Set, string Channel)> _textures = new(StringComparer.Ordinal);
 
     /// <summary>The shared library (texture cache shared by all users).</summary>
     public static MaterialLibrary Default { get; } = new();
@@ -232,10 +234,9 @@ public sealed class MaterialLibrary
     /// </summary>
     public ImageData? LoadTexture(string key)
     {
-        if (!AssetKeys.TryParseBuiltinKey(key, out var id, out var channel)) return null;
-        if (!_textures.TryGetValue(id, out var lazy)) return null;
-        var set = lazy.Value;
-        return channel switch
+        if (key is null || !_textures.TryGetValue(key, out var texture)) return null;
+        var set = texture.Set.Value;
+        return texture.Channel switch
         {
             AlbedoChannel => set.Albedo,
             NormalChannel => set.Normal,
@@ -274,6 +275,9 @@ public sealed class MaterialLibrary
         _materials.Add(material);
         _byId[id] = material;
         if (textures is not null)
-            _textures[id] = new Lazy<ProceduralTextures.TextureSet>(() => textures(albedo, roughness), LazyThreadSafetyMode.ExecutionAndPublication);
+        {
+            var set = new Lazy<ProceduralTextures.TextureSet>(() => textures(albedo, roughness), LazyThreadSafetyMode.ExecutionAndPublication);
+            foreach (var channel in channels) _textures[TextureKey(id, channel)] = (set, channel);
+        }
     }
 }

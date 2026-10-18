@@ -390,6 +390,57 @@ public class ModelImporterTests
     }
 
     [Fact]
+    public void LargeObjWithoutNormalsImportsInReasonableTime()
+    {
+        // 2 × 240² = 115 200 triangles as indexed OBJ text without normals: exercises parsing, vertex joining and the
+        // angle-aware normal generator.
+        const int cells = 240;
+        var sb = new System.Text.StringBuilder(8 << 20);
+        for (int y = 0; y <= cells; y++)
+            for (int x = 0; x <= cells; x++)
+                sb.Append(FormattableString.Invariant($"v {x * 0.05f} {MathF.Sin(x * 0.2f) * 0.2f} {-y * 0.05f}\n"));
+        for (int y = 0; y < cells; y++)
+            for (int x = 0; x < cells; x++)
+            {
+                int a = y * (cells + 1) + x + 1, b = a + 1, c = a + cells + 1, d = c + 1;
+                sb.Append(FormattableString.Invariant($"f {a} {b} {d}\nf {a} {d} {c}\n"));
+            }
+        var obj = System.Text.Encoding.ASCII.GetBytes(sb.ToString());
+        var sw = Stopwatch.StartNew();
+
+        var result = ModelImporter.Import("terrain.obj", obj);
+
+        sw.Stop();
+        Assert.Equal(2 * cells * cells, result.TriangleCount);
+        Assert.True(sw.Elapsed < TimeSpan.FromSeconds(30), $"import took {sw.Elapsed}");
+        var mesh = result.Model.Parts[0].Mesh;
+        // The wavy surface is smooth (dihedral angles far below 66°): no vertex is split.
+        Assert.Equal((cells + 1) * (cells + 1), mesh.VertexCount);
+        Assert.All(mesh.Normals, n => Assert.True(n.Z > 0.5f));
+    }
+
+    [Fact]
+    public void ConcurrentImportsAreIndependent()
+    {
+        var dae = System.Text.Encoding.UTF8.GetBytes(TestFiles.Collada(meter: 0.01f));
+        var stl = TestFiles.BinaryStl(TestFiles.BoxTriangles(yUp: false));
+        var glb = TestFiles.Glb();
+        var results = new ImportedModel[24];
+
+        Parallel.For(0, results.Length, new ParallelOptions { MaxDegreeOfParallelism = 8 }, i =>
+        {
+            results[i] = (i % 3) switch
+            {
+                0 => ModelImporter.Import("box.dae", dae),
+                1 => ModelImporter.Import("box.stl", stl),
+                _ => ModelImporter.Import("box.glb", glb),
+            };
+        });
+
+        Assert.All(results, r => AssertBox(r));
+    }
+
+    [Fact]
     public void ManyObjectsAreFlattenedIntoOnePartWithASubMeshPerMaterial()
     {
         // Three OBJ objects (two materials); with MaxParts = 1 they are merged into one part.

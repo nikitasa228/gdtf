@@ -11,8 +11,9 @@ namespace Candela.Assets;
 /// <item>On Linux AssimpNet calls <c>dlopen</c> through <c>[DllImport("libdl.so")]</c>. glibc 2.34+ distributions ship
 /// only <c>libdl.so.2</c> (the unversioned name belongs to the -dev package), so the binding fails with
 /// <see cref="DllNotFoundException"/>. A DllImport resolver maps the name to <c>libdl.so.2</c> or <c>libc.so.6</c>.</item>
-/// <item>The library is looked up next to the application, next to this assembly and in the NuGet cache, so it is also
-/// found when Candela.Assets is loaded by a host whose base directory differs (test runners, plug-in hosts).</item>
+/// <item>The library is looked up in <c>runtimes/{rid}/native</c> and flat next to the application, next to this
+/// assembly and next to AssimpNet.dll, so it is found both in portable builds (RID folders) and in RID-specific
+/// publishes (flattened), and when Candela.Assets is loaded by a host whose base directory differs (test runners).</item>
 /// </list>
 /// The first call does the work; later calls return the cached outcome. Thread-safe.
 /// </summary>
