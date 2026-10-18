@@ -67,7 +67,7 @@ public sealed class ImportTests
         string obj = SceneBuilder.WriteCubeObj(folder);
         string script = Path.Combine(folder, "crashing-worker.sh");
         File.WriteAllText(script, "#!/bin/sh\necho 'Segmentation fault in libassimp' >&2\nkill -SEGV $$\n");
-        File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
 
         using var engine = new StageEngine(new StageEngineOptions
         {
@@ -94,7 +94,7 @@ public sealed class ImportTests
         string obj = SceneBuilder.WriteCubeObj(folder);
         string script = Path.Combine(folder, "hanging-worker.sh");
         File.WriteAllText(script, "#!/bin/sh\nsleep 30\n");
-        File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
 
         using var engine = new StageEngine(new StageEngineOptions
         {

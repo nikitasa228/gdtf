@@ -218,8 +218,9 @@ public sealed class StageSimulation
                 else
                 {
                     float brightest = 0f;
-                    foreach (var beam in pose.State.Beams)
-                        if (beam.Intensity > brightest) brightest = beam.Intensity;
+                    var beams = pose.State.Beams;
+                    for (int b = 0; b < beams.Count; b++)
+                        if (beams[b].Intensity > brightest) brightest = beams[b].Intensity;
                     float share = settings.IdleNoiseShare;
                     activity = share + (1f - share) * Math.Clamp(brightest, 0f, 1f);
                 }

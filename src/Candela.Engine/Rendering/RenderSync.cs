@@ -528,8 +528,9 @@ public sealed class RenderSync : IDisposable
     private void UpdateFixtures(bool force = false)
     {
         var poses = _engine.Poses;
-        foreach (var id in poses.Removed)
-            if (_entities.TryGetValue(id, out var gone) && gone.FixtureType is not null) _rebuild.Add(id);
+        var removed = poses.Removed;
+        for (int i = 0; i < removed.Count; i++)
+            if (_entities.TryGetValue(removed[i], out var gone) && gone.FixtureType is not null) _rebuild.Add(removed[i]);
         if (_rebuild.Count > 0) ProcessChanges();
 
         if (force)
@@ -537,8 +538,9 @@ public sealed class RenderSync : IDisposable
             foreach (var pose in poses.All) PlaceFixture(pose);
             return;
         }
-        foreach (var id in poses.Changed)
-            if (poses.TryGet(id, out var pose)) PlaceFixture(pose);
+        var changed = poses.Changed;
+        for (int i = 0; i < changed.Count; i++)
+            if (poses.TryGet(changed[i], out var pose)) PlaceFixture(pose);
     }
 
     private void PlaceFixture(FixturePose pose)

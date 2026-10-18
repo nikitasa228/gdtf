@@ -160,13 +160,17 @@ public sealed class FixturePoses
         _changed.Clear();
         _changedSet.Clear();
         _removed.Clear();
-        foreach (var id in dmx.Removed)
+        // index loops: the engine's lists are interfaces, and foreach over them would allocate an enumerator per frame
+        var removed = dmx.Removed;
+        for (int i = 0; i < removed.Count; i++)
         {
+            var id = removed[i];
             if (_poses.Remove(id)) _removed.Add(id);
             _moved.Remove(id);
         }
 
-        foreach (var id in dmx.Changed) Refresh(scene, dmx, id);
+        var changed = dmx.Changed;
+        for (int i = 0; i < changed.Count; i++) Refresh(scene, dmx, changed[i]);
         if (_moved.Count > 0)
         {
             _scratch.Clear();
