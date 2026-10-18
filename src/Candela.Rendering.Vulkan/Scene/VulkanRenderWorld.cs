@@ -57,6 +57,57 @@ internal sealed class InstanceRecord
     public int LivePosition;
 }
 
+/// <summary>
+/// Identity of a light across <see cref="IRenderWorld.SetLights"/> calls (lights are replaced every frame): the
+/// fixture id and the occurrence of that id in the light list (multi-beam fixtures), so cached shadow maps follow
+/// their light.
+/// </summary>
+/// <param name="FixtureId">Fixture entity id (empty for lights without one).</param>
+/// <param name="Occurrence">Index among the lights with the same fixture id.</param>
+internal readonly record struct LightKey(Guid FixtureId, int Occurrence);
+
+/// <summary>
+/// Changes to shadow-casting geometry since the shadow atlas last looked: world-space bounding spheres of instances
+/// that appeared, disappeared, moved or changed materials (old and new position), or "everything" when too much
+/// changed or a change cannot be localised (materials or meshes replaced).
+/// </summary>
+internal sealed class ShadowCasterChanges
+{
+    private const int Capacity = 4096;
+    private readonly List<Vector4> _spheres = new(256);
+
+    /// <summary>Changed spheres (centre, radius).</summary>
+    public ReadOnlySpan<Vector4> Spheres => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_spheres);
+
+    /// <summary>Every cached shadow map must be re-rendered.</summary>
+    public bool All { get; private set; }
+
+    public void Add(Vector4 sphere)
+    {
+        if (All)
+            return;
+        if (_spheres.Count >= Capacity)
+        {
+            InvalidateAll();
+            return;
+        }
+
+        _spheres.Add(sphere);
+    }
+
+    public void InvalidateAll()
+    {
+        All = true;
+        _spheres.Clear();
+    }
+
+    public void Clear()
+    {
+        All = false;
+        _spheres.Clear();
+    }
+}
+
 /// <summary>Counts of live objects in a <see cref="VulkanRenderWorld"/> (diagnostics and leak tests).</summary>
 /// <param name="Meshes">Meshes.</param>
 /// <param name="Textures">Textures (user textures and cached material images, without the three defaults).</param>
@@ -103,6 +154,9 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     private readonly List<NoiseSource> _noiseSources = new();
     private readonly HashSet<string> _missingImages = new(StringComparer.Ordinal);
     private readonly BarrierBatch _submitBarriers;
+    private readonly Dictionary<Guid, int> _lightOccurrences = new();
+    private LightKey[] _lightKeys = new LightKey[64];
+    private AtmosphereResources? _atmosphere;
     private int[] _live = new int[64];
     private int _liveCount;
     private DescriptorSetLayout _setLayout;
@@ -121,6 +175,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             _slotBuffer = new SceneBuffer<uint>(context, StorageUsage, "instance material slots", 1024);
             _lightBuffer = new SceneBuffer<GpuLight>(context, StorageUsage, "lights", 64);
             _lineBuffer = new SceneBuffer<LineVertex>(context, BufferUsageFlags.VertexBufferBit, "lines", 256);
+            _atmosphere = new AtmosphereResources(context);
             _materialBuffer.Resize(1);
             _materialBuffer[0] = MaterialPacker.Default;
             _materialBuffer.MarkDirty(0);
@@ -139,11 +194,20 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     /// <summary>Current object counts.</summary>
     public RenderWorldStatistics Statistics => new(_meshes.Count, _textures.Count, _materials.Count, _instances.Count, LightCount, LineSegmentCount);
 
-    /// <summary>The atmosphere of the current frame (stored for the stage-2 volumetric renderer).</summary>
+    /// <summary>The atmosphere of the current frame (null = clear air, no participating media).</summary>
     public AtmosphereState? Atmosphere { get; private set; }
 
-    /// <summary>Noise sources of the current frame (stored for the stage-2 noise overlay).</summary>
+    /// <summary>Noise sources of the current frame (noise overlay).</summary>
     public IReadOnlyList<NoiseSource> NoiseSources => _noiseSources;
+
+    /// <summary>GPU volumes of the atmosphere, the blackbody table and the noise sources.</summary>
+    internal AtmosphereResources AtmosphereGpu => _atmosphere!;
+
+    /// <summary>Shadow-caster changes not yet seen by the shadow atlas.</summary>
+    internal ShadowCasterChanges ShadowChanges { get; } = new();
+
+    /// <summary>Identity of each light of the current frame (index = light index).</summary>
+    internal ReadOnlySpan<LightKey> LightKeys => _lightKeys.AsSpan(0, LightCount);
 
     internal DescriptorSetLayout SceneSetLayout => _setLayout;
 
@@ -159,6 +223,9 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     internal GpuBuffer MaterialBuffer => _materialBuffer.Buffer;
 
     internal GpuBuffer InstanceBuffer => _instanceBuffer.Buffer;
+
+    /// <summary>Instance slots in use (one past the highest instance index).</summary>
+    internal int InstanceSlotCount => _instanceBuffer.Count;
 
     internal GpuBuffer MaterialSlotBuffer => _slotBuffer.Buffer;
 
@@ -201,9 +268,10 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
                 ulong vertexBytes = (ulong)vertices.Length * (ulong)sizeof(GpuVertex);
                 indexOffset = VkUtil.AlignUp(vertexBytes, 16);
                 ulong total = indexOffset + (ulong)mesh.Indices.Length * sizeof(uint);
-                geometry = GpuBuffer.Create(_context, total,
-                    BufferUsageFlags.VertexBufferBit | BufferUsageFlags.IndexBufferBit | BufferUsageFlags.TransferDstBit,
-                    MemoryUsage.GpuOnly, $"mesh '{name}'");
+                var usage = BufferUsageFlags.VertexBufferBit | BufferUsageFlags.IndexBufferBit | BufferUsageFlags.TransferDstBit;
+                if (_context.Capabilities.RayTracing)
+                    usage |= BufferUsageFlags.AccelerationStructureBuildInputReadOnlyBitKhr; // bottom-level structures read the mesh in place
+                geometry = GpuBuffer.Create(_context, total, usage, MemoryUsage.GpuOnly, $"mesh '{name}'");
                 var region = _context.Upload.Allocate(total, 16);
                 fixed (GpuVertex* v = vertices)
                     System.Buffer.MemoryCopy(v, region.Pointer, (long)total, (long)vertexBytes);
@@ -264,6 +332,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             _context.DeferDispose(record.Edges);
         record.Geometry = null;
         record.Edges = null;
+        ShadowChanges.InvalidateAll();
     }
 
     // ------------------------------------------------------------------ textures
@@ -305,6 +374,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     {
         ArgumentNullException.ThrowIfNull(material);
         var record = _materials.Get(handle.Value, out _, "material");
+        ShadowChanges.InvalidateAll(); // alpha masks and reflective-shadow-map albedo
         var previous = record.Textures.ToArray();
         record.Textures.Clear();
         Apply(record, material, images); // acquire the new textures before releasing the old (shared images stay alive)
@@ -319,6 +389,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         if (record is null)
             return;
         record.Destroyed = true;
+        ShadowChanges.InvalidateAll();
         foreach (var t in record.Textures)
             ReleaseCached(t);
         record.Textures.Clear();
@@ -357,6 +428,8 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             _instanceBuffer.Resize(index + 1);
         AssignMaterials(record, materials);
         WriteInstance(record);
+        if (CastsShadow(record.Flags))
+            ShadowChanges.Add(record.WorldSphere);
 
         if (_liveCount == _live.Length)
             Array.Resize(ref _live, _live.Length * 2);
@@ -369,9 +442,16 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     public void UpdateInstance(InstanceHandle instance, Matrix4x4 world, InstanceFlags flags)
     {
         var record = _instances.Get(instance.Value, out _, "instance");
+        bool moved = record.World != world;
+        bool castsBefore = CastsShadow(record.Flags);
+        bool castsAfter = CastsShadow(flags);
+        if (castsBefore && (moved || !castsAfter))
+            ShadowChanges.Add(record.WorldSphere);
         record.World = world;
         record.Flags = flags;
         WriteInstance(record);
+        if (castsAfter && (moved || !castsBefore))
+            ShadowChanges.Add(record.WorldSphere);
     }
 
     /// <inheritdoc/>
@@ -380,6 +460,8 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         var record = _instances.Get(instance.Value, out _, "instance");
         AssignMaterials(record, materials);
         WriteInstance(record);
+        if (CastsShadow(record.Flags))
+            ShadowChanges.Add(record.WorldSphere);
     }
 
     /// <inheritdoc/>
@@ -388,6 +470,8 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         var record = _instances.Remove(instance.Value, out int index);
         if (record is null)
             return;
+        if (CastsShadow(record.Flags))
+            ShadowChanges.Add(record.WorldSphere);
         for (int i = 0; i < record.Materials.Length; i++)
         {
             ReleaseMaterialReference(record.Materials[i]);
@@ -412,8 +496,21 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     {
         ThrowIfDisposed();
         _lightBuffer.Resize(lights.Length);
+        if (_lightKeys.Length < lights.Length)
+            Array.Resize(ref _lightKeys, Math.Max(lights.Length, _lightKeys.Length * 2));
+        _lightOccurrences.Clear();
         for (int i = 0; i < lights.Length; i++)
-            LightPacker.Pack(lights[i], out _lightBuffer[i]);
+        {
+            ref readonly var light = ref lights[i];
+            uint gobo = 0;
+            if (light.Gobo.IsValid && _userTextures.TryGet(light.Gobo.Value, out _) is { } texture)
+                gobo = texture.Slot;
+            LightPacker.Pack(light, gobo, out _lightBuffer[i]);
+            _lightOccurrences.TryGetValue(light.FixtureId, out int occurrence);
+            _lightOccurrences[light.FixtureId] = occurrence + 1;
+            _lightKeys[i] = new LightKey(light.FixtureId, occurrence);
+        }
+
         _lightBuffer.MarkDirty(0, lights.Length);
         LightCount = lights.Length;
     }
@@ -427,15 +524,26 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         LineSegmentCount = n / 2;
     }
 
-    /// <inheritdoc/>
-    public void SetAtmosphere(AtmosphereState atmosphere) => Atmosphere = atmosphere;
+    /// <summary>
+    /// Sets the participating media of this frame: uniform haze, the smoke density grid (scattering), the flame
+    /// temperature grid (blackbody emission) and the noise field. Grids are uploaded with the next render; pass null
+    /// (or never call this) for clear air.
+    /// </summary>
+    public void SetAtmosphere(AtmosphereState atmosphere)
+    {
+        ThrowIfDisposed();
+        Atmosphere = atmosphere;
+        _atmosphere!.Set(atmosphere);
+    }
 
     /// <inheritdoc/>
     public void SetNoiseSources(ReadOnlySpan<NoiseSource> sources)
     {
+        ThrowIfDisposed();
         _noiseSources.Clear();
         foreach (var s in sources)
             _noiseSources.Add(s);
+        _atmosphere!.SetNoiseSources(sources);
     }
 
     /// <summary>Destroys every GPU object of the world (the device must be idle; called by the renderer).</summary>
@@ -462,6 +570,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         _slotBuffer?.Dispose();
         _lightBuffer?.Dispose();
         _lineBuffer?.Dispose();
+        _atmosphere?.Dispose();
         _textures.Dispose();
         var vk = _context.Vk;
         foreach (var (pool, _) in _pools)
@@ -488,6 +597,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         bool slots = _slotBuffer.PrepareUpload(barriers);
         bool lights = _lightBuffer.PrepareUpload(barriers);
         bool lines = _lineBuffer.PrepareUpload(barriers);
+        bool atmosphere = _atmosphere!.PrepareUpload(barriers);
         bool geometry = _pendingGeometry.Count > 0;
         barriers.Flush();
 
@@ -496,6 +606,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         _slotBuffer.RecordUpload(cmd);
         _lightBuffer.RecordUpload(cmd);
         _lineBuffer.RecordUpload(cmd);
+        _atmosphere.Record(cmd, barriers);
         if (geometry)
         {
             foreach (var (dst, src, srcOffset, size) in _pendingGeometry)
@@ -508,7 +619,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             _pendingGeometry.Clear();
         }
 
-        if (materials || instances || slots || lights || lines || geometry)
+        if (materials || instances || slots || lights || lines || geometry || atmosphere)
         {
             // One global barrier makes every copy of this frame visible to its consumers.
             BarrierBatch.Describe(BufferUse.ShaderRead, out var shaderStages, out var shaderAccess, out _);
@@ -520,6 +631,8 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             MarkUploaded(slots, _slotBuffer.Buffer, BufferUse.ShaderRead);
             MarkUploaded(lights, _lightBuffer.Buffer, BufferUse.ShaderRead);
             MarkUploaded(lines, _lineBuffer.Buffer, BufferUse.VertexInput);
+            MarkUploaded(atmosphere, _atmosphere.NoiseSources.Buffer, BufferUse.ShaderRead);
+            MarkUploaded(atmosphere, _atmosphere.FlameLut, BufferUse.ShaderRead);
             foreach (var g in _uploadedGeometry)
                 BarrierBatch.MarkWritten(ref g.State, PipelineStageFlags2.CopyBit, AccessFlags2.TransferWriteBit, BufferUse.GeometryInput);
             _uploadedGeometry.Clear();
@@ -562,6 +675,9 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     }
 
     // ------------------------------------------------------------------ helpers
+
+    private static bool CastsShadow(InstanceFlags flags) =>
+        (flags & InstanceFlags.CastShadow) != 0 && (flags & (InstanceFlags.Hidden | InstanceFlags.Reference)) == 0;
 
     private static void MarkUploaded(bool uploaded, GpuBuffer buffer, BufferUse use)
     {

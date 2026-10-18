@@ -3,6 +3,11 @@ using Silk.NET.Vulkan;
 
 namespace Candela.Rendering.Vulkan;
 
+/// <summary>An attachment of a dynamic-rendering scope.</summary>
+/// <param name="Image">The image.</param>
+/// <param name="Clear">Clear value (null = load the previous contents).</param>
+internal readonly record struct ColorAttachment(GpuImage Image, Vector4? Clear);
+
 /// <summary>Recording helpers shared by the passes (no allocation).</summary>
 internal static unsafe class PassRecording
 {
@@ -12,22 +17,35 @@ internal static unsafe class PassRecording
     /// <param name="colorClear">Clear value; null = load the previous contents.</param>
     /// <param name="depth">Depth attachment or null.</param>
     /// <param name="depthClear">Clear the depth (to 0 = far plane, reverse-Z) and write it; false = read-only (load, no store).</param>
-    public static void Begin(PassContext context, GpuImage color, Vector4? colorClear, GpuImage? depth, bool depthClear)
+    public static void Begin(PassContext context, GpuImage color, Vector4? colorClear, GpuImage? depth, bool depthClear) =>
+        Begin(context, new ColorAttachment(color, colorClear), default, default, 1, depth, depthClear, depthWrite: depthClear);
+
+    /// <summary>
+    /// Begins dynamic rendering into up to three colour attachments (all the same size) and an optional depth
+    /// attachment; the render area, viewport and scissor cover the first attachment (or the depth image).
+    /// </summary>
+    public static void Begin(PassContext context, ColorAttachment c0, ColorAttachment c1, ColorAttachment c2, int colorCount, GpuImage? depth,
+        bool depthClear, bool depthWrite, bool depthLoad = true)
     {
-        var colorAttachment = new RenderingAttachmentInfo
+        var colors = stackalloc RenderingAttachmentInfo[3];
+        for (int i = 0; i < colorCount; i++)
         {
-            SType = StructureType.RenderingAttachmentInfo,
-            ImageView = color.View,
-            ImageLayout = ImageLayout.ColorAttachmentOptimal,
-            LoadOp = colorClear.HasValue ? AttachmentLoadOp.Clear : AttachmentLoadOp.Load,
-            StoreOp = AttachmentStoreOp.Store,
-        };
-        if (colorClear is { } c)
-        {
-            if (color.Format == Format.R32Uint)
-                colorAttachment.ClearValue.Color = new ClearColorValue(uint32_0: (uint)c.X, uint32_1: (uint)c.Y, uint32_2: (uint)c.Z, uint32_3: (uint)c.W);
-            else
-                colorAttachment.ClearValue.Color = new ClearColorValue(c.X, c.Y, c.Z, c.W);
+            var a = i == 0 ? c0 : i == 1 ? c1 : c2;
+            colors[i] = new RenderingAttachmentInfo
+            {
+                SType = StructureType.RenderingAttachmentInfo,
+                ImageView = a.Image.View,
+                ImageLayout = ImageLayout.ColorAttachmentOptimal,
+                LoadOp = a.Clear.HasValue ? AttachmentLoadOp.Clear : AttachmentLoadOp.Load,
+                StoreOp = AttachmentStoreOp.Store,
+            };
+            if (a.Clear is { } c)
+            {
+                if (a.Image.Format is Format.R32Uint)
+                    colors[i].ClearValue.Color = new ClearColorValue(uint32_0: (uint)c.X, uint32_1: (uint)c.Y, uint32_2: (uint)c.Z, uint32_3: (uint)c.W);
+                else
+                    colors[i].ClearValue.Color = new ClearColorValue(c.X, c.Y, c.Z, c.W);
+            }
         }
 
         var depthAttachment = default(RenderingAttachmentInfo);
@@ -37,26 +55,35 @@ internal static unsafe class PassRecording
             {
                 SType = StructureType.RenderingAttachmentInfo,
                 ImageView = depth.View,
-                ImageLayout = depthClear ? ImageLayout.DepthStencilAttachmentOptimal : ImageLayout.DepthStencilReadOnlyOptimal,
-                LoadOp = depthClear ? AttachmentLoadOp.Clear : AttachmentLoadOp.Load,
-                StoreOp = depthClear ? AttachmentStoreOp.Store : AttachmentStoreOp.None,
+                ImageLayout = depthWrite ? ImageLayout.DepthStencilAttachmentOptimal : ImageLayout.DepthStencilReadOnlyOptimal,
+                LoadOp = depthClear ? AttachmentLoadOp.Clear : depthLoad ? AttachmentLoadOp.Load : AttachmentLoadOp.DontCare,
+                StoreOp = depthWrite ? AttachmentStoreOp.Store : AttachmentStoreOp.None,
             };
             depthAttachment.ClearValue.DepthStencil = new ClearDepthStencilValue(0f, 0);
         }
 
+        uint width = colorCount > 0 ? c0.Image.Width : depth!.Width;
+        uint height = colorCount > 0 ? c0.Image.Height : depth!.Height;
         var info = new RenderingInfo
         {
             SType = StructureType.RenderingInfo,
-            RenderArea = new Rect2D(new Offset2D(0, 0), new Extent2D(color.Width, color.Height)),
+            RenderArea = new Rect2D(new Offset2D(0, 0), new Extent2D(width, height)),
             LayerCount = 1,
-            ColorAttachmentCount = 1,
-            PColorAttachments = &colorAttachment,
+            ColorAttachmentCount = (uint)colorCount,
+            PColorAttachments = colors,
             PDepthAttachment = depth is null ? null : &depthAttachment,
         };
         var vk = context.Context.Vk;
         vk.CmdBeginRendering(context.Cmd, &info);
-        var viewport = new Viewport(0f, 0f, color.Width, color.Height, 0f, 1f);
-        var scissor = new Rect2D(new Offset2D(0, 0), new Extent2D(color.Width, color.Height));
+        SetViewport(context, 0, 0, width, height);
+    }
+
+    /// <summary>Sets viewport and scissor to a rectangle.</summary>
+    public static void SetViewport(PassContext context, int x, int y, uint width, uint height)
+    {
+        var viewport = new Viewport(x, y, width, height, 0f, 1f);
+        var scissor = new Rect2D(new Offset2D(x, y), new Extent2D(width, height));
+        var vk = context.Context.Vk;
         vk.CmdSetViewport(context.Cmd, 0, 1, &viewport);
         vk.CmdSetScissor(context.Cmd, 0, 1, &scissor);
     }
@@ -68,11 +95,27 @@ internal static unsafe class PassRecording
         context.Pipelines.BindSets(context.Cmd, PipelineBindPoint.Graphics, context.SceneSet, context.Target.ViewSet);
     }
 
+    /// <summary>Binds a compute pipeline, the scene and view sets and (optionally) a pass set.</summary>
+    public static void BindCompute(PassContext context, Pipeline pipeline, DescriptorSet passSet = default)
+    {
+        var vk = context.Context.Vk;
+        vk.CmdBindPipeline(context.Cmd, PipelineBindPoint.Compute, pipeline);
+        context.Pipelines.BindSets(context.Cmd, PipelineBindPoint.Compute, context.SceneSet, context.Target.ViewSet);
+        if (passSet.Handle != 0)
+            context.Pipelines.BindPassSet(context.Cmd, PipelineBindPoint.Compute, passSet);
+    }
+
+    /// <summary>Records a full-screen triangle with the bound pipeline.</summary>
+    public static void DrawFullscreen(PassContext context) => context.Context.Vk.CmdDraw(context.Cmd, 3, 1, 0, 0);
+
     /// <summary>
     /// Draws sub-meshes with the bound pipeline: binds each mesh's vertex/index buffer when it changes, sets the
-    /// cull mode per material (double-sided → none) and pushes the instance/material indices.
+    /// cull mode per material (double-sided → none) and pushes the instance/material indices. With
+    /// <paramref name="mode"/> every draw pushes that mode (shadow tile index); otherwise the selection state.
+    /// With <paramref name="selectedOnly"/> only selected instances are drawn.
     /// </summary>
-    public static void DrawMeshes(PassContext context, ReadOnlySpan<DrawItem> items, bool forceCullNone = false)
+    public static void DrawMeshes(PassContext context, ReadOnlySpan<DrawItem> items, bool forceCullNone = false, uint? mode = null,
+        bool selectedOnly = false)
     {
         var vk = context.Context.Vk;
         var cmd = context.Cmd;
@@ -82,6 +125,9 @@ internal static unsafe class PassRecording
         foreach (ref readonly var item in items)
         {
             var instance = world.InstanceAt(item.Instance);
+            bool selected = (instance.Flags & InstanceFlags.Selected) != 0;
+            if (selectedOnly && !selected)
+                continue;
             var mesh = instance.Mesh;
             var geometry = mesh.Geometry!.Handle;
             if (geometry.Handle != boundGeometry)
@@ -103,9 +149,9 @@ internal static unsafe class PassRecording
             {
                 InstanceIndex = (uint)item.Instance,
                 MaterialIndex = item.Material,
-                Mode = (instance.Flags & InstanceFlags.Selected) != 0 ? ShaderConstants.DrawModeSelected : ShaderConstants.DrawModeDefault,
+                Mode = mode ?? (selected ? ShaderConstants.DrawModeSelected : ShaderConstants.DrawModeDefault),
                 Width = 1f,
-                Color = (instance.Flags & InstanceFlags.Selected) != 0 ? context.WireSelectedColor : context.WireColor,
+                Color = selected ? context.WireSelectedColor : context.WireColor,
             };
             context.Pipelines.Push(cmd, constants);
             vk.CmdDrawIndexed(cmd, item.IndexCount, 1, item.IndexStart, 0, 0);
@@ -120,12 +166,49 @@ internal static unsafe class PassRecording
         barriers.Use(context.World.InstanceBuffer, BufferUse.ShaderRead);
         barriers.Use(context.World.MaterialSlotBuffer, BufferUse.ShaderRead);
     }
+
+    /// <summary>
+    /// Declares what lighting.glsl reads (lights, cluster lists, per-view light data, shadow atlas) for shaders of the
+    /// given kind: fragment (<paramref name="compute"/> false) or compute.
+    /// </summary>
+    public static void DeclareLightingReads(PassContext context, BarrierBatch barriers, bool compute)
+    {
+        var use = compute ? BufferUse.ComputeRead : BufferUse.FragmentRead;
+        barriers.Use(context.World.LightBuffer, BufferUse.ShaderRead);
+        barriers.Use(context.Target.Clusters, use);
+        barriers.Use(context.Target.ClusterLights, use);
+        barriers.Use(context.Target.LightViews.Buffer, BufferUse.ShaderRead);
+        barriers.Use(context.Target.Lists.Buffer, BufferUse.ShaderRead);
+        if (context.Atlas is { Depth: not null } atlas)
+        {
+            barriers.Use(atlas.Slots.Buffer, BufferUse.ShaderRead);
+            barriers.Use(atlas.Depth, ImageUse.DepthSampledAnyShader);
+        }
+    }
+
+    /// <summary>Declares the atmosphere volumes, the blackbody table and the noise sources as read.</summary>
+    public static void DeclareMediaReads(PassContext context, BarrierBatch barriers, bool compute)
+    {
+        var atmosphere = context.World.AtmosphereGpu;
+        var image = compute ? ImageUse.SampledCompute : ImageUse.SampledFragment;
+        if (atmosphere.Smoke.Present)
+            barriers.Use(atmosphere.Smoke.Image!, image);
+        if (atmosphere.Flame.Present)
+            barriers.Use(atmosphere.Flame.Image!, image);
+        if (atmosphere.Noise.Present)
+            barriers.Use(atmosphere.Noise.Image!, image);
+        barriers.Use(atmosphere.FlameLut, BufferUse.ShaderRead);
+        barriers.Use(atmosphere.NoiseSources.Buffer, BufferUse.ShaderRead);
+        if (context.Target.GradientLut is { } lut)
+            barriers.Use(lut, image);
+    }
 }
 
 /// <summary>
-/// Depth pre-pass: reverse-Z depth (cleared to 0, GREATER test) and the instance pick id (R32_UINT, 0 = nothing) of
-/// every visible opaque and alpha-tested draw. Later passes test against this depth with EQUAL (no overdraw) or
-/// read-only; <see cref="IRenderer.Pick"/> reads both images back. Runs in every view mode.
+/// Depth pre-pass: reverse-Z depth (cleared to 0, GREATER test), the instance pick id (R32_UINT, 0 = nothing), the
+/// instance index + 1 and the octahedral surface normal of every visible opaque and alpha-tested draw. Later passes
+/// test against this depth with EQUAL (no overdraw) or read-only; <see cref="IRenderer.Pick"/> reads depth and pick ids
+/// back. Runs in every view mode.
 /// </summary>
 internal sealed class DepthPrepassPass : RenderPass
 {
@@ -140,12 +223,16 @@ internal sealed class DepthPrepassPass : RenderPass
     {
         barriers.Use(context.Target.Depth, ImageUse.DepthAttachment, discard: true);
         barriers.Use(context.Target.PickIds, ImageUse.ColorAttachment, discard: true);
+        barriers.Use(context.Target.InstanceIds, ImageUse.ColorAttachment, discard: true);
+        barriers.Use(context.Target.Normals, ImageUse.ColorAttachment, discard: true);
         PassRecording.DeclareSceneReads(context, barriers);
     }
 
     public override void Execute(PassContext context)
     {
-        PassRecording.Begin(context, context.Target.PickIds, Vector4.Zero, context.Target.Depth, depthClear: true);
+        var t = context.Target;
+        PassRecording.Begin(context, new ColorAttachment(t.PickIds, Vector4.Zero), new ColorAttachment(t.InstanceIds, Vector4.Zero),
+            new ColorAttachment(t.Normals, Vector4.Zero), 3, t.Depth, depthClear: true, depthWrite: true);
         PassRecording.BindGraphics(context, context.Pipelines.PrepassOpaque);
         PassRecording.DrawMeshes(context, context.Draws.Opaque);
         if (context.Draws.Masked.Length > 0)
@@ -159,8 +246,8 @@ internal sealed class DepthPrepassPass : RenderPass
 }
 
 /// <summary>
-/// Clustered light assignment (Full view): one work group per cluster of the 16 × 9 × 24 grid tests every light's
-/// cone and range against the cluster's view-space bounds and writes the cluster's light list.
+/// Clustered light assignment (Full view, lux overlay): one work group per cluster of the 16 × 9 × 24 grid tests every
+/// light's cone and range against the cluster's view-space bounds and writes the cluster's light list.
 /// </summary>
 internal sealed class ClusterAssignPass : RenderPass
 {
@@ -169,7 +256,7 @@ internal sealed class ClusterAssignPass : RenderPass
     {
     }
 
-    public override bool IsActive(PassContext context) => context.Shading == ViewShading.Full && context.World.LightCount > 0;
+    public override bool IsActive(PassContext context) => context.LightsActive;
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {
@@ -180,18 +267,17 @@ internal sealed class ClusterAssignPass : RenderPass
         barriers.Use(context.Target.ClusterLights, BufferUse.ComputeWrite);
     }
 
-    public override unsafe void Execute(PassContext context)
+    public override void Execute(PassContext context)
     {
-        var vk = context.Context.Vk;
-        vk.CmdBindPipeline(context.Cmd, PipelineBindPoint.Compute, context.Pipelines.ClusterAssign);
-        context.Pipelines.BindSets(context.Cmd, PipelineBindPoint.Compute, context.SceneSet, context.Target.ViewSet);
-        vk.CmdDispatch(context.Cmd, ShaderConstants.ClusterCount, 1, 1);
+        PassRecording.BindCompute(context, context.Pipelines.ClusterAssign);
+        context.Context.Vk.CmdDispatch(context.Cmd, ShaderConstants.ClusterCount, 1, 1);
     }
 }
 
 /// <summary>
 /// Full view, opaque surfaces: forward PBR shading of opaque and alpha-tested draws with the lights of their
-/// cluster, EQUAL depth test against the pre-pass, into the HDR image cleared to the background luminance.
+/// cluster (profile, cookie, soft shadows) and the indirect irradiance, EQUAL depth test against the pre-pass, into
+/// the HDR image cleared to the background luminance.
 /// </summary>
 internal sealed class ForwardOpaquePass : RenderPass
 {
@@ -207,9 +293,9 @@ internal sealed class ForwardOpaquePass : RenderPass
         barriers.Use(context.Target.Hdr, ImageUse.ColorAttachment, discard: true);
         barriers.Use(context.Target.Depth, ImageUse.DepthTestReadOnly);
         PassRecording.DeclareSceneReads(context, barriers);
-        barriers.Use(context.World.LightBuffer, BufferUse.FragmentRead);
-        barriers.Use(context.Target.Clusters, BufferUse.FragmentRead);
-        barriers.Use(context.Target.ClusterLights, BufferUse.FragmentRead);
+        PassRecording.DeclareLightingReads(context, barriers, compute: false);
+        if (context.Target.Indirect is { } indirect)
+            barriers.Use(indirect, ImageUse.SampledFragment);
     }
 
     public override void Execute(PassContext context)
@@ -224,7 +310,7 @@ internal sealed class ForwardOpaquePass : RenderPass
 
 /// <summary>
 /// Full view, blended and transmissive surfaces (and reference drawings) back to front with premultiplied alpha,
-/// depth-tested against the opaque scene without writing depth.
+/// depth-tested against the opaque scene without writing depth, fogged by the medium in front of them.
 /// </summary>
 internal sealed class ForwardTransparentPass : RenderPass
 {
@@ -240,9 +326,9 @@ internal sealed class ForwardTransparentPass : RenderPass
         barriers.Use(context.Target.Hdr, ImageUse.ColorAttachment);
         barriers.Use(context.Target.Depth, ImageUse.DepthTestReadOnly);
         PassRecording.DeclareSceneReads(context, barriers);
-        barriers.Use(context.World.LightBuffer, BufferUse.FragmentRead);
-        barriers.Use(context.Target.Clusters, BufferUse.FragmentRead);
-        barriers.Use(context.Target.ClusterLights, BufferUse.FragmentRead);
+        PassRecording.DeclareLightingReads(context, barriers, compute: false);
+        if (context.Target.FroxelIntegrated is { } volume)
+            barriers.Use(volume, ImageUse.SampledFragment);
     }
 
     public override void Execute(PassContext context)
@@ -342,8 +428,9 @@ internal sealed class WireframePass : RenderPass
 }
 
 /// <summary>
-/// Display transform: the HDR image through the tone mapper (Full: AgX/ACES/Neutral; Colorless/Wireframe:
-/// pass-through) and sRGB encoding into the display image.
+/// Display transform: the HDR image (bilinear upscaling from the internal resolution) mixed with the bloom, through the
+/// tone mapper (Full: AgX/ACES/Neutral; Colorless/Wireframe: pass-through), the lux/noise/cable overlay colouring and
+/// sRGB encoding into the display image.
 /// </summary>
 internal sealed class TonemapPass : RenderPass
 {
@@ -356,19 +443,28 @@ internal sealed class TonemapPass : RenderPass
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {
-        barriers.Use(context.Target.Hdr, ImageUse.SampledFragment);
-        barriers.Use(context.Target.Display, ImageUse.ColorAttachment, discard: true);
-        barriers.Use(context.Target.FrameUniform, BufferUse.UniformRead);
+        var t = context.Target;
+        barriers.Use(t.Hdr, ImageUse.SampledFragment);
+        barriers.Use(t.Display, ImageUse.ColorAttachment, discard: true);
+        barriers.Use(t.FrameUniform, BufferUse.UniformRead);
+        barriers.Use(context.World.InstanceBuffer, BufferUse.ShaderRead);
+        barriers.Use(t.InstanceIds, ImageUse.SampledFragment);
+        if (context.BloomActive)
+            barriers.Use(t.BloomLevel(0), ImageUse.SampledFragment);
+        if (t.Analysis is { } analysis)
+            barriers.Use(analysis, ImageUse.SampledFragment);
+        if (t.GradientLut is { } lut)
+            barriers.Use(lut, ImageUse.SampledFragment);
     }
 
     public override void Execute(PassContext context)
     {
         PassRecording.Begin(context, context.Target.Display, null, null, depthClear: false);
         PassRecording.BindGraphics(context, context.Pipelines.Tonemap);
-        context.Pipelines.Push(context.Cmd, new GpuDrawConstants { Mode = context.ToneMode });
-        var vk = context.Context.Vk;
-        vk.CmdDraw(context.Cmd, 3, 1, 0, 0);
-        vk.CmdEndRendering(context.Cmd);
+        int levels = context.BloomActive ? context.Target.BloomLevels : 1;
+        context.Pipelines.Push(context.Cmd, new GpuDrawConstants { Mode = context.ToneMode, Width = 1f / Math.Max(levels, 1) });
+        PassRecording.DrawFullscreen(context);
+        context.Context.Vk.CmdEndRendering(context.Cmd);
     }
 }
 
@@ -388,22 +484,25 @@ internal sealed class GridPass : RenderPass
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {
         barriers.Use(context.Target.Display, ImageUse.ColorAttachment);
-        barriers.Use(context.Target.Depth, ImageUse.DepthTestReadOnly);
+        barriers.Use(context.OverlayDepth, ImageUse.DepthTestReadOnly);
         barriers.Use(context.Target.FrameUniform, BufferUse.UniformRead);
     }
 
     public override void Execute(PassContext context)
     {
-        PassRecording.Begin(context, context.Target.Display, null, context.Target.Depth, depthClear: false);
+        PassRecording.Begin(context, context.Target.Display, null, context.OverlayDepth, depthClear: false);
         PassRecording.BindGraphics(context, context.Pipelines.Grid);
         var vk = context.Context.Vk;
         vk.CmdSetDepthTestEnable(context.Cmd, context.Shading != ViewShading.Wireframe);
-        vk.CmdDraw(context.Cmd, 3, 1, 0, 0);
+        PassRecording.DrawFullscreen(context);
         vk.CmdEndRendering(context.Cmd);
     }
 }
 
-/// <summary>Line segments of <see cref="IRenderWorld.SetLines"/>: anti-aliased screen-space quads, depth-tested, over the display image.</summary>
+/// <summary>
+/// Line segments of <see cref="IRenderWorld.SetLines"/> and the beam outlines: anti-aliased screen-space quads over the
+/// display image, depth-tested — except in the cable overlay, where the lines are drawn on top of everything.
+/// </summary>
 internal sealed class LinesPass : RenderPass
 {
     public LinesPass()
@@ -411,25 +510,42 @@ internal sealed class LinesPass : RenderPass
     {
     }
 
-    public override bool IsActive(PassContext context) => context.World.LineSegmentCount > 0;
+    public override bool IsActive(PassContext context) => context.World.LineSegmentCount > 0 || context.Target.BeamLines.Count > 0;
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {
         barriers.Use(context.Target.Display, ImageUse.ColorAttachment);
-        barriers.Use(context.Target.Depth, ImageUse.DepthTestReadOnly);
+        barriers.Use(context.OverlayDepth, ImageUse.DepthTestReadOnly);
         barriers.Use(context.Target.FrameUniform, BufferUse.UniformRead);
-        barriers.Use(context.World.LineBuffer, BufferUse.VertexInput);
+        if (context.World.LineSegmentCount > 0)
+            barriers.Use(context.World.LineBuffer, BufferUse.VertexInput);
+        if (context.Target.BeamLines.Count > 0)
+            barriers.Use(context.Target.BeamLines.Buffer, BufferUse.VertexInput);
     }
 
     public override unsafe void Execute(PassContext context)
     {
-        PassRecording.Begin(context, context.Target.Display, null, context.Target.Depth, depthClear: false);
+        PassRecording.Begin(context, context.Target.Display, null, context.OverlayDepth, depthClear: false);
         PassRecording.BindGraphics(context, context.Pipelines.Lines);
         var vk = context.Context.Vk;
-        var buffer = context.World.LineBuffer.Handle;
         ulong offset = 0;
-        vk.CmdBindVertexBuffers(context.Cmd, 0, 1, &buffer, &offset);
-        vk.CmdDraw(context.Cmd, 6, (uint)context.World.LineSegmentCount, 0, 0);
+        int beamSegments = context.Target.BeamLines.Count / 2;
+        if (beamSegments > 0)
+        {
+            vk.CmdSetDepthTestEnable(context.Cmd, true);
+            var beams = context.Target.BeamLines.Buffer.Handle;
+            vk.CmdBindVertexBuffers(context.Cmd, 0, 1, &beams, &offset);
+            vk.CmdDraw(context.Cmd, 6, (uint)beamSegments, 0, 0);
+        }
+
+        if (context.World.LineSegmentCount > 0)
+        {
+            vk.CmdSetDepthTestEnable(context.Cmd, context.Overlay != OverlayMode.Cables);
+            var buffer = context.World.LineBuffer.Handle;
+            vk.CmdBindVertexBuffers(context.Cmd, 0, 1, &buffer, &offset);
+            vk.CmdDraw(context.Cmd, 6, (uint)context.World.LineSegmentCount, 0, 0);
+        }
+
         vk.CmdEndRendering(context.Cmd);
     }
 }

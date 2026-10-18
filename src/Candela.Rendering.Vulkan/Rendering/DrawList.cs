@@ -98,6 +98,9 @@ internal sealed class DrawList
     /// <summary>Instances rejected by frustum culling in the last build.</summary>
     public int CulledInstances { get; private set; }
 
+    /// <summary>Visible instances with <see cref="InstanceFlags.Selected"/> in the last build.</summary>
+    public int SelectedInstances { get; private set; }
+
     /// <summary>Rebuilds the lists.</summary>
     /// <param name="world">The scene.</param>
     /// <param name="frustum">View frustum.</param>
@@ -107,7 +110,7 @@ internal sealed class DrawList
     public void Build(VulkanRenderWorld world, in Frustum frustum, Vector3 cameraPosition, Vector3 forward, bool useMaterials)
     {
         _opaqueCount = _maskedCount = _blendedCount = 0;
-        int visible = 0, culled = 0;
+        int visible = 0, culled = 0, selected = 0;
         foreach (int index in world.LiveInstances)
         {
             var instance = world.InstanceAt(index);
@@ -121,6 +124,8 @@ internal sealed class DrawList
             }
 
             visible++;
+            if ((instance.Flags & InstanceFlags.Selected) != 0)
+                selected++;
             var centre = new Vector3(instance.WorldSphere.X, instance.WorldSphere.Y, instance.WorldSphere.Z);
             float depth = Vector3.Dot(centre - cameraPosition, forward);
             bool reference = (instance.Flags & InstanceFlags.Reference) != 0;
@@ -158,6 +163,7 @@ internal sealed class DrawList
 
         VisibleInstances = visible;
         CulledInstances = culled;
+        SelectedInstances = selected;
         if (_blendedCount > 1)
             _blended.AsSpan(0, _blendedCount).Sort(BackToFront);
     }

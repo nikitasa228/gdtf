@@ -46,29 +46,83 @@ struct Instance
     vec4 boundingSphere;     // world-space centre + radius
 };
 
-// Spot light (96 bytes), packed by LightPacker.cs. The profile parameters are those of
-// Candela.Photometry.BeamDistribution; beamProfile() in photometry.glsl evaluates its Relative(theta).
+// Spot light (224 bytes), packed by LightPacker.cs. The profile parameters are those of
+// Candela.Photometry.BeamDistribution; beamProfile() in photometry.glsl evaluates its Relative(theta). With a prism
+// every facet is a copy of this profile around its own (tilted) axis carrying `intensity` (= peak / facets).
+// Gate coordinates: the direction from the light in the light frame (right, up, direction) projected onto the plane
+// at unit distance and scaled by gateScale, so the field-angle circle (before frost) is the unit circle.
 struct Light
 {
     vec3 position;
-    float maxIntensity;      // largest channel of intensity, cd (sets the range from the exposure)
+    float maxIntensity;      // largest channel of the on-axis intensity of the whole fixture, cd (sets the range)
     vec3 direction;
-    float cosCutoff;         // cos of the angle beyond which the intensity is exactly zero (iris included)
-    vec3 intensity;          // linear Rec.2020 colour (luminance 1) x peak candela
+    float cosCutoff;         // cos of the bounding cone (cut-off, iris and prism spread): zero intensity outside
+    vec3 intensity;          // linear Rec.2020 colour (luminance 1) x peak candela of one prism facet
     float invHalfBeam;       // 1 / half beam angle
     float exponent;          // p of exp(-ln2 (theta/theta_b)^p)
     float halfField;         // half field angle (start of the smoothstep window)
     float invWindow;         // 1 / (cutoff - halfField)
-    float cutoff;            // half-angle with zero intensity beyond
+    float cutoff;            // half-angle with zero intensity beyond (per facet)
     float irisAngle;         // half-angle of the iris aperture (4 rad when open)
     float irisSoftStart;     // the iris edge fades from here to irisAngle
     uint shape;              // SHAPE_*
-    uint flags;              // bit 0: casts shadows (stage 2)
-    vec3 up;                 // gobo/blade orientation (stage 2)
-    float sourceRadius;      // exit lens radius, m (stage 2: soft shadows)
+    uint flags;              // LIGHT_*
+    vec3 up;                 // gobo/blade orientation (perpendicular to direction)
+    float sourceRadius;      // exit lens radius, m (soft shadows)
+    vec3 right;              // cross(direction, up)
+    float gateScale;         // 1 / tan(half field angle before frost)
+    uint goboTexture;        // bindless slot (LIGHT_GOBO)
+    float goboBlur;          // defocus radius as a fraction of the gobo image
+    float edgeSoftness;      // half width of the blade edges in gate units
+    uint prismFacets;        // 0 = no prism
+    vec2 goboRotation;       // cos, sin of the gobo rotation
+    float prismCosSpread;    // cos/sin of the facet tilt
+    float prismSinSpread;
+    float prismRotation;     // azimuth of the first facet, rad
+    float boundingAngle;     // acos(cosCutoff)
+    float solidAngle;        // effective solid angle of one facet's profile, sr (flux = intensity x solidAngle x facets)
+    float pad0;
+    vec4 blades[4];          // A..D: xy = edge normal in gate coordinates, z = offset (blocked where dot(p, xy) > z), w = 1 when inserted
 };
 
-// Per-view constants (uniform block, 592 bytes).
+// Per-view data of a light (16 bytes).
+struct LightView
+{
+    uint shadowSlot;         // shadow atlas tile or NO_SHADOW
+    uint flags;              // LIGHT_VIEW_*
+    uint vplOffset;          // reflective shadow maps: first virtual point light
+    uint vplCount;
+};
+
+// A shadow atlas tile (192 bytes).
+struct ShadowSlot
+{
+    mat4 viewProjection;     // world -> light clip (reverse-Z, infinite far plane: depth = near / z)
+    mat4 inverseViewProjection;
+    vec4 atlasRect;          // atlas uv offset (xy) and size (zw) of the tile
+    vec3 position;
+    float near;
+    vec3 axis;
+    float tanHalfAngle;
+    float texelScale;        // world size of one texel per metre of depth: 2 tan(half angle) / resolution
+    float resolution;
+    float atlasTexel;        // 1 / atlas size
+    uint flags;              // bit 0: reflective shadow map present
+};
+
+// A virtual point light (48 bytes): a surface element lit by a spot light that re-emits its reflected flux
+// diffusely (intensity flux / pi x cos theta, cd).
+struct Vpl
+{
+    vec3 position;
+    float pad0;
+    vec3 normal;
+    float pad1;
+    vec3 flux;
+    float pad2;
+};
+
+// Per-view constants (uniform block, 960 bytes).
 struct FrameData
 {
     mat4 view;
@@ -79,7 +133,7 @@ struct FrameData
     mat4 inverseViewProjection;
     vec4 cameraPosition;     // w = 1 for orthographic
     vec4 cameraForward;      // world-space view direction
-    vec4 renderSize;         // width, height, 1/width, 1/height
+    vec4 renderSize;         // scene images (internal resolution): width, height, 1/width, 1/height
     vec4 background;         // HDR clear colour (pre-exposed in Full, display-linear otherwise)
     vec4 gridColorMinor;     // sRGB-encoded colour + alpha
     vec4 gridColorMajor;
@@ -102,6 +156,35 @@ struct FrameData
     float rangeEpsilon;      // exposed value at which a light's contribution counts as negligible
     uint clusterIndexCapacity;
     vec4 headlight;          // Colorless: unit direction towards the key light (world space)
+    mat4 previousViewProjection; // the target's previous frame (temporal reprojection)
+    vec4 displaySize;        // display image: width, height, 1/width, 1/height
+    vec4 volumeGrid;         // froxel counts x, y, z and 1/z
+    vec4 volumeDepth;        // froxel near, far (view depth, m), slices / log(far / near), log(near)
+    vec4 volumeJitter;       // sub-froxel jitter of this frame (x, y, z in froxel units, -0.5..0.5)
+    vec4 media;              // haze sigma_s (1/m), Henyey-Greenstein g, smoke sigma_s at density 1 (1/m), flame absorption (1/m)
+    vec4 smokeMin;           // world box of the smoke grid
+    vec4 smokeMax;
+    vec4 flameMin;           // world box of the flame temperature grid
+    vec4 flameMax;
+    vec4 noiseMin;           // world box of the noise field
+    vec4 noiseMax;
+    vec4 flameLut;           // blackbody LUT: first temperature (K), entries per kelvin, entries, last temperature
+    vec4 overlayRange;       // overlay gradient: RangeMin, RangeMax, logarithmic (0/1), noise fog strength
+    vec4 overlayOutOfRange;  // colour outside the range (sRGB + alpha)
+    vec4 selectionColor;     // selection outline colour (sRGB + alpha)
+    vec4 pixelFootprint;     // world size of a pixel: x = per metre of view depth (perspective), y = constant (orthographic)
+    float lightRangeScale;   // squared light range = maxIntensity x lightRangeScale
+    uint raymarchCount;      // narrow beams marched at full resolution (raymarchList)
+    uint features;           // FEATURE_*
+    uint overlayMode;        // OVERLAY_*
+    uint vplCount;
+    uint frameIndex;         // frames rendered into this target (temporal jitter)
+    uint noiseSourceCount;
+    float bloomIntensity;
+    float indirectIntensity;
+    float renderScale;       // internal / display resolution
+    uint shadowTileCount;
+    float volumeHistoryWeight; // weight of the reprojected froxel history (0 = none)
 };
 
 layout(set = SET_VIEW, binding = BINDING_FRAME, scalar) uniform FrameBlock
@@ -114,7 +197,7 @@ layout(push_constant, scalar) uniform DrawConstants
 {
     uint instanceIndex;
     uint materialIndex;
-    uint mode;               // DRAW_MODE_* (meshes), TONE_* (tone mapping)
+    uint mode;               // DRAW_MODE_* (meshes), TONE_* (tone mapping), tile (shadows), level (bloom)
     float width;             // line width in pixels
     vec4 color;              // constant colour (wireframe, edges)
 } draw;
@@ -122,6 +205,52 @@ layout(push_constant, scalar) uniform DrawConstants
 bool isOrthographic()
 {
     return (frame.flags & FRAME_ORTHOGRAPHIC) != 0u;
+}
+
+bool hasFeature(uint feature)
+{
+    return (frame.features & feature) != 0u;
+}
+
+// World size of one pixel of the scene images at a view depth (gobo filtering, froxel footprints).
+float pixelWorldSize(float viewDepth)
+{
+    return isOrthographic() ? frame.pixelFootprint.y : frame.pixelFootprint.x * max(viewDepth, 0.0);
+}
+
+// Interleaved gradient noise in [0, 1) (Jimenez 2014): cheap per-pixel dither.
+float interleavedGradientNoise(vec2 p)
+{
+    return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715))));
+}
+
+// Integer hash (PCG-style) mapped to [0, 1).
+float hashToUnit(uint x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352du;
+    x ^= x >> 15;
+    x *= 0x846ca68bu;
+    x ^= x >> 16;
+    return float(x >> 8) * (1.0 / 16777216.0);
+}
+
+// Octahedral encoding of a unit normal into [0, 1]^2 (and back).
+vec2 encodeNormal(vec3 n)
+{
+    n /= abs(n.x) + abs(n.y) + abs(n.z);
+    vec2 e = n.z >= 0.0 ? n.xy : (1.0 - abs(n.yx)) * vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
+    return e * 0.5 + 0.5;
+}
+
+vec3 decodeNormal(vec2 e)
+{
+    e = e * 2.0 - 1.0;
+    vec3 n = vec3(e, 1.0 - abs(e.x) - abs(e.y));
+    float t = clamp(-n.z, 0.0, 1.0);
+    n.x += n.x >= 0.0 ? -t : t;
+    n.y += n.y >= 0.0 ? -t : t;
+    return normalize(n);
 }
 
 #endif

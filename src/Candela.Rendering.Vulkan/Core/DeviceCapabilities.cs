@@ -77,6 +77,12 @@ public sealed record DeviceCapabilities
     /// <summary>Maximum 2D image size.</summary>
     public required uint MaxImageDimension2D { get; init; }
 
+    /// <summary>Maximum 3D image size per axis (at least 256 on every Vulkan device).</summary>
+    public uint MaxImageDimension3D { get; init; } = 256;
+
+    /// <summary>Maximum compute work group count in Y/Z (X is <see cref="MaxComputeWorkGroupCountX"/>).</summary>
+    public uint MaxComputeWorkGroupCountYZ { get; init; } = 65535;
+
     /// <summary>Maximum number of device memory allocations.</summary>
     public required uint MaxMemoryAllocationCount { get; init; }
 

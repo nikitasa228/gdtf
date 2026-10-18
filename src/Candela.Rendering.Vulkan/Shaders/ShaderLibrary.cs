@@ -110,7 +110,7 @@ internal sealed partial class ShaderLibrary
         sb.AppendLine("#ifndef CANDELA_GENERATED_GLSL");
         sb.AppendLine("#define CANDELA_GENERATED_GLSL");
         foreach (var (name, value) in ShaderConstants.Defines)
-            sb.Append("#define ").Append(name).Append(' ').AppendLine(value.ToString(CultureInfo.InvariantCulture));
+            sb.Append("#define ").Append(name).Append(' ').AppendLine(value);
         AppendMatrix(sb, "REC709_TO_REC2020", ColorSpaces.Rec709ToRec2020Matrix);
         AppendMatrix(sb, "REC2020_TO_REC709", ColorSpaces.Rec2020ToRec709Matrix);
         var y = ColorSpaces.Rec2020LuminanceCoefficients;

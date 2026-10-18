@@ -1,0 +1,171 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+#extension GL_EXT_ray_query : require
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference_uvec2 : require
+// Ray-traced one-bounce diffuse GI at reduced resolution (devices with ray query). Every pixel traces RT_RAYS
+// cosine-distributed rays from the surface under it against the TLAS of the scene's instances; at a hit the reflected
+// direct light of the view's shadowed lights (shadow maps give the visibility) and the emission are evaluated:
+//   L_hit = albedo / pi x sum_j E_j(hit) + L_emissive,     E_indirect = pi / N x sum L_hit      [lx]
+// (cosine-weighted estimator); misses see the background luminance. The noisy estimate is blended with the previous
+// frame's result reprojected to this surface (exponential moving average, rejected where the depth disagrees).
+// draw.mode = number of GI lights in raymarchList after the ray-marched beams; draw.width = history weight.
+
+#include "lighting.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image2D outIndirect;
+layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler2D historyIndirect;
+layout(set = SET_PASS, binding = BINDING_PASS_TLAS) uniform accelerationStructureEXT sceneTlas;
+
+// Per instance (8 uints at instance * 8): vertex address (2), index address (2), first sub-mesh entry, sub-mesh
+// count, 2 unused; sub-mesh entries (2 uints): first index, material slot.
+layout(set = SET_PASS, binding = BINDING_PASS_BUFFER, scalar) readonly buffer RtGeometryBuffer
+{
+    uint rtData[];
+};
+
+struct RtVertex
+{
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+    vec4 tangent;
+};
+
+layout(buffer_reference, scalar, buffer_reference_align = 4) readonly buffer RtVertices
+{
+    RtVertex v[];
+};
+
+layout(buffer_reference, scalar, buffer_reference_align = 4) readonly buffer RtIndices
+{
+    uint i[];
+};
+
+const uint RT_RAYS = 2u;
+const float RT_MAX_DISTANCE = 100.0;
+
+vec3 cosineDirection(vec3 N, float u1, float u2)
+{
+    float r = sqrt(u1);
+    float phi = 2.0 * PI * u2;
+    vec3 T = abs(N.z) < 0.999 ? normalize(cross(N, vec3(0.0, 0.0, 1.0))) : normalize(cross(N, vec3(1.0, 0.0, 0.0)));
+    vec3 B = cross(N, T);
+    return normalize(T * (r * cos(phi)) + B * (r * sin(phi)) + N * sqrt(max(1.0 - u1, 0.0)));
+}
+
+// Reflected + emitted luminance (cd/m2, Rec.2020) at a ray hit.
+vec3 shadeHit(uint instance, uint geometry, uint primitive, vec2 bary, vec3 rayDir, uint giLights)
+{
+    uint header = instance * 8u;
+    uvec2 vaddr = uvec2(rtData[header], rtData[header + 1u]);
+    uvec2 iaddr = uvec2(rtData[header + 2u], rtData[header + 3u]);
+    uint subMesh = rtData[header + 4u] + 2u * geometry;
+    uint firstIndex = rtData[subMesh];
+    uint slot = rtData[subMesh + 1u];
+    RtIndices indices = RtIndices(iaddr);
+    RtVertices vertices = RtVertices(vaddr);
+    uint i0 = indices.i[firstIndex + 3u * primitive];
+    uint i1 = indices.i[firstIndex + 3u * primitive + 1u];
+    uint i2 = indices.i[firstIndex + 3u * primitive + 2u];
+    RtVertex a = vertices.v[i0];
+    RtVertex b = vertices.v[i1];
+    RtVertex c = vertices.v[i2];
+    vec3 w = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
+    Instance inst = instances[instance];
+    vec3 P = (inst.world * vec4(a.position * w.x + b.position * w.y + c.position * w.z, 1.0)).xyz;
+    vec3 N = normalize(mat3(inst.normalMatrix) * (a.normal * w.x + b.normal * w.y + c.normal * w.z));
+    if (dot(N, rayDir) > 0.0)
+        N = -N;
+    vec2 uv = a.uv * w.x + b.uv * w.y + c.uv * w.z;
+    Material m = materials[slot < inst.materialSlotCount ? materialSlots[inst.materialSlotOffset + slot] : 0u];
+    vec3 albedo = m.baseColor.rgb;
+    if ((m.flags & MATERIAL_BASE_COLOR_TEXTURE) != 0u)
+        albedo = rec709ToRec2020(textureLod(textures[nonuniformEXT(m.baseColorTexture)], uv * m.uvScale, 0.0).rgb * m.baseColorFactor709.rgb);
+    albedo *= 1.0 - clamp(m.metallic, 0.0, 1.0);
+
+    vec3 E = vec3(0.0);
+    for (uint j = 0u; j < giLights; ++j)
+    {
+        uint index = raymarchList[frame.raymarchCount + j];
+        Light light = lights[index];
+        vec3 L;
+        float d2;
+        vec3 I = lightIntensityToward(light, P, 0.0, L, d2);
+        float cosI = dot(N, L);
+        if (cosI <= 0.0 || I.r + I.g + I.b <= 0.0)
+            continue;
+        E += I * (cosI * shadowHard(lightViews[index].shadowSlot, P, N) / d2);
+    }
+
+    return albedo * INV_PI * E + m.emissive;
+}
+
+void main()
+{
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outIndirect);
+    if (any(greaterThanEqual(p, size)))
+        return;
+    vec2 uv = (vec2(p) + 0.5) / vec2(size);
+    ivec2 full = min(ivec2(uv * frame.renderSize.xy), ivec2(frame.renderSize.xy) - 1);
+    float d = texelFetch(sceneDepth, full, 0).r;
+    if (d <= 0.0)
+    {
+        imageStore(outIndirect, p, vec4(0.0, 0.0, 0.0, frame.volumeDepth.y));
+        return;
+    }
+
+    vec2 centre = (vec2(full) + 0.5) * frame.renderSize.zw;
+    vec3 P = worldFromDepth(centre, d);
+    vec3 N = decodeNormal(texelFetch(sceneNormals, full, 0).rg);
+    float viewDepth = viewDepthOf(P);
+    vec3 origin = P + N * max(1e-3, 1e-4 * viewDepth);
+    vec3 sky = frame.background.rgb / max(frame.exposure, 1e-30);
+    uint seed = uint(p.x) * 73856093u ^ uint(p.y) * 19349663u ^ frame.frameIndex * 83492791u;
+    vec3 sum = vec3(0.0);
+    for (uint r = 0u; r < RT_RAYS; ++r)
+    {
+        vec3 dir = cosineDirection(N, hashToUnit(seed + 2u * r), hashToUnit(seed ^ (0x68bc21ebu + 2u * r + 1u)));
+        rayQueryEXT query;
+        rayQueryInitializeEXT(query, sceneTlas, gl_RayFlagsOpaqueEXT, 0xFFu, origin, 0.0, dir, RT_MAX_DISTANCE);
+        while (rayQueryProceedEXT(query))
+        {
+        }
+
+        if (rayQueryGetIntersectionTypeEXT(query, true) == gl_RayQueryCommittedIntersectionTriangleEXT)
+        {
+            uint instance = uint(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+            uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(query, true));
+            uint primitive = uint(rayQueryGetIntersectionPrimitiveIndexEXT(query, true));
+            vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+            sum += shadeHit(instance, geometry, primitive, bary, dir, draw.mode);
+        }
+        else
+        {
+            sum += sky;
+        }
+    }
+
+    vec3 E = PI * sum / float(RT_RAYS);
+    float historyWeight = draw.width;
+    if (historyWeight > 0.0)
+    {
+        vec4 clip = frame.previousViewProjection * vec4(P, 1.0);
+        if (clip.w > 1e-6)
+        {
+            vec2 prevUv = clip.xy / clip.w * 0.5 + 0.5;
+            float prevDepth = isOrthographic() ? viewDepth : clip.w;
+            if (all(greaterThanEqual(prevUv, vec2(0.0))) && all(lessThanEqual(prevUv, vec2(1.0))))
+            {
+                vec4 h = textureLod(historyIndirect, prevUv, 0.0);
+                if (abs(h.a - prevDepth) < 0.05 * prevDepth && all(equal(h, h)))
+                    E = mix(E, h.rgb, historyWeight);
+            }
+        }
+    }
+
+    imageStore(outIndirect, p, vec4(E, viewDepth));
+}

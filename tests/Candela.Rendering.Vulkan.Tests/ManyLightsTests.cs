@@ -38,7 +38,7 @@ public sealed class ManyLightsTests
                     var color = LightColor.FromRec709(new Vector3(0.1f + random.NextSingle(), 0.1f + random.NextSingle(), 0.1f + random.NextSingle()));
                     float beam = 12f + 12f * random.NextSingle();
                     lights[i] = ProceduralTestScene.Spot(position, aim, color, 2000f + 6000f * random.NextSingle(), beam, beam * 1.5f);
-                    profiles[i] = BeamDistribution.Create(LightPacker.DefaultBeamType, lights[i].BeamAngle, lights[i].FieldAngle);
+                    profiles[i] = BeamDistribution.Create(lights[i].BeamType, lights[i].BeamAngle, lights[i].FieldAngle);
                 }
             }
 

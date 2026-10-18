@@ -1,0 +1,134 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Reflective shadow maps, step 1: virtual point lights. One work group per light with a reflective shadow map in this
+// view (raymarchList[raymarchCount + group]). The light's shadow tile is divided into 16 x 16 cells; each thread
+// estimates the flux its cell reflects from 4 x 4 stratified texels,
+//   flux(texel) = I(omega) x cookie x albedo x Omega_texel,   Omega_texel = (2 tan(a) / res)^2 x cos^3(theta)
+// (I = the light's current intensity, so the cached tile stays valid when dimmer, colour or cookie change). A prefix
+// sum turns the cell estimates into a CDF; VPL k picks a cell with the stratified number (k + 0.5) / count and a
+// texel inside it (hashed, fixed per k so the result is stable), and carries flux(texel) / (count x pdf) so the VPL
+// set is an unbiased estimate of the light reflected by everything the light sees (importance sampling by
+// reflected flux). VPLs are written to vpls[vplOffset + k].
+
+#define VPLS_WRITABLE
+#include "lighting.glsl"
+
+layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+
+const uint CELLS = 16u;
+const uint SAMPLES_PER_AXIS = 4u;
+
+shared float sCdf[256];
+shared float sTotal;
+
+// Flux (lm per Rec.2020 channel) reflected by the shadow-tile texel at integer tile coordinates tc, with its
+// world position and normal. Zero where the tile saw nothing.
+vec3 texelFlux(Light light, ShadowSlot s, ivec2 tc, out vec3 P, out vec3 N)
+{
+    P = vec3(0.0);
+    N = vec3(0.0, 0.0, 1.0);
+    vec2 tileUv = (vec2(tc) + 0.5) / s.resolution;
+    vec2 atlasUv = s.atlasRect.xy + tileUv * s.atlasRect.zw;
+    float d = textureLod(shadowDepth, atlasUv, 0.0).r;
+    if (d <= 0.0)
+        return vec3(0.0);
+    vec4 h = s.inverseViewProjection * vec4(tileUv * 2.0 - 1.0, d, 1.0);
+    P = h.xyz / h.w;
+    vec3 albedo = textureLod(rsmAlbedo, atlasUv, 0.0).rgb;
+    N = decodeNormal(textureLod(rsmNormal, atlasUv, 0.0).rg);
+    vec3 toP = P - light.position;
+    float dist = length(toP);
+    if (dist <= 1e-4)
+        return vec3(0.0);
+    vec3 omega = toP / dist;
+    float cosAxis = dot(omega, s.axis);
+    if (cosAxis <= 0.0 || dot(omega, light.direction) < light.cosCutoff)
+        return vec3(0.0);
+    float texelSize = 2.0 * s.tanHalfAngle / s.resolution;
+    float solidAngle = texelSize * texelSize * cosAxis * cosAxis * cosAxis;
+    vec3 I = light.intensity * lightCookieProfile(light, omega, 0.0);
+    return I * albedo * solidAngle;
+}
+
+void main()
+{
+    uint tid = gl_LocalInvocationIndex;
+    uint lightIndex = raymarchList[frame.raymarchCount + gl_WorkGroupID.x];
+    LightView view = lightViews[lightIndex];
+    Light light = lights[lightIndex];
+    ShadowSlot s = shadowSlots[view.shadowSlot];
+    int res = int(s.resolution);
+    int cellSize = max(res / int(CELLS), 1);
+
+    // Cell flux estimate (luminance), scaled to the whole cell.
+    ivec2 cell = ivec2(tid % CELLS, tid / CELLS);
+    float estimate = 0.0;
+    for (uint j = 0u; j < SAMPLES_PER_AXIS; ++j)
+    {
+        for (uint i = 0u; i < SAMPLES_PER_AXIS; ++i)
+        {
+            ivec2 tc = cell * cellSize + ivec2((vec2(i, j) + 0.5) * float(cellSize) / float(SAMPLES_PER_AXIS));
+            vec3 P, N;
+            estimate += luminanceRec2020(texelFlux(light, s, min(tc, ivec2(res - 1)), P, N));
+        }
+    }
+
+    estimate *= float(cellSize * cellSize) / float(SAMPLES_PER_AXIS * SAMPLES_PER_AXIS);
+    sCdf[tid] = estimate;
+    barrier();
+    if (tid == 0u)
+    {
+        float running = 0.0;
+        for (uint c = 0u; c < 256u; ++c)
+        {
+            running += sCdf[c];
+            sCdf[c] = running;
+        }
+
+        sTotal = running;
+    }
+
+    barrier();
+    float total = sTotal;
+    uint count = view.vplCount;
+    for (uint k = tid; k < count; k += 256u)
+    {
+        Vpl vpl;
+        vpl.position = vec3(0.0);
+        vpl.normal = vec3(0.0, 0.0, 1.0);
+        vpl.flux = vec3(0.0);
+        vpl.pad0 = 0.0;
+        vpl.pad1 = 0.0;
+        vpl.pad2 = 0.0;
+        if (total > 0.0)
+        {
+            float u = (float(k) + 0.5) / float(count) * total;
+            uint lo = 0u;
+            uint hi = 255u;
+            while (lo < hi)
+            {
+                uint mid = (lo + hi) / 2u;
+                if (sCdf[mid] < u)
+                    lo = mid + 1u;
+                else
+                    hi = mid;
+            }
+
+            float cellWeight = sCdf[lo] - (lo > 0u ? sCdf[lo - 1u] : 0.0);
+            ivec2 c = ivec2(lo % CELLS, lo / CELLS);
+            uint seed = k * 2654435761u + lightIndex * 40503u;
+            ivec2 offset = ivec2(vec2(hashToUnit(seed), hashToUnit(seed ^ 0x9e3779b9u)) * float(cellSize));
+            vec3 P, N;
+            vec3 flux = texelFlux(light, s, min(c * cellSize + offset, ivec2(res - 1)), P, N);
+            float pdf = cellWeight / total / float(cellSize * cellSize);
+            if (cellWeight > 0.0)
+            {
+                vpl.position = P + N * 0.01;
+                vpl.normal = N;
+                vpl.flux = flux / (float(count) * pdf);
+            }
+        }
+
+        vpls[view.vplOffset + k] = vpl;
+    }
+}

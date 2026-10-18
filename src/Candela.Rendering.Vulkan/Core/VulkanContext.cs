@@ -790,6 +790,8 @@ public sealed unsafe class VulkanContext : IDisposable
             NonCoherentAtomSize = limits.NonCoherentAtomSize,
             OptimalBufferCopyOffsetAlignment = limits.OptimalBufferCopyOffsetAlignment,
             MaxImageDimension2D = limits.MaxImageDimension2D,
+            MaxImageDimension3D = limits.MaxImageDimension3D,
+            MaxComputeWorkGroupCountYZ = Math.Min(limits.MaxComputeWorkGroupCount[1], limits.MaxComputeWorkGroupCount[2]),
             MaxMemoryAllocationCount = limits.MaxMemoryAllocationCount,
             MaxComputeWorkGroupCountX = limits.MaxComputeWorkGroupCount[0],
             MaxLineWidth = limits.LineWidthRange[1],
