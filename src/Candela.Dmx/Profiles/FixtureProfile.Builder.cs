@@ -257,6 +257,17 @@ public sealed partial class FixtureProfile
         {
             string attribute = string.IsNullOrEmpty(src.AttributeName) ? "NoFeature" : src.AttributeName;
             var cls = Classify(attribute);
+            if (cls.Kind == AttributeKind.Dimmer && ch.Class.Kind != AttributeKind.Dimmer && !string.IsNullOrEmpty(ch.Attribute))
+            {
+                // a Dimmer function on a channel of another attribute (control/function channels, background dimmers, a
+                // hue channel whose function carries the wrong attribute) must not dim the beam; a colour-system channel
+                // keeps its own meaning
+                cls = ch.Class.Kind is AttributeKind.HsbHue or AttributeKind.HsbSaturation or AttributeKind.HsbBrightness or AttributeKind.CieX
+                    or AttributeKind.CieY or AttributeKind.CieBrightness
+                    ? ch.Class
+                    : AttributeClass.Ignored;
+                Warnings.Add($"{src.FullName}: Dimmer function on a '{ch.Attribute}' channel read as {(cls.Kind == AttributeKind.Ignored ? "no intensity" : ch.Attribute)}.");
+            }
             float physicalFrom = Finite(src.PhysicalFrom, 0f), physicalTo = Finite(src.PhysicalTo, 1f);
             // GDTF's default physical range 0 … 1 is a placeholder unless channel sets carry the real values
             bool defaultRange = IsDefaultRange(physicalFrom, physicalTo);
@@ -979,18 +990,7 @@ public sealed partial class FixtureProfile
                 }
             }
 
-            // relation masters already applied through their followers are excluded from those beams' dimmer product
-            var excluded = new List<int>?[Beams.Count];
-            foreach (var r in Relations)
-            {
-                if (r.Type != RelationType.Multiply) continue;
-                int f0 = _beamFirst[r.Follower], fc = _beamCount[r.Follower];
-                for (int b = f0; b < f0 + fc; b++)
-                {
-                    var list = excluded[b] ??= new List<int>();
-                    if (!list.Contains(r.Master)) list.Add(r.Master);
-                }
-            }
+            var excluded = ExcludedRelationMasters();
 
             var own = new List<int>?[Beams.Count];
             var shared = new List<int>();
@@ -1041,6 +1041,95 @@ public sealed partial class FixtureProfile
                     beam.SourceKelvin = 6000f;
                 }
             }
+        }
+
+        /// <summary>
+        /// Per beam: the Multiply relation masters that reach the beam through their followers and therefore must not
+        /// scale it a second time as a beam dimmer. A colour master (a head colour scaling its pixels' colour) is
+        /// excluded wherever its followers are. A dimmer master is excluded only where it scales all of the beam's light:
+        /// when a dimmer that follows it (directly or along a chain) is applied to the beam, or when every colour channel
+        /// of the beam follows it. Otherwise — e.g. a master dimmer whose relations reach only virtual head colours while
+        /// addressed pixel colours light the beam (Cyclops CPX-412OB II, BeamZ StarColor 540) — it dims the beam directly.
+        /// </summary>
+        private List<int>?[] ExcludedRelationMasters()
+        {
+            var excluded = new List<int>?[Beams.Count];
+            var followersOf = new Dictionary<int, List<int>>();
+            foreach (var r in Relations)
+            {
+                if (r.Type != RelationType.Multiply) continue;
+                if (!followersOf.TryGetValue(r.Master, out var list)) followersOf[r.Master] = list = new List<int>();
+                if (!list.Contains(r.Follower)) list.Add(r.Follower);
+            }
+            if (followersOf.Count == 0) return excluded;
+
+            // the channels covering each beam, and which of them carry colour
+            var beamChannels = new List<int>[Beams.Count];
+            for (int b = 0; b < Beams.Count; b++) beamChannels[b] = new List<int>();
+            var isColor = new bool[Channels.Count];
+            foreach (var ch in Channels)
+            {
+                int first = _beamFirst[ch.Index], count = _beamCount[ch.Index];
+                for (int b = first; b < first + count; b++) beamChannels[b].Add(ch.Index);
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                    if (Functions[k].Class.Kind is AttributeKind.ColorAdd or AttributeKind.ColorRgb or AttributeKind.HsbBrightness or AttributeKind.CieBrightness)
+                        isColor[ch.Index] = true;
+            }
+
+            // masters with their followers first (chains: the pixel dimmer is decided before the grand master above it)
+            var rank = new Dictionary<int, int>();
+            for (int i = 0; i < FollowerOrder.Length; i++) rank[FollowerOrder[i]] = i;
+            var masters = followersOf.Keys.OrderByDescending(m => rank.TryGetValue(m, out int r) ? r : -1).ThenBy(m => m).ToList();
+            var isExcluded = new HashSet<(int Master, int Beam)>();
+            foreach (int m in masters)
+            {
+                var reach = Reach(m, followersOf);
+                var beams = new SortedSet<int>();
+                foreach (int f in followersOf[m])
+                    for (int b = _beamFirst[f]; b < _beamFirst[f] + _beamCount[f]; b++) beams.Add(b);
+                bool dimmer = IsIntensityMaster(Channels[m]);
+                foreach (int b in beams)
+                {
+                    bool exclude = !dimmer || ScalesWholeBeam(m, b, reach, beamChannels[b], isColor, isExcluded);
+                    if (!exclude) continue;
+                    isExcluded.Add((m, b));
+                    var list = excluded[b] ??= new List<int>();
+                    if (!list.Contains(m)) list.Add(m);
+                }
+            }
+            return excluded;
+        }
+
+        /// <summary>True when dimmer master <paramref name="m"/> already scales all of beam <paramref name="b"/>'s light through its followers.</summary>
+        private bool ScalesWholeBeam(int m, int b, HashSet<int> reach, List<int> channels, bool[] isColor, HashSet<(int, int)> isExcluded)
+        {
+            int colors = 0;
+            bool allColorsFollow = true;
+            foreach (int c in channels)
+            {
+                if (c == m) continue;
+                if (reach.Contains(c) && IsIntensityMaster(Channels[c]) && !isExcluded.Contains((c, b))) return true;
+                if (!isColor[c]) continue;
+                colors++;
+                allColorsFollow &= reach.Contains(c);
+            }
+            return colors > 0 && allColorsFollow;
+        }
+
+        /// <summary>Every channel that follows <paramref name="master"/> through Multiply relations, directly or along a chain.</summary>
+        private static HashSet<int> Reach(int master, Dictionary<int, List<int>> followersOf)
+        {
+            var reach = new HashSet<int>();
+            var stack = new Stack<int>();
+            stack.Push(master);
+            while (stack.Count > 0)
+            {
+                int c = stack.Pop();
+                if (!followersOf.TryGetValue(c, out var list)) continue;
+                foreach (int f in list)
+                    if (f != master && reach.Add(f)) stack.Push(f);
+            }
+            return reach;
         }
 
         private static int LowerBound(int[] sorted, int value)
