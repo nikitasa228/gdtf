@@ -133,7 +133,7 @@ public sealed class GdtfModelLoader
 
     private LoadedModel? LoadUncached(GdtfModel model)
     {
-        string path = $"Models/{model.Name}";
+        string path = ReadContext.ChildPath("Models", model.Name);
         if (model.File is null)
             return model.PrimitiveType == GdtfPrimitiveType.Undefined ? null : Primitive(model, ModelSourceKind.Primitive);
 

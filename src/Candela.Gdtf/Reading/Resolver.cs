@@ -76,7 +76,7 @@ internal static class Resolver
 
         foreach (var a in defs.Attributes)
         {
-            string path = $"Attributes/{a.Name}";
+            string path = ReadContext.ChildPath("Attributes", a.Name);
             if (a.ActivationGroupName is not null)
             {
                 a.ActivationGroup = groups.Find(a.ActivationGroupName);
@@ -173,7 +173,7 @@ internal static class Resolver
 
         foreach (var g in ft.AllGeometries())
         {
-            string path = $"Geometries/{g.Name}";
+            string path = ReadContext.ChildPath("Geometries", g.Name);
             if (g.ModelName is not null)
             {
                 g.Model = models.Find(g.ModelName);
@@ -261,7 +261,7 @@ internal static class Resolver
     private static void ResolveMode(ReadContext ctx, DmxMode mode, GeometryIndex index)
     {
         var ft = ctx.FixtureType;
-        string modePath = $"DMXModes/{mode.Name}";
+        string modePath = ReadContext.ChildPath("DMXModes", mode.Name);
 
         // Root geometry.
         if (mode.GeometryName is not null)
@@ -296,7 +296,7 @@ internal static class Resolver
 
         foreach (var ch in mode.Channels)
         {
-            string path = $"{modePath}/{ch.Name}";
+            string path = ReadContext.ChildPath(modePath, ch.Name);
             if (ch.GeometryName is not null)
             {
                 ch.Geometry = PickGeometry(index.Find(ch.GeometryName), mode.Geometry);
@@ -323,7 +323,7 @@ internal static class Resolver
         // Node references between channels and functions (need every channel's name and resolution first).
         foreach (var ch in mode.Channels)
         {
-            string path = $"{modePath}/{ch.Name}";
+            string path = ReadContext.ChildPath(modePath, ch.Name);
             if (ch.InitialFunctionName is not null)
             {
                 ch.InitialFunction = FindOwnFunction(ch, ch.InitialFunctionName);
@@ -361,7 +361,7 @@ internal static class Resolver
 
         foreach (var rel in mode.Relations)
         {
-            string path = $"{modePath}/Relations/{rel.Name}";
+            string path = ReadContext.ChildPath(modePath + "/Relations", rel.Name);
             if (rel.MasterName is not null)
             {
                 rel.Master = FindChannelOrFunction(mode, rel.MasterName).Channel;
@@ -376,7 +376,7 @@ internal static class Resolver
 
         foreach (var macro in mode.Macros)
         {
-            string path = $"{modePath}/FTMacros/{macro.Name}";
+            string path = ReadContext.ChildPath(modePath + "/FTMacros", macro.Name);
             if (macro.ChannelFunctionName is not null)
             {
                 macro.ChannelFunction = FindChannelOrFunction(mode, macro.ChannelFunctionName).Function;

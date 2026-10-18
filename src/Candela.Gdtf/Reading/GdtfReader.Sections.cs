@@ -96,7 +96,7 @@ public static partial class GdtfReader
         foreach (var ae in e.Elements(X.Attributes).Elements(X.Attribute))
         {
             string name = ReadContext.Text(ae, X.Name);
-            string path = $"Attributes/{name}";
+            string path = ReadContext.ChildPath("Attributes", name);
             var a = new GdtfAttribute
             {
                 Name = name,
@@ -129,7 +129,7 @@ public static partial class GdtfReader
         foreach (var we in e.Elements(X.Wheel))
         {
             var wheel = new Wheel { Name = ReadContext.Text(we, X.Name) };
-            string path = $"Wheels/{wheel.Name}";
+            string path = ReadContext.ChildPath("Wheels", wheel.Name);
             int index = 0;
             foreach (var se in we.Elements(X.Slot))
             {
@@ -232,7 +232,7 @@ public static partial class GdtfReader
                     foreach (var de in child.Elements(X.DmxProfile))
                     {
                         var prof = new DmxProfile { Name = ReadContext.Text(de, X.Name) };
-                        string path = $"DMXProfiles/{prof.Name}";
+                        string path = ReadContext.ChildPath("DMXProfiles", prof.Name);
                         foreach (var pe in de.Elements(X.Point))
                         {
                             prof.Points.Add(new DmxProfilePoint(
@@ -296,7 +296,7 @@ public static partial class GdtfReader
     private static ColorSpace ParseColorSpace(ReadContext ctx, XElement e)
     {
         string name = ReadContext.NonEmpty(e, X.Name) ?? ColorSpace.DefaultName;
-        string path = $"ColorSpace/{name}";
+        string path = ReadContext.ChildPath("ColorSpace", name);
         var mode = ctx.Enum(e, X.Mode, ColorSpaceModes, ColorSpaceMode.Srgb, path);
         var cs = ColorSpace.Create(mode, name);
         if (mode != ColorSpaceMode.Custom) return cs;
@@ -365,7 +365,7 @@ public static partial class GdtfReader
         foreach (var me in e.Elements(X.Model))
         {
             string name = ReadContext.Text(me, X.Name);
-            string path = $"Models/{name}";
+            string path = ReadContext.ChildPath("Models", name);
             var m = new GdtfModel
             {
                 Name = name,
@@ -448,9 +448,9 @@ public static partial class GdtfReader
             {
                 int brk = ctx.Int(child, X.DmxBreak, 1, path);
                 int offset = ctx.DmxAddress(child, X.DmxOffset, 1, path);
-                if (offset < 1)
+                if (offset is < 1 or > DmxLayout.MaxSlotOffset)
                 {
-                    ctx.Warn(path, $"Break DMXOffset {offset} is not a DMX address; 1 used.");
+                    ctx.Warn(path, $"Break DMXOffset {offset} is not a DMX address (1 … {DmxLayout.MaxSlotOffset}); 1 used.");
                     offset = 1;
                 }
                 gr.Breaks.Add(new GeometryBreak(brk, offset));

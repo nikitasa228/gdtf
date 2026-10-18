@@ -19,7 +19,7 @@ public static partial class GdtfReader
                 Description = ReadContext.Text(me, X.Description),
                 GeometryName = ReadContext.NonEmpty(me, X.Geometry),
             };
-            string path = $"DMXModes/{mode.Name}";
+            string path = ReadContext.ChildPath("DMXModes", mode.Name);
             foreach (var child in me.Elements())
             {
                 switch (child.Name.LocalName)
@@ -69,7 +69,7 @@ public static partial class GdtfReader
             GeometryName = ReadContext.NonEmpty(ce, X.Geometry),
             InitialFunctionName = ReadContext.NonEmpty(ce, X.InitialFunction),
         };
-        string path = $"{modePath}/DMXChannel {ch.GeometryName}";
+        string path = ReadContext.ChildPath(modePath, $"DMXChannel {ReadContext.Shorten(ch.GeometryName ?? "")}");
 
         var brk = ReadContext.Str(ce, X.DmxBreak)?.Trim();
         if (string.Equals(brk, "Overwrite", StringComparison.OrdinalIgnoreCase)) ch.BreakIsOverwrite = true;
@@ -119,8 +119,8 @@ public static partial class GdtfReader
             var part = (comma < 0 ? s : s[..comma]).Trim();
             s = comma < 0 ? ReadOnlySpan<char>.Empty : s[(comma + 1)..];
             if (part.IsEmpty) continue;
-            if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out int o) && o >= 1) list.Add(o);
-            else ctx.Warn(path, $"Offset part \"{part.ToString()}\" is not a DMX address; dropped.");
+            if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out int o) && o is >= 1 and <= DmxLayout.MaxSlotOffset) list.Add(o);
+            else ctx.Warn(path, $"Offset part \"{ReadContext.Shorten(part.ToString())}\" is not a DMX address (1 … {DmxLayout.MaxSlotOffset}); dropped.");
         }
         if (list.Count > DmxValue.MaxByteCount)
         {

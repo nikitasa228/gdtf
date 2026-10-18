@@ -190,6 +190,18 @@ public sealed class FixtureGeometryBuilder
     /// <summary>Maximum number of parts of one fixture (guards against reference explosions in broken files).</summary>
     public const int MaxParts = 200_000;
 
+    /// <summary>
+    /// Longest <see cref="FixturePart.Path"/> (characters). A part whose path would be longer gets the path
+    /// <c>…#{index}</c> instead, so hostile names cannot make path memory grow with depth × name length.
+    /// </summary>
+    public const int MaxPathLength = 4096;
+
+    /// <summary>
+    /// Most expansion steps (parts, references, refused references) of one build: bounds the work for files whose
+    /// references are refused over and over, which <see cref="MaxParts"/> alone does not.
+    /// </summary>
+    private const long MaxSteps = 4L * MaxParts;
+
     private readonly FixtureType _fixtureType;
     private readonly Func<GdtfModel, LoadedModel?>? _models;
 
@@ -236,8 +248,17 @@ public sealed class FixtureGeometryBuilder
         // references, which recursion could not survive on small thread stacks.
         var stack = new Stack<Work>();
         stack.Push(new Work(root, root.Name, root.Position, root.Model, -1, "", Array.Empty<GeometryReference>(), null, null));
+        int refused = 0;
+        long steps = 0;
         while (stack.Count > 0)
         {
+            if (++steps > MaxSteps)
+            {
+                // Only references that are refused over and over (a geometry referencing itself thousands of times,
+                // instanced thousands of times) get here: the parts built so far are kept.
+                warnings.Add(new GdtfWarning(root.Name, $"The geometry tree takes more than {MaxSteps} steps to expand; the rest is omitted."));
+                break;
+            }
             var w = stack.Pop();
             if (w.Leave is { } finished)
             {
@@ -250,7 +271,8 @@ public sealed class FixtureGeometryBuilder
                 var template = r.ReferencedGeometry!;
                 if (w.Chain.Length + 1 > MaxReferenceDepth || active.Contains(template))
                 {
-                    warnings.Add(new GdtfWarning(w.ParentPath, $"Reference '{r.Name}' to '{template.Name}' is recursive or nested too deeply; not expanded."));
+                    if (refused++ == 0)
+                        warnings.Add(new GdtfWarning(w.ParentPath, $"Reference '{r.Name}' to '{template.Name}' is recursive or nested too deeply; not expanded."));
                     continue;
                 }
                 var next = new GeometryReference[w.Chain.Length + 1];
@@ -268,8 +290,11 @@ public sealed class FixtureGeometryBuilder
             }
 
             var g = w.Geometry!;
-            string path = w.ParentPath.Length == 0 ? w.Name : $"{w.ParentPath}/{w.Name}";
             int index = parts.Count;
+            // Only absurdly long names exceed the limit (real paths stay below 300 characters): an indexed path keeps every
+            // part addressable without making the memory for paths grow with depth × name length.
+            string path = w.ParentPath.Length + 1 + w.Name.Length > MaxPathLength ? $"…#{index}"
+                : w.ParentPath.Length == 0 ? w.Name : $"{w.ParentPath}/{w.Name}";
             parts.Add(new FixturePart(index, w.Name, path, w.Parent, w.Local, g, w.Chain, w.InstancedBy, w.Model,
                 w.Model is null ? null : _models?.Invoke(w.Model)));
             keys.TryAdd(new FixtureGeometry.PartKey(g, w.Chain), index);
@@ -288,6 +313,8 @@ public sealed class FixtureGeometryBuilder
                 }
             }
         }
+        if (refused > 1)
+            warnings.Add(new GdtfWarning(root.Name, $"{refused} recursive or too deeply nested references were not expanded in all."));
         return new FixtureGeometry(root, mode, parts, keys, warnings);
     }
 
