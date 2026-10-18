@@ -227,6 +227,7 @@ internal enum Str
     SettingsAutosave,
     SettingsAutosaveOff,
     SettingsMaxRecent,
+    SettingsFileLocation,
     SettingsGpu,
     SettingsGpuPreferred,
     SettingsGpuAutomatic,

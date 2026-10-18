@@ -158,9 +158,14 @@ internal sealed class MessageBoxes
 internal sealed class AboutWindow
 {
     private readonly WorkspaceContext _ctx;
+    private readonly KeyBindingDispatcher _dispatcher;
 
     /// <summary>Creates the window.</summary>
-    public AboutWindow(WorkspaceContext context) => _ctx = context ?? throw new ArgumentNullException(nameof(context));
+    public AboutWindow(WorkspaceContext context, KeyBindingDispatcher dispatcher)
+    {
+        _ctx = context ?? throw new ArgumentNullException(nameof(context));
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+    }
 
     /// <summary>Whether it is shown.</summary>
     public bool IsOpen { get; set; }
@@ -195,6 +200,8 @@ internal sealed class AboutWindow
             ImGui.TextUnformatted($"Dear ImGui {ImGui.GetVersionS()} · .NET {Environment.Version}");
             ImGui.Separator();
             ImGui.TextDisabled(Loc.Get(Str.AboutLicenses));
+            if (WindowKeys.CloseRequested(_dispatcher))
+                open = false;
         }
 
         ImGui.End();
@@ -208,13 +215,15 @@ internal sealed class ShortcutsWindow
 {
     private readonly CommandRegistry _commands;
     private readonly KeyBindingsService _keys;
+    private readonly KeyBindingDispatcher _dispatcher;
     private string _filter = "";
 
     /// <summary>Creates the window.</summary>
-    public ShortcutsWindow(CommandRegistry commands, KeyBindingsService keys)
+    public ShortcutsWindow(CommandRegistry commands, KeyBindingsService keys, KeyBindingDispatcher dispatcher)
     {
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _keys = keys ?? throw new ArgumentNullException(nameof(keys));
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
     }
 
     /// <summary>Whether it is shown.</summary>
@@ -247,6 +256,9 @@ internal sealed class ShortcutsWindow
 
                 ImGui.EndTable();
             }
+
+            if (WindowKeys.CloseRequested(_dispatcher))
+                open = false;
         }
 
         ImGui.End();

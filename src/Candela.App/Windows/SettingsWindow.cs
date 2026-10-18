@@ -145,11 +145,16 @@ internal sealed class SettingsWindow
             }
 
             ImGui.EndChild();
+            if (WindowKeys.CloseRequested(_dispatcher))
+                open = false;
         }
 
         ImGui.End();
         if (!open)
+        {
             IsOpen = false;
+            StopCapture();
+        }
     }
 
     private void DrawSections(float scale)
@@ -417,6 +422,8 @@ internal sealed class SettingsWindow
                 continue;
             if (key == ImGuiKey.Escape && !io.KeyCtrl && !io.KeyShift && !io.KeyAlt)
             {
+                // Escape cancels the recording only: it neither closes the window nor clears the scene selection.
+                _dispatcher.Consume(ImGuiKey.Escape);
                 StopCapture();
                 return;
             }
@@ -647,7 +654,10 @@ internal sealed class SettingsWindow
             PropertyGrid.End();
         }
 
-        ImGui.TextDisabled(_ctx.Settings.FilePath);
+        // Long paths wrap inside the window instead of running off its right edge.
+        ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
+        ImGui.TextWrapped(Loc.Format(Str.SettingsFileLocation, _ctx.Settings.FilePath));
+        ImGui.PopStyleColor();
     }
 
     private void DrawGpu()
@@ -656,8 +666,10 @@ internal sealed class SettingsWindow
         var info = _ctx.Gpu.Context.Info;
         Heading(Str.SettingsGpu);
         ImGui.TextUnformatted($"{Icons.Cpu}  {Loc.Format(Str.SettingsCurrentDevice, info.DeviceName)}");
-        ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture,
+        ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
+        ImGui.TextWrapped(string.Create(CultureInfo.InvariantCulture,
             $"{info.DriverName} · Vulkan {info.ApiVersion} · {info.DeviceMemoryBytes / (1024.0 * 1024 * 1024):0.#} GB · {Loc.Format(Str.SettingsRayTracing, Loc.Get(info.SupportsRayTracing ? Str.MsgYes : Str.MsgNo))}"));
+        ImGui.PopStyleColor();
         ImGui.Spacing();
         if (PropertyGrid.Begin("##gpu", 230f))
         {

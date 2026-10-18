@@ -430,6 +430,57 @@ public sealed class KeyBindingDispatchTests
     }
 
     [Fact]
+    public void Escape_closes_a_focused_window_instead_of_deselecting()
+    {
+        using var ui = new HeadlessImGui(new Vector2(800, 600));
+        var (commands, ran) = Registry(EditorActions.DeselectAll);
+        var dispatcher = new KeyBindingDispatcher(commands, KeyBindingsService.CreateDefault());
+        bool windowOpen = true;
+        string text = "";
+        bool editText = false;
+        void Window()
+        {
+            if (!windowOpen)
+                return;
+            ImGui.SetNextWindowFocus();
+            ImGui.Begin("Settings");
+            if (editText)
+            {
+                ImGui.SetKeyboardFocusHere();
+                editText = false;
+            }
+
+            ImGui.InputText("##filter", ref text, 32);
+            if (Candela.App.Windows.WindowKeys.CloseRequested(dispatcher))
+                windowOpen = false;
+            ImGui.End();
+        }
+
+        for (int i = 0; i < 3; i++)
+            ui.Frame(() => { Window(); dispatcher.Dispatch(); });
+
+        // While its text field is edited, Escape belongs to the field: the window stays and nothing is deselected.
+        editText = true;
+        for (int i = 0; i < 3; i++)
+            ui.Frame(() => { Window(); dispatcher.Dispatch(); });
+        Assert.True(ImGui.GetIO().WantTextInput);
+        Press(ui, dispatcher, ImGuiKey.Escape, draw: Window);
+        Assert.True(windowOpen);
+        Assert.Empty(ran);
+
+        // Then Escape closes the window, and only the window.
+        for (int i = 0; i < 2; i++)
+            ui.Frame(() => { Window(); dispatcher.Dispatch(); });
+        Press(ui, dispatcher, ImGuiKey.Escape, draw: Window);
+        Assert.False(windowOpen);
+        Assert.Empty(ran);
+
+        // With no window left, Escape deselects.
+        Press(ui, dispatcher, ImGuiKey.Escape, draw: Window);
+        Assert.Equal(new[] { EditorActions.DeselectAll }, ran);
+    }
+
+    [Fact]
     public void Rebuild_applies_new_bindings()
     {
         using var ui = new HeadlessImGui(new Vector2(800, 600));

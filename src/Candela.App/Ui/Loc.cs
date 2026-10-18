@@ -277,6 +277,7 @@ internal static class Loc
         (Str.SettingsAutosave, "Autosave interval (minutes)", "Автосохранение (минуты)"),
         (Str.SettingsAutosaveOff, "0 = off", "0 = выключено"),
         (Str.SettingsMaxRecent, "Recent files to remember", "Число недавних файлов"),
+        (Str.SettingsFileLocation, "Settings are saved to {0}", "Настройки сохраняются в {0}"),
         (Str.SettingsGpu, "GPU", "Видеокарта"),
         (Str.SettingsGpuPreferred, "Preferred GPU", "Предпочитаемая видеокарта"),
         (Str.SettingsGpuAutomatic, "Automatic (most capable)", "Автоматически (самая мощная)"),

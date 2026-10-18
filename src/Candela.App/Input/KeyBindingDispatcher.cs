@@ -84,7 +84,8 @@ internal sealed class KeyBindingDispatcher
     private readonly CommandRegistry _commands;
     private KeyBindingMap _map;
     private ImGuiKey[] _keys;
-    private bool _popupWasOpen;
+    private int _popupOpenFrame = int.MinValue;
+    private readonly HashSet<ImGuiKey> _consumed = new();
 
     /// <summary>Creates a dispatcher for <paramref name="bindings"/>.</summary>
     public KeyBindingDispatcher(CommandRegistry commands, KeyBindingSet bindings)
@@ -103,6 +104,15 @@ internal sealed class KeyBindingDispatcher
     /// <summary>The last action run (diagnostics and tests).</summary>
     public string? LastAction { get; private set; }
 
+    /// <summary>
+    /// Marks a key press of this frame as used by a window (Escape that closed the settings window or cancelled a chord
+    /// recording), so it does not also run a shortcut. Cleared after <see cref="Dispatch"/>.
+    /// </summary>
+    public void Consume(ImGuiKey key) => _consumed.Add(key);
+
+    /// <summary>True when a window already used this frame's press of <paramref name="key"/>.</summary>
+    public bool IsConsumed(ImGuiKey key) => _consumed.Contains(key);
+
     /// <summary>Replaces the bindings (preset changed or a chord edited).</summary>
     public void Rebuild(KeyBindingSet bindings)
     {
@@ -113,17 +123,23 @@ internal sealed class KeyBindingDispatcher
     /// <summary>Checks this frame's key presses and runs the bound commands. Call once per frame inside the ImGui frame.</summary>
     public void Dispatch()
     {
+        int frame = ImGui.GetFrameCount();
         bool popupOpen = ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId | ImGuiPopupFlags.AnyPopupLevel);
-        bool popupClosedThisFrame = _popupWasOpen && !popupOpen;
-        _popupWasOpen = popupOpen;
+        bool popupClosedThisFrame = !popupOpen && _popupOpenFrame == frame - 1;
+        if (popupOpen)
+            _popupOpenFrame = frame;
         if (Suspended || popupOpen || popupClosedThisFrame)
+        {
+            _consumed.Clear();
             return;
+        }
+
         var io = ImGui.GetIO();
         bool typing = io.WantTextInput;
         var mods = KeyNames.ModifiersOf(io.KeyCtrl, io.KeyShift, io.KeyAlt, io.KeySuper);
         foreach (var key in _keys)
         {
-            if (!ImGui.IsKeyPressed(key, false))
+            if (!ImGui.IsKeyPressed(key, false) || _consumed.Contains(key))
                 continue;
             // While typing, only chords with Ctrl/Alt/Super are shortcuts (Delete, Escape, letters belong to the text field).
             if (typing && (mods & (KeyModifiers.Ctrl | KeyModifiers.Alt | KeyModifiers.Super)) == 0)
@@ -135,5 +151,7 @@ internal sealed class KeyBindingDispatcher
             if (action is not null && _commands.TryRun(action))
                 LastAction = action;
         }
+
+        _consumed.Clear();
     }
 }

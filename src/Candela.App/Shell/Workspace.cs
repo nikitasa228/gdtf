@@ -88,8 +88,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _keys.Library.Changed += () => _dispatcher.Rebuild(_keys.Current);
         _browser = new FileBrowserDialog(Path.Combine(ConfigPaths.ConfigDir, "recent-places.json"));
         _settingsWindow = new SettingsWindow(_ctx, _keys, _commands, _dispatcher, _browser, () => _styleDirty = true);
-        _about = new AboutWindow(_ctx);
-        _shortcuts = new ShortcutsWindow(_commands, _keys);
+        _about = new AboutWindow(_ctx, _dispatcher);
+        _shortcuts = new ShortcutsWindow(_commands, _keys, _dispatcher);
 
         _ctx.Session.AttachRenderer(_ctx.Gpu.Renderer);
         AddViewport();
