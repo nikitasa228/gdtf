@@ -4,17 +4,18 @@ namespace Candela.Gdtf;
 
 /// <summary>
 /// An <see cref="XmlReader"/> wrapper that hides elements nested deeper than a limit and stops after a maximum number of
-/// elements, so that a hostile <c>description.xml</c> cannot make <see cref="System.Xml.Linq.XDocument"/> loading
-/// super-linear or exhaust memory.
+/// nodes (elements and their attributes), so that a hostile <c>description.xml</c> cannot make
+/// <see cref="System.Xml.Linq.XDocument"/> loading super-linear or exhaust memory.
 /// </summary>
 /// <remarks>
 /// <para>
 /// <see cref="System.Xml.Linq.XContainer"/> walks up to the root for every node it adds, so building a tree costs
 /// O(depth²): 30 000 nested elements take seconds, while the underlying reader streams them in milliseconds. Elements
 /// deeper than <see cref="MaxDepth"/> are skipped with the reader's own <see cref="XmlReader.Skip"/> (linear) and
-/// counted in <see cref="SkippedElements"/>; after <see cref="MaxElements"/> elements the document is cut off
-/// (<see cref="Truncated"/>), as if it ended there. Normal files (the library's deepest is 12 levels, the largest
-/// has 74 000 elements) pass through unchanged at the cost of one virtual call per node.
+/// counted in <see cref="SkippedElements"/>; once more than <see cref="MaxNodes"/> elements and attributes have been
+/// read the document is cut off before the element that exceeds the budget (<see cref="Truncated"/>), as if it ended
+/// there. Normal files (the library's deepest is 12 levels, the largest has 43 000 elements with 218 000 attributes)
+/// pass through unchanged at the cost of one virtual call per node.
 /// </para>
 /// <para>The wrapper owns the inner reader and disposes it.</para>
 /// </remarks>
@@ -23,29 +24,29 @@ internal sealed class LimitedXmlReader : XmlReader
     private readonly XmlReader _inner;
     private bool _truncated;
 
-    public LimitedXmlReader(XmlReader inner, int maxDepth, long maxElements)
+    public LimitedXmlReader(XmlReader inner, int maxDepth, long maxNodes)
     {
         ArgumentNullException.ThrowIfNull(inner);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxDepth, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(maxElements, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxNodes, 1);
         _inner = inner;
         MaxDepth = maxDepth;
-        MaxElements = maxElements;
+        MaxNodes = maxNodes;
     }
 
     /// <summary>Deepest element depth that is passed through (the root element has depth 0).</summary>
     public int MaxDepth { get; }
 
-    /// <summary>Number of elements after which the document is cut off.</summary>
-    public long MaxElements { get; }
+    /// <summary>Number of elements plus attributes after which the document is cut off.</summary>
+    public long MaxNodes { get; }
 
     /// <summary>Elements (with their content) skipped because they were nested deeper than <see cref="MaxDepth"/>.</summary>
     public long SkippedElements { get; private set; }
 
-    /// <summary>Elements passed through so far.</summary>
-    public long ElementCount { get; private set; }
+    /// <summary>Elements and attributes passed through so far.</summary>
+    public long NodeCount { get; private set; }
 
-    /// <summary>True when the document was cut off after <see cref="MaxElements"/> elements.</summary>
+    /// <summary>True when the document was cut off after <see cref="MaxNodes"/> elements and attributes.</summary>
     public bool Truncated => _truncated;
 
     public override bool Read()
@@ -57,10 +58,14 @@ internal sealed class LimitedXmlReader : XmlReader
             _inner.Skip();
             if (_inner.EOF || _inner.ReadState != ReadState.Interactive) return false;
         }
-        if (_inner.NodeType == XmlNodeType.Element && ++ElementCount > MaxElements)
+        if (_inner.NodeType == XmlNodeType.Element)
         {
-            _truncated = true;
-            return false;
+            NodeCount += 1 + _inner.AttributeCount;
+            if (NodeCount > MaxNodes)
+            {
+                _truncated = true;
+                return false;
+            }
         }
         return true;
     }

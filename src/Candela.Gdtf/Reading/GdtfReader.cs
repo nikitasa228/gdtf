@@ -50,6 +50,9 @@ public static partial class GdtfReader
     public static FixtureType Read(GdtfArchive archive)
     {
         ArgumentNullException.ThrowIfNull(archive);
+        long size = archive.GetSize(GdtfArchive.DescriptionEntry);
+        if (size > MaxDescriptionBytes)
+            throw new GdtfFormatException($"description.xml of '{archive.FileName ?? "GDTF"}' is {size} bytes; more than {MaxDescriptionBytes} is not a fixture description.");
         var bytes = archive.ReadDescription();
         using var ms = new MemoryStream(bytes, writable: false);
         return ReadDescription(ms, archive, archive.FileName);
@@ -67,10 +70,16 @@ public static partial class GdtfReader
     internal const int MaxXmlDepth = MaxGeometryDepth + 8;
 
     /// <summary>
-    /// Elements read at most (the largest file of the library has 74 000); the rest of a larger document is ignored
-    /// with a warning so that a hostile file cannot exhaust memory.
+    /// Elements plus attributes read at most (the largest description of the library has 260 000); the rest of a larger
+    /// document is ignored with a warning so that a hostile file cannot exhaust memory.
     /// </summary>
-    internal const long MaxXmlElements = 4_000_000;
+    internal const long MaxXmlNodes = 4_000_000;
+
+    /// <summary>
+    /// Largest <c>description.xml</c> read, in bytes or characters (64 MiB; the library's largest is 6 MB). Larger ones
+    /// are not GDTF descriptions but damage or an attack, and the file is rejected.
+    /// </summary>
+    public const int MaxDescriptionBytes = 64 << 20;
 
     private static FixtureType ReadDescription(Stream xml, GdtfArchive? archive, string? sourceName)
     {
@@ -79,7 +88,7 @@ public static partial class GdtfReader
         bool truncated, namespaced;
         try
         {
-            using var reader = new LimitedXmlReader(XmlReader.Create(xml, XmlSettings), MaxXmlDepth, MaxXmlElements);
+            using var reader = new LimitedXmlReader(XmlReader.Create(xml, XmlSettings), MaxXmlDepth, MaxXmlNodes);
             doc = XDocument.Load(reader, LoadOptions.None);
             skipped = reader.SkippedElements;
             truncated = reader.Truncated;
@@ -98,7 +107,7 @@ public static partial class GdtfReader
         if (skipped > 0)
             limits.Add(new GdtfWarning("", $"{skipped} element(s) nested deeper than {MaxXmlDepth} levels were ignored with their content."));
         if (truncated)
-            limits.Add(new GdtfWarning("", $"description.xml has more than {MaxXmlElements} elements; the rest of the file was ignored."));
+            limits.Add(new GdtfWarning("", $"description.xml has more than {MaxXmlNodes} elements and attributes; the rest of the file was ignored."));
         if (namespaced && doc.Root is { } root && StripNamespaces(root))
             limits.Add(new GdtfWarning("", "description.xml uses XML namespaces, which GDTF does not define; elements and attributes are read by local name."));
         return Parse(doc, archive, sourceName, limits);
@@ -141,6 +150,7 @@ public static partial class GdtfReader
         IgnoreProcessingInstructions = true,
         IgnoreWhitespace = true,
         CloseInput = false,
+        MaxCharactersInDocument = MaxDescriptionBytes,
     };
 
     private static FixtureType Parse(XDocument doc, GdtfArchive? archive, string? sourceName, List<GdtfWarning> limits)

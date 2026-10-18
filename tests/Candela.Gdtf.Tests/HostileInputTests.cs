@@ -79,19 +79,39 @@ public sealed class HostileInputTests
     public void Limited_reader_skips_deep_elements_and_truncates_after_the_element_budget()
     {
         const string xml = "<a><b><c><d/></c></b><b2/><b3><c3/></b3><b4/></a>";
-        using (var r = new LimitedXmlReader(XmlReader.Create(new StringReader(xml)), maxDepth: 1, maxElements: 100))
+        using (var r = new LimitedXmlReader(XmlReader.Create(new StringReader(xml)), maxDepth: 1, maxNodes: 100))
         {
             var doc = System.Xml.Linq.XDocument.Load(r);
             Assert.Equal(new[] { "a", "b", "b2", "b3", "b4" }, doc.Descendants().Select(e => e.Name.LocalName));
             Assert.Equal(2, r.SkippedElements); // <c> (with <d>) and <c3>
             Assert.False(r.Truncated);
         }
-        using (var r = new LimitedXmlReader(XmlReader.Create(new StringReader(xml)), maxDepth: 10, maxElements: 3))
+        using (var r = new LimitedXmlReader(XmlReader.Create(new StringReader(xml)), maxDepth: 10, maxNodes: 3))
         {
             var doc = System.Xml.Linq.XDocument.Load(r);
             Assert.True(r.Truncated);
             Assert.Equal(3, doc.Descendants().Count()); // a, b, c: the document ends where the budget ran out
         }
+    }
+
+    [Fact]
+    public void Attributes_count_against_the_node_budget()
+    {
+        const string xml = "<a x='1' y='2' z='3'><b p='1' q='2'/><c/></a>";
+        using var r = new LimitedXmlReader(XmlReader.Create(new StringReader(xml)), maxDepth: 10, maxNodes: 6);
+        var doc = System.Xml.Linq.XDocument.Load(r);
+        Assert.True(r.Truncated); // a with 3 attributes (4) + b with 2 (3) = 7 > 6: cut before b
+        Assert.Equal("a", Assert.Single(doc.Descendants()).Name.LocalName);
+    }
+
+    [Fact]
+    public void Oversized_descriptions_are_rejected_without_decompressing_them()
+    {
+        var bytes = TestData.Zip(("description.xml", new byte[GdtfReader.MaxDescriptionBytes + 1]));
+        var sw = Stopwatch.StartNew();
+        var e = Assert.Throws<GdtfFormatException>(() => GdtfReader.Read(new MemoryStream(bytes), "huge.gdtf"));
+        Assert.Contains("not a fixture description", e.Message, StringComparison.Ordinal);
+        Assert.True(sw.Elapsed < Fast);
     }
 
     [Fact]

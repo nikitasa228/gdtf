@@ -232,7 +232,8 @@ template channels, so it does not count those instances.
   fixture. Warnings are capped at 500 per file, and their paths and messages are cut to 240 and 600 characters.
 * **Hostile input.** `description.xml` is read through a filtering `XmlReader`: elements nested deeper than 264
   levels (enough for the 256 geometry levels kept; real files reach 12) are skipped with their content, and reading
-  stops after 4 million elements (the largest library file has 74 000), both with a warning. `XDocument` costs
+  stops after 4 million elements plus attributes (the largest library description has 260 000), both with a
+  warning. Descriptions over 64 MiB (the largest is 6 MB) are rejected. `XDocument` costs
   O(depth²), so 30 000 nested geometries took 5.5 s; they now take 12 ms. Normal files are not slower: loading all
   1091 descriptions takes the same CPU time with and without the filter (2.2 s), and a full sequential parse of the
   library 4.4 s before and after. Further limits: 200 000 geometry-reference instances and 1 000 000 channel
