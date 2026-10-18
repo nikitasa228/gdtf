@@ -84,7 +84,7 @@ public static class FixtureEvaluator
         for (int c = 0; c < rt.Length; c++) Select(channels[c], fns, rt, c);
 
         // 3: manual overrides
-        overrides?.Apply(rt, fns);
+        overrides?.Apply(rt);
 
         // 4: relations (virtual dimmers)
         var relations = p.RelationArray;

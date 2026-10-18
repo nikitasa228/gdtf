@@ -280,7 +280,7 @@ public sealed class AttributeOverrides
                 int fn = DmxEncoder.FindFunction(profile, c, attribute, value);
                 if (fn < 0) continue;
                 entries.RemoveAll(e => e.Channel == c);
-                entries.Add(new Entry(c, fn, value));
+                entries.Add(Entry.Create(profile.FunctionArray[fn], value));
                 any = true;
             }
             if (!any) unresolved.Add(key);
@@ -288,21 +288,29 @@ public sealed class AttributeOverrides
         return new AttributeOverrides(profile, entries.ToArray(), unresolved);
     }
 
-    internal void Apply(ChannelRuntime[] rt, ProfileFunction[] fns)
+    internal void Apply(ChannelRuntime[] rt)
     {
-        foreach (var e in _entries)
+        foreach (ref readonly var e in _entries.AsSpan())
         {
-            var f = fns[e.Function];
             ref var r = ref rt[e.Channel];
-            float v = Math.Clamp(e.Value, f.MinValue, f.MaxValue);
-            uint dmx = DmxEncoder.ToDmx(f, v);
             r.Function = e.Function;
-            r.Dmx = dmx;
-            r.SetIndex = FixtureEvaluator.SetIndexAt(f, dmx);
-            r.Physical = f.UsesSlotPosition ? FixtureEvaluator.PhysicalAt(f, dmx, r.SetIndex) : v;
-            r.Target = v;
+            r.Dmx = e.Dmx;
+            r.SetIndex = e.SetIndex;
+            r.Physical = e.Physical;
+            r.Target = e.Value;
         }
     }
 
-    private readonly record struct Entry(int Channel, int Function, float Value);
+    /// <summary>One manual value, decoded once: the channel's function, DMX value, channel set and physical value.</summary>
+    private readonly record struct Entry(int Channel, int Function, float Value, uint Dmx, int SetIndex, float Physical)
+    {
+        public static Entry Create(ProfileFunction f, float value)
+        {
+            float v = Math.Clamp(value, f.MinValue, f.MaxValue);
+            uint dmx = DmxEncoder.ToDmx(f, v);
+            int set = f.SetIndexAt(dmx);
+            float physical = f.UsesSlotPosition ? FixtureEvaluator.PhysicalAt(f, dmx, set) : v;
+            return new Entry(f.Channel, f.Index, v, dmx, set, physical);
+        }
+    }
 }
