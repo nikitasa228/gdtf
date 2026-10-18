@@ -21,7 +21,7 @@ fire.Step(dt, flameDevices);                         // GENERATOR FIRE fixtures 
 emitters.Clear();
 emitters.AddRange(hazersFogsFans);                   // SmokeEmitter.Hazer / FogMachine / Fan from fixture states
 emitters.AddRange(fire.SmokeEmitters);               // soot and heat of the flames
-smoke.Step(dt, emitters);                            // fixed sub-steps inside
+smoke.Step(dt, CollectionsMarshal.AsSpan(emitters)); // fixed sub-steps inside
 atmosphere.SmokeDensity = new VolumeGrid { Min = smoke.Bounds.Min, Max = smoke.Bounds.Max, SizeX = smoke.SizeX, …,
                                            Values = copy of smoke.Density };
 lights.AddRange(fire.LightSamples);                  // isotropic point lights, colour × candela
