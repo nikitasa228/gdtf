@@ -14,6 +14,44 @@ using Hexa.NET.ImGuizmo;
 
 namespace Candela.App.Viewport;
 
+/// <summary>Open / on-screen state of a viewport, for choosing the viewport that View commands act on.</summary>
+internal interface IViewportVisibility
+{
+    /// <summary>The panel is open (it may still be a hidden tab).</summary>
+    bool IsOpen { get; }
+
+    /// <summary>The panel was drawn in the current or the previous frame (open and its tab is the visible one).</summary>
+    bool IsShown { get; }
+}
+
+/// <summary>Which viewport the View menu, the toolbar shortcuts and Frame Selection act on.</summary>
+internal static class ActiveViewportRule
+{
+    /// <summary>
+    /// The active viewport while it is on screen; otherwise the first viewport on screen (the active one may be a hidden
+    /// tab behind another panel — a shortcut must never change a view the user cannot see), then the first open one,
+    /// then the first one.
+    /// </summary>
+    public static T Choose<T>(T? active, IReadOnlyList<T> viewports)
+        where T : class, IViewportVisibility
+    {
+        ArgumentNullException.ThrowIfNull(viewports);
+        if (viewports.Count == 0)
+            throw new ArgumentException("At least one viewport is needed.", nameof(viewports));
+        if (active is { IsOpen: true, IsShown: true })
+            return active;
+        for (int i = 0; i < viewports.Count; i++)
+            if (viewports[i] is { IsOpen: true, IsShown: true } shown)
+                return shown;
+        if (active is { IsOpen: true })
+            return active;
+        for (int i = 0; i < viewports.Count; i++)
+            if (viewports[i].IsOpen)
+                return viewports[i];
+        return viewports[0];
+    }
+}
+
 /// <summary>What the workspace provides to its viewports.</summary>
 internal interface IViewportHost
 {
@@ -35,7 +73,7 @@ internal interface IViewportHost
 /// view cube that snaps to the six orthographic views; click / Shift+click / box selection through the renderer's pick
 /// buffer; and ImGuizmo move / rotate gizmos with snapping, every drag one undo step.
 /// </summary>
-internal sealed unsafe class ViewportPanel : Panel
+internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
 {
     private const float ToolbarAlpha = 0.82f;
     private readonly WorkspaceContext _ctx;
@@ -69,6 +107,8 @@ internal sealed unsafe class ViewportPanel : Panel
     private string _title = "";
     private string _titleLanguage = "";
     private ViewDirection? _hoveredFace;
+    private long _lastDrawnFrame = long.MinValue;
+    private bool _wasFocused;
     private readonly ToolbarLabels _labels = new();
     private float _toolbarBottom;
 
@@ -96,6 +136,9 @@ internal sealed unsafe class ViewportPanel : Panel
 
     /// <summary>The corner view cube.</summary>
     public bool ShowViewCube { get; set; } = true;
+
+    /// <inheritdoc/>
+    public bool IsShown => IsOpen && _lastDrawnFrame >= _ctx.Timer.FrameCount - 1;
 
     /// <summary>The render target (null until the panel was first shown).</summary>
     internal IRenderTarget? Target => _target;
@@ -236,6 +279,13 @@ internal sealed unsafe class ViewportPanel : Panel
     /// <inheritdoc/>
     public override void Draw()
     {
+        _lastDrawnFrame = _ctx.Timer.FrameCount;
+        // Focusing a viewport (clicking it or its tab) makes it the target of View commands; only the change of focus
+        // counts, so hovering another viewport with the wheel can still make that one active.
+        bool focused = ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows);
+        if (focused && !_wasFocused)
+            _host.SetActiveViewport(this);
+        _wasFocused = focused;
         var avail = ImGui.GetContentRegionAvail();
         if (avail.X < 8 || avail.Y < 8)
             return;
@@ -252,7 +302,11 @@ internal sealed unsafe class ViewportPanel : Panel
         else
             drawList.AddRectFilled(_imageMin, max, Theme.U32(Theme.WorkspaceBackground));
         if (_host.IsActive(this))
-            drawList.AddRect(_imageMin, max, Theme.U32(Theme.WithAlpha(Theme.Accent, 0.35f)));
+        {
+            // The target of View commands and shortcuts when several viewports are on screen.
+            float t = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
+            drawList.AddRect(_imageMin + new Vector2(1f), max - new Vector2(1f), Theme.U32(Theme.WithAlpha(Theme.Accent, 0.8f)), 0f, ImDrawFlags.None, 2f * t);
+        }
 
         // The gizmo runs before the input surface: ImGuizmo only starts a drag when no ImGui item is hovered or active,
         // so the surface is left out while the mouse is over (or dragging) a gizmo handle.

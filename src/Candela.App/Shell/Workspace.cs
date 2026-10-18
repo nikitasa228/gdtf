@@ -227,21 +227,20 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     /// <inheritdoc/>
     public bool IsActive(ViewportPanel viewport)
     {
-        if (!ReferenceEquals(_activeViewport, viewport))
+        if (!ReferenceEquals(ActiveViewport, viewport))
             return false;
-        int open = 0;
+        int shown = 0;
         foreach (var v in _viewports)
-            if (v.IsOpen)
-                open++;
-        return open > 1;
+            if (v.IsShown)
+                shown++;
+        return shown > 1;
     }
 
     /// <inheritdoc/>
     public void SuspendShortcuts(bool suspended) => _dispatcher.Suspended = suspended || _settingsWindow.IsCapturing;
 
     /// <summary>The viewport View-menu commands act on.</summary>
-    internal ViewportPanel ActiveViewport =>
-        _activeViewport is { IsOpen: true } v ? v : _viewports.FirstOrDefault(x => x.IsOpen) ?? _viewports[0];
+    internal ViewportPanel ActiveViewport => ActiveViewportRule.Choose(_activeViewport, _viewports);
 
     // ---- panels -------------------------------------------------------------------------------------------------
 

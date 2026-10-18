@@ -92,4 +92,38 @@ public sealed class UxReviewTests
             ui.Frame(Draw);
         Assert.True(columnWidth >= labelWidth, $"label column {columnWidth} px is narrower than its label ({labelWidth} px)");
     }
+
+    private sealed class FakeViewport : Candela.App.Viewport.IViewportVisibility
+    {
+        public FakeViewport(bool open, bool shown)
+        {
+            IsOpen = open;
+            IsShown = shown;
+        }
+
+        public bool IsOpen { get; }
+
+        public bool IsShown { get; }
+    }
+
+    [Fact]
+    public void View_commands_never_act_on_a_viewport_hidden_behind_another_tab()
+    {
+        // Viewport 1 was clicked last, then Viewport 5 was opened as a tab of the same group and hides it.
+        var hiddenTab = new FakeViewport(open: true, shown: false);
+        var shownTab = new FakeViewport(open: true, shown: true);
+        var other = new FakeViewport(open: true, shown: true);
+        var closed = new FakeViewport(open: false, shown: false);
+        var all = new[] { hiddenTab, closed, shownTab, other };
+        Assert.Same(shownTab, Candela.App.Viewport.ActiveViewportRule.Choose(hiddenTab, all));
+        Assert.Same(other, Candela.App.Viewport.ActiveViewportRule.Choose(other, all));
+        Assert.Same(shownTab, Candela.App.Viewport.ActiveViewportRule.Choose(closed, all));
+        Assert.Same(shownTab, Candela.App.Viewport.ActiveViewportRule.Choose(null, all));
+        // Nothing on screen (every viewport is a hidden tab, or the frame has not been drawn yet): the active open one.
+        var a = new FakeViewport(open: true, shown: false);
+        var b = new FakeViewport(open: true, shown: false);
+        Assert.Same(b, Candela.App.Viewport.ActiveViewportRule.Choose(b, new[] { a, b }));
+        Assert.Same(a, Candela.App.Viewport.ActiveViewportRule.Choose(closed, new[] { closed, a, b }));
+        Assert.Same(closed, Candela.App.Viewport.ActiveViewportRule.Choose(null, new[] { closed }));
+    }
 }
