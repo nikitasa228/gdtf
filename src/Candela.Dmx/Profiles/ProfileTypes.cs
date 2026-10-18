@@ -216,8 +216,20 @@ public sealed class ProfileFunction
         SetFlagArray = Array.ConvertAll(sets, s => s.Flags);
     }
 
-    /// <summary>Flags of set <paramref name="setIndex"/> (−1: none).</summary>
-    internal ChannelSetFlags FlagsOf(int setIndex) => setIndex >= 0 ? SetFlagArray[setIndex] : ChannelSetFlags.None;
+    /// <summary>Flags of set <paramref name="setIndex"/> (−1: outside every set, the function's own <see cref="NameFlags"/>).</summary>
+    internal ChannelSetFlags FlagsOf(int setIndex) => setIndex >= 0 ? SetFlagArray[setIndex] : NameFlags;
+
+    /// <summary>
+    /// Open/closed meaning of a shutter function's own name ("Open", "Closed"), applied where no named channel set says
+    /// otherwise; none for other attributes.
+    /// </summary>
+    internal ChannelSetFlags NameFlags { get; set; }
+
+    /// <summary>
+    /// True when the function's physical range is GDTF's default 0 … 1 (or 1 … 0): for rates (strobe and pulse
+    /// frequencies) it is then a normalised slow … fast, not 0 … 1 Hz.
+    /// </summary>
+    internal bool DefaultPhysicalRange { get; set; }
 
     /// <summary>Motion group (MSpeed channels scale it): 0 position, 1 colour, 2 gobo, 3 beam, 4 shaper, 5 other.</summary>
     internal int MotionGroup { get; set; } = 5;

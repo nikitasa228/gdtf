@@ -28,8 +28,10 @@ public sealed partial class FixtureProfile
         private int[] _beamFirst = Array.Empty<int>(); // per channel: first beam index affected
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
         private int[] _subtreeSize = Array.Empty<int>();
+        private float[] _beamShare = Array.Empty<float>(); // per beam: share of the fixture's specs output
         private bool? _emitterYVaries;
         private bool? _cmyAsColorAdd;
+        private readonly Dictionary<AttributeKind, bool> _realRange = new();
 
         public Builder(FixtureType fixtureType, DmxMode mode, FixtureSpecs? specs)
         {
@@ -220,16 +222,31 @@ public sealed partial class FixtureProfile
         {
             string attribute = string.IsNullOrEmpty(src.AttributeName) ? "NoFeature" : src.AttributeName;
             var cls = Classify(attribute);
+            float physicalFrom = Finite(src.PhysicalFrom, 0f), physicalTo = Finite(src.PhysicalTo, 1f);
+            // GDTF's default physical range 0 … 1 is a placeholder unless channel sets carry the real values
+            bool defaultRange = IsDefaultRange(physicalFrom, physicalTo);
+            bool setsReal = defaultRange && src.ChannelSets.Exists(s =>
+                (s.PhysicalFrom is { } a && float.IsFinite(a) && MathF.Abs(a) > 1.5f) || (s.PhysicalTo is { } b && float.IsFinite(b) && MathF.Abs(b) > 1.5f));
+            bool placeholder = defaultRange && !setsReal;
+            float offset = 0f, scale = 1f;
+            if (placeholder && cls.Kind is AttributeKind.Zoom or AttributeKind.Pan or AttributeKind.Tilt)
+                (cls, offset, scale) = ResolvePlaceholderRange(ch, src, cls);
             var f = new ProfileFunction(Functions.Count, ch.Index, src, attribute, cls)
             {
                 Unit = src.Attribute?.PhysicalUnit ?? PhysicalUnit.None,
                 Curve = src.DmxProfile is { Points.Count: > 0 } ? src.DmxProfile : null,
+                DefaultPhysicalRange = placeholder,
             };
             uint max = ch.MaxValue;
             f.DmxFrom = Math.Min(src.DmxFromValue, max);
             f.DmxTo = Math.Clamp(src.DmxToValue, f.DmxFrom, max);
-            f.PhysicalFrom = Finite(src.PhysicalFrom, 0f);
-            f.PhysicalTo = Finite(src.PhysicalTo, 1f);
+            f.PhysicalFrom = offset + scale * physicalFrom;
+            f.PhysicalTo = offset + scale * physicalTo;
+
+            // a shutter function named "Open" / "Closed" means that wherever no named channel set says otherwise
+            var nameFlags = cls.Kind == AttributeKind.Shutter ? NameParsing.Flags(src.Name, cls.Kind) & (ChannelSetFlags.Open | ChannelSetFlags.Closed) : 0;
+            if (nameFlags == (ChannelSetFlags.Open | ChannelSetFlags.Closed)) nameFlags = ChannelSetFlags.None;
+            f.NameFlags = nameFlags;
 
             // channel sets
             var sets = new List<ProfileChannelSet>(src.ChannelSets.Count);
@@ -237,9 +254,10 @@ public sealed partial class FixtureProfile
             {
                 uint from = Math.Clamp(s.DmxFromValue, f.DmxFrom, f.DmxTo);
                 uint to = Math.Clamp(s.DmxToValue, from, f.DmxTo);
-                float pf = s.PhysicalFrom is { } a && float.IsFinite(a) ? a : float.NaN;
-                float pt = s.PhysicalTo is { } b && float.IsFinite(b) ? b : pf;
-                var set = new ProfileChannelSet(s, from, to, pf, pt, NameParsing.Flags(s.Name, cls.Kind));
+                float pf = s.PhysicalFrom is { } a && float.IsFinite(a) ? offset + scale * a : float.NaN;
+                float pt = s.PhysicalTo is { } b && float.IsFinite(b) ? offset + scale * b : pf;
+                var setFlags = string.IsNullOrWhiteSpace(s.Name) ? nameFlags : NameParsing.Flags(s.Name, cls.Kind);
+                var set = new ProfileChannelSet(s, from, to, pf, pt, setFlags);
                 switch (cls.Kind)
                 {
                     case AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc:
@@ -304,19 +322,79 @@ public sealed partial class FixtureProfile
             }
             else
             {
-                f.MinValue = MathF.Min(f.PhysicalFrom, f.PhysicalTo);
-                f.MaxValue = MathF.Max(f.PhysicalFrom, f.PhysicalTo);
+                // a default 0 … 1 function range whose channel sets carry the real values (degrees, Hz …): the sets define it
+                f.MinValue = setsReal ? float.PositiveInfinity : MathF.Min(f.PhysicalFrom, f.PhysicalTo);
+                f.MaxValue = setsReal ? float.NegativeInfinity : MathF.Max(f.PhysicalFrom, f.PhysicalTo);
                 foreach (var s in sets)
                 {
                     if (!s.HasPhysical) continue;
                     f.MinValue = MathF.Min(f.MinValue, MathF.Min(s.PhysicalFrom, s.PhysicalTo));
                     f.MaxValue = MathF.Max(f.MaxValue, MathF.Max(s.PhysicalFrom, s.PhysicalTo));
                 }
+                if (!(f.MinValue <= f.MaxValue))
+                {
+                    f.MinValue = MathF.Min(f.PhysicalFrom, f.PhysicalTo);
+                    f.MaxValue = MathF.Max(f.PhysicalFrom, f.PhysicalTo);
+                }
             }
             return f;
         }
 
         private static bool IsKelvin(float v) => v is >= 1000f and <= 25000f;
+
+        /// <summary>True for GDTF's default physical range 0 … 1 (either direction).</summary>
+        private static bool IsDefaultRange(float from, float to) => (from == 0f && to == 1f) || (from == 1f && to == 0f);
+
+        /// <summary>
+        /// A Zoom, Pan or Tilt function with GDTF's default physical range 0 … 1 — degrees are meant, the author left the
+        /// field alone — is mapped onto the fixture's researched range (<c>_specs</c> beamAngleDeg, panRangeDeg,
+        /// tiltRangeDeg; pan and tilt centred on 0°), so that it does not zoom to a 1° pencil or pan by 1°. When the
+        /// function sits on a channel of another attribute, or the mode already has a real range for the attribute (a
+        /// mislabelled effect such as a "zoom lens rotation"), or no range is known for a zoom, it does not drive the
+        /// attribute at all. Returns the class to use and the linear map physical → physical′ = offset + scale·physical.
+        /// </summary>
+        private (AttributeClass Class, float Offset, float Scale) ResolvePlaceholderRange(ProfileChannel ch, ChannelFunction src, AttributeClass cls)
+        {
+            var kind = cls.Kind;
+            if (ch.Class.Kind != kind || ModeHasRealRange(kind))
+            {
+                Warnings.Add($"{src.FullName}: {kind} with GDTF's placeholder range 0…1 next to a real {kind} range; not used as {kind}.");
+                return (AttributeClass.Ignored, 0f, 1f);
+            }
+            if (kind == AttributeKind.Zoom)
+            {
+                if (Specs?.BeamAngleDeg is { } b && b.Min > 0 && b.Max > b.Min * 1.05 && b.Max < 180 && double.IsFinite(b.Max))
+                {
+                    Warnings.Add(FormattableString.Invariant($"{src.FullName}: Zoom with GDTF's placeholder range 0…1; mapped to {b.Min}…{b.Max}° (specs)."));
+                    return (cls, (float)b.Min, (float)(b.Max - b.Min));
+                }
+                Warnings.Add($"{src.FullName}: Zoom with GDTF's placeholder range 0…1 and no known zoom range; the beam keeps its native angle.");
+                return (AttributeClass.Ignored, 0f, 1f);
+            }
+            double? range = kind == AttributeKind.Pan ? Specs?.PanRangeDeg : Specs?.TiltRangeDeg;
+            if (range is { } r && r > 0 && r <= 3600 && double.IsFinite(r))
+            {
+                Warnings.Add(FormattableString.Invariant($"{src.FullName}: {kind} with GDTF's placeholder range 0…1; mapped to ±{r / 2}° (specs)."));
+                return (cls, (float)(-r / 2), (float)r);
+            }
+            return (cls, 0f, 1f);
+        }
+
+        /// <summary>True when a function of the mode with attribute kind <paramref name="kind"/> has a physical range other than GDTF's default 0 … 1.</summary>
+        private bool ModeHasRealRange(AttributeKind kind)
+        {
+            if (_realRange.TryGetValue(kind, out bool known)) return known;
+            bool real = false;
+            foreach (var ch in Mode.Channels)
+                foreach (var fn in ch.Functions)
+                {
+                    if (real || AttributeClassifier.Classify(fn.AttributeName ?? "").Kind != kind) continue;
+                    float a = Finite(fn.PhysicalFrom, 0f), b = Finite(fn.PhysicalTo, 1f);
+                    real = (!IsDefaultRange(a, b) && a != b) || fn.ChannelSets.Exists(s => s.PhysicalFrom is { } v && float.IsFinite(v) && MathF.Abs(v) > 1.5f);
+                }
+            _realRange[kind] = real;
+            return real;
+        }
 
         private static float Finite(float v, float fallback) => float.IsFinite(v) ? v : fallback;
 
@@ -730,6 +808,7 @@ public sealed partial class FixtureProfile
                             Beams[b].OwnMechanics = true;
             }
 
+            ComputeBeamShares();
             foreach (var beam in Beams)
             {
                 try
@@ -794,7 +873,7 @@ public sealed partial class FixtureProfile
             beam.FieldRatio = Math.Clamp(ratio, 1f, 8f);
 
             float zoomMin = float.PositiveInfinity, zoomMax = 0f;
-            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCrossfade = false;
+            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false;
             var emitterSet = new SortedSet<int>();
             foreach (int c in ChannelsOfBeam(beam))
             {
@@ -805,7 +884,7 @@ public sealed partial class FixtureProfile
                     switch (f.Class.Kind)
                     {
                         case AttributeKind.Zoom:
-                            foreach (float a in (ReadOnlySpan<float>)[f.PhysicalFrom, f.PhysicalTo])
+                            foreach (float a in (ReadOnlySpan<float>)[f.MinValue, f.MaxValue])
                             {
                                 float d = MathF.Abs(a);
                                 if (d is > 0.1f and < 180f)
@@ -820,6 +899,7 @@ public sealed partial class FixtureProfile
                             break;
                         case AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc:
                             hasCmyOrCto = hasColorTemperature = true;
+                            hasCtc |= f.Class.Kind == AttributeKind.Ctc;
                             break;
                         case AttributeKind.ColorCrossfade:
                             hasCrossfade = true;
@@ -844,7 +924,7 @@ public sealed partial class FixtureProfile
             // reference output at full white
             if (Specs?.MaxLuminousIntensityCd is { } cd && cd > 0 && double.IsFinite(cd))
             {
-                float perBeam = (float)(cd / Math.Max(1, Beams.Count));
+                float perBeam = (float)(cd * _beamShare[beam.Index]);
                 float specAngle = hasZoom ? zoomMin : native; // datasheet candela is the narrowest-zoom value
                 beam.ReferenceFlux = perBeam * table.SolidAngle(specAngle * DegToRad);
                 beam.PhotometrySource = PhotometrySource.SpecsCandela;
@@ -852,7 +932,7 @@ public sealed partial class FixtureProfile
             else if (Specs?.LuminousFluxLm is { } lm && lm > 0 && double.IsFinite(lm) && !(bg.LuminousFlux > 0f && bg.LuminousFlux != GdtfDefaultFlux))
             {
                 // the GDTF flux is missing or GDTF's default: the researched fixture flux, shared between the beams
-                beam.ReferenceFlux = (float)(lm / Math.Max(1, Beams.Count));
+                beam.ReferenceFlux = (float)(lm * _beamShare[beam.Index]);
                 beam.PhotometrySource = PhotometrySource.SpecsFlux;
             }
             else if (bg.LuminousFlux > 0f && float.IsFinite(bg.LuminousFlux))
@@ -864,7 +944,7 @@ public sealed partial class FixtureProfile
             }
             else
             {
-                float efficacy = bg.LampType switch
+                float efficacy = EffectiveLampType(bg, emitterSet.Count > 0) switch
                 {
                     LampType.Led => 40f,
                     LampType.Discharge => 45f,
@@ -913,15 +993,70 @@ public sealed partial class FixtureProfile
                     }
             }
 
-            // LED engines that mix colour (emitters in this mode, or several coloured emitters in the fixture) move their white
-            // point electronically; CMY channels and white-only LED engines mean real filters
-            beam.ElectronicColor = bg.LampType == LampType.Led && !hasColorSub && (emitterSet.Count > 0 || HasColouredEmitters());
+            // LED engines that mix colour (emitters in this mode, or several coloured emitters in the fixture) or tune their
+            // white (CTC, or kelvin CTO/CTB on a wash-type LED) move their white point electronically; CMY channels and the
+            // CTO flags of LED spots and profiles are real filters
+            beam.ElectronicColor = EffectiveLampType(bg, emitterSet.Count > 0) == LampType.Led && !hasColorSub &&
+                (emitterSet.Count > 0 || HasColouredEmitters() || hasCtc || (hasColorTemperature && !IsSpotLike(Category)));
             if (beam.ElectronicColor && beam.Emitters.Length > 0 && (hasColorTemperature || hasCrossfade))
             {
                 string key = string.Join(";", beam.Emitters.Select(e => FormattableString.Invariant($"{e.Chromaticity.X:F4},{e.Chromaticity.Y:F4},{e.MaxFlux:G6}")));
                 if (!_whiteTables.TryGetValue(key, out var white)) _whiteTables[key] = white = WhiteEfficiencyTable.Create(beam.Emitters);
                 beam.WhiteTable = white;
             }
+        }
+
+        /// <summary>
+        /// The light source of a beam: LED when the mode drives additive emitters in it; else the researched
+        /// <c>_specs</c> lightSourceType (GDTF files often keep the default "Discharge", or a wrong type); else the GDTF
+        /// LampType.
+        /// </summary>
+        private LampType EffectiveLampType(BeamGeometry bg, bool hasEmitters)
+        {
+            if (hasEmitters) return LampType.Led;
+            return Specs?.LightSourceType switch
+            {
+                "LED" => LampType.Led,
+                "Discharge Lamp" => LampType.Discharge,
+                "Halogen Lamp" => LampType.Halogen,
+                "Tungsten Lamp" => LampType.Tungsten,
+                _ => bg.LampType,
+            };
+        }
+
+        /// <summary>Spot-type fixtures, whose CTO/CTB on an LED engine is a mechanical filter rather than a tunable white.</summary>
+        private static bool IsSpotLike(FixtureCategory category) => category is FixtureCategory.Profile or FixtureCategory.Spot
+            or FixtureCategory.Beam or FixtureCategory.WashBeam or FixtureCategory.Bsw or FixtureCategory.FollowSpot;
+
+        /// <summary>
+        /// Share of the fixture's researched output (<c>_specs</c> candela or flux) that each beam carries: proportional to
+        /// the beams' GDTF LuminousFlux when the file gives them different values (a main engine and an aura ring, large
+        /// and small cells), equal otherwise. A beam whose flux is missing or GDTF's default 10 000 lm counts as the mean
+        /// of the beams with a real value.
+        /// </summary>
+        private void ComputeBeamShares()
+        {
+            int n = Beams.Count;
+            _beamShare = new float[n];
+            var flux = new double[n];
+            double known = 0;
+            int knownCount = 0;
+            for (int b = 0; b < n; b++)
+            {
+                float f = Beams[b].Geometry.LuminousFlux;
+                flux[b] = f > 0f && float.IsFinite(f) && f != GdtfDefaultFlux ? f : double.NaN;
+                if (double.IsNaN(flux[b])) continue;
+                known += flux[b];
+                knownCount++;
+            }
+            double mean = knownCount > 0 ? known / knownCount : 1.0;
+            double total = 0;
+            for (int b = 0; b < n; b++)
+            {
+                if (double.IsNaN(flux[b])) flux[b] = mean;
+                total += flux[b];
+            }
+            for (int b = 0; b < n; b++) _beamShare[b] = total > 0 ? (float)(flux[b] / total) : 1f / n;
         }
 
         /// <summary>True when the fixture type describes at least two visible emitters of clearly different colour (an RGB… engine).</summary>

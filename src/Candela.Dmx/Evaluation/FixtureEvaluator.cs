@@ -786,11 +786,14 @@ public static class FixtureEvaluator
         }
     }
 
-    /// <summary>Strobe/pulse frequency in Hz; 0 … 1 ranges without a frequency unit span 0.5 … 25 Hz.</summary>
-    private static float StrobeFrequency(ProfileFunction f, float physical)
+    /// <summary>
+    /// Strobe/pulse frequency in Hz; 0 … 1 ranges without a frequency unit, and GDTF's default range 0 … 1 (a placeholder
+    /// left by the author, not a 1 Hz maximum), span 0.5 … 25 Hz.
+    /// </summary>
+    internal static float StrobeFrequency(ProfileFunction f, float physical)
     {
         if (!float.IsFinite(physical)) return 0f;
-        if (f.Unit != Gdtf.PhysicalUnit.Frequency && f.LevelScale <= 1f) return 0.5f + 24.5f * Math.Clamp(physical, 0f, 1f);
+        if ((f.Unit != Gdtf.PhysicalUnit.Frequency || f.DefaultPhysicalRange) && f.LevelScale <= 1f) return 0.5f + 24.5f * Math.Clamp(physical, 0f, 1f);
         return Math.Clamp(MathF.Abs(physical), 0f, 100f);
     }
 
