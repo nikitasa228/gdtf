@@ -101,15 +101,19 @@ internal sealed class SceneExporter
         else if (rigging is not null) obj = new MvrSupport();
         else if (mesh is not null || wall is not null) obj = new MvrSceneObject();
         else if (fixture is not null) obj = new MvrFixture();
-        else if (e.Has<GroupComponent>() || e.Components.Count == 0 || e.Children.Count > 0)
+        else if (e.Has<GroupComponent>()) obj = new MvrGroupObject();
+        else if (e.Components.Count == 0)
+        {
+            // A plain transform node: what the importer makes of a SceneObject whose geometry is all in child meshes
+            // (or that has none), so it goes back out as a SceneObject.
+            obj = new MvrSceneObject();
+        }
+        else if (e.Children.Count > 0)
         {
             obj = new MvrGroupObject();
-            if (e.Components.Count > 0 && !e.Has<GroupComponent>())
-            {
-                _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.NotRepresentable, "as-group",
-                    n => $"{n} object(s) of a kind MVR cannot hold have child objects; they are written as GroupObjects so the children keep their place.",
-                    e.Id);
-            }
+            _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.NotRepresentable, "as-group",
+                n => $"{n} object(s) of a kind MVR cannot hold have child objects; they are written as GroupObjects so the children keep their place.",
+                e.Id);
         }
         else
         {

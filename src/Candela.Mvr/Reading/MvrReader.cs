@@ -188,6 +188,7 @@ public static class MvrReader
         XmlResolver = null,
         IgnoreComments = true,
         IgnoreProcessingInstructions = true,
+        IgnoreWhitespace = true,
         CloseInput = false,
     };
 
