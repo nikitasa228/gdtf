@@ -191,5 +191,20 @@ public sealed class ProtocolManager : IDisposable
         if (protocol is ExternalProtocolBase b) b.FailWithoutStarting(message);
     }
 
-    private void OnProtocolStatusChanged(object? sender, ProtocolStatusEventArgs e) => StatusChanged?.Invoke(this, e);
+    private void OnProtocolStatusChanged(object? sender, ProtocolStatusEventArgs e)
+    {
+        // Often called on a receive thread: one faulty subscriber must neither crash it nor starve the others.
+        if (StatusChanged is not { } handler) return;
+        foreach (var d in handler.GetInvocationList())
+        {
+            try
+            {
+                ((EventHandler<ProtocolStatusEventArgs>)d)(this, e);
+            }
+            catch (Exception)
+            {
+                // Contained; see ExternalProtocolBase.RaiseStatusChanged.
+            }
+        }
+    }
 }

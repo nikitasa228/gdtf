@@ -157,7 +157,8 @@ enable Art-Net or sACN output and point it at the network Candela is on. If a pr
 fixture phase-shifted), runs a colour chase, sends a dimmer wave and makes the zoom breathe. Every frame carries
 ArtSync and ArtTimeCode. Point it at `127.0.0.1:6454` to drive a local Candela, or at a node to drive a real rig. It is
 meant for `Candela.Cli` and the editor, which build it from the patch. `ArtNetTestPattern.DemoRig(...)` builds a
-12-channel moving-head + RGBW-par rig that needs no GDTF. The engine can plug GDTF-based encoders from `Candela.Dmx`
+12-channel moving-head + RGBW-par rig that needs no GDTF. The background loop never stops on an error (network down,
+failing encoder); the last one is shown in `ArtNetTestConsole.LastError`. The engine can plug GDTF-based encoders from `Candela.Dmx`
 into the same show through `ITestPatternEncoder`.
 
 ## Protocol details
