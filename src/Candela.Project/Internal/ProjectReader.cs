@@ -443,6 +443,13 @@ internal static class ProjectReader
 
             IReadOnlyList<Guid> related = users.TryGetValue(record.Id, out var u) ? u : Array.Empty<Guid>();
             var label = string.IsNullOrEmpty(record.FileName) ? record.Id.ToString("D") : $"'{record.FileName}'";
+            if (!Enum.IsDefined(record.Kind) && raw is { } numericKind && record.Id != Guid.Empty && seen.Add(record.Id))
+            {
+                // A kind given as a number this version does not define: kept like an unknown kind name.
+                Keep(access, project, record.Id, numericKind, folders, users, options, issues,
+                    string.Create(CultureInfo.InvariantCulture, $"of a kind this version does not know ({(int)record.Kind})"));
+                continue;
+            }
             if (record.Id == Guid.Empty || !seen.Add(record.Id) || !Enum.IsDefined(record.Kind) || string.IsNullOrEmpty(record.Entry))
             {
                 issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetRecordInvalid,
