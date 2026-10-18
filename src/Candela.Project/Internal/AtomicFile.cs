@@ -41,7 +41,7 @@ internal static class AtomicFile
         {
             if ((File.GetAttributes(full) & FileAttributes.ReadOnly) != 0)
                 throw new UnauthorizedAccessException($"'{full}' is read-only; it was not overwritten.");
-            if (!OperatingSystem.IsWindows()) mode = File.GetUnixFileMode(full) & PermissionBits;
+            if (!OperatingSystem.IsWindows()) mode = TryGetMode(full);
         }
         var temp = TempPathFor(full);
         try
@@ -55,7 +55,7 @@ internal static class AtomicFile
             }
             verify?.Invoke(temp);
             beforeReplace?.Invoke();
-            if (mode is { } m && !OperatingSystem.IsWindows()) File.SetUnixFileMode(temp, m);
+            if (mode is { } m && !OperatingSystem.IsWindows()) TryCopyMode(temp, m);
             Replace(temp, full);
             return length;
         }
@@ -86,10 +86,40 @@ internal static class AtomicFile
             if (info.LinkTarget is null) return fullPath;
             return info.ResolveLinkTarget(returnFinalTarget: true) is { } target ? Path.GetFullPath(target.FullName) : fullPath;
         }
-        catch (IOException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             // A link cycle or an unreadable link: write the path as given.
             return fullPath;
+        }
+    }
+
+    [System.Runtime.Versioning.UnsupportedOSPlatform("windows")]
+    private static UnixFileMode? TryGetMode(string path)
+    {
+        try
+        {
+            return File.GetUnixFileMode(path) & PermissionBits;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gives the temporary file the target's permission bits. Best effort: file systems without Unix permissions (a FAT
+    /// or exFAT memory stick, many network shares) refuse <c>chmod</c>, and saving there must still work.
+    /// </summary>
+    [System.Runtime.Versioning.UnsupportedOSPlatform("windows")]
+    private static void TryCopyMode(string path, UnixFileMode mode)
+    {
+        try
+        {
+            if ((File.GetUnixFileMode(path) & PermissionBits) != mode) File.SetUnixFileMode(path, mode);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // The file keeps the permissions the file system gives new files.
         }
     }
 
