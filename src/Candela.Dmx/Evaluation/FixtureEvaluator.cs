@@ -136,12 +136,13 @@ public static class FixtureEvaluator
         }
 
         // 6: dynamics and rotations
+        var moves = p.ChannelMoves;
         for (int c = 0; c < rt.Length; c++)
         {
             ref var r = ref rt[c];
-            if (r.Function < 0)
+            if (r.Function < 0 || !moves[c])
             {
-                r.Value = r.Target;
+                r.Value = r.Target; // electronic: follows DMX
                 continue;
             }
             var f = fns[r.Function];
@@ -165,8 +166,7 @@ public static class FixtureEvaluator
 
             if (f.IsRotation)
             {
-                var set = r.SetIndex >= 0 ? f.SetArray[r.SetIndex] : null;
-                float spinSpeed = set is not null && (set.Flags & ChannelSetFlags.NoFunction) != 0 ? 0f : SpinSpeed(f, r.Physical);
+                float spinSpeed = (r.SetFlags & ChannelSetFlags.NoFunction) != 0 ? 0f : SpinSpeed(f, r.Physical);
                 if (restart)
                 {
                     r.Spin.Initialized = true;
@@ -201,8 +201,8 @@ public static class FixtureEvaluator
                 {
                     case AttributeKind.Pan: pan += r.Value; break;
                     case AttributeKind.Tilt: tilt += r.Value; break;
-                    case AttributeKind.PanRotate: pan += (float)(r.Spin.Position % 360.0); break;
-                    case AttributeKind.TiltRotate: tilt += (float)(r.Spin.Position % 360.0); break;
+                    case AttributeKind.PanRotate: pan += Turn(r.Spin.Position); break;
+                    case AttributeKind.TiltRotate: tilt += Turn(r.Spin.Position); break;
                     case AttributeKind.Rotation: SetComponent(ref rot, n, GetComponent(rot, n) + r.Value * DegToRad); break;
                     case AttributeKind.Translation: SetComponent(ref trans, n, GetComponent(trans, n) + r.Value); break;
                 }
@@ -224,7 +224,7 @@ public static class FixtureEvaluator
             var acc = BeamAcc.Create();
             ResetWheels(shared);
             Array.Clear(state.EmitterLevels);
-            var ctx = new ApplyContext(p, fns, rt, time, state.Seed, state.WhiteCache);
+            var ctx = new ApplyContext(p, fns, rt, time, state.Seed, state.Cache);
             foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
             var ownLevels = state.OwnEmitterLevels;
             var beamStates = state.BeamArray;
@@ -239,7 +239,7 @@ public static class FixtureEvaluator
                 {
                     // the beam has its own wheels, prisms or blades: start from the shared ones, then resolve
                     CopyWheels(shared, bs);
-                    foreach (int c in pb.OwnChannels) Apply(ref beamAcc, bs, ownLevels, c, in ctx, ref animating);
+                    ApplyOwn(ref beamAcc, bs, ownLevels, pb.OwnChannels, in ctx, ref animating);
                     FinalizeAllWheels(p, bs);
                 }
                 else
@@ -250,7 +250,7 @@ public static class FixtureEvaluator
                         FinalizeAllWheels(p, shared);
                         sharedFinalized = true;
                     }
-                    foreach (int c in pb.OwnChannels) Apply(ref beamAcc, bs, ownLevels, c, in ctx, ref animating);
+                    ApplyOwn(ref beamAcc, bs, ownLevels, pb.OwnChannels, in ctx, ref animating);
                     CopyWheels(shared, bs);
                 }
                 Finalize(pb, bs, ref beamAcc, ownLevels, curve, in ctx, ref animating);
@@ -277,6 +277,7 @@ public static class FixtureEvaluator
             ref readonly var e = ref table[Math.Min(v, 255u)];
             r.Function = ch.FirstFunction + e.Function;
             r.SetIndex = e.Set;
+            r.SetFlags = e.Flags;
             r.Physical = e.Physical;
             r.Target = e.Target;
             return;
@@ -288,10 +289,12 @@ public static class FixtureEvaluator
             r.Physical = 0f;
             r.Target = 0f;
             r.SetIndex = -1;
+            r.SetFlags = ChannelSetFlags.None;
             return;
         }
         var fn = fns[best];
         r.SetIndex = fn.SetIndexAt(v);
+        r.SetFlags = fn.FlagsOf(r.SetIndex);
         r.Physical = PhysicalAt(fn, v, r.SetIndex);
         r.Target = fn.UsesSlotPosition ? fn.SlotPositionAt(v) : r.Physical;
     }
@@ -350,6 +353,10 @@ public static class FixtureEvaluator
     private static float Level(ProfileFunction f, float value) => Math.Clamp(value / f.LevelScale, 0f, 1f);
 
     private static float Finite(float v) => float.IsFinite(v) ? v : 0f;
+
+    /// <summary>An angle in degrees reduced to one turn with the sign of the input (as <c>angle % 360</c>, without a libm call).</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static float Turn(double degrees) => (float)(degrees - 360.0 * Math.Truncate(degrees / 360.0));
 
     private static float GetComponent(Vector3 v, int i) => i switch { 0 => v.X, 1 => v.Y, _ => v.Z };
 
@@ -459,17 +466,17 @@ public static class FixtureEvaluator
 
     private readonly struct ApplyContext
     {
-        public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, double time, uint seed, WhitePointCache whiteCache)
+        public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, double time, uint seed, EvaluationCache cache)
         {
             Profile = p;
             Functions = fns;
             Runtime = rt;
             Time = time;
             Seed = seed;
-            WhiteCache = whiteCache;
+            Cache = cache;
         }
 
-        public WhitePointCache WhiteCache { get; }
+        public EvaluationCache Cache { get; }
 
         public FixtureProfile Profile { get; }
         public ProfileFunction[] Functions { get; }
@@ -534,14 +541,38 @@ public static class FixtureEvaluator
         }
     }
 
+    /// <summary>Applies a beam's own channels; emitter levels (most pixel channels) take a short path.</summary>
+    private static void ApplyOwn(ref BeamAcc acc, BeamState bs, float[] levels, int[] channels, in ApplyContext ctx, ref bool animating)
+    {
+        var rt = ctx.Runtime;
+        var fns = ctx.Functions;
+        foreach (int c in channels)
+        {
+            ref var r = ref rt[c];
+            if (r.Function < 0) continue;
+            var f = fns[r.Function];
+            if (f.Class.Kind == AttributeKind.ColorAdd)
+            {
+                if (f.Emitter >= 0)
+                {
+                    levels[f.Emitter] = MathF.Max(levels[f.Emitter], Level(f, r.Value) * r.Relation);
+                    acc.Emitters = true;
+                }
+                continue;
+            }
+            Apply(ref acc, bs, levels, c, in ctx, ref animating);
+        }
+    }
+
     private static void Apply(ref BeamAcc acc, BeamState bs, float[] levels, int c, in ApplyContext ctx, ref bool animating)
     {
         ref var r = ref ctx.Runtime[c];
         if (r.Function < 0) return;
         var f = ctx.Functions[r.Function];
-        var set = r.SetIndex >= 0 ? f.SetArray[r.SetIndex] : null;
-        var flags = set?.Flags ?? ChannelSetFlags.None;
+        var flags = r.SetFlags;
         var cls = f.Class;
+        // the set object itself only for the attributes that read its pre-parsed meaning (waveform, kelvin, colour, name)
+        var set = r.SetIndex >= 0 && ReadsSet(cls.Kind) ? f.SetArray[r.SetIndex] : null;
         float v = r.Value;
         float level = Level(f, v) * r.Relation;
         int n = Math.Max(cls.Number, 1) - 1;
@@ -712,6 +743,10 @@ public static class FixtureEvaluator
         }
     }
 
+    private static bool ReadsSet(AttributeKind kind) => kind is AttributeKind.Strobe or AttributeKind.StrobeRate or AttributeKind.StrobeMode
+        or AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc or AttributeKind.ColorMacro or AttributeKind.WheelSelect
+        or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake;
+
     /// <summary>Adds a subtractive filter (code 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y; see <see cref="ProfileFunction.ColorCode"/>).</summary>
     private static void ApplySubtractive(ref BeamAcc acc, int code, float level)
     {
@@ -814,7 +849,7 @@ public static class FixtureEvaluator
         if (arr is null || arr.Length == 0) return;
         if (n >= arr.Length) n = arr.Length - 1;
         ref var w = ref arr[n];
-        var flags = set?.Flags ?? ChannelSetFlags.None;
+        var flags = r.SetFlags;
         int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
         if (f.Wheel >= 0) w.Wheel = f.Wheel;
         switch (f.Class.Kind)
@@ -834,7 +869,7 @@ public static class FixtureEvaluator
                 }
                 if (f.Class.Kind == AttributeKind.WheelSelectSpin)
                 {
-                    w.Rotation = (float)(r.Spin.Position % 360.0) * DegToRad;
+                    w.Rotation = Turn(r.Spin.Position) * DegToRad;
                     w.RotationSpeed = (float)r.Spin.Velocity * DegToRad;
                 }
                 else if (f.Class.Kind == AttributeKind.WheelSelectShake && (flags & ChannelSetFlags.NoFunction) == 0)
@@ -852,8 +887,9 @@ public static class FixtureEvaluator
             case AttributeKind.WheelSpin:
                 {
                     double angle = r.Spin.Position;
-                    w.WheelAngle = (float)(angle % 360.0) * DegToRad;
-                    w.Position = 1f + (float)(angle % 360.0 / 360.0) * slots;
+                    float turn = Turn(angle);
+                    w.WheelAngle = turn * DegToRad;
+                    w.Position = 1f + turn / 360f * slots;
                     break;
                 }
             case AttributeKind.WheelShake:
@@ -878,7 +914,7 @@ public static class FixtureEvaluator
                 w.RotationSpeed = 0f;
                 break;
             case AttributeKind.SlotRotate:
-                w.Rotation = (float)(r.Spin.Position % 360.0) * DegToRad;
+                w.Rotation = Turn(r.Spin.Position) * DegToRad;
                 w.RotationSpeed = (float)r.Spin.Velocity * DegToRad;
                 break;
             case AttributeKind.SlotShake:
@@ -900,13 +936,19 @@ public static class FixtureEvaluator
 
     private static void ResetWheels(BeamState s)
     {
-        s.ColorWheels.AsSpan().Fill(WheelState.Unused);
-        s.Gobos.AsSpan().Fill(WheelState.Unused);
-        s.Prisms.AsSpan().Fill(WheelState.Unused);
-        s.AnimationWheels.AsSpan().Fill(WheelState.Unused);
-        s.Effects.AsSpan().Fill(WheelState.Unused);
-        s.BeamShapers.AsSpan().Fill(WheelState.Unused);
-        s.Blades.AsSpan().Clear();
+        Reset(s.ColorWheels);
+        Reset(s.Gobos);
+        Reset(s.Prisms);
+        Reset(s.AnimationWheels);
+        Reset(s.Effects);
+        Reset(s.BeamShapers);
+        var blades = s.Blades;
+        for (int i = 0; i < blades.Length; i++) blades[i] = default;
+
+        static void Reset(WheelState[] a)
+        {
+            for (int i = 0; i < a.Length; i++) a[i] = WheelState.UnusedState;
+        }
     }
 
     private static void CopyWheels(BeamState from, BeamState to)
@@ -923,8 +965,8 @@ public static class FixtureEvaluator
         static void Copy(WheelState[] a, WheelState[] b)
         {
             int n = Math.Min(a.Length, b.Length);
-            a.AsSpan(0, n).CopyTo(b);
-            if (b.Length > n) b.AsSpan(n).Fill(WheelState.Unused);
+            for (int i = 0; i < n; i++) b[i] = a[i];
+            for (int i = n; i < b.Length; i++) b[i] = WheelState.UnusedState;
         }
     }
 
@@ -1048,7 +1090,7 @@ public static class FixtureEvaluator
         {
             // two engines: the white one (CTC + tint, at the emitters' best output for that CCT) cross-faded with the colour one
             float f = Math.Clamp(acc.Crossfade, 0f, 1f);
-            var white = ctx.WhiteCache.Xyz(ctcKelvin, tint) * (reference * pb.WhiteEfficiency(ctcKelvin));
+            var white = ctx.Cache.WhiteXyz(ctcKelvin, tint) * (reference * pb.WhiteEfficiency(ctcKelvin));
             var colour = any ? xyz : pb.SourceXyz * reference;
             xyz = white * (1f - f) + colour * f;
             any = true;
@@ -1078,21 +1120,9 @@ public static class FixtureEvaluator
                 float mired = (float.IsNaN(ctcKelvin) ? 1e6f / pb.SourceKelvin : 1e6f / ctcKelvin) + acc.MiredShift;
                 targetKelvin = 1e6f / Math.Clamp(mired, 40f, 1000f);
             }
-            if (pb.ElectronicColor && temperature)
-            {
-                // an LED engine re-balances its emitters: the chromatic change of a conversion filter, but the luminous
-                // cost of the engine at the new white point instead of the filter's
-                var conversion = table.RgbTransmission(0f, 0f, 0f, targetKelvin);
-                float filtered = ColorSpaces.LuminanceRec2020(table.SourceRgb * conversion);
-                float engine = pb.WhiteEfficiency(targetKelvin) / MathF.Max(pb.WhiteEfficiency(pb.SourceKelvin), WhiteEfficiencyTable.Floor);
-                if (filtered > 1e-4f) conversion *= engine / filtered;
-                rgb *= conversion;
-                if (cmy) rgb *= table.RgbTransmission(acc.C, acc.M, acc.Y, float.NaN);
-            }
-            else
-            {
-                rgb *= table.RgbTransmission(acc.C, acc.M, acc.Y, targetKelvin);
-            }
+            // an LED engine re-balances its emitters: the chromatic change of a conversion filter, but the luminous cost of
+            // the engine at the new white point instead of the filter's (re-balancing never adds light)
+            rgb *= ctx.Cache.Filter(pb, table, acc.C, acc.M, acc.Y, targetKelvin, electronic: pb.ElectronicColor && temperature);
         }
         foreach (ref readonly var w in bs.ColorWheels.AsSpan())
         {
@@ -1115,7 +1145,7 @@ public static class FixtureEvaluator
         float beamAngle = float.IsFinite(acc.Zoom) ? Math.Clamp(acc.Zoom, 0.1f, 179f) * DegToRad : pb.NativeBeamAngle;
         bs.BeamAngle = beamAngle;
         bs.FieldAngle = MathF.Min(beamAngle * pb.FieldRatio, 1.5f * MathF.PI);
-        float peak = pb.PeakCandelaAt(beamAngle) * transmission * bs.Intensity;
+        float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity;
         bs.PeakCandela = float.IsFinite(peak) ? peak : 0f;
         bs.Flux = flux * bs.Intensity;
         bs.Focus = float.IsFinite(acc.Focus) ? acc.Focus : 0.5f;
@@ -1142,8 +1172,7 @@ public static class FixtureEvaluator
     /// <summary>HSB (hue in degrees, saturation and brightness 0 … 1) to RGB 0 … 1.</summary>
     internal static Vector3 HsbToRgb(float hue, float saturation, float brightness)
     {
-        float h = float.IsFinite(hue) ? hue % 360f : 0f;
-        if (h < 0f) h += 360f;
+        float h = float.IsFinite(hue) ? hue - 360f * MathF.Floor(hue / 360f) : 0f;
         float s = Math.Clamp(saturation, 0f, 1f), b = Math.Clamp(brightness, 0f, 1f);
         float c = b * s;
         float hp = h / 60f;

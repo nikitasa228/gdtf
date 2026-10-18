@@ -52,9 +52,10 @@ public static class MotorDynamics
             return;
         }
         if (!(dt > 0)) return;
+        double x = state.Position, v = state.Velocity;
+        if (x == target && v == 0) return; // at rest on the target
         double vmax = limits.MaxSpeed > 0f ? limits.MaxSpeed : 1e-6;
         double amax = limits.MaxAcceleration;
-        double x = state.Position, v = state.Velocity;
         double eps = 1e-7 * Math.Max(1.0, Math.Abs(target));
 
         if (!double.IsFinite(amax) || amax <= 0)
@@ -69,11 +70,13 @@ public static class MotorDynamics
             return;
         }
 
+        double invA = limits.InverseAcceleration;
+        double settleSpeed2 = 2 * amax * eps + 1e-24; // squared speed below which the motor stops within eps
         double remaining = dt;
         for (int iter = 0; iter < 16 && remaining > 0; iter++)
         {
             double e = target - x;
-            if (Math.Abs(e) <= eps && Math.Abs(v) <= Math.Sqrt(2 * amax * eps) + 1e-12)
+            if (Math.Abs(e) <= eps && v * v <= settleSpeed2)
             {
                 x = target;
                 v = 0;
@@ -83,45 +86,44 @@ public static class MotorDynamics
             double u = v * dir; // speed toward the target
             double d = Math.Abs(e);
             double t, a; // phase duration and acceleration toward the target
-            double brake = u > 0 ? u * u / (2 * amax) : 0;
+            double brake = u > 0 ? 0.5 * u * u * invA : 0;
             if (u < 0)
             {
-                t = -u / amax; // moving away: turn around
+                t = -u * invA; // moving away: turn around
                 a = amax;
             }
             else if (brake >= d - eps)
             {
-                t = u / amax; // on (or past) the braking curve
+                t = u * invA; // on (or past) the braking curve
                 a = -amax;
                 if (t <= 0) { x = target; v = 0; break; }
             }
             else if (u > vmax * (1 + 1e-9))
             {
                 // faster than allowed (speed limit just lowered): slow down, but never past the braking curve
-                double tv = (u - vmax) / amax;
-                t = tv;
+                t = (u - vmax) * invA;
                 a = -amax;
             }
             else if (u < vmax * (1 - 1e-9))
             {
-                double t1 = (vmax - u) / amax;
-                double t2 = (-u + Math.Sqrt(u * u / 2 + amax * d)) / amax;
+                double t1 = (vmax - u) * invA;
+                double t2 = (Math.Sqrt(u * u / 2 + amax * d) - u) * invA;
                 t = Math.Min(t1, t2);
                 a = amax;
             }
             else
             {
-                t = (d - u * u / (2 * amax)) / u; // cruise until the braking curve
+                t = (d - brake) / u; // cruise until the braking curve
                 a = 0;
             }
             if (!(t > 1e-12)) t = 1e-12;
             double tt = Math.Min(t, remaining);
             double accel = a * dir;
-            x += v * tt + 0.5 * accel * tt * tt;
+            x += (v + 0.5 * accel * tt) * tt;
             v += accel * tt;
             remaining -= tt;
         }
-        if (Math.Abs(target - x) <= eps && Math.Abs(v) <= Math.Sqrt(2 * amax * eps) + 1e-12)
+        if (Math.Abs(target - x) <= eps && v * v <= settleSpeed2)
         {
             x = target;
             v = 0;

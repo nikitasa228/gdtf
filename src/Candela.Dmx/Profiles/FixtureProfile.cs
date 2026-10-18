@@ -107,6 +107,12 @@ public sealed partial class FixtureProfile
     /// <summary>Channels that follow at least one relation master, ascending.</summary>
     internal int[] FollowerChannels { get; }
 
+    /// <summary>Per channel: where its bytes are in the fixture's DMX (shared by every buffer of the profile).</summary>
+    internal ChannelSlots[] SlotLayout { get; }
+
+    /// <summary>Per channel: true when one of its functions is motorised or rotates (needs motor dynamics).</summary>
+    internal bool[] ChannelMoves { get; }
+
     /// <summary>Channels whose functions affect every beam (evaluated once per frame, not per beam).</summary>
     internal int[] SharedBeamChannels { get; }
 
@@ -198,10 +204,50 @@ public sealed partial class FixtureProfile
         ModifierChannels = b.ModifierChannels;
         FollowerRelations = b.FollowerRelations;
         FollowerChannels = Enumerable.Range(0, b.FollowerRelations.Length).Where(c => b.FollowerRelations[c].Length > 0).ToArray();
+        SlotLayout = Array.ConvertAll(ChannelArray, ChannelSlots.Of);
+        ChannelMoves = Array.ConvertAll(ChannelArray, ch =>
+        {
+            for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                if (FunctionArray[k].Motion != MotionKind.None || FunctionArray[k].IsRotation) return true;
+            return false;
+        });
         FlameChannel = b.FlameChannel;
         ColorSpacePrimaries = b.ColorSpacePrimaries;
         IsRelationMaster = b.IsRelationMaster;
         _channelsByAttribute = b.ChannelsByAttribute;
         _channelsByName = b.ChannelsByName;
+    }
+}
+
+/// <summary>Where one channel's bytes are: break index (−1 for virtual channels), first 0-based slot, byte count, and whether the bytes are consecutive.</summary>
+internal readonly struct ChannelSlots
+{
+    private ChannelSlots(int breakIndex, int first, int bytes, bool contiguous)
+    {
+        Break = breakIndex;
+        First = first;
+        Bytes = bytes;
+        Contiguous = contiguous;
+    }
+
+    /// <summary>Index into the profile's breaks, −1 for a virtual channel.</summary>
+    public readonly int Break;
+
+    /// <summary>0-based slot of the coarse byte.</summary>
+    public readonly int First;
+
+    /// <summary>Number of bytes.</summary>
+    public readonly int Bytes;
+
+    /// <summary>True when the bytes are at First, First + 1, … (GDTF allows any offsets).</summary>
+    public readonly bool Contiguous;
+
+    public static ChannelSlots Of(ProfileChannel ch)
+    {
+        var offsets = ch.Instance.Offsets;
+        if (ch.IsVirtual || ch.BreakIndex < 0) return new ChannelSlots(-1, 0, 0, true);
+        bool contiguous = true;
+        for (int i = 1; i < offsets.Length; i++) contiguous &= offsets[i] == offsets[0] + i;
+        return new ChannelSlots(ch.BreakIndex, offsets[0] - 1, offsets.Length, contiguous);
     }
 }

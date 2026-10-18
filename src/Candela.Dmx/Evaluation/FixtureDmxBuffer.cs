@@ -55,13 +55,35 @@ public sealed class FixtureDmxBuffer
     /// <summary>Reads every channel's raw value into the evaluation state (per-frame path).</summary>
     internal void ReadAll(ChannelRuntime[] runtime)
     {
-        var breaks = _channelBreak;
-        var offsets = _channelOffsets;
-        int n = Math.Min(runtime.Length, breaks.Length);
+        var layout = Profile.SlotLayout;
+        int n = Math.Min(runtime.Length, layout.Length);
         for (int c = 0; c < n; c++)
         {
-            int b = breaks[c];
-            runtime[c].Dmx = b < 0 ? _virtual[c] : Combine(_breaks[b], offsets[c]);
+            ref readonly var l = ref layout[c];
+            uint v;
+            if (l.Break < 0)
+            {
+                v = _virtual[c];
+            }
+            else if (l.Contiguous)
+            {
+                var slots = _breaks[l.Break];
+                int o = l.First;
+                v = 0;
+                if ((uint)(o + l.Bytes) <= (uint)slots.Length)
+                {
+                    for (int i = 0; i < l.Bytes; i++) v = (v << 8) | slots[o + i];
+                }
+                else
+                {
+                    for (int i = 0; i < l.Bytes; i++) v = (v << 8) | ((uint)(o + i) < (uint)slots.Length ? slots[o + i] : 0u);
+                }
+            }
+            else
+            {
+                v = Combine(_breaks[l.Break], _channelOffsets[c]);
+            }
+            runtime[c].Dmx = v;
         }
     }
 

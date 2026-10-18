@@ -29,6 +29,7 @@ public sealed partial class FixtureProfile
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
         private int[] _subtreeSize = Array.Empty<int>();
         private bool? _emitterYVaries;
+        private bool? _cmyAsColorAdd;
 
         public Builder(FixtureType fixtureType, DmxMode mode, FixtureSpecs? specs)
         {
@@ -118,6 +119,34 @@ public sealed partial class FixtureProfile
             return -1;
         }
 
+        /// <summary>
+        /// True when the mode's only additive colour attributes are ColorAdd_C/M/Y: real files use them for CMY colour
+        /// mixing (subtractive flags or a virtual CMY mode; DMX 0 = white), never for a cyan + magenta + yellow emitter set.
+        /// </summary>
+        private bool CmyWrittenAsColorAdd()
+        {
+            if (_cmyAsColorAdd is { } known) return known;
+            bool any = false, onlyCmy = true;
+            foreach (var ch in Mode.Channels)
+                foreach (var lc in ch.LogicalChannels)
+                    foreach (var f in lc.Functions)
+                    {
+                        if (AttributeClassifier.Classify(f.AttributeName) is not { Kind: AttributeKind.ColorAdd } c) continue;
+                        any = true;
+                        onlyCmy &= c.Code is "C" or "M" or "Y";
+                    }
+            _cmyAsColorAdd = any && onlyCmy;
+            if (_cmyAsColorAdd.Value) Warnings.Add("ColorAdd_C/M/Y without other emitters are read as CMY colour mixing (ColorSub).");
+            return _cmyAsColorAdd.Value;
+        }
+
+        /// <summary>Classifies an attribute of this mode (see <see cref="CmyWrittenAsColorAdd"/> for the one mode-dependent rule).</summary>
+        private AttributeClass Classify(string attribute)
+        {
+            var cls = AttributeClassifier.Classify(attribute);
+            return cls.Kind == AttributeKind.ColorAdd && CmyWrittenAsColorAdd() ? cls with { Kind = AttributeKind.ColorSub } : cls;
+        }
+
         private void BuildChannels()
         {
             var instances = Mode.ChannelInstances;
@@ -136,7 +165,7 @@ public sealed partial class FixtureProfile
                     Warnings.Add($"{inst}: geometry lookup failed ({e.Message}).");
                 }
                 int breakIndex = inst.Offsets.Length == 0 ? -1 : BreakIndex(inst.Break);
-                var pc = new ProfileChannel(Channels.Count, inst, breakIndex, part, AttributeClassifier.Classify(attribute))
+                var pc = new ProfileChannel(Channels.Count, inst, breakIndex, part, Classify(attribute))
                 {
                     Attribute = attribute,
                     Snap = ch.LogicalChannels.Count > 0 ? ch.LogicalChannels[0].Snap : SnapMode.No,
@@ -190,7 +219,7 @@ public sealed partial class FixtureProfile
         private ProfileFunction CompileFunction(ProfileChannel ch, ChannelFunction src)
         {
             string attribute = string.IsNullOrEmpty(src.AttributeName) ? "NoFeature" : src.AttributeName;
-            var cls = AttributeClassifier.Classify(attribute);
+            var cls = Classify(attribute);
             var f = new ProfileFunction(Functions.Count, ch.Index, src, attribute, cls)
             {
                 Unit = src.Attribute?.PhysicalUnit ?? PhysicalUnit.None,
@@ -1163,7 +1192,7 @@ public sealed partial class FixtureProfile
                     var f = fns[fn];
                     int set = f.SetIndexAt(v);
                     float physical = FixtureEvaluator.PhysicalAt(f, v, set);
-                    table[v] = new DecodeEntry(fn - ch.FirstFunction, set, physical, f.UsesSlotPosition ? f.SlotPositionAt(v) : physical);
+                    table[v] = new DecodeEntry(fn - ch.FirstFunction, set, f.FlagsOf(set), physical, f.UsesSlotPosition ? f.SlotPositionAt(v) : physical);
                 }
                 ch.Decode = table;
                 shared.TryAdd(ch.Source, table);

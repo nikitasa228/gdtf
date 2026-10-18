@@ -13,6 +13,9 @@ namespace Candela.Dmx;
 /// <param name="MaxAcceleration">Largest acceleration, units/s² (∞ = speed changes instantly).</param>
 public readonly record struct MotorLimits(float MaxSpeed, float MaxAcceleration)
 {
+    /// <summary>1 / <see cref="MaxAcceleration"/> (s²/unit), precomputed for the per-frame integration.</summary>
+    internal double InverseAcceleration { get; } = MaxAcceleration > 0f ? 1.0 / MaxAcceleration : double.PositiveInfinity;
+
     /// <summary>No dynamics: the value follows its target immediately.</summary>
     public static MotorLimits Instant => new(float.PositiveInfinity, float.PositiveInfinity);
 
@@ -179,12 +182,19 @@ public sealed class ProfileFunction
     /// <summary>First DMX value of every set (same order as <see cref="SetArray"/>), for the binary search on the per-frame path.</summary>
     internal uint[] SetDmxFrom { get; private set; } = Array.Empty<uint>();
 
+    /// <summary>Flags of every set (same order as <see cref="SetArray"/>), so the per-frame path need not visit the set objects.</summary>
+    internal ChannelSetFlags[] SetFlagArray { get; private set; } = Array.Empty<ChannelSetFlags>();
+
     /// <summary>Installs the channel sets (sorted by DMX value).</summary>
     internal void SetSets(ProfileChannelSet[] sets)
     {
         SetArray = sets;
         SetDmxFrom = Array.ConvertAll(sets, s => s.DmxFrom);
+        SetFlagArray = Array.ConvertAll(sets, s => s.Flags);
     }
+
+    /// <summary>Flags of set <paramref name="setIndex"/> (−1: none).</summary>
+    internal ChannelSetFlags FlagsOf(int setIndex) => setIndex >= 0 ? SetFlagArray[setIndex] : ChannelSetFlags.None;
 
     /// <summary>Motion group (MSpeed channels scale it): 0 position, 1 colour, 2 gobo, 3 beam, 4 shaper, 5 other.</summary>
     internal int MotionGroup { get; set; } = 5;
@@ -639,10 +649,11 @@ public sealed class ProfileAxis
 /// <summary>A pre-decoded DMX value: active function (relative to the channel's first), channel set, physical and control value.</summary>
 internal readonly struct DecodeEntry
 {
-    public DecodeEntry(int function, int set, float physical, float target)
+    public DecodeEntry(int function, int set, ChannelSetFlags flags, float physical, float target)
     {
         Function = (short)function;
         Set = (short)set;
+        Flags = flags;
         Physical = physical;
         Target = target;
     }
@@ -652,6 +663,9 @@ internal readonly struct DecodeEntry
 
     /// <summary>Channel set index in the function, −1 when none.</summary>
     public readonly short Set;
+
+    /// <summary>Flags of that channel set.</summary>
+    public readonly ChannelSetFlags Flags;
 
     /// <summary>GDTF physical value.</summary>
     public readonly float Physical;

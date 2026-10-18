@@ -296,13 +296,14 @@ public sealed class AttributeOverrides
             r.Function = e.Function;
             r.Dmx = e.Dmx;
             r.SetIndex = e.SetIndex;
+            r.SetFlags = e.SetFlags;
             r.Physical = e.Physical;
             r.Target = e.Value;
         }
     }
 
     /// <summary>One manual value, decoded once: the channel's function, DMX value, channel set and physical value.</summary>
-    private readonly record struct Entry(int Channel, int Function, float Value, uint Dmx, int SetIndex, float Physical)
+    private readonly record struct Entry(int Channel, int Function, float Value, uint Dmx, int SetIndex, ChannelSetFlags SetFlags, float Physical)
     {
         public static Entry Create(ProfileFunction f, float value)
         {
@@ -310,7 +311,7 @@ public sealed class AttributeOverrides
             uint dmx = DmxEncoder.ToDmx(f, v);
             int set = f.SetIndexAt(dmx);
             float physical = f.UsesSlotPosition ? FixtureEvaluator.PhysicalAt(f, dmx, set) : v;
-            return new Entry(f.Channel, f.Index, v, dmx, set, physical);
+            return new Entry(f.Channel, f.Index, v, dmx, set, f.FlagsOf(set), physical);
         }
     }
 }

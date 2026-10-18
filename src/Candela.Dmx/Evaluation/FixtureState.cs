@@ -102,7 +102,9 @@ public struct WheelState
     public float Rate;
 
     /// <summary>A mechanism that is not used.</summary>
-    public static WheelState Unused => new() { Wheel = -1, Position = float.NaN, IsOpen = true, Insertion = 0f };
+    public static WheelState Unused => UnusedState;
+
+    internal static readonly WheelState UnusedState = new() { Wheel = -1, Position = float.NaN, IsOpen = true, Insertion = 0f };
 }
 
 /// <summary>One framing blade (shutter) of a beam.</summary>
@@ -164,7 +166,7 @@ public sealed class BeamState
         AnimationWheels = Filled(animations);
         Effects = Filled(effects);
         BeamShapers = Filled(shapers);
-        Blades = new BladeState[blades];
+        Blades = blades == 0 ? Array.Empty<BladeState>() : new BladeState[blades];
         Color = LightColor.White;
         Iris = 1f;
         FocusDistance = float.NaN;
@@ -172,6 +174,7 @@ public sealed class BeamState
 
     private static WheelState[] Filled(int n)
     {
+        if (n == 0) return Array.Empty<WheelState>(); // shared: beams without a mechanism do not touch memory of their own
         var a = new WheelState[n];
         Array.Fill(a, WheelState.Unused);
         return a;
@@ -293,7 +296,7 @@ public sealed class FixtureState
     internal readonly float[] OwnEmitterLevels;
     internal readonly BeamState SharedScratch;
     internal readonly float[] SpeedFactors = [1f, 1f, 1f, 1f, 1f, 1f];
-    internal readonly WhitePointCache WhiteCache = new();
+    internal readonly EvaluationCache Cache = new();
 
     /// <summary>Creates the state of a fixture of <paramref name="profile"/>.</summary>
     /// <param name="profile">The compiled profile.</param>
@@ -451,25 +454,76 @@ public sealed class FixtureState
 }
 
 /// <summary>
-/// The last white point computed for a fixture (CCT + Δuv → XYZ with Y = 1), so that the beams of a multi-cell fixture
-/// share one locus computation per frame.
+/// Results of the costlier colour and photometry functions for the last inputs seen, so that the beams of a multi-cell
+/// fixture (which usually share CTC/CTO/CMY, zoom and source) compute them once per frame. One per fixture state.
 /// </summary>
-internal sealed class WhitePointCache
+internal sealed class EvaluationCache
 {
-    private float _kelvin = float.NaN;
-    private float _duv = float.NaN;
-    private Vector3 _xyz;
+    private float _whiteKelvin = float.NaN, _whiteDuv = float.NaN;
+    private Vector3 _whiteXyz;
+
+    private SubtractiveColorTable? _filterTable;
+    private WhiteEfficiencyTable? _filterWhite;
+    private float _filterSource = float.NaN, _filterC = float.NaN, _filterM = float.NaN, _filterY = float.NaN, _filterTarget = float.NaN;
+    private bool _filterElectronic;
+    private Vector3 _filter;
+
+    private BeamSolidAngleTable? _omegaTable;
+    private float _omegaAngle = float.NaN;
+    private float _omega;
 
     /// <summary>XYZ (Y = 1) of colour temperature <paramref name="kelvin"/> offset by <paramref name="duv"/> from the Planckian locus.</summary>
-    public Vector3 Xyz(float kelvin, float duv)
+    public Vector3 WhiteXyz(float kelvin, float duv)
     {
-        if (kelvin != _kelvin || duv != _duv)
+        if (kelvin != _whiteKelvin || duv != _whiteDuv)
         {
-            _xyz = ColorSpaces.XyToXyz(Cct.XyFromCct(kelvin, duv));
-            _kelvin = kelvin;
-            _duv = duv;
+            _whiteXyz = ColorSpaces.XyToXyz(Cct.XyFromCct(kelvin, duv));
+            _whiteKelvin = kelvin;
+            _whiteDuv = duv;
         }
-        return _xyz;
+        return _whiteXyz;
+    }
+
+    /// <summary>
+    /// Per-channel (linear Rec.2020) multiplier of CMY filters and a colour-temperature change to
+    /// <paramref name="targetKelvin"/> (NaN = none) for a beam's source. <paramref name="electronic"/>: the change is an
+    /// LED engine re-balancing its emitters (chromatic change of a conversion filter, luminous cost of the engine).
+    /// </summary>
+    public Vector3 Filter(ProfileBeam beam, SubtractiveColorTable table, float c, float m, float y, float targetKelvin, bool electronic)
+    {
+        if (ReferenceEquals(table, _filterTable) && ReferenceEquals(beam.WhiteTable, _filterWhite) && beam.SourceKelvin == _filterSource &&
+            c == _filterC && m == _filterM && y == _filterY && electronic == _filterElectronic &&
+            (targetKelvin == _filterTarget || (float.IsNaN(targetKelvin) && float.IsNaN(_filterTarget))))
+            return _filter;
+        Vector3 result;
+        if (electronic)
+        {
+            var conversion = table.RgbTransmission(0f, 0f, 0f, targetKelvin);
+            float filtered = ColorSpaces.LuminanceRec2020(table.SourceRgb * conversion);
+            float engine = MathF.Min(1f, beam.WhiteEfficiency(targetKelvin) / MathF.Max(beam.WhiteEfficiency(beam.SourceKelvin), WhiteEfficiencyTable.Floor));
+            if (filtered > 1e-4f) conversion *= engine / filtered;
+            if (c > 0f || m > 0f || y > 0f) conversion *= table.RgbTransmission(c, m, y, float.NaN);
+            result = conversion;
+        }
+        else
+        {
+            result = table.RgbTransmission(c, m, y, targetKelvin);
+        }
+        (_filterTable, _filterWhite, _filterSource, _filterC, _filterM, _filterY, _filterTarget, _filterElectronic, _filter) =
+            (table, beam.WhiteTable, beam.SourceKelvin, c, m, y, targetKelvin, electronic, result);
+        return result;
+    }
+
+    /// <summary>Effective solid angle (sr) of a beam's distribution at full beam angle <paramref name="beamAngle"/> (rad).</summary>
+    public float SolidAngle(BeamSolidAngleTable table, float beamAngle)
+    {
+        if (!ReferenceEquals(table, _omegaTable) || beamAngle != _omegaAngle)
+        {
+            _omega = table.SolidAngle(beamAngle);
+            _omegaTable = table;
+            _omegaAngle = beamAngle;
+        }
+        return _omega;
     }
 }
 
@@ -483,6 +537,7 @@ internal struct ChannelRuntime
     public float Value;
     public float Relation;
     public int SetIndex;
+    public ChannelSetFlags SetFlags;
     public MotorState Motor;
     public MotorState Spin;
     public AttributeKind MotorKind;
