@@ -45,6 +45,9 @@ public static class ProjectIssueCodes
     /// <summary>Parent links formed a cycle; the cycle was broken by moving an entity to the scene root.</summary>
     public const string SceneParentCycle = "project.scene-parent-cycle";
 
+    /// <summary>An entity was nested deeper than the reader accepts (1000 levels); it was moved to the root, keeping its world placement.</summary>
+    public const string SceneTooDeep = "project.scene-too-deep";
+
     /// <summary>An entity's transform could not be read or was not finite; identity was used.</summary>
     public const string SceneTransformInvalid = "project.scene-transform-invalid";
 

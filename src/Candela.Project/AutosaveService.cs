@@ -30,6 +30,15 @@ public sealed class AutosaveOptions
 
     /// <summary>Clock for the interval and the recorded times (tests inject a manual clock).</summary>
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
+
+    /// <summary>
+    /// The recovered session this service continues (<see cref="RecoverableSession.Load"/> was used to open the project):
+    /// its autosave files become this session's, are rotated by new autosaves and deleted by
+    /// <see cref="AutosaveService.CompleteSession"/>. Its folder is used instead of <see cref="Directory"/>. Without it a
+    /// new session never writes to, rotates or deletes autosave files that an ended session left behind, so crash data
+    /// stays recoverable until the user recovers or discards it (<see cref="RecoverableSession.Delete"/>).
+    /// </summary>
+    public RecoverableSession? Resume { get; init; }
 }
 
 /// <summary>A finished autosave (reported through <see cref="AutosaveService.Saved"/> on the main thread).</summary>
@@ -53,12 +62,16 @@ public sealed record AutosaveResult(string Path, DateTime SavedUtc, long BytesWr
 /// <b>Files.</b> The newest autosave is <c>{key}.candela</c>, older ones <c>{key}.1.candela</c> …
 /// (<see cref="AutosaveOptions.KeepCount"/> in total); <c>{key}.session.json</c> records the scene name and the file the
 /// project belongs to; <c>{key}.lock</c> is held open while the session runs, so another running instance never offers a
-/// live session for recovery. The key is the project id (<c>{id}~2</c>, … when that project is already open in another
-/// instance). Every file is written atomically.
+/// live session for recovery. The key is the project id; <c>{id}~2</c>, … are used when that project is already open in
+/// another instance, or when an ended session of it left autosave files that were neither recovered nor discarded — a new
+/// session never overwrites, rotates away or deletes another session's crash data. A session opened with
+/// <see cref="AutosaveOptions.Resume"/> continues the recovered session's files instead. Every file is written atomically.
 /// </para>
 /// <para>
-/// <b>Lifecycle.</b> On start-up call <see cref="FindRecoverable"/> to list sessions that did not end cleanly. On a clean
-/// exit (or when the project is closed normally) call <see cref="CompleteSession"/>, which deletes the session's files.
+/// <b>Lifecycle.</b> On start-up call <see cref="FindRecoverable"/> to list sessions that did not end cleanly; after opening
+/// one with <see cref="RecoverableSession.Load"/>, start the new service with <see cref="AutosaveOptions.Resume"/> so it
+/// carries on with (and finally cleans up) those files. On a clean exit (or when the project is closed normally) call
+/// <see cref="CompleteSession"/>, which deletes the session's files.
 /// <see cref="Dispose"/> only stops the service and keeps the files, so an exception unwinding through a <c>using</c>
 /// never destroys the recovery data it exists for.
 /// </para>
@@ -67,7 +80,7 @@ public sealed class AutosaveService : IDisposable
 {
     private const string SessionSuffix = ".session.json";
     private const string LockSuffix = ".lock";
-    private const int MaxInstances = 64;
+    private const int MaxInstances = 256;
 
     private readonly Func<bool, ProjectSnapshot?> _capture;
     private readonly AutosaveOptions _options;
@@ -101,9 +114,12 @@ public sealed class AutosaveService : IDisposable
         _keep = System.Math.Clamp(_options.KeepCount, 1, 100);
         Interval = _options.Interval;
         ProjectId = projectId;
-        Directory = Path.GetFullPath(_options.Directory ?? DefaultDirectory);
+        var resume = _options.Resume;
+        if (resume is not null && resume.ProjectId != Guid.Empty && resume.ProjectId != projectId)
+            throw new ArgumentException($"The recovered session belongs to project {resume.ProjectId:D}, not {projectId:D}.", nameof(options));
+        Directory = Path.GetFullPath(resume?.Directory ?? _options.Directory ?? DefaultDirectory);
         System.IO.Directory.CreateDirectory(Directory);
-        (SessionKey, _lock) = AcquireSession(Directory, projectId);
+        (SessionKey, _lock) = AcquireSession(Directory, projectId, resume?.SessionKey);
         _tracker = tracker;
         _startedUtc = _clock.GetUtcNow().UtcDateTime;
         _lastCaptureTimestamp = _clock.GetTimestamp();
@@ -407,20 +423,42 @@ public sealed class AutosaveService : IDisposable
 
     // ----- files and sessions ---------------------------------------------------------------------------------------
 
-    private static (string Key, FileStream Lock) AcquireSession(string directory, Guid projectId)
+    /// <summary>
+    /// Takes the lock of a session key: <paramref name="resumeKey"/> when given and not running elsewhere, otherwise the
+    /// first of <c>{id}</c>, <c>{id}~2</c>, … that no running session holds and that has no autosave files left by an
+    /// ended session (those belong to a crash the user has not recovered or discarded yet and must not be overwritten).
+    /// </summary>
+    private static (string Key, FileStream Lock) AcquireSession(string directory, Guid projectId, string? resumeKey)
     {
+        if (!string.IsNullOrEmpty(resumeKey))
+        {
+            try
+            {
+                return (resumeKey, OpenLock(Path.Combine(directory, resumeKey + LockSuffix), FileMode.OpenOrCreate));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // The recovered session is running in another instance after all; start a session of our own.
+            }
+        }
+
         Exception? last = null;
         for (int n = 1; n <= MaxInstances; n++)
         {
             var key = n == 1 ? projectId.ToString("D") : string.Create(CultureInfo.InvariantCulture, $"{projectId:D}~{n}");
+            FileStream stream;
             try
             {
-                return (key, OpenLock(Path.Combine(directory, key + LockSuffix), FileMode.OpenOrCreate));
+                stream = OpenLock(Path.Combine(directory, key + LockSuffix), FileMode.OpenOrCreate);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {
                 last = e;
+                continue;
             }
+            if (ListFiles(directory, key).Count == 0) return (key, stream);
+            ReleaseLock(stream);
+            last = new IOException($"The autosave files of session '{key}' have not been recovered or discarded yet.");
         }
         throw new IOException($"No autosave session could be started for project {projectId:D}: {last?.Message}", last);
     }

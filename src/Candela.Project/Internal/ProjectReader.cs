@@ -57,7 +57,8 @@ internal static class ProjectReader
         {
             throw new ProjectFormatException($"The scene (scene.json) cannot be read: {e.Message}.", e);
         }
-        var scene = SceneJsonReader.Read(sceneBytes, issues);
+        var unknownComponents = new Dictionary<Guid, IReadOnlyList<JsonElement>>();
+        var scene = SceneJsonReader.Read(sceneBytes, issues, unknownComponents);
 
         // 3. Everything else: tolerant.
         var store = new AssetStore(options.Materials);
@@ -67,6 +68,7 @@ internal static class ProjectReader
             CreatedUtc = manifest.CreatedUtc != default ? manifest.CreatedUtc : DateTime.UtcNow,
             Manifest = manifest,
         };
+        foreach (var (entity, components) in unknownComponents) project.UnknownComponentsMutable[entity] = components;
         ReadSettings(access, project.Settings, hasManifest, issues);
         var assetUsers = CollectAssetUsers(scene);
         ReadAssets(access, store, assetUsers, options, issues);

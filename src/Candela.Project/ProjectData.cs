@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.SceneGraph;
@@ -55,6 +56,15 @@ public sealed class ProjectData
     /// again. Byte arrays are shared and must not be modified.
     /// </summary>
     public Dictionary<string, byte[]> GdtfFiles { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Components of types this version does not know (written by a newer version), as raw JSON by entity id. Loading keeps
+    /// them and saving writes them back for every entity that still exists, so opening and saving a newer project here
+    /// does not destroy them; this version cannot show, change or merge them. Entities without such components are absent.
+    /// </summary>
+    public IReadOnlyDictionary<Guid, IReadOnlyList<JsonElement>> UnknownComponents => UnknownComponentsMutable;
+
+    internal Dictionary<Guid, IReadOnlyList<JsonElement>> UnknownComponentsMutable { get; } = new();
 
     /// <summary>PNG preview of the project (shown by Open dialogs), or null.</summary>
     public byte[]? Thumbnail { get; set; }

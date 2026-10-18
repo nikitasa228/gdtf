@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Candela.Assets;
 using Candela.Core.SceneGraph.Components;
 using Candela.Core.Serialization;
@@ -16,7 +17,7 @@ public sealed class ProjectSnapshot
     private ProjectSnapshot(ProjectData project, ProjectSaveOptions options, TimeProvider clock)
     {
         var scene = project.Scene;
-        SceneJson = JsonSerializer.SerializeToUtf8Bytes(SceneSerializer.ToFile(scene), CandelaJson.Options);
+        SceneJson = SerializeScene(scene, project.UnknownComponents);
         ProjectId = project.Id;
         FilePath = project.FilePath;
         SceneName = scene.Name;
@@ -120,6 +121,31 @@ public sealed class ProjectSnapshot
         ArgumentNullException.ThrowIfNull(project);
         options ??= ProjectSaveOptions.Default;
         return new ProjectSnapshot(project, options, options.TimeProvider);
+    }
+
+    /// <summary>
+    /// <c>scene.json</c>: Core's <see cref="SceneSerializer"/> layout, plus the components of unknown types kept from loading
+    /// (<see cref="ProjectData.UnknownComponents"/>) appended to the entities that still exist.
+    /// </summary>
+    private static byte[] SerializeScene(Core.SceneGraph.Scene scene, IReadOnlyDictionary<Guid, IReadOnlyList<JsonElement>> unknown)
+    {
+        var file = SceneSerializer.ToFile(scene);
+        if (unknown.Count == 0) return JsonSerializer.SerializeToUtf8Bytes(file, CandelaJson.Options);
+        var root = JsonSerializer.SerializeToNode(file, CandelaJson.Options)!.AsObject();
+        if (root["entities"] is JsonArray entities)
+        {
+            foreach (var node in entities)
+            {
+                if (node is not JsonObject entity || entity["id"] is not JsonValue idValue || !idValue.TryGetValue(out string? idText) ||
+                    !Guid.TryParse(idText, out var id) || !unknown.TryGetValue(id, out var kept))
+                {
+                    continue;
+                }
+                if (entity["components"] is not JsonArray components) entity["components"] = components = new JsonArray();
+                foreach (var component in kept) components.Add(JsonNode.Parse(component.GetRawText()));
+            }
+        }
+        return JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options);
     }
 
     /// <summary>Resolves the bytes stored for a GDTF name: provider, then the project's copy, then a GDTF asset of that name.</summary>
