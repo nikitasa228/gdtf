@@ -82,6 +82,59 @@ public sealed class AddEntitiesCommand : IUndoableCommand
     }
 }
 
+/// <summary>
+/// Duplicates entities in place as one undo step: each copy (with its subtree, new ids) is added under its original's
+/// parent, after the existing children. References among the copied entities point at the copies (a duplicated truss
+/// with its fixtures keeps them mounted on the copy); references to other entities are kept (the copy of a fixture still
+/// hangs on the original truss). The copies are made when the command is created; redo re-adds the same copies.
+/// </summary>
+public sealed class DuplicateEntitiesCommand : IUndoableCommand
+{
+    private readonly SceneModel _scene;
+    private readonly Entity?[] _parents;
+
+    /// <summary>Copies <paramref name="entities"/> (entities of <paramref name="scene"/>; one listed with its ancestor is copied once).</summary>
+    /// <exception cref="ArgumentException">An entity is not in <paramref name="scene"/>.</exception>
+    public DuplicateEntitiesCommand(SceneModel scene, IEnumerable<Entity> entities)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(entities);
+        var list = entities.Where(e => e is not null).ToList();
+        foreach (var e in list)
+            if (e.Scene != scene) throw new ArgumentException($"{e} is not in the scene.", nameof(entities));
+        _scene = scene;
+        Result = EntityCloner.Clone(list, new EntityCloneOptions { TargetScene = scene, ExternalReferences = ExternalReferenceHandling.Keep });
+        _parents = Result.Originals.Select(o => o.Parent).ToArray();
+        Description = Result.Originals.Count == 1 ? $"Duplicate {Result.Originals[0].Name}" : $"Duplicate {Result.Originals.Count} objects";
+    }
+
+    /// <inheritdoc/>
+    public string Description { get; }
+
+    /// <summary>The copies and what happened to their references.</summary>
+    public EntityCloneResult Result { get; }
+
+    /// <summary>The copied subtree roots (select them after <see cref="Do"/>).</summary>
+    public IReadOnlyList<Entity> Copies => Result.Roots;
+
+    /// <inheritdoc/>
+    public void Do()
+    {
+        for (int i = 0; i < Result.Roots.Count; i++)
+        {
+            var parent = _parents[i];
+            _scene.Add(Result.Roots[i], parent is not null && parent.Scene == _scene ? parent : null);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void Undo()
+    {
+        for (int i = Result.Roots.Count - 1; i >= 0; i--)
+            if (Result.Roots[i].Scene == _scene) _scene.Remove(Result.Roots[i]);
+    }
+}
+
 /// <summary>Removes an entity and restores it at the same place on undo. The description is fixed when the command is created.</summary>
 /// <param name="scene">Scene to remove from.</param>
 /// <param name="entity">Entity (with its subtree) to remove.</param>
