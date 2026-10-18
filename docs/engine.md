@@ -295,10 +295,13 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 `tests/Candela.Engine.Tests` (66 tests, ≈ 30 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
-* **Фокина.mvr**: opens with 91 fixtures, 4 substitutes and no errors; every fixture has a state and a pose; after
-  open white, RenderSync draws every model part of every fixture (pick ids map back) and exactly one light per lit
-  beam (≥ 59 lit fixtures; the MagicPanel stand-in evaluates dark, see limitations); identical results for identical
-  input sequences; export → reopen keeps ids, specs and addresses.
+* **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
+  patch spacing equals the manufacturers' footprints (Rivale Profile 42, MagicBlade R 44, Zonda 3 Wash/FX 26,
+  Atomic 3000 LED 3), and GDTFs with the real names, modes and footprints in place of the substitutes resolve every
+  type exactly with a clean patch (docs/mvr.md); the info/validate CLI checks follow the library the same way; every
+  fixture has a state and a pose; after open white, RenderSync draws every model part of every fixture (pick ids map
+  back) and exactly one light per lit beam (≥ 59 lit fixtures; the MagicPanel stand-in evaluates dark, see
+  limitations); identical results for identical input sequences; export → reopen keeps ids, specs and addresses.
 * **Pipeline**: an Art-Net packet (real UDP receiver on loopback) makes a MAC Viper DMX-driven and its head instances
   move over several frames (motor dynamics; the base does not move); console-driven status follows a DMX cable from a
   console (unplugging returns the fixture to manual; without consoles live universes drive); a hazer fills the air
@@ -345,7 +348,8 @@ a device):
 
 * Fixtures of the `Фокина.mvr` stand-in `Ayrton@MagicPanel_602` (Extended mode) evaluate to zero intensity at full
   dimmer: the pixel beams take their dimmer from per-pixel virtual dimmers that are relation masters (a Candela.Dmx
-  behaviour, reported for that module); the real MagicBlade R GDTF is not in the library anyway.
+  behaviour, reported for that module); the real MagicBlade R GDTF is not in the library anyway (it is published only
+  on GDTF-Share, behind a login or CAPTCHA; see docs/mvr.md).
 * The light meter ignores gobos, blades, iris, prisms and shadows (the GPU lux overlay applies them).
 * Fixture lens glow (emissive lenses following the intensity) is not drawn; beams light the scene and the haze.
 * The DMX recorder samples the input once per engine frame (not every received packet).

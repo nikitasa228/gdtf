@@ -235,7 +235,42 @@ Every fixture ends up with a library GDTF that has real geometry and DMX modes. 
 * one `mvr.mode-footprint` warning (MagicBlade R);
 * one note for Depence's unknown `<FixtureTypeId>` element.
 
-There are no errors. Adding the real GDTFs to the library turns the substitutes into exact matches with no code change.
+There are no import errors. The substitutes are not good enough for the show, though: the MagicPanel 602 stand-in's
+160-channel `Extended` mode overlaps the 44-channel MagicBlade patch (`candela validate` reports 73 `patch.overlap` and
+4 `patch.out-of-range` errors, all caused by it), and the other stand-ins have the wrong optics and photometry.
+
+#### What the scene expects, and where the real GDTFs are
+
+Depence wrote the patch for the manufacturers' real DMX modes: the most frequent address spacing of every type is
+exactly the documented footprint of the mode it asks for, and with those footprints the 91 fixtures are free of
+overlaps and out-of-range addresses (`FokinaLibraryTests` checks the spacing against the table below).
+
+| Model (objects) | `GDTFMode` | Footprint (manufacturer document) | Official GDTF (state on 2026-10-18) |
+|---|---|---|---|
+| Ayrton MagicBlade-R (28) | `Extended` | 44 ch (DMX chart V1.0: Basic 18, Standard 20, Extended 44) | GDTF-Share fixture 5377 "MagicBlade R", revision `V2.73 Fix_3D_Vectorwork` (2026-03-18), modes `Extended`, `Standard`, `Basic` |
+| Ayrton Zonda 3 Wash (28) | `Basic` | 26 ch (DMX chart V130: Basic 26, Standard 37, Extended Ring 46, Extended Pixel 79) | GDTF-Share fixture 9750 "Zonda 3 WASH", revision `V1.7 Add_RDM_Personality` (2026-07-07), modes `Basic`, `Standard`, `Extended Ring`, `Extended Pixel` |
+| Ayrton Rivale Profile (27) | `Standard` | 42 ch (DMX chart V122: Standard 42, Extended 65) | GDTF-Share fixture 10439 "Rivale Profile", revision `V1.8 Correct_Gobo_Value` (2026-09-23), modes `Standard_540`, `Extended_540` |
+| Martin Atomic 3000 LED (4) | `Mode 1` | 3 ch (user manual rev. C: 3-channel, 4-channel and 14-channel Extended modes) | none published: Martin's GDTF-Share account (linked from martin.com) has the VDO Atomic Bold/Dot but no Atomic 3000 LED |
+| Ayrton Zonda 3 FX (4) | `Basic` | 26 ch | in the library (`Ayrton@Zonda_3_FX@V1.81_Corrected_Factory_Tilt.gdtf`) |
+
+Ayrton's product pages and support area (ayrton.eu, "Support" downloads) link every GDTF to the manufacturer's
+GDTF-Share page (`gdtf-share.com/userPage.php?name=AyrtonDigitalLighting&page=Revisions&fixtureId=…`) and host no GDTF
+files themselves; martin.com links its "GDTF library" to GDTF-Share as well. GDTF-Share shows the revision lists
+publicly, but downloading a file needs an account login or a solved CAPTCHA, so the files cannot be fetched
+automatically and are not in the repository yet.
+
+To add them, download the three Ayrton files from GDTF-Share (and a Martin Atomic 3000 LED GDTF once one is published),
+keep GDTF-Share's file names (`Manufacturer@Fixture_Name@Revision.gdtf`, e.g.
+`Ayrton@Rivale_Profile@V1.8_Correct_Gobo_Value.gdtf`) in the repository root, regenerate `_specs`
+(`python3 -I _specs/tools/extract_gdtf.py . _specs`, then `python3 -I _specs/tools/validate.py
+_specs/fixtures_index.json`) and check with `candela info stages/Фокина.mvr` and `candela validate stages/Фокина.mvr`.
+No code change is needed: `FokinaLibraryTests` opens the scene against GDTFs with the real manufacturer names, mode
+names and footprints and gets exact matches, no `mvr.mode-footprint` warning and no patch issue at all. Two
+`mvr.mode-unknown` warnings remain because the GDTFs name modes differently from Depence: the Rivale Profile's
+`Standard` is `Standard_540`, and the Atomic's `Mode 1` is its 3-channel mode. Both are picked correctly by name and
+patch spacing. The engine and CLI tests adapt to the library on their own. `tests/Candela.Mvr.Tests/FokinaTests.cs` and
+`tests/Candela.Gdtf.Tests/LibraryTests.cs` list today's substitutes explicitly and must be updated together with the
+files.
 
 ## Merge mode
 

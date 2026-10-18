@@ -15,12 +15,18 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       counts match `_specs` for 7272 modes, all 4982 models load (docs/gdtf.md)
 - [x] Fixture library: scan folders, categories (PROFILE … GENERATOR FIRE), `_specs` physical data, caching,
       MVR stub GDTF → library match, binary disk cache keyed by content + reader version (8–9× faster re-open;
-      hostile-input limits; reviewed). 4 of the 6 types in `stages/Фокина.mvr`
+      hostile-input limits; reviewed). 4 of the 5 types in `stages/Фокина.mvr`
       (Ayrton Rivale Profile, MagicBlade R, Zonda 3 Wash, Martin Atomic 3000 LED) are not in the library, so
-      same-brand substitutes are used until those GDTF files are added
+      same-brand substitutes are used until those GDTF files are added. The Ayrton GDTFs are published only on
+      GDTF-Share (download needs a login or CAPTCHA, so they must be added by hand); Martin has published none for
+      the Atomic 3000 LED. Sources, revisions and expected footprints: docs/mvr.md
+- [ ] Add the official GDTFs of Ayrton Rivale Profile, MagicBlade R and Zonda 3 Wash (GDTF-Share fixtures 10439,
+      5377, 9750) and, once Martin publishes it, the Atomic 3000 LED; regenerate `_specs`; update the substitute
+      expectations in the Mvr and Gdtf tests (Engine tests and the drop-in check need no change)
 - [x] MVR import (layers, fixtures, scene objects, trusses, supports, groups, addresses, embedded GDTF/3D) and export;
       `stages/Фокина.mvr` loads with all 91 fixtures (5 GDTF specs; 4 resolved to same-brand substitutes, reported as
-      issues, until the real files are added) — docs/mvr.md
+      issues, until the real files are added; the MagicBlade R stand-in's wider mode overlaps the patch; with the
+      real footprints the patch is clean, checked with stand-ins of the real names and modes) — docs/mvr.md
 - [x] Photometry: CIE colour science, CCT, emitter mixing, CMY/gels, beam distribution, cd/lux, light meter,
       acoustics, blackbody (docs/photometry.md)
 - [x] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics, encoder, DmxEngine

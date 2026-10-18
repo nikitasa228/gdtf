@@ -39,9 +39,12 @@ internal static class FokinaFixtureTypes
     public static readonly FixtureTypeInfo MagicBladeR = new("Ayrton@MagicBlade R.gdtf", "Extended", 28, 44,
         "Ayrton", "MagicBlade R", [("Extended", 44), ("Standard", 20), ("Basic", 18)]);
 
-    /// <summary>Ayrton Zonda 3 Wash: Basic 26 channels (DMX chart V130; GDTF-Share fixture 9750, named "Zonda 3 WASH").</summary>
+    /// <summary>
+    /// Ayrton Zonda 3 Wash: Basic 26 / Standard 37 / Extended Ring 46 / Extended Pixel 79 channels (DMX chart V130;
+    /// GDTF-Share fixture 9750, named "Zonda 3 WASH").
+    /// </summary>
     public static readonly FixtureTypeInfo Zonda3Wash = new("Ayrton@Zonda 3 Wash.gdtf", "Basic", 28, 26,
-        "Ayrton", "Zonda 3 WASH", [("Extended Ring", 43), ("Standard", 34), ("Extended Pixel", 43), ("Basic", 26)]);
+        "Ayrton", "Zonda 3 WASH", [("Extended Ring", 46), ("Standard", 37), ("Extended Pixel", 79), ("Basic", 26)]);
 
     /// <summary>
     /// Martin Atomic 3000 LED: 3-channel, 4-channel and 14-channel Extended modes (user manual rev. C). Martin has not
