@@ -1,0 +1,51 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Reflective shadow maps, step 2: indirect irradiance at reduced resolution. Every pixel of the indirect image takes
+// the surface under the centre of its footprint (scene depth + pre-pass normal) and sums the virtual point lights:
+//   E = sum flux_k x max(cos theta_k, 0) x max(cos theta_p, 0) x T_haze(d) / (pi x max(d^2, d_min^2))      [lx]
+// (a VPL radiates flux/pi x cos theta cd). Visibility between VPL and receiver is not tested (standard RSM). The
+// clamp d_min avoids the 1/d^2 singularity next to a VPL. alpha = view depth for the bilateral upsampling.
+
+#include "lighting.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image2D outIndirect;
+
+const float VPL_MIN_DISTANCE = 0.1;
+
+void main()
+{
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outIndirect);
+    if (any(greaterThanEqual(p, size)))
+        return;
+    vec2 uv = (vec2(p) + 0.5) / vec2(size);
+    ivec2 full = min(ivec2(uv * frame.renderSize.xy), ivec2(frame.renderSize.xy) - 1);
+    float d = texelFetch(sceneDepth, full, 0).r;
+    if (d <= 0.0)
+    {
+        imageStore(outIndirect, p, vec4(0.0, 0.0, 0.0, frame.volumeDepth.y));
+        return;
+    }
+
+    vec2 centre = (vec2(full) + 0.5) * frame.renderSize.zw;
+    vec3 P = worldFromDepth(centre, d);
+    vec3 N = decodeNormal(texelFetch(sceneNormals, full, 0).rg);
+    vec3 E = vec3(0.0);
+    for (uint k = 0u; k < frame.vplCount; ++k)
+    {
+        Vpl v = vpls[k];
+        vec3 toP = P - v.position;
+        float d2 = dot(toP, toP);
+        float invD = inversesqrt(max(d2, 1e-12));
+        vec3 dir = toP * invD;
+        float cosV = dot(v.normal, dir);
+        float cosP = -dot(N, dir);
+        if (cosV <= 0.0 || cosP <= 0.0)
+            continue;
+        E += v.flux * (cosV * cosP * lightPathTransmittance(d2 * invD) / (PI * max(d2, VPL_MIN_DISTANCE * VPL_MIN_DISTANCE)));
+    }
+
+    imageStore(outIndirect, p, vec4(finiteLight(E), viewDepthOf(P)));
+}

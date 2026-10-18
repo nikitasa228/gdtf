@@ -102,8 +102,13 @@ public sealed class GoldenImageTests
         return new ImageData { Width = width, Height = height, Pixels = pixels };
     }
 
-    private static void CompareWithGolden(ImageData actual, string name)
+    /// <summary>
+    /// Compares <paramref name="actual"/> with <c>Golden/&lt;name&gt;.png</c> (or writes it there when
+    /// <c>CANDELA_UPDATE_GOLDEN=1</c>); the image is also written to the test output folder for inspection.
+    /// </summary>
+    internal static void CompareWithGolden(ImageData actual, string name)
     {
+        ImageFiles.WritePng(actual, Path.Combine(TestRenderers.OutputDirectory, $"golden-actual-{name}.png"));
         string file = $"{name}.png";
         if (Environment.GetEnvironmentVariable("CANDELA_UPDATE_GOLDEN") == "1")
         {

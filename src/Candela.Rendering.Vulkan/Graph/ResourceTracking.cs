@@ -52,6 +52,18 @@ internal enum ImageUse
 
     /// <summary>Swapchain image handed to the presentation engine.</summary>
     Present,
+
+    /// <summary>Storage image read and written by a compute shader (GENERAL layout).</summary>
+    StorageCompute,
+
+    /// <summary>Storage image only read by a compute shader (GENERAL layout).</summary>
+    StorageComputeRead,
+
+    /// <summary>Depth sampled in a compute shader (read-only depth layout).</summary>
+    DepthSampledCompute,
+
+    /// <summary>Depth sampled by any shader stage (read-only depth layout): the shadow atlas.</summary>
+    DepthSampledAnyShader,
 }
 
 /// <summary>How a pass uses a buffer.</summary>
@@ -70,6 +82,18 @@ internal enum BufferUse
     TransferSource,
     TransferDestination,
     HostRead,
+
+    /// <summary>Written (and read) by fragment or compute shaders.</summary>
+    ShaderWrite,
+
+    /// <summary>Vertex/index/instance data read by acceleration structure builds.</summary>
+    AccelerationStructureBuildInput,
+
+    /// <summary>Acceleration structure storage or scratch written by a build.</summary>
+    AccelerationStructureBuild,
+
+    /// <summary>Acceleration structure traversed by ray queries in compute shaders.</summary>
+    AccelerationStructureRead,
 }
 
 /// <summary>
@@ -159,6 +183,30 @@ internal sealed unsafe class BarrierBatch
                 layout = ImageLayout.TransferDstOptimal;
                 write = true;
                 return;
+            case ImageUse.StorageCompute:
+                stage = PipelineStageFlags2.ComputeShaderBit;
+                access = AccessFlags2.ShaderStorageReadBit | AccessFlags2.ShaderStorageWriteBit;
+                layout = ImageLayout.General;
+                write = true;
+                return;
+            case ImageUse.StorageComputeRead:
+                stage = PipelineStageFlags2.ComputeShaderBit;
+                access = AccessFlags2.ShaderStorageReadBit;
+                layout = ImageLayout.General;
+                write = false;
+                return;
+            case ImageUse.DepthSampledCompute:
+                stage = PipelineStageFlags2.ComputeShaderBit;
+                access = AccessFlags2.ShaderSampledReadBit;
+                layout = ImageLayout.DepthStencilReadOnlyOptimal;
+                write = false;
+                return;
+            case ImageUse.DepthSampledAnyShader:
+                stage = PipelineStageFlags2.VertexShaderBit | PipelineStageFlags2.FragmentShaderBit | PipelineStageFlags2.ComputeShaderBit;
+                access = AccessFlags2.ShaderSampledReadBit;
+                layout = ImageLayout.DepthStencilReadOnlyOptimal;
+                write = false;
+                return;
             case ImageUse.Present:
                 stage = PipelineStageFlags2.None;
                 access = AccessFlags2.None;
@@ -218,6 +266,24 @@ internal sealed unsafe class BarrierBatch
                 stage = PipelineStageFlags2.CopyBit | PipelineStageFlags2.ClearBit;
                 access = AccessFlags2.TransferWriteBit;
                 write = true;
+                return;
+            case BufferUse.ShaderWrite:
+                stage = PipelineStageFlags2.FragmentShaderBit | PipelineStageFlags2.ComputeShaderBit;
+                access = AccessFlags2.ShaderStorageReadBit | AccessFlags2.ShaderStorageWriteBit;
+                write = true;
+                return;
+            case BufferUse.AccelerationStructureBuildInput:
+                stage = PipelineStageFlags2.AccelerationStructureBuildBitKhr;
+                access = AccessFlags2.ShaderReadBit;
+                return;
+            case BufferUse.AccelerationStructureBuild:
+                stage = PipelineStageFlags2.AccelerationStructureBuildBitKhr;
+                access = AccessFlags2.AccelerationStructureReadBitKhr | AccessFlags2.AccelerationStructureWriteBitKhr;
+                write = true;
+                return;
+            case BufferUse.AccelerationStructureRead:
+                stage = PipelineStageFlags2.ComputeShaderBit;
+                access = AccessFlags2.AccelerationStructureReadBitKhr;
                 return;
             case BufferUse.HostRead:
                 stage = PipelineStageFlags2.HostBit;
@@ -383,7 +449,8 @@ internal sealed unsafe class BarrierBatch
 
     private const AccessFlags2 WriteMask = AccessFlags2.ShaderWriteBit | AccessFlags2.ShaderStorageWriteBit |
                                            AccessFlags2.ColorAttachmentWriteBit | AccessFlags2.DepthStencilAttachmentWriteBit |
-                                           AccessFlags2.TransferWriteBit | AccessFlags2.HostWriteBit | AccessFlags2.MemoryWriteBit;
+                                           AccessFlags2.TransferWriteBit | AccessFlags2.HostWriteBit | AccessFlags2.MemoryWriteBit |
+                                           AccessFlags2.AccelerationStructureWriteBitKhr;
 
     private void AddImage(Image image, ImageSubresourceRange range, PipelineStageFlags2 srcStage, AccessFlags2 srcAccess,
         PipelineStageFlags2 dstStage, AccessFlags2 dstAccess, ImageLayout oldLayout, ImageLayout newLayout)

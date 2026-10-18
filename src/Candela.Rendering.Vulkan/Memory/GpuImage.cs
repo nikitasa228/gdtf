@@ -3,7 +3,7 @@ using Silk.NET.Vulkan;
 namespace Candela.Rendering.Vulkan;
 
 /// <summary>
-/// A 2D <c>VkImage</c> (optimal tiling) with a default view over all mip levels, and its memory.
+/// A 2D or 3D <c>VkImage</c> (optimal tiling) with a default view over all mip levels, and its memory.
 /// <see cref="Dispose"/> destroys immediately — use <see cref="VulkanContext.DeferDispose"/> for images in use.
 /// </summary>
 public sealed unsafe class GpuImage : IDisposable
@@ -14,7 +14,7 @@ public sealed unsafe class GpuImage : IDisposable
     private ImageView _view;
 
     private GpuImage(VulkanContext context, Image handle, ImageView view, MemoryAllocation allocation, Format format, uint width,
-        uint height, uint mipLevels, ImageUsageFlags usage, ImageAspectFlags aspect, string name)
+        uint height, uint depth, uint mipLevels, ImageUsageFlags usage, ImageAspectFlags aspect, string name)
     {
         _context = context;
         _handle = handle;
@@ -23,6 +23,7 @@ public sealed unsafe class GpuImage : IDisposable
         Format = format;
         Width = width;
         Height = height;
+        Depth = depth;
         MipLevels = mipLevels;
         Usage = usage;
         Aspect = aspect;
@@ -45,6 +46,12 @@ public sealed unsafe class GpuImage : IDisposable
     /// <summary>Height of mip 0, pixels.</summary>
     public uint Height { get; }
 
+    /// <summary>Depth of mip 0 (1 for 2D images).</summary>
+    public uint Depth { get; }
+
+    /// <summary>True for a 3D image (volume).</summary>
+    public bool Is3D => Depth > 1 || _is3D;
+
     /// <summary>Number of mip levels.</summary>
     public uint MipLevels { get; }
 
@@ -66,12 +73,30 @@ public sealed unsafe class GpuImage : IDisposable
     /// <summary>Synchronisation state for the barrier tracker.</summary>
     internal ResourceState State;
 
+    /// <summary>True until the renderer has given the image defined contents (cleared or fully written).</summary>
+    internal bool NeedsInitialization = true;
+
+    private bool _is3D;
+
     /// <summary>Creates a 2D image with memory and a view.</summary>
     public static GpuImage Create2D(VulkanContext context, uint width, uint height, Format format, ImageUsageFlags usage, string name,
-        uint mipLevels = 1, bool dedicated = false)
+        uint mipLevels = 1, bool dedicated = false) =>
+        Create(context, ImageType.Type2D, width, height, 1, format, usage, name, mipLevels, dedicated);
+
+    /// <summary>Creates a 3D image (volume, one mip level) with memory and a view.</summary>
+    public static GpuImage Create3D(VulkanContext context, uint width, uint height, uint depth, Format format, ImageUsageFlags usage, string name,
+        bool dedicated = false)
+    {
+        var image = Create(context, ImageType.Type3D, width, height, depth, format, usage, name, 1, dedicated);
+        image._is3D = true;
+        return image;
+    }
+
+    private static GpuImage Create(VulkanContext context, ImageType type, uint width, uint height, uint depth, Format format, ImageUsageFlags usage,
+        string name, uint mipLevels, bool dedicated)
     {
         ArgumentNullException.ThrowIfNull(context);
-        if (width == 0 || height == 0)
+        if (width == 0 || height == 0 || depth == 0)
             throw new ArgumentOutOfRangeException(nameof(width), "Image size must be positive.");
         var aspect = format is Format.D32Sfloat or Format.D16Unorm or Format.X8D24UnormPack32
             ? ImageAspectFlags.DepthBit
@@ -81,9 +106,9 @@ public sealed unsafe class GpuImage : IDisposable
         var info = new ImageCreateInfo
         {
             SType = StructureType.ImageCreateInfo,
-            ImageType = ImageType.Type2D,
+            ImageType = type,
             Format = format,
-            Extent = new Extent3D(width, height, 1),
+            Extent = new Extent3D(width, height, depth),
             MipLevels = mipLevels,
             ArrayLayers = 1,
             Samples = SampleCountFlags.Count1Bit,
@@ -103,7 +128,7 @@ public sealed unsafe class GpuImage : IDisposable
             {
                 SType = StructureType.ImageViewCreateInfo,
                 Image = image,
-                ViewType = ImageViewType.Type2D,
+                ViewType = type == ImageType.Type3D ? ImageViewType.Type3D : ImageViewType.Type2D,
                 Format = format,
                 SubresourceRange = new ImageSubresourceRange(aspect & ~ImageAspectFlags.StencilBit, 0, mipLevels, 0, 1),
             };
@@ -111,7 +136,7 @@ public sealed unsafe class GpuImage : IDisposable
             VkUtil.Check(vk.CreateImageView(context.Device, &viewInfo, null, &view), $"vkCreateImageView '{name}'");
             context.SetDebugName(ObjectType.Image, image.Handle, name);
             context.SetDebugName(ObjectType.ImageView, view.Handle, name);
-            return new GpuImage(context, image, view, allocation, format, width, height, mipLevels, usage, aspect, name);
+            return new GpuImage(context, image, view, allocation, format, width, height, depth, mipLevels, usage, aspect, name);
         }
         catch
         {

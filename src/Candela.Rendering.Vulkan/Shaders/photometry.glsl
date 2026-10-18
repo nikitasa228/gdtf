@@ -41,11 +41,12 @@ float beamProfile(Light light, float theta)
     return g;
 }
 
-// Squared distance beyond which a light's contribution is negligible for this view: where a white Lambertian
-// surface lit on axis would reach frame.rangeEpsilon after exposure, (exposure I / (pi d^2)) = epsilon.
+// Squared distance beyond which a light's contribution is negligible for this view. Full view: where a white
+// Lambertian surface lit on axis would reach the display threshold after exposure, exposure I / (pi d^2) = epsilon.
+// Lux overlay: where the illuminance falls far below the gradient's range. The renderer sets lightRangeScale.
 float lightRangeSquared(Light light)
 {
-    return frame.exposure * light.maxIntensity / (PI * frame.rangeEpsilon);
+    return light.maxIntensity * frame.lightRangeScale;
 }
 
 // Smooth cut at the range: (1 - (d/range)^4)^2. Where a light contributes 100x the threshold the factor is
@@ -58,24 +59,13 @@ float rangeWindow(float distanceSquared, float rangeSquared)
     return w * w;
 }
 
-// Illuminance (lux, per Rec.2020 channel) that a spot light produces on a surface at P with normal N, and the unit
-// direction towards the light. E = I(theta) cos(incidence) / d^2 - inverse square, no artificial attenuation.
-vec3 spotIlluminance(Light light, vec3 P, vec3 N, out vec3 L)
+// Henyey-Greenstein phase function (1/sr) for the cosine between the light's propagation direction and the
+// direction towards the viewer.
+float henyeyGreenstein(float cosTheta, float g)
 {
-    vec3 toLight = light.position - P;
-    float d2 = max(dot(toLight, toLight), MIN_LIGHT_DISTANCE * MIN_LIGHT_DISTANCE);
-    L = toLight * inversesqrt(d2);
-    float cosIncidence = dot(N, L);
-    if (cosIncidence <= 0.0)
-        return vec3(0.0);
-    vec3 fromLight = -L;
-    float cosTheta = dot(fromLight, light.direction);
-    if (cosTheta < light.cosCutoff)
-        return vec3(0.0);
-    // atan of |sin| and cos keeps full precision near the axis (acos does not).
-    float theta = atan(length(cross(fromLight, light.direction)), cosTheta);
-    float profile = beamProfile(light, theta);
-    return light.intensity * (profile * rangeWindow(d2, lightRangeSquared(light)) * cosIncidence / d2);
+    float g2 = g * g;
+    float denom = max(1.0 + g2 - 2.0 * g * cosTheta, 1e-6);
+    return (1.0 - g2) / (4.0 * PI * denom * sqrt(denom));
 }
 
 #endif
