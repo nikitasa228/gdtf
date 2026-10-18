@@ -135,8 +135,8 @@ public sealed record RiggingSolution(IReadOnlyList<TrussLoad> Trusses, IReadOnly
 /// <remarks>
 /// A fixture counts as hanging on a truss when its <c>MountedOn</c> is the truss (or an entity under it), or — without
 /// <c>MountedOn</c> — when it sits under a truss entity in the hierarchy (under a rigging point entity it hangs from that
-/// point). Cable segments are carried by a truss when their nodes are
-/// anchored to it or to fixtures hanging on it (a segment with only one end on a truss puts half its weight on it).
+/// point). Cable segments are carried by a truss when their nodes are anchored to it or to fixtures hanging on it (a
+/// segment with only one end on a truss puts half its weight on it).
 /// Floors are <see cref="WallComponent"/>s of kind <see cref="WallKind.Floor"/>, taken as rectangles centred on their
 /// entity origin; without a floor below, the floor is at Z = 0.
 /// </remarks>
@@ -351,13 +351,16 @@ public sealed class RiggingAnalyzer
             trussById[e.Id] = load;
 
             string what = $"truss '{e.Name}' ({(string.IsNullOrWhiteSpace(t.Profile) ? t.Kind.ToString() : t.Profile)}, {Fmt.M(length)})";
-            string heaviestFixtures = Fmt.List(fixtureItems.OrderByDescending(i => i.WeightKg).Select(i => $"{i.Description} {Fmt.Kg(i.WeightKg)}"), 4);
+            // "#3 'Spot 3' (Robe …) 25.5 kg, …": the fixtures to move first, for the overload messages.
+            string heaviestFixtures = fixtureItems.Count == 0
+                ? ""
+                : " Heaviest: " + Fmt.List(fixtureItems.OrderByDescending(i => i.WeightKg).Select(i => $"{i.Description} {Fmt.Kg(i.WeightKg)}"), 4) + ".";
             bool uniformReported = false;
             if (load.MaxUniformLoadKg is { } maxUniform && load.LoadKg > maxUniform + 1e-6)
             {
                 uniformReported = true;
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussOverload,
-                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg, maxUniform)} ({Fmt.Count(fixtureIds.Count, "fixture", "fixtures")} {Fmt.Kg(fixtureKg)}, clamps {Fmt.Kg(clamps)}, cables {Fmt.Kg(load.CableWeightKg)}) but its maximum uniform load is {Fmt.Kg(maxUniform)}. Heaviest: {heaviestFixtures}.",
+                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg, maxUniform)} ({Fmt.Count(fixtureIds.Count, "fixture", "fixtures")} {Fmt.Kg(fixtureKg)}, clamps {Fmt.Kg(clamps)}, cables {Fmt.Kg(load.CableWeightKg)}) but its maximum uniform load is {Fmt.Kg(maxUniform)}.{heaviestFixtures}",
                     [e.Id, .. fixtureIds]));
             }
             if (load.MaxPointLoadKg is { } maxPoint)
@@ -368,7 +371,7 @@ public sealed class RiggingAnalyzer
                         e.Id, heaviest.EntityId));
                 else if (pointEq > maxPoint + 1e-6)
                     issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussPointOverload,
-                        $"The {what} is overloaded: its loads bend it as much as {Fmt.Kg(pointEq, maxPoint)} hung at mid-span, more than its maximum point load of {Fmt.Kg(maxPoint)} ({heaviestFixtures}).",
+                        $"The {what} is overloaded: its loads bend it as much as {Fmt.Kg(pointEq, maxPoint)} hung at mid-span, more than its maximum point load of {Fmt.Kg(maxPoint)}.{heaviestFixtures}",
                         [e.Id, .. fixtureIds]));
             }
             else if (!uniformReported && load.MaxUniformLoadKg is { } maxUdl && uniformEq > maxUdl + 1e-6)
@@ -376,7 +379,7 @@ public sealed class RiggingAnalyzer
                 // Without a point-load rating, concentrated loads are judged by the uniform load that bends the truss
                 // as much (a load table's uniform rating is a bending limit for all but the shortest spans).
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussOverload,
-                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)}, but concentrated near mid-span it bends the truss like {Fmt.Kg(uniformEq, maxUdl)} spread evenly, more than its maximum uniform load of {Fmt.Kg(maxUdl)} ({heaviestFixtures}).",
+                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)}, but concentrated near mid-span it bends the truss like {Fmt.Kg(uniformEq, maxUdl)} spread evenly, more than its maximum uniform load of {Fmt.Kg(maxUdl)}.{heaviestFixtures}",
                     [e.Id, .. fixtureIds]));
             }
         }
@@ -484,7 +487,6 @@ public sealed class RiggingAnalyzer
         return results;
     }
 
-    /// <summary>The entity or its nearest ancestor that is a truss, or null.</summary>
     /// <summary>
     /// Largest bending moment (kg·m) of the items on a truss of the given length, taken as a beam simply supported at
     /// both ends; item positions are projected on the truss axis (local X) and clamped to the span. O(n log n).
@@ -526,6 +528,7 @@ public sealed class RiggingAnalyzer
         return null;
     }
 
+    /// <summary>The entity or its nearest ancestor that is a truss, or null.</summary>
     private static Entity? TrussOf(Entity? entity)
     {
         for (var e = entity; e is not null; e = e.Parent)
