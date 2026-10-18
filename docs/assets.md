@@ -34,8 +34,9 @@ or project.
 
 Errors that Assimp *reports* are caught like any other, but a segmentation fault inside the native library cannot be
 caught — it ends the process (the editor, or a project load that decodes a damaged asset). Fuzzing the bundled Assimp
-5.0 build with about 15 000 truncated and byte-corrupted files showed crashes or endless loops in its OBJ, MTL, PLY,
-STL (ASCII), COLLADA, glTF, 3MF, X, X3D and ASCII FBX readers. Damaged input therefore never reaches Assimp:
+5.0 build with about 20 000 truncated and corrupted files showed crashes or endless loops in its OBJ, MTL, PLY,
+STL (ASCII), COLLADA, glTF, 3MF, X, X3D and ASCII FBX readers. Damaged input therefore never reaches Assimp (and all
+1 794 distinct 3DS and GLB models inside the repository's GDTF files import without a failure):
 
 * **OBJ/MTL** are rewritten by `ObjSanitizer` into a strictly well-formed subset first (numbers validated, face corners
   resolved to absolute indices and written uniformly, faces with invalid references dropped with a warning, points,
