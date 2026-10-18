@@ -80,13 +80,25 @@ internal static class ObjSanitizer
     /// <summary>Sanitised copy of an OBJ file.</summary>
     public static byte[] SanitizeObj(ReadOnlySpan<byte> data, Report report)
     {
-        var output = new ArrayBufferWriter<byte>(data.Length + 64);
+        // First pass: validity of every vertex, texture coordinate and normal. Positive face indices may refer forward
+        // (Assimp resolves them after reading the whole file); negative ones are relative to what precedes the face.
         var vertexValid = new List<bool>();
-        int texCount = 0, normalCount = 0;
         var texValid = new List<bool>();
         var normalValid = new List<bool>();
-        var corners = new List<(long V, long T, long N)>(8);
         Span<double> numbers = stackalloc double[4];
+        var scan = new LineReader(data);
+        while (scan.TryNext(out var statement))
+        {
+            var rest = statement;
+            var key = NextToken(ref rest);
+            if (key.SequenceEqual("v"u8)) vertexValid.Add(ReadNumbers(rest, numbers, 3) >= 3);
+            else if (key.SequenceEqual("vt"u8)) texValid.Add(ReadNumbers(rest, numbers, 2) >= 1);
+            else if (key.SequenceEqual("vn"u8)) normalValid.Add(ReadNumbers(rest, numbers, 3) >= 3);
+        }
+
+        var output = new ArrayBufferWriter<byte>(data.Length + 64);
+        int vertexCount = 0, texCount = 0, normalCount = 0;
+        var corners = new List<(long V, long T, long N)>(8);
         Span<byte> buffer = stackalloc byte[64];
         var lines = new LineReader(data);
         while (lines.TryNext(out var line))
@@ -98,7 +110,7 @@ internal static class ObjSanitizer
             {
                 int n = ReadNumbers(rest, numbers, 3);
                 bool ok = n >= 3;
-                vertexValid.Add(ok);
+                vertexCount++;
                 if (ok) WriteStatement(output, "v"u8, numbers[..3]);
                 else
                 {
@@ -110,7 +122,6 @@ internal static class ObjSanitizer
             {
                 int n = ReadNumbers(rest, numbers, 2);
                 texCount++;
-                texValid.Add(n >= 1);
                 if (n >= 1)
                 {
                     if (n == 1) numbers[1] = 0;
@@ -126,7 +137,6 @@ internal static class ObjSanitizer
             {
                 int n = ReadNumbers(rest, numbers, 3);
                 normalCount++;
-                normalValid.Add(n >= 3);
                 if (n >= 3) WriteStatement(output, "vn"u8, numbers[..3]);
                 else
                 {
@@ -136,7 +146,7 @@ internal static class ObjSanitizer
             }
             else if (key.SequenceEqual("f"u8) || key.SequenceEqual("fo"u8))
             {
-                if (!ReadFace(rest, vertexValid, texValid, normalValid, corners))
+                if (!ReadFace(rest, vertexValid, vertexCount, texValid, texCount, normalValid, normalCount, corners))
                 {
                     report.DroppedFaces++;
                     continue;
@@ -319,8 +329,8 @@ internal static class ObjSanitizer
         return true;
     }
 
-    private static bool ReadFace(ReadOnlySpan<byte> rest, List<bool> vertexValid, List<bool> texValid, List<bool> normalValid,
-        List<(long V, long T, long N)> corners)
+    private static bool ReadFace(ReadOnlySpan<byte> rest, List<bool> vertexValid, int vertexCount, List<bool> texValid, int texCount,
+        List<bool> normalValid, int normalCount, List<(long V, long T, long N)> corners)
     {
         corners.Clear();
         while (true)
@@ -341,18 +351,21 @@ internal static class ObjSanitizer
                     if (nPart.IndexOf((byte)'/') >= 0) return false;
                 }
             }
-            long v = Resolve(vPart, vertexValid);
+            long v = Resolve(vPart, vertexValid, vertexCount);
             if (v <= 0) return false;
-            corners.Add((v, tPart.IsEmpty ? 0 : Resolve(tPart, texValid), nPart.IsEmpty ? 0 : Resolve(nPart, normalValid)));
+            corners.Add((v, tPart.IsEmpty ? 0 : Resolve(tPart, texValid, texCount), nPart.IsEmpty ? 0 : Resolve(nPart, normalValid, normalCount)));
         }
         return corners.Count >= 3;
     }
 
-    /// <summary>1-based absolute index of a reference to a valid element, or 0.</summary>
-    private static long Resolve(ReadOnlySpan<byte> token, List<bool> valid)
+    /// <summary>
+    /// 1-based absolute index of a reference to a valid element, or 0. Negative references count back from the
+    /// <paramref name="preceding"/> elements defined before the face.
+    /// </summary>
+    private static long Resolve(ReadOnlySpan<byte> token, List<bool> valid, int preceding)
     {
         if (!Utf8Parser.TryParse(token, out long index, out int consumed) || consumed != token.Length || index == 0) return 0;
-        long absolute = index > 0 ? index : valid.Count + 1 + index;
+        long absolute = index > 0 ? index : preceding + 1 + index;
         if (absolute < 1 || absolute > valid.Count || !valid[(int)(absolute - 1)]) return 0;
         return absolute;
     }

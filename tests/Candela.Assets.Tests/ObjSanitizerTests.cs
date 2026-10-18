@@ -26,6 +26,17 @@ public class ObjSanitizerTests
     }
 
     [Fact]
+    public void PositiveIndicesMayReferToVerticesDefinedLater()
+    {
+        // Assimp resolves positive indices after reading the whole file, so some exporters write faces first.
+        var text = Sanitize("f 1 2 3\nf -1 -2 -3\nv 0 0 0\nv 1 0 0\nv 0 1 0\nf -3 -2 -1\n");
+        Assert.Contains("f 1 2 3\n", text, StringComparison.Ordinal);
+        Assert.Equal(2, text.Split("f 1 2 3\n").Length - 1); // the relative face at the end resolves to the same corners
+        var result = ModelImporter.Import("forward.obj", Encoding.ASCII.GetBytes("f 1 2 3\nv 0 0 0\nv 1 0 0\nv 0 1 0\n"));
+        Assert.Equal(1, result.TriangleCount);
+    }
+
+    [Fact]
     public void InvalidVerticesKeepNumberingAndTheirFacesAreDropped()
     {
         var report = new ObjSanitizer.Report();

@@ -131,8 +131,9 @@ axis, the 3DS Z→Y rotation) are switched off or discarded so every format goes
   baked, one sub-mesh per material) to bound draw calls.
 * Skinned meshes are imported in their bind pose; animations, cameras and lights in the file are ignored; vertex
   colours are not supported (warning).
-* **Performance** (Debug build, one core of the test machine): a 105 800-triangle binary STL imports in ≈ 0.45 s, a
-  115 200-triangle OBJ without normals (text parsing, joining, normal generation) in ≈ 0.7 s.
+* **Performance** (Debug build, one core of the test machine): a 105 800-triangle binary STL imports in ≈ 0.2 s, an
+  80 000-triangle binary PLY in ≈ 0.1 s, a 115 200-triangle OBJ without normals (sanitising, text parsing, joining,
+  normal generation) in ≈ 1 s.
 
 ### Companion files and texture keys
 
