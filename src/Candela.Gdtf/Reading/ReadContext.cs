@@ -308,6 +308,17 @@ internal sealed class ReadContext
 
     public static string Shorten(string s) => s.Length <= 80 ? s : s[..77] + "...";
 
+    /// <summary>
+    /// Warning path of a child element: <c>{parent}/{name}</c>, with the name shortened and the parent cut to its end
+    /// so that paths stay short however deep the tree or long the names (building them must not be quadratic).
+    /// </summary>
+    public static string ChildPath(string parentPath, string name)
+    {
+        const int maxParent = WarningSink.MaxPathLength;
+        if (parentPath.Length > maxParent) parentPath = "…" + parentPath[^(maxParent - 1)..];
+        return $"{parentPath}/{Shorten(name)}";
+    }
+
     /// <summary>Case-insensitive enum map from GDTF spellings (plus aliases) to values.</summary>
     public static Dictionary<string, T> Map<T>(params (string Name, T Value)[] items)
     {

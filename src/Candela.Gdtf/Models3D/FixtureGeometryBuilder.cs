@@ -231,47 +231,71 @@ public sealed class FixtureGeometryBuilder
         var keys = new Dictionary<FixtureGeometry.PartKey, int>();
         var warnings = new List<GdtfWarning>();
         var active = new HashSet<GdtfGeometry>(ReferenceEqualityComparer.Instance) { root.TopLevel };
-        bool limitHit = false;
 
-        void AddNode(GdtfGeometry g, string name, Matrix4x4 local, GdtfModel? model, int parent, string parentPath, GeometryReference[] chain,
-            GeometryReference? instancedBy)
+        // Depth first in file order with an explicit stack: trees may be 256 levels deep inside each of 16 nested
+        // references, which recursion could not survive on small thread stacks.
+        var stack = new Stack<Work>();
+        stack.Push(new Work(root, root.Name, root.Position, root.Model, -1, "", Array.Empty<GeometryReference>(), null, null));
+        while (stack.Count > 0)
         {
+            var w = stack.Pop();
+            if (w.Leave is { } finished)
+            {
+                active.Remove(finished);
+                continue;
+            }
+            if (w.Reference is { } r)
+            {
+                // A reference is expanded when it is reached, so the active set holds exactly the templates above it.
+                var template = r.ReferencedGeometry!;
+                if (w.Chain.Length + 1 > MaxReferenceDepth || active.Contains(template))
+                {
+                    warnings.Add(new GdtfWarning(w.ParentPath, $"Reference '{r.Name}' to '{template.Name}' is recursive or nested too deeply; not expanded."));
+                    continue;
+                }
+                var next = new GeometryReference[w.Chain.Length + 1];
+                w.Chain.CopyTo(next, 0);
+                next[^1] = r;
+                active.Add(template);
+                stack.Push(new Work(null, "", default, null, -1, "", Array.Empty<GeometryReference>(), null, null, template));
+                stack.Push(new Work(template, r.Name, r.Position, r.Model ?? template.Model, w.Parent, w.ParentPath, next, r, null));
+                continue;
+            }
             if (parts.Count >= MaxParts)
             {
-                if (!limitHit) warnings.Add(new GdtfWarning(root.Name, $"More than {MaxParts} parts; the rest are omitted."));
-                limitHit = true;
-                return;
+                warnings.Add(new GdtfWarning(root.Name, $"More than {MaxParts} parts; the rest are omitted."));
+                break;
             }
-            string path = parentPath.Length == 0 ? name : $"{parentPath}/{name}";
-            int index = parts.Count;
-            parts.Add(new FixturePart(index, name, path, parent, local, g, chain, instancedBy, model, model is null ? null : _models?.Invoke(model)));
-            keys.TryAdd(new FixtureGeometry.PartKey(g, chain), index);
 
-            foreach (var child in g.Children)
+            var g = w.Geometry!;
+            string path = w.ParentPath.Length == 0 ? w.Name : $"{w.ParentPath}/{w.Name}";
+            int index = parts.Count;
+            parts.Add(new FixturePart(index, w.Name, path, w.Parent, w.Local, g, w.Chain, w.InstancedBy, w.Model,
+                w.Model is null ? null : _models?.Invoke(w.Model)));
+            keys.TryAdd(new FixtureGeometry.PartKey(g, w.Chain), index);
+
+            for (int i = g.Children.Count - 1; i >= 0; i--)
             {
-                if (child is GeometryReference r)
+                var child = g.Children[i];
+                if (child is GeometryReference reference)
                 {
-                    if (r.ReferencedGeometry is not { } template) continue;
-                    if (chain.Length + 1 > MaxReferenceDepth || active.Contains(template))
-                    {
-                        warnings.Add(new GdtfWarning(path, $"Reference '{r.Name}' to '{template.Name}' is recursive or nested too deeply; not expanded."));
-                        continue;
-                    }
-                    var next = new GeometryReference[chain.Length + 1];
-                    chain.CopyTo(next, 0);
-                    next[^1] = r;
-                    active.Add(template);
-                    AddNode(template, r.Name, r.Position, r.Model ?? template.Model, index, path, next, r);
-                    active.Remove(template);
+                    if (reference.ReferencedGeometry is not null)
+                        stack.Push(new Work(null, "", default, null, index, path, w.Chain, null, reference));
                 }
                 else
                 {
-                    AddNode(child, child.Name, child.Position, child.Model, index, path, chain, null);
+                    stack.Push(new Work(child, child.Name, child.Position, child.Model, index, path, w.Chain, null, null));
                 }
             }
         }
-
-        AddNode(root, root.Name, root.Position, root.Model, -1, "", Array.Empty<GeometryReference>(), null);
         return new FixtureGeometry(root, mode, parts, keys, warnings);
     }
+
+    /// <summary>
+    /// One step of the walk: a geometry to add as a part, a reference to expand (<see cref="Reference"/>), or the end of
+    /// a referenced template's subtree (<see cref="Leave"/>).
+    /// </summary>
+    private readonly record struct Work(
+        GdtfGeometry? Geometry, string Name, Matrix4x4 Local, GdtfModel? Model, int Parent, string ParentPath,
+        GeometryReference[] Chain, GeometryReference? InstancedBy, GeometryReference? Reference, GdtfGeometry? Leave = null);
 }

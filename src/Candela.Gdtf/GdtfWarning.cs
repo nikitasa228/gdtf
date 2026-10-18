@@ -36,12 +36,24 @@ internal sealed class WarningSink
         _limit = limit;
     }
 
+    /// <summary>Longest path kept in a warning (longer ones keep their end, which names the element).</summary>
+    internal const int MaxPathLength = 240;
+
+    /// <summary>Longest message kept in a warning (file values quoted in messages can be arbitrarily long).</summary>
+    internal const int MaxMessageLength = 600;
+
     public int Count => _warnings.Count + _suppressed;
 
     public void Add(string path, string message)
     {
-        if (_warnings.Count < _limit) _warnings.Add(new GdtfWarning(path, message));
-        else _suppressed++;
+        if (_warnings.Count >= _limit)
+        {
+            _suppressed++;
+            return;
+        }
+        if (path.Length > MaxPathLength) path = "…" + path[^(MaxPathLength - 1)..];
+        if (message.Length > MaxMessageLength) message = message[..(MaxMessageLength - 1)] + "…";
+        _warnings.Add(new GdtfWarning(path, message));
     }
 
     /// <summary>Appends a summary line when warnings were dropped.</summary>

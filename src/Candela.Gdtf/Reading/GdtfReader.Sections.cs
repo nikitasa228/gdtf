@@ -436,7 +436,7 @@ public static partial class GdtfReader
         }
 
         g.Name = ReadContext.Text(e, X.Name);
-        string path = $"{parentPath}/{g.Name}";
+        string path = ReadContext.ChildPath(parentPath, g.Name);
         g.ModelName = ReadContext.NonEmpty(e, X.Model);
         g.Position = ctx.Matrix(e, X.Position, path);
         ParseGeometryAttributes(ctx, e, g, path);

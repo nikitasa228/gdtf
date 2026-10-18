@@ -59,19 +59,46 @@ public static partial class GdtfReader
     public static FixtureType ReadDescription(Stream descriptionXml, string? sourceName = null) =>
         ReadDescription(descriptionXml, null, sourceName);
 
+    /// <summary>
+    /// Deepest XML element level that is read (the GDTF root is level 0): enough for <see cref="MaxGeometryDepth"/>
+    /// nested geometries plus their Break / PinPatch children; real files reach level 12. Deeper elements are skipped
+    /// with a warning, which keeps loading linear for hostile nesting.
+    /// </summary>
+    internal const int MaxXmlDepth = MaxGeometryDepth + 8;
+
+    /// <summary>
+    /// Elements read at most (the largest file of the library has 74 000); the rest of a larger document is ignored
+    /// with a warning so that a hostile file cannot exhaust memory.
+    /// </summary>
+    internal const long MaxXmlElements = 4_000_000;
+
     private static FixtureType ReadDescription(Stream xml, GdtfArchive? archive, string? sourceName)
     {
         XDocument doc;
+        long skipped;
+        bool truncated;
         try
         {
-            using var reader = XmlReader.Create(xml, XmlSettings);
+            using var reader = new LimitedXmlReader(XmlReader.Create(xml, XmlSettings), MaxXmlDepth, MaxXmlElements);
             doc = XDocument.Load(reader, LoadOptions.None);
+            skipped = reader.SkippedElements;
+            truncated = reader.Truncated;
         }
         catch (XmlException e)
         {
             throw new GdtfFormatException($"description.xml of '{sourceName ?? "GDTF"}' is not well-formed XML: {e.Message}", e);
         }
-        return Parse(doc, archive, sourceName);
+        catch (InvalidOperationException e)
+        {
+            // XDocument refuses documents without a root element or with content after it.
+            throw new GdtfFormatException($"description.xml of '{sourceName ?? "GDTF"}' is not a valid XML document: {e.Message}", e);
+        }
+        var limits = new List<GdtfWarning>(2);
+        if (skipped > 0)
+            limits.Add(new GdtfWarning("", $"{skipped} element(s) nested deeper than {MaxXmlDepth} levels were ignored with their content."));
+        if (truncated)
+            limits.Add(new GdtfWarning("", $"description.xml has more than {MaxXmlElements} elements; the rest of the file was ignored."));
+        return Parse(doc, archive, sourceName, limits);
     }
 
     private static readonly XmlReaderSettings XmlSettings = new()
@@ -85,11 +112,12 @@ public static partial class GdtfReader
         CloseInput = false,
     };
 
-    private static FixtureType Parse(XDocument doc, GdtfArchive? archive, string? sourceName)
+    private static FixtureType Parse(XDocument doc, GdtfArchive? archive, string? sourceName, List<GdtfWarning> limits)
     {
         var root = doc.Root ?? throw new GdtfFormatException($"description.xml of '{sourceName ?? "GDTF"}' is empty.");
         var ft = new FixtureType { SourceFileName = sourceName };
         var ctx = new ReadContext(ft, archive);
+        foreach (var w in limits) ctx.Warn(w.Path, w.Message);
 
         XElement? fte;
         if (root.Name == X.Gdtf)
