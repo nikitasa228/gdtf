@@ -121,4 +121,55 @@ public sealed class FokinaLibraryTests
         engine.RefreshIssues();
         Assert.DoesNotContain(engine.Issues.Current, i => i.Category == IssueCategory.Patch);
     }
+    [SkippableFact]
+    public void Stand_ins_survive_a_save_and_switch_to_the_real_gdtf_when_it_is_added()
+    {
+        // an engine with its own copy of the repository library (the real files are added to it below)
+        var missing = FokinaFixtureTypes.MissingFrom(TestEnvironment.Library);
+        Skip.If(!missing.Contains(FokinaFixtureTypes.MagicBladeR), "the library has the MagicBlade R already");
+        StageEngine NewEngine(string name) => new(new StageEngineOptions
+        {
+            Library = FixtureLibrary.Scan([TestEnvironment.Root]),
+            CacheDirectory = TestEnvironment.NewTempDirectory(name),
+            DmxParallelism = 2,
+            SimulationParallelism = 2,
+        });
+
+        string project = Path.Combine(TestEnvironment.NewTempDirectory("standin-project"), "fokina.candela");
+        using (var author = NewEngine("standin-author"))
+        {
+            Assert.True(author.Open(TestEnvironment.Fokina).Success);
+            Assert.Equal(missing.Sum(t => t.Objects), author.Settings.Substitutes.Count);
+            Assert.True(author.SaveAs(project).Success);
+        }
+
+        using var engine = NewEngine("standin-reopen");
+        Assert.True(engine.Open(project).Success);
+        Assert.Equal(missing.Sum(t => t.Objects), engine.Settings.Substitutes.Count);
+        var blades = engine.Scene.Query<FixtureComponent>().Where(x => x.Entity.Name == "MagicBlade R").ToList();
+        Assert.Equal(FokinaFixtureTypes.MagicBladeR.Objects, blades.Count);
+        Assert.All(blades, b => Assert.Equal(FokinaFixtureTypes.MagicBladeR.Spec, engine.SubstitutionOf(b.Entity.Id)?.RequestedSpec));
+        engine.RefreshIssues();
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Severity == IssueSeverity.Error);
+
+        // the real MagicBlade R GDTF arrives (a stand-in with the real name and modes): its fixtures switch to it in the
+        // mode the scene asks for, and only they leave the substitute list
+        string folder = TestEnvironment.NewTempDirectory("standin-real");
+        string real = FokinaFixtureTypes.WriteStandIn(folder, FokinaFixtureTypes.MagicBladeR, s_standInIds[0]);
+        var imported = engine.Import(real);
+        Assert.True(imported.Success, imported.Summary);
+        engine.Tick(1.0 / 30);
+        foreach (var b in blades)
+        {
+            Assert.Equal(Path.GetFileName(real), b.Component.GdtfSpec);
+            Assert.Equal(FokinaFixtureTypes.MagicBladeR.Mode, b.Component.GdtfMode);
+            Assert.Null(engine.SubstitutionOf(b.Entity.Id));
+            Assert.Equal(FokinaFixtureTypes.MagicBladeR.Footprint, engine.Dmx.GetState(b.Entity.Id)!.Profile.Footprint);
+        }
+        Assert.Equal(missing.Sum(t => t.Objects) - FokinaFixtureTypes.MagicBladeR.Objects, engine.Settings.Substitutes.Count);
+        engine.RefreshIssues();
+        Assert.Contains(engine.Issues.Current, i => i.Code == EngineIssueCodes.SubstituteReplaced && i.Entities.Count == blades.Count);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Severity == IssueSeverity.Error);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == "patch.substitute-gdtf" && i.Message.Contains("MagicBlade", StringComparison.Ordinal));
+    }
 }

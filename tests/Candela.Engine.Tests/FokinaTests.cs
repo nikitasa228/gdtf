@@ -28,14 +28,32 @@ public sealed class FokinaTests
             Assert.NotNull(engine.Dmx.GetState(entity.Id));
         Assert.Equal(91, engine.Poses.Count);
 
-        // the MagicBlade R stand-in (160 channels on a 44-channel spacing) overlaps its neighbours: a real problem of the
-        // resolved scene that stays visible in the issue list next to the substitute warnings
+        // the stand-ins use the mode that fits their type's patch spacing (the MagicBlade R stand-in, a MagicPanel 602,
+        // would overlap its neighbours in its 160-channel "Extended"): the resolved scene has no patch errors, and each
+        // stand-in type is reported once with all its fixtures
         engine.RefreshIssues();
-        if (missing.Contains(FokinaFixtureTypes.MagicBladeR))
-            Assert.Contains(engine.Issues.Current, i => i.Code == "patch.overlap");
-        else
-            Assert.DoesNotContain(engine.Issues.Current, i => i.Code == "patch.overlap");
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Category == IssueCategory.Patch && i.Severity == IssueSeverity.Error);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == "patch.overlap" || i.Code == "patch.out-of-range");
         Assert.Equal(missing.Count > 0, engine.Issues.Current.Any(i => i.Code == MvrIssueCodes.GdtfSubstitute));
+        var substituteIssues = engine.Issues.Current.Where(i => i.Code == "patch.substitute-gdtf").ToList();
+        Assert.Equal(missing.Count, substituteIssues.Count);
+        Assert.Equal(missing.Sum(t => t.Objects), substituteIssues.Sum(i => i.Entities.Count));
+        Assert.Equal(missing.Sum(t => t.Objects), engine.Settings.Substitutes.Count);
+        if (missing.Contains(FokinaFixtureTypes.MagicBladeR))
+        {
+            var blade = engine.Scene.Query<FixtureComponent>().First(x => x.Entity.Name == "MagicBlade R");
+            var state = engine.Dmx.GetState(blade.Entity.Id)!;
+            Assert.True(state.Profile.Footprint <= FokinaFixtureTypes.MagicBladeR.Footprint, $"{state.Profile} on a 44-channel spacing");
+            Assert.Equal(FokinaFixtureTypes.MagicBladeR.Spec, engine.SubstitutionOf(blade.Entity.Id)!.RequestedSpec);
+            Assert.Equal("Extended", engine.SubstitutionOf(blade.Entity.Id)!.RequestedMode);
+            Assert.Equal(44, engine.SubstitutionOf(blade.Entity.Id)!.PatchSpacing);
+            Assert.Contains(result.Issues, i => i.Code == EngineIssueCodes.SubstituteMode);
+            Assert.DoesNotContain(result.Issues, i => i.Code == MvrIssueCodes.ModeFootprint);
+        }
+        // the real Zonda 3 FX fixtures are not stand-ins, although the Zonda 3 Wash stand-in is the same file
+        var fx = engine.Scene.Query<FixtureComponent>().Where(x => x.Entity.Name == "Zonda 3 FX").ToList();
+        Assert.NotEmpty(fx);
+        Assert.All(fx, x => Assert.Null(engine.SubstitutionOf(x.Entity.Id)));
     }
 
     [Fact]

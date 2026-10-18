@@ -109,16 +109,13 @@ public sealed class CliTests
         Assert.Contains("Basic", gdtf.Output, StringComparison.Ordinal);
         Assert.Contains("760000 cd", gdtf.Output, StringComparison.Ordinal);
 
+        // the stand-ins take the modes that fit the patch spacing: no patch errors, one warning per stand-in type
         var validate = Run("validate", TestEnvironment.Fokina, "--library", TestEnvironment.Root, "--plot");
-        if (missing.Contains(FokinaFixtureTypes.MagicBladeR))
-        {
-            Assert.Equal(Program.ExitInputErrors, validate.Code); // the MagicBlade R stand-in's footprint overlaps
-            Assert.Contains("patch.overlap", validate.Output, StringComparison.Ordinal);
-        }
-        else
-        {
-            Assert.DoesNotContain("patch.overlap", validate.Output, StringComparison.Ordinal);
-        }
+        Assert.Equal(Program.ExitOk, validate.Code);
+        Assert.DoesNotContain("patch.overlap", validate.Output, StringComparison.Ordinal);
+        Assert.Contains(" 0 errors", validate.Output, StringComparison.Ordinal);
+        Assert.Equal(missing.Count > 0, validate.Output.Contains("patch.substitute-gdtf", StringComparison.Ordinal));
+        Assert.DoesNotContain("data.no-signal", validate.Output, StringComparison.Ordinal);
         Assert.Contains("Light plot", validate.Output, StringComparison.Ordinal);
         Assert.Contains("Total:", validate.Output, StringComparison.Ordinal);
     }
