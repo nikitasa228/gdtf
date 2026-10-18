@@ -190,7 +190,9 @@ build/test jobs while measuring:
 The work per step fell from ≈ 205 to ≈ 130 ms of CPU time during optimisation (bounds-check-free interpolation,
 cell-centred midpoint velocities, branch-free CG rows, multigrid with fused passes). Projection was 76 ms with
 Jacobi-PCG (42 iterations) against 52 ms with MGPCG (8.5 iterations) single-threaded; the CG is memory-bound, which
-limits the gain from more threads on this VM. `SmokePerformanceTests` prints the current numbers.
+limits the gain from more threads on this VM. A looser `PressureTolerance` of 10⁻³ needs 6.2 instead of 8.5
+iterations (≈ 20 % less projection time) with practically identical smoke (centre of mass equal to 10⁻⁵ m after 30
+steps); the reference keeps 10⁻⁴. `SmokePerformanceTests` prints the current numbers.
 
 ### Limits
 
