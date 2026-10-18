@@ -91,8 +91,13 @@ Fixture ports are built in this order:
 1. **GDTF 1.2 WiringObjects** of the DMX mode's geometry tree (fuses are internal and skipped). The connector, the
    direction (Input/Consumer/NetworkInput → input, Output/PowerSource/NetworkOutput → output, NetworkInOut →
    bidirectional) and the signal (SignalType text, else component type and connector) are read. So are the current
-   limit (FuseCurrent, else MaxPayLoad / Voltage) and the position in the fixture.
+   limit of power outputs (the smaller of FuseCurrent and MaxPayLoad / Voltage) and the position in the fixture.
    * An XLR port named "DMX" is DMX even when the file says "Power". The Astera AX2 GDTF does this.
+   * A name that says "in" or "out" outranks the component type: the BeamZ DOT BAR and BS 1200 files type their
+     "Power OUT" thru as a Consumer and "Network IN" as a NetworkOutput.
+   * A GDTF limit never lifts a port above its connector rating: several files write the mains voltage into
+     FuseCurrent (240 "A" on a TRUE1 thru), which stays a 16 A TRUE1 port. An inlet's fuse protects the device's own
+     supply, not the thru wiring, so inlets keep their connector rating.
 2. **GDTF 1.0/1.1 legacy Connectors**, used only when there are no WiringObjects.
    * The direction comes from the name ("DMX-In 5pin", "PowerCon True1-Out", "Thru", "Mains") before the gender,
      because files disagree on gender: the ADJ files give the TRUE1 inlet gender +1.
@@ -129,8 +134,11 @@ be fed from a generator or another distro.
 * **Feeds.** Each device reached gets a `DataFeed`: console and output, signal, universe(s), chain index (1 = first
   device), the upstream device and port, the cable path from the console, and the run length. A plain daisy chain
   therefore comes out in chain order.
-* **Splitters and segments.** A device with two or more DMX outputs is a splitter: the device count and run length
-  start a new segment behind it.
+* **Splitters and segments.** A distribution device (library category OTHER) with two or more DMX outputs of the same
+  connector is a splitter: the device count and run length start a new segment behind it. A lighting fixture never
+  is one. Its XLR 3-pin and 5-pin thru sockets (a sixth of the library has both) are the same line, so the segment
+  goes on through it. Cabling both of them branches the line without a splitter (`data.y-split`).
+* **DMX breaks.** A thru repeats only the break that arrives at its input.
 * **Converters.** A device with Ethernet in, DMX outputs and no DMX input is an Ethernet → DMX converter (Art-Net
   node, Martin feeder). Its n-th DMX output sends the n-th universe of the incoming range.
 * **Console-driven.** `ConsoleDrivenFixtures` / `IsConsoleDriven` hold every fixture that a data path connects to a
@@ -140,7 +148,7 @@ be fed from a generator or another distro.
 |---|---|---|
 | Patched fixture with no data path (only fixtures that have a wired data input) | `data.no-signal` | warning |
 | Patched universe ≠ universe arriving at the input (DMX: break of the input; Ethernet: every address in range) | `data.universe-mismatch` | error |
-| DMX/Ethernet cable tree with more than two plugged ends | `data.y-split` | warning |
+| DMX/Ethernet cable tree with more than two plugged ends; both thru sockets of one fixture in use | `data.y-split` | warning |
 | More than 32 devices on one DMX segment (`NetworkSolverOptions.MaxDmxDevicesPerSegment`) | `data.chain-too-long` | warning |
 | DMX segment cable length above the cable type's maximum (300 m); Ethernet link above 100 m | `data.run-too-long` | warning |
 | A device reached twice from one output (loop or parallel path) | `data.loop` | error |
@@ -161,7 +169,9 @@ ends.
 * **Links.** Link outputs pass the same supply on.
 * **Distribution outputs.** These pass the device's output supply: DC voltage for PSUs, or mains marked "dimmed" for
   dimmer channels.
-* **Fed distros.** A distro reached through its `Mains In` expands its own outlets.
+* **Fed distros.** A distro reached through its `Mains In` expands its own outlets. A distro whose `Mains In` has a
+  power cable is never a source of its own: if that cable does not lead to a powered output, the distro and its
+  loads are unpowered.
 * **Second feeds.** A device reached a second time is fed twice (`power.multiple-feeds`, error). Only the first feed
   counts.
 
@@ -169,8 +179,12 @@ ends.
 
 * Single-phase outlets use their `Phase`.
 * Multicore outlets rotate their circuits over L1–L3 on three-phase sources.
-* Three-phase outlets (5-pin CEE) pass all phases to a three-phase distro. A single-phase device behind one sits on the
-  outlet's phase.
+* Three-phase outlets (5-pin CEE) pass all phases to a three-phase distro through a three-phase cable. A single-phase
+  device, or a single-phase lead, behind one sits on the outlet's phase. A three-phase distro on a single-phase feed
+  is `power.phase-mismatch` (error).
+* **Voltage.** `VoltageV` of a source is the voltage its single-phase loads see. A three-phase source entered with
+  its line-to-line voltage (300 V or more: 400 V, 415 V) is converted to line-to-neutral (V / √3 = 231 V, 240 V);
+  below 300 V it is taken as line-to-neutral already.
 
 **Loads.** Loads are computed post-order, so nothing is counted twice:
 
@@ -191,10 +205,11 @@ ends.
 | Outlet circuit current above the breaker (per circuit on multicore outlets) | `power.breaker-overload` | error |
 | Link output current above its limit (fuse / payload / connector rating, TRUE1 16 A) | `power.link-overload` | error |
 | Inlet current (own + everything behind) above the inlet connector rating | `power.inlet-overload` | error |
-| Cable current above the cable type rating | `power.cable-overload` | error |
+| Cable current above the cable type rating (the message names what the cable feeds) | `power.cable-overload` | error |
 | Distribution channel above `maxLoadPerChannelA`; total above `maxLoadW` / `maxLoadCurrentA` | `power.channel-overload`, `power.distribution-overload` | error |
 | Fixture needing mains with no supply; fed distro whose feed has no power | `power.unpowered` | warning |
 | Supply not in `supportedPowerNetworks`, outside the voltage/frequency range, or DC on a mains fixture | `power.voltage-mismatch` | error |
+| Three-phase distro fed from a single-phase outlet or lead | `power.phase-mismatch` | error |
 | Three-phase source with (max − min) / max > 20 % and max ≥ 2 A | `power.phase-imbalance` | note |
 | LED/discharge fixture on a dimmed channel | `power.dimmed-electronic-load` | note |
 | Source with an invalid voltage | `power.source-invalid` | error |
@@ -251,6 +266,12 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
     half when only one end is.
   * The total is compared with `MaxUniformLoadKg` (`rigging.truss-overload`), and the heaviest single item with
     `MaxPointLoadKg` (`rigging.truss-point-overload`). Both are errors.
+  * **Bending.** Fixtures are point loads, so their bending moment is checked as well. The truss is taken as a beam
+    simply supported at both ends of its length. M is the largest moment of all carried items. The equivalent
+    mid-span point load 4·M / L is compared with `MaxPointLoadKg`. Without a point rating, the equivalent uniform
+    load 8·M / L is compared with `MaxUniformLoadKg`. Two 25 kg fixtures 0.2 m apart at the middle of a 6 m truss bend
+    it like 49 kg at mid-span, although each is below a 30 kg point rating.
+  * Overload messages name the heaviest fixtures with their weights.
 * **Rigging points.** Each point carries a share of every truss in its `Carries` list. The shares come from the lever
   rule between neighbouring points along the truss axis; overhangs go to the end pair, with uplift clamped to 0.
   * The truss's own weight is spread along its length. Without `WeightKg` it is estimated from the profile: F34
@@ -290,7 +311,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 63 tests and runs in about 15 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` has 77 tests and runs in about 20 s. It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.
@@ -309,6 +330,11 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
   allocation-free drawing. Truss overload (uniform and point), unmounted, riser and missing mount, cable weight on a
   truss, lever-rule rigging points, unknown weight.
 * **Integration.** Malformed scenes, the issue log with both providers, and a 1000-fixture timing.
+* **Review regressions.** A 34-fixture chain of BeamZ Cobra 100 Spots (XLR3 + XLR5 thru) still trips the 32-device
+  warning, while a real splitter starts new segments. Also tested: both thru sockets in use, DMX breaks, the 240 A
+  "fuse" of the BeamZ Ignite 740 thru, thru sockets typed as inputs, 400 V three-phase sources, a three-phase distro
+  on a single-phase feed, a distro on a dead `Mains In` cable, and two fixtures that bend a truss past its point
+  rating.
 
 ## Assumptions and known gaps
 
@@ -317,9 +343,14 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 * **Specs-only fixtures.** These get one `DMX In`/`DMX Out` pair per listed DMX connector and one bidirectional
   `Ethernet` port; a second Ethernet port is not invented.
 * **Power and phases.** Currents add apparent power arithmetically (conservative; no vector sum of different power
-  factors). Line-to-line voltages of three-phase sources are not modelled: `VoltageV` is the phase voltage.
+  factors). Three-phase loads are taken as single-phase loads per phase: a 400 V three-phase fixture is not
+  modelled. A three-phase source voltage below 300 V is taken as line-to-neutral, so a US 208Y/120 V system must be
+  entered as 120 V.
 * **Converters.** Ethernet → DMX converters map universes to outputs in port order. Node configuration is not
   modelled.
 * **Truss statics.** The lever rule treats a truss on three or more points as simply supported spans, not a
-  continuous beam. Floors are assumed centred on their entity.
-* **Patch overlap.** Address overlap between fixtures is a patch check and is not done here.
+  continuous beam. The bending check uses the truss length as the span, whatever its hanging points. Shear and
+  deflection limits of short spans are not modelled. Floors are assumed centred on their entity.
+* **Splitters.** A DMX splitter is recognised by its library category (OTHER) and two outputs with the same connector.
+  A fixture without a `_specs` record also counts as OTHER.
+* **Patch overlap.** Address overlap between fixtures is a patch check of `Candela.Dmx` and is not done here.

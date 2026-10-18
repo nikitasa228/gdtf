@@ -79,8 +79,11 @@ public class ReviewRegressionTests
             Category = FixtureCategory.Other,
             Ports =
             [
-                Data("DMX In", PortDirection.Input), Data("DMX Out 1", PortDirection.Output), Data("DMX Out 2", PortDirection.Output),
-                Data("DMX Out 3", PortDirection.Output), Data("DMX Out 4", PortDirection.Output),
+                Data("DMX In", PortDirection.Input),
+                Data("DMX Out 1", PortDirection.Output),
+                Data("DMX Out 2", PortDirection.Output),
+                Data("DMX Out 3", PortDirection.Output),
+                Data("DMX Out 4", PortDirection.Output),
             ],
         };
         var profiles = new InMemoryFixtureProfileProvider().Add(TestData.Naja, head).Add("Test@Splitter", splitter);
