@@ -93,6 +93,40 @@ public sealed class RenderingTests
         Assert.True(mean > 0.05, $"the image is (nearly) black: mean luminance {mean:0.000}");
         Assert.True(bright > 0.05, $"no lit floor area: {bright:P1} bright pixels");
         Assert.True(bright < 0.9, $"the image is blown out: {bright:P1} bright pixels");
+
+        // the auto view frames the content: the lit stage spans most of the picture
+        int minX = image.Width, maxX = -1, minY = image.Height, maxY = -1;
+        for (int y = 0; y < image.Height; y++)
+        {
+            for (int x = 0; x < image.Width; x++)
+            {
+                int i = 4 * (y * image.Width + x);
+                double l = (0.2126 * image.Pixels[i] + 0.7152 * image.Pixels[i + 1] + 0.0722 * image.Pixels[i + 2]) / 255.0;
+                if (l < 0.12) continue;
+                minX = Math.Min(minX, x);
+                maxX = Math.Max(maxX, x);
+                minY = Math.Min(minY, y);
+                maxY = Math.Max(maxY, y);
+            }
+        }
+        Assert.True(maxX - minX > 0.6 * image.Width, $"the stage spans only x {minX}…{maxX} of {image.Width}");
+        Assert.True(maxY - minY > 0.6 * image.Height, $"the stage spans only y {minY}…{maxY} of {image.Height}");
+    }
+
+    [SkippableFact]
+    public void Thumbnail_of_a_file_deleted_since_the_scan_is_a_dark_picture_not_an_exception()
+    {
+        using var renderer = CreateRendererOrSkip();
+        string folder = TestEnvironment.NewTempDirectory("thumb-deleted");
+        File.Copy(Path.Combine(TestEnvironment.Root, SceneBuilder.MacViper), Path.Combine(folder, SceneBuilder.MacViper));
+        var library = Gdtf.FixtureLibrary.Scan(new[] { folder });
+        var entry = Assert.Single(library.Entries);
+        File.Delete(entry.FilePath);
+        var store = new ThumbnailStore(TestEnvironment.NewTempDirectory("thumb-deleted-store"));
+        using var thumbnails = new FixtureThumbnailRenderer(renderer, library, store);
+        var image = thumbnails.Render(entry, 32);
+        Assert.Equal(32, image.Width);
+        Assert.Empty(Directory.GetFiles(store.Directory, "*.png", SearchOption.AllDirectories));
     }
 
     [SkippableFact]

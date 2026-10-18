@@ -182,6 +182,9 @@ internal static class RenderCommand
     /// <summary>Simulation step used to advance --time (30 frames per second, like a typical preview).</summary>
     public const double TickSeconds = 1.0 / 30.0;
 
+    /// <summary>Space around the content of the preset views (1 = touching the image edges).</summary>
+    public const float FramingMargin = 1.1f;
+
     public static int Run(RenderOptions options, TextWriter output, TextWriter error)
     {
         var total = Stopwatch.StartNew();
@@ -333,8 +336,13 @@ internal static class RenderCommand
         }
         else
         {
-            var bounds = SceneBounds.Compute(engine.Scene, engine.Models.GetBounds);
-            camera = ViewFraming.Frame(bounds, options.View, options.FovY, (float)options.Width / options.Height);
+            // frame the content itself (the corners of every object's box), not the scene's bounding box with its
+            // empty volume, so the stage fills the picture
+            var corners = new List<Vector3>();
+            SceneBounds.CollectContentCorners(engine.Scene, corners, engine.Models.GetBounds);
+            SceneBounds.CollectFixtureParts(engine.Poses, corners);
+            camera = ViewFraming.Frame(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(corners), ViewFraming.Direction(options.View),
+                options.FovY, (float)options.Width / options.Height, FramingMargin);
         }
         if (options.Ev100 is { } ev) camera.Ev100 = ev;
         else

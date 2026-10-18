@@ -68,6 +68,61 @@ public static class ViewFraming
         return camera;
     }
 
+    /// <summary>
+    /// The tightest framing of a set of points (e.g. <see cref="SceneBounds.CollectContentCorners"/>) seen from
+    /// <paramref name="towardsCamera"/> (unit vector from the content towards the eye): the camera keeps that viewing
+    /// direction and is moved sideways and along it until every point is inside the image with
+    /// <paramref name="margin"/> (1 = touching the edges) and the content is centred. A box's corners frame the empty
+    /// volume of the box as well; the points of the content fill the picture. No finite point: the default box.
+    /// </summary>
+    public static RenderCamera Frame(ReadOnlySpan<Vector3> points, Vector3 towardsCamera, float fovYDegrees, float aspect, float margin = 1.06f)
+    {
+        float fovDegrees = Math.Clamp(float.IsFinite(fovYDegrees) ? fovYDegrees : 45f, 5f, 120f);
+        float fovY = fovDegrees * MathF.PI / 180f;
+        aspect = float.IsFinite(aspect) && aspect > 0.05f ? aspect : 16f / 9f;
+        float m = float.IsFinite(margin) && margin >= 1f ? margin : 1.06f;
+        float length = towardsCamera.Length();
+        var forward = length > 1e-6f && float.IsFinite(length) ? -towardsCamera / length : -Direction(ViewPreset.Auto);
+        var worldUp = MathF.Abs(forward.Z) > 0.999f ? Vector3.UnitY : Vector3.UnitZ;
+        var right = Vector3.Normalize(Vector3.Cross(forward, worldUp));
+        var up = Vector3.Cross(right, forward);
+        float tanY = MathF.Tan(fovY / 2f) / m, tanX = MathF.Tan(fovY / 2f) * aspect / m;
+
+        // In camera axes (x right, y up, z forward) a point is inside when |x − ex| ≤ tan·(z − ez). The four side
+        // planes each touch their outermost point: A = max(x − tanX·z), B = max(−x − tanX·z) give the horizontal fit
+        // ez = −(A + B) / (2·tanX), ex = (A − B) / 2; likewise vertically. The eye takes the farther of the two.
+        float a = float.NegativeInfinity, b = float.NegativeInfinity, c = float.NegativeInfinity, d = float.NegativeInfinity;
+        float zMin = float.PositiveInfinity, zMax = float.NegativeInfinity, zSum = 0f;
+        int n = 0;
+        foreach (var p in points)
+        {
+            if (!float.IsFinite(p.X) || !float.IsFinite(p.Y) || !float.IsFinite(p.Z)) continue;
+            float x = Vector3.Dot(p, right), y = Vector3.Dot(p, up), z = Vector3.Dot(p, forward);
+            a = MathF.Max(a, x - tanX * z);
+            b = MathF.Max(b, -x - tanX * z);
+            c = MathF.Max(c, y - tanY * z);
+            d = MathF.Max(d, -y - tanY * z);
+            zMin = MathF.Min(zMin, z);
+            zMax = MathF.Max(zMax, z);
+            zSum += z;
+            n++;
+        }
+        if (n == 0) return Frame(Aabb.Empty, -forward, fovDegrees, aspect, m);
+
+        float ex = (a - b) / 2f, ey = (c - d) / 2f;
+        float ez = MathF.Min(-(a + b) / (2f * tanX), -(c + d) / (2f * tanY));
+        // everything in front of the camera, and the eye at least a little away from the content
+        float extent = MathF.Max(zMax - zMin, 0.1f);
+        ez = MathF.Min(ez, zMin - MathF.Max(0.1f, 0.05f * extent));
+        var eye = right * ex + up * ey + forward * ez;
+        float focus = MathF.Max(zSum / n - ez, 0.1f);
+        var camera = RenderCamera.LookAt(eye, eye + forward * focus, fovDegrees);
+        float near = zMin - ez;
+        camera.Near = MathF.Max(0.05f, near * 0.5f);
+        camera.Far = MathF.Max(100f, (zMax - ez) * 2f);
+        return camera;
+    }
+
     /// <summary>Unit vector from the target towards the camera for a preset.</summary>
     public static Vector3 Direction(ViewPreset preset) => preset switch
     {

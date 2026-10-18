@@ -72,6 +72,7 @@ public sealed class FixtureThumbnailRenderer : IDisposable
         string? hash = _store is null ? null : ContentHash(entry);
         string variant = mode is null ? Variant : Variant + "-" + VariantSuffix(mode);
         if (hash is not null && _store!.Load(hash, size, variant) is { } cached) return cached;
+        // a file that cannot be read (deleted since the library was scanned) still gets a (dark) picture, not cached
         var image = RenderOrbitFrame(entry, size, size, DefaultAzimuth, mode);
         if (hash is not null)
         {
@@ -251,12 +252,20 @@ public sealed class FixtureThumbnailRenderer : IDisposable
         };
     }
 
-    private string ContentHash(FixtureLibraryEntry entry)
+    /// <summary>SHA-256 of the GDTF file (the cache key), or null when the file cannot be read (deleted, locked).</summary>
+    private string? ContentHash(FixtureLibraryEntry entry)
     {
         string key = $"{entry.FilePath}|{entry.FileSize}|{entry.LastWriteTimeUtc.Ticks}";
         if (_hashes.TryGetValue(key, out var hash)) return hash;
-        using (var fs = new FileStream(entry.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            hash = Convert.ToHexString(SHA256.HashData(fs)).ToLowerInvariant();
+        try
+        {
+            using (var fs = new FileStream(entry.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                hash = Convert.ToHexString(SHA256.HashData(fs)).ToLowerInvariant();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
         _hashes[key] = hash;
         return hash;
     }
