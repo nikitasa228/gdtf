@@ -59,6 +59,10 @@ internal sealed unsafe class DockWorkspace
     private uint _menuNode;
     private Panel? _menuPanel;
     private bool _openMenu;
+    private Vector2 _menuAnchorMin;
+    private Vector2 _menuAnchorMax;
+    private Vector2 _menuViewportPos;
+    private Vector2 _menuViewportSize;
 
     /// <summary>Tab styles per dock node.</summary>
     public TabStyleMap TabStyles => _styles;
@@ -182,6 +186,10 @@ internal sealed unsafe class DockWorkspace
         {
             _openMenu = false;
             ImGui.OpenPopup(popupId);
+            // Anchor the menu to its button and open it towards the inside of the window: a menu opened at the
+            // mouse next to the right edge would leave the main window (and become a separate OS window).
+            var placement = MenuPlacement(_menuAnchorMin, _menuAnchorMax, _menuViewportPos, _menuViewportSize);
+            ImGui.SetNextWindowPos(placement.Position, ImGuiCond.Always, placement.Pivot);
         }
 
         if (!ImGui.BeginPopup(popupId))
@@ -397,8 +405,29 @@ internal sealed unsafe class DockWorkspace
         ImGui.EndChild();
     }
 
+    /// <summary>
+    /// Where a menu opened from a button with the screen rectangle (<paramref name="buttonMin"/>, <paramref name="buttonMax"/>)
+    /// goes: below the button, its left edge on the button's left edge, or — for a button in the right half of the
+    /// viewport — its right edge on the button's right edge, so the menu opens towards the inside of the window. A
+    /// button in the lower half opens the menu upwards (icon-column buttons sit at the bottom of a group).
+    /// </summary>
+    internal static (Vector2 Position, Vector2 Pivot) MenuPlacement(Vector2 buttonMin, Vector2 buttonMax, Vector2 viewportPos, Vector2 viewportSize)
+    {
+        var centre = viewportPos + viewportSize * 0.5f;
+        bool right = (buttonMin.X + buttonMax.X) * 0.5f > centre.X;
+        bool below = (buttonMin.Y + buttonMax.Y) * 0.5f > centre.Y;
+        float x = right ? buttonMax.X : buttonMin.X;
+        float y = below ? buttonMin.Y : buttonMax.Y;
+        return (new Vector2(x, y), new Vector2(right ? 1f : 0f, below ? 1f : 0f));
+    }
+
     private void RequestMenu(ImGuiDockNodePtr node, Panel panel)
     {
+        _menuAnchorMin = ImGui.GetItemRectMin();
+        _menuAnchorMax = ImGui.GetItemRectMax();
+        var viewport = ImGui.GetWindowViewport();
+        _menuViewportPos = viewport.Pos;
+        _menuViewportSize = viewport.Size;
         _menuNode = node.ID;
         _menuPanel = panel;
         _openMenu = true;

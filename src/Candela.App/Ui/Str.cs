@@ -300,4 +300,52 @@ internal enum Str
     StatusModified,
     StatusDocsMissing,
     Search,
+
+    // Units
+    UnitMetres,
+    UnitFeet,
+    UnitMinutesFormat,
+
+    // Settings (added by the UX review)
+    SettingsGridSpacing,
+    SettingsAngleStep,
+    SettingsNavHelpCandela,
+    SettingsNavHelpBlender,
+    SettingsNavHelpMaya,
+    SettingsArtNetOffset0,
+    SettingsArtNetOffset1,
+    SettingsRayTracing,
+    SettingsGpuNotListed,
+    PresetDefault,
+    PresetCustom,
+
+    // Preview indirect light modes
+    PreviewIndirectOff,
+    PreviewIndirectRsm,
+    PreviewIndirectRayTraced,
+
+    // Console, issues, about
+    ConsoleDebug,
+    IssuesRelatedObjects,
+    AboutLicenses,
+
+    // View cube
+    ViewCubeMenu,
+
+    // Built-in materials (Core MaterialIds)
+    MaterialPaintedWallWhite,
+    MaterialPaintedWallBlack,
+    MaterialConcrete,
+    MaterialStageFloorBlack,
+    MaterialDanceFloorWhite,
+    MaterialWoodStage,
+    MaterialMoltonBlack,
+    MaterialCyclorama,
+    MaterialCarpet,
+    MaterialAluminiumTruss,
+    MaterialSteelBlack,
+    MaterialMirror,
+    MaterialGlass,
+    MaterialLedScreenOff,
+    MaterialDefault,
 }

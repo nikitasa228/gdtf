@@ -194,7 +194,7 @@ internal sealed class AboutWindow
             ImGui.TextUnformatted($"GPU: {info.DeviceName} ({info.DriverName}, Vulkan {info.ApiVersion})");
             ImGui.TextUnformatted($"Dear ImGui {ImGui.GetVersionS()} · .NET {Environment.Version}");
             ImGui.Separator();
-            ImGui.TextDisabled("Inter — SIL Open Font License 1.1 · Lucide icons — ISC License");
+            ImGui.TextDisabled(Loc.Get(Str.AboutLicenses));
         }
 
         ImGui.End();

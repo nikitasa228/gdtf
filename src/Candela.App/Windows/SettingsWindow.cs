@@ -48,12 +48,6 @@ internal enum SettingsSection
 /// </summary>
 internal sealed class SettingsWindow
 {
-    private static readonly string[] ArtNetOffsets =
-    {
-        "0 — Art-Net 0:0:0 = universe 0",
-        "1 — Art-Net 0:0:0 = universe 1 (grandMA, Eos, …)",
-    };
-
     private readonly WorkspaceContext _ctx;
     private readonly KeyBindingsService _keys;
     private readonly CommandRegistry _commands;
@@ -66,6 +60,9 @@ internal sealed class SettingsWindow
     private string _presetName = "";
     private string _keyFilter = "";
     private List<(string Label, string Value)>? _interfaces;
+    private IReadOnlyList<string>? _devices;
+    private string _gridFormat = "";
+    private string _formatsLanguage = "";
     private bool _focusRequested;
 
     /// <summary>Creates the window.</summary>
@@ -101,6 +98,15 @@ internal sealed class SettingsWindow
         if (section is { } s)
             _section = s;
         _interfaces = null;
+        _devices = null;
+    }
+
+    private void RefreshFormats()
+    {
+        if (_gridFormat.Length > 0 && string.Equals(_formatsLanguage, Loc.Language, StringComparison.Ordinal))
+            return;
+        _formatsLanguage = Loc.Language;
+        _gridFormat = "%.2f " + Loc.Get(Str.UnitMetres);
     }
 
     /// <summary>Draws the window when open.</summary>
@@ -239,10 +245,10 @@ internal sealed class SettingsWindow
         ImGui.TextUnformatted(Loc.Get(Str.SettingsPreset));
         ImGui.SameLine();
         ImGui.SetNextItemWidth(200 * scale);
-        if (ImGui.BeginCombo("##preset", library.CurrentName))
+        if (ImGui.BeginCombo("##preset", PresetDisplayName(library.CurrentName)))
         {
             foreach (var name in library.Names)
-                if (ImGui.Selectable(name, name == library.CurrentName) && name != PresetLibrary<KeyBindingSet>.CustomName)
+                if (ImGui.Selectable(PresetDisplayName(name), name == library.CurrentName) && name != PresetLibrary<KeyBindingSet>.CustomName)
                 {
                     StopCapture();
                     _keys.Select(name);
@@ -367,6 +373,14 @@ internal sealed class SettingsWindow
 
     private string LabelOf(string actionId) => _commands.Find(actionId)?.Text ?? actionId;
 
+    /// <summary>The shown name of a preset: the reserved "Default" and "Custom" are translated, saved names are not.</summary>
+    internal static string PresetDisplayName(string name) => name switch
+    {
+        PresetLibrary<KeyBindingSet>.DefaultName => Loc.Get(Str.PresetDefault),
+        PresetLibrary<KeyBindingSet>.CustomName => Loc.Get(Str.PresetCustom),
+        _ => name,
+    };
+
     private static KeyChord? TryParse(string text)
     {
         try
@@ -440,7 +454,7 @@ internal sealed class SettingsWindow
 
         PropertyGrid.Row("");
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(NavigationHelp(s.NavigationStyle));
+        ImGui.TextWrapped(Loc.Get(NavigationHelp(s.NavigationStyle)));
         ImGui.PopStyleColor();
         PropertyGrid.Row(Str.SettingsZoomSpeed);
         float zoom = s.ZoomSpeed;
@@ -460,26 +474,28 @@ internal sealed class SettingsWindow
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
-        PropertyGrid.Row(Str.ViewportGrid);
+        PropertyGrid.Row(Str.SettingsGridSpacing);
         float grid = settings.GridSpacing;
-        if (ImGui.DragFloat("##grid", ref grid, 0.01f, 0.05f, 50f, "%.2f m"))
+        RefreshFormats();
+        if (ImGui.DragFloat("##grid", ref grid, 0.01f, 0.05f, 50f, _gridFormat))
         {
             settings.GridSpacing = Math.Clamp(grid, 0.05f, 50f);
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
-        PropertyGrid.Row(Str.ToolSnapping);
+        PropertyGrid.Row(Str.SettingsAngleStep);
         float angle = _ctx.Tools.AngleStep;
         if (ImGui.DragFloat("##angle", ref angle, 0.5f, 1f, 90f, "%.0f°"))
             _ctx.Tools.AngleStep = Math.Clamp(angle, 1f, 90f);
         PropertyGrid.End();
     }
 
-    private static string NavigationHelp(string style) => NavigationStyles.Normalize(style) switch
+    /// <summary>The summary of a navigation style's mouse bindings.</summary>
+    internal static Str NavigationHelp(string style) => NavigationStyles.Normalize(style) switch
     {
-        NavigationStyles.Blender => "MMB orbit · Shift+MMB pan · Ctrl+MMB zoom · Shift+RMB fly (W/A/S/D/Q/E) · wheel zoom · LMB select",
-        NavigationStyles.Maya => "Alt+LMB orbit · Alt+MMB / MMB pan · Alt+RMB zoom · RMB fly (W/A/S/D/Q/E) · wheel zoom · LMB select",
-        _ => "MMB / Alt+LMB orbit · Shift+MMB / Alt+Shift+LMB pan · Ctrl+MMB zoom · RMB fly (W/A/S/D/Q/E) · wheel zoom · LMB select",
+        NavigationStyles.Blender => Str.SettingsNavHelpBlender,
+        NavigationStyles.Maya => Str.SettingsNavHelpMaya,
+        _ => Str.SettingsNavHelpCandela,
     };
 
     private void DrawLibrary()
@@ -555,11 +571,19 @@ internal sealed class SettingsWindow
             }
 
             PropertyGrid.Row(Str.SettingsArtNetOffset);
-            int offset = s.ArtNetUniverseOffset;
-            if (ImGui.Combo("##offset", ref offset, ArtNetOffsets, ArtNetOffsets.Length))
+            int offset = Math.Clamp(s.ArtNetUniverseOffset, 0, 1);
+            if (ImGui.BeginCombo("##offset", Loc.Get(offset == 0 ? Str.SettingsArtNetOffset0 : Str.SettingsArtNetOffset1)))
             {
-                s.ArtNetUniverseOffset = offset;
-                Changed();
+                for (int i = 0; i <= 1; i++)
+                {
+                    if (ImGui.Selectable(Loc.Get(i == 0 ? Str.SettingsArtNetOffset0 : Str.SettingsArtNetOffset1), offset == i))
+                    {
+                        s.ArtNetUniverseOffset = i;
+                        Changed();
+                    }
+                }
+
+                ImGui.EndCombo();
             }
 
             PropertyGrid.End();
@@ -604,7 +628,7 @@ internal sealed class SettingsWindow
         {
             PropertyGrid.Row(Str.SettingsAutosave);
             int autosave = s.AutosaveMinutes;
-            if (ImGui.SliderInt("##autosave", ref autosave, 0, 60, autosave == 0 ? Loc.Get(Str.SettingsAutosaveOff) : "%d min"))
+            if (ImGui.SliderInt("##autosave", ref autosave, 0, 60, autosave == 0 ? Loc.Get(Str.SettingsAutosaveOff) : Loc.Get(Str.UnitMinutesFormat)))
             {
                 s.AutosaveMinutes = Math.Clamp(autosave, 0, 240);
                 Changed();
@@ -633,16 +657,33 @@ internal sealed class SettingsWindow
         Heading(Str.SettingsGpu);
         ImGui.TextUnformatted($"{Icons.Cpu}  {Loc.Format(Str.SettingsCurrentDevice, info.DeviceName)}");
         ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture,
-            $"{info.DriverName} · Vulkan {info.ApiVersion} · {info.DeviceMemoryBytes / (1024.0 * 1024 * 1024):0.#} GB · RT {(info.SupportsRayTracing ? "yes" : "no")}"));
+            $"{info.DriverName} · Vulkan {info.ApiVersion} · {info.DeviceMemoryBytes / (1024.0 * 1024 * 1024):0.#} GB · {Loc.Format(Str.SettingsRayTracing, Loc.Get(info.SupportsRayTracing ? Str.MsgYes : Str.MsgNo))}"));
         ImGui.Spacing();
         if (PropertyGrid.Begin("##gpu", 230f))
         {
             PropertyGrid.Row(Str.SettingsGpuPreferred);
-            string preferred = s.PreferredGpu;
-            if (ImGui.InputTextWithHint("##preferred", Loc.Get(Str.SettingsGpuAutomatic), ref preferred, 128))
+            _devices ??= GpuDevices.List(_ctx.Gpu.Context);
+            string preferred = s.PreferredGpu.Trim();
+            string shown = preferred.Length == 0 ? Loc.Get(Str.SettingsGpuAutomatic)
+                : GpuDevices.Find(_devices, preferred) ?? Loc.Format(Str.SettingsGpuNotListed, preferred);
+            if (ImGui.BeginCombo("##preferred", shown))
             {
-                s.PreferredGpu = preferred;
-                Changed();
+                if (ImGui.Selectable(Loc.Get(Str.SettingsGpuAutomatic), preferred.Length == 0))
+                {
+                    s.PreferredGpu = "";
+                    Changed();
+                }
+
+                foreach (var device in _devices)
+                {
+                    if (ImGui.Selectable(device, string.Equals(device, preferred, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        s.PreferredGpu = device;
+                        Changed();
+                    }
+                }
+
+                ImGui.EndCombo();
             }
 
             PropertyGrid.Row(Str.SettingsGpuValidation);

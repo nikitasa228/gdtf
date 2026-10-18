@@ -110,7 +110,7 @@ internal sealed unsafe class RenderPanel : Panel
 internal sealed class PreviewPanel : Panel
 {
     private static readonly string[] ToneMappers = { "AgX", "ACES", "Neutral" };
-    private static readonly string[] IndirectModes = { "Off", "Reflective shadow maps", "Ray traced" };
+    private static readonly Str[] IndirectModes = { Str.PreviewIndirectOff, Str.PreviewIndirectRsm, Str.PreviewIndirectRayTraced };
     private readonly WorkspaceContext _ctx;
 
     /// <summary>Creates the panel.</summary>
@@ -146,9 +146,14 @@ internal sealed class PreviewPanel : Panel
         if (ImGui.Checkbox("##volumetrics", ref volumetrics))
             p.Volumetrics = volumetrics;
         PropertyGrid.Row(Str.PreviewIndirect);
-        int indirect = (int)p.Indirect;
-        if (ImGui.Combo("##indirect", ref indirect, IndirectModes, IndirectModes.Length))
-            p.Indirect = (IndirectLighting)indirect;
+        int indirect = Math.Clamp((int)p.Indirect, 0, IndirectModes.Length - 1);
+        if (ImGui.BeginCombo("##indirect", Loc.Get(IndirectModes[indirect])))
+        {
+            for (int i = 0; i < IndirectModes.Length; i++)
+                if (ImGui.Selectable(Loc.Get(IndirectModes[i]), i == indirect))
+                    p.Indirect = (IndirectLighting)i;
+            ImGui.EndCombo();
+        }
         PropertyGrid.Row(Str.PreviewBloom);
         bool bloom = p.Bloom;
         if (ImGui.Checkbox("##bloom", ref bloom))

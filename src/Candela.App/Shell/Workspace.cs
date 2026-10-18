@@ -331,6 +331,22 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _focusPanel = panel.Id;
     }
 
+    /// <summary>
+    /// Window menu: a checked (open) panel is closed, an unchecked one is opened and brought to the front — the check
+    /// mark shows what a click will undo. Panels that cannot close (the first viewport) are only focused.
+    /// </summary>
+    internal void TogglePanel(Panel panel)
+    {
+        if (panel.IsOpen && panel.CanClose)
+        {
+            panel.IsOpen = false;
+            panel.OnClosed();
+            return;
+        }
+
+        FocusPanel(panel);
+    }
+
     private Panel? FindPanel(string id) =>
         _panels.FirstOrDefault(p => string.Equals(p.Id, id, StringComparison.OrdinalIgnoreCase)) ??
         _panels.FirstOrDefault(p => MenuScope.Matches(id, p.Title, p.Id, null));

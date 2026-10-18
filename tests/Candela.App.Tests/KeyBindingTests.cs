@@ -284,6 +284,48 @@ public sealed class KeyBindingDispatchTests
     }
 
     [Fact]
+    public void Shortcuts_do_not_reach_the_scene_while_a_popup_or_dialog_is_open()
+    {
+        using var ui = new HeadlessImGui(new Vector2(800, 600));
+        ui.Frame(() => { });
+        var (commands, ran) = Registry(EditorActions.Delete, EditorActions.DeselectAll, EditorActions.Undo);
+        var dispatcher = new KeyBindingDispatcher(commands, KeyBindingsService.CreateDefault());
+        bool open = true;
+        bool openRequested = true;
+        void Modal()
+        {
+            if (openRequested)
+            {
+                ImGui.OpenPopup("dialog");
+                openRequested = false;
+            }
+
+            if (ImGui.BeginPopupModal("dialog"))
+            {
+                ImGui.TextUnformatted("A dialog");
+                if (!open)
+                    ImGui.CloseCurrentPopup();
+                ImGui.EndPopup();
+            }
+        }
+
+        ui.Frame(Modal);
+        Press(ui, dispatcher, ImGuiKey.Delete, draw: Modal);
+        Press(ui, dispatcher, ImGuiKey.Z, KeyModifiers.Ctrl, Modal);
+        Assert.Empty(ran);
+
+        // Escape belongs to the dialog (its Cancel), not to "Deselect".
+        Press(ui, dispatcher, ImGuiKey.Escape, draw: Modal);
+        Assert.Empty(ran);
+
+        open = false;
+        ui.Frame(Modal);
+        ui.Frame(Modal);
+        Press(ui, dispatcher, ImGuiKey.Delete, draw: Modal);
+        Assert.Equal(new[] { EditorActions.Delete }, ran);
+    }
+
+    [Fact]
     public void Rebuild_applies_new_bindings()
     {
         using var ui = new HeadlessImGui(new Vector2(800, 600));

@@ -74,7 +74,9 @@ internal sealed class KeyBindingMap
 /// <summary>
 /// Runs editor commands for key presses (polled from Dear ImGui each frame, so scripted input works the same as real
 /// keys). Plain letter keys are ignored while a text field has the keyboard, and everything is ignored while the
-/// shortcut editor records a new chord or a viewport flies with W/A/S/D.
+/// shortcut editor records a new chord, a viewport flies with W/A/S/D, or a popup (menu, combo box, context menu,
+/// modal dialog) is open: the popup owns the keyboard, so Escape only closes it and Delete or Ctrl+Z cannot change the
+/// scene behind a dialog.
 /// </summary>
 internal sealed class KeyBindingDispatcher
 {
@@ -109,7 +111,7 @@ internal sealed class KeyBindingDispatcher
     /// <summary>Checks this frame's key presses and runs the bound commands. Call once per frame inside the ImGui frame.</summary>
     public void Dispatch()
     {
-        if (Suspended)
+        if (Suspended || ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId | ImGuiPopupFlags.AnyPopupLevel))
             return;
         var io = ImGui.GetIO();
         bool typing = io.WantTextInput;

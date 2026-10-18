@@ -329,13 +329,8 @@ internal sealed partial class Workspace
         {
             foreach (var panel in _panels)
             {
-                if (_menu.Item($"{panel.Icon}  {panel.Title}", "", panel.IsOpen, true, panel.Id))
-                {
-                    if (panel.IsOpen && panel.CanClose && !ImGui.IsKeyDown(ImGuiKey.ModShift))
-                        FocusPanel(panel);
-                    else
-                        FocusPanel(panel);
-                }
+                if (_menu.Item(panel.MenuLabel, "", panel.IsOpen, true, panel.Id))
+                    TogglePanel(panel);
             }
 
             _menu.Separator();

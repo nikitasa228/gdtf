@@ -46,7 +46,7 @@ internal sealed class ConsolePanel : Panel
         ImGui.SameLine();
         ImGui.Checkbox(Loc.Get(Str.ConsoleAutoScroll), ref _autoScroll);
         ImGui.SameLine();
-        ImGui.Checkbox("Debug", ref _showDebug);
+        ImGui.Checkbox(Loc.Get(Str.ConsoleDebug), ref _showDebug);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(MathF.Max(120 * scale, ImGui.GetContentRegionAvail().X));
         ImGui.InputTextWithHint("##filter", Labels.With(Icons.Filter, Str.ConsoleFilter), ref _filter, 128);

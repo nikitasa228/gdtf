@@ -13,6 +13,7 @@ internal abstract class Panel
 {
     private string _windowName = "";
     private string _cachedTitle = "";
+    private string _menuLabel = "";
 
     /// <summary>Creates a panel with a stable <paramref name="id"/> and an icon from <see cref="Icons"/>.</summary>
     protected Panel(string id, string icon)
@@ -56,9 +57,20 @@ internal abstract class Panel
             {
                 _cachedTitle = title;
                 _windowName = $"{Icon}  {title}###{Id}";
+                _menuLabel = $"{Icon}  {title}";
             }
 
             return _windowName;
+        }
+    }
+
+    /// <summary>The Window-menu label (icon + title), rebuilt with the title.</summary>
+    public string MenuLabel
+    {
+        get
+        {
+            _ = WindowName;
+            return _menuLabel;
         }
     }
 

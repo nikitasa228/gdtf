@@ -107,7 +107,7 @@ internal sealed class IssuesPanel : Panel
         }
 
         if (ImGui.IsItemHovered() && issue.Entities.Count > 0)
-            ImGui.SetTooltip($"{issue.Code} · {issue.Entities.Count} {Loc.Get(Str.PropComponents).ToLowerInvariant()}");
+            ImGui.SetTooltip(Loc.Format(Str.IssuesRelatedObjects, issue.Code, issue.Entities.Count));
         else if (ImGui.IsItemHovered())
             ImGui.SetTooltip(issue.Code);
         ImGui.PopID();
