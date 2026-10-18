@@ -190,19 +190,19 @@ internal sealed unsafe class PropertiesPanel : Panel
 
         PropertyGrid.Row(Str.PropPosition);
         var position = local.Position * unit;
-        if (AxisFields("##position", ref position, 0.01f, 0f, 0f, _formats.Position, out bool positionDone))
+        if (AxisFields("##position", ref position, 0.01f, 0f, 0f, _formats.Position, _formats.WidestSample, out bool positionDone))
             Apply(entity, local with { Position = position / unit }, "Move", "position");
         EndEdit(positionDone);
 
         PropertyGrid.Row(Str.PropRotation);
         var euler = TransformMath.ToEulerDegrees(local.Rotation);
-        if (AxisFields("##rotation", ref euler, 0.5f, 0f, 0f, _formats.Rotation, out bool rotationDone))
+        if (AxisFields("##rotation", ref euler, 0.5f, 0f, 0f, _formats.Rotation, _formats.WidestSample, out bool rotationDone))
             Apply(entity, local with { Rotation = TransformMath.FromEulerDegrees(euler) }, "Rotate", "rotation");
         EndEdit(rotationDone);
 
         PropertyGrid.Row(Str.PropScale);
         var scale = local.Scale;
-        if (AxisFields("##scale", ref scale, 0.01f, 0.001f, 1000f, _formats.Scale, out bool scaleDone))
+        if (AxisFields("##scale", ref scale, 0.01f, 0.001f, 1000f, _formats.Scale, _formats.WidestSample, out bool scaleDone))
             Apply(entity, local with { Scale = Vector3.Max(scale, new Vector3(0.001f)) }, "Scale", "scale");
         EndEdit(scaleDone);
         PropertyGrid.End();
@@ -210,20 +210,27 @@ internal sealed unsafe class PropertiesPanel : Panel
 
     /// <summary>
     /// Three drag fields for X, Y and Z, each labelled with its axis letter and marked with the axis colour on its left
-    /// edge (X red, Y green, Z blue, as in the viewport). <paramref name="finished"/> is true when one of them ended an
-    /// edit this frame (the undo merge of the drag ends there).
+    /// edge (X red, Y green, Z blue, as in the viewport). Side by side when a third of the column fits
+    /// <paramref name="widestSample"/> (a typical value with its axis letter and unit); in a narrow panel or at a large UI
+    /// scale they stack, one full-width field per axis, instead of cutting the numbers. <paramref name="finished"/> is
+    /// true when one of them ended an edit this frame (the undo merge of the drag ends there).
     /// </summary>
-    private static bool AxisFields(string id, ref Vector3 value, float speed, float min, float max, string[] formats, out bool finished)
+    private static bool AxisFields(string id, ref Vector3 value, float speed, float min, float max, string[] formats, string widestSample,
+        out bool finished)
     {
         var style = ImGui.GetStyle();
         float spacing = style.ItemInnerSpacing.X;
-        float width = MathF.Max(1f, (ImGui.GetContentRegionAvail().X - 2f * spacing) / 3f);
+        float available = ImGui.GetContentRegionAvail().X;
+        float width = MathF.Max(1f, (available - 2f * spacing) / 3f);
+        bool stacked = AxisFieldsStack(width, ImGui.CalcTextSize(widestSample).X, style.FramePadding.X);
+        if (stacked)
+            width = MathF.Max(1f, available);
         bool changed = false;
         finished = false;
         ImGui.PushID(id);
         for (int axis = 0; axis < 3; axis++)
         {
-            if (axis > 0)
+            if (axis > 0 && !stacked)
                 ImGui.SameLine(0, spacing);
             ImGui.PushID(axis);
             ImGui.SetNextItemWidth(width);
@@ -251,6 +258,14 @@ internal sealed unsafe class PropertiesPanel : Panel
         ImGui.PopID();
         return changed;
     }
+
+    /// <summary>
+    /// True when side-by-side axis fields of <paramref name="fieldWidth"/> pixels would cut a value as wide as
+    /// <paramref name="sampleWidth"/>: the centred text needs its width plus a small margin on both sides (half the
+    /// frame padding, at least the axis stripe) to stay readable.
+    /// </summary>
+    internal static bool AxisFieldsStack(float fieldWidth, float sampleWidth, float framePaddingX) =>
+        fieldWidth < sampleWidth + MathF.Max(framePaddingX, 4f);
 
     private static Vector4 AxisColor(int axis) => axis == 0 ? Theme.AxisX : axis == 1 ? Theme.AxisY : Theme.AxisZ;
 
@@ -381,6 +396,9 @@ internal sealed unsafe class PropertiesPanel : Panel
 
         public string[] Scale { get; } = new string[3];
 
+        /// <summary>A typical widest field text ("X  -0.000 m"), to decide whether the fields fit side by side.</summary>
+        public string WidestSample { get; private set; } = "X  -0.000 m";
+
         public void Refresh(bool imperial)
         {
             if (_imperial == imperial && string.Equals(_language, Loc.Language, StringComparison.Ordinal))
@@ -388,6 +406,7 @@ internal sealed unsafe class PropertiesPanel : Panel
             _imperial = imperial;
             _language = Loc.Language;
             string unit = Loc.Get(imperial ? Str.UnitFeet : Str.UnitMetres);
+            WidestSample = $"X  -0.000 {unit}";
             for (int i = 0; i < 3; i++)
             {
                 Position[i] = $"{Axes[i]}  %.3f {unit}";

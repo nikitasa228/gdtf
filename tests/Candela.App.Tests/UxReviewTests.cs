@@ -126,4 +126,13 @@ public sealed class UxReviewTests
         Assert.Same(a, Candela.App.Viewport.ActiveViewportRule.Choose(closed, new[] { closed, a, b }));
         Assert.Same(closed, Candela.App.Viewport.ActiveViewportRule.Choose(null, new[] { closed }));
     }
+
+    [Theory]
+    // Field width, text width of "X  -0.000 m" at the UI scale, frame padding → stacked?
+    [InlineData(90f, 71f, 8f, false)]   // English at 100 % in the default right panel: side by side
+    [InlineData(60f, 105f, 12f, true)]  // Russian at 150 %: the numbers would be cut, so one field per line
+    [InlineData(79f, 71f, 8f, false)]
+    [InlineData(78f, 71f, 8f, true)]
+    public void Transform_fields_stack_instead_of_cutting_their_numbers(float fieldWidth, float textWidth, float padding, bool stacked) =>
+        Assert.Equal(stacked, Candela.App.Panels.PropertiesPanel.AxisFieldsStack(fieldWidth, textWidth, padding));
 }
