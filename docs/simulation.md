@@ -258,7 +258,7 @@ no light, volume or smoke before ignition or after burn-out. `BurnTime` > 0 clos
 until the output is released to 0 and raised again (shot length / safety time-out).
 
 Soot radiation temperature along the flame: 0.72·T_r at the blue base, T_r from 12 % to 60 % of the height, cooling to
-0.6·T_r at the tip. A parcel's share of the light is its heat × L_bb(T)/L_bb(T_r), normalised so that a steady flame
+0.8·T_r (≈ 1440 K) at the orange tip. A parcel's share of the light is its heat × L_bb(T)/L_bb(T_r), normalised so that a steady flame
 emits exactly Φ = χ_r·Q·K(T_r) (during ignition, with only the dim base burning, it emits less).
 
 ### Outputs
@@ -266,8 +266,8 @@ emits exactly Φ = χ_r·Q·K(T_r) (during ignition, with only the dim base burn
 * **Light samples** (`LightSamples`, 4 per flame): the parcels grouped by progress into sections; each sample sits at
   its section's light-weighted centre, with the black-body colour (`LightColor`) of its flux-weighted chromaticity
   mix, intensity Φ_section/4π in cd, its mean temperature and the column radius (light size for soft shadows). The
-  samples of a 5 m flame are 7, 11, 8 and 0.2 kcd at 1780, 1800, 1770 and 1460 K CCT; the flame as a whole is ≈ 1785 K
-  (test: 1500–2200 K, on the Planckian locus).
+  samples of a 5 m flame are 6.6, 9.8, 8.7 and 1.5 kcd at 1780, 1800, 1780 and 1595 K CCT; the flame as a whole is
+  ≈ 1775 K (test: every sample of 3 m, 5 m and 8 m flames within 1500–2200 K, on the Planckian locus).
 * **Temperature volumes** (`Volumes`, one per burning flame, ≤ 48 cells per axis, ≈ 0.1 m cells): parcels splat their
   temperature with the kernel (1 − q²)² of radius 0.35·D_flame·(0.6 + 0.6·s); a cell gets Σk·T/max(Σk, 1) — the mean
   temperature where parcels overlap, fading to 0 (= no flame) at the edge. `EmissionCoefficient` κ makes the volume's

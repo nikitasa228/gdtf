@@ -492,8 +492,9 @@ public sealed class FireSimulation
 
     /// <summary>
     /// Soot radiation temperature of a parcel at progress s (0 = nozzle, 1 = tip), K: the blue, barely luminous base
-    /// (0.72·T_r) heats up to T_r within the first 12 % of the flame, stays there to 60 %, and cools to 0.6·T_r at the
-    /// tip where the soot burns out.
+    /// (0.72·T_r) heats up to T_r within the first 12 % of the flame, stays there to 60 %, and cools to 0.8·T_r at the
+    /// tip where the soot burns out (≈ 1440 K for the default 1800 K: the orange tip of a flame column, which keeps every
+    /// light sample's colour within the 1500–2200 K of real flames).
     /// </summary>
     private float ParcelTemperature(float s)
     {
@@ -502,7 +503,7 @@ public sealed class FireSimulation
             return tr * (0.72f + 0.28f * (s / 0.12f));
         if (s < 0.6f)
             return tr;
-        return tr * (1f - 0.4f * MathF.Min(1f, (s - 0.6f) / 0.4f));
+        return tr * (1f - 0.2f * MathF.Min(1f, (s - 0.6f) / 0.4f));
     }
 
     /// <summary>World position of a parcel and its kernel radius.</summary>

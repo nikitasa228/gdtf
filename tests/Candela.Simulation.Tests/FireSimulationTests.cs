@@ -121,19 +121,22 @@ public sealed class FireSimulationTests(ITestOutputHelper output)
             Assert.True(heights[n] > heights[n - 1]);
     }
 
-    [Fact]
-    public void FlameColour_IsThatOfA1500To2200KelvinBlackBody()
+    [Theory]
+    [InlineData(5f, 1f)]
+    [InlineData(3f, 0.2f)]
+    [InlineData(8f, 1f)]
+    public void FlameColour_IsThatOfA1500To2200KelvinBlackBody(float height, float level)
     {
         var fire = new FireSimulation();
-        Run(fire, 0.8, Flame(1f));
-        float total = fire.TotalLuminousFlux;
+        Run(fire, 0.8, Flame(level, height));
+        Assert.Equal(fire.Settings.LightSamplesPerFlame, fire.LightSamples.Length);
         Vector3 xyz = Vector3.Zero;
         foreach (var s in fire.LightSamples)
         {
             var cct = s.Color.ToCct();
             output.WriteLine($"sample at {s.Position.Z:F2} m: {s.IntensityCandela / 1e3:F1} kcd, T {s.Temperature:F0} K, CCT {cct.Kelvin:F0} K, Δuv {cct.Duv:F4}");
-            if (s.LuminousFlux > 0.05f * total)
-                Assert.InRange(cct.Kelvin, 1500f, 2200f);
+            // Every sample, including the dim orange tip (regression: the tip section used to come out at ≈ 1450 K).
+            Assert.InRange(cct.Kelvin, 1500f, 2200f);
             Assert.True(MathF.Abs(cct.Duv) < 0.003f, "a black-body colour lies on the Planckian locus");
             xyz += s.Color.ToXyz() * s.LuminousFlux;
         }
