@@ -76,7 +76,11 @@ public sealed class VolumetricTests
                 SmokeScatteringAtFullDensity = 0.5f,
                 SmokeDensity = new VolumeGrid
                 {
-                    Min = new Vector3(-30f, -30f, -1f), Max = new Vector3(30f, 30f, 8f), SizeX = 8, SizeY = 8, SizeZ = 8,
+                    Min = new Vector3(-30f, -30f, -1f),
+                    Max = new Vector3(30f, 30f, 8f),
+                    SizeX = 8,
+                    SizeY = 8,
+                    SizeZ = 8,
                     Values = Enumerable.Repeat(Haze / 0.5f, 8 * 8 * 8).ToArray(),
                 },
             });
