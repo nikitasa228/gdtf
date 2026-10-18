@@ -14,13 +14,48 @@ internal static class ShaderConstants
     public const uint BindingLights = 3;
     public const uint BindingTextures = 4;
 
-    // Set 1: view (one per render target and frame slot).
+    // Set 1: view (one per render target; rebuilt when a referenced resource is replaced).
     public const int SetView = 1;
     public const uint BindingFrame = 0;
     public const uint BindingClusters = 1;
     public const uint BindingClusterLights = 2;
     public const uint BindingClusterCounter = 3;
     public const uint BindingHdr = 4;
+    public const uint BindingLightViews = 5;
+    public const uint BindingShadowSlots = 6;
+    public const uint BindingShadowMap = 7;
+    public const uint BindingShadowDepth = 8;
+    public const uint BindingRsmAlbedo = 9;
+    public const uint BindingRsmNormal = 10;
+    public const uint BindingVpls = 11;
+    public const uint BindingIndirect = 12;
+    public const uint BindingVolume = 13;
+    public const uint BindingSmoke = 14;
+    public const uint BindingFlame = 15;
+    public const uint BindingNoiseField = 16;
+    public const uint BindingFlameLut = 17;
+    public const uint BindingNoiseSources = 18;
+    public const uint BindingGradientLut = 19;
+    public const uint BindingSceneDepth = 20;
+    public const uint BindingSceneNormals = 21;
+    public const uint BindingInstanceIds = 22;
+    public const uint BindingBloom = 23;
+    public const uint BindingAnalysis = 24;
+    public const uint BindingRaymarchList = 25;
+    public const uint BindingSelectionMask = 26;
+    public const uint BindingExposure = 27;
+    public const uint ViewBindingCount = 28;
+
+    // Set 2: per-pass resources of compute passes (storage images, history images, the TLAS).
+    public const int SetPass = 2;
+    public const uint BindingPassStorage0 = 0;
+    public const uint BindingPassStorage1 = 1;
+    public const uint BindingPassStorage2 = 2;
+    public const uint BindingPassSampled0 = 3;
+    public const uint BindingPassSampled1 = 4;
+    public const uint BindingPassSampled2 = 5;
+    public const uint BindingPassTlas = 6;
+    public const uint BindingPassBuffer = 7;
 
     // Clustered light assignment: 16 × 9 screen tiles × 24 logarithmic depth slices.
     public const uint ClusterCountX = 16;
@@ -52,6 +87,22 @@ internal static class ShaderConstants
     public const uint ShapeGeneralizedGaussian = 1;
     public const uint ShapeUniformCone = 2;
 
+    // Light flags (Light.flags).
+    public const uint LightCastShadows = 1u << 0;
+    public const uint LightGobo = 1u << 1;
+    public const uint LightBlades = 1u << 2;
+    public const uint LightPrism = 1u << 3;
+
+    // Per-view light flags (LightView.flags).
+    public const uint LightViewRaymarched = 1u << 0;
+    public const uint LightViewRsm = 1u << 1;
+
+    /// <summary>LightView.shadowSlot of a light without a shadow map.</summary>
+    public const uint NoShadow = 0xFFFFFFFFu;
+
+    /// <summary>Most prism facets evaluated per light (more are clamped).</summary>
+    public const uint MaxPrismFacets = 16;
+
     // View modes.
     public const uint ViewFull = 0;
     public const uint ViewColorless = 1;
@@ -66,61 +117,157 @@ internal static class ShaderConstants
     // Frame flags.
     public const uint FrameOrthographic = 1u << 0;
 
+    // Frame features (FrameData.features).
+    public const uint FeatureShadows = 1u << 0;
+    public const uint FeatureVolumetrics = 1u << 1;
+    public const uint FeatureIndirectRsm = 1u << 2;
+    public const uint FeatureIndirectRayTraced = 1u << 3;
+    public const uint FeatureHaze = 1u << 4;
+    public const uint FeatureSmoke = 1u << 5;
+    public const uint FeatureFlame = 1u << 6;
+    public const uint FeatureNoiseField = 1u << 7;
+    public const uint FeatureBloom = 1u << 8;
+    public const uint FeatureScaled = 1u << 9;
+    public const uint FeatureTemporal = 1u << 10;
+    public const uint FeatureNoiseFog = 1u << 11;
+    public const uint FeatureVolumeLights = 1u << 12;
+
+    // Overlay modes (FrameData.overlayMode).
+    public const uint OverlayNone = 0;
+    public const uint OverlayLux = 1;
+    public const uint OverlayNoise = 2;
+    public const uint OverlayCables = 3;
+
     // Draw modes (push constant `mode`).
     public const uint DrawModeDefault = 0;
     public const uint DrawModeSelected = 1;
+
+    // Auto exposure histogram.
+    public const uint HistogramBins = 128;
+
+    /// <summary>log2 luminance (cd/m²) of the first histogram bin.</summary>
+    public const float HistogramMinLog2 = -14f;
+
+    /// <summary>log2 luminance (cd/m²) of the end of the last histogram bin.</summary>
+    public const float HistogramMaxLog2 = 22f;
 
     /// <summary>Exposed value below which a light's contribution counts as negligible (sets its range).</summary>
     public const float LightRangeEpsilon = 2e-5f;
 
     /// <summary>All values as GLSL #define pairs.</summary>
-    public static IEnumerable<(string Name, long Value)> Defines => new (string, long)[]
+    public static IEnumerable<(string Name, string Value)> Defines => new (string, string)[]
     {
-        ("SET_SCENE", SetScene),
-        ("BINDING_MATERIALS", BindingMaterials),
-        ("BINDING_INSTANCES", BindingInstances),
-        ("BINDING_MATERIAL_SLOTS", BindingMaterialSlots),
-        ("BINDING_LIGHTS", BindingLights),
-        ("BINDING_TEXTURES", BindingTextures),
-        ("SET_VIEW", SetView),
-        ("BINDING_FRAME", BindingFrame),
-        ("BINDING_CLUSTERS", BindingClusters),
-        ("BINDING_CLUSTER_LIGHTS", BindingClusterLights),
-        ("BINDING_CLUSTER_COUNTER", BindingClusterCounter),
-        ("BINDING_HDR", BindingHdr),
-        ("CLUSTER_COUNT_X", ClusterCountX),
-        ("CLUSTER_COUNT_Y", ClusterCountY),
-        ("CLUSTER_COUNT_Z", ClusterCountZ),
-        ("CLUSTER_THREADS", ClusterThreads),
-        ("MAX_LIGHTS_PER_CLUSTER", MaxLightsPerCluster),
-        ("TEXTURE_WHITE", TextureWhite),
-        ("TEXTURE_BLACK", TextureBlack),
-        ("TEXTURE_FLAT_NORMAL", TextureFlatNormal),
-        ("MATERIAL_ALPHA_MASK", MaterialAlphaMask),
-        ("MATERIAL_ALPHA_BLEND", MaterialAlphaBlend),
-        ("MATERIAL_DOUBLE_SIDED", MaterialDoubleSided),
-        ("MATERIAL_UNLIT", MaterialUnlit),
-        ("MATERIAL_BASE_COLOR_TEXTURE", MaterialBaseColorTexture),
-        ("MATERIAL_EMISSIVE_TEXTURE", MaterialEmissiveTexture),
-        ("MATERIAL_NORMAL_TEXTURE", MaterialNormalTexture),
-        ("MATERIAL_METALLIC_ROUGHNESS_TEXTURE", MaterialMetallicRoughnessTexture),
-        ("MATERIAL_OCCLUSION_TEXTURE", MaterialOcclusionTexture),
-        ("MATERIAL_TRANSMISSIVE", MaterialTransmissive),
-        ("SHAPE_LAMBERTIAN", ShapeLambertian),
-        ("SHAPE_GENERALIZED_GAUSSIAN", ShapeGeneralizedGaussian),
-        ("SHAPE_UNIFORM_CONE", ShapeUniformCone),
-        ("VIEW_FULL", ViewFull),
-        ("VIEW_COLORLESS", ViewColorless),
-        ("VIEW_WIREFRAME", ViewWireframe),
-        ("TONE_AGX", ToneAgX),
-        ("TONE_ACES", ToneAces),
-        ("TONE_NEUTRAL", ToneNeutral),
-        ("TONE_PASSTHROUGH", TonePassthrough),
-        ("FRAME_ORTHOGRAPHIC", FrameOrthographic),
-        ("DRAW_MODE_DEFAULT", DrawModeDefault),
-        ("DRAW_MODE_SELECTED", DrawModeSelected),
-        ("INSTANCE_FLAG_NOT_PICKABLE", (long)InstanceFlags.NotPickable),
-        ("INSTANCE_FLAG_REFERENCE", (long)InstanceFlags.Reference),
-        ("INSTANCE_FLAG_SELECTED", (long)InstanceFlags.Selected),
+        ("SET_SCENE", I(SetScene)),
+        ("BINDING_MATERIALS", I(BindingMaterials)),
+        ("BINDING_INSTANCES", I(BindingInstances)),
+        ("BINDING_MATERIAL_SLOTS", I(BindingMaterialSlots)),
+        ("BINDING_LIGHTS", I(BindingLights)),
+        ("BINDING_TEXTURES", I(BindingTextures)),
+        ("SET_VIEW", I(SetView)),
+        ("BINDING_FRAME", I(BindingFrame)),
+        ("BINDING_CLUSTERS", I(BindingClusters)),
+        ("BINDING_CLUSTER_LIGHTS", I(BindingClusterLights)),
+        ("BINDING_CLUSTER_COUNTER", I(BindingClusterCounter)),
+        ("BINDING_HDR", I(BindingHdr)),
+        ("BINDING_LIGHT_VIEWS", I(BindingLightViews)),
+        ("BINDING_SHADOW_SLOTS", I(BindingShadowSlots)),
+        ("BINDING_SHADOW_MAP", I(BindingShadowMap)),
+        ("BINDING_SHADOW_DEPTH", I(BindingShadowDepth)),
+        ("BINDING_RSM_ALBEDO", I(BindingRsmAlbedo)),
+        ("BINDING_RSM_NORMAL", I(BindingRsmNormal)),
+        ("BINDING_VPLS", I(BindingVpls)),
+        ("BINDING_INDIRECT", I(BindingIndirect)),
+        ("BINDING_VOLUME", I(BindingVolume)),
+        ("BINDING_SMOKE", I(BindingSmoke)),
+        ("BINDING_FLAME", I(BindingFlame)),
+        ("BINDING_NOISE_FIELD", I(BindingNoiseField)),
+        ("BINDING_FLAME_LUT", I(BindingFlameLut)),
+        ("BINDING_NOISE_SOURCES", I(BindingNoiseSources)),
+        ("BINDING_GRADIENT_LUT", I(BindingGradientLut)),
+        ("BINDING_SCENE_DEPTH", I(BindingSceneDepth)),
+        ("BINDING_SCENE_NORMALS", I(BindingSceneNormals)),
+        ("BINDING_INSTANCE_IDS", I(BindingInstanceIds)),
+        ("BINDING_BLOOM", I(BindingBloom)),
+        ("BINDING_ANALYSIS", I(BindingAnalysis)),
+        ("BINDING_RAYMARCH_LIST", I(BindingRaymarchList)),
+        ("BINDING_SELECTION_MASK", I(BindingSelectionMask)),
+        ("BINDING_EXPOSURE", I(BindingExposure)),
+        ("SET_PASS", I(SetPass)),
+        ("BINDING_PASS_STORAGE0", I(BindingPassStorage0)),
+        ("BINDING_PASS_STORAGE1", I(BindingPassStorage1)),
+        ("BINDING_PASS_STORAGE2", I(BindingPassStorage2)),
+        ("BINDING_PASS_SAMPLED0", I(BindingPassSampled0)),
+        ("BINDING_PASS_SAMPLED1", I(BindingPassSampled1)),
+        ("BINDING_PASS_SAMPLED2", I(BindingPassSampled2)),
+        ("BINDING_PASS_TLAS", I(BindingPassTlas)),
+        ("BINDING_PASS_BUFFER", I(BindingPassBuffer)),
+        ("CLUSTER_COUNT_X", I(ClusterCountX)),
+        ("CLUSTER_COUNT_Y", I(ClusterCountY)),
+        ("CLUSTER_COUNT_Z", I(ClusterCountZ)),
+        ("CLUSTER_THREADS", I(ClusterThreads)),
+        ("MAX_LIGHTS_PER_CLUSTER", I(MaxLightsPerCluster)),
+        ("TEXTURE_WHITE", I(TextureWhite)),
+        ("TEXTURE_BLACK", I(TextureBlack)),
+        ("TEXTURE_FLAT_NORMAL", I(TextureFlatNormal)),
+        ("MATERIAL_ALPHA_MASK", I(MaterialAlphaMask)),
+        ("MATERIAL_ALPHA_BLEND", I(MaterialAlphaBlend)),
+        ("MATERIAL_DOUBLE_SIDED", I(MaterialDoubleSided)),
+        ("MATERIAL_UNLIT", I(MaterialUnlit)),
+        ("MATERIAL_BASE_COLOR_TEXTURE", I(MaterialBaseColorTexture)),
+        ("MATERIAL_EMISSIVE_TEXTURE", I(MaterialEmissiveTexture)),
+        ("MATERIAL_NORMAL_TEXTURE", I(MaterialNormalTexture)),
+        ("MATERIAL_METALLIC_ROUGHNESS_TEXTURE", I(MaterialMetallicRoughnessTexture)),
+        ("MATERIAL_OCCLUSION_TEXTURE", I(MaterialOcclusionTexture)),
+        ("MATERIAL_TRANSMISSIVE", I(MaterialTransmissive)),
+        ("SHAPE_LAMBERTIAN", I(ShapeLambertian)),
+        ("SHAPE_GENERALIZED_GAUSSIAN", I(ShapeGeneralizedGaussian)),
+        ("SHAPE_UNIFORM_CONE", I(ShapeUniformCone)),
+        ("LIGHT_CAST_SHADOWS", I(LightCastShadows)),
+        ("LIGHT_GOBO", I(LightGobo)),
+        ("LIGHT_BLADES", I(LightBlades)),
+        ("LIGHT_PRISM", I(LightPrism)),
+        ("LIGHT_VIEW_RAYMARCHED", I(LightViewRaymarched)),
+        ("LIGHT_VIEW_RSM", I(LightViewRsm)),
+        ("NO_SHADOW", I(NoShadow) + "u"),
+        ("MAX_PRISM_FACETS", I(MaxPrismFacets)),
+        ("VIEW_FULL", I(ViewFull)),
+        ("VIEW_COLORLESS", I(ViewColorless)),
+        ("VIEW_WIREFRAME", I(ViewWireframe)),
+        ("TONE_AGX", I(ToneAgX)),
+        ("TONE_ACES", I(ToneAces)),
+        ("TONE_NEUTRAL", I(ToneNeutral)),
+        ("TONE_PASSTHROUGH", I(TonePassthrough)),
+        ("FRAME_ORTHOGRAPHIC", I(FrameOrthographic)),
+        ("FEATURE_SHADOWS", I(FeatureShadows)),
+        ("FEATURE_VOLUMETRICS", I(FeatureVolumetrics)),
+        ("FEATURE_INDIRECT_RSM", I(FeatureIndirectRsm)),
+        ("FEATURE_INDIRECT_RAY_TRACED", I(FeatureIndirectRayTraced)),
+        ("FEATURE_HAZE", I(FeatureHaze)),
+        ("FEATURE_SMOKE", I(FeatureSmoke)),
+        ("FEATURE_FLAME", I(FeatureFlame)),
+        ("FEATURE_NOISE_FIELD", I(FeatureNoiseField)),
+        ("FEATURE_BLOOM", I(FeatureBloom)),
+        ("FEATURE_SCALED", I(FeatureScaled)),
+        ("FEATURE_TEMPORAL", I(FeatureTemporal)),
+        ("FEATURE_NOISE_FOG", I(FeatureNoiseFog)),
+        ("FEATURE_VOLUME_LIGHTS", I(FeatureVolumeLights)),
+        ("OVERLAY_NONE", I(OverlayNone)),
+        ("OVERLAY_LUX", I(OverlayLux)),
+        ("OVERLAY_NOISE", I(OverlayNoise)),
+        ("OVERLAY_CABLES", I(OverlayCables)),
+        ("DRAW_MODE_DEFAULT", I(DrawModeDefault)),
+        ("DRAW_MODE_SELECTED", I(DrawModeSelected)),
+        ("HISTOGRAM_BINS", I(HistogramBins)),
+        ("HISTOGRAM_MIN_LOG2", F(HistogramMinLog2)),
+        ("HISTOGRAM_MAX_LOG2", F(HistogramMaxLog2)),
+        ("INSTANCE_FLAG_CAST_SHADOW", I((long)InstanceFlags.CastShadow)),
+        ("INSTANCE_FLAG_NOT_PICKABLE", I((long)InstanceFlags.NotPickable)),
+        ("INSTANCE_FLAG_REFERENCE", I((long)InstanceFlags.Reference)),
+        ("INSTANCE_FLAG_SELECTED", I((long)InstanceFlags.Selected)),
+        ("INSTANCE_FLAG_CABLE_HIGHLIGHT", I((long)InstanceFlags.CableHighlight)),
     };
+
+    private static string I(long value) => value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string F(float value) => value.ToString("0.0########", System.Globalization.CultureInfo.InvariantCulture);
 }

@@ -1,7 +1,8 @@
 #version 460
 #extension GL_GOOGLE_include_directive : require
-// Depth pre-pass: writes depth (fixed function) and the instance pick id. Variant ALPHA_MASK discards fragments
-// below the material's alpha cut-off (glTF MASK).
+// Depth pre-pass: writes depth (fixed function), the instance pick id, the instance index + 1 (overlays) and the
+// octahedral-encoded surface normal (indirect light, bilateral filters). Variant ALPHA_MASK discards fragments below
+// the material's alpha cut-off (glTF MASK).
 
 #include "scene.glsl"
 
@@ -13,6 +14,8 @@ layout(location = 4) flat in uint inInstance;
 layout(location = 5) flat in uint inMaterial;
 
 layout(location = 0) out uint outPickId;
+layout(location = 1) out uint outInstance;
+layout(location = 2) out vec2 outNormal;
 
 void main()
 {
@@ -26,4 +29,7 @@ void main()
 #endif
     Instance inst = instances[inInstance];
     outPickId = (inst.flags & INSTANCE_FLAG_NOT_PICKABLE) != 0u ? 0u : inst.pickId;
+    outInstance = inInstance + 1u;
+    vec3 n = normalize(inNormal);
+    outNormal = encodeNormal(gl_FrontFacing ? n : -n);
 }

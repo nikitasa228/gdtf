@@ -1,0 +1,98 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Froxel injection: for every froxel (8 x 8 px screen tile x exponential depth slice) the source term of the volume
+// rendering equation and the extinction coefficient at its (jittered) centre:
+//   S = sigma_s x sum over cluster lights of HG(g, cos) x I(theta) x cookie x shadow / d^2     (cd/m2 per metre)
+//     + kappa x L_blackbody(T)                                                                 (flame emission)
+//   sigma_t = sigma_s (haze and smoke do not absorb) + kappa (flame)
+// with sigma_s = haze + smoke density x scattering at full density. Narrow beams that are ray marched at full
+// resolution (LIGHT_VIEW_RAYMARCHED) are skipped. With temporal accumulation the result is blended with the
+// previous frame's value reprojected to this froxel's world position (the jitter then integrates over the froxel).
+
+#include "lighting.glsl"
+#include "volume.glsl"
+
+layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
+
+layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image3D outInjected;
+layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler3D historyVolume;
+
+// World position at view depth z on the ray through normalised screen position uv.
+vec3 worldAtViewDepth(vec2 uv, float z)
+{
+    vec3 origin, direction;
+    viewRay(uv, origin, direction);
+    if (isOrthographic())
+        return origin + direction * (z - viewDepthOf(origin));
+    return origin + direction * (z / max(dot(direction, frame.cameraForward.xyz), 1e-4));
+}
+
+void main()
+{
+    uvec3 id = gl_GlobalInvocationID;
+    if (any(greaterThanEqual(id, uvec3(frame.volumeGrid.xyz))))
+        return;
+    vec3 jitter = hasFeature(FEATURE_TEMPORAL) ? frame.volumeJitter.xyz : vec3(0.0);
+    vec2 uv = (vec2(id.xy) + 0.5 + jitter.xy) / frame.volumeGrid.xy;
+    float z = froxelDepth(float(id.z) + 0.5 + jitter.z);
+    vec3 P = worldAtViewDepth(uv, z);
+    vec3 cameraP = isOrthographic() ? P - frame.cameraForward.xyz * z : frame.cameraPosition.xyz;
+    vec3 V = normalize(cameraP - P); // towards the viewer
+
+    float sigmaS = scatteringAt(P);
+    float absorption;
+    vec3 source = flameEmissionAt(P, absorption);
+    float extinction = sigmaS + absorption;
+
+    if (sigmaS > 0.0 && hasFeature(FEATURE_VOLUME_LIGHTS) && frame.lightCount > 0u)
+    {
+        // A froxel spans about 8 pixels (more where the grid hits the 3D image limit): filter cookies over its width.
+        float footprint = frame.renderSize.x / frame.volumeGrid.x * pixelWorldSize(z);
+        float g = frame.media.y;
+        vec3 scattered = vec3(0.0);
+        uvec2 cluster = clusters[clusterIndexUv(uv, z)];
+        for (uint i = 0u; i < cluster.y; ++i)
+        {
+            uint index = clusterLights[cluster.x + i];
+            LightView lv = lightViews[index];
+            if ((lv.flags & LIGHT_VIEW_RAYMARCHED) != 0u)
+                continue;
+            Light light = lights[index];
+            vec3 L;
+            float d2;
+            vec3 I = lightIntensityToward(light, P, footprint, L, d2);
+            if (I.r + I.g + I.b <= 0.0)
+                continue;
+            float shadow = shadowHard(lv.shadowSlot, P, vec3(0.0));
+            scattered += I * (shadow * henyeyGreenstein(dot(-L, V), g) / d2);
+        }
+
+        source += sigmaS * scattered;
+    }
+
+    // Pre-exposed source (keeps the half-float volume in range); extinction in 1/m.
+    vec4 current = vec4(source * frame.exposure, extinction);
+    if (frame.volumeHistoryWeight > 0.0)
+    {
+        // Reproject the froxel centre (without jitter) into the previous frame.
+        vec2 uv0 = (vec2(id.xy) + 0.5) / frame.volumeGrid.xy;
+        float z0 = froxelDepth(float(id.z) + 0.5);
+        vec3 P0 = worldAtViewDepth(uv0, z0);
+        vec4 clip = frame.previousViewProjection * vec4(P0, 1.0);
+        if (clip.w > 1e-6)
+        {
+            vec2 prevUv = clip.xy / clip.w * 0.5 + 0.5;
+            float prevDepth = isOrthographic() ? z0 : clip.w;
+            vec3 uvw = vec3(prevUv, froxelSlice(prevDepth) * frame.volumeGrid.w);
+            if (all(greaterThanEqual(uvw, vec3(0.0))) && all(lessThanEqual(uvw, vec3(1.0))))
+            {
+                vec4 history = textureLod(historyVolume, uvw, 0.0);
+                if (all(equal(history, history)))
+                    current = mix(current, history * vec4(vec3(frame.volumeJitter.w), 1.0), frame.volumeHistoryWeight);
+
+            }
+        }
+    }
+
+    imageStore(outInjected, ivec3(id), vec4(finiteLight(current.rgb), current.a));
+}

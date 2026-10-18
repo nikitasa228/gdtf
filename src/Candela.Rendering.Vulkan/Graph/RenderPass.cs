@@ -10,7 +10,7 @@ namespace Candela.Rendering.Vulkan;
 /// </summary>
 internal enum RenderStage
 {
-    /// <summary>Stage 2: shadow maps and gobo/iris/blade/prism cookies of the spot lights into the atlas.</summary>
+    /// <summary>Shadow maps (and reflective shadow maps) of the spot lights into the shadow atlas.</summary>
     ShadowAtlas = 100,
 
     /// <summary>Depth + pick-id pre-pass.</summary>
@@ -19,22 +19,31 @@ internal enum RenderStage
     /// <summary>Clustered light assignment (compute).</summary>
     LightAssignment = 300,
 
+    /// <summary>Indirect light: virtual point lights and gather (RSM) or ray-traced GI, at reduced resolution.</summary>
+    Indirect = 350,
+
     /// <summary>Opaque and alpha-tested shading into the HDR image (or the Colorless/Wireframe views).</summary>
     Opaque = 400,
 
-    /// <summary>Stage 2: froxel in-scattering of the spot lights in haze, composited over the opaque scene.</summary>
+    /// <summary>Lux / noise analysis values of the visible surfaces.</summary>
+    Analysis = 450,
+
+    /// <summary>Froxel in-scattering of the spot lights in haze and smoke, flame emission, ray-marched narrow beams.</summary>
     Volumetrics = 500,
 
     /// <summary>Alpha-blended and transmissive surfaces, back to front.</summary>
     Transparent = 600,
 
-    /// <summary>Stage 2: bloom and other HDR post effects.</summary>
+    /// <summary>Bloom and the auto-exposure measurement.</summary>
     HdrPost = 700,
 
     /// <summary>Exposure is already applied; tone mapping + sRGB encoding into the display image.</summary>
     DisplayTransform = 800,
 
-    /// <summary>Grid and lines; stage 2: selection outline and the lux/noise/cable analysis overlays.</summary>
+    /// <summary>Scene depth upsampled to display resolution for the overlays (reduced resolution scale only).</summary>
+    OverlayDepth = 850,
+
+    /// <summary>Grid, lines, beam outlines and the selection outline over the display image.</summary>
     Overlays = 900,
 }
 

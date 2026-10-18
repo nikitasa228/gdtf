@@ -73,7 +73,7 @@ internal struct Frustum
 /// <summary>
 /// The draws of one view, built from the world's live instances: hidden instances and instances outside the view
 /// frustum are skipped; each sub-mesh is sorted into the opaque, alpha-tested or blended list by its material
-/// (reference drawings are blended); blended draws are sorted back to front. Arrays grow on demand and are reused,
+/// (reference drawings are blended in the Full and Colorless views); blended draws are sorted back to front. Arrays grow on demand and are reused,
 /// so building allocates nothing in steady state.
 /// </summary>
 internal sealed class DrawList
@@ -98,16 +98,20 @@ internal sealed class DrawList
     /// <summary>Instances rejected by frustum culling in the last build.</summary>
     public int CulledInstances { get; private set; }
 
+    /// <summary>Visible instances with <see cref="InstanceFlags.Selected"/> in the last build.</summary>
+    public int SelectedInstances { get; private set; }
+
     /// <summary>Rebuilds the lists.</summary>
     /// <param name="world">The scene.</param>
     /// <param name="frustum">View frustum.</param>
     /// <param name="cameraPosition">Camera position, world space.</param>
     /// <param name="forward">Unit view direction.</param>
     /// <param name="useMaterials">Full view: materials decide the list. Otherwise every draw is opaque.</param>
-    public void Build(VulkanRenderWorld world, in Frustum frustum, Vector3 cameraPosition, Vector3 forward, bool useMaterials)
+    /// <param name="blendReferences">Reference drawings go to the blended list (Full and Colorless: unlit, semi-transparent).</param>
+    public void Build(VulkanRenderWorld world, in Frustum frustum, Vector3 cameraPosition, Vector3 forward, bool useMaterials, bool blendReferences)
     {
         _opaqueCount = _maskedCount = _blendedCount = 0;
-        int visible = 0, culled = 0;
+        int visible = 0, culled = 0, selected = 0;
         foreach (int index in world.LiveInstances)
         {
             var instance = world.InstanceAt(index);
@@ -121,6 +125,8 @@ internal sealed class DrawList
             }
 
             visible++;
+            if ((instance.Flags & InstanceFlags.Selected) != 0)
+                selected++;
             var centre = new Vector3(instance.WorldSphere.X, instance.WorldSphere.Y, instance.WorldSphere.Z);
             float depth = Vector3.Dot(centre - cameraPosition, forward);
             bool reference = (instance.Flags & InstanceFlags.Reference) != 0;
@@ -138,8 +144,8 @@ internal sealed class DrawList
                     DoubleSided = material?.DoubleSided ?? false,
                     ViewDepth = depth,
                 };
-                var kind = !useMaterials ? DrawKind.Opaque
-                    : reference ? DrawKind.Blend
+                var kind = reference && blendReferences ? DrawKind.Blend
+                    : !useMaterials ? DrawKind.Opaque
                     : material?.Kind ?? DrawKind.Opaque;
                 switch (kind)
                 {
@@ -158,6 +164,7 @@ internal sealed class DrawList
 
         VisibleInstances = visible;
         CulledInstances = culled;
+        SelectedInstances = selected;
         if (_blendedCount > 1)
             _blended.AsSpan(0, _blendedCount).Sort(BackToFront);
     }
