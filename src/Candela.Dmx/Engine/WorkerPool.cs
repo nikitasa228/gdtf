@@ -24,6 +24,9 @@ internal sealed class WorkerPool : IDisposable
     public WorkerPool(int workers, string name)
     {
         _threads = new Thread[Math.Max(0, workers)];
+        // the countdown creates its lock object the first time a waiter actually blocks; block once now, so that this
+        // does not happen (and allocate) inside a frame when the caller first outruns the workers on a loaded machine
+        _done.Wait(1);
         for (int i = 0; i < _threads.Length; i++)
         {
             _threads[i] = new Thread(WorkerLoop) { IsBackground = true, Name = $"{name} {i + 1}" };

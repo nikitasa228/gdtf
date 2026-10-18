@@ -20,7 +20,7 @@ Art-Net / sACN … ──Submit──▶ DmxInputHub ──TryRead (each patched
                                                      axes · beams · device outputs · channel values
 ```
 
-`tests/Candela.Dmx.Tests` (100 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
+`tests/Candela.Dmx.Tests` (103 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
 library through every stage; one test evaluates **every mode of all 1091 GDTF files** with random DMX.
 
 ## Units and conventions
