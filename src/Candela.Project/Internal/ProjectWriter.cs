@@ -149,8 +149,15 @@ internal static class ProjectWriter
         foreach (var name in snapshot.Gdtfs.Keys)
         {
             // Provider exceptions propagate on purpose: the save is aborted and the previous file stays untouched.
-            var bytes = snapshot.ResolveGdtf(name);
+            var bytes = snapshot.ResolveGdtf(name, out var problem);
             var users = snapshot.Gdtfs.EntitiesOf(name);
+            if (bytes is null && problem is not null)
+            {
+                missing.Add(name);
+                issues.Add(IssueSeverity.Warning, IssueCategory.Fixture, ProjectIssueCodes.SaveGdtfInvalid,
+                    $"'{name}' is not a valid GDTF file ({problem}) and is not stored in the project.", users);
+                continue;
+            }
             if (bytes is null)
             {
                 missing.Add(name);
@@ -159,12 +166,10 @@ internal static class ProjectWriter
                     users);
                 continue;
             }
-            if (GdtfCheck.Validate(bytes) is { } problem)
+            if (problem is not null)
             {
-                missing.Add(name);
                 issues.Add(IssueSeverity.Warning, IssueCategory.Fixture, ProjectIssueCodes.SaveGdtfInvalid,
-                    $"'{name}' is not a valid GDTF file ({problem}) and is not stored in the project.", users);
-                continue;
+                    $"The fixture library's '{name}' is not a valid GDTF file ({problem}); the copy kept in the project was stored instead.", users);
             }
             var fileName = ArchivePaths.SafeSegment(name, "fixture");
             if (!fileName.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase)) fileName += ".gdtf";

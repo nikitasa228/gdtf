@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using Candela.Assets;
 using Candela.Core.SceneGraph.Components;
 using Candela.Core.Serialization;
+using Candela.Project.Internal;
 
 namespace Candela.Project;
 
@@ -157,17 +158,31 @@ public sealed class ProjectSnapshot
         return JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options);
     }
 
-    /// <summary>Resolves the bytes stored for a GDTF name: provider, then the project's copy, then a GDTF asset of that name.</summary>
-    internal byte[]? ResolveGdtf(string name)
+    /// <summary>
+    /// The bytes stored for a GDTF name: the first valid file of the provider, the project's copy and a GDTF asset of that
+    /// name, in that order. A damaged library file therefore never replaces a good copy kept in the project.
+    /// <paramref name="problem"/> describes the first invalid candidate (null when there was none).
+    /// </summary>
+    internal byte[]? ResolveGdtf(string name, out string? problem)
     {
-        if (Options.GdtfProvider?.Invoke(name) is { Length: > 0 } provided) return provided;
-        if (GdtfCopies.TryGetValue(name, out var copy)) return copy;
+        problem = null;
+        if (Options.GdtfProvider?.Invoke(name) is { Length: > 0 } provided)
+        {
+            if ((problem = GdtfCheck.Validate(provided)) is null) return provided;
+        }
+        if (GdtfCopies.TryGetValue(name, out var copy))
+        {
+            var p = GdtfCheck.Validate(copy);
+            if (p is null) return copy;
+            problem ??= p;
+        }
         AssetEntry? caseInsensitive = null;
         foreach (var a in Assets)
         {
             if (a.Kind != AssetKind.Gdtf) continue;
-            if (string.Equals(a.OriginalFileName, name, StringComparison.Ordinal)) return a.Data;
-            if (caseInsensitive is null && string.Equals(a.OriginalFileName, name, StringComparison.OrdinalIgnoreCase)) caseInsensitive = a;
+            if (string.Equals(a.OriginalFileName, name, StringComparison.Ordinal) && GdtfCheck.Validate(a.Data) is null) return a.Data;
+            if (caseInsensitive is null && string.Equals(a.OriginalFileName, name, StringComparison.OrdinalIgnoreCase) && GdtfCheck.Validate(a.Data) is null)
+                caseInsensitive = a;
         }
         return caseInsensitive?.Data;
     }

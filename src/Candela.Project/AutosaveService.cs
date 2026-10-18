@@ -228,6 +228,25 @@ public sealed class AutosaveService : IDisposable
     /// <summary>A task that completes when the running write (if any) has finished. Never faults.</summary>
     public Task FlushAsync() => _pending;
 
+    /// <summary>
+    /// Call on the main thread after the user saved the project (Save / Save as succeeded). The saved file now holds
+    /// everything the autosaves hold, so this session's autosave files are deleted — a crash right after a save then never
+    /// offers an older autosave for recovery — and the interval and change tracking restart: the next change is autosaved
+    /// again. A write that is running finishes first; its file is deleted as well. Returns the deletion task (never faults).
+    /// </summary>
+    public Task MarkSaved()
+    {
+        if (_disposed) return Task.CompletedTask;
+        DrainCompleted();
+        _tracker?.TakeChanges(force: false);
+        _lastCaptureTimestamp = _clock.GetTimestamp();
+        var directory = Directory;
+        var key = SessionKey;
+        _pending = _pending.ContinueWith(_ => DeleteSessionFiles(directory, key), CancellationToken.None,
+            TaskContinuationOptions.DenyChildAttach, TaskScheduler.Default);
+        return _pending;
+    }
+
     /// <summary>Existing autosave files of this session, newest first.</summary>
     public IReadOnlyList<string> Files => ListFiles(Directory, SessionKey);
 
@@ -287,7 +306,9 @@ public sealed class AutosaveService : IDisposable
             var info = ReadSessionInfo(dir, key);
             Guid projectId = info?.ProjectId is { } pid && pid != Guid.Empty ? pid : ParseProjectId(key);
             DateTime saved = info?.LastSavedUtc is { } t && t != default ? t : SafeLastWrite(files[0]);
-            sessions.Add(new RecoverableSession(dir, key, projectId, info?.SceneName, info?.OriginalPath, info?.AppVersion, saved, files));
+            var originalModified = string.IsNullOrEmpty(info?.OriginalPath) ? null : OriginalModifiedUtc(info.OriginalPath);
+            sessions.Add(new RecoverableSession(dir, key, projectId, info?.SceneName, info?.OriginalPath, info?.AppVersion, saved, files,
+                originalModified));
         }
         sessions.Sort((a, b) => b.LastSavedUtc.CompareTo(a.LastSavedUtc));
         return sessions;
@@ -575,6 +596,30 @@ public sealed class AutosaveService : IDisposable
         }
     }
 
+    /// <summary>When the project file a session belongs to was last saved (its manifest, else the file time); null when it is gone.</summary>
+    private static DateTime? OriginalModifiedUtc(string path)
+    {
+        try
+        {
+            if (!File.Exists(path)) return null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return null;
+        }
+        try
+        {
+            var modified = ProjectFile.ReadManifest(path).ModifiedUtc;
+            if (modified != default) return modified;
+        }
+        catch (Exception e) when (e is ProjectFormatException or IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            // Not readable as a project: fall back to the file system's time.
+        }
+        var time = SafeLastWrite(path);
+        return time == default ? null : time;
+    }
+
     private static DateTime SafeLastWrite(string path)
     {
         try
@@ -649,8 +694,9 @@ public sealed class AutosaveService : IDisposable
 public sealed class RecoverableSession
 {
     internal RecoverableSession(string directory, string key, Guid projectId, string? sceneName, string? originalPath, string? appVersion,
-        DateTime lastSavedUtc, IReadOnlyList<string> files)
+        DateTime lastSavedUtc, IReadOnlyList<string> files, DateTime? originalModifiedUtc = null)
     {
+        OriginalModifiedUtc = originalModifiedUtc;
         Directory = directory;
         SessionKey = key;
         ProjectId = projectId;
@@ -684,6 +730,19 @@ public sealed class RecoverableSession
 
     /// <summary>Autosave files, newest first.</summary>
     public IReadOnlyList<string> Files { get; }
+
+    /// <summary>
+    /// When <see cref="OriginalPath"/> was last saved (UTC, from its manifest), or null when the session has no file or the
+    /// file is gone.
+    /// </summary>
+    public DateTime? OriginalModifiedUtc { get; }
+
+    /// <summary>
+    /// True when the project file was saved after the newest autosave (for example the user saved, and the program ended
+    /// before <see cref="AutosaveService.MarkSaved"/> or <see cref="AutosaveService.CompleteSession"/> ran, or another
+    /// instance saved it later). Recovering would then bring back an older state; offer to open the file instead.
+    /// </summary>
+    public bool IsOlderThanOriginal => OriginalModifiedUtc is { } original && original > LastSavedUtc;
 
     /// <summary>
     /// Opens the newest autosave that can be read; when it is damaged an older one is used and a
