@@ -83,7 +83,7 @@ public class ModelImporterTests
         Assert.Equal(8, image!.Width);
         Assert.Equal(4, image.Height);
         Assert.Equal(new byte[] { 200, 100, 50, 255 }, image.Pixels[..4]);
-        Assert.Empty(store.Issues.Where(i => i.Severity != Core.Diagnostics.IssueSeverity.Note));
+        Assert.DoesNotContain(store.Issues, i => i.Severity != Core.Diagnostics.IssueSeverity.Note);
     }
 
     [Fact]
