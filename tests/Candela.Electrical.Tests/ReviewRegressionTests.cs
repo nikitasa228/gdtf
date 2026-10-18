@@ -226,6 +226,29 @@ public class ReviewRegressionTests
     }
 
     [Fact]
+    public void A_three_phase_distro_on_a_single_phase_feed_is_an_error()
+    {
+        var kit = new SceneKit();
+        var gen = kit.Source("Generator", new Vector3(-10, -10, 0), voltage: 400f, phases: 3, outlets:
+            [SceneKit.Outlet("CEE 32", "CEE 32A 3P", 32f), SceneKit.Outlet("Schuko", "Schuko", 16f, 2)]);
+        var good = kit.Source("Good distro", new Vector3(0, -5, 0), phases: 3, outlets: SceneKit.Outlet("L1"));
+        var bad = kit.Source("Bad distro", new Vector3(5, -5, 0), phases: 3, outlets: SceneKit.Outlet("L1"));
+        var lead = kit.Source("Lead distro", new Vector3(10, -5, 0), phases: 3, outlets: SceneKit.Outlet("L1"));
+        kit.Cable("cee32-3p", "Main", (gen, "CEE 32"), (good, PortResolver.MainsInPortName));
+        kit.Cable("schuko", "Wrong", (gen, "Schuko"), (bad, PortResolver.MainsInPortName));
+        var cee = kit.Source("Second generator", new Vector3(-20, -10, 0), phases: 3, outlets: SceneKit.Outlet("CEE 32", "CEE 32A 3P", 32f));
+        kit.Cable("cee16", "Single", (cee, "CEE 32"), (lead, PortResolver.MainsInPortName)); // single-phase lead on a 5-pin outlet
+
+        var s = kit.Solve();
+        var issues = s.Issues.WithCode(IssueCodes.PowerPhaseMismatch);
+        Assert.Equal(2, issues.Count);
+        Assert.Contains(issues, i => i.Message.Contains("'Bad distro'") && i.Message.Contains("L2"));
+        Assert.Contains(issues, i => i.Message.Contains("'Lead distro'"));
+        Assert.DoesNotContain(issues, i => i.Entities.Contains(good.Id));
+        Assert.All(issues, i => Assert.Equal(IssueSeverity.Error, i.Severity));
+    }
+
+    [Fact]
     public void A_distro_whose_mains_in_is_cabled_to_nothing_valid_is_not_a_source()
     {
         var kit = new SceneKit();

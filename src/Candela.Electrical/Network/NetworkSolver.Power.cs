@@ -211,7 +211,9 @@ public sealed partial class NetworkSolver
                     int c = Math.Clamp(e.Circuit, 1, circuitCount);
                     var circuit = circuits[c - 1];
                     int phase = OutletPhase(s, outlet, c);
-                    var supply = new Supply(s, outlet, circuit, phase, threePhaseOutlet, s.VoltageV, s.FrequencyHz, s.IsDc, false);
+                    // Only a three-phase cable carries all phases on (a single-phase lead on a CEE 5-pin outlet is one phase).
+                    bool threePhase = threePhaseOutlet && e.Cable.Type is { Phases: 3 };
+                    var supply = new Supply(s, outlet, circuit, phase, threePhase, s.VoltageV, s.FrequencyHz, s.IsDc, false);
                     items.Add(new PowerWork(e, supply, null, outlet, 0));
                 }
             }
@@ -263,6 +265,10 @@ public sealed partial class NetworkSolver
                             (!distro.IsDc && MathF.Abs(distro.FrequencyHz - w.Supply.FrequencyHz) > 1f))
                             Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerVoltageMismatch,
                                 $"Distro '{target.Info.Name}' is set to {Fmt.Supply(distro.VoltageV, distro.FrequencyHz, distro.IsDc)} but is fed with {Fmt.Supply(w.Supply.VoltageV, w.Supply.FrequencyHz, w.Supply.IsDc)} from {FeedOrigin(w.Parent, w.Supply, w.Via)}.",
+                                target.Id, w.Edge.Cable.Entity.Id);
+                        if (distro.Phases == 3 && !w.Supply.ThreePhase)
+                            Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerPhaseMismatch,
+                                $"Distro '{target.Info.Name}' is three-phase but is fed from single-phase {FeedOrigin(w.Parent, w.Supply, w.Via)}: its outlets on the other phases have no supply, and everything it feeds is counted on L{w.Supply.Phase}.",
                                 target.Id, w.Edge.Cable.Entity.Id);
                         ExpandSource(distro, queueLoads: true);
                     }

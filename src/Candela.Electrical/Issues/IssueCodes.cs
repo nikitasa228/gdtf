@@ -87,6 +87,9 @@ public static class IssueCodes
     /// <summary>[Error] The supply voltage/frequency is not one the device accepts.</summary>
     public const string PowerVoltageMismatch = "power.voltage-mismatch";
 
+    /// <summary>[Error] A three-phase distro is fed from a single-phase outlet or cable.</summary>
+    public const string PowerPhaseMismatch = "power.phase-mismatch";
+
     /// <summary>[Note] The phases of a three-phase source are unevenly loaded.</summary>
     public const string PowerPhaseImbalance = "power.phase-imbalance";
 
