@@ -19,7 +19,10 @@ public static class DmxEncoder
         if (f.UsesSlotPosition) return SlotToDmx(f, value);
         if (!float.IsFinite(value)) return f.DmxFrom;
 
-        // channel sets with their own physical range take precedence (that is how the evaluator reads them)
+        // candidates: inside every channel set whose own physical range contains the value, and through the function's
+        // mapping; the one whose evaluated value is closest wins (sets override the mapping where they have values)
+        uint best = f.DmxFrom;
+        float bestErr = float.MaxValue;
         foreach (var s in f.Sets)
         {
             if (!s.HasPhysical || !Between(value, s.PhysicalFrom, s.PhysicalTo)) continue;
@@ -29,14 +32,30 @@ public static class DmxEncoder
                 double t = (value - s.PhysicalFrom) / (double)(s.PhysicalTo - s.PhysicalFrom);
                 d = (uint)Math.Round(s.DmxFrom + Math.Clamp(t, 0, 1) * (s.DmxTo - s.DmxFrom));
             }
-            return Refine(f, d, value);
+            Consider(Refine(f, d, value));
+            if (bestErr == 0f) return best;
         }
 
-        if (f.PhysicalTo == f.PhysicalFrom || f.DmxTo == f.DmxFrom) return FirstPlainDmx(f);
+        if (f.PhysicalTo == f.PhysicalFrom || f.DmxTo == f.DmxFrom)
+        {
+            Consider(FirstPlainDmx(f));
+            return best;
+        }
         double u = Math.Clamp((value - f.PhysicalFrom) / (double)(f.PhysicalTo - f.PhysicalFrom), 0, 1);
         if (f.Curve is not null) u = InvertCurve(f, u);
         uint dmx = (uint)Math.Round(f.DmxFrom + u * (f.DmxTo - f.DmxFrom));
-        return Refine(f, Math.Clamp(dmx, f.DmxFrom, f.DmxTo), value);
+        Consider(Refine(f, Math.Clamp(dmx, f.DmxFrom, f.DmxTo), value));
+        return best;
+
+        void Consider(uint d)
+        {
+            float e = Error(f, d, value);
+            if (e < bestErr)
+            {
+                bestErr = e;
+                best = d;
+            }
+        }
     }
 
     /// <summary>
