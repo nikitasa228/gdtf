@@ -99,7 +99,10 @@ arrangement under a name (dock tree, open panels, floating windows, tab styles a
 projection, shading, overlay, grid, stats); *Delete Layout* removes one; *Reset Layout* (View menu) returns to the
 default. The workspace is saved on exit and restored at the next start; a damaged layout file is reported and the
 default layout is used instead. Layout files are JSON (`format: 1`) with the Dear ImGui ini text embedded, so they can be
-copied between machines.
+copied between machines. The embedded dock tree is checked before Dear ImGui sees it (unique non-zero node ids, parents
+before children, split nodes with exactly two children, one central leaf per tree, sizes within Dear ImGui's 16-bit
+fields): Dear ImGui does not report such damage, it aborts the process — every start, since the workspace is restored
+each time — so a file that fails the check is treated as damaged.
 
 ## Viewports
 
@@ -143,8 +146,12 @@ Orbiting leaves the snapped view.
 | Blender | MMB | Shift+MMB | wheel, Ctrl+MMB drag | Shift+RMB |
 | Maya | Alt+LMB | MMB, Alt+MMB | wheel, Alt+RMB drag | RMB |
 
-Double-click focuses the camera on the point under the cursor; *F* frames the selection (or the whole stage).
-The camera works in metres with Z up; orthographic views keep the apparent size when switching projection.
+Double-click focuses the camera on the point under the cursor; *F* frames the selection (or the whole stage); an object
+without geometry (a light, a group) is framed as a 1 m box around its origin.
+The camera works in metres with Z up; orthographic views keep the apparent size when switching projection, also when fly
+mode (which needs a perspective eye) starts from an orthographic view. The far plane follows the zoom-out limit, so the
+stage never disappears when zooming far out. A navigation, box selection or gizmo drag ends when its viewport stops being
+drawn (its tab covered, the panel closed) — fly mode suspends the shortcuts, and they would otherwise stay off.
 
 ## Selection and editing
 
@@ -153,8 +160,13 @@ The camera works in metres with Z up; orthographic views keep the apparent size 
   lying *entirely* inside it — a box drawn around props does not also pick up the floor or the walls behind them.
   Hidden and locked objects, and objects on hidden or locked layers, are never selected.
 * **Gizmos** (ImGuizmo): *Move* (W) and *Rotate* (E) in world or local space; with several objects selected they move
-  rigidly around the primary (last selected) object. **Snapping** (toolbar or Alt+S, Ctrl inverts it while dragging)
-  uses half the scene grid spacing for moves and 15° for rotations.
+  rigidly around the primary (last selected) object. An object selected together with its parent moves once, with the
+  parent; a selected child of a locked parent moves on its own. Locked objects and objects on locked layers have no
+  gizmo, and their transform fields in the Properties panel are read-only. **Snapping** (toolbar or Alt+S, Ctrl inverts
+  it while dragging) uses half the scene grid spacing for moves and 15° for rotations. Each viewport has its own gizmo
+  id, so a drag in one of several views showing the same selection moves it once. The rotation fields keep the Euler
+  angles as entered (a Y of 95° stays 95° instead of flipping to the equivalent −170° / 85° / −160°, and a drag on Y
+  continues past ±90°) until the rotation is changed elsewhere.
 * **Undo**: every edit goes through Core's `UndoStack`. A whole gizmo drag, or a whole drag on a numeric field, is
   *one* undo step (consecutive transform commands merge until the drag ends). Delete, Duplicate, Cut, Copy and Paste
   work on the top-level selected objects (children follow their parents) and are single steps too.
@@ -174,7 +186,10 @@ All file dialogs use the editor's **portable file browser** (the same on Windows
 and drives, recent folders, a path bar, sortable name / size / date columns with folders first and natural number
 order, type filters, hidden files toggle, and an overwrite confirmation when saving. When saving, the file name field has
 the keyboard as soon as the dialog opens; the typed name is used by Enter and by the Save button alike (the
-extension of the selected type is added when missing).
+extension of the selected type is added when missing). Only the visible rows of a folder are drawn and their texts are
+built once per listing, so folders with tens of thousands of files scroll as smoothly as small ones. A folder that
+cannot be read says so (the previous listing stays) instead of looking empty; symbolic link loops and broken links are
+listed but refused when opened; `~` in the path bar is the home folder.
 
 ![File browser](images/editor-file-browser.png)
 
@@ -244,8 +259,16 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
 ## Robustness
 
 * No exception escapes the frame loop: a failing frame is logged and reported in the Issues panel and the next frame
-  runs; after 120 consecutive failures the editor stops with exit code 1. A failing panel shows its error with a
-  *Retry* button instead of its content, and Dear ImGui's state is recovered so the rest of the UI keeps working.
+  runs; after 120 consecutive failures the editor stops with exit code 1. Dear ImGui aborts the process (a native
+  assertion) when a frame is left open, so the UI frame is always ended — the window, ID and style stacks are unwound
+  with Dear ImGui's error recovery — before an exception reaches the loop. Every top-level part of the UI runs under
+  its own guard: a failing panel shows its error with a *Retry* button instead of its content, a failing dialog
+  (settings, file browser, message, about, shortcuts) closes, a failing menu or status bar only loses that frame's
+  drawing, and the rest of the UI keeps working.
+* An error that repeats (every frame, or every time a dialog opens) is logged in full once and then counted (at 10,
+  100, 1000 … occurrences), and appears once in the Issues panel (at most 200 different program messages; the panel's
+  clear button really empties the list and lets them be reported again). The log file holds the current run and stops
+  at 16 MB; the previous run is kept as `candela-app.previous.log`.
 * Swapchain loss, resize and minimise are handled (the loop idles while minimised); GPU objects of closed viewports
   are released after the frames that used them.
 * Without a Vulkan device the editor explains what to install, in a small OpenGL window (or on standard error in
@@ -255,7 +278,14 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
   > (AMD, NVIDIA, Intel), or on Linux without a GPU install Mesa's software Vulkan driver (mesa-vulkan-drivers,
   > lavapipe).
 
-* Settings, layouts, presets and the recent-places list are written atomically and read defensively.
+* Settings, layouts, presets and the recent-places list are written atomically and read defensively. A damaged
+  settings file is moved aside once (`settings.json.damaged-<time>`), not copied again at every start; headless runs
+  leave it untouched. Key binding files with missing tables, null or empty chords are repaired when read (a custom set
+  saved by an older version also gets the newer actions' defaults). Missing library folders are detected in the
+  background, so a network share that does not answer never freezes the settings window.
+* The Vulkan validation layer (`--validation`) reports no errors for start-up, a session with window resizes, panels
+  torn off into OS windows and docked back, new and closed viewports and UI scale changes, and shutdown (also with OS
+  windows still open); an integration test runs such a session.
 
 ## Headless verification
 
@@ -304,6 +334,7 @@ a real one. Coordinates are pixels in the main window.
 | `select` | `names` | select objects by name |
 | `layout` | `name` | apply a layout |
 | `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection), `value` | change a setting |
+| `window` | `width`, `height` (screen pixels), or `value` (minimize, restore, maximize) | resize the main window or change its state (swapchain recreation) |
 | `screenshot` | `path` | save the current frame (in `--screenshot` runs) |
 
 ## Architecture
@@ -344,7 +375,7 @@ happen on user actions (edits, opening menus and dialogs).
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 340 tests, under a minute) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 400 tests, about a minute) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
 the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
 styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
@@ -355,10 +386,17 @@ round trip through a saved file, loading a layout while running), layout files a
 filters, command-line and script parsing, settings robustness, localisation completeness (issue categories too),
 layout rules found by exercising the UI (menus opening towards the window's inside, the property grid's label column,
 transform fields stacking instead of cutting numbers, the file dialog fitting without scrolling), the editor session,
-and the preview stage on a real (headless) Vulkan renderer with picking. Integration tests start the real editor under
+and the preview stage on a real (headless) Vulkan renderer with picking. `RobustnessTests.cs` tries to break the
+editor: exceptions inside a UI frame and inside a modal dialog, damaged dock trees (each of which aborted or hung Dear
+ImGui), repeated failures, log size and rotation, damaged settings and key binding files, gizmo drags of parent +
+child, locked layers and rotations around the pivot, the far plane at the zoom limit, fly mode from an orthographic
+view, pick pixels at framebuffer scales 1 / 1.25 / 2 and at the image edges, the file browser on unreadable folders,
+link loops, broken links, Unicode names and a 20 000-file folder (allocation per frame measured), background folder
+checks, Euler angle display and framing of objects without geometry. Integration tests start the real editor under
 `xvfb-run`: the default screenshot must be a real frame, a scripted click must select an object and change the
-Properties panel (and Escape must clear it), and a run without a Vulkan driver must exit with code 3. They are skipped
-when `xvfb-run` or a Vulkan device is missing.
+Properties panel (and Escape must clear it), shortcuts must work after fly mode was interrupted by a tab switch, a
+session with resizes, tear-offs and new viewports under `--validation` must report no validation error, and a run
+without a Vulkan driver must exit with code 3. They are skipped when `xvfb-run` or a Vulkan device is missing.
 
 ## Limitations of phase A
 

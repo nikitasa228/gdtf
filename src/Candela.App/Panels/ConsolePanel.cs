@@ -22,6 +22,10 @@ internal sealed class ConsolePanel : Panel
     private bool _appliedDebug;
     private bool _autoScroll = true;
     private bool _scrollToEnd;
+    private double _rebuiltAt = double.NegativeInfinity;
+
+    /// <summary>Shortest time between two rebuilds of the list for new messages, s.</summary>
+    private const double RebuildInterval = 0.1;
 
     /// <summary>Creates the panel.</summary>
     public ConsolePanel(WorkspaceContext context)
@@ -52,8 +56,13 @@ internal sealed class ConsolePanel : Panel
         ImGui.InputTextWithHint("##filter", Labels.With(Icons.Filter, Str.ConsoleFilter), ref _filter, 128);
         ImGui.Separator();
 
-        if (log.Version != _version || _filter != _appliedFilter || _showDebug != _appliedDebug)
+        // New messages are taken in at most ten times a second: a source that logs every frame (protocol traffic,
+        // a recurring warning) would otherwise rebuild the whole list — up to the log's capacity in strings — per frame.
+        double now = _ctx.Timer.Elapsed;
+        bool filterChanged = _filter != _appliedFilter || _showDebug != _appliedDebug;
+        if (filterChanged || (log.Version != _version && now - _rebuiltAt >= RebuildInterval))
         {
+            _rebuiltAt = now;
             _version = log.Version;
             _appliedFilter = _filter;
             _appliedDebug = _showDebug;
