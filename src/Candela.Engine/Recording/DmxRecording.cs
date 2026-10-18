@@ -273,6 +273,11 @@ public sealed class DmxRecording
         {
             throw new InvalidDataException("The DMX recording is truncated.", e);
         }
+        catch (FormatException e)
+        {
+            // a malformed length (7-bit encoded integer) in the header
+            throw new InvalidDataException($"The DMX recording's header is damaged: {e.Message}", e);
+        }
 
         var frames = new List<DmxRecordedFrame>();
         string? problem = null;
