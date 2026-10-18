@@ -133,7 +133,7 @@ public sealed class GdtfModelLoader
 
     private LoadedModel? LoadUncached(GdtfModel model)
     {
-        string path = $"Models/{model.Name}";
+        string path = ReadContext.ChildPath("Models", model.Name);
         if (model.File is null)
             return model.PrimitiveType == GdtfPrimitiveType.Undefined ? null : Primitive(model, ModelSourceKind.Primitive);
 
@@ -165,9 +165,11 @@ public sealed class GdtfModelLoader
                 var info = Fit(mesh, model, kind, entry, convertYUp: kind == ModelSourceKind.Gltf);
                 return new LoadedModel(mesh, info);
             }
-            catch (Exception e) when (e is InvalidDataException or ArgumentException or IndexOutOfRangeException or InvalidOperationException or NotSupportedException)
+            catch (Exception e) when (e is not OutOfMemoryException)
             {
-                Warn(path, $"Model file '{entry}' cannot be read: {e.Message}");
+                // A model file is untrusted content of one geometry: whatever its decoder throws on it (SharpGLTF alone
+                // throws schema, JSON, key, format and I/O exceptions on corrupt data) costs this model, not the fixture.
+                Warn(path, $"Model file '{entry}' cannot be read ({e.GetType().Name}: {e.Message})");
             }
         }
 
@@ -208,7 +210,7 @@ public sealed class GdtfModelLoader
             if (hit is null)
             {
                 string name = Path.GetFileName(file.Replace('\\', '/'));
-                hit = _archive.EntryNames.FirstOrDefault(n => n.EndsWith("/" + name, StringComparison.OrdinalIgnoreCase));
+                hit = _archive.FindInAnyFolder(name);
             }
             mat.BaseColorTexture = hit is not null && _keyPrefix is not null ? _keyPrefix + hit : null;
         }

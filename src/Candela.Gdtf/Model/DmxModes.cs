@@ -285,7 +285,11 @@ public sealed class ChannelFunction
     /// <summary>Start of the DMX range in channel resolution.</summary>
     public uint DmxFromValue { get; set; }
 
-    /// <summary>End of the DMX range in channel resolution (next function's start − 1 within the same mode-master context, or the channel maximum).</summary>
+    /// <summary>
+    /// End of the DMX range in channel resolution: the start of the next function (by DMX start) that can be active at the
+    /// same time, minus one, or the channel maximum. Two functions cannot be active at the same time when they depend on
+    /// the same mode-master channel with disjoint mode ranges, or on two different functions of that channel.
+    /// </summary>
     public uint DmxToValue { get; set; }
 
     /// <summary>Default value as written (GDTF 1.1+; 0/1 when absent).</summary>
@@ -347,6 +351,29 @@ public sealed class ChannelFunction
 
     /// <summary>End of the master's DMX range in which this function is active.</summary>
     public DmxValue ModeTo { get; set; } = DmxValue.Zero;
+
+    /// <summary>
+    /// <see cref="ModeFrom"/> in the resolution of <see cref="ModeMasterChannel"/> (spec conversion, see
+    /// <see cref="DmxValue.ToResolution"/>); 0 when there is no resolved mode master.
+    /// </summary>
+    public uint ModeFromValue { get; set; }
+
+    /// <summary>
+    /// <see cref="ModeTo"/> in the resolution of <see cref="ModeMasterChannel"/>, as an inclusive range end
+    /// (<see cref="DmxValue.ToRangeEnd"/>): a <c>ModeTo</c> written with fewer bytes than the master covers its whole step,
+    /// so adjacent mode ranges leave no gap. Never below <see cref="ModeFromValue"/> (a reversed range is swapped with a
+    /// warning); 0 when there is no resolved mode master.
+    /// </summary>
+    public uint ModeToValue { get; set; }
+
+    /// <summary>
+    /// True when the function's mode-master condition holds for a master channel value <paramref name="masterValue"/>
+    /// (in the master's resolution): <see cref="ModeFromValue"/> ≤ value ≤ <see cref="ModeToValue"/>. Always true for
+    /// functions without a resolved mode master. When the master is a channel function, that function must also be the
+    /// master channel's active one, which this method does not check.
+    /// </summary>
+    public bool IsModeActive(uint masterValue) =>
+        ModeMasterChannel is null || (masterValue >= ModeFromValue && masterValue <= ModeToValue);
 
     /// <summary>DMX profile name as written (GDTF 1.2).</summary>
     public string? DmxProfileName { get; set; }

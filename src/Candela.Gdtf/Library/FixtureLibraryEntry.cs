@@ -70,9 +70,14 @@ public sealed class FixtureLibraryEntry
             }
         }
         AddKey(FileModel);
+        FileKeyCount = keys.Count;
         AddKey(specs?.LongName);
         AddKey(specs?.GdtfName);
-        if (keys.Count == 0) keys.Add(FixtureNames.Key(stem) is { Length: > 0 } k0 ? k0 : stem);
+        if (keys.Count == 0)
+        {
+            keys.Add(FixtureNames.Key(stem) is { Length: > 0 } k0 ? k0 : stem);
+            FileKeyCount = 1;
+        }
         ModelKeys = keys;
     }
 
@@ -127,6 +132,12 @@ public sealed class FixtureLibraryEntry
 
     /// <summary>Normalised model names this entry answers to (file model part, specs long name, GDTF name).</summary>
     internal IReadOnlyList<string> ModelKeys { get; }
+
+    /// <summary>
+    /// How many of <see cref="ModelKeys"/> (the first ones) come from the file name itself; the others are aliases from
+    /// the specs, which lose to a file name that matches when two models answer to the same name.
+    /// </summary>
+    internal int FileKeyCount { get; }
 
     /// <summary>Same manufacturer and model as another entry (i.e. another revision of the same fixture).</summary>
     public bool IsSameModel(FixtureLibraryEntry other)

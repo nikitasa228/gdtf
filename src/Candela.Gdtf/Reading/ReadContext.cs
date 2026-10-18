@@ -150,6 +150,16 @@ internal sealed class ReadContext
         return fallback;
     }
 
+    /// <summary>Enum value, or null when the attribute is missing, empty or unknown (unknown values are warned about).</summary>
+    public T? EnumOpt<T>(XElement e, XName name, IReadOnlyDictionary<string, T> map, string path) where T : struct
+    {
+        var a = e.Attribute(name);
+        if (a is null || string.IsNullOrWhiteSpace(a.Value)) return null;
+        if (map.TryGetValue(a.Value.Trim(), out var v)) return v;
+        Warn(path, $"{name.LocalName}=\"{a.Value}\" is not a known value; the GDTF default is used.");
+        return null;
+    }
+
     public DmxValue Dmx(XElement e, XName name, DmxValue fallback, string path)
     {
         var a = e.Attribute(name);
@@ -270,7 +280,20 @@ internal sealed class ReadContext
     {
         var a = e.Attribute(name);
         if (a is null || string.IsNullOrWhiteSpace(a.Value)) return Matrix4x4.Identity;
-        if (GdtfMatrix.TryParse(a.Value, out var m)) return m;
+        if (GdtfMatrix.TryParse(a.Value, out var m))
+        {
+            // GDTF transforms are affine (last row 0,0,0,1, as in every library file). Anything else would turn the
+            // composition of the tree into a projective transform; keep the affine part.
+            if (m.M14 != 0f || m.M24 != 0f || m.M34 != 0f || m.M44 != 1f)
+            {
+                Warn(path, $"{name.LocalName}=\"{Shorten(a.Value)}\" is not affine (last row is not 0,0,0,1); the last row is ignored.");
+                m.M14 = 0f;
+                m.M24 = 0f;
+                m.M34 = 0f;
+                m.M44 = 1f;
+            }
+            return m;
+        }
         Warn(path, $"{name.LocalName}=\"{Shorten(a.Value)}\" is not a GDTF matrix; identity used.");
         return Matrix4x4.Identity;
     }
@@ -297,6 +320,17 @@ internal sealed class ReadContext
     }
 
     public static string Shorten(string s) => s.Length <= 80 ? s : s[..77] + "...";
+
+    /// <summary>
+    /// Warning path of a child element: <c>{parent}/{name}</c>, with the name shortened and the parent cut to its end
+    /// so that paths stay short however deep the tree or long the names (building them must not be quadratic).
+    /// </summary>
+    public static string ChildPath(string parentPath, string name)
+    {
+        const int maxParent = WarningSink.MaxPathLength;
+        if (parentPath.Length > maxParent) parentPath = "…" + parentPath[^(maxParent - 1)..];
+        return $"{parentPath}/{Shorten(name)}";
+    }
 
     /// <summary>Case-insensitive enum map from GDTF spellings (plus aliases) to values.</summary>
     public static Dictionary<string, T> Map<T>(params (string Name, T Value)[] items)

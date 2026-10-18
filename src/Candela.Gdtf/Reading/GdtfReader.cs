@@ -50,6 +50,9 @@ public static partial class GdtfReader
     public static FixtureType Read(GdtfArchive archive)
     {
         ArgumentNullException.ThrowIfNull(archive);
+        long size = archive.GetSize(GdtfArchive.DescriptionEntry);
+        if (size > MaxDescriptionBytes)
+            throw new GdtfFormatException($"description.xml of '{archive.FileName ?? "GDTF"}' is {size} bytes; more than {MaxDescriptionBytes} is not a fixture description.");
         var bytes = archive.ReadDescription();
         using var ms = new MemoryStream(bytes, writable: false);
         return ReadDescription(ms, archive, archive.FileName);
@@ -59,19 +62,83 @@ public static partial class GdtfReader
     public static FixtureType ReadDescription(Stream descriptionXml, string? sourceName = null) =>
         ReadDescription(descriptionXml, null, sourceName);
 
+    /// <summary>
+    /// Deepest XML element level that is read (the GDTF root is level 0): enough for <see cref="MaxGeometryDepth"/>
+    /// nested geometries plus their Break / PinPatch children; real files reach level 12. Deeper elements are skipped
+    /// with a warning, which keeps loading linear for hostile nesting.
+    /// </summary>
+    internal const int MaxXmlDepth = MaxGeometryDepth + 8;
+
+    /// <summary>
+    /// Elements plus attributes read at most (the largest description of the library has 260 000); the rest of a larger
+    /// document is ignored with a warning so that a hostile file cannot exhaust memory.
+    /// </summary>
+    internal const long MaxXmlNodes = 4_000_000;
+
+    /// <summary>
+    /// Largest <c>description.xml</c> read, in bytes or characters (64 MiB; the library's largest is 6 MB). Larger ones
+    /// are not GDTF descriptions but damage or an attack, and the file is rejected.
+    /// </summary>
+    public const int MaxDescriptionBytes = 64 << 20;
+
     private static FixtureType ReadDescription(Stream xml, GdtfArchive? archive, string? sourceName)
     {
         XDocument doc;
+        long skipped;
+        bool truncated, namespaced;
         try
         {
-            using var reader = XmlReader.Create(xml, XmlSettings);
+            using var reader = new LimitedXmlReader(XmlReader.Create(xml, XmlSettings), MaxXmlDepth, MaxXmlNodes);
             doc = XDocument.Load(reader, LoadOptions.None);
+            skipped = reader.SkippedElements;
+            truncated = reader.Truncated;
+            namespaced = reader.SawNamespace;
         }
         catch (XmlException e)
         {
             throw new GdtfFormatException($"description.xml of '{sourceName ?? "GDTF"}' is not well-formed XML: {e.Message}", e);
         }
-        return Parse(doc, archive, sourceName);
+        catch (InvalidOperationException e)
+        {
+            // XDocument refuses documents without a root element or with content after it.
+            throw new GdtfFormatException($"description.xml of '{sourceName ?? "GDTF"}' is not a valid XML document: {e.Message}", e);
+        }
+        var limits = new List<GdtfWarning>(2);
+        if (skipped > 0)
+            limits.Add(new GdtfWarning("", $"{skipped} element(s) nested deeper than {MaxXmlDepth} levels were ignored with their content."));
+        if (truncated)
+            limits.Add(new GdtfWarning("", $"description.xml has more than {MaxXmlNodes} elements and attributes; the rest of the file was ignored."));
+        if (namespaced && doc.Root is { } root && StripNamespaces(root))
+            limits.Add(new GdtfWarning("", "description.xml uses XML namespaces, which GDTF does not define; elements and attributes are read by local name."));
+        return Parse(doc, archive, sourceName, limits);
+    }
+
+    /// <summary>
+    /// Renames every element and attribute to its local name and drops namespace declarations (GDTF has no namespace;
+    /// a namespaced file comes from a generic XML tool and means the same). Returns true when anything changed.
+    /// </summary>
+    private static bool StripNamespaces(XElement root)
+    {
+        bool changed = false;
+        foreach (var e in root.DescendantsAndSelf())
+        {
+            if (e.Name.Namespace != XNamespace.None)
+            {
+                e.Name = e.Name.LocalName;
+                changed = true;
+            }
+            if (!e.HasAttributes || !e.Attributes().Any(a => a.IsNamespaceDeclaration || a.Name.Namespace != XNamespace.None)) continue;
+            var attributes = new List<XAttribute>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var a in e.Attributes())
+            {
+                if (a.IsNamespaceDeclaration || !seen.Add(a.Name.LocalName)) continue; // same local name twice: first wins
+                attributes.Add(new XAttribute(a.Name.LocalName, a.Value));
+            }
+            e.ReplaceAttributes(attributes);
+            changed = true;
+        }
+        return changed;
     }
 
     private static readonly XmlReaderSettings XmlSettings = new()
@@ -83,13 +150,15 @@ public static partial class GdtfReader
         IgnoreProcessingInstructions = true,
         IgnoreWhitespace = true,
         CloseInput = false,
+        MaxCharactersInDocument = MaxDescriptionBytes,
     };
 
-    private static FixtureType Parse(XDocument doc, GdtfArchive? archive, string? sourceName)
+    private static FixtureType Parse(XDocument doc, GdtfArchive? archive, string? sourceName, List<GdtfWarning> limits)
     {
         var root = doc.Root ?? throw new GdtfFormatException($"description.xml of '{sourceName ?? "GDTF"}' is empty.");
         var ft = new FixtureType { SourceFileName = sourceName };
         var ctx = new ReadContext(ft, archive);
+        foreach (var w in limits) ctx.Warn(w.Path, w.Message);
 
         XElement? fte;
         if (root.Name == X.Gdtf)

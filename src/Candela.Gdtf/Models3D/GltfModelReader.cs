@@ -57,10 +57,10 @@ public static class GltfModelReader
             return slot;
         }
 
-        foreach (var node in EnumerateNodes(root))
+        foreach (var (node, world) in EnumerateNodes(root))
         {
             if (node.Mesh is null) continue;
-            var mesh = ReadMesh(node, Slot, warnings);
+            var mesh = ReadMesh(node, world, Slot, warnings);
             if (mesh is not null) model.Parts.Add(new ModelPart { Name = node.Name ?? node.Mesh.Name ?? "", Mesh = mesh });
         }
         return model;
@@ -140,26 +140,32 @@ public static class GltfModelReader
         return result;
     }
 
-    private static IEnumerable<Node> EnumerateNodes(ModelRoot root)
+    /// <summary>
+    /// The scene's nodes depth first with their world matrices, accumulated on the way down (iteratively: SharpGLTF's
+    /// own <c>WorldMatrix</c> recurses to the root for every node, which is quadratic and can overflow the stack for
+    /// deeply nested hierarchies).
+    /// </summary>
+    private static IEnumerable<(Node Node, Matrix4x4 World)> EnumerateNodes(ModelRoot root)
     {
         var scene = root.DefaultScene ?? root.LogicalScenes.FirstOrDefault();
         IEnumerable<Node> roots = scene is not null
             ? scene.VisualChildren
             : root.LogicalNodes.Where(n => n.VisualParent is null);
-        var stack = new Stack<Node>(roots.Reverse());
+        var stack = new Stack<(Node, Matrix4x4)>();
+        foreach (var r in roots.Reverse()) stack.Push((r, Matrix4x4.Identity));
         var seen = new HashSet<int>();
         while (stack.Count > 0)
         {
-            var n = stack.Pop();
+            var (n, parentWorld) = stack.Pop();
             if (!seen.Add(n.LogicalIndex)) continue;
-            yield return n;
-            foreach (var c in n.VisualChildren.Reverse()) stack.Push(c);
+            var world = n.LocalMatrix * parentWorld;
+            yield return (n, world);
+            foreach (var c in n.VisualChildren.Reverse()) stack.Push((c, world));
         }
     }
 
-    private static MeshData? ReadMesh(Node node, Func<Material?, int> slotOf, Action<string>? warnings)
+    private static MeshData? ReadMesh(Node node, Matrix4x4 world, Func<Material?, int> slotOf, Action<string>? warnings)
     {
-        var world = node.WorldMatrix;
         if (!Matrix4x4.Invert(world, out var inverse)) inverse = Matrix4x4.Identity;
         var normalMatrix = Matrix4x4.Transpose(inverse);
         bool mirrored = world.GetDeterminant() < 0;
