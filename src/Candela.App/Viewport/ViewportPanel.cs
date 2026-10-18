@@ -67,6 +67,8 @@ internal sealed unsafe class ViewportPanel : Panel
     private string _title = "";
     private string _titleLanguage = "";
     private ViewDirection? _hoveredFace;
+    private readonly ToolbarLabels _labels = new();
+    private float _toolbarBottom;
 
     /// <summary>Creates viewport number <paramref name="number"/> (1 … 16).</summary>
     public ViewportPanel(int number, WorkspaceContext context, IViewportHost host)
@@ -528,6 +530,8 @@ internal sealed unsafe class ViewportPanel : Panel
         var style = ImGui.GetStyle();
         float scale = style.FontScaleMain * style.FontScaleDpi;
         var pad = new Vector2(6, 6) * scale;
+        _labels.Refresh();
+        bool compact = _imageSize.X < 760f * scale;
         ImGui.SetCursorScreenPos(_imageMin + pad);
         ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6, 3) * scale);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(4, 4) * scale);
@@ -536,55 +540,66 @@ internal sealed unsafe class ViewportPanel : Panel
         ImGui.PushStyleColor(ImGuiCol.FrameBg, Theme.WithAlpha(Theme.OverlayBackground, ToolbarAlpha));
         ImGui.BeginGroup();
         var tools = _ctx.Tools;
-        ToolButton(Icons.Pointer, Str.ToolSelect, tools.Tool == EditorTool.Select, () => tools.Tool = EditorTool.Select);
+        if (ToolButton(ToolbarLabels.SelectId, Str.ToolSelect, tools.Tool == EditorTool.Select))
+            tools.Tool = EditorTool.Select;
         ImGui.SameLine();
-        ToolButton(Icons.Move, Str.ToolMove, tools.Tool == EditorTool.Move, () => tools.Tool = EditorTool.Move);
+        if (ToolButton(ToolbarLabels.MoveId, Str.ToolMove, tools.Tool == EditorTool.Move))
+            tools.Tool = EditorTool.Move;
         ImGui.SameLine();
-        ToolButton(Icons.Rotate3D, Str.ToolRotate, tools.Tool == EditorTool.Rotate, () => tools.Tool = EditorTool.Rotate);
+        if (ToolButton(ToolbarLabels.RotateId, Str.ToolRotate, tools.Tool == EditorTool.Rotate))
+            tools.Tool = EditorTool.Rotate;
         ImGui.SameLine();
-        ToolButton(tools.LocalSpace ? Icons.Box : Icons.Axis3D, tools.LocalSpace ? Str.ToolSpaceLocal : Str.ToolSpaceWorld, false,
-            () => tools.LocalSpace = !tools.LocalSpace);
+        if (ToolButton(tools.LocalSpace ? ToolbarLabels.LocalId : ToolbarLabels.WorldId, tools.LocalSpace ? Str.ToolSpaceLocal : Str.ToolSpaceWorld, false))
+            tools.LocalSpace = !tools.LocalSpace;
         ImGui.SameLine();
-        ToolButton(Icons.Magnet, Str.ToolSnapping, tools.Snap, () => tools.Snap = !tools.Snap);
-        ImGui.SameLine(0, 12 * scale);
+        if (ToolButton(ToolbarLabels.SnapId, Str.ToolSnapping, tools.Snap))
+            tools.Snap = !tools.Snap;
+        ImGui.SameLine(0, 10 * scale);
 
-        ImGui.SetNextItemWidth(120 * scale);
-        if (ImGui.BeginCombo("##shading", $"{ShadingIcon(View.Shading)}  {ShadingLabel(View.Shading)}"))
+        int shading = (int)View.Shading;
+        if (ImGui.BeginCombo("##shading", compact ? _labels.ShadingIcon[shading] : _labels.ShadingFull[shading], ImGuiComboFlags.WidthFitPreview))
         {
-            foreach (var s in ShadingModes)
-                if (ImGui.Selectable($"{ShadingIcon(s)}  {ShadingLabel(s)}", View.Shading == s))
-                    View.Shading = s;
+            for (int i = 0; i < ShadingModes.Length; i++)
+                if (ImGui.Selectable(_labels.ShadingFull[i], shading == i))
+                    View.Shading = ShadingModes[i];
             ImGui.EndCombo();
         }
 
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(_labels.ShadingTooltip);
         ImGui.SameLine();
-        string projection = Camera.Projection == ProjectionKind.Perspective ? Loc.Get(Str.ViewPerspectiveShort) : Loc.Get(Str.ViewOrthoShort);
-        if (ImGui.Button($"{Icons.Camera}  {projection}##projection"))
+        bool persp = Camera.Projection == ProjectionKind.Perspective;
+        if (ImGui.Button(compact ? ToolbarLabels.ProjectionIconId : persp ? _labels.Perspective : _labels.Orthographic))
             Camera.ToggleProjection();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.ViewProjection));
+            ImGui.SetTooltip(persp ? _labels.PerspectiveTooltip : _labels.OrthographicTooltip);
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(150 * scale);
-        if (ImGui.BeginCombo("##overlay", $"{OverlayIcon(View.Overlay)}  {OverlayLabel(View.Overlay)}"))
+        int overlay = (int)View.Overlay;
+        if (ImGui.BeginCombo("##overlay", compact ? _labels.OverlayIcon[overlay] : _labels.OverlayFull[overlay], ImGuiComboFlags.WidthFitPreview))
         {
-            foreach (var o in OverlayModes)
-                if (ImGui.Selectable($"{OverlayIcon(o)}  {OverlayLabel(o)}", View.Overlay == o))
-                    View.Overlay = o;
+            for (int i = 0; i < OverlayModes.Length; i++)
+                if (ImGui.Selectable(_labels.OverlayFull[i], overlay == i))
+                    View.Overlay = OverlayModes[i];
             ImGui.EndCombo();
         }
 
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(_labels.OverlayTooltip);
         ImGui.SameLine();
-        ToolButton(Icons.Grid, Str.ViewportGrid, View.ShowGrid, () => View.ShowGrid = !View.ShowGrid);
+        if (ToolButton(ToolbarLabels.GridId, Str.ViewportGrid, View.ShowGrid))
+            View.ShowGrid = !View.ShowGrid;
         ImGui.SameLine();
-        ToolButton(Icons.Activity, Str.ViewportStats, ShowStats, () => ShowStats = !ShowStats);
+        if (ToolButton(ToolbarLabels.StatsId, Str.ViewportStats, ShowStats))
+            ShowStats = !ShowStats;
         ImGui.EndGroup();
+        _toolbarBottom = ImGui.GetItemRectMax().Y;
         bool hovered = ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) || ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId);
         ImGui.PopStyleColor(2);
         ImGui.PopStyleVar(3);
         return hovered;
     }
 
-    private static void ToolButton(string icon, Str tooltip, bool active, Action onClick)
+    private static bool ToolButton(string id, Str tooltip, bool active)
     {
         if (active)
         {
@@ -592,12 +607,12 @@ internal sealed unsafe class ViewportPanel : Panel
             ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Theme.WithAlpha(Theme.Accent, 0.7f));
         }
 
-        if (ImGui.Button(icon + "##" + tooltip))
-            onClick();
+        bool clicked = ImGui.Button(id);
         if (active)
             ImGui.PopStyleColor(2);
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip(Loc.Get(tooltip));
+        return clicked;
     }
 
     /// <summary>Draws the view cube; returns true when the mouse is over it.</summary>
@@ -607,27 +622,28 @@ internal sealed unsafe class ViewportPanel : Panel
             return false;
         var style = ImGui.GetStyle();
         float scale = style.FontScaleMain * style.FontScaleDpi;
-        float size = 92f * scale;
-        var center = new Vector2(_imageMin.X + _imageSize.X - size * 0.5f - 14f * scale, _imageMin.Y + size * 0.5f + 14f * scale);
-        if (_imageSize.X < size * 2.2f || _imageSize.Y < size * 1.6f)
+        float size = 84f * scale;
+        float radius = size * 0.6f;
+        var center = new Vector2(_imageMin.X + _imageSize.X - radius - 10f * scale, MathF.Max(_toolbarBottom, _imageMin.Y) + radius + 8f * scale);
+        if (_imageSize.X < size * 2.4f || _imageSize.Y < size * 2.2f)
             return false;
         ViewCube.Project(Camera.Right, Camera.Up, Camera.Forward, center, size, _cubeFaces);
         var mouse = ImGui.GetIO().MousePos;
-        bool inArea = Vector2.Distance(mouse, center) < size * 0.62f;
+        bool inArea = Vector2.Distance(mouse, center) < radius;
         _hoveredFace = viewportHovered && inArea ? ViewCube.HitTest(_cubeFaces, mouse) : null;
 
-        drawList.AddCircleFilled(center, size * 0.62f, Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, inArea ? 0.75f : 0.45f)));
+        drawList.AddCircleFilled(center, radius, Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, inArea ? 0.8f : 0.5f)));
         var font = ImGui.GetFont();
-        float fontSize = ImGui.GetFontSize() * 0.72f;
+        float fontSize = ImGui.GetFontSize() * 0.7f;
         foreach (var face in _cubeFaces)
         {
             if (face.Facing <= 0.02f)
                 continue;
             bool hot = _hoveredFace == face.View;
             bool current = Camera.SnappedView == face.View;
-            var fill = hot ? Theme.WithAlpha(Theme.Accent, 0.85f) : current ? Theme.WithAlpha(Theme.Accent, 0.45f) : Theme.Rgb(0x3A3D44, 0.92f);
+            var fill = hot ? Theme.WithAlpha(Theme.Accent, 0.9f) : current ? Theme.Rgb(0x6B4A2A, 0.95f) : Theme.Rgb(0x3A3D44, 0.95f);
             drawList.AddQuadFilled(face.C0, face.C1, face.C2, face.C3, Theme.U32(fill));
-            drawList.AddQuad(face.C0, face.C1, face.C2, face.C3, Theme.U32(Theme.Rgb(0x111214, 0.9f)), 1.2f * scale);
+            drawList.AddQuad(face.C0, face.C1, face.C2, face.C3, Theme.U32(Theme.Rgb(0x16171A, 0.95f)), 1.2f * scale);
             if (face.Facing > 0.35f)
             {
                 string label = FaceLabel(face.View);
@@ -637,18 +653,11 @@ internal sealed unsafe class ViewportPanel : Panel
             }
         }
 
-        // Axis triad below the cube.
-        var axisOrigin = center + new Vector2(-size * 0.42f, size * 0.62f + 16f * scale);
-        DrawAxis(drawList, axisOrigin, Vector3.UnitX, Theme.AxisX, "X", 16f * scale);
-        DrawAxis(drawList, axisOrigin, Vector3.UnitY, Theme.AxisY, "Y", 16f * scale);
-        DrawAxis(drawList, axisOrigin, Vector3.UnitZ, Theme.AxisZ, "Z", 16f * scale);
-
-        string viewName = Camera.SnappedView is { } snapped ? FaceLabel(snapped) : Loc.Get(Str.ViewPerspectiveShort);
-        string projection = Camera.Projection == ProjectionKind.Perspective ? Loc.Get(Str.ViewPerspectiveShort) : Loc.Get(Str.ViewOrthoShort);
-        string caption = Camera.SnappedView is null ? projection : $"{viewName} · {projection}";
+        string caption = Camera.SnappedView is { } snapped
+            ? _labels.SnappedCaption(snapped, Camera.Projection == ProjectionKind.Perspective)
+            : Camera.Projection == ProjectionKind.Perspective ? _labels.PerspectiveShort : _labels.OrthographicShort;
         var captionSize = ImGui.CalcTextSize(caption);
-        drawList.AddText(new Vector2(center.X + size * 0.5f + 4f * scale - captionSize.X, axisOrigin.Y - captionSize.Y * 0.5f),
-            Theme.U32(Theme.TextMuted), caption);
+        drawList.AddText(new Vector2(center.X - captionSize.X * 0.5f, center.Y + radius + 4f * scale), Theme.U32(Theme.TextMuted), caption);
 
         if (_hoveredFace is { } view && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
         {
@@ -661,13 +670,23 @@ internal sealed unsafe class ViewportPanel : Panel
         return inArea;
     }
 
+    private void DrawAxisTriad(ImDrawListPtr drawList, Vector2 origin, float length)
+    {
+        DrawAxis(drawList, origin, Vector3.UnitX, Theme.AxisX, "X", length);
+        DrawAxis(drawList, origin, Vector3.UnitY, Theme.AxisY, "Y", length);
+        DrawAxis(drawList, origin, Vector3.UnitZ, Theme.AxisZ, "Z", length);
+    }
+
     private void DrawAxis(ImDrawListPtr drawList, Vector2 origin, Vector3 axis, Vector4 color, string label, float length)
     {
         var dir = new Vector2(Vector3.Dot(axis, Camera.Right), -Vector3.Dot(axis, Camera.Up));
         var end = origin + dir * length;
         drawList.AddLine(origin, end, Theme.U32(color), 2f);
         if (dir.LengthSquared() > 0.04f)
-            drawList.AddText(end + dir * 4f - new Vector2(4, 7), Theme.U32(color), label);
+        {
+            var size = ImGui.CalcTextSize(label);
+            drawList.AddText(end + dir * (size.X * 0.7f) - size * 0.5f, Theme.U32(color), label);
+        }
     }
 
     private void DrawStats(ImDrawListPtr drawList)
@@ -676,6 +695,8 @@ internal sealed unsafe class ViewportPanel : Panel
         float scale = style.FontScaleMain * style.FontScaleDpi;
         var pad = new Vector2(8, 6) * scale;
         double now = _ctx.Timer.Elapsed;
+        float lineHeight = ImGui.GetTextLineHeight();
+        float bottom = _imageMin.Y + _imageSize.Y - pad.Y;
         if (ShowStats)
         {
             if (now - _statsUpdatedAt > 0.25 || _statsText.Length == 0)
@@ -687,18 +708,74 @@ internal sealed unsafe class ViewportPanel : Panel
             }
 
             var size = ImGui.CalcTextSize(_statsText);
-            var pos = new Vector2(_imageMin.X + pad.X, _imageMin.Y + _imageSize.Y - size.Y - pad.Y);
+            var pos = new Vector2(_imageMin.X + pad.X, bottom - size.Y);
             drawList.AddRectFilled(pos - new Vector2(6, 3) * scale, pos + size + new Vector2(6, 3) * scale,
                 Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, 0.7f)), 4 * scale);
             drawList.AddText(pos, Theme.U32(Theme.TextMuted), _statsText);
+            bottom = pos.Y - 6f * scale;
         }
 
-        if (_ctx.Session.Content is { Caption.Length: > 0 } content)
+        // Axis triad in the lower-left corner (world X red, Y green, Z blue).
+        float axisLength = 18f * scale;
+        DrawAxisTriad(drawList, new Vector2(_imageMin.X + pad.X + axisLength + 6f * scale, bottom - axisLength - lineHeight * 0.3f), axisLength);
+
+        if (_ctx.Session.Content is { Caption.Length: > 0 } content && _imageSize.X > 520f * scale)
         {
             var size = ImGui.CalcTextSize(content.Caption);
             var pos = new Vector2(_imageMin.X + _imageSize.X - size.X - pad.X, _imageMin.Y + _imageSize.Y - size.Y - pad.Y);
             drawList.AddText(pos, Theme.U32(Theme.WithAlpha(Theme.TextMuted, 0.8f)), content.Caption);
         }
+    }
+
+    /// <summary>Toolbar and overlay texts, rebuilt only when the language changes (no per-frame string building).</summary>
+    private sealed class ToolbarLabels
+    {
+        public const string SelectId = Icons.Pointer + "##select";
+        public const string MoveId = Icons.Move + "##move";
+        public const string RotateId = Icons.Rotate3D + "##rotate";
+        public const string LocalId = Icons.Box + "##space";
+        public const string WorldId = Icons.Axis3D + "##space";
+        public const string SnapId = Icons.Magnet + "##snap";
+        public const string GridId = Icons.Grid + "##grid";
+        public const string StatsId = Icons.Activity + "##stats";
+        public const string ProjectionIconId = Icons.Camera + "##projection";
+        private string _language = "";
+        private string[] _snappedPersp = Array.Empty<string>();
+        private string[] _snappedOrtho = Array.Empty<string>();
+
+        public string[] ShadingFull { get; private set; } = Array.Empty<string>();
+        public string[] ShadingIcon { get; } = ShadingModes.Select(s => ViewportPanel.ShadingIcon(s)).ToArray();
+        public string[] OverlayFull { get; private set; } = Array.Empty<string>();
+        public string[] OverlayIcon { get; } = OverlayModes.Select(o => ViewportPanel.OverlayIcon(o)).ToArray();
+        public string Perspective { get; private set; } = "";
+        public string Orthographic { get; private set; } = "";
+        public string PerspectiveShort { get; private set; } = "";
+        public string OrthographicShort { get; private set; } = "";
+        public string PerspectiveTooltip { get; private set; } = "";
+        public string OrthographicTooltip { get; private set; } = "";
+        public string ShadingTooltip { get; private set; } = "";
+        public string OverlayTooltip { get; private set; } = "";
+
+        public void Refresh()
+        {
+            if (_language == Loc.Language)
+                return;
+            _language = Loc.Language;
+            ShadingFull = ShadingModes.Select(s => $"{ViewportPanel.ShadingIcon(s)}  {ShadingLabel(s)}").ToArray();
+            OverlayFull = OverlayModes.Select(o => $"{ViewportPanel.OverlayIcon(o)}  {OverlayLabel(o)}").ToArray();
+            PerspectiveShort = Loc.Get(Str.ViewPerspectiveShort);
+            OrthographicShort = Loc.Get(Str.ViewOrthoShort);
+            Perspective = $"{Icons.Camera}  {PerspectiveShort}##projection";
+            Orthographic = $"{Icons.Camera}  {OrthographicShort}##projection";
+            PerspectiveTooltip = $"{Loc.Get(Str.ViewProjection)}: {Loc.Get(Str.ProjectionPerspective)}";
+            OrthographicTooltip = $"{Loc.Get(Str.ViewProjection)}: {Loc.Get(Str.ProjectionOrthographic)}";
+            ShadingTooltip = Loc.Get(Str.ViewShading);
+            OverlayTooltip = Loc.Get(Str.ViewOverlay);
+            _snappedPersp = ViewCube.AllViews.Select(v => $"{FaceLabel(v)} · {PerspectiveShort}").ToArray();
+            _snappedOrtho = ViewCube.AllViews.Select(v => $"{FaceLabel(v)} · {OrthographicShort}").ToArray();
+        }
+
+        public string SnappedCaption(ViewDirection view, bool perspective) => (perspective ? _snappedPersp : _snappedOrtho)[(int)view];
     }
 
     private int ToPixelX(Vector2 screen) => (int)MathF.Floor((screen.X - _imageMin.X) * _framebufferScale);
