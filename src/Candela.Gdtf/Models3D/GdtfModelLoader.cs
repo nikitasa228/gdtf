@@ -165,9 +165,11 @@ public sealed class GdtfModelLoader
                 var info = Fit(mesh, model, kind, entry, convertYUp: kind == ModelSourceKind.Gltf);
                 return new LoadedModel(mesh, info);
             }
-            catch (Exception e) when (e is InvalidDataException or ArgumentException or IndexOutOfRangeException or InvalidOperationException or NotSupportedException)
+            catch (Exception e) when (e is not OutOfMemoryException)
             {
-                Warn(path, $"Model file '{entry}' cannot be read: {e.Message}");
+                // A model file is untrusted content of one geometry: whatever its decoder throws on it (SharpGLTF alone
+                // throws schema, JSON, key, format and I/O exceptions on corrupt data) costs this model, not the fixture.
+                Warn(path, $"Model file '{entry}' cannot be read ({e.GetType().Name}: {e.Message})");
             }
         }
 

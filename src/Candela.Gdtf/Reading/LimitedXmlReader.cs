@@ -72,7 +72,18 @@ internal sealed class LimitedXmlReader : XmlReader
     public override bool IsEmptyElement => _inner.IsEmptyElement;
     public override string LocalName => _inner.LocalName;
     public override string Name => _inner.Name;
-    public override string NamespaceURI => _inner.NamespaceURI;
+    public override string NamespaceURI
+    {
+        get
+        {
+            string ns = _inner.NamespaceURI;
+            if (ns.Length > 0) SawNamespace = true;
+            return ns;
+        }
+    }
+
+    /// <summary>True when an element or attribute in an XML namespace (or a namespace declaration) was read.</summary>
+    public bool SawNamespace { get; private set; }
     public override XmlNameTable NameTable => _inner.NameTable;
     public override XmlNodeType NodeType => _truncated ? XmlNodeType.None : _inner.NodeType;
     public override string Prefix => _inner.Prefix;

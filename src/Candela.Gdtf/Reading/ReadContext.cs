@@ -280,7 +280,20 @@ internal sealed class ReadContext
     {
         var a = e.Attribute(name);
         if (a is null || string.IsNullOrWhiteSpace(a.Value)) return Matrix4x4.Identity;
-        if (GdtfMatrix.TryParse(a.Value, out var m)) return m;
+        if (GdtfMatrix.TryParse(a.Value, out var m))
+        {
+            // GDTF transforms are affine (last row 0,0,0,1, as in every library file). Anything else would turn the
+            // composition of the tree into a projective transform; keep the affine part.
+            if (m.M14 != 0f || m.M24 != 0f || m.M34 != 0f || m.M44 != 1f)
+            {
+                Warn(path, $"{name.LocalName}=\"{Shorten(a.Value)}\" is not affine (last row is not 0,0,0,1); the last row is ignored.");
+                m.M14 = 0f;
+                m.M24 = 0f;
+                m.M34 = 0f;
+                m.M44 = 1f;
+            }
+            return m;
+        }
         Warn(path, $"{name.LocalName}=\"{Shorten(a.Value)}\" is not a GDTF matrix; identity used.");
         return Matrix4x4.Identity;
     }

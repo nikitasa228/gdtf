@@ -76,13 +76,14 @@ public static partial class GdtfReader
     {
         XDocument doc;
         long skipped;
-        bool truncated;
+        bool truncated, namespaced;
         try
         {
             using var reader = new LimitedXmlReader(XmlReader.Create(xml, XmlSettings), MaxXmlDepth, MaxXmlElements);
             doc = XDocument.Load(reader, LoadOptions.None);
             skipped = reader.SkippedElements;
             truncated = reader.Truncated;
+            namespaced = reader.SawNamespace;
         }
         catch (XmlException e)
         {
@@ -98,7 +99,37 @@ public static partial class GdtfReader
             limits.Add(new GdtfWarning("", $"{skipped} element(s) nested deeper than {MaxXmlDepth} levels were ignored with their content."));
         if (truncated)
             limits.Add(new GdtfWarning("", $"description.xml has more than {MaxXmlElements} elements; the rest of the file was ignored."));
+        if (namespaced && doc.Root is { } root && StripNamespaces(root))
+            limits.Add(new GdtfWarning("", "description.xml uses XML namespaces, which GDTF does not define; elements and attributes are read by local name."));
         return Parse(doc, archive, sourceName, limits);
+    }
+
+    /// <summary>
+    /// Renames every element and attribute to its local name and drops namespace declarations (GDTF has no namespace;
+    /// a namespaced file comes from a generic XML tool and means the same). Returns true when anything changed.
+    /// </summary>
+    private static bool StripNamespaces(XElement root)
+    {
+        bool changed = false;
+        foreach (var e in root.DescendantsAndSelf())
+        {
+            if (e.Name.Namespace != XNamespace.None)
+            {
+                e.Name = e.Name.LocalName;
+                changed = true;
+            }
+            if (!e.HasAttributes || !e.Attributes().Any(a => a.IsNamespaceDeclaration || a.Name.Namespace != XNamespace.None)) continue;
+            var attributes = new List<XAttribute>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var a in e.Attributes())
+            {
+                if (a.IsNamespaceDeclaration || !seen.Add(a.Name.LocalName)) continue; // same local name twice: first wins
+                attributes.Add(new XAttribute(a.Name.LocalName, a.Value));
+            }
+            e.ReplaceAttributes(attributes);
+            changed = true;
+        }
+        return changed;
     }
 
     private static readonly XmlReaderSettings XmlSettings = new()
