@@ -197,7 +197,7 @@ internal sealed class SettingsWindow
             _styleChanged();
         }
 
-        PropertyGrid.Row(Labels.With(Icons.Languages, Str.SettingsLanguage));
+        PropertyGrid.Row(Str.SettingsLanguage);
         string currentLanguage = Loc.Languages.FirstOrDefault(l => l.Code == s.Language).Name ?? "English";
         if (ImGui.BeginCombo("##language", currentLanguage))
         {
@@ -460,7 +460,7 @@ internal sealed class SettingsWindow
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
-        PropertyGrid.Row(Labels.With(Icons.Grid, Str.ViewportGrid));
+        PropertyGrid.Row(Str.ViewportGrid);
         float grid = settings.GridSpacing;
         if (ImGui.DragFloat("##grid", ref grid, 0.01f, 0.05f, 50f, "%.2f m"))
         {
@@ -468,7 +468,7 @@ internal sealed class SettingsWindow
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
-        PropertyGrid.Row(Labels.With(Icons.Magnet, Str.ToolSnapping));
+        PropertyGrid.Row(Str.ToolSnapping);
         float angle = _ctx.Tools.AngleStep;
         if (ImGui.DragFloat("##angle", ref angle, 0.5f, 1f, 90f, "%.0f°"))
             _ctx.Tools.AngleStep = Math.Clamp(angle, 1f, 90f);

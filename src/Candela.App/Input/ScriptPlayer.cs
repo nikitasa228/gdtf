@@ -148,7 +148,7 @@ internal sealed class ScriptPlayer
                     throw new InvalidOperationException($"action '{a.Text}' is unknown or disabled");
                 break;
             case ScriptActionType.Panel:
-                target.SetPanelOpen(a.Text, a.Flag);
+                target.SetPanelOpen(a.Panel, a.Flag);
                 break;
             case ScriptActionType.Undock:
                 target.UndockPanel(a.Panel, new Vector2(a.X, a.Y), new Vector2(a.Width, a.Height));

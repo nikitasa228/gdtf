@@ -6,10 +6,10 @@ using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Photometry;
-using SpotLight = Candela.Rendering.SpotLight;
 using Candela.Rendering;
 using Candela.Rendering.Vulkan;
 using SceneModel = Candela.Core.SceneGraph.Scene;
+using SpotLight = Candela.Rendering.SpotLight;
 
 namespace Candela.App.Session;
 

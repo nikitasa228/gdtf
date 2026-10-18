@@ -224,6 +224,9 @@ internal sealed class InputScript
                 ? names.EnumerateArray().Select(n => n.GetString() ?? "").Where(n => n.Length > 0).ToList()
                 : Array.Empty<string>(),
         };
+        // "panel" names the panel of panel/undock/tabStyle actions; a panel action may also give it as "name"/"id".
+        if (action.Type == ScriptActionType.Panel && action.Panel.Length == 0)
+            action = action with { Panel = action.Text };
         Validate(action);
         return action;
     }
@@ -231,10 +234,10 @@ internal sealed class InputScript
     private static void Validate(ScriptAction a)
     {
         bool needsText = a.Type is ScriptActionType.Key or ScriptActionType.Menu or ScriptActionType.Action or ScriptActionType.Screenshot
-            or ScriptActionType.Panel or ScriptActionType.Layout or ScriptActionType.Setting;
+            or ScriptActionType.Layout or ScriptActionType.Setting;
         if (needsText && a.Text.Length == 0)
             throw new FormatException($"'{a.Type}' needs a value (text/chord/path/id/name)");
-        if (a.Type is ScriptActionType.Undock or ScriptActionType.TabStyle && a.Panel.Length == 0)
+        if (a.Type is ScriptActionType.Panel or ScriptActionType.Undock or ScriptActionType.TabStyle && a.Panel.Length == 0)
             throw new FormatException($"'{a.Type}' needs \"panel\"");
         if (a.Type == ScriptActionType.TabStyle && a.Style.Length == 0)
             throw new FormatException("'tabStyle' needs \"style\"");
