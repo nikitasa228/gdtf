@@ -140,13 +140,7 @@ public sealed class ProjectMigrationRegistry
     /// <summary>Runs the steps from <paramref name="version"/> to the current version; returns their descriptions.</summary>
     internal IReadOnlyList<string> Migrate(int version, ProjectMigrationContext context, string? writtenBy)
     {
-        if (!CanMigrate(version))
-        {
-            throw new ProjectVersionException(
-                string.Create(CultureInfo.InvariantCulture,
-                    $"This project uses format version {version}, which this version of Candela cannot convert (it reads format {TargetVersion}{(_steps.Count > 0 ? $" and converts from {_steps.Keys.Min()}" : "")})."),
-                version, TargetVersion, writtenBy);
-        }
+        if (!CanMigrate(version)) throw CannotMigrate(version, writtenBy);
         var done = new List<string>();
         for (int v = version; v < TargetVersion; v++)
         {
@@ -157,6 +151,16 @@ public sealed class ProjectMigrationRegistry
             done.Add(string.Create(CultureInfo.InvariantCulture, $"{v} → {v + 1}: {step.Description}"));
         }
         return done;
+    }
+
+    /// <summary>The exception that explains why a file of <paramref name="version"/> cannot be converted.</summary>
+    internal ProjectVersionException CannotMigrate(int version, string? writtenBy)
+    {
+        var from = _steps.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $" and converts from format {_steps.Keys.Min()}") : "";
+        return new ProjectVersionException(
+            string.Create(CultureInfo.InvariantCulture,
+                $"This project uses format version {version}, which this version of Candela cannot convert (it reads format {TargetVersion}{from})."),
+            version, TargetVersion, writtenBy);
     }
 
     private static ProjectMigrationRegistry Freeze(ProjectMigrationRegistry source)

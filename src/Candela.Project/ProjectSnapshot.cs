@@ -18,6 +18,7 @@ public sealed class ProjectSnapshot
         var scene = project.Scene;
         SceneJson = JsonSerializer.SerializeToUtf8Bytes(SceneSerializer.ToFile(scene), CandelaJson.Options);
         ProjectId = project.Id;
+        FilePath = project.FilePath;
         SceneName = scene.Name;
         EntityCount = scene.Count;
         SceneVersion = scene.Version;
@@ -63,6 +64,12 @@ public sealed class ProjectSnapshot
 
     /// <summary>Project identity (manifest <c>projectId</c>).</summary>
     public Guid ProjectId { get; }
+
+    /// <summary>
+    /// <see cref="ProjectData.FilePath"/> at capture time (null for a project that was never saved). Autosave records it so
+    /// a recovered session knows which file it belongs to.
+    /// </summary>
+    public string? FilePath { get; }
 
     /// <summary>Scene name at capture time.</summary>
     public string SceneName { get; }

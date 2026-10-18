@@ -13,7 +13,11 @@ internal static class AtomicFile
     /// <param name="path">Target file; its folder is created when missing.</param>
     /// <param name="write">Writes the complete content to the (seekable) stream.</param>
     /// <param name="verify">Optional check of the finished temporary file (throw to abort).</param>
-    public static long Write(string path, Action<Stream> write, Action<string>? verify = null)
+    /// <param name="beforeReplace">
+    /// Optional step run after the verification, just before the temporary file replaces the target (autosave rotates
+    /// older copies here). Throwing aborts the write; the target is then untouched.
+    /// </param>
+    public static long Write(string path, Action<Stream> write, Action<string>? verify = null, Action? beforeReplace = null)
     {
         var full = Path.GetFullPath(path);
         var folder = Path.GetDirectoryName(full) ?? throw new ArgumentException($"'{path}' has no folder.", nameof(path));
@@ -29,6 +33,7 @@ internal static class AtomicFile
                 length = stream.Length;
             }
             verify?.Invoke(temp);
+            beforeReplace?.Invoke();
             Replace(temp, full);
             return length;
         }
