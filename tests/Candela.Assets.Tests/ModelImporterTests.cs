@@ -449,6 +449,26 @@ public class ModelImporterTests
         AssertBox(result);
     }
 
+    [Theory]
+    [InlineData((short)2, 0f)] // Gouraud: the white specular slot is ignored → matte black dielectric
+    [InlineData((short)3, 1f)] // Phong: a strong white highlight over black diffuse is read as metal
+    public void ThreeDsSpecularColourCountsOnlyForShadingWithHighlights(short shading, float metallic)
+    {
+        // Real fixture models (e.g. a lens) are black Gouraud materials whose specular slot is white.
+        var data = TestFiles.ThreeDsWithMaterial("lense", (19, 19, 19), (255, 255, 255), 30, 100, shading);
+
+        var result = ModelImporter.Import("lens.3ds", data);
+
+        var m = Assert.Single(result.Model.Materials);
+        Assert.Equal(metallic, m.Metallic);
+        if (metallic == 0f)
+        {
+            Assert.True(m.Roughness >= 0.9f);
+            Assert.InRange(m.BaseColorFactor.X, 0.07f, 0.08f);
+        }
+        AssertBox(result);
+    }
+
     [Fact]
     public void PlyAndThreeDsImport()
     {

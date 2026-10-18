@@ -269,6 +269,60 @@ internal static class TestFiles
     }
 
     /// <summary>
+    /// Binary 3DS box with one material: diffuse and specular colours (0–255), shininess and shininess strength in
+    /// percent, and the 3DS shading type (1 flat, 2 Gouraud, 3 Phong, 4 metal).
+    /// </summary>
+    public static byte[] ThreeDsWithMaterial(string name, (byte R, byte G, byte B) diffuse, (byte R, byte G, byte B) specular,
+        short shininessPct, short strengthPct, short shading)
+    {
+        static byte[] Chunk(ushort id, params byte[][] body)
+        {
+            using var ms = new MemoryStream();
+            using var w = new BinaryWriter(ms);
+            w.Write(id);
+            w.Write(6 + body.Sum(b => b.Length));
+            foreach (var b in body) w.Write(b);
+            w.Flush();
+            return ms.ToArray();
+        }
+        static byte[] Pct(short p) => Chunk(0x0030, BitConverter.GetBytes(p));
+        static byte[] Col((byte R, byte G, byte B) c) => Chunk(0x0011, new[] { c.R, c.G, c.B });
+        var corners = BoxCorners(yUp: false);
+        var vertices = new MemoryStream();
+        var vw = new BinaryWriter(vertices);
+        vw.Write((ushort)corners.Length);
+        foreach (var v in corners)
+        {
+            vw.Write(v.X);
+            vw.Write(v.Y);
+            vw.Write(v.Z);
+        }
+        var tris = BoxQuads().SelectMany(q => new[] { (q[0], q[1], q[2]), (q[0], q[2], q[3]) }).ToArray();
+        var faces = new MemoryStream();
+        var fw = new BinaryWriter(faces);
+        fw.Write((ushort)tris.Length);
+        foreach (var (a, b, c) in tris)
+        {
+            fw.Write((ushort)a);
+            fw.Write((ushort)b);
+            fw.Write((ushort)c);
+            fw.Write((ushort)7);
+        }
+        var assignment = new MemoryStream();
+        var aw = new BinaryWriter(assignment);
+        aw.Write(Encoding.ASCII.GetBytes(name + "\0"));
+        aw.Write((ushort)tris.Length);
+        for (int i = 0; i < tris.Length; i++) aw.Write((ushort)i);
+        var faceChunk = Chunk(0x4120, faces.ToArray(), Chunk(0x4130, assignment.ToArray()));
+        var trimesh = Chunk(0x4100, Chunk(0x4110, vertices.ToArray()), faceChunk);
+        var obj = Chunk(0x4000, Encoding.ASCII.GetBytes("box\0"), trimesh);
+        var material = Chunk(0xAFFF, Chunk(0xA000, Encoding.ASCII.GetBytes(name + "\0")), Chunk(0xA010, Col(diffuse)), Chunk(0xA020, Col(diffuse)),
+            Chunk(0xA030, Col(specular)), Chunk(0xA040, Pct(shininessPct)), Chunk(0xA041, Pct(strengthPct)), Chunk(0xA100, BitConverter.GetBytes(shading)));
+        var edit = Chunk(0x3D3D, Chunk(0x3D3E, BitConverter.GetBytes(3u)), material, obj);
+        return Chunk(0x4D4D, Chunk(0x0002, BitConverter.GetBytes(3u)), edit);
+    }
+
+    /// <summary>
     /// ASCII FBX 7.4 box. <paramref name="zUp"/>: 3ds Max axis system (Z up, front −Y); otherwise Maya (Y up, front +Z).
     /// Coordinates are written in units of <paramref name="unitScaleFactorCm"/> centimetres.
     /// </summary>

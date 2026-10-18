@@ -186,6 +186,10 @@ stage light). glTF emissive colour × strength is relative, so 1 is given `Emiss
   is a paint surface. Names are split into words at non-letters and camel-case changes, so "MetalFrame" and
   "Brushed_Steel" match while "Environment" (iron) and "Monochrome" (chrom) do not. A metal's base colour is its
   specular colour (its F0); otherwise base colour = diffuse colour.
+* **Shading models without highlights** — 3DS Flat/Gouraud shading, FBX and COLLADA Lambert, COLLADA constant — have
+  their specular colour and exponent ignored (the original renderer ignores them too). Real fixture 3DS files carry
+  black Gouraud "lens" materials with a white specular slot, which would otherwise become metals. OBJ is exempt: Assimp
+  reports Gouraud for every MTL material without an `illum` statement.
 * **MTL specifics**: `Tr` (transparency) is turned into `d = 1 − Tr` when a material has no `d` (Assimp ignores `Tr`);
   texture statements are matched case-insensitively (`map_kd`), and `norm`/`map_norm` normal maps and `map_emissive`
   are mapped to the spellings Assimp understands.

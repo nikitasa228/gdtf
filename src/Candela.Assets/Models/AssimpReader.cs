@@ -333,13 +333,19 @@ internal static class AssimpReader
         if (IsAssimpDefaultMaterial(am)) return ModelImporter.CreateDefaultMaterial();
         string name = am.HasName && !string.IsNullOrWhiteSpace(am.Name) ? am.Name : $"Material {index + 1}";
         Vector3 C(Color4D c) => new(c.R, c.G, c.B);
+        // Flat/Gouraud (3DS shading type, FBX/COLLADA Lambert) and unshaded (COLLADA constant) materials have no specular
+        // term: their specular colour is a leftover the original renderer ignores. Taking it into account would turn e.g.
+        // a black 3DS lens with a white specular slot into a metal. Not for OBJ: Assimp reports Gouraud for every MTL
+        // material without an "illum" statement, and those do mean their Ks.
+        bool noHighlight = ctx.Format != ModelFormat.Obj && am.HasShadingMode
+            && am.ShadingMode is ShadingMode.Flat or ShadingMode.Gouraud or ShadingMode.NoShading;
         var phong = new PhongMaterial
         {
             Name = name,
             Diffuse = am.HasColorDiffuse ? C(am.ColorDiffuse) : new Vector3(0.8f),
-            Specular = am.HasColorSpecular ? C(am.ColorSpecular) : Vector3.Zero,
+            Specular = am.HasColorSpecular && !noHighlight ? C(am.ColorSpecular) : Vector3.Zero,
             SpecularStrength = am.HasShininessStrength ? am.ShininessStrength : 1f,
-            Shininess = am.HasShininess ? am.Shininess : null,
+            Shininess = am.HasShininess && !noHighlight ? am.Shininess : null,
             Opacity = am.HasOpacity ? am.Opacity : 1f,
             Emissive = am.HasColorEmissive ? C(am.ColorEmissive) : Vector3.Zero,
             TwoSided = am.HasTwoSided && am.IsTwoSided,
