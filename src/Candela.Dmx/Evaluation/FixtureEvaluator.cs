@@ -79,11 +79,13 @@ public static class FixtureEvaluator
         var rt = state.Runtime;
         bool animating = false;
 
-        // 1–2: raw values and active functions
+        // 1–2: raw values (manual values and the mode masters they need replace DMX first, so channels that depend on an
+        // overridden master are decoded against it) and active functions
         dmx.ReadAll(rt);
+        overrides?.ApplyDmx(rt);
         for (int c = 0; c < rt.Length; c++) Select(channels[c], fns, rt, c);
 
-        // 3: manual overrides
+        // 3: manual overrides take their exact function and control value
         overrides?.Apply(rt);
 
         // 4: relations (virtual dimmers)

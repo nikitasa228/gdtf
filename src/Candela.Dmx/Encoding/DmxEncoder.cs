@@ -242,14 +242,23 @@ public static class DmxEncoder
 /// control value, resolved once to (channel, function, value) so that applying them every frame is cheap. Built from
 /// <c>FixtureComponent.ManualAttributes</c> by the engine, or from any dictionary.
 /// </summary>
+/// <remarks>
+/// Mode masters are honoured as by <see cref="DmxEncoder.EncodeFunction"/>: a manual value whose function depends on a
+/// mode master that is not itself set manually moves that master into the function's range, and every other channel
+/// depending on an overridden (or moved) master is decoded with the master's new value — so a manual <c>Gobo1</c>
+/// that switches the wheel from rotation to indexing also turns the <c>Gobo1Pos</c> channel from a rotation speed into
+/// an index angle, exactly as the same values sent over DMX would.
+/// </remarks>
 public sealed class AttributeOverrides
 {
     private readonly Entry[] _entries;
+    private readonly MasterRequirement[] _masters;
 
-    private AttributeOverrides(FixtureProfile profile, Entry[] entries, IReadOnlyList<string> unresolved)
+    private AttributeOverrides(FixtureProfile profile, Entry[] entries, MasterRequirement[] masters, IReadOnlyList<string> unresolved)
     {
         Profile = profile;
         _entries = entries;
+        _masters = masters;
         Unresolved = unresolved;
     }
 
@@ -267,7 +276,7 @@ public sealed class AttributeOverrides
     {
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(values);
-        var entries = new List<Entry>();
+        var requests = new List<(int Channel, string Attribute, float Value)>();
         var unresolved = new List<string>();
         foreach (var (key, value) in values)
         {
@@ -277,17 +286,84 @@ public sealed class AttributeOverrides
             foreach (int c in profile.FindChannels(attribute))
             {
                 if (instance is not null && !string.Equals(profile.Channels[c].InstanceName, instance, StringComparison.OrdinalIgnoreCase)) continue;
-                int fn = DmxEncoder.FindFunction(profile, c, attribute, value);
-                if (fn < 0) continue;
-                entries.RemoveAll(e => e.Channel == c);
-                entries.Add(Entry.Create(profile.FunctionArray[fn], value));
+                if (DmxEncoder.FindFunction(profile, c, attribute, value) < 0) continue;
+                requests.RemoveAll(r => r.Channel == c);
+                requests.Add((c, attribute, value));
                 any = true;
             }
             if (!any) unresolved.Add(key);
         }
-        return new AttributeOverrides(profile, entries.ToArray(), unresolved);
+
+        // pass 1: each value on its own; pass 2: with the DMX of every manual value in place (over the defaults), so a
+        // function that depends on a mode master is chosen consistently with the master's manual value
+        var fns = profile.FunctionArray;
+        var buffer = new FixtureDmxBuffer(profile);
+        var entries = new Entry[requests.Count];
+        for (int i = 0; i < requests.Count; i++)
+        {
+            var (c, attribute, value) = requests[i];
+            entries[i] = Entry.Create(fns[DmxEncoder.FindFunction(profile, c, attribute, value)], value);
+            buffer.SetValue(c, entries[i].Dmx);
+        }
+        // a manual mode master that can produce its value in the range a manual dependent needs takes that function
+        // ("Gobo1" = 3 with "Gobo1PosRotate" = 200: slot 3 in the wheel's rotation mode, not its indexing mode)
+        for (int i = 0; i < entries.Length; i++)
+        {
+            var f = fns[entries[i].Function];
+            int j = f.ModeMaster < 0 ? -1 : requests.FindIndex(r => r.Channel == f.ModeMaster);
+            if (j < 0 || (entries[j].Dmx >= f.ModeFrom && entries[j].Dmx <= f.ModeTo)) continue;
+            foreach (var g in profile.FunctionsOf(f.ModeMaster))
+            {
+                if (!string.Equals(g.Attribute, requests[j].Attribute, StringComparison.OrdinalIgnoreCase) ||
+                    requests[j].Value < g.MinValue || requests[j].Value > g.MaxValue)
+                    continue;
+                var candidate = Entry.Create(g, requests[j].Value);
+                if (candidate.Dmx < f.ModeFrom || candidate.Dmx > f.ModeTo) continue;
+                entries[j] = candidate;
+                buffer.SetValue(f.ModeMaster, candidate.Dmx);
+                break;
+            }
+        }
+        for (int i = 0; i < requests.Count; i++)
+        {
+            var (c, attribute, value) = requests[i];
+            var current = fns[entries[i].Function];
+            if (current.ModeMaster < 0) continue;
+            uint mv = buffer.GetValue(current.ModeMaster);
+            if (mv >= current.ModeFrom && mv <= current.ModeTo) continue;
+            int fn = DmxEncoder.FindFunction(profile, c, attribute, value, buffer);
+            if (fn < 0 || fn == entries[i].Function) continue;
+            entries[i] = Entry.Create(fns[fn], value);
+            buffer.SetValue(c, entries[i].Dmx);
+        }
+
+        // mode masters the manual functions need that are not set manually themselves
+        var overridden = new HashSet<int>(requests.Select(r => r.Channel));
+        var masters = new List<MasterRequirement>();
+        foreach (var e in entries)
+        {
+            var f = fns[e.Function];
+            if (f.ModeMaster < 0 || overridden.Contains(f.ModeMaster) || masters.Exists(m => m.Channel == f.ModeMaster)) continue;
+            masters.Add(new MasterRequirement(f.ModeMaster, f.ModeFrom, f.ModeTo));
+        }
+        return new AttributeOverrides(profile, entries, masters.ToArray(), unresolved);
     }
 
+    /// <summary>
+    /// Step 1 (before functions are selected): writes the manual channels' DMX values and moves the mode masters they need
+    /// into range, so that dependent channels are decoded against them.
+    /// </summary>
+    internal void ApplyDmx(ChannelRuntime[] rt)
+    {
+        foreach (ref readonly var e in _entries.AsSpan()) rt[e.Channel].Dmx = e.Dmx;
+        foreach (ref readonly var m in _masters.AsSpan())
+        {
+            ref var r = ref rt[m.Channel];
+            if (r.Dmx < m.From || r.Dmx > m.To) r.Dmx = m.From;
+        }
+    }
+
+    /// <summary>Step 2 (after functions are selected): forces the manual channels to their exact function and control value.</summary>
     internal void Apply(ChannelRuntime[] rt)
     {
         foreach (ref readonly var e in _entries.AsSpan())
@@ -301,6 +377,9 @@ public sealed class AttributeOverrides
             r.Target = e.Value;
         }
     }
+
+    /// <summary>A mode master that must lie within <c>From … To</c> (master resolution) for a manual function to be active.</summary>
+    private readonly record struct MasterRequirement(int Channel, uint From, uint To);
 
     /// <summary>One manual value, decoded once: the channel's function, DMX value, channel set and physical value.</summary>
     private readonly record struct Entry(int Channel, int Function, float Value, uint Dmx, int SetIndex, ChannelSetFlags SetFlags, float Physical)
