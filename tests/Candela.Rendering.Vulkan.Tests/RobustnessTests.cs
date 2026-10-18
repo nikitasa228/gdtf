@@ -39,9 +39,16 @@ public sealed class RobustnessTests
             // Settings out of range or not finite.
             EveryView(new PreviewSettings
             {
-                ResolutionScale = float.NaN, ShadowMapResolution = -5, MaxShadowedLights = int.MaxValue, VolumetricSlices = int.MaxValue,
-                MaxRaymarchedBeams = int.MaxValue, BloomIntensity = float.PositiveInfinity, ExposureCompensation = float.NaN, AutoExposure = true,
-                Indirect = (IndirectLighting)77, ToneMapper = (ToneMapper)55,
+                ResolutionScale = float.NaN,
+                ShadowMapResolution = -5,
+                MaxShadowedLights = int.MaxValue,
+                VolumetricSlices = int.MaxValue,
+                MaxRaymarchedBeams = int.MaxValue,
+                BloomIntensity = float.PositiveInfinity,
+                ExposureCompensation = float.NaN,
+                AutoExposure = true,
+                Indirect = (IndirectLighting)77,
+                ToneMapper = (ToneMapper)55,
             });
             EveryView(new PreviewSettings { ShadowMapResolution = 1 << 20, VolumetricSlices = -1, MaxRaymarchedBeams = -3, MaxShadowedLights = -1, BloomIntensity = -1f });
 
