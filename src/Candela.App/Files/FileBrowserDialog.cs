@@ -369,6 +369,9 @@ internal sealed class FileBrowserDialog
         }
     }
 
+    /// <summary>Closes the dialog without accepting anything.</summary>
+    public void Cancel() => Close();
+
     private void Close()
     {
         _model = null;

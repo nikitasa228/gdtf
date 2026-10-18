@@ -648,3 +648,71 @@ public sealed class KeyBindingFileRobustnessTests
         Assert.Null(map.Resolve(new Candela.Core.Settings.KeyChord("Z", Candela.Core.Settings.KeyModifiers.Ctrl)));
     }
 }
+
+/// <summary>A failing dialog or menu stays contained: the frame completes and the rest of the UI keeps working.</summary>
+[Collection(UiStateCollection.Name)]
+public sealed class UiGuardTests
+{
+    [Fact]
+    public void A_failing_modal_dialog_is_contained_and_closed()
+    {
+        using var ui = new HeadlessImGui(new Vector2(800, 600));
+        var log = TestLog.Create();
+        var reports = new List<string>();
+        var guard = new Candela.App.Shell.UiGuard(log, (part, message) => reports.Add(part + ": " + message));
+        bool open = true, otherDrawn = false;
+        for (int frame = 0; frame < 5; frame++)
+        {
+            ui.Frame(() =>
+            {
+                bool ok = guard.Run("dialog", () =>
+                {
+                    if (!open)
+                        return;
+                    if (!ImGui.IsPopupOpen("Dialog"))
+                        ImGui.OpenPopup("Dialog");
+                    if (ImGui.BeginPopupModal("Dialog"))
+                    {
+                        ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 0.5f);
+                        ImGui.BeginChild("inner");
+                        throw new IOException("disk gone");
+                    }
+                });
+                if (!ok)
+                {
+                    open = false; // the workspace closes a failed dialog
+                    Candela.App.Shell.UiGuard.CloseAllPopups();
+                }
+
+                Assert.True(guard.Run("other", () =>
+                {
+                    ImGui.Begin("Other");
+                    ImGui.Text("works");
+                    ImGui.End();
+                    otherDrawn = true;
+                }));
+            });
+        }
+
+        Assert.True(otherDrawn);
+        Assert.False(open);
+        Assert.Single(reports);
+        Assert.Contains("disk gone", reports[0], StringComparison.Ordinal);
+        ui.Frame(() => Assert.False(ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId)));
+    }
+
+    [Fact]
+    public void A_part_failing_every_frame_is_logged_once_in_full()
+    {
+        using var ui = new HeadlessImGui(new Vector2(800, 600));
+        var log = TestLog.Create();
+        int reports = 0;
+        var guard = new Candela.App.Shell.UiGuard(log, (_, _) => reports++);
+        for (int frame = 0; frame < 25; frame++)
+            ui.Frame(() => guard.Run("menu", () => throw new InvalidOperationException("broken menu")));
+        Assert.Equal(25, reports); // the session de-duplicates the issues
+        var errors = TestLog.Entries(log).Where(e => e.Level == Candela.App.Diagnostics.LogLevel.Error).ToList();
+        Assert.Equal(2, errors.Count); // the first failure, then "failed 10 times"
+        Assert.Contains("10 times", errors[1].Message, StringComparison.Ordinal);
+    }
+}

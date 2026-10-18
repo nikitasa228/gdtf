@@ -71,6 +71,11 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private readonly Action<Panel> _focusPanelAction;
     private readonly Action<Panel> _undockAction = DockWorkspace.Undock;
     private string _focusPanel = "";
+    private readonly UiGuard _guard;
+    private float _frameScale = 1f;
+    // Cached delegates of the guarded UI parts (no allocation per frame).
+    private readonly Action _applyTabStyles, _drawMainMenu, _drawStatusBar, _drawDockSpace, _drawPanels, _drawTabStyleMenu;
+    private readonly Action _drawSettings, _drawAbout, _drawShortcuts, _drawBrowser, _drawMessages, _dispatch;
 
     /// <summary>Builds the workspace and restores the last layout (or the one named on the command line).</summary>
     public Workspace(WorkspaceContext context, AppOptions options)
@@ -79,6 +84,20 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _drawPanelContent = DrawPanelContent;
         _focusPanelAction = FocusPanel;
+        _guard = new UiGuard(_ctx.Log, (part, message) =>
+            _ctx.Session.ReportProgramError("app.ui-exception", Loc.Format(Str.MsgUnhandled, part, message)));
+        _applyTabStyles = () => _dock.ApplyTabStyles();
+        _drawMainMenu = DrawMainMenu;
+        _drawStatusBar = () => DrawStatusBar(_frameScale);
+        _drawDockSpace = () => _dock.DrawDockSpace();
+        _drawPanels = DrawPanels;
+        _drawTabStyleMenu = () => _dock.DrawTabStyleMenu(_panels, _focusPanelAction, _undockAction);
+        _drawSettings = () => _settingsWindow!.Draw(_frameScale);
+        _drawAbout = () => _about!.Draw(_frameScale);
+        _drawShortcuts = () => _shortcuts!.Draw(_frameScale);
+        _drawBrowser = () => _browser!.Draw(_frameScale);
+        _drawMessages = () => _messages.Draw(_frameScale);
+        _dispatch = () => _dispatcher!.Dispatch();
         _layouts = new LayoutStore(ConfigPaths.LayoutsDir);
         _keys = new KeyBindingsService(_ctx.Settings.Settings, new FilePresetStore(ConfigPaths.PresetsDir),
             Path.Combine(ConfigPaths.ConfigDir, "keybindings.custom.json"), _ctx.Log);
@@ -154,15 +173,46 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             viewport.ProcessPicks(_ctx.Gpu.Renderer);
     }
 
-    /// <summary>Builds the UI for this frame (inside the ImGui frame).</summary>
+    /// <summary>
+    /// Builds the UI for this frame (inside the ImGui frame). Every top-level part runs under the <see cref="UiGuard"/>:
+    /// a failing dialog is closed, a failing menu or status bar only loses that frame's drawing, and panels keep their own
+    /// per-panel error display.
+    /// </summary>
     public void Draw(float deltaTime)
     {
         _ = deltaTime;
-        float scale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
-        _dock.ApplyTabStyles();
-        DrawMainMenu();
-        DrawStatusBar(scale);
-        _dock.DrawDockSpace();
+        _frameScale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
+        _guard.Run("dock tab styles", _applyTabStyles);
+        _guard.Run("main menu", _drawMainMenu);
+        _guard.Run("status bar", _drawStatusBar);
+        _guard.Run("dock space", _drawDockSpace);
+        _guard.Run("panels", _drawPanels);
+        _guard.Run("tab style menu", _drawTabStyleMenu);
+        if (!_guard.Run("settings", _drawSettings))
+            _settingsWindow.IsOpen = false;
+        if (!_guard.Run("about", _drawAbout))
+            _about.IsOpen = false;
+        if (!_guard.Run("keyboard shortcuts", _drawShortcuts))
+            _shortcuts.IsOpen = false;
+        if (!_guard.Run("file dialog", _drawBrowser))
+        {
+            _browser.Cancel();
+            UiGuard.CloseAllPopups();
+        }
+
+        if (!_guard.Run("message", _drawMessages))
+        {
+            _messages.DismissCurrent();
+            UiGuard.CloseAllPopups();
+        }
+
+        _guard.Run("shortcuts", _dispatch);
+        UpdateTitle();
+    }
+
+    private void DrawPanels()
+    {
+        float scale = _frameScale;
         foreach (var panel in _panels)
         {
             if (!panel.IsOpen)
@@ -181,15 +231,6 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
             _dock.DrawPanel(panel, _panels, scale, _drawPanelContent);
         }
-
-        _dock.DrawTabStyleMenu(_panels, _focusPanelAction, _undockAction);
-        _settingsWindow.Draw(scale);
-        _about.Draw(scale);
-        _shortcuts.Draw(scale);
-        _browser.Draw(scale);
-        _messages.Draw(scale);
-        _dispatcher.Dispatch();
-        UpdateTitle();
     }
 
     /// <summary>Renders every visible viewport (inside the GPU frame).</summary>
