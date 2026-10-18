@@ -72,7 +72,7 @@ windows have no OS decorations).*
 | Properties | name, visibility, lock, layer, numeric transform (metres or feet, Euler degrees), components, wall material |
 | Preview | real-time quality settings of the viewports (shadows, volumetrics, indirect light, bloom, exposure …) |
 | Render | final render settings (resolution, samples, bounces, format, frame range); *Render* asks the session |
-| Issues | errors / warnings / notes with severity toggles, category filter and search; click selects and frames |
+| Issues | errors / warnings / notes with severity toggles, category filter and search; click selects and frames; the tooltip shows the whole message and the issue code |
 | Console | the editor log with level filter, text filter and auto-scroll |
 
 ### Tab styles
@@ -106,21 +106,30 @@ copied between machines.
 Each viewport renders into its own render target sized to the panel (in framebuffer pixels, so high-DPI monitors get
 full resolution) and shows it as an ImGui image. *View → New Viewport* (Ctrl+Alt+N) adds more viewports (up to 16) as
 tabs next to the active one — drag a tab to an edge to see them side by side; each has its own camera, shading, overlay
-and grid. Shortcuts and View-menu commands act on the last viewport clicked (highlighted when
-more than one is open).
+and grid. Shortcuts and View-menu commands act on the **active viewport**: the one last clicked, or whose tab was
+selected (a new viewport becomes active at once). With several viewports on screen it has an orange frame. A viewport
+hidden behind another tab of its group is never the target — the commands then go to a visible one.
 
 ![Four viewports, Russian UI](images/editor-four-viewports-ru.png)
 
 *Four Viewports layout in Russian: top, front and right orthographic views (colourless) plus perspective, all showing
-the selection and the gizmo. The view cube of each view shows the snapped face and its caption.*
+the selection and the gizmo; the perspective view is the active one (orange frame). The view cube of each orthographic
+view shows the snapped face, the arrows to its neighbours and the caption.*
 
 **Toolbar** (top left; compact icons when the viewport is narrow): select / move / rotate tool, local / world space,
-snapping, shading (Wireframe, Colorless, Full), projection (perspective / orthographic), overlay (None, Lux, Noise,
-Cables), grid, statistics.
+snapping, shading (Wireframe, Colorless, Full — the menu's last entry, *Viewport Settings…*, opens the Preview panel
+with the real-time quality settings of the Full mode), projection (perspective / orthographic), overlay (None, Lux,
+Noise, Cables), grid, statistics.
 
 **View cube** (top right): the cube turned like the scene; clicking a face snaps the camera to that orthographic view
-(Top, Bottom, Front = from the audience, Back, Left, Right). The caption under it names the current view.
+(Top, Bottom, Front = from the audience, Back, Left, Right). Looking straight at a face, the cube shows only that face,
+so four arrows around it lead to the neighbouring views (from Top: up = Back, down = Front, left / right = Left /
+Right) — every view is one or two clicks away without orbiting. The caption under it names the current view.
 Orbiting leaves the snapped view.
+
+![View cube](images/editor-view-cube.png)
+
+*The view cube in a perspective view, and snapped to Top, Front and Right with the neighbour arrows.*
 
 **Statistics** (bottom left): frames per second, frame time and target size; the world axis triad above it.
 
@@ -138,8 +147,9 @@ The camera works in metres with Z up; orthographic views keep the apparent size 
 ## Selection and editing
 
 * **Click** selects the object under the cursor (through the renderer's pick buffer), a click on the background clears
-  the selection; **Shift+click** adds or removes; **drag** draws a selection box (Shift adds). Hidden and locked
-  objects, and objects on hidden or locked layers, are never selected.
+  the selection; **Shift+click** adds or removes; **drag** draws a selection box (Shift adds) that selects the objects
+  lying *entirely* inside it — a box drawn around props does not also pick up the floor or the walls behind them.
+  Hidden and locked objects, and objects on hidden or locked layers, are never selected.
 * **Gizmos** (ImGuizmo): *Move* (W) and *Rotate* (E) in world or local space; with several objects selected they move
   rigidly around the primary (last selected) object. **Snapping** (toolbar or Alt+S, Ctrl inverts it while dragging)
   uses half the scene grid spacing for moves and 15° for rotations.
@@ -184,12 +194,15 @@ Shortcuts are commands bound to key chords (Core `KeyBindingSet`); menus show th
 | Delete | Delete | Select all / Deselect | Ctrl+A / Escape |
 | Select / Move / Rotate tool | Q / W / E | Wall / Floor / Cable tool | B / Shift+B / C |
 | Snapping / Local-world space | Alt+S / Alt+X | Frame selection | F |
-| Top / Front / Right view | Numpad 7 / 1 / 3 | Bottom / Back / Left view | Ctrl+Numpad 7 / 1 / 3 |
-| Perspective ↔ orthographic | Numpad 5 | Grid | Alt+G |
+| Top / Front / Right view | Num 7 / 1 / 3 | Bottom / Back / Left view | Ctrl+Num 7 / 1 / 3 |
+| Perspective ↔ orthographic | Num 5 | Grid | Alt+G |
 | Wireframe / Colorless / Full | Alt+1 / Alt+2 / Alt+3 | Overlay None / Lux / Noise / Cables | Alt+0 / Alt+L / Alt+N / Alt+C |
 | New viewport | Ctrl+Alt+N | Keyboard shortcuts | F1 |
 
-While a text field has the keyboard, plain keys type into it; chords with Ctrl / Alt / Super still work.
+While a text field has the keyboard, plain keys type into it; chords with Ctrl / Alt / Super still work. **Escape**
+first closes whatever is open — a menu, a combo box, a dialog, the Settings / Keyboard Shortcuts / About window, a
+shortcut being recorded — and only a press with nothing open clears the selection. Menus and the shortcut editor show
+punctuation and keypad keys as `Ctrl+,` and `Num 7` (stored in the binding files as `Ctrl+Comma`, `Numpad7`).
 
 ## Settings
 
@@ -199,7 +212,7 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
 | Section | Settings |
 |---|---|
 | Interface | UI scale (100–400 %, multiplied with the monitor's DPI scale), font size, language (English / Русский), theme |
-| Keyboard | key binding editor: search, click a chord to record a new one, add / remove chords, conflict warnings; presets *Default*, saved names and *Custom* (Core `PresetLibrary` over a `FilePresetStore` in `presets/`), Save as…, Delete, Reset to default |
+| Keyboard | key binding editor: search, click a chord to record a new one (the recorded press does not run the command), add / remove chords (right-click a chord), conflict warnings; presets *Default*, saved names and *Custom* (Core `PresetLibrary` over a `FilePresetStore` in `presets/`; any edit switches to *Custom*), Save as…, Delete, Reset to default |
 | Viewport | navigation style (Candela / Blender / Maya, with a summary of its mouse bindings), zoom speed, display units (metric / imperial), grid spacing (also the move-snapping step), rotation snapping step |
 | Library | library folders (add with the folder browser, remove; missing folders in red) |
 | Network | network interface for Art-Net / sACN, Art-Net universe offset (internal universe = Art-Net port-address + offset; 1 or 0, see `protocols.md`) |
@@ -211,12 +224,15 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
 
 ## Look and language
 
-* Dark theme with an orange accent; panel content uses a two-column property grid (labels left, editors right).
+* Dark theme with an orange accent; panel content uses a two-column property grid (labels left, editors right) whose
+  label column grows to fit the longest (translated) label. The X / Y / Z fields of the transform sit side by side and
+  stack one per line when the panel is too narrow for the numbers (large UI scale, icon-column groups).
 * Font: **Inter** Regular / SemiBold (Latin, Cyrillic, Greek; SIL OFL) with the **Lucide** icon font (ISC) merged in,
   embedded in the assembly; the licences are copied next to the executable (`licenses/`). Dear ImGui 1.92 rasterises
   glyphs on demand, so changing the UI scale or font size is instant and stays sharp.
 * Language: English and Russian; every user-visible string is a `Str` key with both texts in `Ui/Loc.cs` (tests check
-  that every key has both and that placeholders match). Menus and panel titles switch immediately.
+  that every key has both and that placeholders match), including the issue categories of Core. Menus and panel titles
+  switch immediately.
 * DPI: the UI scale is *user scale × monitor content scale*; windows moved between monitors adapt.
 
 ## Robustness
@@ -322,14 +338,18 @@ happen on user actions (edits, opening menus and dialogs).
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 280 tests, ~15 s) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 330 tests, under a minute) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
-the view cube (projection, hit testing, snapping to the six views, no allocations), navigation styles, selection rules,
-edit operations and undo grouping, gizmo drag merging, Euler angles, key binding maps / presets / dispatch (through a
-window-less Dear ImGui context), docking (default and four-viewport presets, icon-column style, layout and tab-style
+the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
+styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
+drag merging, Euler angles, key binding maps / presets / dispatch and their display names (through a window-less Dear
+ImGui context: Escape that closes a menu, dialog or window, and a chord just recorded, never also run a shortcut),
+the choice of the active viewport, docking (default and four-viewport presets, icon-column style, layout and tab-style
 round trip through a saved file, loading a layout while running), layout files and store, the file browser model and
-filters, command-line and script parsing, settings robustness, localisation completeness, the editor session, and the
-preview stage on a real (headless) Vulkan renderer with picking. Integration tests start the real editor under
+filters, command-line and script parsing, settings robustness, localisation completeness (issue categories too),
+layout rules found by exercising the UI (menus opening towards the window's inside, the property grid's label column,
+transform fields stacking instead of cutting numbers, the file dialog fitting without scrolling), the editor session,
+and the preview stage on a real (headless) Vulkan renderer with picking. Integration tests start the real editor under
 `xvfb-run`: the default screenshot must be a real frame, a scripted click must select an object and change the
 Properties panel (and Escape must clear it), and a run without a Vulkan driver must exit with code 3. They are skipped
 when `xvfb-run` or a Vulkan device is missing.
