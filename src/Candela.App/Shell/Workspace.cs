@@ -54,6 +54,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private readonly PreviewPanel _preview;
     private ViewportPanel? _activeViewport;
     private readonly FittedText _statusFit = new();
+    private IReadOnlyList<string>? _savedLayouts;
+    private double _savedLayoutsAt;
     private string? _pendingIni;
     private bool _styleDirty;
     private string _status = "";
@@ -587,8 +589,25 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         };
     }
 
+    /// <summary>
+    /// Names of the saved layouts for the Window → Layouts menu: the folder is read when the menu needs it, at most once a
+    /// second while it stays open (not every frame), and again right after a layout was saved or deleted here.
+    /// </summary>
+    private IReadOnlyList<string> SavedLayouts()
+    {
+        double now = _ctx.Timer.Elapsed;
+        if (_savedLayouts is null || now - _savedLayoutsAt > 1.0)
+        {
+            _savedLayouts = _layouts.List();
+            _savedLayoutsAt = now;
+        }
+
+        return _savedLayouts;
+    }
+
     private void SaveLayoutAs(string name)
     {
+        _savedLayouts = null;
         try
         {
             _layouts.Save(name, CaptureLayout(name));

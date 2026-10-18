@@ -190,4 +190,59 @@ public sealed class UxReviewTests
     [InlineData(126f, 60f, 182f, 60f, 0f)]     // too low even for the minimum: hidden
     public void View_cube_shrinks_to_fit_small_viewports(float preferred, float minimum, float width, float height, float expected) =>
         Assert.Equal(expected, Candela.App.Viewport.ViewportPanel.ViewCubeSize(preferred, minimum, width, height), 3);
+
+    private static void Type(HeadlessImGui ui, Action draw, string text)
+    {
+        ImGui.GetIO().AddInputCharactersUTF8(text);
+        ui.Frame(draw);
+        ui.Frame(draw);
+    }
+
+    private static void PressEnter(HeadlessImGui ui, Action draw)
+    {
+        ImGui.GetIO().AddKeyEvent(ImGuiKey.Enter, true);
+        ui.Frame(draw);
+        ImGui.GetIO().AddKeyEvent(ImGuiKey.Enter, false);
+        ui.Frame(draw);
+    }
+
+    [Fact]
+    public void A_typed_name_reaches_the_prompt_before_enter_so_ok_can_be_clicked()
+    {
+        using var ui = new HeadlessImGui(new Vector2(1200, 800));
+        var messages = new Candela.App.Windows.MessageBoxes();
+        string? saved = null;
+        messages.Prompt("Save Layout As", "Layout name", name => saved = name);
+        void Draw() => messages.Draw(1f);
+        for (int i = 0; i < 4; i++)
+            ui.Frame(Draw);
+        Type(ui, Draw, "Stage left");
+        // Without Enter the dialog already holds the text: OK is enabled and a click on it saves this name.
+        Assert.Equal("Stage left", messages.CurrentInput);
+        Assert.Null(saved);
+        PressEnter(ui, Draw);
+        Assert.Equal("Stage left", saved);
+    }
+
+    [Fact]
+    public void A_file_name_typed_in_the_save_dialog_is_used_by_the_save_button()
+    {
+        using var dir = new TempDir();
+        using var ui = new HeadlessImGui(new Vector2(1600, 900));
+        var dialog = new FileBrowserDialog(dir.File("recent-places.json"));
+        string? accepted = null;
+        dialog.Show(FileBrowserMode.Save, "Save As", new[] { new FileFilter("Candela project", "*.candela") }, dir.Path, "", p => accepted = p);
+        void Draw() => dialog.Draw(1f);
+        for (int i = 0; i < 4; i++)
+            ui.Frame(Draw);
+        // The name field has the keyboard as soon as the dialog opens; typing updates the model at once.
+        Assert.True(ImGui.GetIO().WantTextInput);
+        Type(ui, Draw, "show");
+        Assert.Equal("show", dialog.Model!.FileName);
+        Assert.Null(accepted);
+        PressEnter(ui, Draw);
+        Assert.NotNull(accepted);
+        Assert.Equal("show.candela", Path.GetFileName(accepted));
+    }
 }
+

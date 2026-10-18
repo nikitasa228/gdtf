@@ -20,6 +20,7 @@ internal sealed class FileBrowserDialog
     private string _title = "";
     private string _pathText = "";
     private bool _openRequested;
+    private bool _focusFileName;
     private bool _confirmOverwrite;
     private string _pendingPath = "";
     private int _selected = -1;
@@ -57,6 +58,7 @@ internal sealed class FileBrowserDialog
             _model.Navigate(Path.GetPathRoot(Environment.CurrentDirectory) ?? "/");
         _pathText = _model.CurrentDirectory;
         _openRequested = true;
+        _focusFileName = mode == FileBrowserMode.Save;
         _confirmOverwrite = false;
         _selected = -1;
     }
@@ -141,7 +143,8 @@ internal sealed class FileBrowserDialog
         var style = ImGui.GetStyle();
         float toggleWidth = ImGui.CalcTextSize(Icons.Eye).X + style.FramePadding.X * 2f;
         ImGui.SetNextItemWidth(-(toggleWidth + style.ItemSpacing.X));
-        if (ImGui.InputText("##path", ref _pathText, 1024, ImGuiInputTextFlags.EnterReturnsTrue))
+        ImGui.InputText("##path", ref _pathText, 1024);
+        if (TextInput.Confirmed())
             Navigate(model, _pathText);
         ImGui.SameLine();
         bool hidden = model.ShowHidden;
@@ -253,15 +256,18 @@ internal sealed class FileBrowserDialog
         ImGui.SameLine(labelWidth);
         ImGui.SetNextItemWidth(-buttonWidth - ImGui.GetStyle().ItemSpacing.X);
         string name = model.FileName;
-        if (ImGui.InputText("##filename", ref name, 512, ImGuiInputTextFlags.EnterReturnsTrue))
+        if (_focusFileName)
         {
-            model.FileName = name;
+            // Saving: the name field has the keyboard from the start, so the name can be typed at once.
+            ImGui.SetKeyboardFocusHere();
+            _focusFileName = false;
+        }
+
+        // The model follows every keystroke, so clicking Save / Open after typing uses the typed name.
+        ImGui.InputText("##filename", ref name, 512);
+        model.FileName = name;
+        if (TextInput.Confirmed())
             TryAccept(model, confirmOverwrite: true);
-        }
-        else
-        {
-            model.FileName = name;
-        }
 
         ImGui.SameLine();
         string accept = model.Mode switch

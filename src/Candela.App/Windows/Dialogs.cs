@@ -32,6 +32,9 @@ internal sealed class MessageBoxes
     /// <summary>The message being shown (tests, scripts).</summary>
     public string? CurrentText => _current?.Text;
 
+    /// <summary>The text typed into the current prompt (tests).</summary>
+    internal string? CurrentInput => _current?.Input;
+
     /// <summary>Number of messages waiting or shown.</summary>
     public int Count => _queue.Count + (_current is null ? 0 : 1);
 
@@ -86,7 +89,8 @@ internal sealed class MessageBoxes
             ImGui.SetNextItemWidth(width);
             if (ImGui.IsWindowAppearing())
                 ImGui.SetKeyboardFocusHere();
-            bool enter = ImGui.InputTextWithHint("##name", m.Text, ref m.Input, 120, ImGuiInputTextFlags.EnterReturnsTrue);
+            ImGui.InputTextWithHint("##name", m.Text, ref m.Input, 120);
+            bool enter = TextInput.Confirmed();
             ImGui.Spacing();
             ImGui.BeginDisabled(m.Input.Trim().Length == 0);
             if (ImGui.Button(Loc.Get(Str.MsgOk), new Vector2(110, 0) * scale) || (enter && m.Input.Trim().Length > 0))

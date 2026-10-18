@@ -342,7 +342,7 @@ internal sealed partial class Workspace
                     ApplyPreset(LayoutPreset.Default);
                 if (_menu.Item(Str.WindowLayoutFourViews, Icons.LayoutGrid))
                     ApplyPreset(LayoutPreset.FourViewports);
-                var saved = _layouts.List();
+                var saved = SavedLayouts();
                 if (saved.Count > 0)
                     _menu.Separator();
                 foreach (var name in saved)
@@ -360,7 +360,10 @@ internal sealed partial class Workspace
                             _messages.Ask(Loc.Get(Str.WindowDeleteLayout), Loc.Format(Str.MsgDeleteLayoutQuestion, n), yes =>
                             {
                                 if (yes)
+                                {
                                     _layouts.Delete(n);
+                                    _savedLayouts = null;
+                                }
                             });
                     }
 
