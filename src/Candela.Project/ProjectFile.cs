@@ -99,6 +99,8 @@ public static class ProjectFile
     /// with single elements are listed in <see cref="ProjectData.LoadIssues"/>.
     /// </summary>
     /// <exception cref="FileNotFoundException">The file does not exist.</exception>
+    /// <exception cref="IOException">The file cannot be opened (locked, unreadable medium).</exception>
+    /// <exception cref="UnauthorizedAccessException">No permission to read the file.</exception>
     /// <exception cref="ProjectFormatException">Not a readable Candela project (the message is written for the user).</exception>
     /// <exception cref="ProjectVersionException">Written in a format version this program cannot read.</exception>
     public static ProjectData Load(string path, ProjectLoadOptions? options = null)

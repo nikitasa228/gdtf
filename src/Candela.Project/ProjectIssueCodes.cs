@@ -69,7 +69,9 @@ public static class ProjectIssueCodes
     /// <summary>A companion file of a model (texture, MTL, buffer) is missing or damaged; the model loads without it.</summary>
     public const string AssetCompanionMissing = "project.asset-companion-missing";
 
-    /// <summary><c>fixtures/index.json</c> is damaged; GDTF files were recovered from the <c>fixtures/</c> folder.</summary>
+    /// <summary>
+    /// <c>fixtures/index.json</c> is damaged (GDTF files were recovered from the <c>fixtures/</c> folder) or lists a name twice.
+    /// </summary>
     public const string GdtfIndexInvalid = "project.gdtf-index-invalid";
 
     /// <summary>A GDTF file listed in the project is missing from the archive.</summary>

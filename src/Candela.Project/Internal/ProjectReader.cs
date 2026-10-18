@@ -605,8 +605,8 @@ internal static class ProjectReader
             var related = usage.EntitiesOf(record.Name);
             if (project.GdtfFiles.ContainsKey(record.Name))
             {
-                issues.Add(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.GdtfCorrupt,
-                    $"'{record.Name}' is listed twice in the project; the first copy is used.", related);
+                issues.Add(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.GdtfIndexInvalid,
+                    $"'{record.Name}' is listed twice in the project's fixture list; the first copy is used.", related);
                 continue;
             }
             byte[]? data;

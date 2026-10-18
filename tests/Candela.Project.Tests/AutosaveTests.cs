@@ -230,6 +230,17 @@ public sealed class AutosaveTests : IDisposable
     }
 
     [Fact]
+    public void Update_does_not_allocate_while_nothing_is_due()
+    {
+        var project = new ProjectData(new Scene("Quiet"));
+        using var service = AutosaveService.ForProject(project, SaveOptions, Options());
+        service.Update();
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 10_000; i++) service.Update();
+        Assert.Equal(before, GC.GetAllocatedBytesForCurrentThread());
+    }
+
+    [Fact]
     public void Autosave_file_names_are_parsed_strictly()
     {
         var id = Guid.NewGuid().ToString("D");
