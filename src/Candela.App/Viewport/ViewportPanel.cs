@@ -45,6 +45,7 @@ internal sealed unsafe class ViewportPanel : Panel
     private readonly ViewCubeArrow[] _cubeArrows = new ViewCubeArrow[ViewCube.ArrowCount];
     private readonly List<PickRequest> _picks = new();
     private readonly List<Entity> _dragEntities = new();
+    private SelectionController.ProjectToScreen? _boxProjector;
     private Matrix4x4[] _dragStartWorld = Array.Empty<Matrix4x4>();
     private Transform[] _dragStartLocal = Array.Empty<Transform>();
     private Matrix4x4 _pivotStart;
@@ -421,23 +422,23 @@ internal sealed unsafe class ViewportPanel : Panel
         var session = _ctx.Session;
         var content = session.Content;
         var inside = new List<Guid>();
+        _boxProjector ??= ProjectToScreen;
         foreach (var e in session.Scene.All())
         {
-            Vector3 center;
-            if (content is not null && content.TryGetBounds(e.Id, out var bounds))
-                center = bounds.Center;
-            else
-                center = e.WorldPosition;
-            if (Camera.WorldToScreen(center, _imageSize, out var p))
-            {
-                var s = p + _imageMin;
-                if (s.X >= min.X && s.X <= max.X && s.Y >= min.Y && s.Y <= max.Y)
-                    inside.Add(e.Id);
-            }
+            // Objects with geometry must lie entirely inside the box; objects without (lights, groups) by their origin.
+            var bounds = content is not null && content.TryGetBounds(e.Id, out var b0) ? b0 : new Aabb(e.WorldPosition, e.WorldPosition);
+            if (SelectionController.Encloses(bounds, min, max, _boxProjector))
+                inside.Add(e.Id);
         }
 
-        // Only top-level picks: children inside the box are covered by their selected parents.
         SelectionController.Box(session.Scene, session.Selection, inside, shift);
+    }
+
+    private bool ProjectToScreen(Vector3 world, out Vector2 screen)
+    {
+        bool ok = Camera.WorldToScreen(world, _imageSize, out var p);
+        screen = p + _imageMin;
+        return ok;
     }
 
     private void DrawBoxSelection(ImDrawListPtr drawList)

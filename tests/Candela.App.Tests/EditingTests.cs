@@ -125,6 +125,43 @@ public sealed class SelectionControllerTests
         Assert.Equal(new Vector2(10, 5), min);
         Assert.Equal(new Vector2(50, 40), max);
     }
+
+    [Fact]
+    public void A_box_encloses_only_objects_lying_entirely_inside_it()
+    {
+        // Perspective camera from the audience: a small prop and a large floor whose centre is next to the prop.
+        var camera = new Candela.App.Viewport.ViewportCamera { Target = new Vector3(0, 0, 0.5f), Yaw = 0f, Pitch = 0.3f, Distance = 12f };
+        var size = new Vector2(1000, 600);
+        bool Project(Vector3 w, out Vector2 p) => camera.WorldToScreen(w, size, out p);
+        var prop = new Aabb(new Vector3(-0.5f, -0.5f, 0f), new Vector3(0.5f, 0.5f, 1f));
+        var floor = new Aabb(new Vector3(-8f, -6f, -0.05f), new Vector3(8f, 6f, 0f));
+        // A box around the prop (its projected corners plus a margin).
+        var min = new Vector2(float.MaxValue);
+        var max = new Vector2(float.MinValue);
+        for (int i = 0; i < 8; i++)
+        {
+            var c = new Vector3((i & 1) == 0 ? prop.Min.X : prop.Max.X, (i & 2) == 0 ? prop.Min.Y : prop.Max.Y, (i & 4) == 0 ? prop.Min.Z : prop.Max.Z);
+            Assert.True(Project(c, out var p));
+            min = Vector2.Min(min, p);
+            max = Vector2.Max(max, p);
+        }
+
+        min -= new Vector2(10);
+        max += new Vector2(10);
+        Assert.True(Project(floor.Center, out var floorCentre));
+        Assert.True(floorCentre.X > min.X && floorCentre.X < max.X && floorCentre.Y > min.Y && floorCentre.Y < max.Y,
+            "the floor's centre lies inside the box (the case that must not select it)");
+        Assert.True(SelectionController.Encloses(prop, min, max, Project));
+        Assert.False(SelectionController.Encloses(floor, min, max, Project));
+        Assert.False(SelectionController.Encloses(prop, min + new Vector2(30, 0), max, Project), "a box cutting the prop does not enclose it");
+        Assert.False(SelectionController.Encloses(Aabb.Empty, min, max, Project));
+        // Points behind the camera are never enclosed.
+        var behind = Aabb.Empty;
+        behind.Include(camera.Eye - camera.Forward * 2f);
+        behind.Include(camera.Eye - camera.Forward * 1.5f + new Vector3(0.2f));
+        Assert.False(behind.IsEmpty);
+        Assert.False(SelectionController.Encloses(behind, new Vector2(-1e6f), new Vector2(1e6f), Project));
+    }
 }
 
 public sealed class EditOperationsTests

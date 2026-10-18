@@ -1,5 +1,6 @@
 using System.Numerics;
 using Candela.Core.Editing;
+using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using SceneModel = Candela.Core.SceneGraph.Scene;
 
@@ -8,11 +9,15 @@ namespace Candela.App.Editing;
 /// <summary>
 /// Selection rules of the viewports over Core's <see cref="Selection"/>: click selects one object (or clears on the
 /// background), Shift+click adds or removes (requirement), a drag box selects what it encloses (Shift adds to the
-/// selection), Ctrl+A selects everything selectable, Escape clears. Hidden and locked entities (or entities on hidden or
+/// selection; only objects lying entirely inside the box count, so a box drawn around props on a stage does not also
+/// grab the floor or the walls behind them), Ctrl+A selects everything selectable, Escape clears. Hidden and locked entities (or entities on hidden or
 /// locked layers) are never selected.
 /// </summary>
 internal static class SelectionController
 {
+    /// <summary>Projects a world point (m) to screen pixels; false when the point cannot be shown (behind the camera).</summary>
+    public delegate bool ProjectToScreen(Vector3 world, out Vector2 screen);
+
     /// <summary>Whether an entity may be selected from the viewport.</summary>
     public static bool IsSelectable(SceneModel scene, Entity entity)
     {
@@ -111,6 +116,28 @@ internal static class SelectionController
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// True when the box <paramref name="bounds"/> lies entirely inside the screen rectangle (<paramref name="min"/>,
+    /// <paramref name="max"/>): all eight corners project in front of the camera and into the rectangle.
+    /// <paramref name="project"/> maps a world point to screen pixels (false when it is behind the camera). Empty bounds
+    /// are never enclosed.
+    /// </summary>
+    public static bool Encloses(Aabb bounds, Vector2 min, Vector2 max, ProjectToScreen project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        if (bounds.IsEmpty)
+            return false;
+        for (int i = 0; i < 8; i++)
+        {
+            var corner = new Vector3((i & 1) == 0 ? bounds.Min.X : bounds.Max.X, (i & 2) == 0 ? bounds.Min.Y : bounds.Max.Y,
+                (i & 4) == 0 ? bounds.Min.Z : bounds.Max.Z);
+            if (!project(corner, out var p) || p.X < min.X || p.X > max.X || p.Y < min.Y || p.Y > max.Y)
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>Normalised screen rectangle of a drag from <paramref name="a"/> to <paramref name="b"/>.</summary>
