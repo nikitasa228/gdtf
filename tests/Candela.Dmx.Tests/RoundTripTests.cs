@@ -14,6 +14,9 @@ public class RoundTripTests(ITestOutputHelper output)
     [InlineData("Elation@Paladin_Panel", null)]
     [InlineData("ADJ@Entour_Haze_PRO", "4 Channel Mode")]
     [InlineData("Clay_Paky@Arolla_Aqua_LT", null)]
+    [InlineData("Briteq@BTI-BLIZZARD_WASH2", null)] // pan, tilt and zoom with placeholder ranges mapped onto the specs
+    [InlineData("ADJ@Inno_Pocket_Z4", null)] // zoom range defined by its channel set
+    [InlineData("Elation@Proteus_Brutus_FS", null)]
     public void Every_channel_function_round_trips(string prefix, string? mode)
     {
         var p = TestData.Profile(prefix, mode);
