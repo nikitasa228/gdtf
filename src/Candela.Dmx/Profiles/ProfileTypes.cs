@@ -106,7 +106,7 @@ public sealed class ProfileChannelSet
     public int WheelSlot => Source.WheelSlotIndex;
 
     /// <summary>Meaning recognised in the name.</summary>
-    public ChannelSetFlags Flags { get; }
+    public ChannelSetFlags Flags { get; internal set; }
 
     /// <summary>Colour temperature named by the set (K), NaN when none.</summary>
     public float Kelvin { get; internal set; } = float.NaN;

@@ -89,7 +89,8 @@ public static class FixtureEvaluator
         // 3: manual overrides take their exact function and control value
         overrides?.Apply(rt);
 
-        // 4: relations (virtual dimmers)
+        // 4: relations (virtual dimmers, group masters, zone overrides); followers come after their masters, so a
+        // master's own relations (grand master → pixel dimmer → pixel colour) are part of its level
         var relations = p.RelationArray;
         foreach (int c in p.FollowerChannels)
         {
@@ -100,9 +101,17 @@ public static class FixtureEvaluator
                 var r = relations[ri];
                 if (follower.Function != r.FollowerFunction) continue;
                 ref var m = ref rt[r.Master];
-                float masterLevel = m.Function >= 0 ? Level(fns[m.Function], m.Target) : 1f;
-                if (r.Type == Gdtf.RelationType.Multiply) follower.Relation *= masterLevel;
-                else follower.Target = masterLevel * fns[follower.Function].LevelScale;
+                float masterLevel = m.Function >= 0 ? Level(fns[m.Function], m.Target) * m.Relation : m.Relation;
+                if (r.Type == Gdtf.RelationType.Multiply)
+                {
+                    follower.Relation *= masterLevel;
+                }
+                else if (m.Dmx != channels[r.Master].DefaultValue)
+                {
+                    // Override: a master in use (away from its default) replaces the follower's level
+                    follower.Target = masterLevel * fns[follower.Function].LevelScale;
+                    follower.Relation = 1f;
+                }
             }
         }
 

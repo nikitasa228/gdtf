@@ -83,6 +83,7 @@ public sealed partial class FixtureProfile
         public int[] OutputChannels { get; private set; } = Array.Empty<int>();
         public int[] ModifierChannels { get; private set; } = Array.Empty<int>();
         public int[][] FollowerRelations { get; private set; } = Array.Empty<int[]>();
+        public int[] FollowerOrder { get; private set; } = Array.Empty<int>();
         public bool[] IsRelationMaster { get; private set; } = Array.Empty<bool>();
         public Dictionary<string, int[]> ChannelsByAttribute { get; } = new(StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, int> ChannelsByName { get; } = new(StringComparer.Ordinal);
@@ -300,6 +301,8 @@ public sealed partial class FixtureProfile
                 float pf = s.PhysicalFrom is { } a && float.IsFinite(a) ? offset + scale * a : float.NaN;
                 float pt = s.PhysicalTo is { } b && float.IsFinite(b) ? offset + scale * b : pf;
                 var setFlags = string.IsNullOrWhiteSpace(s.Name) ? nameFlags : NameParsing.Flags(s.Name, cls.Kind);
+                if (cls.Kind == AttributeKind.Shutter && (setFlags & ChannelSetFlags.Closed) != 0 && IsStrobeOff(src, s.Name))
+                    setFlags = (setFlags & ~ChannelSetFlags.Closed) | ChannelSetFlags.Open;
                 var set = new ProfileChannelSet(s, from, to, pf, pt, setFlags);
                 switch (cls.Kind)
                 {
@@ -320,6 +323,7 @@ public sealed partial class FixtureProfile
                 sets.Add(set);
             }
             sets.Sort((x, y) => x.DmxFrom.CompareTo(y.DmxFrom));
+            if (cls.Kind == AttributeKind.Dimmer) ReconcileDimmerNames(f, sets);
             f.SetSets(sets.ToArray());
 
             float maxAbs = MathF.Max(MathF.Abs(f.PhysicalFrom), MathF.Abs(f.PhysicalTo));
@@ -387,6 +391,60 @@ public sealed partial class FixtureProfile
 
         /// <summary>True for GDTF's default physical range 0 … 1 (either direction).</summary>
         private static bool IsDefaultRange(float from, float to) => (from == 0f && to == 1f) || (from == 1f && to == 0f);
+
+        /// <summary>
+        /// A shutter channel set named just "Off" inside a strobe function ("Strobe Off", "Strobe") or a function whose
+        /// physical value is a constant open shutter: the strobe is off and the shutter open, not "light off" (1060 sets
+        /// of 15 files in the library).
+        /// </summary>
+        private static bool IsStrobeOff(ChannelFunction function, string setName)
+        {
+            if (!string.Equals(setName.Trim(), "off", StringComparison.OrdinalIgnoreCase)) return false;
+            if (function.Name.Contains("strobe", StringComparison.OrdinalIgnoreCase)) return true;
+            float from = Finite(function.PhysicalFrom, 0f), to = Finite(function.PhysicalTo, 1f);
+            return from == to && from >= 0.99f;
+        }
+
+        /// <summary>
+        /// Channel sets named "Open"/"Closed" on a dimmer that contradict its physical range (e.g. "Closed" at DMX 255 of
+        /// a 0 → 1 dimmer, Ayrton MagicPanel 602, ACME AM-WASH300, Prolights PixieWash): the one of the two that follows
+        /// the DMX convention — more DMX is brighter — is believed. An increasing physical range drops the contradicting
+        /// names; a decreasing one whose names all contradict it (closed at DMX 0, open at the top: LIGHT SKY IPL1015) is
+        /// reversed. A decreasing range whose names agree with it is an inverted dimmer and stays.
+        /// </summary>
+        private void ReconcileDimmerNames(ProfileFunction f, List<ProfileChannelSet> sets)
+        {
+            float lo = MathF.Min(f.PhysicalFrom, f.PhysicalTo), span = MathF.Abs(f.PhysicalTo - f.PhysicalFrom);
+            if (!(span > 1e-6f) || f.DmxTo <= f.DmxFrom) return;
+            int flagged = 0, contradicting = 0;
+            var contradicts = new bool[sets.Count];
+            for (int i = 0; i < sets.Count; i++)
+            {
+                var s = sets[i];
+                bool open = (s.Flags & ChannelSetFlags.Open) != 0, closed = (s.Flags & ChannelSetFlags.Closed) != 0;
+                if (open == closed) continue;
+                flagged++;
+                float physical = s.HasPhysical
+                    ? 0.5f * (s.PhysicalFrom + s.PhysicalTo)
+                    : f.PhysicalAt((uint)(((ulong)s.DmxFrom + s.DmxTo) / 2));
+                bool bright = (physical - lo) / span >= 0.5f;
+                if (closed == bright)
+                {
+                    contradicts[i] = true;
+                    contradicting++;
+                }
+            }
+            if (contradicting == 0) return;
+            if (f.PhysicalTo < f.PhysicalFrom && contradicting == flagged)
+            {
+                (f.PhysicalFrom, f.PhysicalTo) = (f.PhysicalTo, f.PhysicalFrom);
+                Warnings.Add($"{f.Source.FullName}: dimmer range runs against its open/closed channel sets; reversed.");
+                return;
+            }
+            for (int i = 0; i < sets.Count; i++)
+                if (contradicts[i]) sets[i].Flags &= ~(ChannelSetFlags.Open | ChannelSetFlags.Closed);
+            Warnings.Add($"{f.Source.FullName}: {contradicting} open/closed channel set name(s) contradict the dimmer's physical range; the range is used.");
+        }
 
         /// <summary>
         /// A Zoom, Pan or Tilt function with GDTF's default physical range 0 … 1 — degrees are meant, the author left the
@@ -555,10 +613,18 @@ public sealed partial class FixtureProfile
             }
         }
 
+        /// <summary>
+        /// Resolves the mode's relations to channel instances (per geometry-reference chain), reads a dimmer's
+        /// <c>Override</c> of a level as <c>Multiply</c> (a virtual dimmer written with the wrong type: replacing a
+        /// colour by the dimmer level would make the colour channels inoperative), drops relations that close a cycle and
+        /// orders the followers so that every master is evaluated before its followers (relation chains such as
+        /// grand master → pixel dimmer → pixel colour).
+        /// </summary>
         private void BuildRelations()
         {
             var follower = new List<int>[Channels.Count];
             IsRelationMaster = new bool[Channels.Count];
+            int reinterpreted = 0;
             foreach (var r in Mode.Relations)
             {
                 if (r.Master is not { } masterChannel || r.Follower?.LogicalChannel?.Channel is not { } followerChannel)
@@ -575,14 +641,95 @@ public sealed partial class FixtureProfile
                         if (ReferenceEquals(Functions[k].Source, r.Follower)) { fn = k; break; }
                     int mi = ResolveInstance(masterChannel, fch.Instance.References);
                     if (fn < 0 || mi < 0 || mi == fi) continue;
+                    var type = r.Type;
+                    if (type == RelationType.Override && IsIntensityMaster(Channels[mi]) && IsLevelKind(Functions[fn].Class.Kind))
+                    {
+                        type = RelationType.Multiply;
+                        reinterpreted++;
+                    }
                     (follower[fi] ??= new List<int>()).Add(Relations.Count);
-                    Relations.Add(new ProfileRelation(mi, fi, fn, r.Type));
-                    if (r.Type == RelationType.Multiply) IsRelationMaster[mi] = true;
+                    Relations.Add(new ProfileRelation(mi, fi, fn, type));
                 }
             }
+            if (reinterpreted > 0)
+                Warnings.Add($"{reinterpreted} Override relation(s) of a dimmer over a level read as Multiply (virtual dimmer).");
+
             FollowerRelations = new int[Channels.Count][];
             for (int i = 0; i < Channels.Count; i++) FollowerRelations[i] = follower[i]?.ToArray() ?? Array.Empty<int>();
+            OrderFollowers();
+            foreach (int c in FollowerOrder)
+                foreach (int ri in FollowerRelations[c])
+                    if (Relations[ri].Type == RelationType.Multiply) IsRelationMaster[Relations[ri].Master] = true;
         }
+
+        /// <summary>Followers in evaluation order: every channel after the masters it follows (Kahn's algorithm); relations closing a cycle are dropped.</summary>
+        private void OrderFollowers()
+        {
+            int n = Channels.Count;
+            var pending = new int[n]; // relations whose master is itself a follower that is not yet ordered
+            var dependents = new List<int>?[n];
+            var isFollower = new bool[n];
+            for (int c = 0; c < n; c++) isFollower[c] = FollowerRelations[c].Length > 0;
+            for (int c = 0; c < n; c++)
+            {
+                foreach (int ri in FollowerRelations[c])
+                {
+                    int m = Relations[ri].Master;
+                    if (!isFollower[m]) continue;
+                    pending[c]++;
+                    (dependents[m] ??= new List<int>()).Add(c);
+                }
+            }
+            var order = new List<int>();
+            var queue = new Queue<int>();
+            for (int c = 0; c < n; c++)
+                if (isFollower[c] && pending[c] == 0) queue.Enqueue(c);
+            while (queue.Count > 0)
+            {
+                int c = queue.Dequeue();
+                order.Add(c);
+                if (dependents[c] is not { } deps) continue;
+                foreach (int d in deps)
+                    if (--pending[d] == 0) queue.Enqueue(d);
+            }
+            if (order.Count < Channels.Count(ch => isFollower[ch.Index]))
+            {
+                // the remaining followers sit on cycles: keep only their relations to masters that are already resolved
+                int dropped = 0;
+                var placed = new bool[n];
+                foreach (int c in order) placed[c] = true;
+                for (int c = 0; c < n; c++)
+                {
+                    if (!isFollower[c] || placed[c]) continue;
+                    var keep = new List<int>();
+                    foreach (int ri in FollowerRelations[c])
+                    {
+                        int m = Relations[ri].Master;
+                        if (!isFollower[m] || placed[m]) keep.Add(ri);
+                        else dropped++;
+                    }
+                    FollowerRelations[c] = keep.ToArray();
+                    order.Add(c);
+                    placed[c] = true;
+                }
+                Warnings.Add($"{dropped} relation(s) forming a cycle ignored.");
+            }
+            FollowerOrder = order.Where(c => FollowerRelations[c].Length > 0).ToArray();
+        }
+
+        /// <summary>A channel whose attribute is an intensity (Dimmer): its relations scale their followers.</summary>
+        private bool IsIntensityMaster(ProfileChannel ch)
+        {
+            if (ch.Class.Kind == AttributeKind.Dimmer) return true;
+            for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                if (Functions[k].Class.Kind == AttributeKind.Dimmer) return true;
+            return false;
+        }
+
+        /// <summary>Attributes whose value is a level 0 … 1 that an intensity master can scale.</summary>
+        private static bool IsLevelKind(AttributeKind kind) =>
+            kind is AttributeKind.Dimmer or AttributeKind.ColorAdd or AttributeKind.ColorRgb or AttributeKind.HsbBrightness
+                or AttributeKind.CieBrightness;
 
         // ------------------------------------------------------------------ wheels and emitters
 
