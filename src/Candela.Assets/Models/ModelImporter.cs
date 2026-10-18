@@ -25,6 +25,9 @@ namespace Candela.Assets;
 /// </summary>
 public static class ModelImporter
 {
+    /// <summary>Mirror across the YZ plane (used to keep part transforms free of reflections).</summary>
+    private static readonly Matrix4x4 s_mirrorX = Matrix4x4.CreateScale(-1f, 1f, 1f);
+
     private static readonly Dictionary<string, string> s_foreignFormats = new(StringComparer.OrdinalIgnoreCase)
     {
         [".blend"] = "Blender files cannot be read directly; export from Blender as .glb or .fbx",
@@ -80,29 +83,15 @@ public static class ModelImporter
         if (data.Length == 0) throw new AssetImportException($"'{files.MainFile}' is empty.");
 
         var ctx = new ImportContext(files, options, format);
-        RawModel raw;
-        if (format is ModelFormat.Gltf or ModelFormat.Glb)
+        // glTF is never handed to Assimp: its glTF reader crashes the process on damaged files that SharpGLTF rejects
+        // cleanly. PLY is read by Candela's own reader for the same reason (Assimp hangs or crashes on truncated PLY);
+        // OBJ and COLLADA are checked/cleaned before Assimp sees them (ModelPreflight).
+        RawModel raw = format switch
         {
-            try
-            {
-                raw = GltfReader.Read(ctx);
-            }
-            catch (AssetImportException gltfError) when (AssimpNative.IsAvailable && !gltfError.Message.Contains("missing", StringComparison.Ordinal))
-            {
-                // A file SharpGLTF rejects (unusual extensions, spec violations) may still be readable by Assimp.
-                try
-                {
-                    ctx = new ImportContext(files, options, format);
-                    raw = AssimpReader.Read(ctx);
-                    ctx.Warn("The glTF file is not standard-conforming; it was read with reduced material support.");
-                }
-                catch (AssetImportException)
-                {
-                    throw gltfError;
-                }
-            }
-        }
-        else raw = AssimpReader.Read(ctx);
+            ModelFormat.Gltf or ModelFormat.Glb => GltfReader.Read(ctx),
+            ModelFormat.Ply => PlyReader.Read(ctx),
+            _ => AssimpReader.Read(ctx),
+        };
 
         return Finish(raw, ctx);
     }
@@ -165,12 +154,35 @@ public static class ModelImporter
         var conversion = basis * Matrix4x4.CreateScale(unit);
         if (!Matrix4x4.Invert(conversion, out var inverse)) throw new AssetImportException("The model's axis conversion is degenerate.");
         var transformed = new HashSet<MeshData>(ReferenceEqualityComparer.Instance);
+        var mirrored = new Dictionary<MeshData, MeshData>(ReferenceEqualityComparer.Instance);
         var parts = new List<ModelPart>(raw.Parts.Count);
         foreach (var rp in raw.Parts)
         {
             if (transformed.Add(rp.Mesh)) MeshTools.Transform(rp.Mesh, conversion);
             var t = rp.World.IsIdentity ? Matrix4x4.Identity : Snap(inverse * rp.World * conversion);
-            parts.Add(new ModelPart { Name = rp.Name, Mesh = rp.Mesh, Transform = t });
+            var mesh = rp.Mesh;
+            if (MeshTools.Determinant3(t) < 0f)
+            {
+                // A mirroring node (negative scale, common for symmetric parts) would turn the instance inside out for a
+                // renderer that culls by winding. Bake the mirror into a copy of the mesh (winding flipped back) and keep a
+                // proper rotation in the transform: mesh·S·(S·T) = mesh·T with S = diag(−1, 1, 1).
+                if (!mirrored.TryGetValue(rp.Mesh, out var copy))
+                {
+                    copy = MeshTools.Clone(rp.Mesh);
+                    MeshTools.Transform(copy, s_mirrorX);
+                    mirrored[rp.Mesh] = copy;
+                    transformed.Add(copy);
+                }
+                mesh = copy;
+                t = s_mirrorX * t;
+            }
+            parts.Add(new ModelPart { Name = rp.Name, Mesh = mesh, Transform = t });
+        }
+        if (mirrored.Count > 0)
+        {
+            // Meshes that are only used mirrored are no longer referenced; do not process them further.
+            var used = new HashSet<MeshData>(parts.Select(p => p.Mesh), ReferenceEqualityComparer.Instance);
+            transformed.RemoveWhere(m => !used.Contains(m));
         }
 
         if (parts.Count > System.Math.Max(1, options.MaxParts))

@@ -9,6 +9,28 @@ namespace Candela.Assets;
 /// </summary>
 public static class MeshTools
 {
+    /// <summary>Positions with more faces around them than this use clustered normals (see <see cref="GenerateNormals"/>).</summary>
+    private const int MaxExactValence = 64;
+
+    /// <summary>Most orientation clusters per high-valence position (and most normal variants searched per vertex).</summary>
+    private const int MaxClusters = 64;
+
+    /// <summary>A deep copy of <paramref name="mesh"/> (every array and the sub-mesh list are copied).</summary>
+    public static MeshData Clone(MeshData mesh)
+    {
+        ArgumentNullException.ThrowIfNull(mesh);
+        return new MeshData
+        {
+            Name = mesh.Name,
+            Positions = (Vector3[])mesh.Positions.Clone(),
+            Normals = (Vector3[])mesh.Normals.Clone(),
+            TexCoords = mesh.TexCoords is null ? null : (Vector2[])mesh.TexCoords.Clone(),
+            Tangents = mesh.Tangents is null ? null : (Vector4[])mesh.Tangents.Clone(),
+            Indices = (uint[])mesh.Indices.Clone(),
+            SubMeshes = new List<SubMesh>(mesh.SubMeshes),
+        };
+    }
+
     /// <summary>
     /// Computes per-vertex tangents (Lengyel's method, accumulated per triangle, Gram–Schmidt orthogonalised against the
     /// normal). <c>w</c> follows glTF: <c>cross(normal, tangent.xyz) * w</c> points towards decreasing V, i.e. "up" in a
@@ -76,7 +98,10 @@ public static class MeshTools
     /// <paramref name="smoothingAngleDegrees"/> and splitting vertices at sharper edges (a box keeps flat faces, a
     /// cylinder's side is smooth). Faces are area-weighted; vertices at the same position (texture seams) smooth
     /// together. Indices are rewritten when vertices are split; texture coordinates are carried over, tangents dropped
-    /// (regenerate them afterwards) and sub-mesh ranges stay valid. Runs in O(Σ valence²).
+    /// (regenerate them afterwards) and sub-mesh ranges stay valid. Ordinary vertices (valence ≤ 64) compare every pair of
+    /// faces around them; around high-valence positions (the centre of a finely divided disc or a cone apex) faces are
+    /// first grouped into at most 64 clusters of similar orientation and each corner takes its cluster's normal, so the
+    /// cost stays linear in the number of faces (O(Σ min(valence, 64) · valence)).
     /// </summary>
     public static void GenerateNormals(MeshData mesh, float smoothingAngleDegrees)
     {
@@ -116,9 +141,56 @@ public static class MeshTools
             if (idx[i] < vertexCount) start[weld[idx[i]] + 1]++;
         for (int v = 0; v < vertexCount; v++) start[v + 1] += start[v];
         var faces = new int[start[vertexCount]];
+        var cornerSlot = new int[faceCount * 3];
         var fill = (int[])start.Clone();
         for (int i = 0; i < faceCount * 3; i++)
-            if (idx[i] < vertexCount) faces[fill[weld[idx[i]]]++] = i / 3;
+        {
+            if (idx[i] >= vertexCount) continue;
+            int slot = fill[weld[idx[i]]]++;
+            faces[slot] = i / 3;
+            cornerSlot[i] = slot;
+        }
+
+        // High-valence positions: greedy clustering of the surrounding faces by orientation (see the remarks).
+        int[]? clusterOf = null;
+        List<Vector3>? clusterSum = null;
+        for (int p = 0; p < vertexCount; p++)
+        {
+            int valence = start[p + 1] - start[p];
+            if (valence <= MaxExactValence) continue;
+            clusterOf ??= new int[faces.Length];
+            clusterSum ??= new List<Vector3>();
+            int firstCluster = clusterSum.Count;
+            var representatives = new List<Vector3>(MaxClusters);
+            for (int k = start[p]; k < start[p + 1]; k++)
+            {
+                int g = faces[k];
+                var u = unit[g];
+                if (u == Vector3.Zero)
+                {
+                    clusterOf[k] = -1;
+                    continue;
+                }
+                int found = -1;
+                for (int c = 0; c < representatives.Count; c++)
+                {
+                    if (Vector3.Dot(representatives[c], u) >= cosLimit)
+                    {
+                        found = firstCluster + c;
+                        break;
+                    }
+                }
+                if (found < 0)
+                {
+                    found = clusterSum.Count;
+                    clusterSum.Add(Vector3.Zero);
+                    // Beyond the cluster limit a face keeps its own normal (singleton cluster, not searched again).
+                    if (representatives.Count < MaxClusters) representatives.Add(u);
+                }
+                clusterOf[k] = found;
+                clusterSum[found] += weighted[g];
+            }
+        }
 
         // One normal per face corner; corners of the same vertex with (nearly) equal normals share an output vertex.
         var outPos = new List<Vector3>(vertexCount);
@@ -141,16 +213,25 @@ public static class MeshTools
             var n = Vector3.Zero;
             var own = unit[f];
             int p = weld[v];
-            for (int k = start[p]; k < start[p + 1]; k++)
+            if (start[p + 1] - start[p] > MaxExactValence)
             {
-                int g = faces[k];
-                if (g == f || Vector3.Dot(own, unit[g]) >= cosLimit) n += weighted[g];
+                int c = clusterOf![cornerSlot[i]];
+                if (c >= 0) n = clusterSum![c];
+            }
+            else
+            {
+                for (int k = start[p]; k < start[p + 1]; k++)
+                {
+                    int g = faces[k];
+                    if (g == f || Vector3.Dot(own, unit[g]) >= cosLimit) n += weighted[g];
+                }
             }
             if (n.LengthSquared() < 1e-30f) n = own.LengthSquared() > 0 ? own : Vector3.UnitZ;
             n = Vector3.Normalize(n);
 
-            int found = -1;
-            for (int o = variants[v]; o >= 0; o = nextVariant[o])
+            // Reuse an output vertex with the same normal (the search is bounded; a miss only duplicates a vertex).
+            int found = -1, searched = 0;
+            for (int o = variants[v]; o >= 0 && searched < MaxClusters; o = nextVariant[o], searched++)
             {
                 if (Vector3.Dot(outNrm[o], n) > 0.9999f)
                 {
