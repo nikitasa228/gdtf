@@ -2,7 +2,8 @@ namespace Candela.Simulation;
 
 /// <summary>
 /// A complete copy of a <see cref="SmokeSimulation"/>'s state — velocity, density, temperature, pressure (the solver's
-/// warm start, so a restored run continues bit-identically), solid cells, time and step counters. Used to scrub a
+/// warm start, so a restored run continues bit-identically), solid cells, the ramped ventilation airflow, time and step
+/// counters. Used to scrub a
 /// timecode show: keep snapshots at key frames and re-simulate forward from the nearest one. A snapshot can be reused
 /// with <see cref="SmokeSimulation.CaptureSnapshot(SmokeSimulationSnapshot)"/> so scrubbing does not allocate.
 /// </summary>
@@ -31,6 +32,8 @@ public sealed class SmokeSimulationSnapshot
     internal double Accumulator { get; set; }
 
     internal System.Numerics.Vector3 Airflow { get; set; }
+
+    internal int ObstacleCount { get; set; }
 
     internal float[] U { get; }
 

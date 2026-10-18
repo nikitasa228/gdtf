@@ -338,12 +338,11 @@ public sealed partial class SmokeSimulation
     /// </summary>
     private void ApplyAirflow(float dt)
     {
-        if (_airflowTarget == Vector3.Zero && _inflowVelocity == Vector3.Zero)
-            return;
+        var difference = _airflowTarget - _inflowVelocity;
+        if (difference.LengthSquared() < 1e-12f)
+            return; // settled (within 1 µm/s)
         float alpha = 1f - MathF.Exp(-dt / _settings.AirflowResponseTime);
-        var increment = (_airflowTarget - _inflowVelocity) * alpha;
-        if (increment == Vector3.Zero)
-            return;
+        var increment = difference.LengthSquared() < 1e-8f ? difference : difference * alpha;
         _inflowVelocity += increment;
         AddUniform(_u, _uFlags, increment.X, _inflowVelocity.X);
         AddUniform(_v, _vFlags, increment.Y, _inflowVelocity.Y);

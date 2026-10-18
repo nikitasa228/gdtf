@@ -43,7 +43,7 @@ public sealed record SmokeSimulationSettings
     /// <summary>Upper limit of cells along any axis (budget).</summary>
     public int MaxCellsPerAxis { get; init; } = 128;
 
-    /// <summary>Upper limit of the total cell count (budget; 1 M cells ≈ 70 MB of solver state).</summary>
+    /// <summary>Upper limit of the total cell count (budget; 1 M cells ≈ 110 MB of solver state).</summary>
     public int MaxCellCount { get; init; } = 128 * 128 * 64;
 
     /// <summary>Fixed internal time step, s. <see cref="SmokeSimulation.Step"/> runs as many of these as fit the frame time.</summary>

@@ -14,9 +14,10 @@ namespace Candela.Simulation;
 /// <item>forces — buoyancy (warm air rises, chilled air and heavy fog sink), effect fans;</item>
 /// <item>semi-Lagrangian self-advection of the velocity (RK2 back-trace, trilinear interpolation);</item>
 /// <item>optional viscosity;</item>
-/// <item>pressure projection (Jacobi-preconditioned conjugate gradient) with free-slip solids and open faces;</item>
-/// <item>advection of density and temperature by the divergence-free velocity (MacCormack with limiter by default),
-/// optional diffusion, then dissipation and cooling.</item>
+/// <item>pressure projection (conjugate gradient preconditioned with a geometric multigrid V-cycle) with free-slip
+/// solids and open faces;</item>
+/// <item>advection of density and temperature by the divergence-free velocity (MacCormack with limiter by default) with
+/// a conservation fixer for smoke mass and heat, optional diffusion, then dissipation and cooling.</item>
 /// </list>
 /// The GPU implementation in the renderer is tested against this class, so it favours clarity and physical units:
 /// density is the relative aerosol concentration whose scattering coefficient is density × <see
@@ -410,6 +411,7 @@ public sealed partial class SmokeSimulation
         snapshot.StepCount = _stepCount;
         snapshot.Accumulator = _accumulator;
         snapshot.Airflow = _inflowVelocity;
+        snapshot.ObstacleCount = _obstacleCount;
     }
 
     /// <summary>
@@ -434,6 +436,8 @@ public sealed partial class SmokeSimulation
             snapshot.Solid.AsSpan().CopyTo(_solid);
             RebuildSolverTopology();
         }
+
+        _obstacleCount = snapshot.ObstacleCount;
 
         _time = snapshot.Time;
         _stepCount = snapshot.StepCount;

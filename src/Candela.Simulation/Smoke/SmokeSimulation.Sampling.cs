@@ -71,7 +71,10 @@ public sealed partial class SmokeSimulation
         return Vector3.Lerp(Vector3.Lerp(c00, c10, fy), Vector3.Lerp(c01, c11, fy), fz);
     }
 
-    /// <summary>Cell-centred value at grid position <paramref name="g"/> for queries (no ambient test; solids ignored).</summary>
+    /// <summary>
+    /// Cell-centred value at sample coordinates (<paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>) = grid
+    /// position − ½, for queries: 0 inside a solid, solid corners skipped, no ambient test at open faces.
+    /// </summary>
     private float SampleScalarPlain(float[] f, float x, float y, float z)
     {
         if (!_hasObstacles)
