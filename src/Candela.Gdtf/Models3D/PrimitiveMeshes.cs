@@ -5,12 +5,22 @@ namespace Candela.Gdtf;
 
 /// <summary>
 /// Procedural meshes for GDTF built-in primitive types, sized to the model's declared Length (X) × Width (Y) ×
-/// Height (Z) in metres and centred on the geometry origin. Shapes follow the hanging orientation GDTF uses: yokes open
-/// downwards (−Z), heads and conventional barrels point their lens down, scanner mirrors sit at the bottom.
+/// Height (Z) in metres. Shapes follow the hanging orientation GDTF uses: yokes open downwards (−Z), heads and
+/// conventional barrels point their lens down, scanner mirrors sit at the bottom.
 /// </summary>
 /// <remarks>
+/// <para>
+/// Origins: GDTF 1.1 redefined the Base, Scanner and Conventional meshes so that their origin is the mounting plate
+/// (spec revision notes, "The origin of the meshes is now the mounting plate"); the 1.1 types <c>Base1_1</c>,
+/// <c>Scanner1_1</c> and <c>Conventional1_1</c> therefore hang below their origin (Z from −Height to 0), while every
+/// other primitive, including the original Base, Scanner and Conventional, is centred on it. The library confirms
+/// both: Conventional1_1 bodies carry their Beam at Z ≈ −Height (BOS P-7 HEX, Briteq BT-THEATRE), Conventional bodies
+/// at −Height/2 (ACME BW-545), and Base1_1 bases end where their yoke starts.
+/// </para>
+/// <para>
 /// The bounding box of every primitive is exactly the declared size. Box faces have flat normals, round surfaces smooth
 /// normals; front faces are counter-clockwise seen from outside.
+/// </para>
 /// </remarks>
 public static class PrimitiveMeshes
 {
@@ -64,7 +74,7 @@ public static class PrimitiveMeshes
                 break;
         }
 
-        var mesh = b.ToMesh(name, size);
+        var mesh = b.ToMesh(name, size, HangsFromOrigin(type) ? new Vector3(0, 0, -0.5f) : Vector3.Zero);
         return new ModelData
         {
             Name = name,
@@ -72,6 +82,13 @@ public static class PrimitiveMeshes
             Materials = { new MaterialData { Name = "gdtf-primitive", BaseColorFactor = new Vector4(0.06f, 0.06f, 0.06f, 1f), Roughness = 0.55f } },
         };
     }
+
+    /// <summary>
+    /// True for the GDTF 1.1 primitives whose origin is the mounting plate (<c>Base1_1</c>, <c>Scanner1_1</c>,
+    /// <c>Conventional1_1</c>): their mesh spans Z from −Height to 0. All other primitives are centred on the origin.
+    /// </summary>
+    public static bool HangsFromOrigin(GdtfPrimitiveType type) =>
+        type is GdtfPrimitiveType.Base1_1 or GdtfPrimitiveType.Scanner1_1 or GdtfPrimitiveType.Conventional1_1;
 
     /// <summary>An axis-aligned box mesh with flat normals.</summary>
     public static MeshData Box(Vector3 min, Vector3 max, string name = "box")
@@ -241,13 +258,14 @@ public static class PrimitiveMeshes
             }
         }
 
-        public MeshData ToMesh(string name, Vector3 scale)
+        /// <summary>The mesh in unit space moved by <paramref name="offset"/> (unit space), then scaled to size.</summary>
+        public MeshData ToMesh(string name, Vector3 scale, Vector3 offset = default)
         {
             var positions = new Vector3[_positions.Count];
             var normals = new Vector3[_normals.Count];
             for (int i = 0; i < positions.Length; i++)
             {
-                positions[i] = _positions[i] * scale;
+                positions[i] = (_positions[i] + offset) * scale;
                 var n = _normals[i] / scale;
                 normals[i] = n.LengthSquared() > 1e-30f ? Vector3.Normalize(n) : Vector3.UnitZ;
             }
