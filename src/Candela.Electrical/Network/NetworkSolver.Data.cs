@@ -18,10 +18,13 @@ public sealed partial class NetworkSolver
         }
     }
 
-    /// <summary>A data output waiting to be followed.</summary>
+    /// <summary>
+    /// A data output waiting to be followed, with what it carries (a converter turns Ethernet into DMX universes) and
+    /// the state of the current DMX segment.
+    /// </summary>
     private readonly record struct DataFrame(
-        Device Device, Port Output, int Depth, int SegmentCount, float SegmentRunM, float SegmentMaxRunM, (Guid, string) SegmentKey,
-        CablePathNode? Path);
+        Device Device, Port Output, SignalKind Signal, int FirstUniverse, int UniverseCount, int Depth, int SegmentCount, float SegmentRunM,
+        float SegmentMaxRunM, (Guid, string) SegmentKey, CablePathNode? Path);
 
     private sealed record DataResult(
         IReadOnlyList<DataLine> Lines, IReadOnlyDictionary<Guid, IReadOnlyList<DataFeed>> FeedsByDevice, HashSet<Guid> ConsoleDriven);
@@ -50,16 +53,17 @@ public sealed partial class NetworkSolver
                         Output = output,
                         Feeds = lineFeeds,
                     };
-                    bool dmx = output.Signal == SignalKind.Dmx512;
                     string lineName = $"console '{console.Info.Name}' {output.Name}";
                     var visited = new HashSet<Guid> { console.Id };
                     var stack = new Stack<DataFrame>();
-                    stack.Push(new DataFrame(console, output, 0, 0, 0f, float.PositiveInfinity, (console.Id, output.Name), null));
+                    stack.Push(new DataFrame(console, output, output.Signal, line.FirstUniverse, line.UniverseCount, 0, 0, 0f, float.PositiveInfinity,
+                        (console.Id, output.Name), null));
                     var next = new List<DataFrame>();
 
                     while (stack.Count > 0)
                     {
                         var f = stack.Pop();
+                        bool dmx = f.Signal == SignalKind.Dmx512;
                         if (!_plugged.TryGetValue(new PortRef(f.Device.Id, f.Output.Name), out var hit)) continue;
                         var cable = hit.Cable;
                         if (cable.Type is not { IsData: true } type) continue;
@@ -73,7 +77,7 @@ public sealed partial class NetworkSolver
                             if (ReferenceEquals(ep, from) || !ep.IsUsable) continue;
                             var target = _devices[ep.EntityId];
                             var input = ep.Port!;
-                            if (!input.Signal.CarriesData() || !SameDataFamily(input.Signal, output.Signal)) continue;
+                            if (!input.Signal.CarriesData() || !SameDataFamily(input.Signal, f.Signal)) continue;
                             if (input.Direction == PortDirection.Output)
                             {
                                 if (reportedCables.Add(cable.Entity.Id))
@@ -104,9 +108,9 @@ public sealed partial class NetworkSolver
                                 InputPort = input.Name,
                                 ConsoleEntityId = console.Id,
                                 ConsolePort = output.Name,
-                                Signal = output.Signal,
-                                FirstUniverse = line.FirstUniverse,
-                                UniverseCount = line.UniverseCount,
+                                Signal = f.Signal,
+                                FirstUniverse = f.FirstUniverse,
+                                UniverseCount = f.UniverseCount,
                                 ChainIndex = depth,
                                 UpstreamEntityId = f.Device.Id == console.Id ? null : f.Device.Id,
                                 UpstreamPort = f.Output.Name,
@@ -129,17 +133,32 @@ public sealed partial class NetworkSolver
 
                             if (target.Fixture is null) continue; // consoles and power sources do not pass data on
                             int dmxOutputs = 0;
+                            bool dmxInput = false;
                             foreach (var p in target.Info.Ports)
+                            {
                                 if (p.Direction == PortDirection.Output && p.Signal == SignalKind.Dmx512) dmxOutputs++;
+                                if (p.Direction != PortDirection.Output && p.Signal == SignalKind.Dmx512) dmxInput = true;
+                            }
                             bool splitter = dmx && dmxOutputs >= 2;
+                            bool converter = f.Signal == SignalKind.Ethernet && !dmxInput && dmxOutputs > 0;
+                            int convertedPort = 0;
                             foreach (var o in target.Info.Ports)
                             {
                                 if (ReferenceEquals(o, input) || o.Direction == PortDirection.Input || !o.Signal.CarriesData() ||
-                                    !SameDataFamily(o.Signal, output.Signal) || o.Role is PortRole.Other or PortRole.PowerIn)
+                                    o.Role is PortRole.Other or PortRole.PowerIn)
                                     continue;
+                                if (converter && o.Signal == SignalKind.Dmx512)
+                                {
+                                    // Ethernet → DMX node: its DMX outputs send consecutive universes of the incoming range.
+                                    if (convertedPort >= f.UniverseCount) continue;
+                                    next.Add(new DataFrame(target, o, SignalKind.Dmx512, f.FirstUniverse + convertedPort++, 1, depth, 0, 0f,
+                                        float.PositiveInfinity, (target.Id, o.Name), path));
+                                    continue;
+                                }
+                                if (!SameDataFamily(o.Signal, f.Signal)) continue;
                                 next.Add(splitter
-                                    ? new DataFrame(target, o, depth, 0, 0f, float.PositiveInfinity, (target.Id, o.Name), path)
-                                    : new DataFrame(target, o, depth, segCount, segRun, segMax, f.SegmentKey, path));
+                                    ? new DataFrame(target, o, f.Signal, f.FirstUniverse, f.UniverseCount, depth, 0, 0f, float.PositiveInfinity, (target.Id, o.Name), path)
+                                    : new DataFrame(target, o, f.Signal, f.FirstUniverse, f.UniverseCount, depth, segCount, segRun, segMax, f.SegmentKey, path));
                             }
                         }
                         for (int i = next.Count - 1; i >= 0; i--) stack.Push(next[i]);

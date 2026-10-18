@@ -155,13 +155,16 @@ public sealed record DataFeed
     /// <summary>Console output port.</summary>
     public required string ConsolePort { get; init; }
 
-    /// <summary>DMX512 or Ethernet.</summary>
+    /// <summary>
+    /// What arrives at the input: DMX512 or Ethernet. Usually the console output's signal; behind an Ethernet → DMX
+    /// converter (a device with Ethernet in and DMX outputs but no DMX input) it is DMX512.
+    /// </summary>
     public required SignalKind Signal { get; init; }
 
-    /// <summary>First universe on the line (the only one for DMX).</summary>
+    /// <summary>First universe arriving at the input (the only one for DMX; a converter's n-th DMX output sends the n-th universe of its Ethernet range).</summary>
     public required int FirstUniverse { get; init; }
 
-    /// <summary>Universes on the line (1 for DMX).</summary>
+    /// <summary>Universes arriving at the input (1 for DMX).</summary>
     public required int UniverseCount { get; init; }
 
     /// <summary>1-based position from the console: 1 = first device after the console.</summary>

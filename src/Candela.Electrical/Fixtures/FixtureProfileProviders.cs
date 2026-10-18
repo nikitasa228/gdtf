@@ -67,7 +67,17 @@ public sealed class LibraryFixtureProfileProvider : IFixtureProfileProvider
         }
         if (type is not null && mode is not null && type.FindMode(mode) is null)
             notes.Add($"DMX mode '{mode}' is not in '{entry.FileName}'; the first mode's ports are used.");
-        return FixtureProfile.Build(spec, mode, type, specs, entry.FileName, match.Kind == FixtureMatchKind.Substitute, notes);
+        bool substitute = match.Kind == FixtureMatchKind.Substitute;
+        try
+        {
+            return FixtureProfile.Build(spec, mode, type, specs, entry.FileName, substitute, notes);
+        }
+        catch (Exception e) when (e is not OutOfMemoryException && type is not null)
+        {
+            // Malformed GDTF content that the builder cannot interpret: keep what the specs record knows.
+            notes.Add($"GDTF '{entry.FileName}' could not be interpreted ({e.Message}); ports and power come from _specs only.");
+            return FixtureProfile.Build(spec, mode, null, specs, entry.FileName, substitute, notes);
+        }
     }
 }
 

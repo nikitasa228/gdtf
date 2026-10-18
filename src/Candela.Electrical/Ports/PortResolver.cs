@@ -329,8 +329,11 @@ public sealed class PortResolver
             }
         }
 
-        bool hasDmx = ports.Any(p => p.Signal is SignalKind.Dmx512 or SignalKind.Hybrid && p.Direction != PortDirection.Output);
-        bool hasEthernet = ports.Any(p => p.Signal == SignalKind.Ethernet);
+        // When the GDTF describes any data port, its data wiring is taken as complete (the specs dataConnectors are
+        // derived from the same GDTF); otherwise data ports come from the specs connectors / control signals.
+        bool gdtfData = ports.Any(p => p.Origin != PortOrigin.Specs && p.Signal.CarriesData());
+        bool hasDmx = gdtfData || ports.Any(p => p.Signal is SignalKind.Dmx512 or SignalKind.Hybrid && p.Direction != PortDirection.Output);
+        bool hasEthernet = gdtfData || ports.Any(p => p.Signal == SignalKind.Ethernet);
         bool dmxSignal = specs.ControlSignal.Any(s => s.Contains("DMX512", StringComparison.OrdinalIgnoreCase) && !s.Contains("Wireless", StringComparison.OrdinalIgnoreCase));
         bool ethernetSignal = specs.ControlSignal.Any(s => s.StartsWith("Ethernet", StringComparison.OrdinalIgnoreCase));
         if (!hasDmx)
@@ -434,6 +437,10 @@ public sealed class PortResolver
     internal static SignalKind SignalFromGdtf(WiringObjectGeometry w, ConnectorInfo connector)
     {
         string s = (w.SignalType ?? "").Trim();
+        // An XLR data connector named DMX is a DMX port even when the file calls its signal "Power" (Astera AX2).
+        if (connector.Domain == ConnectorDomain.Dmx && (w.Name?.Contains("DMX", StringComparison.OrdinalIgnoreCase) ?? false) &&
+            !s.Contains("data", StringComparison.OrdinalIgnoreCase))
+            return SignalKind.Dmx512;
         if (s.Length > 0)
         {
             bool power = s.Contains("power", StringComparison.OrdinalIgnoreCase) || s.Contains("battery", StringComparison.OrdinalIgnoreCase) ||

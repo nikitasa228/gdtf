@@ -205,6 +205,33 @@ public class DataNetworkTests
     }
 
     [Fact]
+    public void Ethernet_to_dmx_converter_sends_the_universes_of_its_ethernet_range()
+    {
+        const string feederFile = "Martin_Professional@Exterior_AC-Feeder@20260602.gdtf";
+        var feederProfile = TestData.Profile(feederFile);
+        Assert.DoesNotContain(feederProfile.Ports, p => p.Origin == PortOrigin.Specs && p.Signal.CarriesData()); // GDTF data wiring is complete
+
+        var kit = new SceneKit();
+        var desk = kit.Console("Desk", new Vector3(0, -12, 0), SceneKit.EthernetOutput("Net 1", 5, 2));
+        var feeder = kit.Fixture(feederFile, "Feeder", 90, new Vector3(0, -6, 0));
+        var head = kit.Fixture(TestData.Naja, "Head", 1, new Vector3(0, 0, 6), universe: 5, address: 1);
+        var stray = kit.Fixture(TestData.Naja, "Stray", 2, new Vector3(2, 0, 6), universe: 6, address: 1);
+        kit.Cable("ethernet", "E", (desk, "Net 1"), (feeder, "Ethernet IN"));
+        kit.Cable("dmx-xlr5", "D1", (feeder, "Data OUT"), (head, "XLR IN"));
+        kit.Cable("dmx-xlr5", "D2", (head, "XLR OUT"), (stray, "XLR IN"));
+
+        var s = kit.Solve();
+        var feed = s.DataFeedOf(head.Id)!;
+        Assert.Equal((SignalKind.Dmx512, 5, 1, 2), (feed.Signal, feed.FirstUniverse, feed.UniverseCount, feed.ChainIndex));
+        Assert.Equal(feeder.Id, feed.UpstreamEntityId);
+        Assert.True(s.IsConsoleDriven(head.Id));
+        var mismatch = s.Issues.Single(IssueCodes.DataUniverseMismatch);
+        Assert.Contains("#2 'Stray'", mismatch.Message);
+        Assert.Contains("carries universe 5", mismatch.Message);
+        Assert.Contains(s.Issues, i => i.Code == IssueCodes.CableAdapterNeeded && i.Message.Contains("Martin 8-pin"));
+    }
+
+    [Fact]
     public void A_fixture_fed_from_two_console_outputs_is_a_warning()
     {
         var kit = new SceneKit();

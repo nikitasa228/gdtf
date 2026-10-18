@@ -157,11 +157,16 @@ public class PortTests
     [Fact]
     public void Every_library_fixture_that_needs_power_and_dmx_gets_matching_ports()
     {
+        // A private library with a tiny parse cache: profiles keep no reference to the parsed GDTF, so memory stays
+        // flat while all 1091 files are parsed.
+        var library = new Candela.Gdtf.FixtureLibrary(TestData.Specs, cacheCapacity: 2);
+        Assert.Equal(1091, library.AddFolder(TestData.RepoRoot));
+        var profiles = new LibraryFixtureProfileProvider(library);
         var missingPower = new ConcurrentBag<string>();
         var missingData = new ConcurrentBag<string>();
-        Parallel.ForEach(TestData.Library.Entries, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, entry =>
+        Parallel.ForEach(library.Entries, new ParallelOptions { MaxDegreeOfParallelism = Math.Min(2, Environment.ProcessorCount) }, entry =>
         {
-            var profile = TestData.Profiles.GetProfile(entry.FileName, null);
+            var profile = profiles.GetProfile(entry.FileName, null);
             Assert.NotNull(profile);
             var specs = entry.Specs!;
             bool battery = specs.BatteryPowered && (specs.PowerConnectorIn is null || specs.PowerConnectorIn.StartsWith("Battery", StringComparison.Ordinal));
