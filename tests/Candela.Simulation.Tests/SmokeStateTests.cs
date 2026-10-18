@@ -13,13 +13,13 @@ public sealed class SmokeStateTests
         SmokeEmitter.Fan(new Vector3(-1.8f, -1.5f, 1f), new Vector3(1f, 0.5f, 0f), 0.7f),
     ];
 
-    private static SmokeSimulation Scene(int threads = -1)
+    private static SmokeSimulation Scene(int threads = -1, DomainFaces open = DomainFaces.AllButFloor)
     {
         var sim = new SmokeSimulation(new SmokeSimulationSettings
         {
             Bounds = new Aabb(new Vector3(-2f, -2f, 0f), new Vector3(2f, 2f, 3f)),
             CellSize = 0.125f,
-            OpenFaces = DomainFaces.AllButFloor,
+            OpenFaces = open,
             MaxDegreeOfParallelism = threads,
         });
         sim.SetObstacles([ObstacleBox.FromAabb(new Aabb(new Vector3(0f, -0.5f, 0f), new Vector3(0.5f, 0.5f, 1f)))]);
@@ -55,12 +55,14 @@ public sealed class SmokeStateTests
         Assert.True(a.TotalSmokeMass() > 0);
     }
 
-    [Fact]
-    public void Results_DoNotDependOnTheThreadCount()
+    [Theory]
+    [InlineData(DomainFaces.AllButFloor)]
+    [InlineData(DomainFaces.None)] // singular pressure system: the null-space projection of the CG residual runs too
+    public void Results_DoNotDependOnTheThreadCount(DomainFaces open)
     {
-        var parallel = Scene(-1);
-        var serial = Scene(1);
-        var two = Scene(2);
+        var parallel = Scene(-1, open);
+        var serial = Scene(1, open);
+        var two = Scene(2, open);
         for (int n = 0; n < 20; n++)
         {
             parallel.StepOnce(Emitters);
