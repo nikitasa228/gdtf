@@ -188,6 +188,201 @@ public sealed class ShadowTests
         }
     }
 
+    [SkippableFact]
+    public void EveryShadowCasterWithinTheBudgetGetsAWorkingTile()
+    {
+        // Twelve equally important lights, each over its own box: every one must be shadowed. (The atlas holds four
+        // full-size tiles; sizing every equally scored light at full size used to leave all but four unshadowed.)
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            var grey = scene.Lambert(new Vector3(0.6f));
+            scene.Floor(30f, grey);
+            var lights = new SpotLight[12];
+            var boxes = new Vector3[lights.Length];
+            for (int i = 0; i < lights.Length; i++)
+            {
+                var p = new Vector3(-7.5f + 5f * (i % 4), -5f + 5f * (i / 4), 4f);
+                lights[i] = StageScene.Spot(p, p with { Z = 0f }, 8000f, 30f, 40f);
+                boxes[i] = new Vector3(p.X - 0.5f, p.Y, 0.5f);
+                scene.Box(new Vector3(0.5f, 0.5f, 1f), boxes[i], grey); // its shadow on the floor: x from -0.75 to -1 m off the light
+            }
+
+            renderer.World.SetLights(lights);
+            var view = new TopDownView(Width, Height, 16f);
+            using var target = renderer.CreateTarget(Width, Height);
+            var settings = new PreviewSettings();
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux }, settings, 0f);
+            Assert.Equal(lights.Length, renderer.LastStatistics.ShadowedLights);
+            var lux = renderer.ReadAnalysis(target);
+            var reference = lights.Select(l => new Photometry.SpotLight(l.Position, l.Direction, l.PeakCandela,
+                BeamDistribution.Create(l.BeamType, l.BeamAngle, l.FieldAngle))).ToArray();
+            for (int i = 0; i < lights.Length; i++)
+            {
+                // Behind the box as seen from its light: in the umbra.
+                var (x, y, centre) = view.NearestPixel(new Vector3(lights[i].Position.X - 0.875f, lights[i].Position.Y, 0f));
+                float unshadowed = LightMeter.IlluminanceAt(reference, centre, Vector3.UnitZ);
+                Assert.True(lux[y * Width + x] < 0.02f * unshadowed, $"light {i}: {lux[y * Width + x]:F1} lx in the umbra, {unshadowed:F1} lx unshadowed");
+            }
+
+            // Reflective shadow maps of every shadowed light share one budget of virtual point lights.
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false }, settings, 0f);
+            Assert.InRange(renderer.LastStatistics.VirtualPointLights, 1, LightPlanner.VplBudget);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
+    public void TwoViewsInOneFrameShareTheAtlasWithoutReRendering()
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            var grey = scene.Lambert(new Vector3(0.6f));
+            scene.Floor(40f, grey);
+            scene.Box(Vector3.One, new Vector3(0f, 0f, 0.5f), grey);
+            var lights = new SpotLight[8];
+            for (int i = 0; i < lights.Length; i++)
+            {
+                var p = new Vector3(-10.5f + 3f * i, 0f, 6f);
+                lights[i] = StageScene.Spot(p, p with { Z = 0f }, 20000f, 30f, 45f);
+            }
+
+            renderer.World.SetLights(lights);
+            using var a = renderer.CreateTarget(96, 72);
+            using var b = renderer.CreateTarget(96, 72);
+            var near = RenderCamera.LookAt(new Vector3(-9f, -4f, 3f), new Vector3(-9f, 0f, 0f), 50f);
+            var wide = RenderCamera.LookAt(new Vector3(0f, -25f, 12f), Vector3.Zero, 60f);
+            var options = new ViewOptions { ShowGrid = false };
+            var settings = new PreviewSettings { Volumetrics = false };
+            int tiles = -1, shadowedA = 0, shadowedB = 0;
+            for (int frame = 0; frame < 6; frame++)
+            {
+                var f = renderer.Context.BeginFrame();
+                renderer.Render(a, near, options, settings, 1f / 60f);
+                tiles = renderer.LastStatistics.ShadowTilesRendered;
+                shadowedA = renderer.LastStatistics.ShadowedLights;
+                renderer.Render(b, wide, options, settings, 1f / 60f);
+                tiles += renderer.LastStatistics.ShadowTilesRendered;
+                shadowedB = renderer.LastStatistics.ShadowedLights;
+                renderer.Context.SubmitFrame(f);
+            }
+
+            Assert.Equal(0, tiles); // steady state: the views keep each other's tiles
+            Assert.Equal(lights.Length, shadowedB);
+            Assert.True(shadowedA > 0);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
+    public void GrazingLightOnAShadowCastingFloorHasNoAcne()
+    {
+        // Robust bias: a floor that casts shadows itself, lit at 10-20 degrees elevation, keeps the unshadowed
+        // illuminance (1 %) everywhere in the pools.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(30f, scene.Lambert(new Vector3(0.5f)), InstanceFlags.CastShadow);
+            var lights = new[]
+            {
+                StageScene.Spot(new Vector3(-8f, 0f, 1.5f), Vector3.Zero, 200000f, 20f, 30f),
+                StageScene.Spot(new Vector3(0f, -9f, 3f), new Vector3(0f, 1f, 0f), 100000f, 30f, 45f),
+            };
+            lights[0].SourceRadius = 0.1f;
+            lights[1].SourceRadius = 0.05f;
+            renderer.World.SetLights(lights);
+            var view = new TopDownView(Width, Height, 12f);
+            using var target = renderer.CreateTarget(Width, Height);
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux }, new PreviewSettings(), 0f);
+            var lux = renderer.ReadAnalysis(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            var reference = lights.Select(l => new Photometry.SpotLight(l.Position, l.Direction, l.PeakCandela,
+                BeamDistribution.Create(l.BeamType, l.BeamAngle, l.FieldAngle))).ToArray();
+            int n = 0;
+            for (int py = 0; py < Height; py += 3)
+            {
+                for (int px = 0; px < Width; px += 3)
+                {
+                    float expected = LightMeter.IlluminanceAt(reference, view.FloorPointOf(px, py), Vector3.UnitZ);
+                    if (expected < 20f)
+                        continue;
+                    n++;
+                    Assert.True(MathF.Abs(lux[py * Width + px] - expected) <= 0.01f * expected,
+                        $"pixel ({px}, {py}): {lux[py * Width + px]:F1} lx, light meter {expected:F1} lx");
+                }
+            }
+
+            Assert.True(n > 500, $"{n} lit points");
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableTheory]
+    [InlineData(0f)]
+    [InlineData(0.15f)]
+    public void LitSphereHasNoSelfShadowAcne(float sourceRadius)
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            var grey = scene.Lambert(new Vector3(0.5f));
+            scene.Floor(20f, grey);
+            var centre = new Vector3(0f, 0f, 1f);
+            scene.Sphere(1f, centre, grey);
+            var light = StageScene.Spot(new Vector3(-3f, -1f, 6f), centre, 50000f, 40f, 60f);
+            light.SourceRadius = sourceRadius;
+            renderer.World.SetLights(new[] { light });
+            var view = new TopDownView(200, 200, 3f);
+            using var target = renderer.CreateTarget(200, 200);
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux }, new PreviewSettings(), 0f);
+            var lux = renderer.ReadAnalysis(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            var reference = new[] { new Photometry.SpotLight(light.Position, light.Direction, light.PeakCandela,
+                BeamDistribution.Create(light.BeamType, light.BeamAngle, light.FieldAngle)) };
+            int n = 0;
+            for (int y = 0; y < 200; y += 2)
+            {
+                for (int x = 0; x < 200; x += 2)
+                {
+                    var floor = view.FloorPointOf(x, y);
+                    float r2 = floor.X * floor.X + floor.Y * floor.Y;
+                    if (r2 > 0.64f)
+                        continue;
+                    var p = new Vector3(floor.X, floor.Y, centre.Z + MathF.Sqrt(1f - r2)); // the sphere seen from above
+                    var normal = Vector3.Normalize(p - centre);
+                    if (Vector3.Dot(normal, Vector3.Normalize(light.Position - p)) < 0.35f)
+                        continue; // away from the terminator (the mesh is tessellated)
+                    float expected = LightMeter.IlluminanceAt(reference, p, normal);
+                    Assert.True(MathF.Abs(lux[y * 200 + x] - expected) <= 0.04f * expected,
+                        $"{p}: {lux[y * 200 + x]:F1} lx, light meter {expected:F1} lx");
+                    n++;
+                }
+            }
+
+            Assert.True(n > 500, $"{n} lit sphere points");
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     private static StageScene BuildBoxScene(VulkanRenderer renderer, InstanceFlags boxFlags)
     {
         var scene = new StageScene(renderer);

@@ -168,6 +168,52 @@ public sealed class CookieTests
         }
     }
 
+    [SkippableFact]
+    public void FrostAndPrismKeepTheFlux()
+    {
+        // The lux overlay integrated over a large floor is the flux reaching it: the open beam equals the light meter's
+        // integral, and a lossless diffuser (frost) or a prism (N copies with 1/N each) only redistributes it.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(40f, scene.Lambert(new Vector3(0.5f)), InstanceFlags.None);
+            var view = new TopDownView(200, 200, 16f);
+            using var target = renderer.CreateTarget(200, 200);
+            double pixelArea = (16.0 / 200) * (16.0 / 200);
+            double Flux(SpotLight light)
+            {
+                renderer.World.SetLights(new[] { light });
+                renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux }, new PreviewSettings(), 0f);
+                return renderer.ReadAnalysis(target).Sum(v => (double)v) * pixelArea;
+            }
+
+            var open = StageScene.Spot(new Vector3(0f, 0f, 4f), Vector3.Zero, 20000f, 20f, 30f, shadows: false);
+            double reference = 0;
+            var meter = new[] { new Photometry.SpotLight(open.Position, open.Direction, open.PeakCandela, BeamDistribution.Create(open.BeamType, open.BeamAngle, open.FieldAngle)) };
+            for (int y = 0; y < 200; y++)
+            {
+                for (int x = 0; x < 200; x++)
+                    reference += LightMeter.IlluminanceAt(meter, view.FloorPointOf(x, y), Vector3.UnitZ) * pixelArea;
+            }
+
+            double openFlux = Flux(open);
+            Assert.InRange(openFlux / reference, 0.99, 1.01);
+            var frosted = open;
+            frosted.Frost = 1f;
+            Assert.InRange(Flux(frosted) / openFlux, 0.98, 1.02);
+            var prism = open;
+            prism.PrismFacets = 3;
+            prism.PrismSpread = 0.3f;
+            Assert.InRange(Flux(prism) / openFlux, 0.98, 1.02);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     private static SpotLight Light(float beamDeg, float fieldDeg, Vector3? position = null)
     {
         var p = position ?? new Vector3(0f, 0f, Height0);

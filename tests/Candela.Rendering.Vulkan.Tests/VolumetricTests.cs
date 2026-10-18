@@ -181,6 +181,141 @@ public sealed class VolumetricTests
         }
     }
 
+    [SkippableTheory]
+    [InlineData(true, 16)]
+    [InlineData(true, 0)]
+    [InlineData(false, 16)]
+    public void LookingUpTheBeamMatchesTheIntegral(bool narrow, int maxRaymarched)
+    {
+        // From inside the beam towards the light (strong forward scattering, steep gradients along the view ray):
+        // the ray-marched narrow beam, the same beam in the froxels and a wide beam in the froxels.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var light = narrow
+                ? StageScene.Spot(LightPosition, Vector3.Zero, 40000f, 8f, 12f, shadows: false)
+                : StageScene.Spot(LightPosition, Vector3.Zero, 10000f, 40f, 60f, shadows: false);
+            var eye = narrow ? new Vector3(0f, -0.1f, 1f) : new Vector3(0f, -0.5f, 1f);
+            var look = narrow ? new Vector3(0f, 0.3f, 3.5f) : new Vector3(0f, 0.4f, 3.5f);
+            renderer.World.SetLights(new[] { light });
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = Haze, Anisotropy = Anisotropy });
+            using var target = renderer.CreateTarget(Width, Height);
+            var camera = RenderCamera.LookAt(eye, look, 40f);
+            camera.Ev100 = 6f;
+            var settings = new PreviewSettings { TemporalAccumulation = false, VolumetricSlices = 128, Bloom = false, MaxRaymarchedBeams = maxRaymarched };
+            renderer.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, settings, 1f / 60f);
+            Assert.Equal(narrow && maxRaymarched > 0 ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
+            float measured = CentreLuminance(renderer.ReadHdr(target));
+            float expected = ReferenceInScattering(light, eye, Vector3.Normalize(look - eye));
+            Assert.InRange(MathF.Abs(measured - expected) / expected, 0f, 0.05f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ShadowedHazeStaysDark(bool narrow)
+    {
+        // A plate 1 m below the light blocks the middle of the beam: the haze under it (froxels, or the ray-marched
+        // narrow beam) gets no light.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Box(new Vector3(2f, 2f, 0.05f), new Vector3(0f, 0f, 3f), scene.Lambert(new Vector3(0.5f)));
+            var light = narrow
+                ? StageScene.Spot(LightPosition, Vector3.Zero, 40000f, 8f, 12f)
+                : StageScene.Spot(LightPosition, Vector3.Zero, 10000f, 40f, 60f);
+            renderer.World.SetLights(new[] { light });
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = Haze, Anisotropy = Anisotropy });
+            using var target = renderer.CreateTarget(Width, Height);
+            var camera = RenderCamera.LookAt(CameraPosition, CameraPosition + Vector3.UnitY, 40f);
+            camera.Ev100 = 2f;
+            var settings = new PreviewSettings { TemporalAccumulation = false, Bloom = false, Indirect = IndirectLighting.Off };
+            var options = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
+            renderer.Render(target, camera, options, settings, 1f / 60f);
+            Assert.Equal(narrow ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
+            float shadowed = CentreLuminance(renderer.ReadHdr(target));
+            settings.Shadows = false;
+            renderer.Render(target, camera, options, settings, 1f / 60f);
+            float lit = CentreLuminance(renderer.ReadHdr(target));
+            Assert.True(lit > 0.1f, $"lit haze {lit} cd/m²");
+            Assert.True(shadowed < 0.02f * lit, $"shadowed haze {shadowed} cd/m², {lit} cd/m² unshadowed");
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FroxelHistoryIsReprojectedWhenTheCameraMoves(bool rotate)
+    {
+        // The camera trucks (or pans) over 20 frames and ends on the beam: with the history reprojected the beam is
+        // where the converged still image has it; without (history read at the same froxel) it lags by ~5 px.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var light = StageScene.Spot(LightPosition, Vector3.Zero, 10000f, 40f, 60f, shadows: false);
+            renderer.World.SetLights(new[] { light });
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = Haze, Anisotropy = Anisotropy });
+            using var target = renderer.CreateTarget(Width, Height);
+            var settings = new PreviewSettings { TemporalAccumulation = true, VolumetricSlices = 64, Bloom = false, MaxRaymarchedBeams = 0 };
+            RenderCamera Camera(int i)
+            {
+                var eye = rotate ? CameraPosition : CameraPosition + new Vector3(-1f + 0.05f * i, 0f, 0f);
+                float yaw = rotate ? 0.15f - 0.0075f * i : 0f;
+                var camera = RenderCamera.LookAt(eye, eye + new Vector3(MathF.Sin(yaw), MathF.Cos(yaw), 0f), 40f);
+                camera.Ev100 = 2f;
+                return camera;
+            }
+
+            var options = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
+            for (int i = 0; i <= 20; i++)
+                renderer.Render(target, Camera(i), options, settings, 1f / 60f);
+            float moving = BeamCentroid(renderer.ReadHdr(target));
+            for (int i = 0; i < 30; i++)
+                renderer.Render(target, Camera(20), options, settings, 1f / 60f);
+            float still = BeamCentroid(renderer.ReadHdr(target));
+            Assert.InRange(moving - still, -0.75f, 0.75f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    /// <summary>Luminance-weighted mean column of the lower part of the image (below the light), pixels.</summary>
+    private static float BeamCentroid(HdrReadback hdr)
+    {
+        double sum = 0, weighted = 0;
+        for (int y = hdr.Height / 3; y < hdr.Height - 10; y++)
+        {
+            for (int x = 0; x < hdr.Width; x++)
+            {
+                float l = hdr.LuminanceAt(x, y);
+                sum += l;
+                weighted += l * (x + 0.5);
+            }
+        }
+
+        return (float)(weighted / sum);
+    }
+
+    /// <summary>Mean luminance of the four pixels around the image centre (the centre ray lies between them).</summary>
+    private static float CentreLuminance(HdrReadback hdr) =>
+        0.25f * (hdr.LuminanceAt(Width / 2 - 1, Height / 2 - 1) + hdr.LuminanceAt(Width / 2, Height / 2 - 1) +
+                 hdr.LuminanceAt(Width / 2 - 1, Height / 2) + hdr.LuminanceAt(Width / 2, Height / 2));
+
     /// <summary>
     /// Renders the beam in haze (no geometry, black background) from the side and returns the luminance of the centre
     /// pixel, whose view ray crosses the beam axis 2 m below the light at right angles.
@@ -222,18 +357,20 @@ public sealed class VolumetricTests
     /// does not absorb, but the light it scatters leaves both the light's path r and the view path l), integrated
     /// numerically with the midpoint rule.
     /// </summary>
-    private static float ReferenceInScattering(SpotLight light)
+    private static float ReferenceInScattering(SpotLight light) => ReferenceInScattering(light, CameraPosition, Vector3.UnitY);
+
+    /// <inheritdoc cref="ReferenceInScattering(SpotLight)"/>
+    private static float ReferenceInScattering(SpotLight light, Vector3 origin, Vector3 direction)
     {
         var beam = BeamDistribution.Create(light.BeamType, light.BeamAngle, light.FieldAngle);
-        var direction = Vector3.UnitY;
         double sum = 0;
-        const int steps = 200000;
-        const double length = 40;
+        const int steps = 400000;
+        const double length = 60;
         double dl = length / steps;
         for (int i = 0; i < steps; i++)
         {
             double l = (i + 0.5) * dl;
-            var x = CameraPosition + direction * (float)l;
+            var x = origin + direction * (float)l;
             var toPoint = x - light.Position;
             float r = toPoint.Length();
             var propagation = toPoint / r;
