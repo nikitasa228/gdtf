@@ -137,6 +137,27 @@ public class FileDefectTests
     }
 
     [Fact]
+    public void Rotations_and_shakes_with_the_default_physical_range_turn_and_shake_at_real_rates()
+    {
+        // Vari-Lite VL2600 Spot: Gobo1PosRotate 0…1 "deg/s" (not a 1 °/s crawl)
+        var vl = TestData.Profile("Vari-Lite@VL2600_Spot", "16Bit Enhanced");
+        var rotate = vl.Functions.First(f => f.Class.Kind == AttributeKind.SlotRotate && f.Attribute == "Gobo1PosRotate");
+        var buffer = Full(vl);
+        DmxEncoder.EncodeFunction(buffer, rotate.Index, 1f);
+        var gobo = FixtureEvaluator.Evaluate(vl, buffer, 2.0).Beams[0].Gobos[0];
+        Assert.Equal(360f * Deg, MathF.Abs(gobo.RotationSpeed), 0.02f);
+
+        // Elation Fuze Max Spot: Gobo1SelectShake 0…1 "Hz"
+        var fuze = TestData.Profile("Elation@Fuze_Max_Spot", "Standard Pan540");
+        var shake = fuze.Functions.First(f => f.Class.Kind == AttributeKind.WheelSelectShake && f.Attribute == "Gobo1SelectShake");
+        buffer = Full(fuze);
+        buffer.SetValue(shake.Channel, shake.DmxTo);
+        var state = FixtureEvaluator.Evaluate(fuze, buffer, 1.0);
+        Assert.Equal(shake.Index, state.GetChannel(shake.Channel).Function);
+        Assert.InRange(state.Beams[0].Gobos[0].ShakeFrequency, 5f, 10f);
+    }
+
+    [Fact]
     public void A_shutter_function_named_open_opens_the_shutter_over_its_whole_range()
     {
         // LIGHT_SKY IP2021 Profile: Shutter1 function "Open" with GDTF's default physical range and no channel sets

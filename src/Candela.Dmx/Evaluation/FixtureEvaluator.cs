@@ -425,12 +425,26 @@ public static class FixtureEvaluator
         m.Motor = default; // different quantity: the first step jumps
     }
 
-    /// <summary>Rotation speed in deg/s of a spin function's physical value (0 … 1 ranges are read as turns per second).</summary>
+    /// <summary>
+    /// Rotation speed in deg/s of a spin function's physical value (0 … 1 ranges without an angular-speed unit, and GDTF's
+    /// default range 0 … 1, are read as turns per second).
+    /// </summary>
     private static float SpinSpeed(ProfileFunction f, float physical)
     {
         if (!float.IsFinite(physical)) return 0f;
-        if (f.Unit != Gdtf.PhysicalUnit.AngularSpeed && f.LevelScale <= 1f) return physical * 360f;
+        if ((f.Unit != Gdtf.PhysicalUnit.AngularSpeed || f.DefaultPhysicalRange) && f.LevelScale <= 1f) return physical * 360f;
         return Math.Clamp(physical, -36000f, 36000f);
+    }
+
+    /// <summary>
+    /// Shake frequency in Hz of a shake function (wheel, slot or select shake): its physical value, 2 Hz when it gives none,
+    /// and 0.5 … 10 Hz over GDTF's default range 0 … 1 (a placeholder, not 0 … 1 Hz).
+    /// </summary>
+    private static float ShakeFrequency(ProfileFunction f, float physical)
+    {
+        if (!float.IsFinite(physical)) return 2f;
+        if (f.DefaultPhysicalRange) return 0.5f + 9.5f * Math.Clamp(physical, 0f, 1f);
+        return MathF.Abs(physical) > 0.01f ? MathF.Abs(physical) : 2f;
     }
 
     /// <summary>Motion groups for MSpeed channels: 0 position, 1 colour, 2 gobo, 3 beam (zoom/focus/iris/frost/prism), 4 shaper, 5 other.</summary>
@@ -904,7 +918,7 @@ public static class FixtureEvaluator
                 }
                 else if (f.Class.Kind == AttributeKind.WheelSelectShake && (flags & ChannelSetFlags.NoFunction) == 0)
                 {
-                    float hz = MathF.Abs(r.Physical) > 0.01f ? MathF.Abs(r.Physical) : 2f;
+                    float hz = ShakeFrequency(f, r.Physical);
                     w.ShakeFrequency = hz;
                     if (float.IsFinite(w.Position)) w.Position += 0.12f * Waveforms.Oscillation(ctx.Time, hz);
                     animating = true;
@@ -924,7 +938,7 @@ public static class FixtureEvaluator
                 }
             case AttributeKind.WheelShake:
                 {
-                    float hz = MathF.Abs(r.Physical) > 0.01f ? MathF.Abs(r.Physical) : 2f;
+                    float hz = ShakeFrequency(f, r.Physical);
                     if (!float.IsFinite(w.Position)) w.Position = 1f;
                     w.Position += 0.25f * Waveforms.Oscillation(ctx.Time, hz);
                     w.ShakeFrequency = hz;
@@ -933,7 +947,7 @@ public static class FixtureEvaluator
                 }
             case AttributeKind.WheelRandom:
                 {
-                    float hz = Math.Clamp(MathF.Abs(r.Physical), 0.05f, 50f);
+                    float hz = f.DefaultPhysicalRange ? 0.2f + 4.8f * Math.Clamp(r.Physical, 0f, 1f) : Math.Clamp(MathF.Abs(r.Physical), 0.05f, 50f);
                     long k = (long)Math.Floor(ctx.Time * hz);
                     w.Position = 1f + MathF.Floor(Waveforms.Hash01(ctx.Seed, k, 0x77u + (uint)n) * slots);
                     animating = true;
@@ -952,7 +966,7 @@ public static class FixtureEvaluator
                 break;
             case AttributeKind.SlotShake:
                 {
-                    float hz = MathF.Abs(r.Physical) > 0.01f ? MathF.Abs(r.Physical) : 2f;
+                    float hz = ShakeFrequency(f, r.Physical);
                     w.Rotation += 15f * DegToRad * Waveforms.Oscillation(ctx.Time, hz);
                     w.ShakeFrequency = hz;
                     animating = true;
