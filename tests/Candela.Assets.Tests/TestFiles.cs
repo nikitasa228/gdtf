@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.IO.Compression;
 using System.Numerics;
 using System.Text;
 using Candela.Assets;
@@ -422,32 +421,6 @@ internal static class TestFiles
         var scene = model.UseScene("scene");
         scene.CreateNode("box").Mesh = mesh;
         return model;
-    }
-
-    /// <summary>A 3MF package with a Z-up box in millimetres.</summary>
-    public static byte[] ThreeMf()
-    {
-        var corners = BoxCorners(yUp: false, 1000f);
-        var tris = BoxQuads().SelectMany(q => new[] { (q[0], q[1], q[2]), (q[0], q[2], q[3]) });
-        var model = new StringBuilder("""<?xml version="1.0" encoding="UTF-8"?>""" + "\n");
-        model.Append("""<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><object id="1" type="model"><mesh><vertices>""");
-        foreach (var c in corners) model.Append($"<vertex x=\"{F(c.X)}\" y=\"{F(c.Y)}\" z=\"{F(c.Z)}\"/>");
-        model.Append("</vertices><triangles>");
-        foreach (var (a, b, c) in tris) model.Append($"<triangle v1=\"{a}\" v2=\"{b}\" v3=\"{c}\"/>");
-        model.Append("""</triangles></mesh></object></resources><build><item objectid="1"/></build></model>""");
-        using var ms = new MemoryStream();
-        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
-        {
-            void Add(string name, string content)
-            {
-                using var s = zip.CreateEntry(name).Open();
-                s.Write(Encoding.UTF8.GetBytes(content));
-            }
-            Add("[Content_Types].xml", """<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>""");
-            Add("_rels/.rels", """<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>""");
-            Add("3D/3dmodel.model", model.ToString());
-        }
-        return ms.ToArray();
     }
 
     /// <summary>Header of a SketchUp file (0xFF 0xFE 0xFF, length, "SketchUp Model" in UTF-16LE) plus filler.</summary>

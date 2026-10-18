@@ -18,10 +18,10 @@ public enum ModelFormat
     /// <summary>3D Studio (.3ds). Z-up, units unknown.</summary>
     ThreeDs,
 
-    /// <summary>Stereolithography (.stl, ASCII or binary). Z-up (CAD), units unknown (often millimetres).</summary>
+    /// <summary>Stereolithography (.stl, ASCII or binary; read by Candela's own reader). Z-up (CAD), units unknown (often millimetres).</summary>
     Stl,
 
-    /// <summary>Stanford polygon file (.ply). Treated as Z-up, units unknown.</summary>
+    /// <summary>Stanford polygon file (.ply, ASCII or binary; read by Candela's own reader). Treated as Z-up, units unknown.</summary>
     Ply,
 
     /// <summary>glTF 2.0 JSON (.gltf) with external or embedded buffers. Y-up metres by specification.</summary>
@@ -29,12 +29,6 @@ public enum ModelFormat
 
     /// <summary>Binary glTF 2.0 (.glb). Y-up metres by specification.</summary>
     Glb,
-
-    /// <summary>3D Manufacturing Format (.3mf). Z-up; the unit is in the file (default millimetres).</summary>
-    ThreeMf,
-
-    /// <summary>Any other format AssimpNet reads (.x, .ase, .lwo, .off, .ac, .x3d, .ms3d, .zae); read in Assimp's Y-up convention.</summary>
-    OtherAssimp,
 
     /// <summary>SketchUp (.skp): closed format, detected only to be rejected with a helpful message.</summary>
     SketchUp,
@@ -57,16 +51,8 @@ public static class AssetFormats
         [".gltf"] = ModelFormat.Gltf,
         [".glb"] = ModelFormat.Glb,
         [".skp"] = ModelFormat.SketchUp,
-        // Further formats handled by the bundled Assimp build that are reasonably common for set and prop models.
-        [".3mf"] = ModelFormat.ThreeMf,
-        [".x"] = ModelFormat.OtherAssimp,
-        [".ase"] = ModelFormat.OtherAssimp,
-        [".lwo"] = ModelFormat.OtherAssimp,
-        [".off"] = ModelFormat.OtherAssimp,
-        [".ac"] = ModelFormat.OtherAssimp,
-        [".x3d"] = ModelFormat.OtherAssimp,
-        [".ms3d"] = ModelFormat.OtherAssimp,
-        [".zae"] = ModelFormat.OtherAssimp,
+        // Further formats of the bundled Assimp build (3MF, X, X3D, …) are deliberately not offered: fuzzing showed that
+        // their readers crash the process on damaged files (see ModelPreflight and docs/assets.md).
     };
 
     private static readonly HashSet<string> s_imageExtensions = new(StringComparer.OrdinalIgnoreCase)

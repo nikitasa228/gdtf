@@ -10,7 +10,7 @@ using Matrix4x4 = System.Numerics.Matrix4x4;
 namespace Candela.Assets;
 
 /// <summary>
-/// Reads OBJ, FBX, COLLADA, 3DS, STL, PLY and the other Assimp formats into a <see cref="RawModel"/> (source space).
+/// Reads OBJ, FBX, COLLADA and 3DS into a <see cref="RawModel"/> (source space).
 /// Assimp reads through <see cref="VirtualIOSystem"/>, so companions come from the <see cref="ModelFileSet"/>.
 /// Root-node conversions that Assimp applies on its own (COLLADA unit/up axis, 3DS Z→Y rotation) are removed so that
 /// axis and unit handling happens in one place (<see cref="ModelImporter"/>) from the file's metadata.
@@ -35,8 +35,9 @@ internal static class AssimpReader
         var files = ctx.Files;
         string ext = Path.GetExtension(files.MainFile).ToLowerInvariant();
         string alias = "__candela_main__" + ext;
+        var main = ModelPreflight.Prepare(ctx, out var companionFilter);
         AiScene? scene;
-        using (var io = new VirtualIOSystem(files, alias))
+        using (var io = new VirtualIOSystem(files, alias, main, companionFilter))
         using (var assimp = new AssimpContext())
         {
             assimp.SetIOSystem(io);
@@ -57,6 +58,7 @@ internal static class AssimpReader
             {
                 throw new AssetImportException(Describe(ctx.Format, e.Message), e);
             }
+            ModelPreflight.ReportWarnings(ctx);
         }
         if (scene is null) throw new AssetImportException(Describe(ctx.Format, "no scene was produced"));
         if (!scene.HasMeshes || scene.RootNode is null) throw new AssetImportException("The file contains no surface geometry (only points, lines or empty objects).");
@@ -129,8 +131,6 @@ internal static class AssimpReader
             ModelFormat.Fbx => "FBX",
             ModelFormat.Collada => "COLLADA (.dae)",
             ModelFormat.ThreeDs => "3DS",
-            ModelFormat.Stl => "STL",
-            ModelFormat.Ply => "PLY",
             ModelFormat.Gltf or ModelFormat.Glb => "glTF",
             _ => "model",
         };
@@ -186,24 +186,12 @@ internal static class AssimpReader
                 resetRoot = true;
                 break;
             case ModelFormat.ThreeDs:
-            case ModelFormat.Stl:
-            case ModelFormat.Ply:
                 raw.UpAxis = SourceUpAxis.Z;
                 resetRoot = true;
-                break;
-            case ModelFormat.ThreeMf:
-                raw.UpAxis = SourceUpAxis.Z;
-                resetRoot = true;
-                if (SourceMetadata.Read3mfUnit(ctx.Files.MainData) is { } unit)
-                {
-                    raw.UnitScale = unit;
-                    raw.UnitsKnown = true;
-                }
                 break;
             default:
-                // glTF read by Assimp (fallback) and the other formats: Assimp's own Y-up convention, metres.
+                // Not reached for the supported formats (glTF and PLY have their own readers); Assimp's Y-up convention.
                 raw.UpAxis = SourceUpAxis.Y;
-                raw.UnitsKnown = ctx.Format is ModelFormat.Gltf or ModelFormat.Glb;
                 break;
         }
     }
@@ -277,7 +265,7 @@ internal static class AssimpReader
     /// <summary>
     /// Converts one Assimp mesh (triangles only). Normals come from the file when it has valid ones; otherwise they are
     /// generated with <paramref name="smoothingAngle"/> (Assimp's own generator cannot split vertices that a format such
-    /// as PLY or 3MF already shares between faces, which smears normals around hard edges).
+    /// as STL or 3DS already shares between faces, which smears normals around hard edges).
     /// </summary>
     private static MeshData? ConvertMesh(AiMesh m, float smoothingAngle)
     {
@@ -336,7 +324,7 @@ internal static class AssimpReader
         return mesh;
     }
 
-    /// <summary>Names Assimp gives the material it invents for geometry without one (OBJ, 3DS, 3MF, FBX readers).</summary>
+    /// <summary>Names Assimp gives the material it invents for geometry without one (OBJ, 3DS, FBX readers).</summary>
     private static bool IsAssimpDefaultMaterial(Material am) =>
         am.HasName && am.Name is "DefaultMaterial" or "%%%DEFAULT" or "$$$DEFAULT" && am.GetAllMaterialTextures().Length == 0;
 
@@ -511,24 +499,21 @@ internal static class AssimpReader
     }
 }
 
-/// <summary>Assimp file system over a <see cref="ModelFileSet"/> (read-only).</summary>
-internal sealed class VirtualIOSystem : IOSystem
+/// <summary>
+/// Assimp file system over a <see cref="ModelFileSet"/> (read-only). The main file is served from
+/// <paramref name="mainData"/> (possibly sanitised); companions pass through <paramref name="companionFilter"/>
+/// (e.g. MTL sanitising) before Assimp sees them. The file set itself keeps the original bytes.
+/// </summary>
+internal sealed class VirtualIOSystem(ModelFileSet files, string mainAlias, byte[] mainData, Func<string, byte[], byte[]>? companionFilter)
+    : IOSystem
 {
-    private readonly ModelFileSet _files;
-    private readonly string _mainAlias;
-
-    public VirtualIOSystem(ModelFileSet files, string mainAlias)
-    {
-        _files = files;
-        _mainAlias = mainAlias;
-    }
-
     public override IOStream OpenFile(string pathToFile, FileIOMode fileMode)
     {
         if (fileMode is not (FileIOMode.Read or FileIOMode.ReadBinary or FileIOMode.ReadText)) return null!;
         var normalized = (pathToFile ?? "").Replace('\\', '/');
-        if (normalized.EndsWith(_mainAlias, StringComparison.OrdinalIgnoreCase)) return new MemoryIOStream(pathToFile!, fileMode, _files.MainData);
-        return _files.TryRead(normalized, out _, out var data) ? new MemoryIOStream(pathToFile!, fileMode, data) : null!;
+        if (normalized.EndsWith(mainAlias, StringComparison.OrdinalIgnoreCase)) return new MemoryIOStream(pathToFile!, fileMode, mainData);
+        if (!files.TryRead(normalized, out var key, out var data)) return null!;
+        return new MemoryIOStream(pathToFile!, fileMode, companionFilter is null ? data : companionFilter(key, data));
     }
 }
 

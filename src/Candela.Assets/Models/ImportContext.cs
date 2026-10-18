@@ -23,6 +23,9 @@ internal sealed class ImportContext
     public Dictionary<string, byte[]> Embedded { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, ImageData> Generated { get; } = new(StringComparer.Ordinal);
 
+    /// <summary>What <see cref="ObjSanitizer"/> removed from an OBJ import (null for other formats).</summary>
+    public ObjSanitizer.Report? ObjReport { get; set; }
+
     /// <summary>Adds a warning once.</summary>
     public void Warn(string message)
     {

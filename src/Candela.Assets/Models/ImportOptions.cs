@@ -27,7 +27,7 @@ public sealed record ImportOptions
 
     /// <summary>
     /// Metres per file unit (0.001 for millimetres, 0.0254 for inches). Null uses the file's unit metadata (FBX
-    /// UnitScaleFactor, COLLADA &lt;unit meter&gt;, 3MF unit) or 1 for formats without units.
+    /// UnitScaleFactor, COLLADA &lt;unit meter&gt;) or 1 for formats without units.
     /// </summary>
     public float? UnitScale { get; init; }
 

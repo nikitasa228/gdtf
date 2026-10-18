@@ -8,13 +8,15 @@ namespace Candela.Assets;
 /// <summary>
 /// Imports 3D models into Core <see cref="ModelData"/> in Candela space: right-handed, Z up, metres.
 /// <list type="bullet">
-/// <item>glTF / GLB through SharpGLTF (PBR materials map directly); OBJ(+MTL), FBX, COLLADA, 3DS, STL, PLY, 3MF and the other
-/// formats listed in <see cref="AssetFormats.ModelExtensions"/> through Assimp (classic materials approximated, see
-/// <see cref="MaterialApproximation"/>).</item>
+/// <item>glTF / GLB through SharpGLTF (PBR materials map directly); PLY and STL through Candela's own readers; OBJ(+MTL),
+/// FBX, COLLADA and 3DS through Assimp after a managed check/clean-up (<see cref="ModelPreflight"/>) that keeps damaged
+/// files from crashing the native library (classic materials approximated, see <see cref="MaterialApproximation"/>).</item>
 /// <item>Axes: glTF/OBJ/FBX(Y-up) are rotated so +Y becomes +Z and the front (+Z) faces the audience (−Y); FBX axis
-/// metadata, COLLADA &lt;up_axis&gt; are honoured; STL/PLY/3DS/3MF are taken as Z-up. Units: FBX UnitScaleFactor,
-/// COLLADA &lt;unit meter&gt;, 3MF unit; unit-less formats are metres unless they are implausibly large (then
-/// millimetres, with a warning). <see cref="ImportOptions"/> overrides both.</item>
+/// metadata, COLLADA &lt;up_axis&gt; are honoured; STL/PLY/3DS are taken as Z-up. Units: FBX UnitScaleFactor,
+/// COLLADA &lt;unit meter&gt;; unit-less formats are metres unless they are implausibly large (then millimetres, with a
+/// warning). <see cref="ImportOptions"/> overrides both.</item>
+/// <item>Node transforms become part transforms in Candela space; mirroring transforms are baked into a mirrored copy of
+/// the mesh so every part transform is a proper rotation (renderers may cull by winding).</item>
 /// <item>Normals are generated when missing (smooth up to the smoothing angle; flat for glTF as its specification
 /// requires) and tangents are always computed from the final UVs.</item>
 /// <item>Textures are referenced by keys (<see cref="ImportOptions.TextureKeyPrefix"/> + relative path) that resolve to
@@ -46,6 +48,16 @@ public static class ModelImporter
         [".stp"] = "CAD (STEP) files cannot be read; export a mesh as .stl, .obj or .glb",
         [".igs"] = "CAD (IGES) files cannot be read; export a mesh as .stl, .obj or .glb",
         [".iges"] = "CAD (IGES) files cannot be read; export a mesh as .stl, .obj or .glb",
+        [".3mf"] = "3MF files are not supported; export the model as .stl, .obj or .glb",
+        [".x"] = "DirectX .x files are not supported; export the model as .glb, .fbx or .obj",
+        [".x3d"] = "X3D files are not supported; export the model as .glb, .dae or .obj",
+        [".zae"] = "Zipped COLLADA (.zae) is not supported; extract the .dae file and import that",
+        [".ase"] = "ASE files are not supported; export the model as .fbx, .dae or .obj",
+        [".lwo"] = "LightWave objects are not supported; export the model as .fbx, .glb or .obj",
+        [".lws"] = "LightWave scenes are not supported; export the model as .fbx, .glb or .obj",
+        [".off"] = "OFF files are not supported; convert the model to .ply, .obj or .stl",
+        [".ac"] = "AC3D files are not supported; export the model as .obj or .dae",
+        [".ms3d"] = "MilkShape files are not supported; export the model as .obj or .fbx",
     };
 
     /// <summary>True when <paramref name="fileName"/> has an importable model extension.</summary>
@@ -84,12 +96,13 @@ public static class ModelImporter
 
         var ctx = new ImportContext(files, options, format);
         // glTF is never handed to Assimp: its glTF reader crashes the process on damaged files that SharpGLTF rejects
-        // cleanly. PLY is read by Candela's own reader for the same reason (Assimp hangs or crashes on truncated PLY);
-        // OBJ and COLLADA are checked/cleaned before Assimp sees them (ModelPreflight).
+        // cleanly. PLY and STL are read by Candela's own readers for the same reason (Assimp hangs or crashes on
+        // truncated files); OBJ and COLLADA are checked/cleaned before Assimp sees them (ModelPreflight).
         RawModel raw = format switch
         {
             ModelFormat.Gltf or ModelFormat.Glb => GltfReader.Read(ctx),
             ModelFormat.Ply => PlyReader.Read(ctx),
+            ModelFormat.Stl => StlReader.Read(ctx),
             _ => AssimpReader.Read(ctx),
         };
 

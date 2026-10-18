@@ -7,9 +7,10 @@ drawings or posters, GDTF files kept with a project — plus the built-in materi
 `IImageSource`. Third-party code: AssimpNet 5.0.0-beta1 (Assimp 5, BSD-3), SharpGLTF.Core (MIT), StbImageSharp and
 StbImageWriteSharp (public domain / MIT).
 
-`tests/Candela.Assets.Tests` (≈ 170 tests, a few seconds) writes every test file itself — OBJ+MTL+PNG, GLB/glTF built
-with SharpGLTF, COLLADA text, ASCII/binary STL, PLY, 3DS, ASCII FBX, 3MF, PNG/JPEG/TGA/BMP/HDR/GIF/PSD — and uses one
-real GDTF file of the repository for the project round trip.
+`tests/Candela.Assets.Tests` (≈ 230 tests, well under a minute) writes every test file itself — OBJ+MTL+PNG, GLB/glTF
+built with SharpGLTF, COLLADA text, ASCII/binary STL, ASCII/binary PLY, 3DS, ASCII FBX, PNG/JPEG/TGA/BMP/HDR/GIF/PSD —
+and uses one real GDTF file of the repository for the project round trip. `ModelRobustnessTests` feeds every reader
+truncated and randomly corrupted files (each one a former crash or hang of the native library).
 
 ## Conventions
 
@@ -26,7 +27,24 @@ real GDTF file of the repository for the project round trip.
 **Robustness.** A file that cannot be imported at all throws `AssetImportException` with a message written for the
 user. Everything recoverable — a missing texture, an unsupported texture format, a broken mesh part, guessed units —
 becomes a warning on the `ImportedModel` and an `Issue` in the `AssetStore`; one bad element never fails a whole model
-or project. Native failures inside Assimp are caught and reported the same way.
+or project.
+
+Errors that Assimp *reports* are caught like any other, but a segmentation fault inside the native library cannot be
+caught — it ends the process (the editor, or a project load that decodes a damaged asset). Fuzzing the bundled Assimp
+5.0 build with truncated and byte-corrupted files showed crashes or endless loops in its OBJ, MTL, PLY, COLLADA, glTF,
+3MF, X and X3D readers (and none in FBX, 3DS and STL over several hundred cases each). Damaged input therefore never
+reaches Assimp:
+
+* **OBJ/MTL** are rewritten by `ObjSanitizer` into a strictly well-formed subset first (numbers validated, face corners
+  resolved to absolute indices and written uniformly, faces with invalid references dropped with a warning, points,
+  lines and free-form statements removed, MTL statements outside a named material dropped, texture options checked).
+  An OBJ without any face is rejected before Assimp sees it (it crashes building a point cloud). The original bytes are
+  what the project stores.
+* **COLLADA** is checked by `ModelPreflight`: well-formed XML, numeric arrays and index lists that contain only valid
+  numbers and as many as declared, accessors that stay inside their arrays.
+* **PLY** is read by Candela's own `PlyReader`; **glTF/GLB** only by SharpGLTF (a file SharpGLTF rejects is not retried
+  with Assimp, whose glTF reader crashed on exactly those files).
+* 3MF, X, X3D and the other exotic Assimp formats are not offered (they are rejected with advice on what to export).
 
 ## Model import (`ModelImporter`)
 
@@ -41,14 +59,12 @@ applied.
 | Format | Reader | Up axis (Auto) | Units (Auto) |
 |---|---|---|---|
 | glTF 2.0 `.gltf` (external or data-URI buffers), `.glb` | SharpGLTF | Y (specification) | metres (specification) |
-| Wavefront `.obj` + `.mtl` | Assimp | Y (convention of Blender, Maya, 3ds Max OBJ export) | none → metres / guess |
+| Wavefront `.obj` + `.mtl` | Assimp (after `ObjSanitizer`) | Y (convention of Blender, Maya, 3ds Max OBJ export) | none → metres / guess |
 | Autodesk `.fbx` (binary and ASCII) | Assimp | from `GlobalSettings` (UpAxis, FrontAxis, CoordAxis and signs) | `UnitScaleFactor` (cm per unit; default 1 cm) |
-| COLLADA `.dae` | Assimp | `<asset><up_axis>` (Y_UP default, Z_UP, X_UP) | `<asset><unit meter>` (default 1) |
+| COLLADA `.dae` | Assimp (after `ModelPreflight`) | `<asset><up_axis>` (Y_UP default, Z_UP, X_UP) | `<asset><unit meter>` (default 1) |
 | 3D Studio `.3ds` | Assimp | Z | none → metres / guess |
 | STL `.stl` (ASCII and binary) | Assimp | Z (CAD) | none → metres / guess |
-| Stanford `.ply` | Assimp | Z | none → metres / guess |
-| 3MF `.3mf` | Assimp | Z (specification) | `<model unit>` (default millimetre) |
-| `.x`, `.ase`, `.lwo`, `.off`, `.ac`, `.x3d`, `.ms3d`, `.zae` | Assimp | Y (Assimp's convention) | metres / guess |
+| Stanford `.ply` (ASCII, binary little/big endian) | Candela (`PlyReader`) | Z | none → metres / guess |
 
 Rejected with advice instead of a generic error:
 
@@ -57,8 +73,10 @@ Rejected with advice instead of a generic error:
   .glb"* (`AssetFormats.SketchUpMessage`).
 * Native scene files of other tools (`.blend`, `.max`, `.c4d`, `.ma`/`.mb`, `.3dm`), drawings (`.dwg`, `.dxf`), USD and
   CAD exchange formats (`.step`, `.iges`) — each with the export to use.
-* glTF with Draco/meshopt mesh compression ("export it without compression"); a glTF file SharpGLTF rejects as
-  non-conforming is retried with Assimp (reduced material support, with a warning).
+* Formats the bundled Assimp could read but not robustly (`.3mf`, `.x`, `.x3d`, `.zae`, `.ase`, `.lwo`, `.off`, `.ac`,
+  `.ms3d`) — each with the export to use.
+* glTF with Draco/meshopt mesh compression ("export it without compression"); a glTF file SharpGLTF rejects is reported
+  with SharpGLTF's reason.
 
 ### Axes and units
 
@@ -72,7 +90,7 @@ axis, the 3DS Z→Y rotation) are switched off or discarded so every format goes
   front −Y) and mirrored systems. Mirroring bases flip the triangle winding back to counter-clockwise.
 * **COLLADA** `X_UP` is mapped by its definition (right = −Y, up = +X, towards the viewer = +Z).
 * **Units**: FBX `UnitScaleFactor` is centimetres per file unit (metres = factor / 100); COLLADA `<unit meter>` is metres
-  per unit; 3MF's `unit` attribute is one of micron, millimeter, centimeter, inch, foot, meter. Formats without units
+  per unit. Formats without units
   are read as metres, **unless the model would be larger than 200 m** — then it is read as millimetres (the usual CAD
   unit) and a warning says so (`ImportOptions.GuessUnits`, `ImportOptions.GuessMillimetresAbove`).
 * **Overrides**: `ImportOptions.UpAxis` (Auto / Y / Z) and `ImportOptions.UnitScale` (metres per file unit) replace the
@@ -80,17 +98,25 @@ axis, the 3DS Z→Y rotation) are switched off or discarded so every format goes
   .SetImportOptions` changes them later and re-decodes the model.
 * Node transforms are kept (parts with their own `Transform`); after the conversion `C` they become `C⁻¹ · T · C`, so a
   part's transform is expressed in Candela space too. Shared meshes stay shared (instancing).
+* **Mirrored nodes** (negative scale — symmetric props are often exported as one mesh instanced with scale −1) would
+  turn an instance inside out for a renderer that culls by winding. The importer bakes the reflection into a mirrored
+  copy of the mesh (winding flipped back, normals and tangents correct) and stores `S · T` with `S = diag(−1, 1, 1)`,
+  so every part transform has a positive determinant while the world geometry is unchanged.
 
 ### Geometry processing
 
 * Triangulation, joining of identical vertices, removal of degenerate and invalid triangles (out-of-range indices,
-  non-finite positions); points and lines are skipped with a warning.
+  non-finite positions); points and lines are skipped with a warning. PLY polygons are fan-triangulated (PLY writers
+  emit convex faces); PLY texture coordinates (`s t`, `u v`, `texture_u texture_v`, or MeshLab's per-corner `texcoord`
+  lists, which unweld the corners) are flipped from OpenGL's V-up to Candela's V-down.
 * **Normals** are taken from the file when it has valid ones. Otherwise they are generated with the smoothing angle
   `ImportOptions.SmoothingAngleDegrees` (66° by default, the usual DCC default): faces are area-weighted, faces on both
   sides of a texture seam smooth together, and vertices are split where the dihedral angle is sharper — a box keeps
-  flat faces, a cylinder's side stays smooth (`MeshTools.GenerateNormals`, O(Σ valence²)). Assimp's own generator is
-  not used because it cannot split vertices that a format (PLY, 3MF, 3DS) already shares between faces. glTF files
-  without normals get flat normals, as the glTF specification requires.
+  flat faces, a cylinder's side stays smooth (`MeshTools.GenerateNormals`). Around ordinary vertices (≤ 64 faces) every
+  pair of faces is compared; around high-valence positions (the centre of a finely divided disc, a cone apex) the faces
+  are first grouped into at most 64 orientation clusters, so a 50 000-triangle fan takes milliseconds instead of
+  minutes. Assimp's own generator is not used because it cannot split vertices that a format (PLY, STL, 3DS) already
+  shares between faces. glTF files without normals get flat normals, as the glTF specification requires.
 * **Tangents** are always computed from the final UVs (Lengyel's method, Gram–Schmidt against the normal, glTF
   handedness), so normal maps work for every format.
 * Materials that no part uses (Assimp invents a default material for every OBJ; libraries carry unused entries) are
@@ -147,6 +173,9 @@ stage light). glTF emissive colour × strength is relative, so 1 is given `Emiss
   specular colour is clearly tinted (saturation > 0.25 at max Ks > 0.25 — dielectrics have white highlights), or (c) the
   name says metal (chrome, steel, aluminium, gold, brass, …, also Russian names) and there is a highlight (max Ks ≥ 0.2).
   A metal's base colour is its specular colour (its F0); otherwise base colour = diffuse colour.
+* **MTL specifics**: `Tr` (transparency) is turned into `d = 1 − Tr` when a material has no `d` (Assimp ignores `Tr`);
+  texture statements are matched case-insensitively (`map_kd`), and `norm`/`map_norm` normal maps and `map_emissive`
+  are mapped to the spellings Assimp understands.
 * **Opacity** < 1: clear materials (named glass/window, or opacity ≤ 0.6 at roughness ≤ 0.3) become transmissive glass
   (transmission = 1 − opacity, IOR 1.5, roughness ≤ 0.1, double-sided); everything else alpha-blends. Opacity 0 is
   treated as "not set" (exporters write it that way), never as invisible.
@@ -310,8 +339,9 @@ loading counts as a use) manage the cache.
 
 ## Native library (Assimp)
 
-AssimpNet 5.0.0-beta1 ships Assimp 5 for `linux-x64` (`libassimp.so`, needs glibc ≥ 2.27), `win-x64` and `win-x86`
-(`assimp.dll`, needs the MSVC 2015+ runtime) and `osx-x64`; the build copies them to `runtimes/{rid}/native`.
+AssimpNet 5.0.0-beta1 ships Assimp 5 for `linux-x64` (`libassimp.so`, needs glibc ≥ 2.27 and `libz.so.1`), `win-x64`
+and `win-x86` (`assimp.dll`, built with the C runtime linked statically — its only import is `KERNEL32.dll`, so no
+Visual C++ redistributable is needed) and `osx-x64`; the build copies them to `runtimes/{rid}/native`.
 `AssimpNative.EnsureLoaded()` (called before the first Assimp import) fixes two problems of the managed binding:
 
 * On Linux the binding calls `dlopen` through `[DllImport("libdl.so")]`, but glibc 2.34+ systems only ship
@@ -344,5 +374,5 @@ When the native library cannot be loaded, model imports other than glTF fail wit
    Phong exponent ↔ Beckmann roughness.
 6. E. Lengyel, *Computing Tangent Space Basis Vectors for an Arbitrary Mesh* (2001).
 7. W. Wang, B. Jüttler, D. Zheng, Y. Liu, *Computation of Rotation Minimizing Frames*, ACM TOG 27(1), 2008.
-8. Khronos glTF 2.0 specification and extensions; COLLADA 1.4.1 specification; 3MF Core specification; Autodesk FBX
-   SDK documentation (axis system, UnitScaleFactor).
+8. Khronos glTF 2.0 specification and extensions; COLLADA 1.4.1 specification; PLY format (G. Turk, Stanford, 1994);
+   Autodesk FBX SDK documentation (axis system, UnitScaleFactor).

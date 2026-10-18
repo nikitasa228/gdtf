@@ -362,19 +362,64 @@ public class ModelImporterTests
     }
 
     [Fact]
-    public void PlyThreeDsAndThreeMfImport()
+    public void MirroredNodesAreBakedSoPartTransformsNeverReflect()
+    {
+        // Symmetric props are often exported as one mesh instanced with a negative scale. A part transform with a
+        // negative determinant would turn the instance inside out for a renderer that culls by winding.
+        var model = TestFiles.GltfModel(withTexture: false);
+        var original = model.LogicalNodes[0];
+        original.LocalMatrix = Matrix4x4.CreateTranslation(2f, 0f, 0f);
+        var mirror = model.DefaultScene.CreateNode("mirror");
+        mirror.Mesh = original.Mesh;
+        mirror.LocalMatrix = Matrix4x4.CreateScale(-1f, 1f, 1f) * Matrix4x4.CreateTranslation(-2f, 0f, 0f);
+
+        var result = ModelImporter.Import("pair.glb", model.WriteGLB().ToArray());
+
+        Assert.Equal(2, result.Model.Parts.Count);
+        foreach (var part in result.Model.Parts)
+        {
+            Assert.True(MeshTools.Determinant3(part.Transform) > 0, $"part '{part.Name}' still mirrors");
+            Assert.True(Geo.NormalsAgreeWithWinding(part.Mesh));
+            part.Mesh.Validate();
+        }
+        Assert.NotSame(result.Model.Parts[0].Mesh, result.Model.Parts[1].Mesh);
+        // Both boxes are closed and outward-facing in world space.
+        Assert.True(Geo.SignedVolume(result.Model) > 1.9, $"signed volume {Geo.SignedVolume(result.Model)}");
+        var mirrored = result.Model.Parts.Single(p => p.Name == "mirror");
+        var bounds = mirrored.Mesh.ComputeBounds().Transform(mirrored.Transform);
+        Geo.AssertNear(new Vector3(-2.5f, -0.25f, 0f), bounds.Min);
+        Geo.AssertNear(new Vector3(-1.5f, 0.25f, 2f), bounds.Max);
+        // A mirrored world normal still points away from the box: the +X face of the source is the −X face now.
+        var mesh = mirrored.Mesh;
+        var center = (bounds.Min + bounds.Max) / 2;
+        for (int i = 0; i < mesh.Positions.Length; i++)
+        {
+            var p = Vector3.Transform(mesh.Positions[i], mirrored.Transform);
+            var n = Vector3.Normalize(Vector3.TransformNormal(mesh.Normals[i], mirrored.Transform));
+            Assert.True(Vector3.Dot(n, p - center) > 0, "normal points into the box");
+        }
+    }
+
+    [Fact]
+    public void MirroringColladaNodeIsBakedToo()
+    {
+        var dae = TestFiles.Collada(1f, "Z_UP").Replace("<node id=\"box\" name=\"box\">", "<node id=\"box\" name=\"box\"><scale>-1 1 1</scale>", StringComparison.Ordinal);
+        var result = ModelImporter.Import("mirror.dae", System.Text.Encoding.UTF8.GetBytes(dae));
+        var part = Assert.Single(result.Model.Parts);
+        Assert.True(MeshTools.Determinant3(part.Transform) > 0);
+        AssertBox(result);
+    }
+
+    [Fact]
+    public void PlyAndThreeDsImport()
     {
         var ply = ModelImporter.Import("box.ply", System.Text.Encoding.ASCII.GetBytes(TestFiles.AsciiPly()));
         var threeDs = ModelImporter.Import("box.3ds", TestFiles.ThreeDs());
-        var threeMf = ModelImporter.Import("box.3mf", TestFiles.ThreeMf());
 
         AssertBox(ply);
         Assert.Equal(ModelFormat.Ply, ply.Format);
         AssertBox(threeDs);
         Assert.Equal(ModelFormat.ThreeDs, threeDs.Format);
-        AssertBox(threeMf);
-        Assert.Equal(0.001f, threeMf.UnitScale, 6);
-        Assert.True(threeMf.UnitsKnown);
     }
 
     [Fact]
@@ -403,6 +448,9 @@ public class ModelImporterTests
     [InlineData("scene.blend", "Blender")]
     [InlineData("scene.max", "3ds Max")]
     [InlineData("drawing.dwg", "DWG")]
+    [InlineData("print.3mf", "3MF files are not supported")]
+    [InlineData("scene.x3d", "X3D files are not supported")]
+    [InlineData("mesh.x", "DirectX .x files are not supported")]
     [InlineData("notes.txt", "not a supported 3D model")]
     public void ForeignFormatsAreRejectedWithAdvice(string fileName, string fragment)
     {

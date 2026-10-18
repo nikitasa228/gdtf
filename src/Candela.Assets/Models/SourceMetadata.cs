@@ -1,11 +1,10 @@
 using System.Globalization;
-using System.IO.Compression;
 using System.Numerics;
 using System.Xml;
 
 namespace Candela.Assets;
 
-/// <summary>Axis and unit metadata read from model files (COLLADA, 3MF, FBX global settings).</summary>
+/// <summary>Axis and unit metadata read from model files (COLLADA asset element, FBX global settings).</summary>
 internal static class SourceMetadata
 {
     /// <summary>Row-vector matrix that turns a Y-up right-handed frame into Candela's Z-up: (x, y, z) → (x, −z, y).</summary>
@@ -61,39 +60,6 @@ internal static class SourceMetadata
             "X_UP" => (meter, SourceUpAxis.Z, new Matrix4x4(0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1)),
             _ => (meter, SourceUpAxis.Y, null),
         };
-    }
-
-    /// <summary>Unit of a 3MF package (<c>&lt;model unit&gt;</c>, default millimetre) in metres; null when unreadable.</summary>
-    public static float? Read3mfUnit(byte[] data)
-    {
-        try
-        {
-            using var zip = new ZipArchive(new MemoryStream(data, writable: false), ZipArchiveMode.Read);
-            var entry = zip.Entries.FirstOrDefault(e => e.FullName.EndsWith(".model", StringComparison.OrdinalIgnoreCase)
-                && e.FullName.StartsWith("3D/", StringComparison.OrdinalIgnoreCase));
-            if (entry is null) return null;
-            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore, XmlResolver = null };
-            using var reader = XmlReader.Create(entry.Open(), settings);
-            while (reader.Read())
-            {
-                if (reader.NodeType != XmlNodeType.Element) continue;
-                if (reader.LocalName != "model") return 0.001f;
-                return (reader.GetAttribute("unit") ?? "millimeter").Trim().ToLowerInvariant() switch
-                {
-                    "micron" => 1e-6f,
-                    "centimeter" => 0.01f,
-                    "inch" => 0.0254f,
-                    "foot" => 0.3048f,
-                    "meter" => 1f,
-                    _ => 0.001f,
-                };
-            }
-        }
-        catch (Exception e) when (e is InvalidDataException or XmlException or IOException)
-        {
-            return null;
-        }
-        return null;
     }
 
     /// <summary>
