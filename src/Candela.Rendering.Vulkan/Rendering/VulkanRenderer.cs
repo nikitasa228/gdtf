@@ -276,6 +276,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
             var selection = ColorSpaces.SrgbDecode(new Vector3(view.SelectionColor.X, view.SelectionColor.Y, view.SelectionColor.Z));
             p.WireSelectedColor = new Vector4(selection, 1f);
 
+            // The cluster list capacity goes into the frame data: grow the buffer first.
+            if (decisions.Lights)
+                t.EnsureClusterCapacity(_world.LightCount);
             BuildFrameData(t, camera, view, decisions, exposure, ref p.Data, out var frustum);
             var forward = new Vector3(p.Data.CameraForward.X, p.Data.CameraForward.Y, p.Data.CameraForward.Z);
             var eye = new Vector3(p.Data.CameraPosition.X, p.Data.CameraPosition.Y, p.Data.CameraPosition.Z);
@@ -333,8 +336,6 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
             // Per-view resources and descriptors.
             t.Prepare(decisions.Requirements);
-            if (decisions.Lights)
-                t.EnsureClusterCapacity(_world.LightCount);
             UpdateGradient(t, decisions, barriers);
             bool lightViews = t.LightViews.PrepareUpload(barriers);
             bool lists = t.Lists.PrepareUpload(barriers);
