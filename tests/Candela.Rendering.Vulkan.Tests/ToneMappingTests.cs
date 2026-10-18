@@ -57,7 +57,7 @@ public sealed class ToneMappingTests
     }
 
     [SkippableFact]
-    public void ExposureCompensationIsAddedToTheCameraEv()
+    public void ExposureCompensationAddsStopsOfExposure()
     {
         var renderer = TestRenderers.CreateOrSkip();
         try
@@ -67,7 +67,9 @@ public sealed class ToneMappingTests
             var camera = ProceduralTestScene.CreateCamera();
             renderer.Render(target, camera, new ViewOptions(), new PreviewSettings { ExposureCompensation = 1.5f }, 0f);
             var hdr = renderer.ReadHdr(target);
-            Assert.Equal(Core.Math.Units.ExposureFromEv100(camera.Ev100 + 1.5f), hdr.Exposure, 6);
+            // +1.5 stops: the camera EV minus 1.5, i.e. 2^1.5 times the exposure.
+            Assert.Equal(Core.Math.Units.ExposureFromEv100(camera.Ev100 - 1.5f), hdr.Exposure, 6);
+            Assert.InRange(hdr.Exposure / (Core.Math.Units.ExposureFromEv100(camera.Ev100) * MathF.Pow(2f, 1.5f)), 0.999f, 1.001f);
         }
         finally
         {

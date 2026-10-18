@@ -3,8 +3,9 @@
 // Bloom downsampling (Jimenez 2014, "Next generation post processing in Call of Duty"): each level is the previous one
 // (the HDR image for the first level) filtered with the 13-tap pattern of five overlapping 4x4 box filters (weights
 // 0.5 for the centre box, 0.125 for the four corner boxes) at half resolution. The filter is normalised, so every
-// level keeps the image's total energy. Variant FIRST reads the HDR image and weights the five boxes by
-// 1 / (1 + luma) (Karis average) so isolated very bright pixels do not flicker.
+// level keeps the image's total energy. Variant FIRST reads the HDR image; it limits the (pre-exposed) luma of each
+// sample to FIREFLY_LUMA, 10 stops above display white, so a stray half-float overflow or a sub-pixel specular glint
+// cannot flood the pyramid. Unlike a Karis average this leaves the energy of everything below that limit untouched.
 
 #include "view.glsl"
 
@@ -15,10 +16,14 @@ layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeon
 layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler2D sourceLevel;
 #endif
 
+const float FIREFLY_LUMA = 1024.0;
+
 vec3 fetch(vec2 uv)
 {
 #ifdef FIRST
-    return max(textureLod(hdrTexture, uv, 0.0).rgb, vec3(0.0));
+    vec3 c = max(textureLod(hdrTexture, uv, 0.0).rgb, vec3(0.0));
+    float luma = dot(c, vec3(0.2627, 0.6780, 0.0593));
+    return luma > FIREFLY_LUMA ? c * (FIREFLY_LUMA / luma) : c;
 #else
     return textureLod(sourceLevel, uv, 0.0).rgb;
 #endif
@@ -30,15 +35,6 @@ vec2 sourceTexel()
     return 1.0 / vec2(textureSize(hdrTexture, 0));
 #else
     return 1.0 / vec2(textureSize(sourceLevel, 0));
-#endif
-}
-
-float karisWeight(vec3 c)
-{
-#ifdef FIRST
-    return 1.0 / (1.0 + dot(c, vec3(0.2627, 0.6780, 0.0593)));
-#else
-    return 1.0;
 #endif
 }
 
@@ -64,16 +60,8 @@ void main()
     vec3 l = fetch(uv + t * vec2(0.0, 2.0));
     vec3 m = fetch(uv + t * vec2(2.0, 2.0));
 
-    vec3 box0 = (d + e + i + j) * 0.25;
-    vec3 box1 = (a + b + f + g) * 0.25;
-    vec3 box2 = (b + c + g + h) * 0.25;
-    vec3 box3 = (f + g + k + l) * 0.25;
-    vec3 box4 = (g + h + l + m) * 0.25;
-    float w0 = 0.5 * karisWeight(box0);
-    float w1 = 0.125 * karisWeight(box1);
-    float w2 = 0.125 * karisWeight(box2);
-    float w3 = 0.125 * karisWeight(box3);
-    float w4 = 0.125 * karisWeight(box4);
-    vec3 result = (box0 * w0 + box1 * w1 + box2 * w2 + box3 * w3 + box4 * w4) / (w0 + w1 + w2 + w3 + w4);
+    vec3 centre = (d + e + i + j) * 0.25;
+    vec3 corners = (a + b + f + g) + (b + c + g + h) + (f + g + k + l) + (g + h + l + m);
+    vec3 result = centre * 0.5 + corners * (0.125 * 0.25);
     imageStore(outLevel, p, vec4(result, 1.0));
 }

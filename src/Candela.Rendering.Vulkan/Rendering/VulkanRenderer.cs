@@ -64,8 +64,9 @@ internal sealed record HdrReadback(int Width, int Height, float[] Rgba, float Ex
 /// read-backs of the last submitted frame and must not be called while a frame is being recorded.</para>
 /// <para><b>Exposure.</b> Full view: HDR = luminance (cd/m²) × <c>Units.ExposureFromEv100(EV)</c> with EV = the camera's
 /// EV100 (or, with <see cref="PreviewSettings.AutoExposure"/>, the EV of the adapted scene luminance) +
-/// <see cref="PreviewSettings.ExposureCompensation"/> — the compensation is added to the EV (positive values darken,
-/// like closing the aperture). Colorless and Wireframe are display-referred and not exposed.</para>
+/// <see cref="PreviewSettings.ExposureCompensation"/> applied in stops of exposure: EV − compensation, so +1 doubles
+/// the exposure (a brighter image, like photographic exposure compensation). Colorless and Wireframe are
+/// display-referred and not exposed.</para>
 /// </remarks>
 public sealed unsafe class VulkanRenderer : IRenderer
 {
@@ -384,6 +385,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 Exposure = p.Data.Exposure,
                 Shading = decisions.Shading,
                 Overlay = decisions.Overlay,
+                Bloom = p.BloomActive && t.BloomLevels > 0,
             };
         }
         finally
@@ -441,6 +443,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         if (!t.Last.Valid || x < 0 || y < 0 || x >= t.Width || y >= t.Height)
             return null;
         int rw = t.RenderWidth, rh = t.RenderHeight;
+        int displayX = x, displayY = y;
         x = Math.Clamp((int)((x + 0.5f) * rw / t.Width), 0, rw - 1);
         y = Math.Clamp((int)((y + 0.5f) * rh / t.Height), 0, rh - 1);
         int x0 = Math.Max(x - 1, 0), y0 = Math.Max(y - 1, 0);
@@ -473,13 +476,13 @@ public sealed unsafe class VulkanRenderer : IRenderer
             return null;
 
         var last = t.Last;
-        Vector3 Unproject(int px, int py, float d)
+        Vector3 UnprojectNdc(float nx, float ny, float d)
         {
-            float nx = (px + 0.5f) / rw * 2f - 1f;
-            float ny = (py + 0.5f) / rh * 2f - 1f;
             var h = Vector4.Transform(new Vector4(nx, ny, d, 1f), last.InverseViewProjection);
             return new Vector3(h.X, h.Y, h.Z) / h.W;
         }
+
+        Vector3 Unproject(int px, int py, float d) => UnprojectNdc((px + 0.5f) / rw * 2f - 1f, (py + 0.5f) / rh * 2f - 1f, d);
 
         var position = Unproject(x, y, depth);
         var toCamera = last.Orthographic ? -last.CameraForward : Vector3.Normalize(last.CameraPosition - position);
@@ -518,6 +521,22 @@ public sealed unsafe class VulkanRenderer : IRenderer
             {
                 n = Vector3.Normalize(n);
                 normal = Vector3.Dot(n, toCamera) < 0f ? -n : n;
+
+                // At a reduced resolution scale the internal pixel centre is up to half an internal pixel away from
+                // the display pixel's ray: move the point along the surface's tangent plane onto that ray.
+                if (rw != t.Width || rh != t.Height)
+                {
+                    float nx = (displayX + 0.5f) / t.Width * 2f - 1f, ny = (displayY + 0.5f) / t.Height * 2f - 1f;
+                    var origin = UnprojectNdc(nx, ny, 1f);
+                    var direction = Vector3.Normalize(UnprojectNdc(nx, ny, 0.5f) - origin);
+                    float denominator = Vector3.Dot(direction, normal);
+                    if (MathF.Abs(denominator) > 1e-4f)
+                    {
+                        var hit = origin + direction * (Vector3.Dot(position - origin, normal) / denominator);
+                        if (Vector3.Distance(hit, position) <= MathF.Max(a.Length(), b.Length()))
+                            position = hit;
+                    }
+                }
             }
         }
 
@@ -547,25 +566,45 @@ public sealed unsafe class VulkanRenderer : IRenderer
         var t = Validate(target);
         if (!t.Last.Valid)
             throw new InvalidOperationException("The target has not been rendered yet.");
-        int w = t.RenderWidth, h = t.RenderHeight;
+        return ReadRgba16(t.Hdr, t.Last.Exposure, 1f);
+    }
+
+    /// <summary>
+    /// Test/diagnostic hook: the bloom image of the target's last frame — level 0 of the pyramid (half the internal
+    /// resolution) divided by the number of levels, i.e. the image the display transform mixes in, in cd/m² (exposure
+    /// removed like <see cref="ReadHdr"/>). Its mean equals the HDR image's mean when the bloom conserves energy.
+    /// Blocking.
+    /// </summary>
+    internal HdrReadback ReadBloom(IRenderTarget target)
+    {
+        ThrowIfDisposed();
+        var t = Validate(target);
+        if (!t.Last.Valid || !t.Last.Bloom || t.BloomLevels == 0)
+            throw new InvalidOperationException("The target's last frame has no bloom.");
+        return ReadRgba16(t.BloomLevel(0), t.Last.Exposure, 1f / t.BloomLevels);
+    }
+
+    private HdrReadback ReadRgba16(GpuImage image, float exposure, float scale)
+    {
+        int w = (int)image.Width, h = (int)image.Height;
         ulong size = (ulong)w * (ulong)h * 8;
         var readback = Readback(size);
         var cmd = Context.Immediate.Begin();
         _barriers.CommandBuffer = cmd;
-        _barriers.Use(t.Hdr, ImageUse.TransferSource);
+        _barriers.Use(image, ImageUse.TransferSource);
         _barriers.Use(readback, BufferUse.TransferDestination);
         _barriers.Flush();
-        CopyToBuffer(cmd, t.Hdr, ImageAspectFlags.ColorBit, 0, 0, (uint)w, (uint)h, readback, 0);
+        CopyToBuffer(cmd, image, ImageAspectFlags.ColorBit, 0, 0, (uint)w, (uint)h, readback, 0);
         _barriers.Use(readback, BufferUse.HostRead);
         _barriers.Flush();
         Context.Immediate.SubmitAndWait();
         Context.Allocator.Invalidate(readback.Allocation, 0, size);
         var halves = new ReadOnlySpan<Half>(readback.MappedPointer, w * h * 4);
         var result = new float[w * h * 4];
-        float scale = t.Last.Exposure > 0f ? 1f / t.Last.Exposure : 1f;
+        float colorScale = (exposure > 0f ? 1f / exposure : 1f) * scale;
         for (int i = 0; i < result.Length; i++)
-            result[i] = (i & 3) == 3 ? (float)halves[i] : (float)halves[i] * scale;
-        return new HdrReadback(w, h, result, t.Last.Exposure);
+            result[i] = (i & 3) == 3 ? (float)halves[i] : (float)halves[i] * colorScale;
+        return new HdrReadback(w, h, result, exposure);
     }
 
     /// <summary>
@@ -650,7 +689,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.Indirect = indirect;
         d.Bloom = full && settings.Bloom && float.IsFinite(settings.BloomIntensity) && settings.BloomIntensity > 0f;
         d.AutoExposure = full && settings.AutoExposure;
-        float scale = float.IsFinite(settings.ResolutionScale) ? Math.Clamp(settings.ResolutionScale, 0.25f, 1f) : 1f;
+        float scale = float.IsFinite(settings.ResolutionScale) ? Math.Clamp(settings.ResolutionScale, 0.5f, 1f) : 1f;
         int rw = Math.Max(1, (int)MathF.Round(t.Width * scale)), rh = Math.Max(1, (int)MathF.Round(t.Height * scale));
         d.Scaled = rw != t.Width || rh != t.Height;
         d.Scale = scale;
@@ -705,7 +744,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         if (d.Shading != ViewShading.Full)
             return 1f;
         float compensation = float.IsFinite(settings.ExposureCompensation) ? settings.ExposureCompensation : 0f;
-        float cameraEv = (float.IsFinite(camera.Ev100) ? camera.Ev100 : 6f) + compensation;
+        float cameraEv = (float.IsFinite(camera.Ev100) ? camera.Ev100 : 6f) - compensation;
         if (!d.AutoExposure)
         {
             t.AdaptedLog2Luminance = float.NaN;
@@ -729,7 +768,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
         if (float.IsNaN(t.AdaptedLog2Luminance))
             return Units.ExposureFromEv100(cameraEv);
-        float ev = Units.Ev100FromLuminance(MathF.Pow(2f, t.AdaptedLog2Luminance)) + compensation;
+        float ev = Units.Ev100FromLuminance(MathF.Pow(2f, t.AdaptedLog2Luminance)) - compensation;
         return Units.ExposureFromEv100(ev);
     }
 

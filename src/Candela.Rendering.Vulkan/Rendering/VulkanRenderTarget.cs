@@ -20,6 +20,9 @@ internal struct LastFrameInfo
 
     /// <summary>Overlay of the frame (the analysis image holds lux or dB).</summary>
     public OverlayMode Overlay;
+
+    /// <summary>Whether the frame computed the bloom pyramid.</summary>
+    public bool Bloom;
 }
 
 /// <summary>
@@ -663,8 +666,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         uint w = w0, h = h0;
         for (int i = 0; i < levels; i++)
         {
-            _bloom[i] = GpuImage.Create2D(_context, w, h, TargetFormats.HdrStorage, ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit,
-                $"bloom {i}");
+            _bloom[i] = GpuImage.Create2D(_context, w, h, TargetFormats.HdrStorage,
+                ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit, $"bloom {i}");
             w = Math.Max((w + 1) / 2, 1);
             h = Math.Max((h + 1) / 2, 1);
         }
