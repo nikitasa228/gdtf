@@ -55,9 +55,6 @@ internal static class LightPacker
     /// <summary>Defocus radius of the gobo image at GoboBlur = 1, as a fraction of the image width.</summary>
     public const float GoboBlurAtFull = 0.12f;
 
-    /// <summary>Additional cookie blur radius at frost = 1, as a fraction of the gobo image width.</summary>
-    public const float FrostCookieBlur = 0.10f;
-
     /// <summary>Half width of a focused blade edge in gate units (optical softness of a real gate).</summary>
     public const float SharpEdgeSoftness = 0.004f;
 
@@ -126,6 +123,11 @@ internal static class LightPacker
         float blur = float.IsFinite(light.GoboBlur) ? Math.Clamp(light.GoboBlur, 0f, 1f) : 0f;
         float irisAngle = IrisAngle(light, gate);
         float irisSoftness = MathF.Min(IrisSoftness + 0.3f * blur + 0.3f * frost, 0.9f);
+        // Cookie blur radius in gobo-image units (the gate is 2 gate units = 1 image wide): focus blur plus the angular
+        // spread of the frost (its half width at half maximum) seen from the gate.
+        float focusBlur = GoboBlurAtFull * blur;
+        float frostBlur = frost > 0f ? 0.5f * MathF.Tan(MathF.Min(1.1774f * FrostSigmaAtFull * frost, 1.2f)) / gateTan : 0f;
+        float cookieBlur = MathF.Sqrt(focusBlur * focusBlur + frostBlur * frostBlur);
         float effectiveCutoff = MathF.Min(cutoff, irisAngle);
         float bounding = MathF.Min(effectiveCutoff + spread, MathF.PI);
         var direction = NormalizeOr(light.Direction, -Vector3.UnitZ);
@@ -167,8 +169,8 @@ internal static class LightPacker
             Right = right,
             GateScale = 1f / gateTan,
             GoboTexture = goboSlot,
-            GoboBlur = GoboBlurAtFull * blur + FrostCookieBlur * frost,
-            EdgeSoftness = SharpEdgeSoftness + 0.25f * blur + 0.2f * frost,
+            GoboBlur = cookieBlur,
+            EdgeSoftness = SharpEdgeSoftness + 2f * cookieBlur,
             PrismFacets = (uint)facets,
             GoboRotation = new Vector2(MathF.Cos(rotation), MathF.Sin(rotation)),
             PrismCosSpread = MathF.Cos(spread),
