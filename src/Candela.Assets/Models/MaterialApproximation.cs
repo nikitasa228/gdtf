@@ -38,7 +38,7 @@ public sealed record PhongMaterial
 /// Approximates PBR metallic-roughness parameters for classic materials (documented in docs/assets.md):
 /// <list type="bullet">
 /// <item>Roughness from the Phong exponent n via the Blinn-Phong ↔ Beckmann correspondence α = √(2 / (n + 2))
-/// (Walter et al. 2007) and glTF's perceptual roughness r = √α. n = 0 → 1, n = 10 → 0.64, n = 100 → 0.38,
+/// (Walter et al. 2007) and glTF's perceptual roughness r = √α. n = 0 → 1, n = 10 → 0.64, n = 100 → 0.37,
 /// n = 1000 → 0.21. Without a specular highlight (specular ≈ black) roughness is at least 0.9; without an exponent 0.8.</item>
 /// <item>Metallic = 1 when the specular colour dominates a dark diffuse colour (max Ks &gt; 0.5 and &gt; 2 × max Kd), when the
 /// specular colour is clearly tinted (saturation &gt; 0.25 at max Ks &gt; 0.25 — dielectrics have white highlights), or
