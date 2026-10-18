@@ -275,9 +275,9 @@ The result is sRGB-encoded (IEC 61966-2-1) with a ±½ LSB triangular dither and
 
 ## Accuracy and test coverage
 
-`tests/Candela.Rendering.Vulkan.Tests` (41 tests, a few seconds on lavapipe once the SPIR-V cache is warm) runs every test with the validation
-layer and synchronization validation and asserts **zero validation errors**, including leak reports at shutdown.
-Tests are skipped with a message when no Vulkan device exists.
+`tests/Candela.Rendering.Vulkan.Tests` (41 tests, a few seconds on lavapipe once the SPIR-V cache is warm) runs
+every test with the validation layer and synchronization validation and asserts **zero validation errors**, including
+leak reports at shutdown. Tests are skipped with a message when no Vulkan device exists.
 
 | Test | Checks |
 |---|---|
