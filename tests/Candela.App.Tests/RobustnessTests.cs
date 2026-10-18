@@ -1,6 +1,22 @@
 using System.Numerics;
+using Candela.App.Diagnostics;
+using Candela.App.Docking;
+using Candela.App.Editing;
+using Candela.App.Files;
+using Candela.App.Input;
+using Candela.App.Session;
+using Candela.App.Settings;
 using Candela.App.Shell;
+using Candela.App.Ui;
+using Candela.App.Viewport;
+using Candela.Core.Editing;
+using Candela.Core.Math;
+using Candela.Core.Presets;
+using Candela.Core.SceneGraph;
+using Candela.Core.Settings;
+using Candela.Rendering;
 using Hexa.NET.ImGui;
+using SceneModel = Candela.Core.SceneGraph.Scene;
 
 namespace Candela.App.Tests;
 
@@ -68,7 +84,7 @@ public sealed unsafe class DockIniValidatorTests
 {
     private static readonly Vector2 Display = new(1600, 900);
 
-    private sealed class TestPanel(string id) : Candela.App.Docking.Panel(id, "")
+    private sealed class TestPanel(string id) : Panel(id, "")
     {
         public override string Title => Id;
 
@@ -78,15 +94,15 @@ public sealed unsafe class DockIniValidatorTests
     }
 
     /// <summary>Dear ImGui's settings text after building a preset (optionally rearranged) on a window-less context.</summary>
-    private static string IniOf(Candela.App.Docking.LayoutPreset preset, Action<List<Candela.App.Docking.Panel>, Candela.App.Docking.DockWorkspace>? rearrange = null)
+    private static string IniOf(LayoutPreset preset, Action<List<Panel>, DockWorkspace>? rearrange = null)
     {
         using var ui = new HeadlessImGui(Display);
         var ids = new List<string> { "Library", "Viewport1", "Properties", "Preview", "Render", "Issues", "Console" };
-        if (preset == Candela.App.Docking.LayoutPreset.FourViewports)
+        if (preset == LayoutPreset.FourViewports)
             ids.AddRange(new[] { "Viewport2", "Viewport3", "Viewport4" });
-        var panels = ids.Select(i => (Candela.App.Docking.Panel)new TestPanel(i)).ToList();
-        var dock = new Candela.App.Docking.DockWorkspace();
-        var plan = new Candela.App.Docking.LayoutPlan();
+        var panels = ids.Select(i => (Panel)new TestPanel(i)).ToList();
+        var dock = new DockWorkspace();
+        var plan = new LayoutPlan();
         plan.Left.Add(panels[0].DockName);
         plan.Center.AddRange(panels.Where(p => p.Id.StartsWith("Viewport", StringComparison.Ordinal)).Select(p => p.DockName));
         plan.Right.AddRange(panels.Skip(2).Take(3).Select(p => p.DockName));
@@ -132,24 +148,24 @@ public sealed unsafe class DockIniValidatorTests
     {
         var layouts = new[]
         {
-            IniOf(Candela.App.Docking.LayoutPreset.Default),
-            IniOf(Candela.App.Docking.LayoutPreset.FourViewports),
+            IniOf(LayoutPreset.Default),
+            IniOf(LayoutPreset.FourViewports),
             // A floating group of two panels (a root node without a dock space window) and an icon-column group.
-            IniOf(Candela.App.Docking.LayoutPreset.Default, (panels, dock) =>
+            IniOf(LayoutPreset.Default, (panels, dock) =>
             {
-                uint right = Candela.App.Docking.DockWorkspace.DockIdOf(panels[2]);
-                dock.TabStyles.SetStyle(right, Candela.App.Docking.TabStyle.LeftIcons);
-                Candela.App.Docking.DockWorkspace.Undock(panels[5]);
+                uint right = DockWorkspace.DockIdOf(panels[2]);
+                dock.TabStyles.SetStyle(right, TabStyle.LeftIcons);
+                DockWorkspace.Undock(panels[5]);
             }),
         };
         foreach (var ini in layouts)
         {
             Assert.Contains("[Docking][Data]", ini);
-            Assert.True(Candela.App.Docking.DockIniValidator.Validate(ini, out string reason), reason + "\n" + ini);
+            Assert.True(DockIniValidator.Validate(ini, out string reason), reason + "\n" + ini);
         }
 
-        Assert.True(Candela.App.Docking.DockIniValidator.Validate("", out _));
-        Assert.True(Candela.App.Docking.DockIniValidator.Validate("[Window][A]\nPos=1,2\n", out _));
+        Assert.True(DockIniValidator.Validate("", out _));
+        Assert.True(DockIniValidator.Validate("[Window][A]\nPos=1,2\n", out _));
     }
 
     public static TheoryData<string> Damage => new()
@@ -163,7 +179,7 @@ public sealed unsafe class DockIniValidatorTests
     [MemberData(nameof(Damage))]
     public void Damaged_dock_trees_are_rejected(string damage)
     {
-        string ini = IniOf(Candela.App.Docking.LayoutPreset.Default);
+        string ini = IniOf(LayoutPreset.Default);
         var lines = DockLines(ini);
         string firstChild = lines.First(l => l.Contains("Parent=", StringComparison.Ordinal));
         string leaf = lines.First(l => l.Contains("ID=0x00000005", StringComparison.Ordinal));
@@ -190,24 +206,24 @@ public sealed unsafe class DockIniValidatorTests
             _ => throw new ArgumentOutOfRangeException(nameof(damage)),
         };
         Assert.NotEqual(ini, bad);
-        Assert.False(Candela.App.Docking.DockIniValidator.Validate(bad, out string reason));
+        Assert.False(DockIniValidator.Validate(bad, out string reason));
         Assert.False(string.IsNullOrWhiteSpace(reason));
 
         // Through the layout file: a damaged layout, which the workspace replaces with the default arrangement.
-        var file = new Candela.App.Docking.LayoutFile { Name = "x", ImGui = bad };
-        var e = Assert.Throws<Candela.App.Docking.LayoutFormatException>(() => Candela.App.Docking.LayoutFile.FromJson(file.ToJson()));
+        var file = new LayoutFile { Name = "x", ImGui = bad };
+        var e = Assert.Throws<LayoutFormatException>(() => LayoutFile.FromJson(file.ToJson()));
         Assert.Contains("damaged", e.Message, StringComparison.Ordinal);
     }
 
     [Fact]
     public void A_restored_valid_layout_still_loads_into_dear_imgui()
     {
-        string ini = IniOf(Candela.App.Docking.LayoutPreset.FourViewports);
-        var file = Candela.App.Docking.LayoutFile.FromJson(new Candela.App.Docking.LayoutFile { Name = "four", ImGui = ini }.ToJson());
+        string ini = IniOf(LayoutPreset.FourViewports);
+        var file = LayoutFile.FromJson(new LayoutFile { Name = "four", ImGui = ini }.ToJson());
         using var ui = new HeadlessImGui(Display);
         ImGui.LoadIniSettingsFromMemory(file.ImGui);
-        ui.Frame(() => ImGui.DockSpaceOverViewport(Candela.App.Docking.DockWorkspace.DockSpaceId, ImGui.GetMainViewport()));
-        Assert.False(ImGuiP.DockBuilderGetNode(Candela.App.Docking.DockWorkspace.DockSpaceId).IsNull);
+        ui.Frame(() => ImGui.DockSpaceOverViewport(DockWorkspace.DockSpaceId, ImGui.GetMainViewport()));
+        Assert.False(ImGuiP.DockBuilderGetNode(DockWorkspace.DockSpaceId).IsNull);
     }
 }
 
@@ -216,16 +232,16 @@ public sealed unsafe class DockIniValidatorTests
 public sealed class FailureReportingTests : IDisposable
 {
     private readonly TempDir _dir = new();
-    private readonly Candela.App.Diagnostics.AppLog _log = TestLog.Create();
-    private readonly Candela.App.Settings.SettingsStore _settings;
-    private readonly Candela.App.Session.EditorSession _session;
+    private readonly AppLog _log = TestLog.Create();
+    private readonly SettingsStore _settings;
+    private readonly EditorSession _session;
 
     public FailureReportingTests()
     {
-        Candela.App.Ui.Loc.SetLanguage("en");
-        _settings = new Candela.App.Settings.SettingsStore(_log, _dir.File("settings.json"));
+        Loc.SetLanguage("en");
+        _settings = new SettingsStore(_log, _dir.File("settings.json"));
         _settings.Load();
-        _session = new Candela.App.Session.EditorSession(_log, _settings);
+        _session = new EditorSession(_log, _settings);
     }
 
     public void Dispose()
@@ -246,7 +262,7 @@ public sealed class FailureReportingTests : IDisposable
         // Distinct messages are capped.
         for (int i = 0; i < 1000; i++)
             _session.ReportProgramError("app.frame-exception", "message " + i);
-        Assert.Equal(Candela.App.Session.EditorSession.MaxProgramMessages, _session.Issues.Current.Count);
+        Assert.Equal(EditorSession.MaxProgramMessages, _session.Issues.Current.Count);
     }
 
     [Fact]
@@ -266,19 +282,19 @@ public sealed class FailureReportingTests : IDisposable
     [Fact]
     public void The_same_exception_is_logged_in_full_once_then_counted()
     {
-        var filter = new Candela.App.Diagnostics.RepeatedErrorFilter();
-        var kinds = new List<Candela.App.Diagnostics.ErrorLogKind>();
+        var filter = new RepeatedErrorFilter();
+        var kinds = new List<ErrorLogKind>();
         for (int i = 0; i < 1000; i++)
             kinds.Add(filter.Record(Throw("boom")));
-        Assert.Equal(Candela.App.Diagnostics.ErrorLogKind.Full, kinds[0]);
-        Assert.Equal(1, kinds.Count(k => k == Candela.App.Diagnostics.ErrorLogKind.Full));
+        Assert.Equal(ErrorLogKind.Full, kinds[0]);
+        Assert.Equal(1, kinds.Count(k => k == ErrorLogKind.Full));
         // Counted at 10, 100 and 1000 repeats.
-        Assert.Equal(new[] { 9, 99, 999 }, kinds.Select((k, i) => (k, i)).Where(t => t.k == Candela.App.Diagnostics.ErrorLogKind.Count).Select(t => t.i));
+        Assert.Equal(new[] { 9, 99, 999 }, kinds.Select((k, i) => (k, i)).Where(t => t.k == ErrorLogKind.Count).Select(t => t.i));
         Assert.Equal(1000, filter.Repeats);
 
         // A different failure is logged in full again.
-        Assert.Equal(Candela.App.Diagnostics.ErrorLogKind.Full, filter.Record(Throw("other")));
-        Assert.Equal(Candela.App.Diagnostics.ErrorLogKind.Full, filter.Record(new ArgumentException("boom")));
+        Assert.Equal(ErrorLogKind.Full, filter.Record(Throw("other")));
+        Assert.Equal(ErrorLogKind.Full, filter.Record(new ArgumentException("boom")));
     }
 
     private static InvalidOperationException Throw(string message)
@@ -297,13 +313,13 @@ public sealed class FailureReportingTests : IDisposable
     public void The_log_file_keeps_the_previous_run_and_stops_at_its_size_limit()
     {
         string path = _dir.File("logs/app.log");
-        using (var first = new Candela.App.Diagnostics.AppLog { ConsoleLevel = Candela.App.Diagnostics.LogLevel.Error + 1 })
+        using (var first = new AppLog { ConsoleLevel = LogLevel.Error + 1 })
         {
             first.OpenFile(path);
             first.Info("Test", "first run");
         }
 
-        using (var second = new Candela.App.Diagnostics.AppLog { ConsoleLevel = Candela.App.Diagnostics.LogLevel.Error + 1, MaxFileBytes = 4096 })
+        using (var second = new AppLog { ConsoleLevel = LogLevel.Error + 1, MaxFileBytes = 4096 })
         {
             second.OpenFile(path);
             for (int i = 0; i < 1000; i++)
@@ -317,8 +333,8 @@ public sealed class FailureReportingTests : IDisposable
         Assert.DoesNotContain("repeated failure 999", current);
         Assert.Contains("further messages are kept in memory only", current);
         Assert.InRange(new FileInfo(path).Length, 1, 4096 + 512);
-        Assert.Contains("first run", File.ReadAllText(Candela.App.Diagnostics.AppLog.PreviousPathOf(path)));
-        Assert.EndsWith("app.previous.log", Candela.App.Diagnostics.AppLog.PreviousPathOf(path), StringComparison.Ordinal);
+        Assert.Contains("first run", File.ReadAllText(AppLog.PreviousPathOf(path)));
+        Assert.EndsWith("app.previous.log", AppLog.PreviousPathOf(path), StringComparison.Ordinal);
     }
 }
 
@@ -328,15 +344,15 @@ public sealed class GizmoDragTests
     private static void Near(Vector3 expected, Vector3 actual, float tolerance = 1e-4f) =>
         Assert.True(Vector3.Distance(expected, actual) <= tolerance, $"expected {expected}, got {actual}");
 
-    private readonly Candela.Core.SceneGraph.Scene _scene = new("t");
-    private readonly Candela.Core.Editing.Selection _selection = new();
-    private readonly Candela.Core.Editing.UndoStack _undo = new();
+    private readonly SceneModel _scene = new("t");
+    private readonly Selection _selection = new();
+    private readonly UndoStack _undo = new();
 
-    private Candela.Core.SceneGraph.Entity Add(string name, Vector3 position, Candela.Core.SceneGraph.Entity? parent = null) =>
-        _scene.Add(new Candela.Core.SceneGraph.Entity(name) { Local = new Candela.Core.Math.Transform(position) }, parent);
+    private Entity Add(string name, Vector3 position, Entity? parent = null) =>
+        _scene.Add(new Entity(name) { Local = new Transform(position) }, parent);
 
     /// <summary>Drags the gizmo of <paramref name="primary"/> in <paramref name="frames"/> steps to <paramref name="end"/>.</summary>
-    private void Drag(Candela.App.Editing.GizmoDrag drag, Candela.Core.SceneGraph.Entity primary, Matrix4x4 end, int frames = 10)
+    private void Drag(GizmoDrag drag, Entity primary, Matrix4x4 end, int frames = 10)
     {
         var start = primary.WorldMatrix;
         drag.Begin(_scene, _selection, primary, _undo);
@@ -359,7 +375,7 @@ public sealed class GizmoDragTests
         var parent = Add("parent", new Vector3(1, 0, 0));
         var child = Add("child", new Vector3(0, 2, 0), parent);
         _selection.Set(new[] { parent.Id, child.Id }); // the child is the primary (last selected)
-        var drag = new Candela.App.Editing.GizmoDrag();
+        var drag = new GizmoDrag();
         var end = child.WorldMatrix * Matrix4x4.CreateTranslation(3, 0, 0);
         Drag(drag, child, end);
 
@@ -377,7 +393,7 @@ public sealed class GizmoDragTests
         var child = Add("child", new Vector3(0, 2, 0), parent);
         var other = Add("other", new Vector3(5, 5, 0));
         _selection.Set(new[] { parent.Id, other.Id, child.Id });
-        var drag = new Candela.App.Editing.GizmoDrag();
+        var drag = new GizmoDrag();
         Drag(drag, child, child.WorldMatrix * Matrix4x4.CreateTranslation(0, 0, 2));
         Near(new Vector3(1, 0, 0), parent.WorldPosition);
         Near(new Vector3(1, 2, 2), child.WorldPosition);
@@ -387,14 +403,14 @@ public sealed class GizmoDragTests
     [Fact]
     public void Entities_on_locked_layers_stay_put()
     {
-        var layer = new Candela.Core.SceneGraph.Layer { Name = "rig", Locked = true };
+        var layer = new Layer { Name = "rig", Locked = true };
         _scene.Layers.Add(layer);
         var a = Add("a", Vector3.Zero);
         var b = Add("b", new Vector3(2, 0, 0));
         b.LayerId = layer.Id;
         _selection.Set(new[] { b.Id, a.Id });
-        Assert.False(Candela.App.Editing.SelectionController.IsEditable(_scene, b));
-        Drag(new Candela.App.Editing.GizmoDrag(), a, Matrix4x4.CreateTranslation(0, 1, 0));
+        Assert.False(SelectionController.IsEditable(_scene, b));
+        Drag(new GizmoDrag(), a, Matrix4x4.CreateTranslation(0, 1, 0));
         Near(new Vector3(0, 1, 0), a.WorldPosition);
         Near(new Vector3(2, 0, 0), b.WorldPosition);
     }
@@ -406,7 +422,7 @@ public sealed class GizmoDragTests
         var other = Add("other", new Vector3(3, 1, 0));
         _selection.Set(new[] { other.Id, pivot.Id });
         var end = Matrix4x4.CreateRotationZ(MathF.PI / 2) * Matrix4x4.CreateTranslation(1, 1, 0);
-        Drag(new Candela.App.Editing.GizmoDrag(), pivot, end, frames: 30);
+        Drag(new GizmoDrag(), pivot, end, frames: 30);
 
         Near(new Vector3(1, 1, 0), pivot.WorldPosition);
         Near(new Vector3(1, 3, 0), other.WorldPosition); // (2, 0) from the pivot turned by 90° about Z
@@ -426,7 +442,7 @@ public sealed class GizmoDragTests
     {
         var a = Add("a", Vector3.Zero);
         _selection.Set(a.Id);
-        var drag = new Candela.App.Editing.GizmoDrag();
+        var drag = new GizmoDrag();
         Drag(drag, a, Matrix4x4.CreateTranslation(1, 0, 0));
         Drag(drag, a, Matrix4x4.CreateTranslation(1, 1, 0));
         drag.Begin(_scene, _selection, a, _undo);
@@ -450,8 +466,8 @@ public sealed class CameraRobustnessTests
     [Fact]
     public void Zoomed_out_to_the_limit_the_target_stays_inside_the_depth_range()
     {
-        var camera = new Candela.App.Viewport.ViewportCamera { Distance = Candela.App.Viewport.ViewportCamera.MaxDistance };
-        Assert.Equal(Candela.App.Viewport.ViewportCamera.MaxDistance, camera.Distance);
+        var camera = new ViewportCamera { Distance = ViewportCamera.MaxDistance };
+        Assert.Equal(ViewportCamera.MaxDistance, camera.Distance);
         Assert.True(camera.Far > camera.Distance * 1.5f, $"far {camera.Far} m clips the target at {camera.Distance} m");
         Assert.True(camera.Near < camera.Distance);
 
@@ -465,14 +481,14 @@ public sealed class CameraRobustnessTests
     [Fact]
     public void Flying_from_a_zoomed_orthographic_view_keeps_the_apparent_size()
     {
-        var camera = new Candela.App.Viewport.ViewportCamera();
-        camera.SnapTo(Candela.App.Viewport.ViewDirection.Top);
+        var camera = new ViewportCamera();
+        camera.SnapTo(ViewDirection.Top);
         camera.Zoom(-12f); // zoom the plan view far out: only the orthographic height changes
         float visible = camera.OrthoHeight;
         Assert.True(visible > 30f);
 
         camera.Look(0f, 0f); // right mouse button in the top view: fly mode
-        Assert.Equal(Candela.Rendering.ProjectionKind.Perspective, camera.Projection);
+        Assert.Equal(ProjectionKind.Perspective, camera.Projection);
         float apparent = 2f * camera.Distance * MathF.Tan(camera.FovY * 0.5f);
         Assert.Equal(visible, apparent, 0.01f * visible);
         Assert.Null(camera.SnappedView);
@@ -493,28 +509,28 @@ public sealed class PickPixelTests
         int w = Math.Max(1, (int)MathF.Round(avail.X * scale)), h = Math.Max(1, (int)MathF.Round(avail.Y * scale));
 
         // Centre of the image → centre of the target.
-        var (cx, cy) = Candela.App.Viewport.ViewportPanel.PixelOf(imageMin + avail * 0.5f, imageMin, scale, w, h);
+        var (cx, cy) = ViewportPanel.PixelOf(imageMin + avail * 0.5f, imageMin, scale, w, h);
         Assert.InRange(cx, w / 2 - 1, w / 2 + 1);
         Assert.InRange(cy, h / 2 - 1, h / 2 + 1);
 
         // The last point inside the image (ImGui's hover rectangle is [min, max)) is the last target pixel, not outside it.
         var last = imageMin + avail - new Vector2(0.01f);
-        var (lx, ly) = Candela.App.Viewport.ViewportPanel.PixelOf(last, imageMin, scale, w, h);
+        var (lx, ly) = ViewportPanel.PixelOf(last, imageMin, scale, w, h);
         Assert.Equal(w - 1, lx);
         Assert.Equal(h - 1, ly);
 
         // The first point is pixel 0; points outside clamp; non-finite input is safe.
-        Assert.Equal((0, 0), Candela.App.Viewport.ViewportPanel.PixelOf(imageMin, imageMin, scale, w, h));
-        Assert.Equal((0, 0), Candela.App.Viewport.ViewportPanel.PixelOf(imageMin - new Vector2(5f), imageMin, scale, w, h));
-        Assert.Equal((0, 0), Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(float.NaN), imageMin, scale, w, h));
+        Assert.Equal((0, 0), ViewportPanel.PixelOf(imageMin, imageMin, scale, w, h));
+        Assert.Equal((0, 0), ViewportPanel.PixelOf(imageMin - new Vector2(5f), imageMin, scale, w, h));
+        Assert.Equal((0, 0), ViewportPanel.PixelOf(new Vector2(float.NaN), imageMin, scale, w, h));
     }
 
     [Fact]
     public void A_high_dpi_click_maps_to_twice_the_ui_offset()
     {
-        var (x, y) = Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(110f, 70f), new Vector2(10f, 20f), 2f, 1000, 1000);
+        var (x, y) = ViewportPanel.PixelOf(new Vector2(110f, 70f), new Vector2(10f, 20f), 2f, 1000, 1000);
         Assert.Equal((200, 100), (x, y));
-        Assert.Equal((50, 25), Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(60f, 45f), new Vector2(10f, 20f), 0f, 1000, 1000)); // bad scale = 1
+        Assert.Equal((50, 25), ViewportPanel.PixelOf(new Vector2(60f, 45f), new Vector2(10f, 20f), 0f, 1000, 1000)); // bad scale = 1
     }
 }
 
@@ -526,13 +542,13 @@ public sealed class SettingsRobustnessTests
     {
         using var dir = new TempDir();
         string path = dir.Write("settings.json", "{ \"uiScale\": 2, oops");
-        var first = new Candela.App.Settings.SettingsStore(TestLog.Create(), path);
+        var first = new SettingsStore(TestLog.Create(), path);
         Assert.Equal(1f, first.Load().UiScale);
         Assert.False(File.Exists(path)); // moved, not copied
         Assert.Single(Directory.GetFiles(dir.Path, "settings.json.damaged-*"));
 
         // The next start (no change saved in between) finds no damaged file and makes no second copy.
-        var second = new Candela.App.Settings.SettingsStore(TestLog.Create(), path);
+        var second = new SettingsStore(TestLog.Create(), path);
         Assert.Equal(1f, second.Load().UiScale);
         Assert.Single(Directory.GetFiles(dir.Path, "settings.json.damaged-*"));
     }
@@ -543,7 +559,7 @@ public sealed class SettingsRobustnessTests
         using var dir = new TempDir();
         string path = dir.Write("settings.json", "[1, 2");
         var log = TestLog.Create();
-        var store = new Candela.App.Settings.SettingsStore(log, path) { ReadOnly = true };
+        var store = new SettingsStore(log, path) { ReadOnly = true };
         Assert.Equal("en", store.Load().Language);
         Assert.Equal("[1, 2", File.ReadAllText(path));
         Assert.Empty(Directory.GetFiles(dir.Path, "settings.json.damaged-*"));
@@ -563,7 +579,7 @@ public sealed class SettingsRobustnessTests
     {
         using var dir = new TempDir();
         string path = dir.Write("settings.json", json);
-        var s = new Candela.App.Settings.SettingsStore(TestLog.Create(), path).Load();
+        var s = new SettingsStore(TestLog.Create(), path).Load();
         Assert.Equal(1f, s.UiScale);
         Assert.Equal("en", s.Language);
     }
@@ -575,9 +591,9 @@ public sealed class SettingsRobustnessTests
         string path = dir.Write("settings.json",
             "{ \"uiScale\": \"NaN\", \"fontSize\": -3, \"language\": null, \"navigationStyle\": null, \"theme\": null, " +
             "\"recentFiles\": null, \"libraryFolders\": [null, \"\", \"/x\", \"/x\"], \"zoomSpeed\": \"Infinity\", \"keyBindingPreset\": \"  \" }");
-        var s = new Candela.App.Settings.SettingsStore(TestLog.Create(), path).Load();
+        var s = new SettingsStore(TestLog.Create(), path).Load();
         Assert.Equal(1f, s.UiScale);
-        Assert.Equal(Candela.App.Ui.FontSet.DefaultSize, s.FontSize);
+        Assert.Equal(FontSet.DefaultSize, s.FontSize);
         Assert.Equal("en", s.Language);
         Assert.Equal("Candela", s.NavigationStyle);
         Assert.Equal("Dark", s.Theme);
@@ -604,48 +620,48 @@ public sealed class KeyBindingFileRobustnessTests
     public void A_damaged_custom_set_is_repaired_at_start()
     {
         using var dir = new TempDir();
-        var settings = new Candela.Core.Settings.AppSettings { KeyBindingPreset = "Custom" };
+        var settings = new AppSettings { KeyBindingPreset = "Custom" };
         string custom = dir.Write("keybindings.custom.json", Damaged);
-        var service = new Candela.App.Input.KeyBindingsService(settings, new Candela.Core.Presets.FilePresetStore(dir.File("presets")), custom, TestLog.Create());
+        var service = new KeyBindingsService(settings, new FilePresetStore(dir.File("presets")), custom, TestLog.Create());
         Assert.True(service.Library.IsCustom);
         var bindings = service.Current.Bindings;
-        Assert.Equal(new[] { "Ctrl+Z" }, bindings[Candela.Core.Settings.EditorActions.Undo]);
-        Assert.Empty(bindings[Candela.Core.Settings.EditorActions.Redo]);
+        Assert.Equal(new[] { "Ctrl+Z" }, bindings[EditorActions.Undo]);
+        Assert.Empty(bindings[EditorActions.Redo]);
         Assert.False(bindings.ContainsKey(""));
-        Assert.True(bindings.ContainsKey(Candela.App.Input.AppActions.NewViewport)); // newer actions get their defaults
+        Assert.True(bindings.ContainsKey(AppActions.NewViewport)); // newer actions get their defaults
 
         // The dispatcher's lookup and the display code accept the repaired set.
-        var map = new Candela.App.Input.KeyBindingMap(service.Current);
+        var map = new KeyBindingMap(service.Current);
         Assert.Equal(2, map.InvalidCount); // "Ctrl+" and "NoSuchKey"
-        Assert.Equal(Candela.Core.Settings.EditorActions.Undo, map.Resolve(new Candela.Core.Settings.KeyChord("Z", Candela.Core.Settings.KeyModifiers.Ctrl)));
+        Assert.Equal(EditorActions.Undo, map.Resolve(new KeyChord("Z", KeyModifiers.Ctrl)));
         foreach (var chords in bindings.Values)
             foreach (var chord in chords)
-                Assert.False(string.IsNullOrEmpty(Candela.App.Input.KeyNames.DisplayChord(chord)));
+                Assert.False(string.IsNullOrEmpty(KeyNames.DisplayChord(chord)));
     }
 
     [Fact]
     public void A_damaged_named_preset_is_repaired_and_a_missing_one_falls_back()
     {
         using var dir = new TempDir();
-        var store = new Candela.Core.Presets.FilePresetStore(dir.File("presets"));
-        store.Save(Candela.Core.Settings.KeyBindingSet.PresetKind, "Hand edited", Damaged);
-        store.Save(Candela.Core.Settings.KeyBindingSet.PresetKind, "No table", "{ \"bindings\": null }");
-        var settings = new Candela.Core.Settings.AppSettings { KeyBindingPreset = "Hand edited" };
-        var service = new Candela.App.Input.KeyBindingsService(settings, store, dir.File("custom.json"), TestLog.Create());
+        var store = new FilePresetStore(dir.File("presets"));
+        store.Save(KeyBindingSet.PresetKind, "Hand edited", Damaged);
+        store.Save(KeyBindingSet.PresetKind, "No table", "{ \"bindings\": null }");
+        var settings = new AppSettings { KeyBindingPreset = "Hand edited" };
+        var service = new KeyBindingsService(settings, store, dir.File("custom.json"), TestLog.Create());
         Assert.Equal("Hand edited", service.Library.CurrentName);
-        Assert.Empty(service.Current.Bindings[Candela.Core.Settings.EditorActions.Redo]);
-        _ = new Candela.App.Input.KeyBindingMap(service.Current);
+        Assert.Empty(service.Current.Bindings[EditorActions.Redo]);
+        _ = new KeyBindingMap(service.Current);
 
         service.Select("No table");
         Assert.NotNull(service.Current.Bindings);
-        _ = new Candela.App.Input.KeyBindingMap(service.Current);
+        _ = new KeyBindingMap(service.Current);
 
         service.Select("Does not exist");
         Assert.Equal("Default", service.Library.CurrentName);
 
         // A map over a set without a table (a set built in code) is empty, not a crash.
-        var map = new Candela.App.Input.KeyBindingMap(new Candela.Core.Settings.KeyBindingSet { Bindings = null! });
-        Assert.Null(map.Resolve(new Candela.Core.Settings.KeyChord("Z", Candela.Core.Settings.KeyModifiers.Ctrl)));
+        var map = new KeyBindingMap(new KeyBindingSet { Bindings = null! });
+        Assert.Null(map.Resolve(new KeyChord("Z", KeyModifiers.Ctrl)));
     }
 }
 
@@ -659,7 +675,7 @@ public sealed class UiGuardTests
         using var ui = new HeadlessImGui(new Vector2(800, 600));
         var log = TestLog.Create();
         var reports = new List<string>();
-        var guard = new Candela.App.Shell.UiGuard(log, (part, message) => reports.Add(part + ": " + message));
+        var guard = new UiGuard(log, (part, message) => reports.Add(part + ": " + message));
         bool open = true, otherDrawn = false;
         for (int frame = 0; frame < 5; frame++)
         {
@@ -681,7 +697,7 @@ public sealed class UiGuardTests
                 if (!ok)
                 {
                     open = false; // the workspace closes a failed dialog
-                    Candela.App.Shell.UiGuard.CloseAllPopups();
+                    UiGuard.CloseAllPopups();
                 }
 
                 Assert.True(guard.Run("other", () =>
@@ -707,11 +723,11 @@ public sealed class UiGuardTests
         using var ui = new HeadlessImGui(new Vector2(800, 600));
         var log = TestLog.Create();
         int reports = 0;
-        var guard = new Candela.App.Shell.UiGuard(log, (_, _) => reports++);
+        var guard = new UiGuard(log, (_, _) => reports++);
         for (int frame = 0; frame < 25; frame++)
             ui.Frame(() => guard.Run("menu", () => throw new InvalidOperationException("broken menu")));
         Assert.Equal(25, reports); // the session de-duplicates the issues
-        var errors = TestLog.Entries(log).Where(e => e.Level == Candela.App.Diagnostics.LogLevel.Error).ToList();
+        var errors = TestLog.Entries(log).Where(e => e.Level == LogLevel.Error).ToList();
         Assert.Equal(2, errors.Count); // the first failure, then "failed 10 times"
         Assert.Contains("10 times", errors[1].Message, StringComparison.Ordinal);
     }
@@ -725,8 +741,8 @@ public sealed class FileBrowserOddPathTests : IDisposable
 
     public void Dispose() => _dir.Dispose();
 
-    private static Candela.App.Files.FileBrowserModel Model(Candela.App.Files.FileBrowserMode mode = Candela.App.Files.FileBrowserMode.Open) =>
-        new(mode, new[] { new Candela.App.Files.FileFilter("All", "*") });
+    private static FileBrowserModel Model(FileBrowserMode mode = FileBrowserMode.Open) =>
+        new(mode, new[] { new FileFilter("All", "*") });
 
     [Fact]
     public void An_unreadable_folder_is_reported_not_shown_as_empty()
@@ -756,7 +772,7 @@ public sealed class FileBrowserOddPathTests : IDisposable
         Assert.NotEmpty(model.Error);
         Assert.Equal(_dir.Path, model.CurrentDirectory); // the previous listing stays
         Assert.Equal(before, model.Entries.Count);
-        if (locked.StartsWith(_dir.Path, StringComparison.Ordinal))
+        if (!OperatingSystem.IsWindows() && locked.StartsWith(_dir.Path, StringComparison.Ordinal))
             File.SetUnixFileMode(locked, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
     }
 
@@ -810,7 +826,7 @@ public sealed class FileBrowserOddPathTests : IDisposable
         Directory.CreateDirectory(root);
         foreach (var name in new[] { "Фокина 2.mvr", "Фокина 10.mvr", "舞台.mvr", "éclairage.mvr", "notes.txt" })
             File.WriteAllText(Path.Combine(root, name), "x");
-        var model = new Candela.App.Files.FileBrowserModel(Candela.App.Files.FileBrowserMode.Open, new[] { new Candela.App.Files.FileFilter("MVR", "*.mvr") });
+        var model = new FileBrowserModel(FileBrowserMode.Open, new[] { new FileFilter("MVR", "*.mvr") });
         Assert.True(model.Navigate(root), model.Error);
         var names = model.Entries.Select(e => e.Name).ToList();
         Assert.Equal(4, names.Count);
@@ -834,10 +850,10 @@ public sealed class FileBrowserOddPathTests : IDisposable
         Assert.Equal(count, model.Entries.Count);
         Assert.True(watch.Elapsed.TotalSeconds < 20, $"listing took {watch.Elapsed.TotalSeconds:0.0} s");
 
-        Candela.App.Ui.Loc.SetLanguage("en");
+        Loc.SetLanguage("en");
         using var ui = new HeadlessImGui(new Vector2(1600, 900));
-        var dialog = new Candela.App.Files.FileBrowserDialog(_dir.File("recent-places.json"));
-        dialog.Show(Candela.App.Files.FileBrowserMode.Open, "Open", new[] { new Candela.App.Files.FileFilter("All", "*") }, big, null, _ => { });
+        var dialog = new FileBrowserDialog(_dir.File("recent-places.json"));
+        dialog.Show(FileBrowserMode.Open, "Open", new[] { new FileFilter("All", "*") }, big, null, _ => { });
         for (int i = 0; i < 3; i++)
             ui.Frame(() => dialog.Draw(1f)); // first frames build the row texts once
 
@@ -857,11 +873,11 @@ public sealed class FileBrowserPathTextTests
     public void A_tilde_means_the_home_folder()
     {
         string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        Assert.Equal(home, Candela.App.Files.FileBrowserModel.ExpandHome("~"));
-        Assert.Equal(Path.Combine(home, "shows"), Candela.App.Files.FileBrowserModel.ExpandHome("~/shows"));
-        Assert.Equal("~shows", Candela.App.Files.FileBrowserModel.ExpandHome("~shows")); // another user's home is not guessed
-        Assert.Equal("/tmp/~", Candela.App.Files.FileBrowserModel.ExpandHome("/tmp/~"));
-        var model = new Candela.App.Files.FileBrowserModel(Candela.App.Files.FileBrowserMode.SelectFolder, Array.Empty<Candela.App.Files.FileFilter>());
+        Assert.Equal(home, FileBrowserModel.ExpandHome("~"));
+        Assert.Equal(Path.Combine(home, "shows"), FileBrowserModel.ExpandHome("~/shows"));
+        Assert.Equal("~shows", FileBrowserModel.ExpandHome("~shows")); // another user's home is not guessed
+        Assert.Equal("/tmp/~", FileBrowserModel.ExpandHome("/tmp/~"));
+        var model = new FileBrowserModel(FileBrowserMode.SelectFolder, Array.Empty<FileFilter>());
         if (Directory.Exists(home))
         {
             Assert.True(model.Navigate("~"), model.Error);
@@ -879,46 +895,46 @@ public sealed class EulerDisplayTests
     [Fact]
     public void A_y_rotation_beyond_90_degrees_stays_as_entered()
     {
-        var entity = new Candela.Core.SceneGraph.Entity("spot");
-        var display = new Candela.App.Editing.EulerDisplay();
+        var entity = new Entity("spot");
+        var display = new EulerDisplay();
         Near(Vector3.Zero, display.Get(entity, entity.Local.Rotation));
 
         // Typed (10°, 80°, 20°), then a drag on Y up to 120° in steps, as the panel applies it frame by frame.
         var angles = new Vector3(10f, 80f, 20f);
-        entity.Local = entity.Local with { Rotation = Candela.App.Editing.TransformMath.FromEulerDegrees(angles) };
+        entity.Local = entity.Local with { Rotation = TransformMath.FromEulerDegrees(angles) };
         display.Set(entity, angles, entity.Local.Rotation);
         for (float y = 85f; y <= 120f; y += 5f)
         {
             var shown = display.Get(entity, entity.Local.Rotation);
             Near(angles, shown); // the field continues from what it showed, not from (−170°, 85°, −160°)
             angles = shown with { Y = y };
-            var q = Candela.App.Editing.TransformMath.FromEulerDegrees(angles);
+            var q = TransformMath.FromEulerDegrees(angles);
             entity.Local = entity.Local with { Rotation = q };
             display.Set(entity, angles, entity.Local.Rotation);
         }
 
         Near(new Vector3(10f, 120f, 20f), display.Get(entity, entity.Local.Rotation));
         // The plain decomposition of the same rotation is the other triple.
-        Near(new Vector3(-170f, 60f, -160f), Candela.App.Editing.TransformMath.ToEulerDegrees(entity.Local.Rotation));
+        Near(new Vector3(-170f, 60f, -160f), TransformMath.ToEulerDegrees(entity.Local.Rotation));
     }
 
     [Fact]
     public void A_rotation_changed_elsewhere_or_another_entity_is_decomposed_afresh()
     {
-        var a = new Candela.Core.SceneGraph.Entity("a");
-        var b = new Candela.Core.SceneGraph.Entity("b");
-        var display = new Candela.App.Editing.EulerDisplay();
-        var q = Candela.App.Editing.TransformMath.FromEulerDegrees(new Vector3(0f, 100f, 0f));
+        var a = new Entity("a");
+        var b = new Entity("b");
+        var display = new EulerDisplay();
+        var q = TransformMath.FromEulerDegrees(new Vector3(0f, 100f, 0f));
         display.Set(a, new Vector3(0f, 100f, 0f), q);
         Near(new Vector3(0f, 100f, 0f), display.Get(a, q));
         Near(new Vector3(0f, 100f, 0f), display.Get(a, Quaternion.Negate(q))); // the same rotation
 
         // The gizmo (or undo) turned it: the stored triple no longer applies.
         var turned = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, 0.5f);
-        Near(Candela.App.Editing.TransformMath.ToEulerDegrees(turned), display.Get(a, turned));
+        Near(TransformMath.ToEulerDegrees(turned), display.Get(a, turned));
         // Another entity with the same rotation as the stored one is not given a's triple.
         display.Set(a, new Vector3(0f, 100f, 0f), q);
-        Near(Candela.App.Editing.TransformMath.ToEulerDegrees(q), display.Get(b, q));
+        Near(TransformMath.ToEulerDegrees(q), display.Get(b, q));
     }
 }
 
@@ -928,26 +944,26 @@ public sealed class FramingBoundsTests
     [Fact]
     public void Entities_without_geometry_frame_a_small_box_around_their_origin()
     {
-        var scene = new Candela.Core.SceneGraph.Scene("t");
-        var light = scene.Add(new Candela.Core.SceneGraph.Entity("light") { Local = new Candela.Core.Math.Transform(new Vector3(4, 2, 6)) });
-        var box = scene.Add(new Candela.Core.SceneGraph.Entity("box"));
-        var boxBounds = new Candela.Core.Math.Aabb(new Vector3(-1, -1, 0), new Vector3(1, 1, 2));
-        bool Lookup(Guid id, out Candela.Core.Math.Aabb b)
+        var scene = new SceneModel("t");
+        var light = scene.Add(new Entity("light") { Local = new Transform(new Vector3(4, 2, 6)) });
+        var box = scene.Add(new Entity("box"));
+        var boxBounds = new Aabb(new Vector3(-1, -1, 0), new Vector3(1, 1, 2));
+        bool Lookup(Guid id, out Aabb b)
         {
-            b = id == box.Id ? boxBounds : Candela.Core.Math.Aabb.Empty;
+            b = id == box.Id ? boxBounds : Aabb.Empty;
             return id == box.Id;
         }
 
-        var lightOnly = Candela.App.Editing.SelectionController.FramingBounds(scene, new[] { light.Id }, Lookup);
+        var lightOnly = SelectionController.FramingBounds(scene, new[] { light.Id }, Lookup);
         Assert.False(lightOnly.IsEmpty);
         Assert.Equal(new Vector3(4, 2, 6), lightOnly.Center);
         Assert.Equal(new Vector3(1f), lightOnly.Size);
 
-        var both = Candela.App.Editing.SelectionController.FramingBounds(scene, new[] { box.Id, light.Id }, Lookup);
+        var both = SelectionController.FramingBounds(scene, new[] { box.Id, light.Id }, Lookup);
         Assert.Equal(new Vector3(-1, -1, 0), both.Min);
         Assert.Equal(new Vector3(4.5f, 2.5f, 6.5f), both.Max);
 
         // Unknown ids frame nothing (the caller then frames the whole stage).
-        Assert.True(Candela.App.Editing.SelectionController.FramingBounds(scene, new[] { Guid.NewGuid() }, Lookup).IsEmpty);
+        Assert.True(SelectionController.FramingBounds(scene, new[] { Guid.NewGuid() }, Lookup).IsEmpty);
     }
 }
