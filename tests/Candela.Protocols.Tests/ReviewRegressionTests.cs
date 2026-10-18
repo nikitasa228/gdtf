@@ -240,4 +240,62 @@ public class ReviewRegressionTests
 
         public void Encode(in TestPatternLook look, Span<byte> universeSlots) => throw new InvalidOperationException("encoder bug");
     }
+
+    [Fact]
+    public void Restarting_under_traffic_is_safe_and_stop_withdraws_every_source()
+    {
+        var hub = new DmxInputHub();
+        using var receiver = new ArtNetReceiver(hub);
+        using var sacn = new SacnReceiver(hub);
+        var options = TestSupport.LoopbackOptions(1, 2) with { SacnJoinMulticast = false };
+        Assert.True(receiver.Start(options));
+        Assert.True(sacn.Start(options));
+        using var stop = new CancellationTokenSource();
+        var errors = new List<Exception>();
+        var traffic = new Thread(() =>
+        {
+            using var art = new ArtNetSender(IPAddress.Loopback);
+            using var acn = new SacnSender(Guid.NewGuid(), "stress");
+            var slots = new byte[512];
+            slots[0] = 200;
+            while (!stop.IsCancellationRequested)
+            {
+                try
+                {
+                    if (receiver.LocalEndPoint is { } a)
+                    {
+                        art.SendDmx(TestSupport.Loopback(a.Port), 0, slots);
+                        art.SendPoll(TestSupport.Loopback(a.Port));
+                        art.SendSync(TestSupport.Loopback(a.Port));
+                    }
+                    if (sacn.LocalEndPoint is { } s) acn.SendData(2, slots, TestSupport.Loopback(s.Port));
+                }
+                catch (System.Net.Sockets.SocketException)
+                {
+                }
+                catch (Exception e)
+                {
+                    lock (errors) errors.Add(e);
+                }
+                Thread.Sleep(1);
+            }
+        })
+        { IsBackground = true };
+        traffic.Start();
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        for (int i = 0; i < 8; i++)
+        {
+            Thread.Sleep(20);
+            Assert.True(receiver.Start(options with { ArtNetUniverseOffset = 1 + (i & 1) }));
+            Assert.True(sacn.Start(options));
+        }
+        Thread.Sleep(50);
+        receiver.Stop();
+        sacn.Stop();
+        stop.Cancel();
+        traffic.Join();
+        Assert.Empty(errors);
+        Assert.Empty(hub.Sources());
+        Assert.True(sw.Elapsed < TimeSpan.FromSeconds(20), $"restarts took {sw.Elapsed}");
+    }
 }
