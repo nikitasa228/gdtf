@@ -375,6 +375,33 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void StrongDiffusion_ConservesSmokeAndHeat()
+    {
+        // Regression: the diffusion ran after the conservation fixer, and its 8 Jacobi sweeps (not converged for
+        // λ = D·dt/h² ≫ 1) gained 4 % of the smoke and heat in 60 steps at D = 2 m²/s.
+        var sim = new SmokeSimulation(new SmokeSimulationSettings
+        {
+            Bounds = new Aabb(new Vector3(-2f, -2f, 0f), new Vector3(2f, 2f, 4f)),
+            CellSize = 0.2f,
+            OpenFaces = DomainFaces.None,
+            DissipationPerSecond = 0f,
+            TemperatureRelaxationRate = 0f,
+            Diffusivity = 2f,
+            Viscosity = 2f,
+        });
+        sim.SetObstacles([ObstacleBox.FromAabb(new Aabb(new Vector3(-0.5f, -2f, 0f), new Vector3(0.5f, 0.5f, 2f)))]);
+        sim.AddSmoke(new Vector3(-1f, 1f, 1f), 0.6f, 1f, 30f);
+        double m0 = sim.TotalSmokeMass();
+        double h0 = sim.TemperatureExcess.ToArray().Sum(t => (double)t);
+        float peak0 = sim.Density.ToArray().Max();
+        SmokeTestScenes.Run(sim, 60);
+        double h1 = sim.TemperatureExcess.ToArray().Sum(t => (double)t);
+        Assert.Equal(1.0, sim.TotalSmokeMass() / m0, 1e-4);
+        Assert.Equal(1.0, h1 / h0, 1e-4);
+        Assert.True(sim.Density.ToArray().Max() < 0.1f * peak0, "the puff has spread");
+    }
+
+    [Fact]
     public void DensityAt_InterpolatesCellValuesTrilinearly()
     {
         var sim = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 4f), 0.25f);

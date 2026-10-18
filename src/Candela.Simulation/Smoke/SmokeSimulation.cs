@@ -470,8 +470,6 @@ public sealed partial class SmokeSimulation
         var (iterations, before, after) = Project();
         long t4 = Stopwatch.GetTimestamp();
         AdvectScalars(dt);
-        if (_settings.Diffusivity > 0f)
-            DiffuseScalars(dt);
         Dissipate(dt);
         long t5 = Stopwatch.GetTimestamp();
         _time += _dt;

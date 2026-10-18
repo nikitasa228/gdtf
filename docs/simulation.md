@@ -80,8 +80,9 @@ frame (counted in `DroppedTime`) so a slow frame cannot snowball. One sub-step:
    round-trip error and fall back to the plain value wherever the correction would leave the range of the eight
    interpolated corners (so it stays stable and creates no new extrema). Solid corners are skipped and the remaining
    weights renormalised (smoke is neither pulled into walls nor diluted by them); beyond an open face the air is
-   ambient (no smoke, no excess heat). Then the **conservation fixer**, optional diffusion (as 4.), and finally
-   **dissipation** (d ×= (1 − f)^dt) and **cooling** (θ ×= e^(−k_θ·dt)).
+   ambient (no smoke, no excess heat). Then optional diffusion (as 4.), the **conservation fixer** (after the
+   diffusion, whose few Jacobi sweeps are not exactly conservative either), and finally **dissipation**
+   (d ×= (1 − f)^dt) and **cooling** (θ ×= e^(−k_θ·dt)).
 
 ### Pressure projection
 

@@ -132,6 +132,7 @@ public sealed partial class SmokeSimulation
     /// Advects density and temperature with the projected (divergence-free) velocity. Semi-Lagrangian pass first; with
     /// MacCormack a second pass traces the result forward again and corrects by half the round-trip error, reverting to
     /// the semi-Lagrangian value wherever that would leave the range of the interpolated corners (Selle et al. 2008).
+    /// Then the optional diffusion and the conservation fixer.
     /// </summary>
     private void AdvectScalars(float dt)
     {
@@ -158,6 +159,10 @@ public sealed partial class SmokeSimulation
             (_temperature, _temperature2) = (_temperature2, _temperature);
         }
 
+        // Diffusion before the fixer: its few Jacobi sweeps are not exactly conservative either (they gained 4 % of the
+        // smoke in 60 steps at D = 2 m²/s), while the converged operator would be.
+        if (_settings.Diffusivity > 0f)
+            DiffuseScalars(dt);
         _massCorrection = conserve ? FixSum(_density, massTarget) : 0f;
         _heatCorrection = conserve ? FixSum(_temperature, heatTarget) : 0f;
     }
