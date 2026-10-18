@@ -517,3 +517,73 @@ public sealed class PickPixelTests
         Assert.Equal((50, 25), Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(60f, 45f), new Vector2(10f, 20f), 0f, 1000, 1000)); // bad scale = 1
     }
 }
+
+/// <summary>Damaged settings files are set aside once; headless (read-only) runs leave the user's files untouched.</summary>
+public sealed class SettingsRobustnessTests
+{
+    [Fact]
+    public void A_damaged_settings_file_is_set_aside_only_once()
+    {
+        using var dir = new TempDir();
+        string path = dir.Write("settings.json", "{ \"uiScale\": 2, oops");
+        var first = new Candela.App.Settings.SettingsStore(TestLog.Create(), path);
+        Assert.Equal(1f, first.Load().UiScale);
+        Assert.False(File.Exists(path)); // moved, not copied
+        Assert.Single(Directory.GetFiles(dir.Path, "settings.json.damaged-*"));
+
+        // The next start (no change saved in between) finds no damaged file and makes no second copy.
+        var second = new Candela.App.Settings.SettingsStore(TestLog.Create(), path);
+        Assert.Equal(1f, second.Load().UiScale);
+        Assert.Single(Directory.GetFiles(dir.Path, "settings.json.damaged-*"));
+    }
+
+    [Fact]
+    public void A_read_only_run_does_not_touch_a_damaged_settings_file()
+    {
+        using var dir = new TempDir();
+        string path = dir.Write("settings.json", "[1, 2");
+        var log = TestLog.Create();
+        var store = new Candela.App.Settings.SettingsStore(log, path) { ReadOnly = true };
+        Assert.Equal("en", store.Load().Language);
+        Assert.Equal("[1, 2", File.ReadAllText(path));
+        Assert.Empty(Directory.GetFiles(dir.Path, "settings.json.damaged-*"));
+        Assert.Contains(TestLog.Entries(log), e => e.Message.Contains("could not be read", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("[]")]
+    [InlineData("\"text\"")]
+    [InlineData("{ \"uiScale\": \"big\" }")]
+    [InlineData("{ \"uiScale\": 1e400 }")]
+    [InlineData("{ \"artNetUniverseOffset\": 99999999999 }")]
+    [InlineData("{ \"recentFiles\": [null, 5] }")]
+    [InlineData("{ \"libraryFolders\": {} }")]
+    public void Any_unreadable_content_gives_defaults(string json)
+    {
+        using var dir = new TempDir();
+        string path = dir.Write("settings.json", json);
+        var s = new Candela.App.Settings.SettingsStore(TestLog.Create(), path).Load();
+        Assert.Equal(1f, s.UiScale);
+        Assert.Equal("en", s.Language);
+    }
+
+    [Fact]
+    public void Odd_but_readable_values_are_repaired()
+    {
+        using var dir = new TempDir();
+        string path = dir.Write("settings.json",
+            "{ \"uiScale\": \"NaN\", \"fontSize\": -3, \"language\": null, \"navigationStyle\": null, \"theme\": null, " +
+            "\"recentFiles\": null, \"libraryFolders\": [null, \"\", \"/x\", \"/x\"], \"zoomSpeed\": \"Infinity\", \"keyBindingPreset\": \"  \" }");
+        var s = new Candela.App.Settings.SettingsStore(TestLog.Create(), path).Load();
+        Assert.Equal(1f, s.UiScale);
+        Assert.Equal(Candela.App.Ui.FontSet.DefaultSize, s.FontSize);
+        Assert.Equal("en", s.Language);
+        Assert.Equal("Candela", s.NavigationStyle);
+        Assert.Equal("Dark", s.Theme);
+        Assert.Empty(s.RecentFiles);
+        Assert.Equal(new[] { "/x" }, s.LibraryFolders);
+        Assert.Equal(1f, s.ZoomSpeed);
+        Assert.Equal("Default", s.KeyBindingPreset);
+    }
+}

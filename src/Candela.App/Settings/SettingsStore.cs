@@ -8,8 +8,9 @@ using Candela.Core.Settings;
 namespace Candela.App.Settings;
 
 /// <summary>
-/// Crash-safe persistence of the user's <see cref="AppSettings"/>. Loading never fails: a damaged file is kept aside as
-/// <c>settings.json.damaged-&lt;time&gt;</c> (so the user's values are not silently overwritten) and defaults are used;
+/// Crash-safe persistence of the user's <see cref="AppSettings"/>. Loading never fails: a damaged file is moved aside to
+/// <c>settings.json.damaged-&lt;time&gt;</c> (so the user's values are not silently overwritten, and only once) and
+/// defaults are used;
 /// out-of-range values are clamped. Saving writes a temporary file and renames it over the old one, so a crash during
 /// a save leaves either the old or the new settings; failures are logged, never thrown. Saves are debounced while the
 /// user drags a slider.
@@ -56,23 +57,37 @@ internal sealed class SettingsStore
             }
             catch (Exception e) when (e is JsonException or IOException or UnauthorizedAccessException or NotSupportedException or InvalidOperationException)
             {
-                string backup = _path + ".damaged-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
-                try
-                {
-                    File.Copy(_path, backup, overwrite: true);
-                    _log.Warn("Settings", $"The settings file could not be read ({e.Message}); it was kept as '{backup}' and defaults are used.");
-                }
-                catch (Exception copyError) when (copyError is IOException or UnauthorizedAccessException)
-                {
-                    _log.Warn("Settings", $"The settings file could not be read ({e.Message}); defaults are used.");
-                }
-
+                KeepDamagedFileAside(e.Message);
                 loaded = null;
             }
         }
 
         Settings = Sanitize(loaded ?? new AppSettings());
         return Settings;
+    }
+
+    /// <summary>
+    /// Moves an unreadable settings file to <c>settings.json.damaged-&lt;time&gt;</c>, so the user's values are not lost
+    /// and the next start does not find (and set aside) the same damaged file again. Read-only runs leave it in place.
+    /// </summary>
+    private void KeepDamagedFileAside(string reason)
+    {
+        if (ReadOnly)
+        {
+            _log.Warn("Settings", $"The settings file could not be read ({reason}); defaults are used.");
+            return;
+        }
+
+        string backup = _path + ".damaged-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+        try
+        {
+            File.Move(_path, backup, overwrite: true);
+            _log.Warn("Settings", $"The settings file could not be read ({reason}); it was kept as '{backup}' and defaults are used.");
+        }
+        catch (Exception moveError) when (moveError is IOException or UnauthorizedAccessException)
+        {
+            _log.Warn("Settings", $"The settings file could not be read ({reason}); defaults are used.");
+        }
     }
 
     /// <summary>
