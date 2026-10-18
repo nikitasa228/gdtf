@@ -8,7 +8,7 @@ namespace Candela.Electrical;
 /// value of <c>_specs/fixtures_index.json</c> (see <c>_specs/SCHEMA.md</c>) and every WiringObject
 /// <c>ConnectorType</c> and legacy <c>Connector</c> <c>Type</c> found in the 1091 library GDTF files (PowerconTRUE1,
 /// powerCONTRUE1TOP, NAC3FCA/NAC3FCB, NAC3MPA/NAC3MPB, PowerConBlue, CEE 7/7, IEC 60320-C13/14, XLR3/XLR5, RJ45/RJ-45,
-/// etherCON, Martin PD/PDE/DCE/8-pin, DC Power Connector (…), Loose End, TBLK, PWB-CAB, Edison, …). Lookup ignores
+/// etherCON, Martin PD/PDE/DCE/8-pin, DC Power Connector (…), Loose End, TBLK, PWB-CAB, Edison, DIN3/DIN5, …). Lookup ignores
 /// case, spaces and punctuation; names that are not recognised resolve to an <see cref="ConnectorDomain.Unknown"/>
 /// connector carrying the name as written, against which no compatibility checks are made.
 /// </summary>
@@ -98,6 +98,7 @@ public static class ConnectorCatalog
         Data("XLR5", "XLR 5-pin (DMX)", "XLR5", ConnectorDomain.Dmx, 5, "connector-xlr5", "XLR 5", "XLR 5-pin", "5-pin XLR", "DMX5", "XLR5 DMX"),
         Data("XLR3", "XLR 3-pin (DMX)", "XLR3", ConnectorDomain.Dmx, 3, "connector-xlr3", "XLR 3", "XLR 3-pin", "3-pin XLR", "DMX3", "XLR3 DMX"),
         Data("XLR", "XLR (DMX, pin count unknown)", GenericXlrFamily, ConnectorDomain.Dmx, 0, "connector-xlr", "DMX XLR", "XLR DMX"),
+        Data("DIN5 (DMX)", "DIN 5-pin (DMX)", "DIN5 (DMX)", ConnectorDomain.Dmx, 5, "connector-din5", "DIN5", "DIN 5", "DIN 5-pin"),
         Data("RJ45", "RJ45", "RJ45", ConnectorDomain.Ethernet, 8, "connector-rj45", "RJ-45", "RJ 45", "8P8C", "Ethernet"),
         Data("etherCON", "Neutrik etherCON (RJ45)", "RJ45", ConnectorDomain.Ethernet, 8, "connector-ethercon",
             "EtherCon", "ethercon cat6", "ethercon cat5", "NE8FAV", "NE8MC"),
