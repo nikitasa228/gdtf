@@ -253,44 +253,140 @@ public enum BeamType
     Glow,
 }
 
+/// <summary>The Beam attributes that have a GDTF default, as flags (see <see cref="BeamGeometry.Specified"/>).</summary>
+[Flags]
+public enum BeamAttributes
+{
+    /// <summary>None.</summary>
+    None = 0,
+
+    /// <summary><see cref="BeamGeometry.LampType"/>.</summary>
+    LampType = 1 << 0,
+
+    /// <summary><see cref="BeamGeometry.PowerConsumption"/>.</summary>
+    PowerConsumption = 1 << 1,
+
+    /// <summary><see cref="BeamGeometry.LuminousFlux"/>.</summary>
+    LuminousFlux = 1 << 2,
+
+    /// <summary><see cref="BeamGeometry.ColorTemperature"/>.</summary>
+    ColorTemperature = 1 << 3,
+
+    /// <summary><see cref="BeamGeometry.BeamAngle"/>.</summary>
+    BeamAngle = 1 << 4,
+
+    /// <summary><see cref="BeamGeometry.FieldAngle"/>.</summary>
+    FieldAngle = 1 << 5,
+
+    /// <summary><see cref="BeamGeometry.ThrowRatio"/>.</summary>
+    ThrowRatio = 1 << 6,
+
+    /// <summary><see cref="BeamGeometry.RectangleRatio"/>.</summary>
+    RectangleRatio = 1 << 7,
+
+    /// <summary><see cref="BeamGeometry.BeamRadius"/>.</summary>
+    BeamRadius = 1 << 8,
+
+    /// <summary><see cref="BeamGeometry.BeamType"/>.</summary>
+    BeamType = 1 << 9,
+
+    /// <summary><see cref="BeamGeometry.ColorRenderingIndex"/>.</summary>
+    ColorRenderingIndex = 1 << 10,
+
+    /// <summary>Every attribute above.</summary>
+    All = (1 << 11) - 1,
+}
+
 /// <summary>A light source. Light leaves the geometry origin along its local −Z axis.</summary>
+/// <remarks>
+/// Every photometric attribute has a GDTF default (1000 W, 10 000 lm, 6000 K, 25°/25°, Wash …) that editors write back
+/// unchanged, so a value alone cannot tell "the file says 10 000 lm" from "the author never set it". <see cref="Specified"/>
+/// (and the <c>Is…Specified</c> properties) record which attributes the file actually gave with a valid value; the
+/// properties themselves always hold a usable value (the file's, else the GDTF default). Assigning a property in code
+/// marks it as specified.
+/// </remarks>
 public sealed class BeamGeometry : GdtfGeometry
 {
-    /// <summary>Creates a beam with GDTF defaults.</summary>
+    private LampType _lampType = LampType.Discharge;
+    private float _powerConsumption = 1000f;
+    private float _luminousFlux = 10000f;
+    private float _colorTemperature = 6000f;
+    private float _beamAngle = 25f;
+    private float _fieldAngle = 25f;
+    private float _throwRatio = 1f;
+    private float _rectangleRatio = 1.7777f;
+    private float _beamRadius = 0.05f;
+    private BeamType _beamType = BeamType.Wash;
+    private float _colorRenderingIndex = 100f;
+
+    /// <summary>Creates a beam with GDTF defaults (nothing specified).</summary>
     public BeamGeometry() : base(GeometryType.Beam) { }
 
-    /// <summary>Lamp kind.</summary>
-    public LampType LampType { get; set; } = LampType.Discharge;
+    /// <summary>
+    /// The attributes the file gave with a valid value (attributes that are missing, empty or unparsable keep the GDTF
+    /// default and are not in this set).
+    /// </summary>
+    public BeamAttributes Specified { get; set; }
+
+    /// <summary>True when every attribute in <paramref name="attributes"/> was given by the file.</summary>
+    public bool IsSpecified(BeamAttributes attributes) => attributes != BeamAttributes.None && (Specified & attributes) == attributes;
+
+    /// <summary>True when <see cref="LampType"/> comes from the file (not the GDTF default Discharge).</summary>
+    public bool IsLampTypeSpecified => IsSpecified(BeamAttributes.LampType);
+
+    /// <summary>True when <see cref="PowerConsumption"/> comes from the file (not the GDTF default 1000 W).</summary>
+    public bool IsPowerConsumptionSpecified => IsSpecified(BeamAttributes.PowerConsumption);
+
+    /// <summary>True when <see cref="LuminousFlux"/> comes from the file (not the GDTF default 10 000 lm).</summary>
+    public bool IsLuminousFluxSpecified => IsSpecified(BeamAttributes.LuminousFlux);
+
+    /// <summary>True when <see cref="ColorTemperature"/> comes from the file (not the GDTF default 6000 K).</summary>
+    public bool IsColorTemperatureSpecified => IsSpecified(BeamAttributes.ColorTemperature);
+
+    /// <summary>True when <see cref="BeamAngle"/> comes from the file (not the GDTF default 25°).</summary>
+    public bool IsBeamAngleSpecified => IsSpecified(BeamAttributes.BeamAngle);
+
+    /// <summary>True when <see cref="FieldAngle"/> comes from the file (not the GDTF default 25°).</summary>
+    public bool IsFieldAngleSpecified => IsSpecified(BeamAttributes.FieldAngle);
+
+    /// <summary>True when <see cref="BeamType"/> comes from the file (not the GDTF default Wash).</summary>
+    public bool IsBeamTypeSpecified => IsSpecified(BeamAttributes.BeamType);
+
+    /// <summary>True when <see cref="ColorRenderingIndex"/> comes from the file (not the GDTF default 100).</summary>
+    public bool IsColorRenderingIndexSpecified => IsSpecified(BeamAttributes.ColorRenderingIndex);
+
+    /// <summary>Lamp kind (GDTF default Discharge).</summary>
+    public LampType LampType { get => _lampType; set { _lampType = value; Specified |= BeamAttributes.LampType; } }
 
     /// <summary>Electrical power of the source in W (GDTF default 1000).</summary>
-    public float PowerConsumption { get; set; } = 1000f;
+    public float PowerConsumption { get => _powerConsumption; set { _powerConsumption = value; Specified |= BeamAttributes.PowerConsumption; } }
 
     /// <summary>Luminous flux of the source in lm (GDTF default 10000).</summary>
-    public float LuminousFlux { get; set; } = 10000f;
+    public float LuminousFlux { get => _luminousFlux; set { _luminousFlux = value; Specified |= BeamAttributes.LuminousFlux; } }
 
     /// <summary>Correlated colour temperature of the white source in K (GDTF default 6000).</summary>
-    public float ColorTemperature { get; set; } = 6000f;
+    public float ColorTemperature { get => _colorTemperature; set { _colorTemperature = value; Specified |= BeamAttributes.ColorTemperature; } }
 
     /// <summary>Full beam angle in degrees, where intensity falls to 50 % (GDTF default 25).</summary>
-    public float BeamAngle { get; set; } = 25f;
+    public float BeamAngle { get => _beamAngle; set { _beamAngle = value; Specified |= BeamAttributes.BeamAngle; } }
 
     /// <summary>Full field angle in degrees, where intensity falls to 10 % (GDTF default 25).</summary>
-    public float FieldAngle { get; set; } = 25f;
+    public float FieldAngle { get => _fieldAngle; set { _fieldAngle = value; Specified |= BeamAttributes.FieldAngle; } }
 
     /// <summary>Throw ratio of a projector lens (GDTF default 1).</summary>
-    public float ThrowRatio { get; set; } = 1f;
+    public float ThrowRatio { get => _throwRatio; set { _throwRatio = value; Specified |= BeamAttributes.ThrowRatio; } }
 
     /// <summary>Width/height ratio of a rectangular beam (GDTF default 1.7777).</summary>
-    public float RectangleRatio { get; set; } = 1.7777f;
+    public float RectangleRatio { get => _rectangleRatio; set { _rectangleRatio = value; Specified |= BeamAttributes.RectangleRatio; } }
 
     /// <summary>Radius of the light-emitting surface in metres (GDTF default 0.05).</summary>
-    public float BeamRadius { get; set; } = 0.05f;
+    public float BeamRadius { get => _beamRadius; set { _beamRadius = value; Specified |= BeamAttributes.BeamRadius; } }
 
-    /// <summary>Beam type.</summary>
-    public BeamType BeamType { get; set; } = BeamType.Wash;
+    /// <summary>Beam type (GDTF default Wash).</summary>
+    public BeamType BeamType { get => _beamType; set { _beamType = value; Specified |= BeamAttributes.BeamType; } }
 
     /// <summary>Colour rendering index 0 … 100 (GDTF default 100).</summary>
-    public float ColorRenderingIndex { get; set; } = 100f;
+    public float ColorRenderingIndex { get => _colorRenderingIndex; set { _colorRenderingIndex = value; Specified |= BeamAttributes.ColorRenderingIndex; } }
 
     /// <summary>Emitter that describes the white spectrum, as written (GDTF 1.2), or null.</summary>
     public string? EmitterSpectrumName { get; set; }

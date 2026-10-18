@@ -492,17 +492,19 @@ public static partial class GdtfReader
         switch (g)
         {
             case BeamGeometry b:
-                b.LampType = ctx.Enum(e, X.LampType, LampTypes, LampType.Discharge, path);
-                b.PowerConsumption = ctx.Float(e, X.PowerConsumption, 1000f, path);
-                b.LuminousFlux = ctx.Float(e, X.LuminousFlux, 10000f, path);
-                b.ColorTemperature = ctx.Float(e, X.ColorTemperature, 6000f, path);
-                b.BeamAngle = ctx.Float(e, X.BeamAngle, 25f, path);
-                b.FieldAngle = ctx.Float(e, X.FieldAngle, 25f, path);
-                b.ThrowRatio = ctx.Float(e, X.ThrowRatio, 1f, path);
-                b.RectangleRatio = ctx.Float(e, X.RectangleRatio, 1.7777f, path);
-                b.BeamRadius = ctx.Float(e, X.BeamRadius, 0.05f, path);
-                b.BeamType = ctx.Enum(e, X.BeamType, BeamTypes, BeamType.Wash, path);
-                b.ColorRenderingIndex = ctx.Float(e, X.ColorRenderingIndex, 100f, path);
+                // Only attributes the file gives with a valid value are assigned (which marks them as specified); the
+                // others keep the GDTF defaults of BeamGeometry.
+                if (ctx.EnumOpt(e, X.LampType, LampTypes, path) is { } lampType) b.LampType = lampType;
+                if (ctx.FloatOpt(e, X.PowerConsumption, path) is { } power) b.PowerConsumption = power;
+                if (ctx.FloatOpt(e, X.LuminousFlux, path) is { } flux) b.LuminousFlux = flux;
+                if (ctx.FloatOpt(e, X.ColorTemperature, path) is { } cct) b.ColorTemperature = cct;
+                if (ctx.FloatOpt(e, X.BeamAngle, path) is { } beamAngle) b.BeamAngle = beamAngle;
+                if (ctx.FloatOpt(e, X.FieldAngle, path) is { } fieldAngle) b.FieldAngle = fieldAngle;
+                if (ctx.FloatOpt(e, X.ThrowRatio, path) is { } throwRatio) b.ThrowRatio = throwRatio;
+                if (ctx.FloatOpt(e, X.RectangleRatio, path) is { } rectangleRatio) b.RectangleRatio = rectangleRatio;
+                if (ctx.FloatOpt(e, X.BeamRadius, path) is { } beamRadius) b.BeamRadius = beamRadius;
+                if (ctx.EnumOpt(e, X.BeamType, BeamTypes, path) is { } beamType) b.BeamType = beamType;
+                if (ctx.FloatOpt(e, X.ColorRenderingIndex, path) is { } cri) b.ColorRenderingIndex = cri;
                 b.EmitterSpectrumName = ReadContext.NonEmpty(e, X.EmitterSpectrum);
                 break;
             case DisplayGeometry d:

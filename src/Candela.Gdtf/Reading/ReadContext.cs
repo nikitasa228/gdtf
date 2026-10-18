@@ -150,6 +150,16 @@ internal sealed class ReadContext
         return fallback;
     }
 
+    /// <summary>Enum value, or null when the attribute is missing, empty or unknown (unknown values are warned about).</summary>
+    public T? EnumOpt<T>(XElement e, XName name, IReadOnlyDictionary<string, T> map, string path) where T : struct
+    {
+        var a = e.Attribute(name);
+        if (a is null || string.IsNullOrWhiteSpace(a.Value)) return null;
+        if (map.TryGetValue(a.Value.Trim(), out var v)) return v;
+        Warn(path, $"{name.LocalName}=\"{a.Value}\" is not a known value; the GDTF default is used.");
+        return null;
+    }
+
     public DmxValue Dmx(XElement e, XName name, DmxValue fallback, string path)
     {
         var a = e.Attribute(name);

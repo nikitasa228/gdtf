@@ -317,10 +317,10 @@ internal static class Resolver
                 foreach (var f in lc.Functions)
                     ResolveFunction(ctx, f, path, attributes, wheels, emitters, filters, gamuts, profiles, colorSpaces);
             }
-            ComputeRanges(ch);
+            ch.Resolution = ch.Offsets.Length > 0 ? ch.Offsets.Length : VirtualResolution(ch);
         }
 
-        // Node references between channels and functions (need every channel's name first).
+        // Node references between channels and functions (need every channel's name and resolution first).
         foreach (var ch in mode.Channels)
         {
             string path = $"{modePath}/{ch.Name}";
@@ -341,9 +341,23 @@ internal static class Resolver
                 var (masterChannel, masterFunction) = FindChannelOrFunction(mode, f.ModeMasterName);
                 f.ModeMasterChannel = masterChannel;
                 f.ModeMasterFunction = masterFunction;
-                if (masterChannel is null) ctx.Warn(path, $"Mode master '{f.ModeMasterName}' is not a channel or function of this mode.");
+                if (masterChannel is null)
+                {
+                    ctx.Warn(path, $"Mode master '{f.ModeMasterName}' is not a channel or function of this mode.");
+                    continue;
+                }
+                f.ModeFromValue = f.ModeFrom.ToResolution(masterChannel.Resolution);
+                f.ModeToValue = f.ModeTo.ToRangeEnd(masterChannel.Resolution);
+                if (f.ModeToValue < f.ModeFromValue)
+                {
+                    ctx.Warn(path, $"Function '{f.Name}': ModeTo {f.ModeTo} is below ModeFrom {f.ModeFrom}; the range is swapped.");
+                    (f.ModeFromValue, f.ModeToValue) = (f.ModeTo.ToResolution(masterChannel.Resolution), f.ModeFrom.ToRangeEnd(masterChannel.Resolution));
+                }
             }
         }
+
+        // DMX ranges need the mode masters: functions that cannot be active together do not end each other's range.
+        foreach (var ch in mode.Channels) ComputeRanges(ch);
 
         foreach (var rel in mode.Relations)
         {
@@ -509,10 +523,15 @@ internal static class Resolver
 
     // ---------------------------------------------------------------- DMX ranges
 
-    /// <summary>Sets channel resolution, function DMX ranges and channel set ranges (all in channel resolution).</summary>
+    /// <summary>
+    /// Sets function DMX ranges and channel set ranges (in channel resolution; <see cref="DmxChannel.Resolution"/> and
+    /// the mode masters must be resolved). GDTF: the end of a function is the next function's DMXFrom − 1 or the
+    /// channel maximum, the end of a channel set the next set's DMXFrom − 1 or the end of its function. "Next" is taken
+    /// in DMX order among the functions that can be active at the same time as this one (see
+    /// <see cref="CanBeActiveTogether"/>): files list one function per mode-master range, all starting at 0.
+    /// </summary>
     internal static void ComputeRanges(DmxChannel ch)
     {
-        ch.Resolution = ch.Offsets.Length > 0 ? ch.Offsets.Length : VirtualResolution(ch);
         var functions = ch.Functions.ToList();
         foreach (var f in functions) f.DmxFromValue = ch.ToChannelValue(f.DmxFrom);
 
@@ -548,16 +567,26 @@ internal static class Resolver
     }
 
     /// <summary>
-    /// Two functions of one channel compete for DMX ranges unless they have the same mode master with disjoint
-    /// mode ranges (then only one of them is active at a time and their ranges may overlap).
+    /// Two functions of one channel compete for DMX ranges unless only one of them can be active at a time: both depend
+    /// on the same mode-master channel (however the master is spelled: by channel name or as a function node of that
+    /// channel) and either their mode ranges are disjoint or they name two different functions of the master channel
+    /// (a channel has one active function at a time).
     /// </summary>
-    private static bool CanBeActiveTogether(ChannelFunction a, ChannelFunction b)
+    internal static bool CanBeActiveTogether(ChannelFunction a, ChannelFunction b)
     {
         if (a.ModeMasterName is null || b.ModeMasterName is null) return true;
-        if (!string.Equals(a.ModeMasterName.Trim(), b.ModeMasterName.Trim(), StringComparison.OrdinalIgnoreCase)) return true;
-        uint aFrom = a.ModeFrom.ToResolution(4), aTo = a.ModeTo.ToResolution(4);
-        uint bFrom = b.ModeFrom.ToResolution(4), bTo = b.ModeTo.ToResolution(4);
-        return aFrom <= bTo && bFrom <= aTo;
+        var ma = a.ModeMasterChannel;
+        var mb = b.ModeMasterChannel;
+        if (ma is null || mb is null)
+        {
+            // Unresolved master: only the spelling can tell whether both depend on the same thing.
+            if (!string.Equals(a.ModeMasterName.Trim(), b.ModeMasterName.Trim(), StringComparison.OrdinalIgnoreCase)) return true;
+            return a.ModeFrom.ToResolution(DmxValue.MaxByteCount) <= b.ModeTo.ToRangeEnd(DmxValue.MaxByteCount) &&
+                   b.ModeFrom.ToResolution(DmxValue.MaxByteCount) <= a.ModeTo.ToRangeEnd(DmxValue.MaxByteCount);
+        }
+        if (!ReferenceEquals(ma, mb)) return true;
+        if (a.ModeMasterFunction is { } fa && b.ModeMasterFunction is { } fb && !ReferenceEquals(fa, fb)) return false;
+        return a.ModeFromValue <= b.ModeToValue && b.ModeFromValue <= a.ModeToValue;
     }
 
     private static int VirtualResolution(DmxChannel ch)
