@@ -333,6 +333,21 @@ public sealed class DataSafetyTests : IDisposable
     }
 
     [Fact]
+    public void Asset_folders_in_another_guid_spelling_are_recovered_with_their_stored_names()
+    {
+        var id = Guid.NewGuid();
+        var png = TestData.Png();
+        var path = _dir.File("spelling.candela");
+        File.WriteAllBytes(path, TestData.Zip(
+            ("scene.json", TestData.Utf8("""{"name":"Spelling","entities":[]}""")),
+            ($"assets/{id.ToString("D").ToUpperInvariant()}/poster.png", png),
+            ($"assets/{Guid.NewGuid():N}/a", new byte[] { 1 }))); // shorter than a canonical folder name
+        var loaded = ProjectFile.Load(path);
+        Assert.Equal(png, loaded.Assets.GetBytes(id));
+        Assert.Contains(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.AssetIndexInvalid);
+    }
+
+    [Fact]
     public void A_damaged_library_file_never_replaces_the_copy_kept_in_the_project()
     {
         var project = new ProjectData(new Scene("Library"));

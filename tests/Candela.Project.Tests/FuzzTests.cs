@@ -114,6 +114,36 @@ public sealed class FuzzTests
         Assert.Empty(failures.Select(f => $"{f.Value}x {f.Key}"));
     }
 
+    [Fact]
+    public void Damaged_entry_names_never_escape_the_exception_contract()
+    {
+        var rng = new Random(2026);
+        var entries = s_entries.Value;
+        var failures = new Dictionary<string, int>();
+        for (int iteration = 0; iteration < 800; iteration++)
+        {
+            var copy = entries.ToArray();
+            for (int k = 0; k < 1 + rng.Next(3); k++)
+            {
+                int which = rng.Next(copy.Length);
+                var name = copy[which].Name;
+                name = rng.Next(7) switch
+                {
+                    0 => name.ToUpperInvariant(),
+                    1 => name.Replace("-", "", StringComparison.Ordinal), // GUID folders in the "N" spelling
+                    2 => name.Length > 1 ? name[..rng.Next(1, name.Length)] : name,
+                    3 => "../" + name,
+                    4 => name + "/",
+                    5 => copy[rng.Next(copy.Length)].Name, // a duplicate name
+                    _ => name.Length > 0 ? name.Remove(rng.Next(name.Length), 1).Insert(0, ((char)('a' + rng.Next(26))).ToString()) : name,
+                };
+                copy[which] = (name, copy[which].Data);
+            }
+            Check(TestData.Zip(copy), failures, roundTrip: true);
+        }
+        Assert.Empty(failures.Select(f => $"{f.Value}x {f.Key}"));
+    }
+
     /// <summary>Loads an archive; true when it loaded. Unexpected outcomes are counted in <paramref name="failures"/>.</summary>
     private static bool Check(byte[] archive, Dictionary<string, int> failures, bool roundTrip)
     {
