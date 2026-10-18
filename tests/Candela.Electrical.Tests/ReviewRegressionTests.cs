@@ -201,6 +201,19 @@ public class ReviewRegressionTests
         Assert.Equal(180, s.PowerCircuits.Single().LoadW, 6);
     }
 
+    [Fact]
+    public void A_substitute_model_is_named_in_a_note()
+    {
+        var kit = new SceneKit();
+        var wash = kit.Fixture("Ayrton@Naja_Wash@V1.gdtf", "Wash", 12, new Vector3(0, 0, 0)); // not in the library: Naja is used
+        var s = kit.Solve();
+        var note = s.Issues.WithCode(IssueCodes.FixtureDataIncomplete).Single(i => i.Entities.Contains(wash.Id));
+        Assert.Equal(IssueSeverity.Note, note.Severity);
+        Assert.Contains("#12 'Wash'", note.Message);
+        Assert.Contains("Ayrton@Naja@V1.0_First_Release.gdtf", note.Message);
+        Assert.True(s.Devices[wash.Id].Profile!.IsSubstitute);
+    }
+
     // ------------------------------------------------------------------ mains
 
     [Fact]

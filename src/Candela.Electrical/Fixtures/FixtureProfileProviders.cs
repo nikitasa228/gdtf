@@ -68,6 +68,8 @@ public sealed class LibraryFixtureProfileProvider : IFixtureProfileProvider
         if (type is not null && mode is not null && type.FindMode(mode) is null)
             notes.Add($"DMX mode '{mode}' is not in '{entry.FileName}'; the first mode's ports are used.");
         bool substitute = match.Kind == FixtureMatchKind.Substitute;
+        if (substitute)
+            notes.Add($"'{spec}' is not in the fixture library; its ports, power draw and weight are those of the similar model {entry.DisplayName} ({entry.FileName}).");
         try
         {
             return FixtureProfile.Build(spec, mode, type, specs, entry.FileName, substitute, notes);

@@ -237,7 +237,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 | Different connectors of the same signal | `cable.adapter-needed` | warning |
 | Two plugs in one port (the second is ignored) | `cable.port-occupied` | error |
 | Anchor entity missing (stored position used); NaN nodes, broken segments, loops | `cable.anchor-missing`, `cable.invalid-geometry` | warning |
-| GDTF not in the library; unreadable GDTF or missing mode | `fixture.unknown-type`, `fixture.data-incomplete` | note |
+| GDTF not in the library; unreadable GDTF, missing mode, or a similar model used as substitute | `fixture.unknown-type`, `fixture.data-incomplete` | note |
 
 ## Cable geometry
 
@@ -311,7 +311,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 77 tests and runs in about 20 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` has 80 tests and runs in about 20 s. It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.
@@ -333,8 +333,8 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 * **Review regressions.** A 34-fixture chain of BeamZ Cobra 100 Spots (XLR3 + XLR5 thru) still trips the 32-device
   warning, while a real splitter starts new segments. Also tested: both thru sockets in use, DMX breaks, the 240 A
   "fuse" of the BeamZ Ignite 740 thru, thru sockets typed as inputs, 400 V three-phase sources, a three-phase distro
-  on a single-phase feed, a distro on a dead `Mains In` cable, and two fixtures that bend a truss past its point
-  rating.
+  on a single-phase feed, a distro on a dead `Mains In` cable, a substitute model, overload values printed next to
+  their limits, a fixture hung under a hoist, and two fixtures that bend a truss past its point rating.
 
 ## Assumptions and known gaps
 
