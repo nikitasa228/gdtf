@@ -180,7 +180,7 @@ public sealed class RoundTripTests
     }
 
     [Fact]
-    public void Snapshot_can_be_written_on_another_thread_while_the_scene_changes()
+    public async Task Snapshot_can_be_written_on_another_thread_while_the_scene_changes()
     {
         using var dir = new TempDir();
         var project = TestData.RichProject();
@@ -190,7 +190,7 @@ public sealed class RoundTripTests
         project.Settings.SetJson("view", "{}");
 
         var path = dir.File("background.candela");
-        var result = Task.Run(() => ProjectFile.Save(path, snapshot)).GetAwaiter().GetResult();
+        var result = await Task.Run(() => ProjectFile.Save(path, snapshot));
         Assert.Empty(result.Issues);
         var loaded = ProjectFile.Load(path);
         Assert.Equal(expected, TestData.SceneJson(loaded.Scene));

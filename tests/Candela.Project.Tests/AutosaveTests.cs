@@ -134,15 +134,15 @@ public sealed class AutosaveTests : IDisposable
     }
 
     [Fact]
-    public void Second_instance_of_the_same_project_gets_its_own_session()
+    public async Task Second_instance_of_the_same_project_gets_its_own_session()
     {
         var project = new ProjectData(new Scene("Twice"));
         using var first = new AutosaveService(project.Id, () => ProjectSnapshot.Capture(project), Options());
         using var second = new AutosaveService(project.Id, () => ProjectSnapshot.Capture(project), Options());
         Assert.Equal(project.Id.ToString("D"), first.SessionKey);
         Assert.Equal(project.Id.ToString("D") + "~2", second.SessionKey);
-        first.SaveNowAsync().Wait();
-        second.SaveNowAsync().Wait();
+        await first.SaveNowAsync();
+        await second.SaveNowAsync();
         Assert.Empty(AutosaveService.FindRecoverable(AutosaveDir));
 
         second.Dispose();
@@ -186,7 +186,7 @@ public sealed class AutosaveTests : IDisposable
     }
 
     [Fact]
-    public void Snapshot_callback_controls_what_is_written()
+    public async Task Snapshot_callback_controls_what_is_written()
     {
         var project = new ProjectData(new Scene("Callback"));
         ProjectSnapshot? next = null;
@@ -209,7 +209,7 @@ public sealed class AutosaveTests : IDisposable
 
         // SaveNowAsync captures immediately, whatever the interval or Enabled.
         next = ProjectSnapshot.Capture(project);
-        service.SaveNowAsync().Wait();
+        await service.SaveNowAsync();
         Assert.Equal(2, calls);
         Assert.Single(service.Files);
         Assert.Equal("Callback", ProjectFile.ReadManifest(service.FilePath).SceneName);

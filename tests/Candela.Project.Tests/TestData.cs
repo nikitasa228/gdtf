@@ -108,7 +108,12 @@ internal static class TestData
         var truss = new Entity("Truss 1");
         truss.Add(new TrussComponent
         {
-            Kind = TrussKind.Ladder, Length = 8f, Profile = "F44", WeightKg = 42.5f, MaxUniformLoadKg = 800f, MaxPointLoadKg = 350f,
+            Kind = TrussKind.Ladder,
+            Length = 8f,
+            Profile = "F44",
+            WeightKg = 42.5f,
+            MaxUniformLoadKg = 800f,
+            MaxPointLoadKg = 350f,
             ModelAssetId = model.Id,
         });
         scene.Add(truss, rig);
@@ -154,7 +159,8 @@ internal static class TestData
         var console = new Entity("Console");
         console.Add(new ConsoleComponent
         {
-            Model = "grandMA3 light", ProtocolId = "sacn",
+            Model = "grandMA3 light",
+            ProtocolId = "sacn",
             Outputs = { new ConsoleOutput { PortName = "Net", Signal = "Ethernet", FirstUniverse = 1, UniverseCount = 8 } },
         });
         scene.Add(console);
@@ -162,7 +168,8 @@ internal static class TestData
         var power = new Entity("Distro");
         power.Add(new PowerSourceComponent
         {
-            VoltageV = 400f, Phases = 3,
+            VoltageV = 400f,
+            Phases = 3,
             Outlets = { new PowerOutlet { PortName = "CEE 32", Connector = "CEE 32A", BreakerA = 32f, Phase = 2 } },
         });
         scene.Add(power);
@@ -174,7 +181,9 @@ internal static class TestData
         var n4 = new CableNode { Position = new Vector3(4, 4, 6) };
         cableEntity.Add(new CableComponent
         {
-            CableTypeId = "dmx-xlr5", Label = "U2-01", SlackFactor = 1.1f,
+            CableTypeId = "dmx-xlr5",
+            Label = "U2-01",
+            SlackFactor = 1.1f,
             Nodes = { n1, n2, n3, n4 },
             Segments = { new CableSegment(n1.Id, n2.Id), new CableSegment(n2.Id, n3.Id), new CableSegment(n2.Id, n4.Id) },
             Endpoints =
