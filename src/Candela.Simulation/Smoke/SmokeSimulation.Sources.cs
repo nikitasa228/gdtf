@@ -68,7 +68,7 @@ public sealed partial class SmokeSimulation
                 continue;
             }
 
-            float output = float.IsFinite(e.Output) ? Math.Clamp(e.Output, 0f, 1f) : 0f;
+            float output = float.IsNaN(e.Output) ? 0f : Math.Clamp(e.Output, 0f, 1f);
             if (output <= 0f)
                 continue;
             var dir = e.Direction;

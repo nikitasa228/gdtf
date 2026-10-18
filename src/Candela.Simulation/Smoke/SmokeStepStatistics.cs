@@ -11,9 +11,10 @@ namespace Candela.Simulation;
 /// <param name="IgnoredEmitters">Emitters skipped in the last sub-step (non-finite position, outside the box, inside a solid).</param>
 /// <param name="DroppedTime">Simulation time discarded because the sub-step cap was reached, s.</param>
 /// <param name="MassCorrection">
-/// Relative correction applied by the mass fixer in the last sub-step (scale factor − 1; 0 when
-/// <see cref="SmokeSimulationSettings.ConserveMass"/> is off): a measure of the advection's conservation error.
+/// Relative correction δ the conservation fixer applied to the smoke in the last sub-step (0 when
+/// <see cref="SmokeSimulationSettings.ConserveMassAndHeat"/> is off): a measure of the advection's conservation error.
 /// </param>
+/// <param name="HeatCorrection">The same for the heat (temperature excess).</param>
 public readonly record struct SmokeStepStatistics(
     int SubSteps,
     int PressureIterations,
@@ -21,7 +22,8 @@ public readonly record struct SmokeStepStatistics(
     float MaxDivergenceAfter,
     int IgnoredEmitters,
     double DroppedTime,
-    float MassCorrection);
+    float MassCorrection,
+    float HeatCorrection);
 
 /// <summary>Wall-clock milliseconds spent in each stage of the last fixed sub-step.</summary>
 /// <param name="Sources">Emitter injection.</param>

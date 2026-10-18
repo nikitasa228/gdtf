@@ -137,10 +137,14 @@ public sealed partial class SmokeSimulation
     {
         _dtForKernels = dt;
         RunSlices(_nz, _cellVelocitySlice);
-        bool conserve = _settings.ConserveMass;
-        double target = 0;
+        bool conserve = _settings.ConserveMassAndHeat;
+        double massTarget = 0, heatTarget = 0;
         if (conserve)
-            target = Math.Max(0.0, SumDensity() - BoundaryOutflow(dt));
+        {
+            BoundaryOutflow(dt, out double massOut, out double heatOut);
+            massTarget = Math.Max(0.0, SumField(_density, out _) - massOut);
+            heatTarget = SumField(_temperature, out _) - heatOut;
+        }
 
         RunSlices(_nz, _advectScalarsForwardSlice);
         if (_settings.ScalarAdvection == ScalarAdvectionScheme.MacCormack)
@@ -154,35 +158,34 @@ public sealed partial class SmokeSimulation
             (_temperature, _temperature2) = (_temperature2, _temperature);
         }
 
-        _massCorrection = 0f;
-        if (conserve)
-            FixMass(target);
+        _massCorrection = conserve ? FixSum(_density, massTarget) : 0f;
+        _heatCorrection = conserve ? FixSum(_temperature, heatTarget) : 0f;
     }
 
     /// <summary>
-    /// Smoke that leaves through open faces during one step, in density·cells: Σ u_n·d·dt/h over the free boundary
-    /// faces with outward velocity, using the density of the cell inside (first-order upwind). Air entering through an
-    /// open face is ambient and carries no smoke. Sequential, so the sum is deterministic.
+    /// Smoke and heat that leave through open faces during one step, in density·cells and kelvin·cells: Σ u_n·q·dt/h
+    /// over the free boundary faces with outward velocity, q taken from the cell inside (first-order upwind). Air
+    /// entering through an open face is ambient: no smoke, no excess heat. Sequential, so the sums are deterministic.
     /// </summary>
-    private double BoundaryOutflow(float dt)
+    private void BoundaryOutflow(float dt, out double mass, out double heat)
     {
-        var open = _settings.OpenFaces;
-        if (open == DomainFaces.None)
-            return 0.0;
-        double sum = 0;
+        mass = heat = 0;
+        if (_settings.OpenFaces == DomainFaces.None)
+            return;
+        double m = 0, q = 0;
         int nx = _nx, ny = _ny, nz = _nz;
         for (int k = 0; k < nz; k++)
         {
             for (int j = 0; j < ny; j++)
             {
-                sum += Outflow(_u, _uFlags, UIndex(0, j, k), -1f, CellIndex(0, j, k));
-                sum += Outflow(_u, _uFlags, UIndex(nx, j, k), 1f, CellIndex(nx - 1, j, k));
+                Outflow(_u, _uFlags, UIndex(0, j, k), -1f, CellIndex(0, j, k));
+                Outflow(_u, _uFlags, UIndex(nx, j, k), 1f, CellIndex(nx - 1, j, k));
             }
 
             for (int i = 0; i < nx; i++)
             {
-                sum += Outflow(_v, _vFlags, VIndex(i, 0, k), -1f, CellIndex(i, 0, k));
-                sum += Outflow(_v, _vFlags, VIndex(i, ny, k), 1f, CellIndex(i, ny - 1, k));
+                Outflow(_v, _vFlags, VIndex(i, 0, k), -1f, CellIndex(i, 0, k));
+                Outflow(_v, _vFlags, VIndex(i, ny, k), 1f, CellIndex(i, ny - 1, k));
             }
         }
 
@@ -190,50 +193,91 @@ public sealed partial class SmokeSimulation
         {
             for (int i = 0; i < nx; i++)
             {
-                sum += Outflow(_w, _wFlags, WIndex(i, j, 0), -1f, CellIndex(i, j, 0));
-                sum += Outflow(_w, _wFlags, WIndex(i, j, nz), 1f, CellIndex(i, j, nz - 1));
+                Outflow(_w, _wFlags, WIndex(i, j, 0), -1f, CellIndex(i, j, 0));
+                Outflow(_w, _wFlags, WIndex(i, j, nz), 1f, CellIndex(i, j, nz - 1));
             }
         }
 
-        return sum * dt * _invH;
+        mass = m * dt * _invH;
+        heat = q * dt * _invH;
 
-        float Outflow(float[] f, byte[] flags, int face, float outward, int cell)
+        void Outflow(float[] f, byte[] flags, int face, float outward, int cell)
         {
             if (flags[face] != FaceFree)
-                return 0f;
+                return;
             float un = f[face] * outward;
-            return un > 0f ? un * _density[cell] : 0f;
+            if (un > 0f)
+            {
+                m += un * _density[cell];
+                q += un * _temperature[cell];
+            }
         }
     }
 
     /// <summary>
-    /// Global mass fixer: semi-Lagrangian and MacCormack advection do not conserve mass (errors of 10–60 % over a few
-    /// hundred steps in recirculating flows), so the advected density is scaled so that the total equals the total
-    /// before advection minus what left through open faces. Scaling keeps the shape and the sign of the field; the
-    /// factor is limited to [0.5, 2] so a broken step cannot blow the field up. This is the "mass fixer" used with
-    /// semi-Lagrangian tracer transport in atmospheric models.
+    /// Conservation fixer: semi-Lagrangian and especially MacCormack advection do not conserve (in recirculating flows
+    /// and strong plumes they gain or lose 10–100 % of the smoke or heat over a few hundred steps), so after advection
+    /// the field is corrected to the total it must have — the total before advection minus what left through open faces.
+    /// The correction is x += δ·|x| with δ = (target − Σx)/Σ|x|: for a positive field (smoke) a uniform rescaling, for
+    /// the signed temperature excess warm and chilled air are corrected in proportion to their magnitude, and no value
+    /// changes sign. δ is limited to ±0.5 so a broken step cannot blow the field up. This is the global "mass fixer" used
+    /// with semi-Lagrangian tracer transport in atmospheric models. Returns δ.
     /// </summary>
-    private void FixMass(double target)
+    private float FixSum(float[] field, double target)
     {
-        double after = SumDensity();
-        if (!(after > 1e-12) || !double.IsFinite(after) || !double.IsFinite(target))
-            return;
-        float factor = (float)Math.Clamp(target / after, 0.5, 2.0);
-        _massCorrection = factor - 1f;
-        if (factor == 1f)
-            return;
-        _massScale = factor;
-        RunSlices(_nz, _scaleDensitySlice);
+        double sum = SumField(field, out double magnitude);
+        if (!(magnitude > 1e-12) || !double.IsFinite(sum) || !double.IsFinite(target))
+            return 0f;
+        float delta = (float)Math.Clamp((target - sum) / magnitude, -0.5, 0.5);
+        if (delta == 0f)
+            return 0f;
+        _fixField = field;
+        _fixDelta = delta;
+        RunSlices(_nz, _fixSlice);
+        return delta;
     }
 
-    private float _massScale = 1f, _massCorrection;
+    private float[] _fixField = Array.Empty<float>(), _sumField = Array.Empty<float>();
+    private float _fixDelta, _massCorrection, _heatCorrection;
 
-    private void ScaleDensitySlice(int k)
+    /// <summary>Σx and Σ|x| over all cells (per-slice partial sums added in slice order: deterministic).</summary>
+    private double SumField(float[] field, out double magnitude)
+    {
+        _sumField = field;
+        RunSlices(_nz, _sumFieldSlice);
+        double sum = 0;
+        magnitude = 0;
+        for (int k = 0; k < _nz; k++)
+        {
+            sum += _slicePartials[k];
+            magnitude += _slicePartials2[k];
+        }
+
+        return sum;
+    }
+
+    private void SumFieldSlice(int k)
     {
         int start = k * _nx * _ny, end = start + _nx * _ny;
-        float f = _massScale;
+        var f = _sumField;
+        double sum = 0, magnitude = 0;
         for (int c = start; c < end; c++)
-            _density[c] *= f;
+        {
+            sum += f[c];
+            magnitude += MathF.Abs(f[c]);
+        }
+
+        _slicePartials[k] = sum;
+        _slicePartials2[k] = magnitude;
+    }
+
+    private void FixSlice(int k)
+    {
+        int start = k * _nx * _ny, end = start + _nx * _ny;
+        var f = _fixField;
+        float delta = _fixDelta;
+        for (int c = start; c < end; c++)
+            f[c] += delta * MathF.Abs(f[c]);
     }
 
     private void AdvectScalarsForwardSlice(int k)

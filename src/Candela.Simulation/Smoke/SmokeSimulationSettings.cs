@@ -90,11 +90,11 @@ public sealed record SmokeSimulationSettings
     public ScalarAdvectionScheme ScalarAdvection { get; init; } = ScalarAdvectionScheme.MacCormack;
 
     /// <summary>
-    /// Whether the advected smoke is rescaled so its total mass changes only by what flows out through open faces
-    /// (global mass fixer; see <c>docs/simulation.md</c>). Off = plain semi-Lagrangian/MacCormack, which gains or loses
-    /// mass in recirculating flows.
+    /// Whether the advected smoke and heat are corrected so their totals change only by what flows out through open
+    /// faces (global conservation fixer; see <c>docs/simulation.md</c>). Off = plain semi-Lagrangian/MacCormack, which
+    /// gains or loses smoke and heat in recirculating flows and strong plumes.
     /// </summary>
-    public bool ConserveMass { get; init; } = true;
+    public bool ConserveMassAndHeat { get; init; } = true;
 
     /// <summary>Molecular/turbulent diffusivity of smoke and heat, m²/s (0 = off; numerical diffusion already acts).</summary>
     public float Diffusivity { get; init; }

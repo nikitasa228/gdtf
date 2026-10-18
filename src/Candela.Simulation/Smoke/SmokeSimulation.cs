@@ -472,7 +472,7 @@ public sealed partial class SmokeSimulation
         long t5 = Stopwatch.GetTimestamp();
         _time += _dt;
         _stepCount++;
-        _statistics = new SmokeStepStatistics(1, iterations, before, after, ignored, 0, _massCorrection);
+        _statistics = new SmokeStepStatistics(1, iterations, before, after, ignored, 0, _massCorrection, _heatCorrection);
         _timings = new SmokeStageTimings(Ms(t1 - t0), Ms(t2 - t1), Ms(t3 - t2), Ms(t4 - t3), Ms(t5 - t4));
 
         static float Ms(long ticks) => (float)(ticks * 1000.0 / Stopwatch.Frequency);
