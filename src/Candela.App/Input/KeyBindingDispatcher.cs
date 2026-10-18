@@ -76,13 +76,15 @@ internal sealed class KeyBindingMap
 /// keys). Plain letter keys are ignored while a text field has the keyboard, and everything is ignored while the
 /// shortcut editor records a new chord, a viewport flies with W/A/S/D, or a popup (menu, combo box, context menu,
 /// modal dialog) is open: the popup owns the keyboard, so Escape only closes it and Delete or Ctrl+Z cannot change the
-/// scene behind a dialog.
+/// scene behind a dialog. The frame in which a popup closes still belongs to it: Dear ImGui closes a menu on Escape, and
+/// the dialogs close themselves on Escape, before the dispatcher runs — that Escape must not also clear the selection.
 /// </summary>
 internal sealed class KeyBindingDispatcher
 {
     private readonly CommandRegistry _commands;
     private KeyBindingMap _map;
     private ImGuiKey[] _keys;
+    private bool _popupWasOpen;
 
     /// <summary>Creates a dispatcher for <paramref name="bindings"/>.</summary>
     public KeyBindingDispatcher(CommandRegistry commands, KeyBindingSet bindings)
@@ -111,7 +113,10 @@ internal sealed class KeyBindingDispatcher
     /// <summary>Checks this frame's key presses and runs the bound commands. Call once per frame inside the ImGui frame.</summary>
     public void Dispatch()
     {
-        if (Suspended || ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId | ImGuiPopupFlags.AnyPopupLevel))
+        bool popupOpen = ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId | ImGuiPopupFlags.AnyPopupLevel);
+        bool popupClosedThisFrame = _popupWasOpen && !popupOpen;
+        _popupWasOpen = popupOpen;
+        if (Suspended || popupOpen || popupClosedThisFrame)
             return;
         var io = ImGui.GetIO();
         bool typing = io.WantTextInput;

@@ -326,6 +326,77 @@ public sealed class KeyBindingDispatchTests
     }
 
     [Fact]
+    public void Escape_that_closes_a_menu_or_a_dialog_does_not_also_deselect()
+    {
+        using var ui = new HeadlessImGui(new Vector2(800, 600));
+        ui.Frame(() => { });
+        var (commands, ran) = Registry(EditorActions.DeselectAll, EditorActions.Delete);
+        var dispatcher = new KeyBindingDispatcher(commands, KeyBindingsService.CreateDefault());
+
+        // A menu (non-modal popup): Dear ImGui closes it on Escape at the start of the frame, before the dispatcher runs.
+        bool openMenu = true;
+        bool menuShown = false;
+        void Menu()
+        {
+            ImGui.Begin("host");
+            if (openMenu)
+            {
+                ImGui.OpenPopup("menu");
+                openMenu = false;
+            }
+
+            menuShown = ImGui.BeginPopup("menu");
+            if (menuShown)
+            {
+                ImGui.MenuItem("Item");
+                ImGui.EndPopup();
+            }
+
+            ImGui.End();
+        }
+
+        ui.Frame(() => { Menu(); dispatcher.Dispatch(); });
+        ui.Frame(() => { Menu(); dispatcher.Dispatch(); });
+        Assert.True(menuShown);
+        Press(ui, dispatcher, ImGuiKey.Escape, draw: Menu);
+        Assert.False(menuShown, "Escape closes the menu");
+        Assert.Empty(ran);
+
+        // A dialog that closes itself on Escape while it is drawn (message boxes, the file browser).
+        bool openDialog = true;
+        bool dialogShown = false;
+        void Dialog()
+        {
+            dialogShown = false;
+            if (openDialog)
+            {
+                ImGui.OpenPopup("dialog");
+                openDialog = false;
+            }
+
+            if (ImGui.BeginPopupModal("dialog"))
+            {
+                dialogShown = true;
+                ImGui.TextUnformatted("A dialog");
+                if (ImGui.IsKeyPressed(ImGuiKey.Escape))
+                    ImGui.CloseCurrentPopup();
+                ImGui.EndPopup();
+            }
+        }
+
+        ui.Frame(() => { Dialog(); dispatcher.Dispatch(); });
+        ui.Frame(() => { Dialog(); dispatcher.Dispatch(); });
+        Assert.True(dialogShown);
+        Press(ui, dispatcher, ImGuiKey.Escape, draw: Dialog);
+        Assert.False(dialogShown, "Escape closes the dialog");
+        Assert.Empty(ran);
+
+        // With nothing open, Escape deselects again.
+        Press(ui, dispatcher, ImGuiKey.Escape);
+        Assert.Equal(new[] { EditorActions.DeselectAll }, ran);
+    }
+
+    [Fact]
     public void Rebuild_applies_new_bindings()
     {
         using var ui = new HeadlessImGui(new Vector2(800, 600));
