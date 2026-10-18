@@ -162,4 +162,34 @@ public sealed class ResolverScalingTests
         Assert.Same(mode, ft.Protocols.Rdm[0].SoftwareVersions[0].Personalities[0].DmxMode);
         Assert.Equal("body", dimmer.Geometry?.Name);
     }
+
+    /// <summary>
+    /// Model files outside the expected folder are found through an index of the archive's entries: looking them up
+    /// used to scan every entry for every model (models × entries), which a large archive turned into seconds.
+    /// </summary>
+    [Fact]
+    public void Model_and_texture_files_in_other_folders_are_found_without_scanning_the_archive()
+    {
+        const int n = 30_000;
+        var entries = new List<(string, byte[])> { ("description.xml", Encoding.UTF8.GetBytes("<GDTF/>")) };
+        for (int i = 0; i < n; i++) entries.Add(($"models/gltf_other/part{i}.glb", Array.Empty<byte>()));
+        entries.Add(("models/gltf_other/Base.GLB", new byte[] { 1 }));
+        entries.Add(("models/3ds_other/base.3ds", new byte[] { 1 }));
+        entries.Add(("textures/Metal.png", new byte[] { 1 }));
+        entries.Add(("models/gltf/metal.png", new byte[] { 1 }));
+        entries.Add(("Root.png", new byte[] { 1 }));
+        using var archive = GdtfArchive.FromBytes(TestData.Zip(entries.ToArray()), "big.gdtf");
+
+        var gltf = new[] { "models/gltf" };
+        var sw = Stopwatch.StartNew();
+        for (int i = 0; i < n; i++) Assert.Null(archive.FindModelFile($"missing{i}", gltf, new[] { ".glb", ".gltf" }));
+        sw.Stop();
+        Assert.True(sw.Elapsed < Bound, $"{n} lookups took {sw.Elapsed}.");
+
+        Assert.Equal("models/gltf_other/Base.GLB", archive.FindModelFile(" base ", gltf, new[] { ".glb" }));
+        Assert.Equal("models/3ds_other/base.3ds", archive.FindModelFile("Base", new[] { "models/3ds" }, new[] { ".3ds" }));
+        Assert.Equal("models/gltf_other/part7.glb", archive.FindModelFile("part7", gltf, new[] { ".gltf", ".glb" }));
+        Assert.Equal("textures/Metal.png", archive.FindInAnyFolder("metal.PNG")); // first in archive order
+        Assert.Null(archive.FindInAnyFolder("root.png"));                         // root entries are not in a folder
+    }
 }

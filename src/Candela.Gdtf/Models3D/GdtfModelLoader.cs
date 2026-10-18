@@ -210,7 +210,7 @@ public sealed class GdtfModelLoader
             if (hit is null)
             {
                 string name = Path.GetFileName(file.Replace('\\', '/'));
-                hit = _archive.EntryNames.FirstOrDefault(n => n.EndsWith("/" + name, StringComparison.OrdinalIgnoreCase));
+                hit = _archive.FindInAnyFolder(name);
             }
             mat.BaseColorTexture = hit is not null && _keyPrefix is not null ? _keyPrefix + hit : null;
         }

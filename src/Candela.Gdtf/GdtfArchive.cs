@@ -178,15 +178,40 @@ public sealed class GdtfArchive : IDisposable
                 var hit = ResolveEntryName($"{folder}/{fileName}{ext}");
                 if (hit is not null) return hit;
             }
+        // Any folder under models/: the first entry (in archive order) with that base name and extension. Looked up in an
+        // index built once, so loading many models of a large archive does not scan every entry per model.
+        var index = ModelFileIndex();
+        string wanted = fileName.Trim();
         foreach (var ext in extensions)
-            foreach (var name in _names)
-            {
-                if (!name.StartsWith("models/", StringComparison.OrdinalIgnoreCase) || !name.EndsWith(ext, StringComparison.OrdinalIgnoreCase)) continue;
-                int slash = name.LastIndexOf('/');
-                var baseName = name.AsSpan(slash + 1, name.Length - slash - 1 - ext.Length);
-                if (baseName.Equals(fileName.AsSpan().Trim(), StringComparison.OrdinalIgnoreCase)) return name;
-            }
+            if (index.TryGetValue(wanted + ext, out var first)) return first;
         return null;
+    }
+
+    private Dictionary<string, string>? _modelFiles;
+    private Dictionary<string, string>? _folderFiles;
+
+    /// <summary>
+    /// The first entry (in archive order) inside some folder whose file name (the part after the last slash) is
+    /// <paramref name="fileName"/>, case-insensitive; null when there is none. Entries at the archive root do not count.
+    /// </summary>
+    internal string? FindInAnyFolder(string fileName) =>
+        Index(ref _folderFiles, static name => name.Contains('/')).TryGetValue(fileName, out var hit) ? hit : null;
+
+    /// <summary>The first entry (in archive order) under <c>models/</c> per file name, case-insensitive.</summary>
+    private Dictionary<string, string> ModelFileIndex() =>
+        Index(ref _modelFiles, static name => name.StartsWith("models/", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Entries passing <paramref name="filter"/> by file name (first in archive order wins), built once.</summary>
+    private Dictionary<string, string> Index(ref Dictionary<string, string>? cache, Func<string, bool> filter)
+    {
+        var index = Volatile.Read(ref cache);
+        if (index is not null) return index;
+        index = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var name in _names)
+            if (filter(name))
+                index.TryAdd(name[(name.LastIndexOf('/') + 1)..], name);
+        Volatile.Write(ref cache, index); // benign race: every thread builds the same content
+        return index;
     }
 
     /// <summary>
