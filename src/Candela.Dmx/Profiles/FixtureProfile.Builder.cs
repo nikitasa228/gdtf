@@ -15,6 +15,9 @@ public sealed partial class FixtureProfile
     private sealed class Builder
     {
         private const float DegToRad = MathF.PI / 180f;
+
+        /// <summary>GDTF's default Beam LuminousFlux (written by editors when the author left the field alone), lm.</summary>
+        private const float GdtfDefaultFlux = 10000f;
         private readonly Dictionary<ChainKey, int> _instanceIndex = new();
         private readonly Dictionary<DmxChannel, List<int>> _instancesOf = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<Wheel, int> _wheelIndex = new(ReferenceEqualityComparer.Instance);
@@ -800,9 +803,17 @@ public sealed partial class FixtureProfile
                 beam.ReferenceFlux = perBeam * table.SolidAngle(specAngle * DegToRad);
                 beam.PhotometrySource = PhotometrySource.SpecsCandela;
             }
+            else if (Specs?.LuminousFluxLm is { } lm && lm > 0 && double.IsFinite(lm) && !(bg.LuminousFlux > 0f && bg.LuminousFlux != GdtfDefaultFlux))
+            {
+                // the GDTF flux is missing or GDTF's default: the researched fixture flux, shared between the beams
+                beam.ReferenceFlux = (float)(lm / Math.Max(1, Beams.Count));
+                beam.PhotometrySource = PhotometrySource.SpecsFlux;
+            }
             else if (bg.LuminousFlux > 0f && float.IsFinite(bg.LuminousFlux))
             {
-                beam.ReferenceFlux = bg.LuminousFlux;
+                // GDTF's default (10 000 lm) on every pixel of a multi-beam fixture is not 10 000 lm per pixel: read it as
+                // the fixture's total
+                beam.ReferenceFlux = bg.LuminousFlux == GdtfDefaultFlux && Beams.Count > 1 ? bg.LuminousFlux / Beams.Count : bg.LuminousFlux;
                 beam.PhotometrySource = PhotometrySource.GdtfFlux;
             }
             else

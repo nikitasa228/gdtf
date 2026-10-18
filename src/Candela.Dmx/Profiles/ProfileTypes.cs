@@ -584,8 +584,11 @@ public enum PhotometrySource
     /// <summary><c>_specs</c> maxLuminousIntensityCd (shared between the fixture's beams).</summary>
     SpecsCandela,
 
-    /// <summary>The GDTF Beam's LuminousFlux.</summary>
+    /// <summary>The GDTF Beam's LuminousFlux (GDTF's default value on a multi-beam fixture is split between its beams).</summary>
     GdtfFlux,
+
+    /// <summary><c>_specs</c> luminousFluxLm (shared between the fixture's beams), when the GDTF flux is missing or the default.</summary>
+    SpecsFlux,
 
     /// <summary>Estimated from the beam's power and a typical efficacy of its lamp type.</summary>
     Estimated,
