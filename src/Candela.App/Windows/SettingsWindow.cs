@@ -48,6 +48,12 @@ internal enum SettingsSection
 /// </summary>
 internal sealed class SettingsWindow
 {
+    private static readonly string[] ArtNetOffsets =
+    {
+        "0 — Art-Net 0:0:0 = universe 0",
+        "1 — Art-Net 0:0:0 = universe 1 (grandMA, Eos, …)",
+    };
+
     private readonly WorkspaceContext _ctx;
     private readonly KeyBindingsService _keys;
     private readonly CommandRegistry _commands;
@@ -107,7 +113,7 @@ internal sealed class SettingsWindow
         }
 
         var viewport = ImGui.GetMainViewport();
-        ImGui.SetNextWindowSize(new Vector2(820, 560) * scale, ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new Vector2(860, 560) * scale, ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.FirstUseEver, new Vector2(0.5f, 0.5f));
         if (_focusRequested)
         {
@@ -123,13 +129,13 @@ internal sealed class SettingsWindow
             ImGui.BeginChild("##section", Vector2.Zero, ImGuiChildFlags.AlwaysUseWindowPadding);
             switch (_section)
             {
-                case SettingsSection.Interface: DrawInterface(scale); break;
+                case SettingsSection.Interface: DrawInterface(); break;
                 case SettingsSection.Keyboard: DrawKeyboard(scale); break;
-                case SettingsSection.Viewport: DrawViewport(scale); break;
+                case SettingsSection.Viewport: DrawViewport(); break;
                 case SettingsSection.Library: DrawLibrary(); break;
-                case SettingsSection.Network: DrawNetwork(scale); break;
-                case SettingsSection.Files: DrawFiles(scale); break;
-                case SettingsSection.Gpu: DrawGpu(scale); break;
+                case SettingsSection.Network: DrawNetwork(); break;
+                case SettingsSection.Files: DrawFiles(); break;
+                case SettingsSection.Gpu: DrawGpu(); break;
             }
 
             ImGui.EndChild();
@@ -163,12 +169,14 @@ internal sealed class SettingsWindow
         }
     }
 
-    private void DrawInterface(float scale)
+    private void DrawInterface()
     {
         var s = _ctx.Settings.Settings;
         Heading(Str.SettingsInterface);
-        ImGui.PushItemWidth(260 * scale);
-        if (ImGui.BeginCombo(Loc.Get(Str.SettingsUiScale), UiScale.Percent(s.UiScale)))
+        if (!PropertyGrid.Begin("##interface", 170f))
+            return;
+        PropertyGrid.Row(Str.SettingsUiScale);
+        if (ImGui.BeginCombo("##scale", UiScale.Percent(s.UiScale)))
         {
             foreach (var preset in UiScale.Presets)
                 if (ImGui.Selectable(UiScale.Percent(preset), MathF.Abs(preset - s.UiScale) < 0.001f))
@@ -176,19 +184,22 @@ internal sealed class SettingsWindow
             ImGui.EndCombo();
         }
 
+        PropertyGrid.Row("");
         float percent = s.UiScale * 100f;
         if (ImGui.SliderFloat("##scale-fine", ref percent, 100f, 300f, "%.0f %%"))
             SetScale(MathF.Round(percent) / 100f);
+        PropertyGrid.Row(Str.SettingsFontSize);
         float font = s.FontSize;
-        if (ImGui.SliderFloat(Loc.Get(Str.SettingsFontSize), ref font, UiScale.MinFontSize, UiScale.MaxFontSize, "%.0f px"))
+        if (ImGui.SliderFloat("##font", ref font, UiScale.MinFontSize, UiScale.MaxFontSize, "%.0f px"))
         {
             s.FontSize = UiScale.ClampFontSize(MathF.Round(font));
             Changed();
             _styleChanged();
         }
 
+        PropertyGrid.Row($"{Icons.Languages}  {Loc.Get(Str.SettingsLanguage)}");
         string currentLanguage = Loc.Languages.FirstOrDefault(l => l.Code == s.Language).Name ?? "English";
-        if (ImGui.BeginCombo($"{Icons.Languages}  {Loc.Get(Str.SettingsLanguage)}", currentLanguage))
+        if (ImGui.BeginCombo("##language", currentLanguage))
         {
             foreach (var (code, name) in Loc.Languages)
             {
@@ -203,13 +214,14 @@ internal sealed class SettingsWindow
             ImGui.EndCombo();
         }
 
-        if (ImGui.BeginCombo(Loc.Get(Str.SettingsTheme), Loc.Get(Str.SettingsThemeDark)))
+        PropertyGrid.Row(Str.SettingsTheme);
+        if (ImGui.BeginCombo("##theme", Loc.Get(Str.SettingsThemeDark)))
         {
             ImGui.Selectable(Loc.Get(Str.SettingsThemeDark), true);
             ImGui.EndCombo();
         }
 
-        ImGui.PopItemWidth();
+        PropertyGrid.End();
     }
 
     private void SetScale(float scale)
@@ -223,8 +235,11 @@ internal sealed class SettingsWindow
     {
         Heading(Str.SettingsKeyboard);
         var library = _keys.Library;
-        ImGui.SetNextItemWidth(220 * scale);
-        if (ImGui.BeginCombo(Loc.Get(Str.SettingsPreset), library.CurrentName))
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextUnformatted(Loc.Get(Str.SettingsPreset));
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(200 * scale);
+        if (ImGui.BeginCombo("##preset", library.CurrentName))
         {
             foreach (var name in library.Names)
                 if (ImGui.Selectable(name, name == library.CurrentName) && name != PresetLibrary<KeyBindingSet>.CustomName)
@@ -236,26 +251,6 @@ internal sealed class SettingsWindow
             ImGui.EndCombo();
         }
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(160 * scale);
-        ImGui.InputTextWithHint("##preset-name", Loc.Get(Str.SettingsPresetNameHint), ref _presetName, 64);
-        ImGui.SameLine();
-        bool validName = _presetName.Trim().Length > 0 && _presetName.Trim() is not (PresetLibrary<KeyBindingSet>.DefaultName or PresetLibrary<KeyBindingSet>.CustomName);
-        ImGui.BeginDisabled(!validName);
-        if (ImGui.Button($"{Icons.Save}  {Loc.Get(Str.SettingsSaveAs)}"))
-        {
-            try
-            {
-                _keys.SaveAs(_presetName.Trim());
-                _presetName = "";
-            }
-            catch (Exception e) when (e is ArgumentException or IOException or UnauthorizedAccessException)
-            {
-                _ctx.Log.Warn("Keys", $"The preset could not be saved: {e.Message}");
-            }
-        }
-
-        ImGui.EndDisabled();
         ImGui.SameLine();
         bool deletable = library.CurrentName is not (PresetLibrary<KeyBindingSet>.DefaultName or PresetLibrary<KeyBindingSet>.CustomName);
         ImGui.BeginDisabled(!deletable);
@@ -271,8 +266,29 @@ internal sealed class SettingsWindow
             _keys.ResetToDefault();
         }
 
+        ImGui.SetNextItemWidth(200 * scale);
+        ImGui.InputTextWithHint("##preset-name", Loc.Get(Str.SettingsPresetNameHint), ref _presetName, 64);
+        ImGui.SameLine();
+        string trimmed = _presetName.Trim();
+        bool validName = trimmed.Length > 0 && trimmed is not (PresetLibrary<KeyBindingSet>.DefaultName or PresetLibrary<KeyBindingSet>.CustomName);
+        ImGui.BeginDisabled(!validName);
+        if (ImGui.Button($"{Icons.Save}  {Loc.Get(Str.SettingsSaveAs)}"))
+        {
+            try
+            {
+                _keys.SaveAs(trimmed);
+                _presetName = "";
+            }
+            catch (Exception e) when (e is ArgumentException or IOException or UnauthorizedAccessException)
+            {
+                _ctx.Log.Warn("Keys", $"The preset could not be saved: {e.Message}");
+            }
+        }
+
+        ImGui.EndDisabled();
+        ImGui.SameLine();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##key-filter", $"{Icons.Search}  {Loc.Get(Str.IssuesSearch).Replace("…", "", StringComparison.Ordinal)}", ref _keyFilter, 64);
+        ImGui.InputTextWithHint("##key-filter", $"{Icons.Search}  {Loc.Get(Str.Search)}", ref _keyFilter, 64);
         if (_captureAction is not null)
             PollCapture();
 
@@ -401,12 +417,14 @@ internal sealed class SettingsWindow
         }
     }
 
-    private void DrawViewport(float scale)
+    private void DrawViewport()
     {
         var s = _ctx.Settings.Settings;
         Heading(Str.SettingsViewport);
-        ImGui.PushItemWidth(260 * scale);
-        if (ImGui.BeginCombo(Loc.Get(Str.SettingsNavigation), s.NavigationStyle))
+        if (!PropertyGrid.Begin("##viewport", 190f))
+            return;
+        PropertyGrid.Row(Str.SettingsNavigation);
+        if (ImGui.BeginCombo("##navigation", s.NavigationStyle))
         {
             foreach (var style in NavigationStyles.All)
             {
@@ -420,36 +438,41 @@ internal sealed class SettingsWindow
             ImGui.EndCombo();
         }
 
+        PropertyGrid.Row("");
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
         ImGui.TextWrapped(NavigationHelp(s.NavigationStyle));
         ImGui.PopStyleColor();
+        PropertyGrid.Row(Str.SettingsZoomSpeed);
         float zoom = s.ZoomSpeed;
-        if (ImGui.SliderFloat(Loc.Get(Str.SettingsZoomSpeed), ref zoom, 0.1f, 5f, "%.1f×", ImGuiSliderFlags.Logarithmic))
+        if (ImGui.SliderFloat("##zoom", ref zoom, 0.1f, 5f, "%.1f×", ImGuiSliderFlags.Logarithmic))
         {
             s.ZoomSpeed = zoom;
             Changed();
         }
 
         var settings = _ctx.Session.Scene.Settings;
+        PropertyGrid.Row(Str.SettingsUnits);
         int units = (int)settings.DisplayUnits;
         string[] unitNames = { Loc.Get(Str.SettingsUnitsMetric), Loc.Get(Str.SettingsUnitsImperial) };
-        if (ImGui.Combo(Loc.Get(Str.SettingsUnits), ref units, unitNames, unitNames.Length))
+        if (ImGui.Combo("##units", ref units, unitNames, unitNames.Length))
         {
             settings.DisplayUnits = (UnitSystem)units;
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
+        PropertyGrid.Row($"{Icons.Grid}  {Loc.Get(Str.ViewportGrid)}");
         float grid = settings.GridSpacing;
-        if (ImGui.DragFloat($"{Icons.Grid}  {Loc.Get(Str.ViewportGrid)}", ref grid, 0.01f, 0.05f, 50f, "%.2f m"))
+        if (ImGui.DragFloat("##grid", ref grid, 0.01f, 0.05f, 50f, "%.2f m"))
         {
             settings.GridSpacing = Math.Clamp(grid, 0.05f, 50f);
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
+        PropertyGrid.Row($"{Icons.Magnet}  {Loc.Get(Str.ToolSnapping)}");
         float angle = _ctx.Tools.AngleStep;
-        if (ImGui.DragFloat($"{Icons.Magnet}  {Loc.Get(Str.ToolSnapping)} (°)", ref angle, 0.5f, 1f, 90f, "%.0f°"))
+        if (ImGui.DragFloat("##angle", ref angle, 0.5f, 1f, 90f, "%.0f°"))
             _ctx.Tools.AngleStep = Math.Clamp(angle, 1f, 90f);
-        ImGui.PopItemWidth();
+        PropertyGrid.End();
     }
 
     private static string NavigationHelp(string style) => NavigationStyles.Normalize(style) switch
@@ -501,43 +524,47 @@ internal sealed class SettingsWindow
         ImGui.PopStyleColor();
     }
 
-    private void DrawNetwork(float scale)
+    private void DrawNetwork()
     {
         var s = _ctx.Settings.Settings;
         Heading(Str.SettingsNetwork);
         _interfaces ??= ListInterfaces();
-        ImGui.PushItemWidth(320 * scale);
-        string current = s.NetworkInterface.Length == 0 ? Loc.Get(Str.SettingsAllInterfaces)
-            : _interfaces.FirstOrDefault(i => i.Value == s.NetworkInterface).Label ?? s.NetworkInterface;
-        if (ImGui.BeginCombo(Loc.Get(Str.SettingsNetworkInterface), current))
+        if (PropertyGrid.Begin("##network", 230f))
         {
-            if (ImGui.Selectable(Loc.Get(Str.SettingsAllInterfaces), s.NetworkInterface.Length == 0))
+            PropertyGrid.Row(Str.SettingsNetworkInterface);
+            string current = s.NetworkInterface.Length == 0 ? Loc.Get(Str.SettingsAllInterfaces)
+                : _interfaces.FirstOrDefault(i => i.Value == s.NetworkInterface).Label ?? s.NetworkInterface;
+            if (ImGui.BeginCombo("##interface", current))
             {
-                s.NetworkInterface = "";
+                if (ImGui.Selectable(Loc.Get(Str.SettingsAllInterfaces), s.NetworkInterface.Length == 0))
+                {
+                    s.NetworkInterface = "";
+                    Changed();
+                }
+
+                foreach (var (label, value) in _interfaces)
+                {
+                    if (ImGui.Selectable(label, s.NetworkInterface == value))
+                    {
+                        s.NetworkInterface = value;
+                        Changed();
+                    }
+                }
+
+                ImGui.EndCombo();
+            }
+
+            PropertyGrid.Row(Str.SettingsArtNetOffset);
+            int offset = s.ArtNetUniverseOffset;
+            if (ImGui.Combo("##offset", ref offset, ArtNetOffsets, ArtNetOffsets.Length))
+            {
+                s.ArtNetUniverseOffset = offset;
                 Changed();
             }
 
-            foreach (var (label, value) in _interfaces)
-            {
-                if (ImGui.Selectable(label, s.NetworkInterface == value))
-                {
-                    s.NetworkInterface = value;
-                    Changed();
-                }
-            }
-
-            ImGui.EndCombo();
+            PropertyGrid.End();
         }
 
-        int offset = s.ArtNetUniverseOffset;
-        string[] offsets = { "0 — Art-Net 0:0:0 = universe 0", "1 — Art-Net 0:0:0 = universe 1 (grandMA, Eos, …)" };
-        if (ImGui.Combo(Loc.Get(Str.SettingsArtNetOffset), ref offset, offsets, offsets.Length))
-        {
-            s.ArtNetUniverseOffset = offset;
-            Changed();
-        }
-
-        ImGui.PopItemWidth();
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
         ImGui.TextWrapped(Loc.Get(Str.SettingsRestartNote));
         ImGui.PopStyleColor();
@@ -569,32 +596,37 @@ internal sealed class SettingsWindow
         return result;
     }
 
-    private void DrawFiles(float scale)
+    private void DrawFiles()
     {
         var s = _ctx.Settings.Settings;
         Heading(Str.SettingsFiles);
-        ImGui.PushItemWidth(200 * scale);
-        int autosave = s.AutosaveMinutes;
-        if (ImGui.SliderInt(Loc.Get(Str.SettingsAutosave), ref autosave, 0, 60, autosave == 0 ? Loc.Get(Str.SettingsAutosaveOff) : "%d min"))
+        if (PropertyGrid.Begin("##files", 230f))
         {
-            s.AutosaveMinutes = Math.Clamp(autosave, 0, 240);
-            Changed();
+            PropertyGrid.Row(Str.SettingsAutosave);
+            int autosave = s.AutosaveMinutes;
+            if (ImGui.SliderInt("##autosave", ref autosave, 0, 60, autosave == 0 ? Loc.Get(Str.SettingsAutosaveOff) : "%d min"))
+            {
+                s.AutosaveMinutes = Math.Clamp(autosave, 0, 240);
+                Changed();
+            }
+
+            PropertyGrid.Row(Str.SettingsMaxRecent);
+            int recent = s.MaxRecentFiles;
+            if (ImGui.SliderInt("##recent", ref recent, 0, 30))
+            {
+                s.MaxRecentFiles = recent;
+                if (s.RecentFiles.Count > recent)
+                    s.RecentFiles.RemoveRange(recent, s.RecentFiles.Count - recent);
+                Changed();
+            }
+
+            PropertyGrid.End();
         }
 
-        int recent = s.MaxRecentFiles;
-        if (ImGui.SliderInt(Loc.Get(Str.SettingsMaxRecent), ref recent, 0, 30))
-        {
-            s.MaxRecentFiles = recent;
-            if (s.RecentFiles.Count > recent)
-                s.RecentFiles.RemoveRange(recent, s.RecentFiles.Count - recent);
-            Changed();
-        }
-
-        ImGui.PopItemWidth();
         ImGui.TextDisabled(_ctx.Settings.FilePath);
     }
 
-    private void DrawGpu(float scale)
+    private void DrawGpu()
     {
         var s = _ctx.Settings.Settings;
         var info = _ctx.Gpu.Context.Info;
@@ -603,19 +635,25 @@ internal sealed class SettingsWindow
         ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture,
             $"{info.DriverName} · Vulkan {info.ApiVersion} · {info.DeviceMemoryBytes / (1024.0 * 1024 * 1024):0.#} GB · RT {(info.SupportsRayTracing ? "yes" : "no")}"));
         ImGui.Spacing();
-        string preferred = s.PreferredGpu;
-        ImGui.SetNextItemWidth(300 * scale);
-        if (ImGui.InputTextWithHint(Loc.Get(Str.SettingsGpuPreferred), Loc.Get(Str.SettingsGpuAutomatic), ref preferred, 128))
+        if (PropertyGrid.Begin("##gpu", 230f))
         {
-            s.PreferredGpu = preferred;
-            Changed();
-        }
+            PropertyGrid.Row(Str.SettingsGpuPreferred);
+            string preferred = s.PreferredGpu;
+            if (ImGui.InputTextWithHint("##preferred", Loc.Get(Str.SettingsGpuAutomatic), ref preferred, 128))
+            {
+                s.PreferredGpu = preferred;
+                Changed();
+            }
 
-        bool validation = s.GpuValidation;
-        if (ImGui.Checkbox(Loc.Get(Str.SettingsGpuValidation), ref validation))
-        {
-            s.GpuValidation = validation;
-            Changed();
+            PropertyGrid.Row(Str.SettingsGpuValidation);
+            bool validation = s.GpuValidation;
+            if (ImGui.Checkbox("##validation", ref validation))
+            {
+                s.GpuValidation = validation;
+                Changed();
+            }
+
+            PropertyGrid.End();
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);

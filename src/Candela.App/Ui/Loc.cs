@@ -349,6 +349,7 @@ internal static class Loc
         (Str.StatusSelected, "{0} selected", "Выделено: {0}"),
         (Str.StatusUndo, "Undo: {0}", "Отмена: {0}"),
         (Str.StatusModified, "modified", "изменено"),
+        (Str.Search, "Search…", "Поиск…"),
         (Str.StatusDocsMissing, "The documentation folder was not found next to the program.", "Папка документации не найдена рядом с программой."),
     };
 }

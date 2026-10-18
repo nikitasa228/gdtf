@@ -15,12 +15,13 @@ namespace Candela.App.Panels;
 /// </summary>
 internal sealed unsafe class RenderPanel : Panel
 {
+    private static readonly string[] Formats = { "PNG", "EXR" };
     private readonly WorkspaceContext _ctx;
     private readonly Action<SessionResult> _report;
     private bool _range;
     private float _rangeStart;
     private float _rangeEnd = 10f;
-    private string _output = "render.png";
+    private string _output;
 
     /// <summary>Creates the panel; <paramref name="report"/> shows the result of the Render button.</summary>
     public RenderPanel(WorkspaceContext context, Action<SessionResult> report)
@@ -41,25 +42,33 @@ internal sealed unsafe class RenderPanel : Panel
     public override void Draw()
     {
         var s = _ctx.Tools.FinalRender;
-        float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
-        ImGui.PushItemWidth(-140 * scale);
-        if (ImGui.InputText(Loc.Get(Str.RenderOutput), ref _output, 512))
-            s.OutputPath = _output;
-        int w = s.Width, h = s.Height;
-        if (ImGui.InputInt(Loc.Get(Str.RenderResolution) + " W", ref w, 0))
-            s.Width = Math.Clamp(w, 16, 16384);
-        if (ImGui.InputInt(Loc.Get(Str.RenderResolution) + " H", ref h, 0))
-            s.Height = Math.Clamp(h, 16, 16384);
-        int spp = s.SamplesPerPixel;
-        if (ImGui.SliderInt(Loc.Get(Str.RenderSamples), ref spp, 1, 4096, "%d", ImGuiSliderFlags.Logarithmic))
-            s.SamplesPerPixel = spp;
-        int bounces = s.MaxBounces;
-        if (ImGui.SliderInt(Loc.Get(Str.RenderBounces), ref bounces, 1, 16))
-            s.MaxBounces = bounces;
-        int format = (int)s.Format;
-        if (ImGui.Combo(Loc.Get(Str.RenderFormat), ref format, "PNG\0EXR\0"))
-            s.Format = (ImageFileFormat)format;
-        ImGui.PopItemWidth();
+        if (PropertyGrid.Begin("##render", 130f))
+        {
+            PropertyGrid.Row(Str.RenderOutput);
+            if (ImGui.InputText("##output", ref _output, 512))
+                s.OutputPath = _output;
+            PropertyGrid.Row(Str.RenderResolution);
+            int* size = stackalloc int[] { s.Width, s.Height };
+            if (ImGui.InputInt2("##resolution", size))
+            {
+                s.Width = Math.Clamp(size[0], 16, 16384);
+                s.Height = Math.Clamp(size[1], 16, 16384);
+            }
+
+            PropertyGrid.Row(Str.RenderSamples);
+            int spp = s.SamplesPerPixel;
+            if (ImGui.SliderInt("##spp", ref spp, 1, 4096, "%d", ImGuiSliderFlags.Logarithmic))
+                s.SamplesPerPixel = spp;
+            PropertyGrid.Row(Str.RenderBounces);
+            int bounces = s.MaxBounces;
+            if (ImGui.SliderInt("##bounces", ref bounces, 1, 16))
+                s.MaxBounces = bounces;
+            PropertyGrid.Row(Str.RenderFormat);
+            int format = (int)s.Format;
+            if (ImGui.Combo("##format", ref format, Formats, Formats.Length))
+                s.Format = (ImageFileFormat)format;
+            PropertyGrid.End();
+        }
 
         ImGui.Spacing();
         if (ImGui.RadioButton(Loc.Get(Str.RenderFrame), !_range))
@@ -67,16 +76,18 @@ internal sealed unsafe class RenderPanel : Panel
         ImGui.SameLine();
         if (ImGui.RadioButton(Loc.Get(Str.RenderRange), _range))
             _range = true;
-        if (_range)
+        if (_range && PropertyGrid.Begin("##range", 130f))
         {
-            ImGui.PushItemWidth(-140 * scale);
-            ImGui.DragFloat(Loc.Get(Str.RenderRangeStart), ref _rangeStart, 0.1f, 0f, 36000f, "%.2f s");
-            ImGui.DragFloat(Loc.Get(Str.RenderRangeEnd), ref _rangeEnd, 0.1f, 0f, 36000f, "%.2f s");
+            PropertyGrid.Row(Str.RenderRangeStart);
+            ImGui.DragFloat("##start", ref _rangeStart, 0.1f, 0f, 36000f, "%.2f s");
+            PropertyGrid.Row(Str.RenderRangeEnd);
+            ImGui.DragFloat("##end", ref _rangeEnd, 0.1f, 0f, 36000f, "%.2f s");
+            PropertyGrid.Row(Str.RenderFrameRate);
             float fps = (float)s.FrameRate;
-            if (ImGui.DragFloat(Loc.Get(Str.RenderFrameRate), ref fps, 0.1f, 1f, 120f, "%.2f fps"))
+            if (ImGui.DragFloat("##fps", ref fps, 0.1f, 1f, 120f, "%.2f fps"))
                 s.FrameRate = fps;
             _rangeEnd = MathF.Max(_rangeEnd, _rangeStart);
-            ImGui.PopItemWidth();
+            PropertyGrid.End();
         }
 
         ImGui.Spacing();
@@ -119,33 +130,41 @@ internal sealed class PreviewPanel : Panel
     public override void Draw()
     {
         var p = _ctx.Tools.Preview;
-        float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
         ImGui.SeparatorText(Loc.Get(Str.PreviewQuality));
-        ImGui.PushItemWidth(-150 * scale);
+        if (!PropertyGrid.Begin("##preview", 150f))
+            return;
+        PropertyGrid.Row(Str.PreviewResolutionScale);
         float resolution = p.ResolutionScale;
-        if (ImGui.SliderFloat(Loc.Get(Str.PreviewResolutionScale), ref resolution, 0.5f, 1f, "%.2f"))
+        if (ImGui.SliderFloat("##resolution", ref resolution, 0.5f, 1f, "%.2f"))
             p.ResolutionScale = resolution;
+        PropertyGrid.Row(Str.PreviewShadows);
         bool shadows = p.Shadows;
-        if (ImGui.Checkbox(Loc.Get(Str.PreviewShadows), ref shadows))
+        if (ImGui.Checkbox("##shadows", ref shadows))
             p.Shadows = shadows;
+        PropertyGrid.Row(Str.PreviewVolumetrics);
         bool volumetrics = p.Volumetrics;
-        if (ImGui.Checkbox(Loc.Get(Str.PreviewVolumetrics), ref volumetrics))
+        if (ImGui.Checkbox("##volumetrics", ref volumetrics))
             p.Volumetrics = volumetrics;
+        PropertyGrid.Row(Str.PreviewIndirect);
         int indirect = (int)p.Indirect;
-        if (ImGui.Combo(Loc.Get(Str.PreviewIndirect), ref indirect, IndirectModes, IndirectModes.Length))
+        if (ImGui.Combo("##indirect", ref indirect, IndirectModes, IndirectModes.Length))
             p.Indirect = (IndirectLighting)indirect;
+        PropertyGrid.Row(Str.PreviewBloom);
         bool bloom = p.Bloom;
-        if (ImGui.Checkbox(Loc.Get(Str.PreviewBloom), ref bloom))
+        if (ImGui.Checkbox("##bloom", ref bloom))
             p.Bloom = bloom;
+        PropertyGrid.Row(Str.PreviewToneMapper);
         int tone = (int)p.ToneMapper;
-        if (ImGui.Combo(Loc.Get(Str.PreviewToneMapper), ref tone, ToneMappers, ToneMappers.Length))
+        if (ImGui.Combo("##tone", ref tone, ToneMappers, ToneMappers.Length))
             p.ToneMapper = (ToneMapper)tone;
+        PropertyGrid.Row(Str.PreviewAutoExposure);
         bool auto = p.AutoExposure;
-        if (ImGui.Checkbox(Loc.Get(Str.PreviewAutoExposure), ref auto))
+        if (ImGui.Checkbox("##auto-exposure", ref auto))
             p.AutoExposure = auto;
+        PropertyGrid.Row(Str.PreviewExposure);
         float ev = p.ExposureCompensation;
-        if (ImGui.SliderFloat(Loc.Get(Str.PreviewExposure), ref ev, -6f, 6f, "%+.1f EV"))
+        if (ImGui.SliderFloat("##ev", ref ev, -6f, 6f, "%+.1f EV"))
             p.ExposureCompensation = ev;
-        ImGui.PopItemWidth();
+        PropertyGrid.End();
     }
 }

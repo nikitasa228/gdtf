@@ -299,4 +299,5 @@ internal enum Str
     StatusUndo,
     StatusModified,
     StatusDocsMissing,
+    Search,
 }
