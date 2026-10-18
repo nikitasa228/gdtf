@@ -184,8 +184,11 @@ build/test jobs while measuring:
 | Configuration | ms per step | steps/s | notes |
 |---|---|---|---|
 | 4 threads, machine load ≈ 6 | 84 | 11.9 | best observed; stages: velocity advection 16, projection 41, scalar advection 23, forces 4 ms |
-| 4 threads, machine load 6–16 | 97–265 | 3.8–10.3 | the VM's 4 cores were shared with up to 16 runnable processes |
-| 1 thread (CPU time) | 125–147 | 6.8–8.0 | stable measure of the work: velocity advection ≈ 30, projection ≈ 52, scalar advection ≈ 45 ms |
+| 4 threads, machine load 10–19 (final code) | 128–187 | 5.3–7.8 | the VM's 4 cores were shared with 10–19 runnable processes, so the run got little more than one core |
+| 1 thread (process CPU time, final code) | 128–155 | — | the work itself: velocity advection ≈ 33, projection ≈ 54–64, scalar advection ≈ 45–51, forces ≈ 5 ms |
+
+The 10 steps/s target is met when the four cores are available (11.9 steps/s at load ≈ 6, a 1.6× speed-up over one
+thread); on a saturated machine the wall time is bounded by the single-thread work of ≈ 130 ms.
 
 The work per step fell from ≈ 205 to ≈ 130 ms of CPU time during optimisation (bounds-check-free interpolation,
 cell-centred midpoint velocities, branch-free CG rows, multigrid with fused passes). Projection was 76 ms with
