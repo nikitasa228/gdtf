@@ -94,9 +94,21 @@ vec3 lightCookieProfile(Light light, vec3 dir, float footprint)
     return sum;
 }
 
-// Luminous intensity (cd per Rec.2020 channel) of a light towards P, cookie and prism included, no shadow.
-// L = unit direction from P to the light, d2 = squared distance (clamped to 1 cm). pixelSize = world size of the
-// receiving pixel/froxel (filters gobos and blade edges).
+// Transmittance of the uniform haze along a light path of length d (sigma_t = sigma_s; the scattered light leaves
+// the path). Smoke is not included (it would need a march through the density volume per light). Shaders compiled
+// with CLEAR_AIR (the lux overlay: a light meter's reading) ignore the atmosphere.
+float lightPathTransmittance(float d)
+{
+#ifdef CLEAR_AIR
+    return 1.0;
+#else
+    return hasFeature(FEATURE_HAZE) ? exp(-frame.media.x * d) : 1.0;
+#endif
+}
+
+// Luminous intensity (cd per Rec.2020 channel) of a light towards P, cookie and prism included, no shadow, times
+// the haze transmittance between the light and P. L = unit direction from P to the light, d2 = squared distance
+// (clamped to 1 cm). pixelSize = world size of the receiving pixel/froxel (filters gobos and blade edges).
 vec3 lightIntensityToward(Light light, vec3 P, float pixelSize, out vec3 L, out float d2)
 {
     vec3 toLight = light.position - P;
@@ -106,7 +118,8 @@ vec3 lightIntensityToward(Light light, vec3 P, float pixelSize, out vec3 L, out 
     if (dot(-L, light.direction) < light.cosCutoff)
         return vec3(0.0);
     float footprint = pixelSize * invD * light.gateScale;
-    return light.intensity * (lightCookieProfile(light, -L, footprint) * rangeWindow(d2, lightRangeSquared(light)));
+    return light.intensity * (lightCookieProfile(light, -L, footprint) * rangeWindow(d2, lightRangeSquared(light)) *
+                              lightPathTransmittance(d2 * invD));
 }
 
 // ------------------------------------------------------------------------------------------------- shadows

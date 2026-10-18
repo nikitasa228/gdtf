@@ -218,8 +218,9 @@ public sealed class VolumetricTests
     }
 
     /// <summary>
-    /// L = ∫ σ_s · p_HG(θ) · I(θ_beam) / r² · exp(−σ_t·l) dl along the centre view ray (σ_t = σ_s: haze does not absorb),
-    /// integrated numerically with the midpoint rule.
+    /// L = ∫ σ_s · p_HG(θ) · I(θ_beam) · exp(−σ_t·r) / r² · exp(−σ_t·l) dl along the centre view ray (σ_t = σ_s: haze
+    /// does not absorb, but the light it scatters leaves both the light's path r and the view path l), integrated
+    /// numerically with the midpoint rule.
     /// </summary>
     private static float ReferenceInScattering(SpotLight light)
     {
@@ -243,7 +244,7 @@ public sealed class VolumetricTests
             float cos = Vector3.Dot(propagation, -direction);
             double g = Anisotropy;
             double phase = (1 - g * g) / (4 * Math.PI * Math.Pow(1 + g * g - 2 * g * cos, 1.5));
-            sum += Haze * phase * intensity / (r * r) * Math.Exp(-Haze * l) * dl;
+            sum += Haze * phase * intensity * Math.Exp(-Haze * r) / (r * r) * Math.Exp(-Haze * l) * dl;
         }
 
         return (float)sum;

@@ -6,7 +6,7 @@
 // Ray-traced one-bounce diffuse GI at reduced resolution (devices with ray query). Every pixel traces RT_RAYS
 // cosine-distributed rays from the surface under it against the TLAS of the scene's instances; at a hit the reflected
 // direct light of the view's shadowed lights (shadow maps give the visibility) and the emission are evaluated:
-//   L_hit = albedo / pi x sum_j E_j(hit) + L_emissive,     E_indirect = pi / N x sum L_hit      [lx]
+//   L_hit = albedo / pi x sum_j E_j(hit) + L_emissive,     E_indirect = pi / N x sum T_haze(t) L_hit      [lx]
 // (cosine-weighted estimator); misses see the background luminance. The noisy estimate is blended with the previous
 // frame's result reprojected to this surface (exponential moving average, rejected where the depth disagrees).
 // draw.mode = number of GI lights in raymarchList after the ray-marched beams; draw.width = history weight.
@@ -141,7 +141,8 @@ void main()
             uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(query, true));
             uint primitive = uint(rayQueryGetIntersectionPrimitiveIndexEXT(query, true));
             vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
-            sum += shadeHit(instance, geometry, primitive, bary, dir, draw.mode);
+            float hitDistance = rayQueryGetIntersectionTEXT(query, true);
+            sum += shadeHit(instance, geometry, primitive, bary, dir, draw.mode) * lightPathTransmittance(hitDistance);
         }
         else
         {

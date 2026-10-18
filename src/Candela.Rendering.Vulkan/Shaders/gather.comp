@@ -2,11 +2,11 @@
 #extension GL_GOOGLE_include_directive : require
 // Reflective shadow maps, step 2: indirect irradiance at reduced resolution. Every pixel of the indirect image takes
 // the surface under the centre of its footprint (scene depth + pre-pass normal) and sums the virtual point lights:
-//   E = sum flux_k x max(cos theta_k, 0) x max(cos theta_p, 0) / (pi x max(d^2, d_min^2))      [lx]
+//   E = sum flux_k x max(cos theta_k, 0) x max(cos theta_p, 0) x T_haze(d) / (pi x max(d^2, d_min^2))      [lx]
 // (a VPL radiates flux/pi x cos theta cd). Visibility between VPL and receiver is not tested (standard RSM). The
 // clamp d_min avoids the 1/d^2 singularity next to a VPL. alpha = view depth for the bilateral upsampling.
 
-#include "view.glsl"
+#include "lighting.glsl"
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
@@ -44,7 +44,7 @@ void main()
         float cosP = -dot(N, dir);
         if (cosV <= 0.0 || cosP <= 0.0)
             continue;
-        E += v.flux * (cosV * cosP / (PI * max(d2, VPL_MIN_DISTANCE * VPL_MIN_DISTANCE)));
+        E += v.flux * (cosV * cosP * lightPathTransmittance(d2 * invD) / (PI * max(d2, VPL_MIN_DISTANCE * VPL_MIN_DISTANCE)));
     }
 
     imageStore(outIndirect, p, vec4(E, viewDepthOf(P)));
