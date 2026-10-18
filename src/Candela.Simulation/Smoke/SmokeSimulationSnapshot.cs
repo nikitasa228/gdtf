@@ -30,6 +30,8 @@ public sealed class SmokeSimulationSnapshot
 
     internal double Accumulator { get; set; }
 
+    internal System.Numerics.Vector3 Airflow { get; set; }
+
     internal float[] U { get; }
 
     internal float[] V { get; }

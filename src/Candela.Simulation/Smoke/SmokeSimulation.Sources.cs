@@ -286,6 +286,41 @@ public sealed partial class SmokeSimulation
     }
 
     /// <summary>
+    /// Constant ventilation airflow. The draft is ramped up with time constant
+    /// <see cref="SmokeSimulationSettings.AirflowResponseTime"/>: each sub-step the inflow faces move toward the target
+    /// airflow and the whole air mass receives the same uniform velocity increment (the body force of the pressure
+    /// difference that drives the draft), so the uniform part of the flow stays consistent with the inflow and the
+    /// projection only has to deal with obstacles and outlets.
+    /// </summary>
+    private void ApplyAirflow(float dt)
+    {
+        if (_airflowTarget == Vector3.Zero && _inflowVelocity == Vector3.Zero)
+            return;
+        float alpha = 1f - MathF.Exp(-dt / _settings.AirflowResponseTime);
+        var increment = (_airflowTarget - _inflowVelocity) * alpha;
+        if (increment == Vector3.Zero)
+            return;
+        _inflowVelocity += increment;
+        AddUniform(_u, _uFlags, increment.X, _inflowVelocity.X);
+        AddUniform(_v, _vFlags, increment.Y, _inflowVelocity.Y);
+        AddUniform(_w, _wFlags, increment.Z, _inflowVelocity.Z);
+
+        static void AddUniform(float[] f, byte[] flags, float increment, float inflow)
+        {
+            if (increment == 0f)
+                return;
+            for (int n = 0; n < f.Length; n++)
+            {
+                byte flag = flags[n];
+                if (flag == FaceFree)
+                    f[n] += increment;
+                else if (flag == FaceInflow)
+                    f[n] = inflow;
+            }
+        }
+    }
+
+    /// <summary>
     /// Buoyancy on the vertical faces: a parcel at temperature T in air at T_a accelerates upward with
     /// g·(T − T_a)/T_a (exact for an ideal gas at constant pressure), and the suspended aerosol mass pulls it down with
     /// g·c/ρ_air (c = aerosol mass concentration).

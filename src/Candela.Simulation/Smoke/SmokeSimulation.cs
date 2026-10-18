@@ -237,6 +237,7 @@ public sealed partial class SmokeSimulation
         _accumulator = 0;
         _stepCount = 0;
         _statistics = default;
+        _inflowVelocity = Vector3.Zero;
         EnforceBoundaryVelocities(_u, _v, _w);
     }
 
@@ -395,6 +396,7 @@ public sealed partial class SmokeSimulation
         snapshot.Time = _time;
         snapshot.StepCount = _stepCount;
         snapshot.Accumulator = _accumulator;
+        snapshot.Airflow = _inflowVelocity;
     }
 
     /// <summary>
@@ -413,6 +415,7 @@ public sealed partial class SmokeSimulation
         snapshot.Density.AsSpan().CopyTo(_density);
         snapshot.Temperature.AsSpan().CopyTo(_temperature);
         snapshot.Pressure.AsSpan().CopyTo(_pressure);
+        _inflowVelocity = snapshot.Airflow;
         if (solidsChanged)
         {
             snapshot.Solid.AsSpan().CopyTo(_solid);
@@ -441,6 +444,7 @@ public sealed partial class SmokeSimulation
         long t1 = Stopwatch.GetTimestamp();
         ApplyBuoyancy(dt);
         ApplyFans(dt);
+        ApplyAirflow(dt);
         long t2 = Stopwatch.GetTimestamp();
         AdvectVelocity(dt);
         if (_settings.Viscosity > 0f)

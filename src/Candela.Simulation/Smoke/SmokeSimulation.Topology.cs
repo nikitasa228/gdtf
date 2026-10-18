@@ -23,6 +23,11 @@ public sealed partial class SmokeSimulation
     private bool _anyClosedComponent;
     private bool _hasObstacles;
     private DomainFaces _inflowFaces;
+
+    /// <summary>Airflow the ventilation ramps toward: the settings' airflow on the axes that have an inflow face, m/s.</summary>
+    private Vector3 _airflowTarget;
+
+    /// <summary>Current (ramped) ventilation airflow, m/s: the velocity of inflow faces. Part of the state.</summary>
     private Vector3 _inflowVelocity;
     private Vector3 _ambientLo, _ambientHi;
     private int _settingsIssueCount;
@@ -132,7 +137,11 @@ public sealed partial class SmokeSimulation
         }
 
         _inflowFaces = inflow;
-        _inflowVelocity = air;
+        _airflowTarget = new Vector3(
+            (inflow & (DomainFaces.XMin | DomainFaces.XMax)) != 0 ? air.X : 0f,
+            (inflow & (DomainFaces.YMin | DomainFaces.YMax)) != 0 ? air.Y : 0f,
+            (inflow & (DomainFaces.ZMin | DomainFaces.ZMax)) != 0 ? air.Z : 0f);
+        _inflowVelocity = Vector3.Zero;
         float inf = float.PositiveInfinity;
         _ambientLo = new Vector3(open.HasFlag(DomainFaces.XMin) ? 0f : -inf, open.HasFlag(DomainFaces.YMin) ? 0f : -inf,
             open.HasFlag(DomainFaces.ZMin) ? 0f : -inf);
