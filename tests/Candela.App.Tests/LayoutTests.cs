@@ -142,13 +142,19 @@ public sealed class LayoutStoreTests
         Assert.Empty(store.List());
         store.Save("Lighting desk", new LayoutFile { Panels = { "Library" } });
         store.Save("a/b: c?", new LayoutFile());
-        store.Save(LayoutStore.WorkspaceName, new LayoutFile { Name = "workspace" });
+        store.SaveWorkspace(new LayoutFile { Name = "workspace" });
         Assert.Equal(new[] { "a/b: c?", "Lighting desk" }, store.List());
         Assert.True(store.Exists("Lighting desk"));
         var loaded = store.Load("Lighting desk")!;
         Assert.Equal("Lighting desk", loaded.Name);
         Assert.Equal(new[] { "Library" }, loaded.Panels);
-        Assert.Equal("workspace", store.Load(LayoutStore.WorkspaceName)!.Name);
+        Assert.Equal("workspace", store.LoadWorkspace()!.Name);
+        // A user layout called like the workspace file is a different file.
+        store.Save(LayoutStore.WorkspaceName, new LayoutFile());
+        Assert.Equal("workspace", store.LoadWorkspace()!.Name);
+        Assert.Equal(LayoutStore.WorkspaceName, store.Load(LayoutStore.WorkspaceName)!.Name);
+        Assert.Contains(LayoutStore.WorkspaceName, store.List());
+        store.Delete(LayoutStore.WorkspaceName);
         Assert.Null(store.Load("missing"));
         store.Delete("a/b: c?");
         store.Delete("missing");
@@ -161,6 +167,7 @@ public sealed class LayoutStoreTests
     [InlineData("Сцена 1")]
     [InlineData("..")]
     [InlineData("a%b")]
+    [InlineData("_workspace")]
     [InlineData("con:*?<>|\"\\/")]
     public void Names_escape_to_safe_file_names_and_back(string name)
     {

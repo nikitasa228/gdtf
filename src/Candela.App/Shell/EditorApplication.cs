@@ -70,7 +70,8 @@ internal sealed class EditorApplication : IDisposable
     {
         try
         {
-            _workspace?.SaveWorkspace();
+            if (!_options.IsScreenshotMode)
+                _workspace?.SaveWorkspace();
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidOperationException)
         {
@@ -97,14 +98,10 @@ internal sealed class EditorApplication : IDisposable
 
     private int Start()
     {
-        _settings = new SettingsStore(_log);
+        // Headless verification runs never write the user's settings or workspace.
+        _settings = new SettingsStore(_log) { ReadOnly = _options.IsScreenshotMode };
         var settings = _settings.Load();
-        if (_options.UiScale is { } scale)
-            settings.UiScale = scale;
-        if (_options.Language is { } language)
-            settings.Language = language;
-        if (_options.Device is { } device)
-            settings.PreferredGpu = device;
+        _settings.ApplyRunOverrides(_options.UiScale, _options.Language, _options.Device);
         Loc.SetLanguage(settings.Language);
 
         if (!GlfwPlatform.Initialize(_log, out string glfwError))

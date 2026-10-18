@@ -61,6 +61,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private string _titleName = "";
     private bool _titleModified;
     private readonly StatusTexts _statusTexts = new();
+    private readonly Action _onLanguageChanged;
+    private Panel? _dockNextPanel;
+    private uint _dockNextNode;
     private readonly Action<Panel> _drawPanelContent;
     private readonly Action<Panel> _focusPanelAction;
     private readonly Action<Panel> _undockAction = DockWorkspace.Undock;
@@ -97,10 +100,10 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
         RegisterCommands();
-        _dock.LayoutChanged += () => { };
         RestoreStartupLayout();
         _activeViewport = _viewports[0];
-        Loc.LanguageChanged += () => _title = "";
+        _onLanguageChanged = () => _title = "";
+        Loc.LanguageChanged += _onLanguageChanged;
     }
 
     /// <summary>All panels (viewports first), in Window-menu order.</summary>
@@ -167,6 +170,12 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 _focusPanel = "";
             }
 
+            if (ReferenceEquals(panel, _dockNextPanel))
+            {
+                ImGui.SetNextWindowDockID(_dockNextNode, ImGuiCond.Always);
+                _dockNextPanel = null;
+            }
+
             _dock.DrawPanel(panel, _panels, scale, _drawPanelContent);
         }
 
@@ -200,11 +209,12 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void OpenAtStartup(string path) => Report(_ctx.Session.Open(path));
 
     /// <summary>Saves the current workspace as the layout restored at the next start.</summary>
-    public void SaveWorkspace() => _layouts.Save(LayoutStore.WorkspaceName, CaptureLayout(LayoutStore.WorkspaceName));
+    public void SaveWorkspace() => _layouts.SaveWorkspace(CaptureLayout(LayoutStore.WorkspaceName));
 
     /// <inheritdoc/>
     public void Dispose()
     {
+        Loc.LanguageChanged -= _onLanguageChanged;
         foreach (var viewport in _viewports)
             viewport.ReleaseTarget();
     }
@@ -241,7 +251,21 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         return panel;
     }
 
-    /// <summary>Opens a new viewport (Window → New Viewport); returns null when the maximum is reached.</summary>
+    /// <summary>View → New Viewport: opens a viewport as a tab of the active viewport's group (or floating).</summary>
+    internal ViewportPanel? NewViewportNextToActive()
+    {
+        uint node = DockWorkspace.DockIdOf(ActiveViewport);
+        var viewport = AddViewport();
+        if (viewport is not null && node != 0)
+        {
+            _dockNextPanel = viewport;
+            _dockNextNode = node;
+        }
+
+        return viewport;
+    }
+
+    /// <summary>Opens a new viewport (reusing a closed one first); returns null when the maximum is reached.</summary>
     internal ViewportPanel? AddViewport()
     {
         var closed = _viewports.FirstOrDefault(v => !v.IsOpen);
@@ -447,7 +471,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         {
             try
             {
-                if (_layouts.Load(LayoutStore.WorkspaceName) is { } saved)
+                if (_layouts.LoadWorkspace() is { } saved)
                 {
                     LoadLayout(saved);
                     return;

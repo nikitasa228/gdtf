@@ -86,7 +86,7 @@ internal sealed partial class Workspace
             () => ActiveViewport.View.ShowGrid);
 
         // Window / help
-        Command(AppActions.NewViewport, Str.ViewNewViewport, Icons.Plus, () => AddViewport(), () => _viewports.Count(v => v.IsOpen) < MaxViewports);
+        Command(AppActions.NewViewport, Str.ViewNewViewport, Icons.Plus, () => NewViewportNextToActive(), () => _viewports.Count(v => v.IsOpen) < MaxViewports);
         Command(AppActions.ResetLayout, Str.ViewResetLayout, Icons.RotateCcw, () => ApplyPreset(LayoutPreset.Default));
         Command(AppActions.Shortcuts, Str.HelpShortcuts, Icons.Keyboard, () => _shortcuts.IsOpen = true);
     }

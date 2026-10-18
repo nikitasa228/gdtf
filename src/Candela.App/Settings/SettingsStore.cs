@@ -19,6 +19,8 @@ internal sealed class SettingsStore
     private readonly string _path;
     private readonly AppLog _log;
     private double _saveDueAt = double.PositiveInfinity;
+    private RunValues _override;
+    private RunValues _stored;
 
     /// <summary>Creates a store for <paramref name="path"/> (default: <see cref="ConfigPaths.SettingsFile"/>).</summary>
     public SettingsStore(AppLog log, string? path = null)
@@ -33,6 +35,9 @@ internal sealed class SettingsStore
 
     /// <summary>The settings file.</summary>
     public string FilePath => _path;
+
+    /// <summary>When true nothing is written (headless verification runs must not change the user's files).</summary>
+    public bool ReadOnly { get; set; }
 
     /// <summary>True when a change is waiting to be written.</summary>
     public bool HasPendingSave => !double.IsPositiveInfinity(_saveDueAt);
@@ -70,6 +75,24 @@ internal sealed class SettingsStore
         return Settings;
     }
 
+    /// <summary>
+    /// Applies command-line values (<c>--scale</c>, <c>--language</c>, <c>--device</c>) for this run only: they are used,
+    /// but the file keeps the stored values unless the user changes the setting during the run. Call after
+    /// <see cref="Load"/>.
+    /// </summary>
+    public void ApplyRunOverrides(float? uiScale, string? language, string? preferredGpu)
+    {
+        _stored = new RunValues(Settings.UiScale, Settings.Language, Settings.PreferredGpu);
+        _override = new RunValues(uiScale is { } scale ? UiScale.ClampScale(scale) : null,
+            language is null ? null : language.Trim().ToLowerInvariant() == "ru" ? "ru" : "en", preferredGpu);
+        if (_override.UiScale is { } s)
+            Settings.UiScale = s;
+        if (_override.Language is { } l)
+            Settings.Language = l;
+        if (_override.PreferredGpu is { } g)
+            Settings.PreferredGpu = g;
+    }
+
     /// <summary>Requests a save <paramref name="delaySeconds"/> after <paramref name="now"/> (later requests postpone it).</summary>
     public void RequestSave(double now, double delaySeconds = 0.75) => _saveDueAt = now + delaySeconds;
 
@@ -84,11 +107,13 @@ internal sealed class SettingsStore
     public bool SaveNow()
     {
         _saveDueAt = double.PositiveInfinity;
+        if (ReadOnly)
+            return true;
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(_path))!);
             string tmp = _path + "." + Environment.ProcessId.ToString(CultureInfo.InvariantCulture) + ".tmp";
-            File.WriteAllText(tmp, CandelaJson.Serialize(Settings));
+            File.WriteAllText(tmp, CandelaJson.Serialize(WithoutRunOverrides()));
             File.Move(tmp, _path, overwrite: true);
             return true;
         }
@@ -98,6 +123,23 @@ internal sealed class SettingsStore
             return false;
         }
     }
+
+    /// <summary>The settings to write: values still equal to a command-line override go back to the stored value.</summary>
+    private AppSettings WithoutRunOverrides()
+    {
+        if (_override.UiScale is null && _override.Language is null && _override.PreferredGpu is null)
+            return Settings;
+        var copy = CandelaJson.DeepClone(Settings);
+        if (_override.UiScale is { } s && copy.UiScale == s)
+            copy.UiScale = _stored.UiScale ?? copy.UiScale;
+        if (_override.Language is { } l && copy.Language == l)
+            copy.Language = _stored.Language ?? copy.Language;
+        if (_override.PreferredGpu is { } g && copy.PreferredGpu == g)
+            copy.PreferredGpu = _stored.PreferredGpu ?? copy.PreferredGpu;
+        return copy;
+    }
+
+    private readonly record struct RunValues(float? UiScale, string? Language, string? PreferredGpu);
 
     /// <summary>Clamps every value to its valid range and repairs missing collections.</summary>
     public static AppSettings Sanitize(AppSettings s)

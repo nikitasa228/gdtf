@@ -83,6 +83,47 @@ public sealed class SettingsStoreTests
     }
 
     [Fact]
+    public void Command_line_overrides_apply_to_one_run_only()
+    {
+        using var dir = new TempDir();
+        string path = dir.File("settings.json");
+        var first = new SettingsStore(TestLog.Create(), path);
+        first.Load();
+        first.Settings.UiScale = 1.25f;
+        first.Settings.Language = "en";
+        first.SaveNow();
+
+        var run = new SettingsStore(TestLog.Create(), path);
+        run.Load();
+        run.ApplyRunOverrides(2f, "RU", "llvmpipe");
+        Assert.Equal((2f, "ru", "llvmpipe"), (run.Settings.UiScale, run.Settings.Language, run.Settings.PreferredGpu));
+        run.Settings.ZoomSpeed = 2f; // an unrelated change made during the run
+        run.SaveNow();
+        var stored = new SettingsStore(TestLog.Create(), path).Load();
+        Assert.Equal((1.25f, "en", ""), (stored.UiScale, stored.Language, stored.PreferredGpu));
+        Assert.Equal(2f, stored.ZoomSpeed);
+
+        // A setting the user changes during the run is saved.
+        run.Settings.UiScale = 1.5f;
+        run.SaveNow();
+        Assert.Equal(1.5f, new SettingsStore(TestLog.Create(), path).Load().UiScale);
+    }
+
+    [Fact]
+    public void Read_only_stores_never_write()
+    {
+        using var dir = new TempDir();
+        string path = dir.File("settings.json");
+        var store = new SettingsStore(TestLog.Create(), path) { ReadOnly = true };
+        store.Load();
+        store.Settings.UiScale = 3f;
+        Assert.True(store.SaveNow());
+        store.RequestSave(0);
+        store.Update(10);
+        Assert.False(File.Exists(path));
+    }
+
+    [Fact]
     public void Sanitize_clamps_and_repairs_every_value()
     {
         var s = new AppSettings

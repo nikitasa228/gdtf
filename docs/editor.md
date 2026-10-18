@@ -39,6 +39,9 @@ without a GPU, Mesa's software driver (lavapipe, package `mesa-vulkan-drivers`) 
 
 Exit codes: `0` ok, `1` failure, `2` usage error (bad option, unreadable script), `3` no usable Vulkan device.
 
+`--scale`, `--language` and `--device` apply to the current run only: the settings file keeps its values unless the
+setting is changed in the editor during the run. Headless runs (`--screenshot`) never write settings or the workspace.
+
 Per-user files live in the Candela config folder (`%APPDATA%\Candela`, `~/.config/Candela`,
 `~/Library/Application Support/Candela`; `CANDELA_CONFIG_DIR` or `--config-dir` override it):
 
@@ -101,8 +104,9 @@ copied between machines.
 ## Viewports
 
 Each viewport renders into its own render target sized to the panel (in framebuffer pixels, so high-DPI monitors get
-full resolution) and shows it as an ImGui image. *View → New Viewport* adds more viewports (up to 16); each has its own
-camera, shading, overlay and grid. Shortcuts and View-menu commands act on the last viewport clicked (highlighted when
+full resolution) and shows it as an ImGui image. *View → New Viewport* (Ctrl+Alt+N) adds more viewports (up to 16) as
+tabs next to the active one — drag a tab to an edge to see them side by side; each has its own camera, shading, overlay
+and grid. Shortcuts and View-menu commands act on the last viewport clicked (highlighted when
 more than one is open).
 
 ![Four viewports, Russian UI](images/editor-four-viewports-ru.png)
@@ -147,7 +151,7 @@ The camera works in metres with Z up; orthographic views keep the apparent size 
 
 | Menu | Items |
 |---|---|
-| File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image), Export MVR…, Render…, Settings…, Exit |
+| File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image), Export (MVR scene), Render…, Settings…, Exit |
 | Edit | Undo / Redo (with the step name), Cut, Copy, Paste, Duplicate, Delete, Select All, Deselect |
 | View | Shading, Projection, Camera views, Overlay, Grid, Statistics, View cube, Frame selection, New viewport, Reset layout |
 | Tools | Select, Move, Rotate, Wall, Floor, Cable (the drawing tools arrive with the engine), Snapping, Local/World space |

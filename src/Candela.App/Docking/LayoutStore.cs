@@ -3,13 +3,14 @@ using System.Text;
 namespace Candela.App.Docking;
 
 /// <summary>
-/// Named layouts of the user, one JSON file each in a folder (<c>ConfigPaths.LayoutsDir</c>). The workspace as it was
-/// at exit is stored under the reserved name <see cref="WorkspaceName"/>. Names are escaped into safe file names and
-/// written atomically (temporary file + rename).
+/// Named layouts of the user, one JSON file each in a folder (<c>ConfigPaths.LayoutsDir</c>), and the workspace as it was
+/// at exit in <c>_workspace.layout.json</c> (<see cref="SaveWorkspace"/>). Names are escaped into safe file names — a
+/// leading underscore included, so no user layout can ever replace the workspace file — and written atomically
+/// (temporary file + rename).
 /// </summary>
 internal sealed class LayoutStore
 {
-    /// <summary>File name (without extension) of the automatically saved workspace.</summary>
+    /// <summary>File name (without extension) of the automatically saved workspace; user names never map to it.</summary>
     public const string WorkspaceName = "_workspace";
 
     private const string Extension = ".layout.json";
@@ -32,8 +33,9 @@ internal sealed class LayoutStore
             if (!Directory.Exists(Folder))
                 return Array.Empty<string>();
             return Directory.EnumerateFiles(Folder, "*" + Extension)
-                .Select(f => Unescape(Path.GetFileName(f)[..^Extension.Length]))
-                .Where(n => n != WorkspaceName)
+                .Select(f => Path.GetFileName(f)[..^Extension.Length])
+                .Where(stem => stem != WorkspaceName)
+                .Select(Unescape)
                 .OrderBy(n => n, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
         }
@@ -53,18 +55,36 @@ internal sealed class LayoutStore
     {
         ArgumentNullException.ThrowIfNull(layout);
         name = ValidateName(name);
+        layout.Name = name;
+        Write(PathOf(name), layout);
+    }
+
+    /// <summary>Writes the workspace restored at the next start.</summary>
+    /// <exception cref="IOException">The file could not be written.</exception>
+    public void SaveWorkspace(LayoutFile layout)
+    {
+        ArgumentNullException.ThrowIfNull(layout);
+        Write(WorkspacePath, layout);
+    }
+
+    /// <summary>Reads the saved workspace; null when there is none. Throws <see cref="LayoutFormatException"/> when damaged.</summary>
+    public LayoutFile? LoadWorkspace() => Read(WorkspacePath);
+
+    /// <summary>Reads a layout; null when it does not exist. Throws <see cref="LayoutFormatException"/> when damaged.</summary>
+    public LayoutFile? Load(string name) => Read(PathOf(ValidateName(name)));
+
+    private string WorkspacePath => Path.Combine(Folder, WorkspaceName + Extension);
+
+    private void Write(string path, LayoutFile layout)
+    {
         Directory.CreateDirectory(Folder);
-        string path = PathOf(name);
         string tmp = path + "." + Environment.ProcessId + ".tmp";
-        layout.Name = name == WorkspaceName ? layout.Name : name;
         File.WriteAllText(tmp, layout.ToJson(), new UTF8Encoding(false));
         File.Move(tmp, path, overwrite: true);
     }
 
-    /// <summary>Reads a layout; null when it does not exist. Throws <see cref="LayoutFormatException"/> when damaged.</summary>
-    public LayoutFile? Load(string name)
+    private static LayoutFile? Read(string path)
     {
-        string path = PathOf(ValidateName(name));
         if (!File.Exists(path))
             return null;
         string json;
@@ -101,16 +121,20 @@ internal sealed class LayoutStore
         return name;
     }
 
-    /// <summary>File-name-safe form: unsafe characters (and the dots of names made only of dots) become <c>%XXXX</c>.</summary>
+    /// <summary>
+    /// File-name-safe form: unsafe characters, the dots of names made only of dots and a leading underscore (reserved for
+    /// the workspace file) become <c>%XXXX</c>.
+    /// </summary>
     internal static string Escape(string name)
     {
         var bad = Path.GetInvalidFileNameChars();
         bool onlyDots = name.Trim('.').Length == 0;
         var sb = new StringBuilder(name.Length);
-        foreach (char c in name)
+        for (int i = 0; i < name.Length; i++)
         {
+            char c = name[i];
             if (Array.IndexOf(bad, c) >= 0 || c is '%' or '/' or '\\' or ':' or '*' or '?' or '"' or '<' or '>' or '|' ||
-                char.IsControl(c) || (onlyDots && c == '.'))
+                char.IsControl(c) || (onlyDots && c == '.') || (i == 0 && c == '_'))
                 sb.Append('%').Append(((int)c).ToString("X4", System.Globalization.CultureInfo.InvariantCulture));
             else
                 sb.Append(c);

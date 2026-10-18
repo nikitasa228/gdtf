@@ -244,6 +244,13 @@ internal sealed unsafe class DockWorkspace
             return ImGuiP.ImHashStr(p);
     }
 
+    /// <summary>The dock node holding a panel's window, or 0 when it is floating or not created yet.</summary>
+    public static uint DockIdOf(Panel panel)
+    {
+        var window = ImGuiP.FindWindowByID(WindowIdOf(panel));
+        return window.IsNull ? 0 : window.DockId;
+    }
+
     /// <summary>Undocks a panel's window (it becomes a floating window, or its own OS window with multi-viewport).</summary>
     public static void Undock(Panel panel)
     {
