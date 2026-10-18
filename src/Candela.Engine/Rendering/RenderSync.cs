@@ -63,6 +63,7 @@ public sealed class RenderSync : IDisposable
     private readonly Dictionary<Guid, bool> _layerVisible = new();
     private readonly AtmosphereState _atmosphere = new();
     private readonly List<ModelVisual> _staleModels = new();
+    private readonly Dictionary<Guid, (Task<bool> Task, HashSet<Guid> Entities)> _decoding = new();
     private readonly List<FixtureTypeVisual> _retiredTypes = new();
     private readonly List<TextureHandle> _retiredTextures = new();
     private readonly List<(FixtureProfile Profile, int Wheel, int Slot)> _scratchGobos = new();
@@ -110,6 +111,16 @@ public sealed class RenderSync : IDisposable
     /// appear when their type has loaded. False loads them during <see cref="Update"/> (CLI, tests, thumbnails).
     /// </summary>
     public bool LoadFixtureModelsInBackground { get; set; } = true;
+
+    /// <summary>
+    /// Decodes the project's imported models (model and truss assets) on background threads (default): a model in a
+    /// native format goes through the import worker, which may take up to <see cref="EngineModels.Timeout"/>, and must
+    /// not stall the frame; the objects appear when their model has decoded. False decodes during <see cref="Update"/>.
+    /// </summary>
+    public bool LoadModelsInBackground { get; set; } = true;
+
+    /// <summary>Imported models still decoding in the background.</summary>
+    public int PendingModels => _decoding.Count;
 
     /// <summary>Uniform haze (1/m) to use instead of the scene's <see cref="SceneSettings.BaseHazeScattering"/>, or null.</summary>
     public float? HazeOverride
@@ -160,6 +171,7 @@ public sealed class RenderSync : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (_all) RebuildAll();
+        if (_decoding.Count > 0) CollectDecodedModels(wait: TimeSpan.Zero);
         ProcessChanges();
         UploadLoadedFixtureTypes();
         UpdateFixtures();
@@ -184,10 +196,39 @@ public sealed class RenderSync : IDisposable
             var left = deadline - DateTime.UtcNow;
             if (left <= TimeSpan.Zero || !task.Wait(left)) break;
         }
+        var remaining = deadline - DateTime.UtcNow;
+        CollectDecodedModels(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero);
+        ProcessChanges();
         UploadLoadedFixtureTypes();
         UpdateFixtures(force: true);
         RefreshFlags();
-        return _fixtureTypes.Values.All(t => t.Uploaded);
+        return _fixtureTypes.Values.All(t => t.Uploaded) && _decoding.Count == 0;
+    }
+
+    /// <summary>
+    /// Takes the imported models whose background decode finished (waiting up to <paramref name="wait"/> for the others)
+    /// and marks the objects that draw them for a rebuild.
+    /// </summary>
+    private void CollectDecodedModels(TimeSpan wait)
+    {
+        var deadline = DateTime.UtcNow + wait;
+        _scratch.Clear();
+        foreach (var (assetId, pending) in _decoding)
+        {
+            if (!pending.Task.IsCompleted)
+            {
+                var left = deadline - DateTime.UtcNow;
+                if (left <= TimeSpan.Zero || !pending.Task.Wait(left)) continue;
+            }
+            _scratch.Add(assetId);
+        }
+        foreach (var assetId in _scratch)
+        {
+            // the objects that wait for it are not drawn yet (nothing to keep), so they are listed with the decode
+            if (_decoding.Remove(assetId, out var done))
+                foreach (var id in done.Entities) _rebuild.Add(id);
+        }
+        _scratch.Clear();
     }
 
     /// <summary>Destroys everything this binding created in the render world and stops following the engine.</summary>
@@ -277,6 +318,7 @@ public sealed class RenderSync : IDisposable
         _models.Clear();
         foreach (var m in _staleModels) m.Destroy(World);
         _staleModels.Clear();
+        _decoding.Clear(); // decodes of the previous project's assets finish into its asset store
         _rebuild.Clear();
         _moved.Clear();
         foreach (var e in _scene.All()) _rebuild.Add(e.Id);
@@ -479,6 +521,14 @@ public sealed class RenderSync : IDisposable
         if (assetId == Guid.Empty || !_engine.Assets.Contains(assetId)) return false;
         if (!_models.TryGetValue(assetId, out var model))
         {
+            if (LoadModelsInBackground && !_engine.Models.IsDecoded(assetId))
+            {
+                // decoded on a worker thread (the import worker may run for seconds); drawn once it is done
+                if (!_decoding.TryGetValue(assetId, out var pending))
+                    _decoding[assetId] = pending = (_engine.Models.DecodeAsync(assetId), new HashSet<Guid>());
+                pending.Entities.Add(v.Entity.Id);
+                return false;
+            }
             var data = _engine.Models.GetModelData(assetId);
             if (data is null) return false;
             model = ModelVisual.Create(World, data, _engine.Images, DefaultMaterial());

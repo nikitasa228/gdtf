@@ -240,15 +240,19 @@ public sealed partial class StageEngine : IDisposable
     /// <summary>
     /// Connects a renderer's world: from now on <see cref="Tick"/> keeps it in sync with the scene. Replaces a previous
     /// binding (whose renderer objects are destroyed). <paramref name="loadFixtureModelsInBackground"/> sets
-    /// <see cref="RenderSync.LoadFixtureModelsInBackground"/> before the first update (false for the CLI, tests and
-    /// thumbnails, which need every fixture model at once).
+    /// <see cref="RenderSync.LoadFixtureModelsInBackground"/> and <see cref="RenderSync.LoadModelsInBackground"/> before
+    /// the first update (false for the CLI, tests and thumbnails, which need every fixture and imported model at once).
     /// </summary>
     public RenderSync AttachRenderWorld(IRenderWorld world, bool loadFixtureModelsInBackground = true)
     {
         ArgumentNullException.ThrowIfNull(world);
         ObjectDisposedException.ThrowIf(_disposed, this);
         _render?.Dispose();
-        _render = new RenderSync(this, world) { LoadFixtureModelsInBackground = loadFixtureModelsInBackground };
+        _render = new RenderSync(this, world)
+        {
+            LoadFixtureModelsInBackground = loadFixtureModelsInBackground,
+            LoadModelsInBackground = loadFixtureModelsInBackground,
+        };
         _render.Update();
         return _render;
     }
