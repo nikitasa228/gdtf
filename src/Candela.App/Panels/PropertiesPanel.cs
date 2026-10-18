@@ -36,6 +36,7 @@ internal sealed unsafe class PropertiesPanel : Panel
     private string _idShort = "";
     private string _selectionText = "";
     private readonly AxisFormats _formats = new();
+    private readonly EulerDisplay _euler = new();
 
     /// <summary>Creates the panel.</summary>
     public PropertiesPanel(WorkspaceContext context)
@@ -88,7 +89,13 @@ internal sealed unsafe class PropertiesPanel : Panel
         }
 
         if (ImGui.CollapsingHeader(Labels.With(Icons.Move3D, Str.PropTransform), ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            // A locked object (or one on a locked layer) does not move: the gizmo is hidden and the fields are read-only.
+            bool readOnly = !SelectionController.IsEditable(_ctx.Session.Scene, entity);
+            ImGui.BeginDisabled(readOnly);
             TransformEditor(entity);
+            ImGui.EndDisabled();
+        }
 
         if (ImGui.CollapsingHeader(Labels.With(Icons.Component, Str.PropComponents), ImGuiTreeNodeFlags.DefaultOpen))
             Components(entity);
@@ -208,9 +215,15 @@ internal sealed unsafe class PropertiesPanel : Panel
         EndEdit(positionDone);
 
         PropertyGrid.Row(Str.PropRotation);
-        var euler = TransformMath.ToEulerDegrees(local.Rotation);
+        var euler = _euler.Get(entity, local.Rotation);
         if (AxisFields("##rotation", ref euler, 0.5f, 0f, 0f, _formats.Rotation, _formats.WidestSample, out bool rotationDone))
-            Apply(entity, local with { Rotation = TransformMath.FromEulerDegrees(euler) }, "Rotate", "rotation");
+        {
+            // The entered triple stays on screen (a Y beyond ±90° would otherwise flip to an equivalent triple).
+            var rotation = TransformMath.FromEulerDegrees(euler);
+            Apply(entity, local with { Rotation = rotation }, "Rotate", "rotation");
+            _euler.Set(entity, euler, entity.Local.Rotation);
+        }
+
         EndEdit(rotationDone);
 
         PropertyGrid.Row(Str.PropScale);

@@ -869,3 +869,55 @@ public sealed class FileBrowserPathTextTests
         }
     }
 }
+
+/// <summary>The rotation fields keep the Euler angles the user entered instead of flipping to an equivalent triple.</summary>
+public sealed class EulerDisplayTests
+{
+    private static void Near(Vector3 expected, Vector3 actual) =>
+        Assert.True(Vector3.Distance(expected, actual) < 1e-3f, $"expected {expected}, got {actual}");
+
+    [Fact]
+    public void A_y_rotation_beyond_90_degrees_stays_as_entered()
+    {
+        var entity = new Candela.Core.SceneGraph.Entity("spot");
+        var display = new Candela.App.Editing.EulerDisplay();
+        Near(Vector3.Zero, display.Get(entity, entity.Local.Rotation));
+
+        // Typed (10°, 80°, 20°), then a drag on Y up to 120° in steps, as the panel applies it frame by frame.
+        var angles = new Vector3(10f, 80f, 20f);
+        entity.Local = entity.Local with { Rotation = Candela.App.Editing.TransformMath.FromEulerDegrees(angles) };
+        display.Set(entity, angles, entity.Local.Rotation);
+        for (float y = 85f; y <= 120f; y += 5f)
+        {
+            var shown = display.Get(entity, entity.Local.Rotation);
+            Near(angles, shown); // the field continues from what it showed, not from (−170°, 85°, −160°)
+            angles = shown with { Y = y };
+            var q = Candela.App.Editing.TransformMath.FromEulerDegrees(angles);
+            entity.Local = entity.Local with { Rotation = q };
+            display.Set(entity, angles, entity.Local.Rotation);
+        }
+
+        Near(new Vector3(10f, 120f, 20f), display.Get(entity, entity.Local.Rotation));
+        // The plain decomposition of the same rotation is the other triple.
+        Near(new Vector3(-170f, 60f, -160f), Candela.App.Editing.TransformMath.ToEulerDegrees(entity.Local.Rotation));
+    }
+
+    [Fact]
+    public void A_rotation_changed_elsewhere_or_another_entity_is_decomposed_afresh()
+    {
+        var a = new Candela.Core.SceneGraph.Entity("a");
+        var b = new Candela.Core.SceneGraph.Entity("b");
+        var display = new Candela.App.Editing.EulerDisplay();
+        var q = Candela.App.Editing.TransformMath.FromEulerDegrees(new Vector3(0f, 100f, 0f));
+        display.Set(a, new Vector3(0f, 100f, 0f), q);
+        Near(new Vector3(0f, 100f, 0f), display.Get(a, q));
+        Near(new Vector3(0f, 100f, 0f), display.Get(a, Quaternion.Negate(q))); // the same rotation
+
+        // The gizmo (or undo) turned it: the stored triple no longer applies.
+        var turned = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, 0.5f);
+        Near(Candela.App.Editing.TransformMath.ToEulerDegrees(turned), display.Get(a, turned));
+        // Another entity with the same rotation as the stored one is not given a's triple.
+        display.Set(a, new Vector3(0f, 100f, 0f), q);
+        Near(Candela.App.Editing.TransformMath.ToEulerDegrees(q), display.Get(b, q));
+    }
+}
