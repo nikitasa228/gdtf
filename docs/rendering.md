@@ -65,6 +65,11 @@ One context per GPU, shared by the renderer, the editor's swapchain and the Dear
   | `runtimeDescriptorArray`, `shaderSampledImageArrayNonUniformIndexing`, `descriptorBindingPartiallyBound`, `descriptorBindingVariableDescriptorCount`, `descriptorBindingSampledImageUpdateAfterBind` | `wideLines` |
   | `timelineSemaphore`, `scalarBlockLayout` | `rayQuery` + `accelerationStructure` + `bufferDeviceAddress` → `SupportsRayTracing` (ray-traced GI; stage 3) |
   | one graphics+compute queue (that can present, when a surface is given); `D32_SFLOAT` sampled + copyable | `samplerAnisotropy`, timestamps |
+  | descriptor limits of the pipeline layout (sets 1 + 2 per stage: 20 sampled images, 11 storage buffers, 3 storage images; 3 bound sets), compute work groups of 256 invocations | |
+
+  The descriptor limits are checked when the device is chosen (a device below them is not eligible instead of
+  failing later); the bindless texture array is sized so that it plus sets 1 and 2 fit the update-after-bind limits
+  (which count every set of the layout).
 
 * **Frames in flight**: 2 (`FramesInFlight`). Each slot has a command pool, one primary command buffer, a fence and a
   timestamp query pool. `BeginFrame` waits only for the fence of the slot's previous use. GPU time per pass is
@@ -344,9 +349,15 @@ atlas is created with the first shadow-casting light and released when none is l
 
 **Which lights.** `LightPlanner` ranks the lights by their estimated contribution to the view; the
 `MaxShadowedLights` best that have `SpotLight.CastShadows` get a tile, the most important one R × R and each further
-one half the size for every factor of 4 its score is below the best one's (at least R/8). A light keeps its tile while
-the wanted size is within one level (hysteresis); otherwise it gets a new tile, evicting the least recently used tiles
-of lights the frame does not need. Lights that do not fit stay unshadowed.
+one half the size for every factor of 4 its score is below the best one's (at least R/8). The tiles of a view must fit
+its share of the atlas (the atlas holds four R × R tiles or 256 of R/8): while they do not, the least important of the
+largest tiles is made one level smaller (so 12 equally important lights get one tile of R and 11 of R/2, 256 get R/8
+each), and casters that do not fit even then stay unshadowed. Views rendered into the same frame (editor viewports)
+plan within equal shares, so one view cannot take the tiles another one needs. A light keeps its tile when another
+view of the same frame already used it, or while the tile is between half the wanted size and the wanted size
+(hysteresis: tiles shrink at once, grow a level late); otherwise it gets a new tile where the wanted size fits,
+evicting the least recently used tiles of lights the frame does not need (only when none is left is a smaller size
+tried).
 
 **Caching.** A tile is re-rendered only when its frustum changes (light moved or turned, or the cone outgrew the 10 %
 margin of the frustum), when a shadow caster inside the frustum was created, destroyed, moved or got other materials
@@ -435,21 +446,30 @@ light-meter reading and does not apply it.
   the tile into 16 × 16 cells, estimates each cell's reflected flux `I(ω) · cookie · T_light · albedo · Ω_texel` from
   4 × 4 stratified texels, builds a CDF and **importance-samples** that light's VPLs by flux (stratified, fixed per
   VPL so the result is stable); each VPL carries `flux / (count · pdf)`, an unbiased estimate of everything the light
-  reflects. The view's budget of 256 VPLs is shared among the RSM lights in proportion to their scores (at least 8
-  each). `gather.comp` evaluates, at **half resolution**, `E = Σ Φ_k · cos θ_k · cos θ_p · T_light / (π · max(d², (0.1 m)²))`
+  reflects. The view's budget of 256 VPLs goes to the 32 most important shadowed lights: 8 each plus the rest in
+  proportion to their scores (so the gather never evaluates more than 256 VPLs per pixel, however many lights are
+  shadowed). `gather.comp` evaluates, at **half resolution**, `E = Σ Φ_k · cos θ_k · cos θ_p · T_light / (π · max(d², (0.1 m)²))`
   for the surface under each pixel (no visibility test), and the forward pass **upsamples bilaterally** (four
   nearest samples, bilinear × view-depth similarity) and adds `albedo/π · E`.
 * **`RayTraced`** (devices with ray query; otherwise falls back to RSM). `rt_gi.comp` traces 4 cosine-distributed rays
   per half-resolution pixel against the TLAS; a hit is shaded with the albedo of its material, the direct light of
-  the view's GI lights (shadowed lights, up to 64, visibility from their shadow maps), its emission and `T_light`; a
+  the view's GI lights (its 64 highest-scoring lights; visibility from their shadow tiles where they have one), its
+  emission and `T_light`; a
   miss sees the background. `E = π/N · Σ L_hit`. The estimate is blended with the reprojected history (weight 0.9,
   rejected where the depth disagrees by more than 5 %; off with `TemporalAccumulation = false`), and the accumulated,
   unfiltered result becomes the next history. Two à-trous iterations (5 × 5 B3 kernel, steps 1 and 2, depth and
   normal edge-stopping) then remove the remaining speckle before the bilateral upsampling.
 * **`Off`**.
 
-Indirect light is one bounce of diffuse light from the shadowed lights; the tests compare both modes with a CPU
-integral of the light a red wall reflects onto a white floor.
+Indirect light is one bounce of diffuse light (from the shadowed lights with RSM); the tests compare both modes with a
+CPU integral of the light a red wall reflects onto a white floor.
+
+**Numeric range.** The light images are half floats: HDR and froxel volumes hold pre-exposed luminance, the indirect
+images irradiance in lux. Every writer clamps to 30 000 (15 stops above display white, so a blend of two clamped
+values still fits) and turns NaN into 0, and the readers of the HDR image (bloom, auto exposure, tone mapping) do the
+same: a fixture aimed into the camera through dense haze at a low exposure, or a surface a few centimetres in front of
+a lens, would otherwise overflow 65 504, which GPUs may store as +∞ and blending, the bloom pyramid and the temporal
+histories then turn into NaN.
 
 ## Post-processing
 
@@ -519,7 +539,7 @@ background is not coloured.
 
 ## Accuracy and test coverage
 
-`tests/Candela.Rendering.Vulkan.Tests` (75 tests, about a minute on lavapipe once the SPIR-V cache is warm;
+`tests/Candela.Rendering.Vulkan.Tests` (92 tests, about a minute on lavapipe once the SPIR-V cache is warm;
 `xunit.runner.json` limits parallelism to two tests because lavapipe renders on the CPU) runs every test with the
 validation layer and synchronization validation and asserts **zero validation errors**, including leak reports at
 shutdown. Tests are skipped with a message when no Vulkan device exists. Images are 160 × 120 … 320 × 240.
@@ -530,17 +550,18 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `ShaderTests` | every shader variant compiles and passes `spirv-val`; include changes invalidate the cache; struct sizes |
 | `RenderModeTests`, `GoldenImageTests` | the procedural scene in Full / Colorless / Wireframe (both wireframe paths) against `Golden/*.png` at 320 × 240 — symmetric 3 × 3 neighbourhood comparison, mean error ≤ 2/255 and ≤ 0.5 % of pixels off by more than 40/255 |
 | `PhotometricTests` | 10 000 cd at 5 m onto a white Lambertian floor: pool centre 10000/25/π cd/m² within 2 %; 30° off axis `profile(θ)·cos³θ` within 3 %; coloured light keeps luminance and chromaticity; iris and frost; emissive and background luminance |
-| `ManyLightsTests` | 1000 lights, validation-clean, shaded luminance = CPU sum over all lights (3 %) |
+| `ManyLightsTests` | 1000 lights, validation-clean, shaded luminance = CPU sum over all lights (3 %) — already in the first frame after the light count grew |
 | `ToneMappingTests` | AgX / ACES / Neutral curves, exposure compensation (stops of exposure) |
 | `PickTests` | pick id, position within 1 cm, normal, depth; not-pickable instances |
 | `SceneTests` | incremental updates, stale handles, material updates, sRGB / Rec.709 → Rec.2020 conversions, mip chains, uploads staged in frames without rendering |
 | `LifecycleTests` | resize, several targets per world, memory returned after destroying everything, leak-free dispose, allocation-free steady-state frames (measured while another thread forces full collections, so GC-collectable runtime caches such as the one behind `Enum.IsDefined` cannot hide); every stage-2 feature on two targets across resizes and view switches, allocation-free with all of them |
-| `ShadowTests` | golden `shadow-box`; a point in the umbra gets ~0 direct light while the lux overlay elsewhere matches `LightMeter` within 1 %; cached tiles are not re-rendered until a caster in their frustum moves; `MaxShadowedLights` priority; `CastShadow` / `CastShadows` respected |
-| `CookieTests` | goldens `cookie-gobo` (orientation, rotation), `cookie-blades`, `cookie-prism` (3 facets, flux 1/N each), `cookie-iris`; frost widens the beam and blurs the gobo; blade insertion and rotation positions |
-| `VolumetricTests` | single scattering in uniform haze vs the numerical integral of σ·HG·I·e^(−σr)/r²·e^(−σl) within 5 % (froxels with and without temporal accumulation, and a ray-marched narrow beam); goldens `volumetric-beam` (side view), `volumetric-smoke` (density blob), `volumetric-flame`; an optically thick flame shows the blackbody luminance (5 %) and chromaticity (0.01) |
-| `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % |
+| `ShadowTests` | golden `shadow-box`; a point in the umbra gets ~0 direct light while the lux overlay elsewhere matches `LightMeter` within 1 %; cached tiles are not re-rendered until a caster in their frustum moves; `MaxShadowedLights` priority; `CastShadow` / `CastShadows` respected; 12 equally important lights all get working tiles (and share one VPL budget); two views in one frame keep each other's tiles; no acne: a shadow-casting floor lit at grazing angles (1 %) and a lit sphere (4 %, tessellation) match `LightMeter` |
+| `CookieTests` | goldens `cookie-gobo` (orientation, rotation), `cookie-blades`, `cookie-prism` (3 facets, flux 1/N each), `cookie-iris`; frost widens the beam and blurs the gobo; blade insertion and rotation positions; the flux on the floor equals the light meter's integral (1 %) and frost and prism keep it (2 %) |
+| `VolumetricTests` | single scattering in uniform haze vs the numerical integral of σ·HG·I·e^(−σr)/r²·e^(−σl) within 5 % (froxels with and without temporal accumulation, and a ray-marched narrow beam); goldens `volumetric-beam` (side view), `volumetric-smoke` (density blob), `volumetric-flame`; an optically thick flame shows the blackbody luminance (5 %) and chromaticity (0.01); looking up a beam from inside it (ray marched, the same beam in the froxels, a wide beam) within 5 % of the integral; haze in a shadow stays dark (froxels and ray marching); the froxel history follows a trucking or panning camera (beam within 0.75 px of the converged image) |
+| `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % (Full and Colorless) |
 | `PostTests` | golden `bloom`; the bloom image has the HDR image's energy (3 %), a halo appears and the source gives up light; auto exposure converges to the trimmed-mean measurement (0.2 stop), follows a 4× brighter scene by 2 stops (adapting over time) and adds compensation; resolution scale 0.5 renders a quarter of the pixels, keeps the display size and picking (< 1 cm), clamps to [0.5, 1] |
 | `IndirectTests` | a red wall bleeds onto a white floor: red/green rises by more than 30 % against `Indirect = Off`, and the added luminance matches a CPU integral of the wall's reflected light (RSM within 12 %, ray-traced GI within 20 %, both measured on lavapipe); fallbacks |
+| `RobustnessTests` | NaN / out-of-range settings, lights and atmosphere grids (empty, short, beyond the 3D image limit, NaN, infinite, null) in every view and overlay; 1000 shadow-casting lights with every feature (256 tiles, ≤ 256 VPLs); 2 Mcd into the camera through dense haze stays below the half-float limit and finite |
 | `MemoryTests` | alignment, free-list reuse and coalescing, granularity, dedicated allocations |
 | `SwapchainTests` | headless surface: acquire/present, resize, minimise, misuse errors, ImGui handoff state |
 
@@ -691,7 +712,7 @@ cookies, photometric profiles and media of stages 1 and 2.
 * **Shadow frusta** are clamped to 80° half-angle: light beyond that (very wide floods) is unshadowed. Lights beyond
   `MaxShadowedLights`, and lights that do not fit in the atlas, are unshadowed (and have no reflective shadow map).
 * **Reflective shadow maps** test no visibility between a VPL and the receiver (light can leak through thin walls);
-  only one bounce; only shadowed lights contribute. The ray-traced GI shades its hits with the shadowed lights (up to
+  only one bounce; only the 32 most important shadowed lights contribute. The ray-traced GI shades its hits with the shadowed lights (up to
   64 per view) plus emission; it is a noisy estimate that needs a few frames to converge after a change.
 * **Transparent surfaces** take the fog of the froxel volume at their depth; volumetric light between overlapping
   transparent layers is approximated by that single lookup. Transmission has no tint and no refraction.
