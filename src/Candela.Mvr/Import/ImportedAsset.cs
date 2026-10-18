@@ -78,10 +78,13 @@ public sealed class ImportedAsset
 /// <summary>Decoding of MVR 3D files into Core models in engine units (metres, Z up).</summary>
 public static class MvrModelFiles
 {
-    /// <summary>The model format of a file name, or null when MVR does not support it.</summary>
+    /// <summary>
+    /// The model format of a file name, or null when MVR does not support it. A name without extension is 3DS, as MVR
+    /// specifies for <c>Geometry3D fileName</c> ("if there is no extension, it will assume that the extension is 3ds").
+    /// </summary>
     public static ModelFileFormat? FormatOf(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() switch
     {
-        ".3ds" => ModelFileFormat.ThreeDs,
+        "" or ".3ds" => ModelFileFormat.ThreeDs,
         ".gltf" => ModelFileFormat.Gltf,
         ".glb" => ModelFileFormat.Glb,
         _ => null,
@@ -164,9 +167,10 @@ public static class MvrModelFiles
                 }
             }
         }
-        catch (JsonException)
+        catch (Exception e) when (e is JsonException or InvalidOperationException or ArgumentException)
         {
-            // The decoder reports the broken file; no dependencies can be listed.
+            // Malformed JSON or a URI string that is not valid UTF-16: the decoder reports the broken file, and no
+            // dependencies can be listed.
         }
         return result;
     }

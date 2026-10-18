@@ -419,7 +419,7 @@ public sealed class MalformedTests
         Assert.Equal(1, Assert.Single(f.Addresses).Absolute);
         Assert.Null(f.Color);
         Assert.Null(f.Focus);
-        Assert.Null(f.UnitNumber);
+        Assert.Equal(0, f.UnitNumber); // the non-numeric unit number is dropped; MVR 1.6 requires one, 0 means none
         Assert.Equal("Robe@Robin MegaPointe.gdtf", f.GdtfSpec);
         Assert.Equal(Matrix4x4.Identity, doc.AllObjects().Single(o => o.Uuid == mesh.Id).Matrix);
         Assert.Equal("Other fixture", doc.AllObjects().Single(o => o.Uuid == other.Id).Name);

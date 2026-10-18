@@ -66,8 +66,8 @@ internal static class MvrXmlWriter
                 if (u.Element is not null)
                 {
                     var e = new XElement(u.Element);
-                    e.SetAttributeValue("provider", Clean(u.Provider));
-                    e.SetAttributeValue("ver", Clean(u.Version));
+                    SetAttribute(e, "provider", u.Provider);
+                    SetAttribute(e, "ver", u.Version);
                     e.WriteTo(w);
                 }
                 else
@@ -243,7 +243,7 @@ internal static class MvrXmlWriter
                 foreach (var s in v.Sources) WriteSource(w, s);
                 w.WriteEndElement();
                 break;
-            case MvrProjector pr when pr.Projections.Count > 0:
+            case MvrProjector pr: // Projections is mandatory on a Projector, even when empty
                 w.WriteStartElement("Projections");
                 foreach (var p in pr.Projections)
                 {
@@ -408,6 +408,21 @@ internal static class MvrXmlWriter
         Attr(w, "type", s.Type);
         Text(w, s.Value);
         w.WriteEndElement();
+    }
+
+    /// <summary>
+    /// Sets an attribute of a kept element (matching its name ignoring case, as the reader does). An empty value does
+    /// not add an attribute the element did not have, so a missing <c>ver</c> stays missing on a round trip.
+    /// </summary>
+    private static void SetAttribute(XElement e, string name, string value)
+    {
+        foreach (var a in e.Attributes())
+        {
+            if (!string.Equals(a.Name.LocalName, name, StringComparison.OrdinalIgnoreCase)) continue;
+            a.Value = Clean(value);
+            return;
+        }
+        if (value.Length > 0) e.SetAttributeValue(name, Clean(value));
     }
 
     private static void Unknown(XmlWriter w, List<XElement> elements)

@@ -193,19 +193,19 @@ public sealed class MvrMapping
     /// <summary>The mapping definition (<c>linkedDef</c>).</summary>
     public Guid LinkedDefinition { get; set; }
 
-    /// <summary>Horizontal size in pixels (<c>ux</c>), or null.</summary>
+    /// <summary>Offset in pixels in x from the source's top-left corner (<c>ux</c>, as DIN SPEC 15801 defines it), or null.</summary>
     public int? Ux { get; set; }
 
-    /// <summary>Vertical size in pixels (<c>uy</c>), or null.</summary>
+    /// <summary>Offset in pixels in y from the source's top-left corner (<c>uy</c>), or null.</summary>
     public int? Uy { get; set; }
 
-    /// <summary>Horizontal offset in pixels (<c>ox</c>), or null.</summary>
+    /// <summary>Size in pixels in x from the starting point (<c>ox</c>), or null.</summary>
     public int? Ox { get; set; }
 
-    /// <summary>Vertical offset in pixels (<c>oy</c>), or null.</summary>
+    /// <summary>Size in pixels in y from the starting point (<c>oy</c>), or null.</summary>
     public int? Oy { get; set; }
 
-    /// <summary>Rotation about the screen normal in degrees (<c>rz</c>), or null.</summary>
+    /// <summary>Rotation about the middle of the rectangle in degrees, counter-clockwise (<c>rz</c>), or null.</summary>
     public float? Rz { get; set; }
 }
 

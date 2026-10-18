@@ -147,7 +147,7 @@ internal sealed class MvrXmlParser
             else
             {
                 aux.UnknownElements.Add(new XElement(c));
-                Unknown("AUXData", c);
+                Unknown("AUXData", c, kept: true);
             }
         }
     }
@@ -203,7 +203,7 @@ internal sealed class MvrXmlParser
                 else
                 {
                     layer.UnknownElements.Add(new XElement(l));
-                    Unknown("Layer", l);
+                    Unknown("Layer", l, kept: true);
                 }
             }
             _doc.Layers.Add(layer);
@@ -220,7 +220,7 @@ internal sealed class MvrXmlParser
             if (obj is null)
             {
                 unknownTarget.Add(new XElement(e));
-                Unknown(context + "/ChildList", e);
+                Unknown(context + "/ChildList", e, kept: true);
                 continue;
             }
             ReadObject(e, obj);
@@ -280,7 +280,7 @@ internal sealed class MvrXmlParser
             if (!handled)
             {
                 obj.UnknownElements.Add(new XElement(c));
-                Unknown(obj.Kind.ToString(), c);
+                Unknown(obj.Kind.ToString(), c, kept: true);
             }
         }
     }
@@ -487,7 +487,13 @@ internal sealed class MvrXmlParser
                         $"{Where(c)}{label}: DMX break '{breakText}' is not a non-negative integer; the address is skipped.", d.Uuid);
                     continue;
                 }
-                if (MvrAddress.TryParse(c.Value, dmxBreak, out var address)) d.Addresses.Add(address!);
+                if (c.Value.Trim() == "0")
+                {
+                    // Some exporters write address 0 for objects that are not patched.
+                    _sink.Aggregate(IssueSeverity.Note, IssueCategory.Patch, MvrIssueCodes.AddressInvalid, "unpatched",
+                        n => $"{n} DMX address(es) are 0, which means not patched; no address is created for them.", d.Uuid);
+                }
+                else if (MvrAddress.TryParse(c.Value, dmxBreak, out var address)) d.Addresses.Add(address!);
                 else
                 {
                     _sink.Add(IssueSeverity.Warning, IssueCategory.Patch, MvrIssueCodes.AddressInvalid,
@@ -636,7 +642,7 @@ internal sealed class MvrXmlParser
             else
             {
                 geo.UnknownElements.Add(new XElement(c));
-                Unknown(e.Name.LocalName, c);
+                Unknown(e.Name.LocalName, c, kept: true);
             }
         }
     }
@@ -778,10 +784,26 @@ internal sealed class MvrXmlParser
         }
     }
 
+    /// <summary>
+    /// Parses a uuid in any .NET text form, and also as 16 hex byte pairs separated by spaces
+    /// (<c>"4A B1 94 62 A6 E3 4C 3B B2 5A D8 09 9F 78 17 0C"</c>), which older exporters write and the DIN SPEC 15801
+    /// example of <c>Focus</c> and <c>Position</c> shows; the bytes are read in text order. The nil uuid is rejected.
+    /// </summary>
     internal static bool TryGuid(string? text, out Guid id)
     {
         id = Guid.Empty;
-        return !string.IsNullOrWhiteSpace(text) && Guid.TryParse(text.Trim(), out id) && id != Guid.Empty;
+        if (string.IsNullOrWhiteSpace(text)) return false;
+        var t = text.AsSpan().Trim();
+        if (Guid.TryParse(t, out id)) return id != Guid.Empty;
+        Span<char> hex = stackalloc char[32];
+        int n = 0;
+        foreach (char c in t)
+        {
+            if (char.IsWhiteSpace(c)) continue;
+            if (n == hex.Length || !char.IsAsciiHexDigit(c)) return false;
+            hex[n++] = c;
+        }
+        return n == hex.Length && Guid.TryParseExact(hex, "N", out id) && id != Guid.Empty;
     }
 
     private static bool TryFloat(string text, out float value)
@@ -809,13 +831,19 @@ internal sealed class MvrXmlParser
             owner);
     }
 
-    private void Unknown(string context, XElement e)
+    /// <summary>
+    /// Reports an element this reader does not know. <paramref name="kept"/> tells whether the caller stored it in an
+    /// <c>UnknownElements</c> list (objects, geometry, layers, AUXData, child lists), so a document round trip writes it
+    /// back; elsewhere (inside containers such as <c>Addresses</c>) it is dropped, and the message says so.
+    /// </summary>
+    private void Unknown(string context, XElement e, bool kept = false)
     {
         string name = e.Name.LocalName;
+        string fate = kept ? "kept in the document" : "not kept: a document round trip drops it";
         _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.UnknownElement, context + "/" + name,
             n => n == 1
-                ? $"Unknown element <{name}> in <{context}> ignored (kept in the document)."
-                : $"Unknown element <{name}> in <{context}> ignored {n} times (kept in the document).");
+                ? $"Unknown element <{name}> in <{context}> ignored ({fate})."
+                : $"Unknown element <{name}> in <{context}> ignored {n} times ({fate}).");
     }
 
     private void ReportUnknownChildren(string context, XElement e, string[] known)

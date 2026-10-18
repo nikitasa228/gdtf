@@ -182,9 +182,11 @@ public sealed class FokinaTests
         Assert.False(fc.CastShadow);
 
         AssertProperRotation(entity.Local);
-        // The fixture hangs: its local Z (GDTF beam axis is −Z) points down.
-        var down = Vector3.Transform(Vector3.UnitZ, entity.Local.Rotation);
-        Assert.True(down.Z < -0.999f, $"local Z maps to {down}");
+        // GDTF describes fixtures hanging, beam along local −Z. This one stands upright on the stage (rotated 180°
+        // about Y): its local Z points down, so its beam points up.
+        var localZ = Vector3.Transform(Vector3.UnitZ, entity.Local.Rotation);
+        Assert.True(localZ.Z < -0.999f, $"local Z maps to {localZ}");
+        Assert.True(Vector3.Transform(-Vector3.UnitZ, entity.Local.Rotation).Z > 0.999f, "the beam points up");
     }
 
     [Fact]

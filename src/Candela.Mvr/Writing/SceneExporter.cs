@@ -5,6 +5,7 @@ using Candela.Core.Diagnostics;
 using Candela.Core.Geometry;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
+using Candela.Gdtf;
 
 namespace Candela.Mvr;
 
@@ -24,6 +25,8 @@ internal sealed class SceneExporter
     private readonly Dictionary<Guid, MvrDeviceObject> _devices = new();
     private readonly List<(MvrLayer Layer, MvrFocusPoint Point)> _focusPoints = new();
     private readonly Dictionary<string, string> _gdtfFiles = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, byte[]> _gdtfBytes = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string?> _firstModes = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, string?> _modelFiles = new();
     private readonly Dictionary<string, string?> _wallFiles = new(StringComparer.Ordinal);
     private readonly HashSet<string> _fileNames = new(StringComparer.OrdinalIgnoreCase);
@@ -164,6 +167,13 @@ internal sealed class SceneExporter
                 if (fixture is not null) ApplyFixture(device, fixture, e, layer);
                 else if (mesh is { CastShadow: false }) device.CastShadow = false;
 
+                // MVR 1.6 makes FixtureID and FixtureIDNumeric mandatory on every device object, UnitNumber on
+                // fixtures and ChainLength on supports; write neutral values where the scene has none.
+                device.FixtureId ??= "";
+                device.FixtureIdNumeric ??= 0;
+                if (device is MvrFixture { UnitNumber: null } unitless) unitless.UnitNumber = 0;
+                if (device is MvrSupport { ChainLength: null } support) support.ChainLength = 0;
+
                 var geometryChildren = device is MvrFixture ? null : GeometryChildren(e);
                 foreach (var c in e.Children)
                 {
@@ -223,6 +233,17 @@ internal sealed class SceneExporter
             d.GdtfSpec = EmbedGdtf(spec, e.Id);
         }
         d.GdtfMode = string.IsNullOrWhiteSpace(fc.GdtfMode) ? null : fc.GdtfMode.Trim();
+        if (d.GdtfMode is null && spec.Length > 0)
+        {
+            // Core null means "the first mode"; MVR requires GDTFMode whenever GDTFSpec is written.
+            d.GdtfMode = FirstModeOf(spec);
+            if (d.GdtfMode is null)
+            {
+                _sink.Aggregate(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.ExportResourceMissing, "fixture-no-mode",
+                    n => $"{n} fixture(s) have no DMX mode and the first mode of their GDTF is not known (the file was not supplied or has no modes); they are written without the GDTFMode MVR requires.",
+                    e.Id);
+            }
+        }
         d.CastShadow = fc.CastShadow;
 
         foreach (var a in fc.Addresses)
@@ -368,10 +389,32 @@ internal sealed class SceneExporter
 
     // ------------------------------------------------------------------ embedded files
 
+    /// <summary>Name of the first DMX mode of the GDTF embedded for <paramref name="spec"/> (parsed once), or null.</summary>
+    private string? FirstModeOf(string spec)
+    {
+        if (_firstModes.TryGetValue(spec, out var cached)) return cached;
+        string? mode = null;
+        if (_gdtfBytes.TryGetValue(spec, out var bytes))
+        {
+            try
+            {
+                using var archive = GdtfArchive.FromBytes(bytes, spec);
+                mode = GdtfReader.Read(archive).DmxModes.FirstOrDefault(m => !string.IsNullOrWhiteSpace(m.Name))?.Name;
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                // Supplied bytes that the GDTF reader cannot handle: reported by the caller as a fixture written
+                // without a mode.
+            }
+        }
+        _firstModes[spec] = mode;
+        return mode;
+    }
+
     private string EmbedGdtf(string spec, Guid user)
     {
         if (_gdtfFiles.TryGetValue(spec, out var existing)) return existing;
-        string name = UniqueFileName(GdtfResolver.EnsureGdtfExtension(MvrDocument.FileNameOf(MvrDocument.NormalizePath(spec))));
+        string name = UniqueFileName(ArchiveFileName(GdtfResolver.EnsureGdtfExtension(MvrDocument.FileNameOf(MvrDocument.NormalizePath(spec)))));
         _gdtfFiles[spec] = name;
 
         if (_options.GdtfProvider is null)
@@ -408,7 +451,21 @@ internal sealed class SceneExporter
             return name;
         }
         _doc.Files.Add(new MvrEmbeddedFile(name, bytes));
+        _gdtfBytes[spec] = bytes;
         return name;
+    }
+
+    /// <summary>
+    /// Replaces characters that MVR file names must not contain (FAT32/NTFS reserved characters and control characters)
+    /// with '_'; the name stays otherwise as the scene has it.
+    /// </summary>
+    internal static string ArchiveFileName(string name)
+    {
+        var sb = new StringBuilder(name.Length);
+        foreach (char ch in name)
+            sb.Append(ch < ' ' || ch is '<' or '>' or ':' or '"' or '/' or '\\' or '|' or '?' or '*' ? '_' : ch);
+        string result = sb.ToString().Trim();
+        return result.StartsWith('.') ? "_" + result : result;
     }
 
     /// <summary>

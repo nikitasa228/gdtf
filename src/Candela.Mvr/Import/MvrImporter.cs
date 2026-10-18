@@ -73,6 +73,13 @@ public static class MvrImporter
     {
         private const int MaxSymbolDepth = 32;
 
+        /// <summary>
+        /// Geometry instances that symbol expansion may create in one import. Nested symbols multiply (a symdef with ten
+        /// symbols of a symdef with ten symbols …), so a broken or malicious file could otherwise ask for billions of
+        /// meshes; expansion stops at this budget and the cut is reported.
+        /// </summary>
+        internal const int MaxExpandedGeometries = 250_000;
+
         private readonly MvrDocument _doc;
         private readonly MvrImportOptions _options;
         private readonly Scene _scene;
@@ -87,6 +94,7 @@ public static class MvrImporter
         private readonly Dictionary<Guid, MvrSymdef> _symdefs = new();
         private readonly Dictionary<Guid, Vector3> _focusWorld = new();
         private readonly Dictionary<string, List<Guid>> _specUsers = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _patchedSpecs = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<(string Spec, string Mode), List<int>> _modeAddresses = new(SpecModeComparer.Instance);
         private readonly Dictionary<(string Spec, string Mode), int> _modeUsers = new(SpecModeComparer.Instance);
         private readonly Dictionary<(string Spec, string Mode), MvrModeResolution> _modes = new(SpecModeComparer.Instance);
@@ -101,6 +109,8 @@ public static class MvrImporter
         private readonly List<Layer> _layers = new();
         private readonly Dictionary<Guid, Layer> _layerMap = new();
         private readonly List<(MvrDeviceObject Object, Entity Entity)> _connectionOwners = new();
+        private int _geometryBudget = MaxExpandedGeometries;
+        private bool _geometryBudgetReported;
 
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
         {
@@ -118,6 +128,7 @@ public static class MvrImporter
             {
                 _scene = target;
                 _merge = true;
+                if (target.Layers.Count == 0) target.Layers.Add(new Layer { Name = "Default" }); // DefaultLayer needs one
                 _group = new Entity(options.GroupName ?? baseName) { LayerId = target.DefaultLayer.Id };
                 _group.Add(new GroupComponent());
                 _idNamespace = _group.Id;
@@ -187,6 +198,7 @@ public static class MvrImporter
                         string spec = d.GdtfSpec.Trim();
                         if (!_specUsers.TryGetValue(spec, out var users)) _specUsers[spec] = users = new List<Guid>();
                         users.Add(id);
+                        if (d.Addresses.Count > 0) _patchedSpecs.Add(spec);
                         var key = (spec, (d.GdtfMode ?? "").Trim());
                         _modeUsers[key] = _modeUsers.GetValueOrDefault(key) + 1;
                         if (!_modeAddresses.TryGetValue(key, out var list)) _modeAddresses[key] = list = new List<int>();
@@ -210,7 +222,7 @@ public static class MvrImporter
         {
             foreach (var (spec, users) in _specUsers)
             {
-                var r = _resolver.Resolve(spec, users);
+                var r = _resolver.Resolve(spec, users, _patchedSpecs.Contains(spec));
                 r.ObjectCount = users.Count;
                 _gdtfs[spec] = r;
             }
@@ -317,9 +329,11 @@ public static class MvrImporter
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {
-                // One broken object must not abort the import of the rest of the scene.
-                _sink.Add(IssueSeverity.Error, IssueCategory.Program, "mvr.object-failed",
-                    $"{obj.Kind} '{obj.Name}' ({obj.Uuid}) could not be imported: {e.Message}");
+                // One broken object must not abort the import of the rest of the scene: report it and import its
+                // children under its parent, composed with its matrix so they keep their place in the world.
+                _sink.Add(IssueSeverity.Error, IssueCategory.Program, MvrIssueCodes.ObjectFailed,
+                    $"{obj.Kind} '{obj.Name}' ({obj.Uuid}) could not be imported ({e.Message}); its children are attached to its parent.");
+                foreach (var c in obj.ChildObjects) Build(c, parentEntity, parentObject, layerId, c.Matrix * local);
                 return;
             }
 
@@ -417,9 +431,23 @@ public static class MvrImporter
                 }
             }
 
-            foreach (var a in d.Addresses) fc.Addresses.Add(a.ToDmxAddress());
+            foreach (var a in d.Addresses)
+            {
+                var dmx = a.ToDmxAddress();
+                // The break "has to be unique for one fixture"; a second address for it would make the patch ambiguous.
+                if (fc.Addresses.Exists(x => x.Break == dmx.Break))
+                {
+                    _sink.Add(IssueSeverity.Warning, IssueCategory.Patch, MvrIssueCodes.AddressInvalid,
+                        string.Create(CultureInfo.InvariantCulture,
+                            $"'{d.Name}' has more than one address for DMX break {a.Break}; only the first ({fc.Addresses.First(x => x.Break == dmx.Break)}) is used."),
+                        _ids[d]);
+                    continue;
+                }
+                fc.Addresses.Add(dmx);
+            }
             fc.FixtureId = FixtureIdOf(d);
-            if (d.UnitNumber is { } unit) fc.UnitNumber = unit.ToString(CultureInfo.InvariantCulture);
+            // 0 is the neutral value exporters write because MVR makes UnitNumber mandatory on fixtures: no unit number.
+            if (d.UnitNumber is { } unit && unit != 0) fc.UnitNumber = unit.ToString(CultureInfo.InvariantCulture);
             if (parentObject is MvrTruss or MvrSupport && parentEntity is not null) fc.MountedOn = parentEntity.Id;
 
             if (d is MvrFixture f)
@@ -503,10 +531,24 @@ public static class MvrImporter
         {
             foreach (var g in geometries)
             {
+                // Checked for symbols too: a tree of symbols without files must not be walked to the end either.
+                if (_geometryBudget <= 0)
+                {
+                    if (!_geometryBudgetReported)
+                    {
+                        _geometryBudgetReported = true;
+                        _sink.Add(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.GeometryLimit,
+                            string.Create(CultureInfo.InvariantCulture,
+                                $"The file expands to more than {MaxExpandedGeometries} geometry instances (nested symbols multiply); the rest of the geometry is not imported."),
+                            owner);
+                    }
+                    return;
+                }
                 var local = g.Matrix * parent;
                 switch (g)
                 {
                     case MvrGeometry3D g3:
+                        _geometryBudget--;
                         output.Add((g3, local, symbolName ?? Path.GetFileNameWithoutExtension(g3.FileName)));
                         break;
                     case MvrSymbol s:
@@ -522,6 +564,7 @@ public static class MvrImporter
                                 $"Symdef '{def.Name}' ({def.Uuid}) instances itself; the recursion is cut.", owner);
                             break;
                         }
+                        _geometryBudget--; // every expansion step counts, so symbol trees without files stay bounded
                         Flatten(def.Geometries, local, output, visiting, depth + 1, owner, def.Name.Length > 0 ? def.Name : symbolName);
                         visiting.Remove(def.Uuid);
                         break;
@@ -535,6 +578,14 @@ public static class MvrImporter
             if (_assetByFile.TryGetValue(key, out var cached)) return cached;
             ImportedAsset? asset = null;
             var file = _doc.FindFile(fileName);
+            // MVR: "if there is no extension, it will assume that the extension is 3ds".
+            if (file is null && Path.GetExtension(key).Length == 0) file = _doc.FindFile(key + ".3ds");
+            // Different spellings of one archive file ("Box.glb", "./box.glb", "truss" for "truss.3ds") share its asset.
+            if (file is not null && _assetByFile.TryGetValue(file.Name, out var sameFile))
+            {
+                _assetByFile[key] = sameFile;
+                return sameFile;
+            }
             if (file is null)
             {
                 _sink.Add(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.FileMissing,
@@ -583,6 +634,7 @@ public static class MvrImporter
                 if (asset is not null) _assets.Add(asset);
             }
             _assetByFile[key] = asset;
+            if (file is not null) _assetByFile[file.Name] = asset;
             return asset;
         }
 

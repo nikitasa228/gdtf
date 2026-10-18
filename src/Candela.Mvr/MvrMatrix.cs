@@ -44,28 +44,37 @@ public static class MvrMatrix
         Span<int> sizes = stackalloc int[4];
         if (!TryReadGroups(text, v, sizes, out int groups, out int count)) return false;
 
+        Matrix4x4 m;
         if (groups == 4 && count == 12 && sizes[0] == 3 && sizes[1] == 3 && sizes[2] == 3 && sizes[3] == 3)
         {
-            matrix = Create(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]);
-            return true;
+            m = Create(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11]);
         }
-        if (groups == 4 && count == 16 && sizes[0] == 4 && sizes[1] == 4 && sizes[2] == 4 && sizes[3] == 4)
+        else if (groups == 4 && count == 16 && sizes[0] == 4 && sizes[1] == 4 && sizes[2] == 4 && sizes[3] == 4 &&
+                 v[3] == 0 && v[7] == 0 && v[11] == 0 && v[15] == 1)
         {
-            bool rowLayout = v[3] == 0 && v[7] == 0 && v[11] == 0 && v[15] == 1;
-            bool columnLayout = v[12] == 0 && v[13] == 0 && v[14] == 0 && v[15] == 1;
-            if (rowLayout)
-            {
-                matrix = Create(v[0], v[1], v[2], v[4], v[5], v[6], v[8], v[9], v[10], v[12], v[13], v[14]);
-                return true;
-            }
-            if (columnLayout)
-            {
-                matrix = Create(v[0], v[4], v[8], v[1], v[5], v[9], v[2], v[6], v[10], v[3], v[7], v[11]);
-                return true;
-            }
+            m = Create(v[0], v[1], v[2], v[4], v[5], v[6], v[8], v[9], v[10], v[12], v[13], v[14]);
         }
-        return false;
+        else if (groups == 4 && count == 16 && sizes[0] == 4 && sizes[1] == 4 && sizes[2] == 4 && sizes[3] == 4 &&
+                 v[12] == 0 && v[13] == 0 && v[14] == 0 && v[15] == 1)
+        {
+            m = Create(v[0], v[4], v[8], v[1], v[5], v[9], v[2], v[6], v[10], v[3], v[7], v[11]);
+        }
+        else
+        {
+            return false;
+        }
+        // Values that are finite as doubles can still overflow single precision (e.g. 1e300 mm).
+        if (!IsFinite(m)) return false;
+        matrix = m;
+        return true;
     }
+
+    /// <summary>True when every element of the affine part is finite.</summary>
+    internal static bool IsFinite(Matrix4x4 m) =>
+        float.IsFinite(m.M11) && float.IsFinite(m.M12) && float.IsFinite(m.M13) &&
+        float.IsFinite(m.M21) && float.IsFinite(m.M22) && float.IsFinite(m.M23) &&
+        float.IsFinite(m.M31) && float.IsFinite(m.M32) && float.IsFinite(m.M33) &&
+        float.IsFinite(m.M41) && float.IsFinite(m.M42) && float.IsFinite(m.M43);
 
     /// <summary>
     /// Formats a row-vector matrix (metres) as an MVR matrix string in millimetres. Rotation values use the shortest

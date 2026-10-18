@@ -22,9 +22,14 @@ GDTF parsing, the fixture library, 3DS/glTF decoding), plus SharpGLTF for writin
 
 ## What is read
 
-Element and attribute names are matched ignoring case and XML namespaces. Elements the reader does not know are kept
+Element and attribute names are matched ignoring case and XML namespaces. Elements the reader does not know are
+reported. Where they sit directly in an object, a geometry entry, a layer, `AUXData` or a `ChildList`, they are kept
 verbatim (`UnknownElements` on the owner) and written back by `WriteDocument`. Depence's `<FixtureTypeId>` is an
-example: it is not part of MVR.
+example: it is not part of MVR. Unknown children of the other containers (`Addresses`, `Protocols`, `Mappings`, …) and
+unknown attributes are dropped; the note says which.
+
+Uuids are read in any .NET text form and also as 16 space-separated hex byte pairs (`4A B1 94 62 …`), as older
+exporters write them and as the DIN SPEC 15801 example of `Focus` and `Position` shows.
 
 * **Document:** `verMajor`, `verMinor`, `provider`, `providerVersion`, and `UserData/Data` blocks (kept as XML).
 * **AUXData:**
@@ -39,7 +44,8 @@ example: it is not part of MVR.
   * `Geometries` (`Geometry3D` with `fileName`, and `Symbol` with `symdef`, each with its own `Matrix`);
   * `GDTFSpec`, `GDTFMode`, `CastShadow`, `Position`, `Function`, `FixtureID`, `FixtureIDNumeric`, `UnitNumber` and
     `ChildPosition`;
-  * `Addresses`: each `Address` (break, absolute or `universe.address` value, raw text kept) and `Network`;
+  * `Addresses`: each `Address` (break, absolute or `universe.address` value, raw text kept) and `Network`. An address
+    of `0` means "not patched": no address is created, and one note counts them;
   * `Protocols`, `Alignments`, `CustomCommands`, `Overwrites`, `Connections`, `CustomIdType`, `CustomId` and
     `multipatch`.
 
@@ -50,7 +56,8 @@ example: it is not part of MVR.
   * Projector: `Projections`.
 * **Embedded files:** every archive entry except the scene description, in archive order, with its kind (GDTF, 3DS,
   glTF, GLB, image, other). If `GeneralSceneDescription.xml` sits in a folder rather than at the archive root,
-  references are resolved from that folder, and a note is reported.
+  references are resolved from that folder, and a note is reported. A `Geometry3D fileName` without extension is a
+  3DS file, as the spec says: `truss` finds `truss.3ds`, and an entry named just `truss` is decoded as 3DS.
 
 ## Coordinates and matrices
 
@@ -67,7 +74,8 @@ objects.
 
 The parser also accepts a 4×4 matrix written as four groups of four. If the last column is `0,0,0,1` it is read as rows.
 If the last row is `0,0,0,1` it is read as the GDTF column layout. Any other text, a wrong number of values, or a
-non-finite value is a `mvr.matrix-invalid` warning, and identity is used instead. An empty `<Matrix/>` means identity
+non-finite value (including numbers too large for single precision, such as `1e300`) is a `mvr.matrix-invalid`
+warning, and identity is used instead. An empty `<Matrix/>` means identity
 and is not reported.
 
 ### Decomposition into entity transforms
@@ -136,12 +144,15 @@ or that already exists in the target scene during a merge, is replaced by a dete
 * universe = `(v − 1) / 512 + 1`;
 * address = `(v − 1) % 512 + 1`.
 
-The `universe.address` notation is accepted as well. MVR breaks are 0-based (`break="0"` patches GDTF `DMXBreak` 1)
+The `universe.address` notation is accepted as well. A break must be unique per object; when one repeats, the first
+address is used and the others are reported (the document keeps them all). MVR breaks are 0-based (`break="0"` patches GDTF `DMXBreak` 1)
 and Core breaks are 1-based, so MVR break `b` becomes `Break = b + 1`. Example: the Фокина probe fixture has
 `<Address break="0">741</Address>`, which becomes `DmxAddress(2, 229, 1)`.
 
 **Geometry.** Symbols are expanded through their `Symdef`s, recursively, so nested symdefs work. Recursion is cut at a
-self-reference (`mvr.symdef-cycle`) or at a depth of 32. Then:
+self-reference (`mvr.symdef-cycle`) or at a depth of 32. Nested symbols multiply (ten symbols of a symdef with ten
+symbols …), so one import expands at most 250 000 symbols and geometry instances; beyond that the rest is skipped and
+reported once (`mvr.geometry-limit`). Then:
 
 * when an object has exactly one geometry at its own origin, the mesh goes on the entity itself;
 * when it has several geometries, or one with an offset, they become child entities. Each child holds one
@@ -150,7 +161,8 @@ self-reference (`mvr.symdef-cycle`) or at a depth of 32. Then:
 * for a truss, the first geometry at the origin is the truss model.
 
 Model files are imported once each, as `ImportedAsset`s with content-addressed ids (the same file gives the same id
-on every import). They are decoded when `ValidateGeometry` is set (the default):
+on every import). References that spell one archive file differently (`Box.glb`, `./box.glb`, `truss` for
+`truss.3ds`) share its asset. They are decoded when `ValidateGeometry` is set (the default):
 
 * 3DS is in millimetres and scaled to metres;
 * glTF/GLB is Y up and rotated to Z up, `(x, y, z) → (x, −z, y)`;
@@ -167,17 +179,24 @@ with one dimmer channel and no geometry. For each distinct `GDTFSpec` the import
 1. **Complete embedded GDTF.** Used as is (`MvrGdtfSource.Embedded`). A GDTF counts as complete when it has a DMX mode
    with channels *and* a geometry with a drawable model: either a primitive, or a model file that exists in the
    archive.
-2. **Fixture library**, when the embedded file is a stub, unreadable or missing (`MvrGdtfSource.Library`). Candidates
-   come from:
+2. **Fixture library**, when the embedded file is incomplete, unreadable or missing (`MvrGdtfSource.Library`).
+   Candidates come from:
    * the stub's `FixtureTypeID`;
    * `FixtureLibrary.FindBySpec(GDTFSpec)`, which parses `Manufacturer@Model[@Revision].gdtf` tolerating spaces, case,
      underscores and punctuation, so `Ayrton @Rivale Profile.gdtf` works;
    * the stub's own Manufacturer, Name and LongName.
 
-   An exact model beats a substitute, then the higher name score wins. A same-brand **substitute** (the model is not in
-   the library) is reported as a `mvr.gdtf-substitute` warning that names the stand-in. A stub replaced by the exact
-   model gets a `mvr.gdtf-stub` note.
-3. **The stub itself** (`MvrGdtfSource.EmbeddedStub`), reported as a `mvr.gdtf-unresolved` warning.
+   An exact model beats a substitute, then the higher name score wins. A stub replaced by the exact model gets a
+   `mvr.gdtf-stub` note. A same-brand **substitute** (the model is not in the library) is a different fixture, so it
+   only replaces a missing or unreadable file or a **placeholder stub**: no drawable geometry and at most one DMX
+   channel per mode, as Depence writes them (a placeholder without any channel counts only when its objects are
+   patched). It is reported as a `mvr.gdtf-substitute` warning that names the stand-in.
+3. **The embedded file itself** (`MvrGdtfSource.EmbeddedStub`):
+   * an incomplete GDTF that is not a placeholder (a real DMX layout without a drawable model, or an unpatched passive
+     device without channels such as a bracket) is kept when the library has no exact model, because a substitute
+     would change the device and its patch. This is a `mvr.gdtf-no-geometry` warning. 17 of the 1091 library files
+     are such GDTFs (for example `Brighter@Smart_Hybrid_280_Pro`, whose geometries link no model);
+   * a placeholder the library has nothing for is a `mvr.gdtf-unresolved` warning.
 4. **Nothing** (`MvrGdtfSource.Unresolved`), reported as a `mvr.gdtf-unresolved` error. The fixture is still created,
    placed and patched, and it keeps the spec and mode as written, so adding the GDTF later resolves it.
 
@@ -223,7 +242,8 @@ There are no errors. Adding the real GDTFs to the library turns the substitutes 
 `Merge(target, document)` adds one root entity named after the file (or `MvrImportOptions.GroupName`) with a
 `GroupComponent`, and imports everything below it:
 
-* layers are matched by uuid, then by name, and missing layers are added;
+* layers are matched by uuid, then by name, and missing layers are added (a target without any layer first gets a
+  `Default` one for the group);
 * repeated uuids are remapped (`mvr.id-remapped`), so the same file can be merged twice;
 * `Merge` mutates the target scene, so it must run on the scene's owning thread. Read the document in the background
   first.
@@ -253,7 +273,16 @@ There are no errors. Adding the real GDTFs to the library turns the substitutes 
   `FixtureIDNumeric`, `UnitNumber` (when numeric), `CustomId`, `Color`, `CastShadow` and `Focus` are written. A
   `FocusPoint` object with a deterministic uuid is created for each focused fixture. Out-of-range addresses and
   non-finite colours or focus points are reported and skipped.
+* **Mandatory elements.** MVR 1.6 requires some elements whatever the scene holds, so they get neutral values:
+  * `FixtureID` (empty) and `FixtureIDNumeric` (0) on every device object (`SceneObject`, `Fixture`, `Truss`,
+    `Support`), `UnitNumber` 0 on fixtures, `ChainLength` 0 on supports, and `Geometries` (possibly empty) on every
+    device object except fixtures; the importer reads `UnitNumber` 0 back as "no unit number";
+  * `GDTFMode` whenever `GDTFSpec` is written: Core's `GdtfMode = null` means "the first mode", so the first mode's name
+    is read from the embedded GDTF. Without the GDTF bytes the fixture is written without a mode and reported;
+  * `Projections` on a `Projector` (document round trip), even when empty.
 * **GDTF files.** Each distinct spec is requested once from `GdtfProvider(specName)` and embedded at the archive root.
+  Characters MVR file names must not contain (FAT32/NTFS reserved characters and control characters) become `_` in
+  the archive name and in `GDTFSpec`.
   A missing, unreadable or non-zip result is reported (`mvr.export-resource-missing`), and the file is then referenced
   without being embedded. `MvrExportOptions.GdtfFromLibrary(library, folders…)` reads library files by name.
 * **Models.** Each `MeshComponent` or `TrussComponent` model is requested once from `ModelProvider(assetId)` and
@@ -277,7 +306,7 @@ temporary file and replaces the target, so a failed export never leaves a trunca
 
 **Document round trip.** `MvrWriter.WriteDocument(MvrReader.Read(x))` writes everything the reader kept:
 
-* unknown elements and `UserData`;
+* the unknown elements it kept (see "What is read") and `UserData`, without adding attributes the blocks did not have;
 * class, position and mapping definitions;
 * symdefs;
 * all object attributes;
@@ -298,12 +327,21 @@ Writing the result again gives the same bytes.
 
   Only data that is not an MVR archive throws `MvrFormatException`: not a zip, no `GeneralSceneDescription.xml`,
   malformed XML, a wrong root element, or an unreadable scene description entry.
-* **Containment.** Each object is built under its own guard during import, so one failure never loses the scene.
+* **Containment.** Each object is built under its own guard during import, so one failure never loses the scene: a
+  failed object is reported (`mvr.object-failed`) and its children are attached to its parent at their world place.
   Repetitive issues are aggregated, and issues are capped at 2000 per pass.
+* **Hostile files.** Limits keep a broken or malicious file from exhausting the machine; each one that applies is
+  reported:
+  * XML nesting is limited to `MvrReader.MaxXmlDepth` (512) levels, about 250 levels of nested objects. The depth is
+    measured in a streaming pass first; a deeper document is pruned while it is streamed (`mvr.nesting-too-deep`), so
+    neither the recursive readers nor XDocument (which slows down more than quadratically with depth: 20 000 nested
+    groups take it half a minute) see the excess;
+  * embedded files are read up to 1 GiB each and 2 GiB in total, whatever sizes the zip directory declares;
+  * symbol expansion stops after 250 000 instances (`mvr.geometry-limit`).
 * **XML safety.** DTDs are ignored and external entities are never resolved.
 * **Cost.** Lookups are dictionary based: uuids, files, symdefs, GDTF specs and modes. Each GDTF and model is parsed
   once per import. `stages/Фокина.mvr` reads, resolves and imports in well under a second, library scan included.
-  The whole test suite takes about a second.
+  The whole test suite takes a few seconds.
 
 ## Tests
 
@@ -311,7 +349,8 @@ Writing the result again gives the same bytes.
 
 * **`FokinaTests`.** Reads every element of the Depence file, resolves all 91 fixtures to library GDTFs with the
   report per spec, and checks the probe fixture: uuid `B1E1000D-…`, at (4.485159, 16.74185, 1.760395) m, address
-  741 → universe 2 address 229, with an orthonormal rotation whose beam points down. Every entity transform must
+  741 → universe 2 address 229, with an orthonormal rotation; it stands upright on the stage (local Z points down,
+  so its GDTF beam, along local −Z, points up). Every entity transform must
   reproduce its MVR matrix. The scene is exported and re-imported (same entities, positions within 1e-4 m, same
   patch, specs and modes, byte-identical repeated export), and merged twice into a venue scene.
 * **`SyntheticTests`.** A hand-written MVR 1.6 archive with every object type and nearly every attribute: nested
@@ -332,6 +371,11 @@ Writing the result again gives the same bytes.
   * a description in a sub-folder and minimal or empty descriptions;
   * the archive errors that do throw;
   * an export with failing callbacks and invalid component values.
+* **`ConformanceTests`.** DIN SPEC 15801 details and hostile input: `Geometry3D` names without extension, uuids as hex
+  byte pairs, an address of 0, single-precision overflow in matrices, accurate notes for unknown elements, the
+  elements MVR 1.6 makes mandatory on export, no invented `UserData` attributes, GDTFs without drawable models that
+  must keep their DMX layout instead of a substitute, 20 000 nested groups, 10⁹ nested symbol instances and a glTF with
+  an invalid URI.
 
 ## Known gaps
 
@@ -343,7 +387,10 @@ Writing the result again gives the same bytes.
   FocusPoints are not entities, and their geometry is not imported. Geometries on `Fixture` elements are ignored,
   because the body comes from the GDTF.
 * **FixtureID.** `FixtureID` is text in MVR but an integer in Core. A non-numeric ID without `FixtureIDNumeric`
-  imports as 0, with a note.
+  imports as 0, with a note. `UnitNumber` 0 imports as "no unit number".
+* **Unknown content.** Unknown attributes, and unknown elements inside containers such as `Addresses`, `Protocols` or
+  `Mappings`, are reported but not kept, so a document round trip drops them. Values outside an enumeration (for
+  example `ScaleHandeling` `UpScale`, which the spec's own example uses) are reported and dropped the same way.
 * **Cables.** Connections carry ports only. Imported cables are straight two-node cables between the device origins.
 * **Model export.** Textures are not embedded in exported GLBs (only material factors), glTF animations are ignored on
   import, and a truss's length is taken from its model bounds along X.

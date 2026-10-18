@@ -5,9 +5,11 @@ using Candela.Gdtf;
 namespace Candela.Mvr;
 
 /// <summary>
-/// Resolves the <c>GDTFSpec</c> references of an MVR: a complete embedded GDTF wins; a stub (no geometry or no DMX
-/// modes, as Depence writes them) or a missing file is replaced by the fixture library's file for the same
-/// manufacturer and model; the stub itself is the last resort.
+/// Resolves the <c>GDTFSpec</c> references of an MVR: a complete embedded GDTF wins; an incomplete one (no drawable
+/// geometry or no DMX channels) or a missing file is replaced by the fixture library's file of the same model. A
+/// same-brand substitute of a different model replaces only a missing file or a placeholder stub (at most one DMX
+/// channel per mode, as Depence writes them); an incomplete GDTF with a real DMX layout, or a passive device without
+/// channels that nobody patched, is kept, because a different model would change the patch and the device.
 /// </summary>
 internal sealed class GdtfResolver
 {
@@ -26,19 +28,22 @@ internal sealed class GdtfResolver
 
     public IReadOnlyList<MvrGdtfReference> References => _ordered;
 
-    /// <summary>The resolution of a spec (resolved once per distinct spec; <paramref name="users"/> are listed in issues).</summary>
-    public MvrGdtfReference Resolve(string spec, IReadOnlyList<Guid> users)
+    /// <summary>
+    /// The resolution of a spec (resolved once per distinct spec; <paramref name="users"/> are listed in issues;
+    /// <paramref name="patched"/> tells whether any of them has a DMX address).
+    /// </summary>
+    public MvrGdtfReference Resolve(string spec, IReadOnlyList<Guid> users, bool patched = true)
     {
         string key = spec.Trim();
         if (_bySpec.TryGetValue(key, out var existing)) return existing;
         var r = new MvrGdtfReference(key);
         _bySpec[key] = r;
         _ordered.Add(r);
-        ResolveCore(r, users.Take(64).ToArray());
+        ResolveCore(r, users.Take(64).ToArray(), patched);
         return r;
     }
 
-    private void ResolveCore(MvrGdtfReference r, Guid[] users)
+    private void ResolveCore(MvrGdtfReference r, Guid[] users, bool patched)
     {
         string spec = r.SpecName;
         FixtureType? embedded = null;
@@ -60,11 +65,14 @@ internal sealed class GdtfResolver
                     embedded = GdtfReader.Read(archive);
                     r.EmbeddedIsStub = !IsComplete(embedded, archive);
                 }
-                catch (Exception e) when (e is GdtfFormatException or InvalidDataException or IOException)
+                catch (Exception e) when (e is not OutOfMemoryException)
                 {
+                    // The embedded file is untrusted content: whatever the GDTF reader throws on it is a content
+                    // problem of this one spec, never a reason to abort the import.
                     _sink.Add(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.GdtfUnreadable,
                         $"Embedded GDTF '{file.Name}' is not a readable GDTF ({e.Message}).", users);
                     r.EmbeddedBytes = null;
+                    embedded = null;
                 }
             }
             if (embedded is not null && !r.EmbeddedIsStub)
@@ -77,6 +85,18 @@ internal sealed class GdtfResolver
         }
 
         var match = FindInLibrary(spec, embedded);
+        if (match is { Kind: FixtureMatchKind.Substitute } && embedded is not null && !IsPlaceholder(embedded, patched))
+        {
+            // The embedded file only lacks a drawable model; its DMX layout (or its being a passive device) is real
+            // information that a different model from the library would replace with a wrong patch.
+            r.Source = MvrGdtfSource.EmbeddedStub;
+            r.FileName = EnsureGdtfExtension(MvrDocument.FileNameOf(r.EmbeddedFileName!));
+            r.FixtureType = embedded;
+            _sink.Add(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.GdtfNoGeometry,
+                $"The embedded '{r.EmbeddedFileName}' has no {StubLacks(embedded)}, and the fixture library does not have '{spec}'. The embedded file is used as is: the library's closest file '{match.Entry.FileName}' is a different model and would change the device and its patch.",
+                users);
+            return;
+        }
         if (match is not null)
         {
             FixtureType? type = null;
@@ -84,7 +104,7 @@ internal sealed class GdtfResolver
             {
                 type = _library!.GetFixtureType(match.Entry);
             }
-            catch (Exception e) when (e is GdtfFormatException or InvalidDataException or IOException or UnauthorizedAccessException)
+            catch (Exception e) when (e is not OutOfMemoryException)
             {
                 _sink.Add(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.GdtfUnreadable,
                     $"Library file '{match.Entry.FileName}' found for '{spec}' cannot be read ({e.Message}).", users);
@@ -175,10 +195,22 @@ internal sealed class GdtfResolver
         return hasChannels && hasGeometry;
     }
 
+    /// <summary>
+    /// A placeholder stub carries no information a substitute would lose: no drawable geometry, at most one DMX channel
+    /// per mode (Depence writes a single dimmer channel), and either one channel somewhere or objects that are patched
+    /// (a passive device such as a bracket has no channels and no address, and is not a placeholder).
+    /// </summary>
+    internal static bool IsPlaceholder(FixtureType type, bool patched)
+    {
+        int maxChannels = 0;
+        foreach (var m in type.DmxModes) maxChannels = System.Math.Max(maxChannels, m.Channels.Count);
+        return maxChannels <= 1 && (maxChannels == 1 || patched);
+    }
+
     private static string StubLacks(FixtureType type)
     {
         bool hasChannels = type.DmxModes.Any(m => m.Channels.Count > 0);
-        return hasChannels ? "geometry" : "DMX modes";
+        return hasChannels ? "drawable geometry" : "DMX channels";
     }
 
     internal static string EnsureGdtfExtension(string name) =>

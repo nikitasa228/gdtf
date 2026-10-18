@@ -14,6 +14,9 @@ public static class MvrIssueCodes
     /// <summary>The file declares a version other than 1.x, or none.</summary>
     public const string VersionUnsupported = "mvr.version";
 
+    /// <summary>Elements nested deeper than <see cref="MvrReader.MaxXmlDepth"/> were dropped with their content.</summary>
+    public const string NestingTooDeep = "mvr.nesting-too-deep";
+
     /// <summary>An element this reader does not know was ignored (kept verbatim in the document).</summary>
     public const string UnknownElement = "mvr.element-unknown";
 
@@ -53,6 +56,12 @@ public static class MvrIssueCodes
     /// <summary>An embedded GDTF is a stub (no geometry or no DMX modes) and was replaced from the library.</summary>
     public const string GdtfStub = "mvr.gdtf-stub";
 
+    /// <summary>
+    /// An embedded GDTF without drawable geometry (or without DMX channels) is used as is: the library does not have the
+    /// model, and a substitute would replace its real DMX layout.
+    /// </summary>
+    public const string GdtfNoGeometry = "mvr.gdtf-no-geometry";
+
     /// <summary>A GDTF was resolved to a different model of the same brand (the exact model is not in the library).</summary>
     public const string GdtfSubstitute = "mvr.gdtf-substitute";
 
@@ -73,6 +82,12 @@ public static class MvrIssueCodes
 
     /// <summary>A 3D file has a format MVR does not support.</summary>
     public const string GeometryUnsupported = "mvr.geometry-unsupported";
+
+    /// <summary>Symbol expansion reached the import's geometry budget; the remaining geometry was not imported.</summary>
+    public const string GeometryLimit = "mvr.geometry-limit";
+
+    /// <summary>An object could not be converted (a program error); its children were attached to its parent.</summary>
+    public const string ObjectFailed = "mvr.object-failed";
 
     /// <summary>A symbol references a symbol definition that does not exist.</summary>
     public const string SymdefMissing = "mvr.symdef-missing";
