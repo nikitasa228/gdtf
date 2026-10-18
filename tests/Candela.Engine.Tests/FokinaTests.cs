@@ -87,7 +87,13 @@ public sealed class FokinaTests
                 litFixtures.Add(entity.Id);
             }
         }
-        Assert.True(litFixtures.Count >= 59, $"only {litFixtures.Count} fixtures lit"); // Zonda (32) and Rivale (27) at least
+        // every fixture lights at open white — the pixel-mapped MagicBlade stand-in included (its pixels' virtual dimmers
+        // and its master dimmer whose channel sets are named the wrong way round, see Candela.Dmx RelationTests) — except
+        // between the flashes of a pure strobe (the Atomic stand-in's 3-channel mode has no steady state)
+        var dark = engine.Scene.Query<FixtureComponent>().Where(x => !litFixtures.Contains(x.Entity.Id)).ToList();
+        Assert.All(dark, x => Assert.True(engine.Dmx.GetState(x.Entity.Id)!.Beams.All(b => b.Strobing && b.Dimmer > 0.99f),
+            $"{x.Component.GdtfSpec} [{engine.Dmx.GetState(x.Entity.Id)!.Profile.Mode.Name}] is dark"));
+        Assert.True(litFixtures.Count >= 87, $"only {litFixtures.Count} fixtures lit");
         Assert.Equal(litBeams, world.Lights.Length);
         foreach (var id in litFixtures)
         {
@@ -95,6 +101,10 @@ public sealed class FokinaTests
             Assert.Equal(beams, world.Lights.Count(l => l.FixtureId == id));
         }
         Assert.All(world.Lights, l => Assert.InRange(l.FieldAngle, l.BeamAngle, StageLightCollector.MaxFieldAngle + 1e-4f));
+        // real optics: no field wider than 4 × the beam (the Rivale Wash stand-in writes its zoom range as beam/field
+        // angle, which used to give a 244° field at mid zoom), and nothing needed the renderer's sanity clamp
+        Assert.All(world.Lights, l => Assert.True(l.FieldAngle <= 4.001f * l.BeamAngle, $"field {l.FieldAngle} for beam {l.BeamAngle}"));
+        Assert.Empty(engine.LightCollector.ClampedFieldFixtures);
     }
 
     [Fact]

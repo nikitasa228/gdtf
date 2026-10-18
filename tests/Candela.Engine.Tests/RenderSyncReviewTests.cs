@@ -141,6 +141,41 @@ public sealed class RenderSyncReviewTests
     }
 
     [Fact]
+    public void Importing_a_gdtf_while_heads_move_keeps_them_where_they_are()
+    {
+        // a library change recompiles every profile; the moving heads continue their move from where they are
+        using var engine = new StageEngine(new StageEngineOptions
+        {
+            Library = Gdtf.FixtureLibrary.Scan(new[] { CopyGdtfs("reload-motion-lib", SceneBuilder.MacViper) }),
+            CacheDirectory = TestEnvironment.NewTempDirectory("reload-motion-cache"),
+        });
+        var head = SceneBuilder.Fixture(engine.Scene, SceneBuilder.MacViper, "Basic", new Vector3(0, 0, 6));
+        var fixture = head.Get<FixtureComponent>()!;
+        fixture.ManualAttributes["Pan"] = -90f;
+        fixture.NotifyChanged();
+        for (int i = 0; i < 10; i++) engine.Tick(Frame);
+        var before = engine.Dmx.GetState(head.Id)!;
+        int axis = before.Profile.Channels[before.Profile.FindChannels("Pan")[0]].Axis;
+        Assert.Equal(-MathF.PI / 2, before.Axes[axis].Pan, 1e-3f);
+
+        fixture.ManualAttributes["Pan"] = 90f;
+        fixture.NotifyChanged();
+        for (int i = 0; i < 20; i++) engine.Tick(Frame);
+        float midway = before.Axes[axis].Pan;
+        Assert.InRange(midway, -MathF.PI / 2 + 0.05f, MathF.PI / 2 - 0.05f);
+
+        Assert.True(engine.Import(Path.Combine(TestEnvironment.Root, SceneBuilder.Naja)).Success);
+        engine.Tick(Frame);
+        var after = engine.Dmx.GetState(head.Id)!;
+        Assert.NotSame(before.Profile, after.Profile);
+        Assert.InRange(after.Axes[axis].Pan, midway, midway + 0.2f);
+        Assert.True(after.IsAnimating);
+        for (int i = 0; i < 300; i++) engine.Tick(Frame);
+        Assert.Equal(MathF.PI / 2, after.Axes[axis].Pan, 1e-3f);
+        Assert.True(engine.Poses.TryGet(head.Id, out var pose) && ReferenceEquals(pose.State, after));
+    }
+
+    [Fact]
     public void Opening_another_scene_while_attached_replaces_everything_drawn()
     {
         using var engine = TestEnvironment.CreateEngine("reopen-attached");
