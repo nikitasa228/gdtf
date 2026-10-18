@@ -29,6 +29,9 @@ public static class ImageImporter
     /// <summary>Largest accepted pixel count (256 megapixels, 1 GiB as RGBA8).</summary>
     public const long MaxPixels = 256L * 1024 * 1024;
 
+    /// <summary>Largest accepted Radiance HDR (64 megapixels, 1 GiB as float RGBA; e.g. an 8192 × 8192 environment).</summary>
+    public const long MaxHdrPixels = 64L * 1024 * 1024;
+
     /// <summary>Identifies an image from its first bytes; null when the format is not recognised or the header is invalid.</summary>
     public static unsafe ImageInfo? Identify(ReadOnlySpan<byte> data)
     {
@@ -65,8 +68,13 @@ public static class ImageImporter
         if (format is null)
             throw new AssetImportException(DescribeUnsupported(data));
         var info = Identify(data) ?? throw new AssetImportException($"The {format.ToUpperInvariant()} image header is damaged.");
-        if (info.Width > MaxDimension || info.Height > MaxDimension || (long)info.Width * info.Height > MaxPixels)
+        long pixels = (long)info.Width * info.Height;
+        if (info.Width > MaxDimension || info.Height > MaxDimension || pixels > (info.IsHdr ? MaxHdrPixels : MaxPixels))
             throw new AssetImportException($"The image is too large ({info.Width} × {info.Height} pixels; at most {MaxDimension} per side).");
+        // A damaged or hostile header can claim a huge image in a few bytes; the decoder would allocate the full pixel
+        // buffer before noticing that the data is missing. No encoding compresses better than these ratios.
+        if (pixels > data.LongLength * MaxPixelsPerByte(format))
+            throw new AssetImportException($"The {format.ToUpperInvariant()} image is damaged: its header claims {info.Width} × {info.Height} pixels, far more than the file holds.");
         try
         {
             ImageData image;
@@ -97,11 +105,32 @@ public static class ImageImporter
         {
             throw;
         }
-        catch (Exception e) when (e is not OutOfMemoryException)
+        catch (OutOfMemoryException e)
+        {
+            // The pixel buffer could not be allocated (one large array): the process itself is fine.
+            throw new AssetImportException($"The image ({info.Width} × {info.Height} pixels) is too large for the available memory.", e);
+        }
+        catch (Exception e)
         {
             throw new AssetImportException($"The {format.ToUpperInvariant()} image is damaged or uses an unsupported variant: {e.Message}", e);
         }
     }
+
+    /// <summary>
+    /// Upper bound of decoded pixels per encoded byte for each container (best case of its compression: deflate ≈ 1032:1
+    /// on 1-bit rows for PNG, 12-bit LZW codes for GIF, run-length encodings for TGA/PSD/HDR, 1-bit rows for BMP).
+    /// JPEG's progressive end-of-band runs compress uniform areas almost without limit, so it is bounded loosely.
+    /// </summary>
+    private static long MaxPixelsPerByte(string format) => format switch
+    {
+        "png" => 8 * 1032,
+        "gif" => 4096,
+        "bmp" => 8,
+        "tga" => 128,
+        "psd" => 128,
+        "hdr" => 128,
+        _ => 1L << 20,
+    };
 
     /// <summary>Decodes an image, returning false (and the reason) instead of throwing.</summary>
     public static bool TryDecode(byte[] data, out ImageData? image, out string? error, bool applyExifOrientation = true)

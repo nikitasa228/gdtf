@@ -424,4 +424,23 @@ public class ImageImporterTests
             }
         }
     }
+
+    [Fact]
+    public void HugeImageClaimedByATinyFileIsRejectedWithoutAllocatingIt()
+    {
+        // A 16 000 × 16 000 PNG header (within the size limits) followed by a few bytes of data: decoding would allocate
+        // 1 GB before finding the data missing.
+        var png = ImageImporter.EncodePng(TestFiles.Image(4, 4, (_, _) => (1, 2, 3, 255)));
+        var header = (byte[])png.Clone();
+        System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(16, 4), 16_000);
+        System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(20, 4), 16_000);
+        Assert.Equal(16_000, ImageImporter.Identify(header)!.Value.Width);
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        var e = Assert.Throws<AssetImportException>(() => ImageImporter.Decode(header));
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        Assert.Contains("far more than the file holds", e.Message, StringComparison.Ordinal);
+        Assert.True(allocated < 16 << 20, $"{allocated} bytes allocated");
+    }
 }

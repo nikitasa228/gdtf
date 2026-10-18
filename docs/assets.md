@@ -9,8 +9,11 @@ StbImageWriteSharp (public domain / MIT).
 
 `tests/Candela.Assets.Tests` (≈ 230 tests, well under a minute) writes every test file itself — OBJ+MTL+PNG, GLB/glTF
 built with SharpGLTF, COLLADA text, ASCII/binary STL, ASCII/binary PLY, 3DS, ASCII FBX, PNG/JPEG/TGA/BMP/HDR/GIF/PSD —
-and uses one real GDTF file of the repository for the project round trip. `ModelRobustnessTests` feeds every reader
-truncated and randomly corrupted files (each one a former crash or hang of the native library).
+and uses the repository's GDTF fixtures as a real-world corpus: `RealModelTests` imports 60 GLB and 80 3DS models
+written by many manufacturers' exporters and compares them with the sizes their description.xml declares (43 of 60
+GLBs match within 2 % after the Y-up conversion; 61 of 63 decisive 3DS models fit their proportions better as read
+Z-up than with Y and Z swapped). `ModelRobustnessTests` feeds every reader truncated and randomly corrupted files
+(each kind a former crash or hang of the native library).
 
 ## Conventions
 
@@ -45,7 +48,8 @@ STL (ASCII), COLLADA, glTF, 3MF, X, X3D and ASCII FBX readers. Damaged input the
   (it indexes them without a bounds check). Binary FBX and 3DS showed no failures under the same fuzzing.
 * **STL** is read by Candela's own `StlReader` (Assimp crashed on a bare `solid name` line).
 * **PLY** is read by Candela's own `PlyReader`; **glTF/GLB** only by SharpGLTF (a file SharpGLTF rejects is not retried
-  with Assimp, whose glTF reader crashed on exactly those files).
+  with Assimp, whose glTF reader crashed on exactly those files). GLB containers whose chunks lack the 4-byte padding
+  the specification requires (written by some fixture exporters) are re-packed and read, with a warning.
 * 3MF, X, X3D and the other exotic Assimp formats are not offered (they are rejected with advice on what to export).
 
 ## Model import (`ModelImporter`)
@@ -209,7 +213,11 @@ stage light). glTF emissive colour × strength is relative, so 1 is given `Emiss
 
 Decoding is StbImageSharp; output is RGBA, top row first. 8-bit images are returned exactly as stored (sRGB colour or
 linear data such as normal maps — the meaning depends on use). Headers are validated before decoding; images larger
-than 32 768 pixels per side or 256 megapixels are rejected. JPEG marker segments are walked in managed code first:
+than 32 768 pixels per side or 256 megapixels (Radiance HDR: 64 megapixels, 1 GiB as float RGBA) are rejected, and so
+is a header that claims more pixels than the file could encode at the best compression ratio of its format (deflate
+≈ 1032:1 on 1-bit PNG rows, 12-bit LZW for GIF, run-length for TGA/PSD/HDR) — the decoder would otherwise allocate the
+full buffer for a few damaged bytes. A pixel buffer that cannot be allocated ends in a message, not a crash. JPEG marker
+segments are walked in managed code first:
 StbImageSharp loops forever when a segment's length runs past the end of the data — exactly what a partial download
 looks like — so such files are rejected as damaged (truncated *scan* data still decodes as far as it goes). TIFF, WebP, HEIF/AVIF, DDS and OpenEXR are recognised and
 rejected with a message naming a supported alternative. `EncodePng` / `SavePng` (atomic: temporary file + rename)
@@ -366,6 +374,10 @@ When the native library cannot be loaded, model imports other than glTF fail wit
 
 ## Known limitations
 
+* The robustness measures above remove every crash and hang that about 20 000 fuzzed files (truncations, byte and
+  number mutations, line edits) produced, but Assimp remains native code: a deliberately crafted FBX, COLLADA, 3DS or
+  OBJ could still find a fault the checks do not cover. The definitive fix — running the native import in a separate
+  worker process — needs a host executable and is left to the application.
 * No animation, skinning (bind pose only), morph targets, cameras or lights from model files; vertex colours ignored.
 * Textures in WebP, KTX2/Basis, DDS, TIFF or EXR are not decoded (the material is used without them, with a warning);
   Draco/meshopt-compressed glTF is rejected.
