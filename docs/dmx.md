@@ -20,7 +20,7 @@ Art-Net / sACN … ──Submit──▶ DmxInputHub ──TryRead (each patched
                                                      axes · beams · device outputs · channel values
 ```
 
-`tests/Candela.Dmx.Tests` (83 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
+`tests/Candela.Dmx.Tests` (100 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
 library through every stage; one test evaluates **every mode of all 1091 GDTF files** with random DMX.
 
 ## Units and conventions
@@ -66,7 +66,17 @@ Compilation (`FixtureProfile.Builder`):
    DMX profile curve (GDTF 1.2), classification of the attribute (`AttributeClassifier`), unit, level scale (0 … 1
    vs percent ranges), wheel, emitter, channel sets sorted by DMX value with names pre-parsed (`NameParsing`: open /
    closed / no function, invert pan/tilt, kelvin, colour names, waveforms, dimmer curves, prism facets), wheel slot
-   maps (see below), colour-temperature neutral points, motion limits.
+   maps (see below), colour-temperature neutral points, motion limits. A shutter function named "Open" or "Closed"
+   gives that state to the DMX values not covered by a named channel set.
+   **Placeholder ranges**: a physical range left at GDTF's default 0 … 1 (and no channel set with real values) is
+   not taken literally where it would break the fixture: `Zoom` maps onto the `_specs` beamAngleDeg range (not a
+   0 … 1° pencil beam; without a known zoom range, or when the mode also has a real zoom — e.g. a "zoom lens
+   rotation" effect written as `Zoom` — the function does not drive the beam angle), `Pan`/`Tilt` onto the `_specs`
+   pan/tilt range centred on 0° (a `Pan`/`Tilt` function on a channel of another attribute, e.g. "Display Intensity"
+   on a control channel, moves nothing), and strobe/pulse frequencies, spins, shakes and random wheels read it as a
+   normalised slow … fast rate (0.5 … 25 Hz strobe, 1 turn/s spin, 0.5 … 10 Hz shake) instead of 0 … 1 Hz. In the
+   library: 28 zoom, 56 pan/tilt and ≈ 550 strobe functions. A default 0 … 1 function range whose channel sets carry
+   the real values (e.g. "Min to Max" 10 … 60°) takes its range from the sets. Each case adds a profile warning.
 5. **Mode masters** resolved to channel instances (the master is looked up along the follower's geometry-reference
    chain, so each pixel's functions depend on that pixel's master) with the master range at the master's resolution.
 6. **Relations** (`Multiply`, `Override`) resolved to channel instances, again per reference chain.
@@ -105,10 +115,11 @@ naming fixtures as `Fixture 101 'Spot 1'`:
 | `patch.out-of-range` | error | the footprint runs past slot 512 |
 | `patch.missing-break` | warning | a break of a multi-break mode has no address |
 | `patch.unpatched` | note | a fixture has no address at all |
-| `patch.overlap` | error | two fixtures share slots (message gives both ranges and the shared slots) |
+| `patch.overlap` | error | two fixtures share slots (message gives both ranges and the shared slots), or two DMX breaks of one fixture do |
 | `patch.shared-address` | warning | identical type, mode and range: a deliberate "same address" patch |
 
-Overlaps are found with a sort-and-sweep per universe (O(n log n) plus the overlaps found; 4750 fixtures take a few
+`Patch.At(universe, slot)` indexes a universe's slots on its first query (a whole patch view costs O(slots +
+fixtures)). Overlaps are found with a sort-and-sweep per universe (O(n log n) plus the overlaps found; 4750 fixtures take a few
 milliseconds), at most 500 overlap issues per analysis.
 
 ## Evaluation (`FixtureEvaluator` → `FixtureState`)
@@ -124,7 +135,12 @@ milliseconds), at most 500 overlap issues per analysis.
    range overrides the function's mapping inside the set) — and the **control value** (the physical value, or the
    slot position for wheel selection).
 3. **Manual overrides** (`AttributeOverrides`, compiled from attribute → value, `"Attribute@Instance"` for one pixel)
-   replace the DMX of their channels: the function that produces the value is selected and its DMX value set.
+   replace the DMX of their channels: the function that produces the value is selected and its DMX value set. Mode
+   masters are honoured as over DMX: the overrides' DMX is in place *before* step 2, so channels depending on a
+   manual mode master are decoded against it (a manual `Gobo1` that selects indexing turns the `Gobo1Pos` channel
+   from a rotation speed into an angle); a manual function whose mode master is not set manually moves that master
+   into its range; and a manual master that can produce its value inside the range a manual dependent needs takes
+   that function (`Gobo1` = 3 with `Gobo1PosRotate` = 200 selects slot 3 in the wheel's rotation mode).
 4. **Relations**: a `Multiply` relation scales its follower's level by the master's level (virtual dimmers — a
    relation master is not multiplied into the beams again); `Override` replaces the follower's value.
 5. **Fixture-wide modifiers**: DimmerCurve (linear / square / inverse square / S-curve by channel-set name), MSpeed
@@ -150,7 +166,8 @@ changes with time alone (strobe, rotation, shake, moving motor).
 `Intensity = Dimmer × relations × dimmer curve × Shutter`. Shutter channels open/close by value or by channel-set
 name ("Open", "Closed"); strobe functions (`Shutter(n)Strobe…`, `StrobeRate` with `StrobeMode…`, iris and frost
 pulses) are deterministic periodic functions of time at the GDTF frequency (Hz; 0 … 1 ranges without a frequency
-unit span 0.5 … 25 Hz), so a frame rendered twice — or offline from recorded DMX — looks the same:
+unit, and GDTF's default range 0 … 1, span 0.5 … 25 Hz), so a frame rendered twice — or offline from recorded DMX —
+looks the same:
 
 | Waveform | GDTF attributes | Shape over one period |
 |---|---|---|
@@ -168,7 +185,11 @@ beam at full white comes from, in order: `_specs` `maxLuminousIntensityCd` (the 
 the narrowest zoom and shared between the fixture's beams; 1058 of the 1060 light-emitting files have it) → the
 GDTF Beam's `LuminousFlux` when it is not GDTF's default 10 000 lm → `_specs` `luminousFluxLm` → GDTF's default flux
 (split between the beams of a multi-beam fixture) → beam power × a typical efficacy of the lamp type (LED 40,
-discharge 45, halogen 18, tungsten 15 lm/W). The flux is kept constant when zooming: the peak follows
+discharge 45, halogen 18, tungsten 15 lm/W). The `_specs` values are shared between the beams in proportion to their
+GDTF `LuminousFlux` when the file gives the beams different fluxes (a main engine and an aura ring, large and small
+cells: 89 of the library's multi-beam modes), a beam with GDTF's default or no flux counting as the mean of the
+others; equally otherwise. The lamp type is LED for a beam whose mode drives additive emitters, else the `_specs`
+`lightSourceType` (files often keep GDTF's default "Discharge" on LED fixtures), else the GDTF `LampType`. The flux is kept constant when zooming: the peak follows
 `flux / Ω_eff(beam angle)` from `Candela.Photometry.BeamDistribution` (tabulated per beam), so zooming wide lowers
 the peak by the solid-angle ratio. `ColorTransmission` is the luminous share of the current colour relative to full
 white (emitter mix level, CMY/CTO, colour-wheel filters).
@@ -194,8 +215,9 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
   kelvin); a CTO/CTB whose kelvin range runs from warmer to cooler than the source *and* has a separate "Open" range is
   a colour-temperature selector and names the resulting CCT like CTC. Kelvin channel sets ("3200K") interpolate in
   mired; 0 … 1 ranges map to a full 5600 → 3200 K conversion. `Tint` shifts Δuv (±0.02 for symmetric ranges).
-* **Electronic colour temperature**: in an LED engine that mixes its colour (emitters in the mode, or several coloured
-  emitters in the fixture, and no CMY flags) CTC/CTO/CTB re-balance the emitters instead of filtering: the colour
+* **Electronic colour temperature**: in an LED engine that mixes its colour or tunes its white (emitters in the
+  mode, several coloured emitters in the fixture, a CTC channel, or a CTO/CTB on an LED that is not a spot, profile,
+  beam or follow spot — whose CTO is a flag — and no CMY flags) CTC/CTO/CTB re-balance the emitters instead of filtering: the colour
   moves like under a conversion filter, but the luminous output follows the engine's efficiency at the new white
   point — the largest flux its emitters can produce at that CCT relative to the source CCT (an exact small linear
   program solved once per profile on a 10-mired grid, `WhiteEfficiencyTable`), never more than before. Without
@@ -294,7 +316,9 @@ physical control values (wheel selection: slot position) and are compiled once i
    topology; default: driven when every universe it is patched in has a live source) decides between DMX (its slots
    are copied when the universe changed) and its manual attributes over GDTF defaults.
 4. Fixtures whose input changed or whose state is animating are evaluated — on `MaxDegreeOfParallelism` threads
-   (default: all cores; an allocation-free fork-join pool, used from 96 fixtures on) — with motor dynamics.
+   (default: all cores; an allocation-free fork-join pool, used from 96 fixtures on) — with motor dynamics. A fixture
+   skipped while it rested has its clock advanced to the previous frame first (`FixtureState.AdvanceIdleClock`), so
+   a move after a pause starts from rest at that frame instead of integrating the pause and completing at once.
 5. `Changed` lists the entity ids whose state changed this frame, `Removed` those that lost their state;
    `GetState(id)`, `IsConsoleDriven(id)` and `GetResolution(id)` (why a fixture has no state) serve the renderer
    and the panels. `BuildPatch()` gives the patch for issue checks.
@@ -409,14 +433,24 @@ and physical value are in `FixtureState` for the properties panel), they only do
 * **Motor dynamics**: default moving-head pan 540° in ≈ 2.5 s, RealFade = full-range travel time (trapezoid and
   triangle), limits never exceeded and no overshoot, frame-rate independence, exact rotation integration,
   evaluator motion identical at 24 and 60 fps, MSpeed scaling.
-* **Patch**: ranges per break, overlaps naming both fixtures, shared addresses, slot 512 overflow, unknown file /
-  mode / universe / address, missing break, MVR stub resolution, 4750 fixtures checked in milliseconds.
+* **Patch**: ranges per break, overlaps naming both fixtures, two breaks of one fixture overlapping, shared
+  addresses, slot 512 overflow, unknown file / mode / universe / address, missing break, MVR stub resolution, 4750
+  fixtures checked in milliseconds and every slot of 250 universes queried.
+* **Manual values and mode masters** (MAC Viper): a manual `Gobo1` re-decodes the `Gobo1Pos` channel, a manual
+  rotation speed moves `Gobo1` into its rotation mode, manual slot + rotation select the slot in that mode.
+* **File defects**: GDTF-default 0 … 1 zoom (Briteq BTI-Blizzard Wash2 → datasheet zoom and candela), zoom sets with
+  the real values (ADJ Inno Pocket Z4), a mislabelled "zoom lens rotation" next to a real zoom (BeamZ Nereid 760),
+  pan/tilt 0 … 1 (Blizzard Wash2), `Pan` on a control channel (Elation Proteus Rayzor Blade L), strobe, spin and
+  shake 0 … 1 (Briteq BTX-Hawk, Vari-Lite VL2600, Elation Fuze Max Spot), a shutter function named "Open" without
+  sets (LIGHT SKY IP2021), an LED engine with GDTF's default lamp type (ARRI Orbiter), a tunable white without emitter
+  data (ROXX Neo Mini), datasheet candela shared by GDTF beam flux (Elation Rayzor 760).
 * **Colour engines**: ARRI L5-C white engine follows CCT at the emitters' efficiency and ignores RGBW, the colour
   engine and the cross-fade between them, placeholder emitter outputs, a CTO channel that selects the CCT (PRstage
   Fresnel), saturation of virtual gels, electronic CTC cheaper than a filter (Elation Fuze Profile), CMY written as
   ColorAdd (LIGHT SKY F1000).
 * **Engine**: live vs manual control, change detection, the console-driven predicate, incremental add / repatch /
-  re-mode / remove, unknown GDTF, dynamics across frames, parallel = sequential, no allocations per frame.
+  re-mode / remove, unknown GDTF, dynamics across frames, a move after an idle pause starts from rest, parallel =
+  sequential, no allocations per frame.
 * **Library-wide**: every mode of all 1091 files (7272 modes, 221 048 channel instances) compiles and evaluates
   random DMX (and random manual values) to finite, in-range values.
 * **Performance**: 2000 fixtures per frame (above).
@@ -428,4 +462,8 @@ and physical value are in `FixtureState` for the properties panel), they only do
   the engine's luminous cost; the firmware's actual emitter levels, and so the spectrum, are not reproduced.
 * The colour of an emitter mix is only as good as the file's emitter data: files whose emitter Y values are not
   photometric (but not obviously placeholders) give a tinted full-on white (e.g. some RGBW washes come out bluish).
-* `_specs` gives one candela value per fixture; multi-beam fixtures share it equally between their beams.
+* `_specs` gives one candela value per fixture; multi-beam fixtures share it by the beams' GDTF flux when the file
+  gives different fluxes, equally otherwise (e.g. the decorative RGB rings of a wash whose beams all keep GDTF's
+  default flux get the same share as the main beam).
+* Placeholder ranges are recognised only when they are exactly GDTF's default 0 … 1; other implausible ranges in the
+  files (e.g. a zoom written as 0.1 … 15°) are taken as written.
