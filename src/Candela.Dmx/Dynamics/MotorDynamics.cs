@@ -29,10 +29,11 @@ public struct MotorState
 /// <para><b>Exact and frame-rate independent.</b> Each step integrates the motion analytically through its constant-
 /// acceleration phases (accelerate, cruise, brake), so evaluating 1 s in 60 steps or in 7 uneven steps gives the same
 /// trajectory up to floating-point rounding. Nothing is random; all state is in <see cref="MotorState"/>.</para>
-/// <para><b>Limits.</b> GDTF <c>RealFade</c> (time to travel PhysicalFrom → PhysicalTo at full speed) and
-/// <c>RealAcceleration</c> (time to reach full speed) are used when a function provides them. Otherwise typical values
-/// of the fixture category apply, e.g. a moving head pans 540° in about 2.5 s (257 °/s, 0.4 s to full speed), tilts
-/// 270° in about 1.6 s, zooms across its range in about 0.75 s and turns a colour wheel once in about 0.8 s.</para>
+/// <para><b>Limits.</b> GDTF <c>RealFade</c> (time to travel PhysicalFrom → PhysicalTo, rest to rest) and
+/// <c>RealAcceleration</c> (time to reach full speed) are used when a function provides them, so that a full-range move
+/// takes exactly RealFade. Otherwise typical values of the fixture category apply, e.g. a moving head pans 540° in about
+/// 2.5 s (257 °/s, 0.4 s to full speed), tilts 270° in about 1.7 s, zooms across its range in about 0.75 s and turns a
+/// colour wheel once in about 0.9 s; scanner mirrors are ten times faster.</para>
 /// </remarks>
 public static class MotorDynamics
 {
@@ -259,12 +260,25 @@ public static class MotorDynamics
 
         float speedLimit = typical.speed;
         float accel = typical.speed / typical.accelTime;
-        if (!function.UsesSlotPosition && range > 0f && function.RealFade > 0.01f && float.IsFinite(function.RealFade))
+        float fade = function.RealFade;
+        if (!function.UsesSlotPosition && range > 0f && fade > 0.01f && float.IsFinite(fade))
         {
-            speedLimit = range / function.RealFade;
-            accel = function.RealAcceleration > 0.005f && float.IsFinite(function.RealAcceleration)
-                ? speedLimit / function.RealAcceleration
-                : speedLimit / typical.accelTime;
+            // RealFade is the time to travel PhysicalFrom → PhysicalTo from rest to rest, RealAcceleration the time to
+            // reach full speed. A trapezoidal profile covers range = v·(fade − ta); when fade < 2·ta the motor never
+            // reaches a cruise speed and the profile is a triangle peaking at 2·range/fade.
+            float ta = function.RealAcceleration > 0.005f && float.IsFinite(function.RealAcceleration)
+                ? function.RealAcceleration
+                : Math.Min(typical.accelTime, fade / 2f);
+            if (fade >= 2f * ta)
+            {
+                speedLimit = range / (fade - ta);
+                accel = speedLimit / ta;
+            }
+            else
+            {
+                accel = 4f * range / (fade * fade);
+                speedLimit = accel * fade / 2f;
+            }
         }
         return (MotionKind.Position, new MotorLimits(speedLimit, accel));
     }

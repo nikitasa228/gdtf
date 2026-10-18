@@ -311,7 +311,7 @@ public static class AttributeClassifier
         if (IsPanTiltSpeedAlias(s)) return new(AttributeKind.MotionSpeed, Code: "Position");
 
         // ---- intensity
-        if (Is(s, "Dimmer") || Is(s, "Intensity")) return new(AttributeKind.Dimmer);
+        if (Is(s, "Dimmer") || Is(s, "Intensity") || Is(s, "Dim")) return new(AttributeKind.Dimmer);
         if (Is(s, "DimmerCurve")) return new(AttributeKind.DimmerCurve);
         if (Is(s, "StrobeDuration") || Is(s, "ShutterStrobeDuration")) return new(AttributeKind.StrobeDuration);
         if (Is(s, "StrobeRate") || Is(s, "StrobeFrequency")) return new(AttributeKind.StrobeRate);
@@ -332,6 +332,7 @@ public static class AttributeClassifier
 
         if (TryNumbered(s, "Strobe", out int strobeN, out var strobeRest) && strobeRest.IsEmpty)
             return new(AttributeKind.Strobe, strobeN, Waveform: Waveform.Strobe);
+        if (StrobeAlias(s) is { } aliasWave) return new(AttributeKind.Strobe, Waveform: aliasWave);
 
         // ---- position
         if (Is(s, "Pan")) return new(AttributeKind.Pan);
@@ -519,6 +520,22 @@ public static class AttributeClassifier
         if (n < 0) return false;
         var letters = buffer[..n];
         return letters.SequenceEqual("ptspeed") || letters.SequenceEqual("pantiltspeed");
+    }
+
+    /// <summary>
+    /// Waveform of a shutter-channel function named with a bare effect name instead of <c>Shutter(n)Strobe…</c> (seen in
+    /// real files: "Burst", "Burst Pulse", "Random Burst Pulse", "Sine Wave"), or null.
+    /// </summary>
+    private static Waveform? StrobeAlias(ReadOnlySpan<char> s)
+    {
+        Span<char> buffer = stackalloc char[32];
+        int n = Letters(s, buffer);
+        if (n < 0) return null;
+        var letters = buffer[..n];
+        if (letters.SequenceEqual("burst") || letters.SequenceEqual("burstpulse")) return Waveform.Burst;
+        if (letters.SequenceEqual("randomburstpulse")) return Waveform.RandomPulse;
+        if (letters.SequenceEqual("sinewave")) return Waveform.Sine;
+        return null;
     }
 
     private static bool IsCctAlias(ReadOnlySpan<char> s)
