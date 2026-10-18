@@ -30,6 +30,9 @@ internal sealed class IssuesPanel : Panel
     private int _errors;
     private int _warnings;
     private int _notes;
+    private string _errorsLabel = "";
+    private string _warningsLabel = "";
+    private string _notesLabel = "";
     private int _selected = -1;
 
     /// <summary>Creates the panel; <paramref name="frameSelection"/> frames the selection in the active viewport.</summary>
@@ -122,11 +125,11 @@ internal sealed class IssuesPanel : Panel
 
     private void DrawToolbar(IssueLog issues)
     {
-        SeverityToggle(Icons.OctagonAlert, Theme.Error, _errors, ref _showErrors, Str.IssueSeverityError);
+        SeverityToggle(_errorsLabel, Theme.Error, ref _showErrors, Str.IssueSeverityError);
         ImGui.SameLine();
-        SeverityToggle(Icons.TriangleAlert, Theme.Warning, _warnings, ref _showWarnings, Str.IssueSeverityWarning);
+        SeverityToggle(_warningsLabel, Theme.Warning, ref _showWarnings, Str.IssueSeverityWarning);
         ImGui.SameLine();
-        SeverityToggle(Icons.Info, Theme.Note, _notes, ref _showNotes, Str.IssueSeverityNote);
+        SeverityToggle(_notesLabel, Theme.Note, ref _showNotes, Str.IssueSeverityNote);
         ImGui.SameLine();
         float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
         ImGui.SetNextItemWidth(150 * scale);
@@ -144,7 +147,7 @@ internal sealed class IssuesPanel : Panel
         ImGui.SameLine();
         float clearWidth = ImGui.CalcTextSize(Icons.Trash).X + ImGui.GetStyle().FramePadding.X * 2;
         ImGui.SetNextItemWidth(MathF.Max(80 * scale, ImGui.GetContentRegionAvail().X - clearWidth - ImGui.GetStyle().ItemSpacing.X));
-        ImGui.InputTextWithHint("##search", $"{Icons.Search}  {Loc.Get(Str.IssuesSearch)}", ref _search, 128);
+        ImGui.InputTextWithHint("##search", Labels.With(Icons.Search, Str.IssuesSearch), ref _search, 128);
         ImGui.SameLine();
         if (ImGui.Button(Icons.Trash))
             issues.ClearProgramMessages();
@@ -152,12 +155,12 @@ internal sealed class IssuesPanel : Panel
             ImGui.SetTooltip(Loc.Get(Str.IssuesClearMessages));
     }
 
-    private static void SeverityToggle(string icon, Vector4 color, int count, ref bool on, Str tooltip)
+    private static void SeverityToggle(string label, Vector4 color, ref bool on, Str tooltip)
     {
         ImGui.PushStyleColor(ImGuiCol.Text, on ? color : Theme.WithAlpha(color, 0.35f));
         if (on)
             ImGui.PushStyleColor(ImGuiCol.Button, Theme.Rgb(0x34373D));
-        if (ImGui.Button($"{icon} {count}##{tooltip}"))
+        if (ImGui.Button(label))
             on = !on;
         if (on)
             ImGui.PopStyleColor();
@@ -181,6 +184,14 @@ internal sealed class IssuesPanel : Panel
             _errors = source.Count(i => i.Severity == IssueSeverity.Error);
             _warnings = source.Count(i => i.Severity == IssueSeverity.Warning);
             _notes = source.Count(i => i.Severity == IssueSeverity.Note);
+        }
+
+        if (_errorsLabel.Length == 0 || !ReferenceEquals(source, _source))
+        {
+            // Rebuilt only when the issue list changes, not every frame.
+            _errorsLabel = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{Icons.OctagonAlert} {_errors}##errors");
+            _warningsLabel = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{Icons.TriangleAlert} {_warnings}##warnings");
+            _notesLabel = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{Icons.Info} {_notes}##notes");
         }
 
         _source = source;

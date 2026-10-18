@@ -41,13 +41,13 @@ internal sealed class LibraryPanel : Panel
     {
         if (!ImGui.BeginTabBar("##library-tabs"))
             return;
-        if (ImGui.BeginTabItem($"{Icons.Lightbulb}  {Loc.Get(Str.LibFixtures)}"))
+        if (ImGui.BeginTabItem(Labels.With(Icons.Lightbulb, Str.LibFixtures)))
         {
             DrawFixtures();
             ImGui.EndTabItem();
         }
 
-        if (ImGui.BeginTabItem($"{Icons.Box}  {Loc.Get(Str.LibModels)}"))
+        if (ImGui.BeginTabItem(Labels.With(Icons.Box, Str.LibModels)))
         {
             PropertiesPanel.EmptyState(Icons.Package, Loc.Get(Str.LibWaitingForEngine));
             ImGui.EndTabItem();
@@ -59,7 +59,7 @@ internal sealed class LibraryPanel : Panel
     private void DrawFixtures()
     {
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##search", $"{Icons.Search}  {Loc.Get(Str.LibSearch)}", ref _search, 128);
+        ImGui.InputTextWithHint("##search", Labels.With(Icons.Search, Str.LibSearch), ref _search, 128);
         ImGui.Spacing();
 
         // Category chips that wrap to the panel width.

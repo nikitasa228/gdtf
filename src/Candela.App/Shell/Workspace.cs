@@ -58,6 +58,12 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private string _status = "";
     private double _statusTime;
     private string _title = "";
+    private string _titleName = "";
+    private bool _titleModified;
+    private readonly StatusTexts _statusTexts = new();
+    private readonly Action<Panel> _drawPanelContent;
+    private readonly Action<Panel> _focusPanelAction;
+    private readonly Action<Panel> _undockAction = DockWorkspace.Undock;
     private string _focusPanel = "";
 
     /// <summary>Builds the workspace and restores the last layout (or the one named on the command line).</summary>
@@ -65,6 +71,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     {
         _ctx = context ?? throw new ArgumentNullException(nameof(context));
         _options = options ?? throw new ArgumentNullException(nameof(options));
+        _drawPanelContent = DrawPanelContent;
+        _focusPanelAction = FocusPanel;
         _layouts = new LayoutStore(ConfigPaths.LayoutsDir);
         _keys = new KeyBindingsService(_ctx.Settings.Settings, new FilePresetStore(ConfigPaths.PresetsDir),
             Path.Combine(ConfigPaths.ConfigDir, "keybindings.custom.json"), _ctx.Log);
@@ -159,10 +167,10 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 _focusPanel = "";
             }
 
-            _dock.DrawPanel(panel, _panels, scale, DrawPanelContent);
+            _dock.DrawPanel(panel, _panels, scale, _drawPanelContent);
         }
 
-        _dock.DrawTabStyleMenu(_panels, FocusPanel, p => DockWorkspace.Undock(p));
+        _dock.DrawTabStyleMenu(_panels, _focusPanelAction, _undockAction);
         _settingsWindow.Draw(scale);
         _about.Draw(scale);
         _shortcuts.Draw(scale);
@@ -207,7 +215,16 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void SetActiveViewport(ViewportPanel viewport) => _activeViewport = viewport;
 
     /// <inheritdoc/>
-    public bool IsActive(ViewportPanel viewport) => ReferenceEquals(_activeViewport, viewport) && _viewports.Count(v => v.IsOpen) > 1;
+    public bool IsActive(ViewportPanel viewport)
+    {
+        if (!ReferenceEquals(_activeViewport, viewport))
+            return false;
+        int open = 0;
+        foreach (var v in _viewports)
+            if (v.IsOpen)
+                open++;
+        return open > 1;
+    }
 
     /// <inheritdoc/>
     public void SuspendShortcuts(bool suspended) => _dispatcher.Suspended = suspended || _settingsWindow.IsCapturing;
@@ -264,7 +281,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         if (panel.Fault is { } fault)
         {
             ImGui.TextColored(Theme.Error, $"{Icons.OctagonAlert}  {Loc.Format(Str.MsgPanelFailed, fault.Message)}");
-            if (ImGui.Button($"{Icons.Refresh}  {Loc.Get(Str.MsgPanelRetry)}"))
+            if (ImGui.Button(Labels.With(Icons.Refresh, Str.MsgPanelRetry)))
                 panel.Fault = null;
             return;
         }
@@ -326,7 +343,13 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private void UpdateTitle()
     {
         var session = _ctx.Session;
-        string title = $"Candela — {session.DisplayName}{(session.IsModified ? " •" : "")}";
+        string name = session.DisplayName;
+        bool modified = session.IsModified;
+        if (_title.Length > 0 && ReferenceEquals(name, _titleName) && modified == _titleModified)
+            return;
+        _titleName = name;
+        _titleModified = modified;
+        string title = $"Candela — {name}{(modified ? " •" : "")}";
         if (title == _title)
             return;
         _title = title;
@@ -345,12 +368,14 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             {
                 var session = _ctx.Session;
                 bool recent = _status.Length > 0 && _ctx.Timer.Elapsed - _statusTime < 12;
-                ImGui.TextColored(Theme.TextMuted, recent ? $"{Icons.Info}  {_status}" : $"{Icons.CircleCheck}  {Loc.Get(Str.StatusReady)}");
+                var texts = _statusTexts;
+                texts.Update(recent ? _status : null, session.Selection.Count, session.Undo.UndoDescription, _ctx.Gpu.Context.Info.DeviceName,
+                    _ctx.Timer.FramesPerSecond, _ctx.Timer.Elapsed);
+                ImGui.TextColored(Theme.TextMuted, texts.Left);
                 ImGui.SameLine(0, 24 * scale);
                 if (!session.Selection.IsEmpty)
-                    ImGui.TextColored(Theme.Accent, $"{Icons.Pointer}  {Loc.Format(Str.StatusSelected, session.Selection.Count)}");
-                string right = string.Create(CultureInfo.InvariantCulture,
-                    $"{(session.Undo.UndoDescription is { } u ? Loc.Format(Str.StatusUndo, u) + "    " : "")}{Icons.Cpu}  {_ctx.Gpu.Context.Info.DeviceName}    {_ctx.Timer.FramesPerSecond:0} fps");
+                    ImGui.TextColored(Theme.Accent, texts.Selection);
+                string right = texts.Right;
                 float w = ImGui.CalcTextSize(right).X;
                 ImGui.SameLine(MathF.Max(ImGui.GetCursorPosX() + 16, ImGui.GetWindowWidth() - w - 16 * scale));
                 ImGui.TextColored(Theme.TextMuted, right);
@@ -676,4 +701,51 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private void ReportMissingMenu(string path) => _ctx.Log.Warn("Script", $"No menu item '{path}'.");
 
     private static IssueSeverity Severity(SessionOutcome outcome) => outcome == SessionOutcome.Failed ? IssueSeverity.Error : IssueSeverity.Note;
+
+    /// <summary>Status bar texts, rebuilt only when what they show changes (no string building per frame).</summary>
+    private sealed class StatusTexts
+    {
+        private string? _message;
+        private int _selectionCount = -1;
+        private string? _undo;
+        private string _device = "";
+        private int _fps = -1;
+        private double _rightBuiltAt = double.NegativeInfinity;
+        private string _language = "";
+
+        public string Left { get; private set; } = "";
+
+        public string Selection { get; private set; } = "";
+
+        public string Right { get; private set; } = "";
+
+        public void Update(string? message, int selectionCount, string? undo, string device, double fps, double now)
+        {
+            bool language = !string.Equals(_language, Loc.Language, StringComparison.Ordinal);
+            _language = Loc.Language;
+            if (language || !ReferenceEquals(message, _message) || Left.Length == 0)
+            {
+                _message = message;
+                Left = message is null ? Labels.With(Icons.CircleCheck, Str.StatusReady) : $"{Icons.Info}  {message}";
+            }
+
+            if (language || selectionCount != _selectionCount)
+            {
+                _selectionCount = selectionCount;
+                Selection = $"{Icons.Pointer}  {Loc.Format(Str.StatusSelected, selectionCount)}";
+            }
+
+            int roundedFps = (int)Math.Round(fps);
+            // The frame rate is refreshed twice a second; undo text and device immediately.
+            if (language || !ReferenceEquals(undo, _undo) || !ReferenceEquals(device, _device) || (roundedFps != _fps && now - _rightBuiltAt > 0.5))
+            {
+                _undo = undo;
+                _device = device;
+                _fps = roundedFps;
+                _rightBuiltAt = now;
+                Right = string.Create(CultureInfo.InvariantCulture,
+                    $"{(undo is { } u ? Loc.Format(Str.StatusUndo, u) + "    " : "")}{Icons.Cpu}  {device}    {roundedFps} fps");
+            }
+        }
+    }
 }

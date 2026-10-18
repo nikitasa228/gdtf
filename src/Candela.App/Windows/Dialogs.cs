@@ -179,7 +179,7 @@ internal sealed class AboutWindow
         ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
         ImGui.SetNextWindowSize(new Vector2(520, 0) * scale, ImGuiCond.Appearing);
         bool open = true;
-        if (ImGui.Begin($"{Loc.Get(Str.HelpAbout)}###About", &open, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize))
+        if (ImGui.Begin(Labels.With("", Str.HelpAbout, "###About"), &open, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize))
         {
             ImGui.PushFont(_ctx.Fonts.Heading, ImGui.GetStyle().FontSizeBase * 1.6f);
             ImGui.TextColored(Theme.Accent, $"{Icons.Lightbulb} Candela");
@@ -227,10 +227,10 @@ internal sealed class ShortcutsWindow
             return;
         ImGui.SetNextWindowSize(new Vector2(560, 520) * scale, ImGuiCond.FirstUseEver);
         bool open = true;
-        if (ImGui.Begin($"{Icons.Keyboard}  {Loc.Get(Str.MsgShortcutsTitle)}###Shortcuts", &open, ImGuiWindowFlags.NoCollapse))
+        if (ImGui.Begin(Labels.With(Icons.Keyboard, Str.MsgShortcutsTitle, "###Shortcuts"), &open, ImGuiWindowFlags.NoCollapse))
         {
             ImGui.SetNextItemWidth(-1);
-            ImGui.InputTextWithHint("##filter", $"{Icons.Search}  {Loc.Get(Str.ConsoleFilter)}", ref _filter, 64);
+            ImGui.InputTextWithHint("##filter", Labels.With(Icons.Search, Str.ConsoleFilter), ref _filter, 64);
             if (ImGui.BeginTable("##shortcuts", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingStretchProp))
             {
                 foreach (var command in _commands.All)

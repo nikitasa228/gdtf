@@ -374,6 +374,33 @@ public sealed unsafe class DockingTests
     }
 
     [Fact]
+    public void A_saved_layout_can_be_loaded_while_the_editor_runs()
+    {
+        using var ui = new HeadlessImGui(Display);
+        var rig = new Rig();
+        rig.Dock.RequestPreset(LayoutPreset.Default, rig.Plan());
+        rig.Frames(ui, 3);
+        string defaultIni = SaveIni();
+        uint right = NodeOf(rig["Properties"]).ID;
+        var librarySize = NodeOf(rig["Library"]).Size;
+
+        // Rearrange: Render floats, Console moves into the right group.
+        DockWorkspace.Undock(rig["Render"]);
+        rig.Frames(ui, 2);
+        ImGuiP.DockBuilderDockWindow(rig["Console"].DockName, right);
+        rig.Frames(ui, 2);
+        Assert.True(Window(rig["Render"]).DockNode.IsNull);
+        Assert.Equal(right, NodeOf(rig["Console"]).ID);
+
+        // Load the saved arrangement between frames, as the workspace does.
+        ImGui.LoadIniSettingsFromMemory(defaultIni);
+        rig.Frames(ui, 3);
+        Assert.Equal(right, NodeOf(rig["Render"]).ID);
+        Assert.Equal(NodeOf(rig["Issues"]).ID, NodeOf(rig["Console"]).ID);
+        Assert.Equal(librarySize, NodeOf(rig["Library"]).Size);
+    }
+
+    [Fact]
     public void Serialising_prunes_styles_of_missing_nodes()
     {
         using var ui = new HeadlessImGui(Display);

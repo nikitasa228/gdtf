@@ -22,8 +22,18 @@ internal sealed unsafe class PropertiesPanel : Panel
 {
     private const float FeetPerMetre = 3.280839895f;
     private readonly WorkspaceContext _ctx;
-    private string _nameBuffer = "";
+    private readonly byte[] _nameUtf8 = new byte[256];
+    private readonly List<string> _componentNames = new();
+    private readonly List<string?> _componentDetails = new();
     private Guid _nameFor;
+    private string? _nameShown;
+    private Entity? _cachedEntity;
+    private long _cachedVersion = -1;
+    private int _cachedSelectionCount = -1;
+    private string _cachedLanguage = "";
+    private string _headerText = "";
+    private string _idText = "";
+    private string _selectionText = "";
 
     /// <summary>Creates the panel.</summary>
     public PropertiesPanel(WorkspaceContext context)
@@ -49,16 +59,17 @@ internal sealed unsafe class PropertiesPanel : Panel
             return;
         }
 
+        RefreshTexts(entity, selection.Count);
         if (selection.Count > 1)
         {
-            ImGui.TextColored(Theme.Accent, $"{Icons.Layers}  {Loc.Format(Str.PropSelectionCount, selection.Count)}");
+            ImGui.TextColored(Theme.Accent, _selectionText);
             ImGui.Separator();
         }
 
         ImGui.PushFont(_ctx.Fonts.Heading, 0f);
-        ImGui.TextUnformatted($"{IconFor(entity)}  {entity.Name}");
+        ImGui.TextUnformatted(_headerText);
         ImGui.PopFont();
-        ImGui.TextDisabled(entity.Id.ToString());
+        ImGui.TextDisabled(_idText);
         ImGui.Spacing();
 
         if (ImGui.BeginTable("##props", 2, ImGuiTableFlags.SizingStretchProp))
@@ -70,32 +81,88 @@ internal sealed unsafe class PropertiesPanel : Panel
             ImGui.EndTable();
         }
 
-        if (ImGui.CollapsingHeader($"{Icons.Move3D}  {Loc.Get(Str.PropTransform)}", ImGuiTreeNodeFlags.DefaultOpen))
+        if (ImGui.CollapsingHeader(Labels.With(Icons.Move3D, Str.PropTransform), ImGuiTreeNodeFlags.DefaultOpen))
             TransformEditor(entity);
 
-        if (ImGui.CollapsingHeader($"{Icons.Component}  {Loc.Get(Str.PropComponents)}", ImGuiTreeNodeFlags.DefaultOpen))
+        if (ImGui.CollapsingHeader(Labels.With(Icons.Component, Str.PropComponents), ImGuiTreeNodeFlags.DefaultOpen))
             Components(entity);
     }
 
     private float Scale => ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
 
+    /// <summary>Rebuilds the displayed texts only when the entity, the scene, the selection size or the language changed.</summary>
+    private void RefreshTexts(Entity entity, int selectionCount)
+    {
+        long version = _ctx.Session.Scene.Version;
+        if (ReferenceEquals(entity, _cachedEntity) && version == _cachedVersion && selectionCount == _cachedSelectionCount &&
+            string.Equals(_cachedLanguage, Loc.Language, StringComparison.Ordinal))
+            return;
+        _cachedEntity = entity;
+        _cachedVersion = version;
+        _cachedSelectionCount = selectionCount;
+        _cachedLanguage = Loc.Language;
+        _selectionText = $"{Icons.Layers}  {Loc.Format(Str.PropSelectionCount, selectionCount)}";
+        _headerText = $"{IconFor(entity)}  {entity.Name}";
+        _idText = entity.Id.ToString();
+        _componentNames.Clear();
+        _componentDetails.Clear();
+        foreach (var component in entity.Components)
+        {
+            _componentNames.Add(component.GetType().Name.Replace("Component", "", StringComparison.Ordinal));
+            _componentDetails.Add(component switch
+            {
+                WallComponent wall => string.Create(CultureInfo.InvariantCulture,
+                    $"{wall.Kind}: {wall.Width:0.##} × {wall.Height:0.##} m, {wall.Thickness:0.###} m"),
+                MeshComponent mesh => mesh.MaterialOverrides.TryGetValue(0, out var m) ? $"{Loc.Get(Str.PropMaterial)}: {m}" : mesh.ModelAssetId.ToString(),
+                FixtureComponent fixture => fixture.GdtfSpec,
+                _ => null,
+            });
+        }
+    }
+
     private void NameRow(Entity entity)
     {
-        if (_nameFor != entity.Id)
-        {
-            _nameFor = entity.Id;
-            _nameBuffer = entity.Name;
-        }
-
         Label(Str.PropName);
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.InputText("##name", ref _nameBuffer, 256, ImGuiInputTextFlags.EnterReturnsTrue) || ImGui.IsItemDeactivatedAfterEdit())
+        // A UTF-8 buffer kept between frames: the field is edited in place without building strings every frame.
+        bool editing = _nameFor == entity.Id && ImGuiP.GetActiveID() == ImGui.GetID("##name");
+        if (!editing && (_nameFor != entity.Id || !ReferenceEquals(_nameShown, entity.Name)))
+            SetNameBuffer(entity);
+        bool commit;
+        fixed (byte* buffer = _nameUtf8)
         {
-            string name = _nameBuffer.Trim();
-            if (name.Length > 0 && name != entity.Name)
-                _ctx.Session.Undo.Execute(new SetValueCommand<string>($"Rename {entity.Name}", () => entity.Name, v => entity.Name = v, name));
-            _nameBuffer = entity.Name;
+            commit = ImGui.InputText("##name", buffer, (nuint)_nameUtf8.Length, ImGuiInputTextFlags.EnterReturnsTrue);
         }
+
+        if (commit || ImGui.IsItemDeactivatedAfterEdit())
+        {
+            int length = Array.IndexOf(_nameUtf8, (byte)0);
+            string name = System.Text.Encoding.UTF8.GetString(_nameUtf8, 0, length < 0 ? _nameUtf8.Length : length).Trim();
+            if (name.Length > 0 && name != entity.Name)
+                _ctx.Session.Undo.Execute(RenameCommand(entity, name));
+            SetNameBuffer(entity);
+        }
+    }
+
+    // The commands are built in their own methods: a lambda capturing a parameter makes C# allocate its closure at the
+    // start of the enclosing method, which would happen every frame in the drawing code.
+    private static SetValueCommand<string> RenameCommand(Entity entity, string name) =>
+        new($"Rename {entity.Name}", () => entity.Name, v => entity.Name = v, name);
+
+    private static SetValueCommand<bool> VisibleCommand(Entity entity, bool visible) =>
+        new(visible ? $"Show {entity.Name}" : $"Hide {entity.Name}", () => entity.Visible, v => entity.Visible = v, visible);
+
+    private static SetValueCommand<bool> LockedCommand(Entity entity, bool locked) =>
+        new(locked ? $"Lock {entity.Name}" : $"Unlock {entity.Name}", () => entity.Locked, v => entity.Locked = v, locked);
+
+    private void SetNameBuffer(Entity entity)
+    {
+        _nameFor = entity.Id;
+        _nameShown = entity.Name;
+        Array.Clear(_nameUtf8);
+        // Truncate on a character boundary so the buffer always holds valid UTF-8 and a terminating zero.
+        var encoder = System.Text.Encoding.UTF8.GetEncoder();
+        encoder.Convert(entity.Name.AsSpan(), _nameUtf8.AsSpan(0, _nameUtf8.Length - 1), flush: true, out _, out _, out _);
     }
 
     private void FlagsRow(Entity entity)
@@ -103,15 +170,13 @@ internal sealed unsafe class PropertiesPanel : Panel
         Label(Str.PropVisible);
         bool visible = entity.Visible;
         if (ImGui.Checkbox("##visible", ref visible))
-            _ctx.Session.Undo.Execute(new SetValueCommand<bool>(visible ? $"Show {entity.Name}" : $"Hide {entity.Name}", () => entity.Visible,
-                v => entity.Visible = v, visible));
+            _ctx.Session.Undo.Execute(VisibleCommand(entity, visible));
         ImGui.SameLine(0, 24 * Scale);
         bool locked = entity.Locked;
         if (ImGui.Checkbox(Loc.Get(Str.PropLocked), ref locked))
-            _ctx.Session.Undo.Execute(new SetValueCommand<bool>(locked ? $"Lock {entity.Name}" : $"Unlock {entity.Name}", () => entity.Locked,
-                v => entity.Locked = v, locked));
+            _ctx.Session.Undo.Execute(LockedCommand(entity, locked));
         Label(Str.PropLayer);
-        ImGui.TextUnformatted(_ctx.Session.Scene.FindLayer(entity.LayerId)?.Name ?? "—");
+        ImGui.TextUnformatted(SceneLookup.LayerOf(_ctx.Session.Scene, entity.LayerId)?.Name ?? "—");
     }
 
     private void TransformEditor(Entity entity)
@@ -168,29 +233,20 @@ internal sealed unsafe class PropertiesPanel : Panel
             return;
         }
 
-        foreach (var component in entity.Components)
+        var components = entity.Components;
+        for (int i = 0; i < components.Count && i < _componentNames.Count; i++)
         {
-            string name = component.GetType().Name.Replace("Component", "", StringComparison.Ordinal);
-            ImGui.PushID(component.GetHashCode());
-            ImGui.BulletText(name);
-            switch (component)
+            var component = components[i];
+            ImGui.PushID(i);
+            ImGui.BulletText(_componentNames[i]);
+            if (_componentDetails[i] is not null || component is WallComponent)
             {
-                case WallComponent wall:
-                    ImGui.Indent();
-                    ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"{wall.Kind}: {wall.Width:0.##} × {wall.Height:0.##} m, {wall.Thickness:0.###} m"));
+                ImGui.Indent();
+                if (_componentDetails[i] is { } text)
+                    ImGui.TextDisabled(text);
+                if (component is WallComponent wall)
                     MaterialCombo(wall);
-                    ImGui.Unindent();
-                    break;
-                case MeshComponent mesh:
-                    ImGui.Indent();
-                    ImGui.TextDisabled(mesh.MaterialOverrides.TryGetValue(0, out var m) ? $"{Loc.Get(Str.PropMaterial)}: {m}" : mesh.ModelAssetId.ToString());
-                    ImGui.Unindent();
-                    break;
-                case FixtureComponent fixture:
-                    ImGui.Indent();
-                    ImGui.TextDisabled(fixture.GdtfSpec);
-                    ImGui.Unindent();
-                    break;
+                ImGui.Unindent();
             }
 
             ImGui.PopID();
@@ -200,19 +256,27 @@ internal sealed unsafe class PropertiesPanel : Panel
     private void MaterialCombo(WallComponent wall)
     {
         ImGui.SetNextItemWidth(-1);
-        if (!ImGui.BeginCombo($"{Loc.Get(Str.PropMaterial)}##material", MaterialName(wall.MaterialId)))
+        if (!ImGui.BeginCombo(Labels.With("", Str.PropMaterial, "##material"), MaterialName(wall.MaterialId)))
             return;
         foreach (var (id, label) in BuiltInMaterials)
         {
             if (ImGui.Selectable(label, id == wall.MaterialId) && id != wall.MaterialId)
-                _ctx.Session.Undo.Execute(ModifyComponentCommand.Create(wall, w => w.MaterialId = id, "Change material"));
+                _ctx.Session.Undo.Execute(MaterialCommand(wall, id));
         }
 
         ImGui.EndCombo();
     }
 
-    private static string MaterialName(string id) =>
-        BuiltInMaterials.FirstOrDefault(m => m.Id == id).Label ?? id;
+    private static IUndoableCommand MaterialCommand(WallComponent wall, string materialId) =>
+        ModifyComponentCommand.Create(wall, w => w.MaterialId = materialId, "Change material");
+
+    private static string MaterialName(string id)
+    {
+        foreach (var (materialId, label) in BuiltInMaterials)
+            if (materialId == id)
+                return label;
+        return id;
+    }
 
     /// <summary>The built-in material ids of Core with readable names (the material library lives in Candela.Assets).</summary>
     internal static readonly (string Id, string Label)[] BuiltInMaterials =

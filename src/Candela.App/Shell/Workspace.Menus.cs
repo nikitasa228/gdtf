@@ -390,7 +390,8 @@ internal sealed partial class Workspace
             _menu.End();
         }
 
-        _menu.EndBar(ReportMissingMenu);
+        if (_menu.EndBar() is { } missed)
+            ReportMissingMenu(missed);
         ImGui.EndMainMenuBar();
     }
 

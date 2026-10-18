@@ -107,6 +107,22 @@ public sealed partial class LocalizationTests : IDisposable
     }
 
     [Fact]
+    public void Icon_labels_are_built_once_per_language()
+    {
+        string first = Labels.With(Icons.Search, Str.Search, "##search");
+        Assert.Same(first, Labels.With(Icons.Search, Str.Search, "##search"));
+        Assert.EndsWith("##search", first);
+        Assert.StartsWith(Icons.Search, first);
+        Assert.Equal(Loc.Get(Str.MenuFile), Labels.With("", Str.MenuFile));
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 100; i++)
+            _ = Labels.With(Icons.Search, Str.Search, "##search");
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Loc.SetLanguage("ru");
+        Assert.Contains("Поиск", Labels.With(Icons.Search, Str.Search, "##search"));
+    }
+
+    [Fact]
     public void Format_uses_invariant_numbers()
     {
         Assert.Equal("60 fps", Loc.Format(Str.ViewportFps, 59.7));

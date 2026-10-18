@@ -41,7 +41,7 @@ internal sealed class ConsolePanel : Panel
     {
         var log = _ctx.Log;
         float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
-        if (ImGui.Button($"{Icons.Trash}  {Loc.Get(Str.ConsoleClear)}"))
+        if (ImGui.Button(Labels.With(Icons.Trash, Str.ConsoleClear)))
             log.Clear();
         ImGui.SameLine();
         ImGui.Checkbox(Loc.Get(Str.ConsoleAutoScroll), ref _autoScroll);
@@ -49,7 +49,7 @@ internal sealed class ConsolePanel : Panel
         ImGui.Checkbox("Debug", ref _showDebug);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(MathF.Max(120 * scale, ImGui.GetContentRegionAvail().X));
-        ImGui.InputTextWithHint("##filter", $"{Icons.Filter}  {Loc.Get(Str.ConsoleFilter)}", ref _filter, 128);
+        ImGui.InputTextWithHint("##filter", Labels.With(Icons.Filter, Str.ConsoleFilter), ref _filter, 128);
         ImGui.Separator();
 
         if (log.Version != _version || _filter != _appliedFilter || _showDebug != _appliedDebug)

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Candela.App.Editing;
 using Candela.Core.Editing;
 using Candela.Core.Geometry;
 using Candela.Core.Math;
@@ -319,7 +320,7 @@ internal sealed class PreviewStage : IViewportContent
         var flags = InstanceFlags.None;
         if (entity.Get<MeshComponent>()?.CastShadow == true)
             flags |= InstanceFlags.CastShadow;
-        if (!entity.IsVisibleInHierarchy || _scene.FindLayer(entity.LayerId) is { Visible: false })
+        if (!entity.IsVisibleInHierarchy || SceneLookup.LayerOf(_scene, entity.LayerId) is { Visible: false })
             flags |= InstanceFlags.Hidden;
         if (IsSelected(entity))
             flags |= InstanceFlags.Selected;

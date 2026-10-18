@@ -20,7 +20,7 @@ internal static class SelectionController
         ArgumentNullException.ThrowIfNull(entity);
         if (entity.Locked || !entity.IsVisibleInHierarchy)
             return false;
-        var layer = scene.FindLayer(entity.LayerId);
+        var layer = SceneLookup.LayerOf(scene, entity.LayerId);
         return layer is null || (layer.Visible && !layer.Locked);
     }
 

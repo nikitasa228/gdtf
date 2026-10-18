@@ -93,7 +93,7 @@ internal sealed unsafe class RenderPanel : Panel
         ImGui.Spacing();
         ImGui.PushStyleColor(ImGuiCol.Button, Theme.WithAlpha(Theme.Accent, 0.75f));
         ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Theme.Accent);
-        if (ImGui.Button($"{Icons.Clapperboard}  {Loc.Get(Str.RenderStart)}", new Vector2(-1, 0)))
+        if (ImGui.Button(Labels.With(Icons.Clapperboard, Str.RenderStart), new Vector2(-1, 0)))
             _report(_ctx.Session.StartFinalRender(s));
         ImGui.PopStyleColor(2);
         ImGui.Spacing();

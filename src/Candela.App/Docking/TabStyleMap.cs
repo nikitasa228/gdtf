@@ -30,7 +30,7 @@ internal sealed class TabStyleMap
     public int Count => _nodes.Count;
 
     /// <summary>The node ids with a stored state.</summary>
-    public IEnumerable<uint> NodeIds => _nodes.Keys;
+    public Dictionary<uint, TabStyleState>.KeyCollection NodeIds => _nodes.Keys;
 
     /// <summary>Raised when a style or selection changes (the workspace marks the layout as modified).</summary>
     public event Action? Changed;

@@ -196,9 +196,9 @@ internal sealed unsafe class DockWorkspace
 
         ImGui.TextDisabled(Loc.Get(Str.TabStyle));
         var style = _styles.StyleOf(_menuNode);
-        if (ImGui.RadioButton($"{Icons.PanelTop}  {Loc.Get(Str.TabStyleTop)}", style == TabStyle.TopTabs))
+        if (ImGui.RadioButton(Labels.With(Icons.PanelTop, Str.TabStyleTop), style == TabStyle.TopTabs))
             SetStyle(node, TabStyle.TopTabs);
-        if (ImGui.RadioButton($"{Icons.PanelLeft}  {Loc.Get(Str.TabStyleLeft)}", style == TabStyle.LeftIcons))
+        if (ImGui.RadioButton(Labels.With(Icons.PanelLeft, Str.TabStyleLeft), style == TabStyle.LeftIcons))
             SetStyle(node, TabStyle.LeftIcons);
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
         ImGui.TextUnformatted(Loc.Get(Str.TabStyleHint));
@@ -220,9 +220,9 @@ internal sealed unsafe class DockWorkspace
         if (_menuPanel is { } current)
         {
             ImGui.Separator();
-            if (ImGui.MenuItem($"{Icons.ExternalLink}  {Loc.Get(Str.DockUndockPanel)}"))
+            if (ImGui.MenuItem(Labels.With(Icons.ExternalLink, Str.DockUndockPanel)))
                 undockPanel(current);
-            if (current.CanClose && ImGui.MenuItem($"{Icons.X}  {Loc.Get(Str.DockClosePanel)}"))
+            if (current.CanClose && ImGui.MenuItem(Labels.With(Icons.X, Str.DockClosePanel)))
             {
                 current.IsOpen = false;
                 current.OnClosed();

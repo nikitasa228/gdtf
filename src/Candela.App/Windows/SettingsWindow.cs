@@ -122,7 +122,7 @@ internal sealed class SettingsWindow
         }
 
         bool open = true;
-        if (ImGui.Begin($"{Icons.Settings}  {Loc.Get(Str.PanelSettings)}###Settings", &open, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
+        if (ImGui.Begin(Labels.With(Icons.Settings, Str.PanelSettings, "###Settings"), &open, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
         {
             DrawSections(scale);
             ImGui.SameLine();
@@ -161,7 +161,7 @@ internal sealed class SettingsWindow
 
     private void SectionItem(SettingsSection section, string icon, Str label)
     {
-        if (ImGui.Selectable($"{icon}  {Loc.Get(label)}", _section == section, ImGuiSelectableFlags.None,
+        if (ImGui.Selectable(Labels.With(icon, label), _section == section, ImGuiSelectableFlags.None,
                 new Vector2(0, ImGui.GetFrameHeight())))
         {
             _section = section;
@@ -197,7 +197,7 @@ internal sealed class SettingsWindow
             _styleChanged();
         }
 
-        PropertyGrid.Row($"{Icons.Languages}  {Loc.Get(Str.SettingsLanguage)}");
+        PropertyGrid.Row(Labels.With(Icons.Languages, Str.SettingsLanguage));
         string currentLanguage = Loc.Languages.FirstOrDefault(l => l.Code == s.Language).Name ?? "English";
         if (ImGui.BeginCombo("##language", currentLanguage))
         {
@@ -260,7 +260,7 @@ internal sealed class SettingsWindow
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(Loc.Get(Str.SettingsDeletePreset));
         ImGui.SameLine();
-        if (ImGui.Button($"{Icons.RotateCcw}  {Loc.Get(Str.SettingsResetDefaults)}"))
+        if (ImGui.Button(Labels.With(Icons.RotateCcw, Str.SettingsResetDefaults)))
         {
             StopCapture();
             _keys.ResetToDefault();
@@ -272,7 +272,7 @@ internal sealed class SettingsWindow
         string trimmed = _presetName.Trim();
         bool validName = trimmed.Length > 0 && trimmed is not (PresetLibrary<KeyBindingSet>.DefaultName or PresetLibrary<KeyBindingSet>.CustomName);
         ImGui.BeginDisabled(!validName);
-        if (ImGui.Button($"{Icons.Save}  {Loc.Get(Str.SettingsSaveAs)}"))
+        if (ImGui.Button(Labels.With(Icons.Save, Str.SettingsSaveAs)))
         {
             try
             {
@@ -288,7 +288,7 @@ internal sealed class SettingsWindow
         ImGui.EndDisabled();
         ImGui.SameLine();
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##key-filter", $"{Icons.Search}  {Loc.Get(Str.Search)}", ref _keyFilter, 64);
+        ImGui.InputTextWithHint("##key-filter", Labels.With(Icons.Search, Str.Search), ref _keyFilter, 64);
         if (_captureAction is not null)
             PollCapture();
 
@@ -329,7 +329,7 @@ internal sealed class SettingsWindow
                     ImGui.PopStyleColor();
                 if (ImGui.BeginPopupContextItem("##chord-menu"))
                 {
-                    if (ImGui.MenuItem($"{Icons.Trash}  {Loc.Get(Str.SettingsRemoveShortcut)}"))
+                    if (ImGui.MenuItem(Labels.With(Icons.Trash, Str.SettingsRemoveShortcut)))
                         _keys.RemoveChord(command.Id, i);
                     ImGui.EndPopup();
                 }
@@ -460,7 +460,7 @@ internal sealed class SettingsWindow
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
-        PropertyGrid.Row($"{Icons.Grid}  {Loc.Get(Str.ViewportGrid)}");
+        PropertyGrid.Row(Labels.With(Icons.Grid, Str.ViewportGrid));
         float grid = settings.GridSpacing;
         if (ImGui.DragFloat("##grid", ref grid, 0.01f, 0.05f, 50f, "%.2f m"))
         {
@@ -468,7 +468,7 @@ internal sealed class SettingsWindow
             _ctx.Session.Scene.NotifySettingsChanged();
         }
 
-        PropertyGrid.Row($"{Icons.Magnet}  {Loc.Get(Str.ToolSnapping)}");
+        PropertyGrid.Row(Labels.With(Icons.Magnet, Str.ToolSnapping));
         float angle = _ctx.Tools.AngleStep;
         if (ImGui.DragFloat("##angle", ref angle, 0.5f, 1f, 90f, "%.0f°"))
             _ctx.Tools.AngleStep = Math.Clamp(angle, 1f, 90f);
@@ -507,7 +507,7 @@ internal sealed class SettingsWindow
             Changed();
         }
 
-        if (ImGui.Button($"{Icons.FolderPlus}  {Loc.Get(Str.SettingsAddFolder)}"))
+        if (ImGui.Button(Labels.With(Icons.FolderPlus, Str.SettingsAddFolder)))
         {
             _browser.Show(FileBrowserMode.SelectFolder, Loc.Get(Str.BrowserFolderTitle), Array.Empty<FileFilter>(), null, null, path =>
             {
