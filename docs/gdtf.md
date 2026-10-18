@@ -18,6 +18,7 @@ metres, degrees in the model (radians only inside maths), seconds, watts, lumen,
 | `FixtureGeometryBuilder` | Flattens a mode's geometry tree into `FixturePart`s (name, parent index, local matrix, mesh), with GeometryReferences expanded. |
 | `GdtfImageSource` | Core `IImageSource` for texture keys `gdtf:{fixture file}#{entry}`. |
 | `FixtureLibrary` | Scans folders without parsing, parses on demand with a cache, groups by category, and finds fixtures by human names. |
+| `FixtureTypeDiskCache` | Persistent binary cache of parsed fixture types under `ConfigPaths.CacheDir/gdtf`, used by `FixtureLibrary` (see below). |
 | `FixtureSpecsIndex` / `FixtureSpecs` | Typed records of `_specs/fixtures_index.json` (see `_specs/SCHEMA.md`), indexed by GDTF file name. |
 | `FixtureCategory` | PROFILE, WASH, WASH BEAM, BEAM, SPOT, FOLLOW SPOT, LED BAR, PAR, HAZE, FOG, FAN, SCANER, LASER, STROBE, BLINDER, UV, BSW, GENERATOR FIRE, OTHER. `DisplayName()` gives exactly these strings. |
 
@@ -45,6 +46,13 @@ metres, degrees in the model (radians only inside maths), seconds, watts, lumen,
   FilterGobo, FilterShaper, Beam, MediaServerLayer/Camera/Master, Display, GeometryReference (+ Breaks), Laser
   (+ Protocols), WiringObject (+ PinPatches), Inventory, Structure, Support and Magnet. Beam keeps all its photometric
   attributes; WiringObject and Support keep all their electrical and mechanical ones.
+* **Beam defaults vs file values.** Every Beam attribute has a GDTF default (1000 W, 10 000 lm, 6000 K, 25°/25°,
+  Wash, CRI 100 …). `BeamGeometry.Specified` (and `IsColorTemperatureSpecified`, `IsLuminousFluxSpecified`,
+  `IsBeamAngleSpecified`, `IsFieldAngleSpecified`, `IsBeamTypeSpecified`, `IsPowerConsumptionSpecified`,
+  `IsColorRenderingIndexSpecified`, `IsLampTypeSpecified`) tells which ones the file actually gives with a valid
+  value; the properties always hold a usable value. All 12 239 beams of the library specify every attribute (GDTF
+  Builder writes them all, defaults included), so a written default can still be the author's untouched default —
+  `Candela.Dmx` therefore treats an unspecified value and a written default alike when `_specs` knows better.
 * **DMXModes:**
   * channels (DMXBreak including "Overwrite", the Offset list or None, InitialFunction, Highlight, Geometry, and the
     GDTF 1.0 channel Default);
@@ -63,7 +71,8 @@ segment of a node path. A dangling reference stays `null` and produces a warning
 `DmxLayout` expands GeometryReferences into `DmxMode.ChannelInstances`, which carry absolute offsets per break and the
 reference chain (so nested references work). It also fills `BreakFootprints` and `Footprint`, which lets the DMX
 layer address every pixel. `FixtureGeometryBuilder` produces the matching parts, and `FixtureGeometry.FindPart(instance)`
-links a channel instance to the part it moves.
+links a channel instance to the part it moves. A channel that names a GeometryReference itself (per-layer controls of
+the Prolights Eclipse XL, for example) maps to the top part of that instance.
 
 ### DMX values
 
@@ -79,6 +88,31 @@ is what is implemented.)
 
 Overflowing values in real files are repaired with a warning. `256/1` is clamped to `255/1`. Sentinels such as
 `4294967295/1`, which is −1 written unsigned, count as "no value".
+
+`DmxValue.ToRangeEnd(bytes)` converts a value that **ends** a range: written with fewer bytes than the channel, it
+covers its whole step, so ranges that meet in the file also meet in the channel. In a 16-bit channel `127/1` ends
+at 0x807F (the mirrored `128/1` is 0x8080), `127/1s` at 0x7FFF and `255/1` at 0xFFFF. `ModeTo` uses it:
+`ChannelFunction.ModeFromValue` / `ModeToValue` hold the mode range in the resolution of the resolved master channel
+(a reversed range is swapped with a warning), and `IsModeActive(masterValue)` tests it. No library file writes a
+`ModeTo` with fewer bytes than its master, but the DMX layer no longer leaves one-value gaps when one does.
+
+### DMX ranges (DMXTo)
+
+The spec: a function ends at the next function's DMXFrom − 1 (at the channel resolution), the last one at the
+channel maximum; a channel set ends at the next set's DMXFrom − 1 or at the end of its function. With mode masters,
+files list one function per master range, often all starting at 0, so "next" only counts functions that can be
+active at the same time. Two functions are exclusive when their mode-master conditions cannot hold together:
+
+* both depend on the same master **channel** (whether spelled as the channel or as one of its functions) with
+  disjoint mode ranges, or name two different functions of it (a channel runs one function at a time);
+* conditions are followed through master functions: a function mastered by a "CTC range" function that is itself
+  mastered by a colour-mode channel is only active in that colour mode.
+
+Verified on the library by computing every function and set range of all 1091 files and inspecting each change:
+comparing masters by spelling cut the static-pattern selection of the BeamZ MHL 1940 (3 modes) at 23 instead of
+255, and comparing them one level deep cut the blue channel of nine Prolights Eclipse fixtures (RGB mode) at 19 and
+their colour temperature at 89. Without mode masters, functions and sets tile every channel exactly as the spec
+says (tested on a sample of the library).
 
 ### Channel counts vs `_specs`
 
@@ -136,7 +170,9 @@ template channels, so it does not count those instances.
   version number, then by file time. `GetRevisions` returns them newest first, and `GroupByCategory` builds the
   library tabs.
 * **Parsing.** `GetFixtureType` / `GetFixtureTypeAsync` parse on demand. Concurrent callers share one parse, failures
-  are not cached, and the cache keeps the most recently used fixture types (128 by default).
+  are not cached, and the cache keeps the most recently used fixture types (128 by default). Below it,
+  `FixtureLibrary.DiskCache` (default `FixtureTypeDiskCache.Default`, null to disable) keeps parsed fixture types on
+  disk across sessions.
 * **Name lookup.** `Find(manufacturer, model)` and `FindBySpec("Manufacturer@Model[@Revision]")` match names from MVR
   stub GDTFs:
   * case, spaces vs underscores and punctuation are ignored;
@@ -160,6 +196,28 @@ template channels, so it does not count those instances.
   Rivale Profile, MagicBlade R, Zonda 3 Wash and Atomic 3000 LED are not in the repository. Adding their GDTFs makes
   the same calls return them as exact matches.
 
+## Disk cache
+
+`FixtureTypeDiskCache` stores parsed fixture types in `{ConfigPaths.CacheDir}/gdtf/{key}.gdtfc`:
+
+* **Key.** SHA-256 over the archive's table of contents — every entry's name, sizes and CRC-32, the zip format's own
+  content checksum — plus the cache format version and the module version ids of `Candela.Gdtf` and `Candela.Core`.
+  The same content under another name or path hits; an edited file misses; any change of the reader code changes
+  the module id (builds are deterministic) and so the key. Hashing the whole file instead would cost more than
+  parsing it: 3D models are over 95 % of a `.gdtf`, the description a few percent.
+* **Format.** A header (magic, version, reader id, key, length, SHA-256 of the payload) and a binary payload: every
+  object of the model with its values, then every resolved link as an index into the object lists, so a loaded
+  fixture type has exactly the links of the parse. Channel instances are rebuilt by `DmxLayout`, warnings are
+  stored. A test round-trips all 1091 library files and compares the loaded object graph with the parsed one
+  property by property, links included.
+* **Corruption.** Files are written to a temporary name and renamed. A file that fails any check (magic, version,
+  key, checksum, counts, indices, enum values, trailing data) is deleted and the GDTF is parsed again; I/O failures
+  only cost the caching. `Statistics` counts hits, misses, stores, damaged files and write failures.
+* **Size.** 64 MB for the whole library. Beyond `MaxBytes` (512 MiB) the least recently used files are deleted down to
+  three quarters of the limit.
+* **Speed.** Reading all 1091 files: 4.6 s parsing vs 0.5 s from the cache (8–9× faster, Release, one thread); the
+  test suite (Debug) measures about 3× for the 60 largest descriptions.
+
 ## Robustness and performance
 
 * **Full parse.** All 1091 files parse with no exception in about 8–11 s, in parallel on 4 cores. The test suite
@@ -171,14 +229,24 @@ template channels, so it does not count those instances.
   * DMX channels without a logical channel;
   * overflowing DMX values.
 * **Containment.** Each section, mode and channel is parsed under its own guard, so one bad element never loses the
-  fixture. Warnings are capped at 500 per file.
+  fixture. Warnings are capped at 500 per file, and their paths and messages are cut to 240 and 600 characters.
+* **Hostile input.** `description.xml` is read through a filtering `XmlReader`: elements nested deeper than 264
+  levels (enough for the 256 geometry levels kept; real files reach 12) are skipped with their content, and reading
+  stops after 4 million elements (the largest library file has 74 000), both with a warning. `XDocument` costs
+  O(depth²), so 30 000 nested geometries took 5.5 s; they now take 12 ms. Normal files are not slower: loading all
+  1091 descriptions takes the same CPU time with and without the filter (2.2 s), and a full sequential parse of the
+  library 4.4 s before and after. Further limits: 200 000 geometry-reference instances and 1 000 000 channel
+  instances per mode, reference chains of 16, DMX slot offsets up to 32 768 per break (the library's largest
+  footprint is 1813), warning paths built from shortened names, part paths of at most 4096 characters, a step
+  budget in `FixtureGeometryBuilder` for references refused over and over, and images above 64 megapixels refused
+  from their header. Geometry matrices whose last row is not `0,0,0,1` are made affine, and a namespaced
+  description (not GDTF, but written by generic XML tools) is read by local names, both with a warning. A model file
+  that its decoder cannot read only falls back to the primitive or a box, whatever the decoder throws.
 * **Hot path.** `FixtureGeometry.ComputeWorldTransforms` takes spans and allocates nothing per frame.
 
 ## Known gaps
 
 * **No GDTF writer.** The module only reads.
-* **No persistent cache.** [ARCHITECTURE.md](ARCHITECTURE.md) foresees a binary cache keyed by file hash; the library
-  currently caches parsed fixture types in memory only.
 * **Opaque blocks.** FTPresets (left open by the spec) and non-RDM protocol blocks are kept as generic attribute bags.
 * **Uninterpreted content.** SVG model views, Display textures and media-server geometries are read and reachable
   through the archive, but not interpreted. glTF animations and skins are ignored, and so is the 3DS keyframer (3DS
