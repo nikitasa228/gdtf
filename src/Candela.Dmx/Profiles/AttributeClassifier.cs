@@ -227,10 +227,10 @@ public enum Waveform
     /// <summary>Symmetric fade in and out (<c>StrobePulse</c>).</summary>
     Pulse,
 
-    /// <summary>Snap open, fade closed (<c>StrobePulseOpen</c>).</summary>
+    /// <summary>Opening pulse: fades open, snaps closed (<c>StrobePulseOpen</c>, a ramp up).</summary>
     PulseOpen,
 
-    /// <summary>Fade open, snap closed (<c>StrobePulseClose</c>).</summary>
+    /// <summary>Closing pulse: snaps open, fades closed (<c>StrobePulseClose</c>, a ramp down).</summary>
     PulseClose,
 
     /// <summary>Rectangular flashes at random times (<c>StrobeRandom</c>).</summary>
@@ -239,10 +239,10 @@ public enum Waveform
     /// <summary>Random symmetric pulses.</summary>
     RandomPulse,
 
-    /// <summary>Random pulses with snap opening.</summary>
+    /// <summary>Opening pulses (ramp up) at random times.</summary>
     RandomPulseOpen,
 
-    /// <summary>Random pulses with snap closing.</summary>
+    /// <summary>Closing pulses (ramp down) at random times.</summary>
     RandomPulseClose,
 
     /// <summary>Sinusoidal modulation.</summary>
@@ -308,8 +308,10 @@ public static class AttributeClassifier
         if (s.EndsWith("MSpeed", StringComparison.OrdinalIgnoreCase) && s.Length > "MSpeed".Length)
             return new(AttributeKind.MotionSpeed, Code: s[..^"MSpeed".Length].ToString());
 
+        if (IsPanTiltSpeedAlias(s)) return new(AttributeKind.MotionSpeed, Code: "Position");
+
         // ---- intensity
-        if (Is(s, "Dimmer")) return new(AttributeKind.Dimmer);
+        if (Is(s, "Dimmer") || Is(s, "Intensity")) return new(AttributeKind.Dimmer);
         if (Is(s, "DimmerCurve")) return new(AttributeKind.DimmerCurve);
         if (Is(s, "StrobeDuration") || Is(s, "ShutterStrobeDuration")) return new(AttributeKind.StrobeDuration);
         if (Is(s, "StrobeRate") || Is(s, "StrobeFrequency")) return new(AttributeKind.StrobeRate);
@@ -327,6 +329,9 @@ public static class AttributeClassifier
                 if (Is(shutterRest, suffix)) return new(AttributeKind.Strobe, shutterN, Waveform: WaveformOf(suffix[6..], Waveform.Strobe));
             return AttributeClass.Ignored;
         }
+
+        if (TryNumbered(s, "Strobe", out int strobeN, out var strobeRest) && strobeRest.IsEmpty)
+            return new(AttributeKind.Strobe, strobeN, Waveform: Waveform.Strobe);
 
         // ---- position
         if (Is(s, "Pan")) return new(AttributeKind.Pan);
@@ -352,7 +357,7 @@ public static class AttributeClassifier
         if (Is(s, "CIE_Brightness")) return new(AttributeKind.CieBrightness);
         if (Is(s, "CTO")) return new(AttributeKind.Cto);
         if (Is(s, "CTB")) return new(AttributeKind.Ctb);
-        if (Is(s, "CTC")) return new(AttributeKind.Ctc);
+        if (Is(s, "CTC") || IsCctAlias(s)) return new(AttributeKind.Ctc);
         if (Is(s, "Tint") || IsTintAlias(s)) return new(AttributeKind.Tint);
         if (TryNumbered(s, "ColorMacro", out int macroN, out var macroRest) && macroRest.IsEmpty) return new(AttributeKind.ColorMacro, macroN);
 
@@ -507,16 +512,41 @@ public static class AttributeClassifier
         };
     }
 
-    private static bool IsTintAlias(ReadOnlySpan<char> s)
+    private static bool IsPanTiltSpeedAlias(ReadOnlySpan<char> s)
     {
         Span<char> buffer = stackalloc char[32];
+        int n = Letters(s, buffer);
+        if (n < 0) return false;
+        var letters = buffer[..n];
+        return letters.SequenceEqual("ptspeed") || letters.SequenceEqual("pantiltspeed");
+    }
+
+    private static bool IsCctAlias(ReadOnlySpan<char> s)
+    {
+        Span<char> buffer = stackalloc char[32];
+        int n = Letters(s, buffer);
+        if (n < 0) return false;
+        var letters = buffer[..n];
+        return letters.SequenceEqual("cct") || letters.SequenceEqual("colortemperature") || letters.SequenceEqual("colourtemperature");
+    }
+
+    private static int Letters(ReadOnlySpan<char> s, Span<char> buffer)
+    {
         int n = 0;
         foreach (char ch in s)
         {
             if (!char.IsLetter(ch)) continue;
-            if (n == buffer.Length) return false;
+            if (n == buffer.Length) return -1;
             buffer[n++] = char.ToLowerInvariant(ch);
         }
+        return n;
+    }
+
+    private static bool IsTintAlias(ReadOnlySpan<char> s)
+    {
+        Span<char> buffer = stackalloc char[32];
+        int n = Letters(s, buffer);
+        if (n < 0) return false;
         var letters = buffer[..n];
         return letters.SequenceEqual("greenmagenta") || letters.SequenceEqual("magentagreen") || letters.SequenceEqual("greenmagentapoint");
     }
