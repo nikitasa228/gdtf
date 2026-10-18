@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Candela.Dmx.Input;
 using Candela.Protocols.Networking;
@@ -35,6 +36,9 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
 
     /// <summary>A stream without packets for this long may be forgotten when <see cref="MaxStreams"/> is reached.</summary>
     private static readonly TimeSpan StreamIdleTimeout = TimeSpan.FromSeconds(10);
+
+    private static readonly string StreamTableFullWarning =
+        $"More than {MaxStreams} Art-Net streams (sender, port, universe) are active; new ones are ignored.";
 
     /// <summary>GoodOutputB of every port: RDM disabled (bit 7), continuous output (6), RDM discovery not running (5),
     /// background discovery disabled (4) — Candela has no RDM responder side.</summary>
@@ -188,56 +192,73 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             return;
         }
         string label;
-        lock (_gate)
+        bool tableFull = false;
+        try
         {
-            if (!ReferenceEquals(rt, _runtime)) return;
-            ulong key = ((ulong)sender.Address << 24) | ((ulong)dmx.Physical << 16) | (uint)dmx.PortAddress;
-            if (!_streams.TryGetValue(key, out var stream))
+            lock (_gate)
             {
-                if (_streams.Count >= MaxStreams && !PruneIdleStreams(now))
+                if (!ReferenceEquals(rt, _runtime)) return;
+                if (!TryGetStream(sender, dmx.Physical, dmx.PortAddress, universe, now, out var stream))
                 {
                     // Thousands of live streams: a flood or a misconfigured device. Keep serving the known ones.
+                    tableFull = true;
                     CountIgnoredPacket();
                     return;
                 }
-                var ip = AddressText(sender.Address);
-                stream = new Stream(new DmxSourceId(SourceProtocol, $"{ip}/{dmx.Physical}"), universe, sender.Address, ip, NodeName(sender.Address));
-                _streams[key] = stream;
-            }
-            label = stream.Label;
-            stream.LastSeenTicks = now.Ticks;
-            if (dmx.Sequence != 0 && stream.LastSequence != 0)
-            {
-                // Art-Net sequence rule (as in E1.31): a frame up to 19 steps behind the last one is late — drop it.
-                int delta = (sbyte)(byte)(dmx.Sequence - stream.LastSequence);
-                if (delta is < 0 and > -20)
+                label = stream.Label;
+                stream.LastSeenTicks = now.Ticks;
+                if (dmx.Sequence != 0 && stream.LastSequence != 0)
                 {
-                    CountIgnoredPacket();
-                    CountUniversePacket(universe, now, label, sequenceError: true);
-                    return;
+                    // Art-Net sequence rule (as in E1.31): a frame up to 19 steps behind the last one is late — drop it.
+                    int delta = (sbyte)(byte)(dmx.Sequence - stream.LastSequence);
+                    if (delta is < 0 and > -20)
+                    {
+                        CountIgnoredPacket();
+                        CountUniversePacket(universe, now, label, sequenceError: true);
+                        return;
+                    }
                 }
-            }
-            stream.LastSequence = dmx.Sequence;
+                stream.LastSequence = dmx.Sequence;
 
-            if (rt.Options.ArtNetSync && _syncTicks.TryGetValue(sender.Address, out var syncTicks)
-                                      && now.Ticks - syncTicks <= SyncTimeout.Ticks)
-            {
-                dmx.Data.CopyTo(stream.Pending);
-                stream.PendingLength = dmx.Data.Length;
-                if (!stream.HasPending)
+                if (rt.Options.ArtNetSync && _syncTicks.TryGetValue(sender.Address, out var syncTicks)
+                                          && now.Ticks - syncTicks <= SyncTimeout.Ticks)
                 {
-                    stream.HasPending = true;
-                    _pending.Add(stream);
+                    dmx.Data.CopyTo(stream.Pending);
+                    stream.PendingLength = dmx.Data.Length;
+                    if (!stream.HasPending)
+                    {
+                        stream.HasPending = true;
+                        _pending.Add(stream);
+                    }
+                }
+                else
+                {
+                    if (stream.HasPending) DropPending(stream);
+                    _hub.Submit(stream.Source, universe, dmx.Data, DmxInputHub.DefaultPriority, stream.Name);
                 }
             }
-            else
-            {
-                if (stream.HasPending) DropPending(stream);
-                _hub.Submit(stream.Source, universe, dmx.Data, DmxInputHub.DefaultPriority, stream.Name);
-            }
+        }
+        finally
+        {
+            // Raised outside the lock: StatusChanged subscribers may read Nodes or other locked state.
+            if (tableFull) AddWarning(StreamTableFullWarning);
         }
         CountPacket(now);
         CountUniversePacket(universe, now, label);
+    }
+
+    /// <summary>Finds or creates the stream of (sender, physical port, port-address); false when the table is full of
+    /// live streams. Called under <c>_gate</c>.</summary>
+    private bool TryGetStream(IPv4Endpoint sender, byte physical, int portAddress, int universe, DateTime now,
+        [NotNullWhen(true)] out Stream? stream)
+    {
+        ulong key = ((ulong)sender.Address << 24) | ((ulong)physical << 16) | (uint)portAddress;
+        if (_streams.TryGetValue(key, out stream)) return true;
+        if (_streams.Count >= MaxStreams && !PruneIdleStreams(now)) return false;
+        var ip = AddressText(sender.Address);
+        stream = new Stream(new DmxSourceId(SourceProtocol, $"{ip}/{physical}"), universe, sender.Address, ip, NodeName(sender.Address));
+        _streams[key] = stream;
+        return true;
     }
 
     private void HandleSync(Runtime rt, ReadOnlySpan<byte> packet, IPv4Endpoint sender, DateTime now)
@@ -416,7 +437,6 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         if (idle is null)
         {
             _nextPruneTicks = now.Ticks + TimeSpan.TicksPerSecond;
-            AddWarning($"More than {MaxStreams} Art-Net streams (sender, port, universe) are active; new ones are ignored.");
             return false;
         }
         foreach (var key in idle)

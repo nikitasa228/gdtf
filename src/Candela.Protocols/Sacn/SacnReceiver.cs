@@ -40,6 +40,9 @@ public sealed class SacnReceiver : ExternalProtocolBase
     /// <summary>A stream without packets for this long may be forgotten when <see cref="MaxStreams"/> is reached.</summary>
     private static readonly TimeSpan StreamIdleTimeout = TimeSpan.FromSeconds(10);
 
+    private static readonly string StreamTableFullWarning =
+        $"More than {MaxStreams} sACN streams (source, universe) are active; new ones are ignored.";
+
     private readonly DmxInputHub _hub;
     private readonly object _gate = new();
     private readonly Dictionary<(Guid Cid, int Universe), Stream> _streams = new();
@@ -203,83 +206,93 @@ public sealed class SacnReceiver : ExternalProtocolBase
         }
 
         string label;
-        lock (_gate)
+        bool tableFull = false;
+        try
         {
-            if (!ReferenceEquals(rt, _runtime)) return;
-            var key = (data.Cid, universe);
-            _streams.TryGetValue(key, out var stream);
-            if (stream is not null)
+            lock (_gate)
             {
-                // E1.31-2018 §6.7.2: discard if -20 < (new - last) <= 0 (as signed 8-bit).
-                int delta = (sbyte)(byte)(data.Sequence - stream.LastSequence);
-                if (delta is <= 0 and > -20)
-                {
-                    CountIgnoredPacket();
-                    CountUniversePacket(universe, now, stream.Label, sequenceError: true);
-                    return;
-                }
-            }
-
-            if (data.IsStreamTerminated)
-            {
-                // Data in a terminating packet is ignored; the source leaves the merge immediately.
+                if (!ReferenceEquals(rt, _runtime)) return;
+                var key = (data.Cid, universe);
+                _streams.TryGetValue(key, out var stream);
                 if (stream is not null)
                 {
-                    _hub.Terminate(stream.Source, universe);
-                    if (stream.HasPending) _pending.Remove(stream);
-                    _streams.Remove(key);
+                    // E1.31-2018 §6.7.2: discard if -20 < (new - last) <= 0 (as signed 8-bit).
+                    int delta = (sbyte)(byte)(data.Sequence - stream.LastSequence);
+                    if (delta is <= 0 and > -20)
+                    {
+                        CountIgnoredPacket();
+                        CountUniversePacket(universe, now, stream.Label, sequenceError: true);
+                        return;
+                    }
                 }
-                CountPacket(now);
-                return;
-            }
 
-            if (stream is null)
-            {
-                if (_streams.Count >= MaxStreams && !PruneIdleStreams(now))
+                if (data.IsStreamTerminated)
                 {
-                    // Thousands of live sources: a flood or a misconfigured device. Keep serving the known ones.
+                    // Data in a terminating packet is ignored; the source leaves the merge immediately.
+                    if (stream is not null)
+                    {
+                        _hub.Terminate(stream.Source, universe);
+                        if (stream.HasPending) _pending.Remove(stream);
+                        _streams.Remove(key);
+                    }
+                    CountPacket(now);
+                    return;
+                }
+
+                if (stream is null)
+                {
+                    if (_streams.Count >= MaxStreams && !PruneIdleStreams(now))
+                    {
+                        // Thousands of live sources: a flood or a misconfigured device. Keep serving the known ones.
+                        tableFull = true;
+                        CountIgnoredPacket();
+                        return;
+                    }
+                    var ip = AddressText(sender.Address);
+                    stream = new Stream(new DmxSourceId(SourceProtocol, ip, data.Cid), universe, ip);
+                    _streams[key] = stream;
+                }
+                stream.LastSequence = data.Sequence;
+                stream.LastSeenTicks = now.Ticks;
+                stream.UpdateName(data.SourceNameField);
+                label = stream.Label;
+
+                if (data.StartCode != 0)
+                {
+                    // Alternate start codes (0xDD per-address priority, text, RDM) are not dimmer data.
                     CountIgnoredPacket();
                     return;
                 }
-                var ip = AddressText(sender.Address);
-                stream = new Stream(new DmxSourceId(SourceProtocol, ip, data.Cid), universe, ip);
-                _streams[key] = stream;
-            }
-            stream.LastSequence = data.Sequence;
-            stream.LastSeenTicks = now.Ticks;
-            stream.UpdateName(data.SourceNameField);
-            label = stream.Label;
 
-            if (data.StartCode != 0)
-            {
-                // Alternate start codes (0xDD per-address priority, text, RDM) are not dimmer data.
-                CountIgnoredPacket();
-                return;
-            }
-
-            int sync = data.SyncAddress;
-            if (sync != 0 && _syncSeen.TryGetValue(sync, out var seen) && now.Ticks - seen <= SyncTimeout.Ticks)
-            {
-                data.Slots.CopyTo(stream.Pending);
-                stream.PendingLength = data.Slots.Length;
-                stream.PendingPriority = data.Priority;
-                stream.PendingSync = sync;
-                if (!stream.HasPending)
+                int sync = data.SyncAddress;
+                if (sync != 0 && _syncSeen.TryGetValue(sync, out var seen) && now.Ticks - seen <= SyncTimeout.Ticks)
                 {
-                    stream.HasPending = true;
-                    _pending.Add(stream);
+                    data.Slots.CopyTo(stream.Pending);
+                    stream.PendingLength = data.Slots.Length;
+                    stream.PendingPriority = data.Priority;
+                    stream.PendingSync = sync;
+                    if (!stream.HasPending)
+                    {
+                        stream.HasPending = true;
+                        _pending.Add(stream);
+                    }
+                }
+                else
+                {
+                    if (stream.HasPending)
+                    {
+                        stream.HasPending = false;
+                        _pending.Remove(stream);
+                    }
+                    _hub.Submit(stream.Source, universe, data.Slots, data.Priority, stream.Name);
+                    if (sync != 0 && rt.Options.SacnJoinMulticast && !_joined.Contains(sync)) JoinLater(rt, sync);
                 }
             }
-            else
-            {
-                if (stream.HasPending)
-                {
-                    stream.HasPending = false;
-                    _pending.Remove(stream);
-                }
-                _hub.Submit(stream.Source, universe, data.Slots, data.Priority, stream.Name);
-                if (sync != 0 && rt.Options.SacnJoinMulticast && !_joined.Contains(sync)) JoinLater(rt, sync);
-            }
+        }
+        finally
+        {
+            // Raised outside the lock: StatusChanged subscribers may read locked state.
+            if (tableFull) AddWarning(StreamTableFullWarning);
         }
         CountPacket(now);
         CountUniversePacket(universe, now, label);
@@ -349,7 +362,6 @@ public sealed class SacnReceiver : ExternalProtocolBase
         if (idle is null)
         {
             _nextPruneTicks = now.Ticks + TimeSpan.TicksPerSecond;
-            AddWarning($"More than {MaxStreams} sACN streams (source, universe) are active; new ones are ignored.");
             return false;
         }
         foreach (var key in idle)

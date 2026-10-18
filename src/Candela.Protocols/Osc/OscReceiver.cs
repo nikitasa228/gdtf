@@ -22,6 +22,9 @@ public sealed class OscReceiver : OscReceiverBase
     /// <summary>Most (sender, universe) buffers held at once; messages for further ones are ignored (with a warning).</summary>
     public const int MaxHeldUniverses = 1024;
 
+    private static readonly string HeldTableFullWarning =
+        $"OSC already holds {MaxHeldUniverses} universes; messages for further universes are ignored.";
+
     private readonly DmxInputHub _hub;
     private readonly object _gate = new();
     private readonly Dictionary<(uint Sender, int Universe), Held> _held = new();
@@ -95,6 +98,7 @@ public sealed class OscReceiver : OscReceiverBase
     {
         var patterns = _patterns;
         if (patterns.Length == 0) return;
+        bool full = false;
         lock (_gate)
         {
             if (!_open) return;
@@ -108,7 +112,11 @@ public sealed class OscReceiver : OscReceiverBase
                     int count = pattern.WriteValues(message, channel, _scratch);
                     if (count == 0) continue;
                     var held = GetHeld(sender, universe, senderText);
-                    if (held is null) break;
+                    if (held is null)
+                    {
+                        full = true;
+                        break;
+                    }
                     _scratch.AsSpan(channel - 1, count).CopyTo(held.Slots.AsSpan(channel - 1));
                     if (!held.Dirty)
                     {
@@ -128,6 +136,7 @@ public sealed class OscReceiver : OscReceiverBase
             }
             _dirty.Clear();
         }
+        if (full) AddWarning(HeldTableFullWarning);
     }
 
     private Held? GetHeld(IPv4Endpoint sender, int universe, string senderText)
@@ -135,12 +144,8 @@ public sealed class OscReceiver : OscReceiverBase
         var key = (sender.Address, universe);
         if (!_held.TryGetValue(key, out var held))
         {
-            if (_held.Count >= MaxHeldUniverses)
-            {
-                // Every held universe is re-submitted each second for as long as OSC runs: bound the set.
-                AddWarning($"OSC already holds {MaxHeldUniverses} universes; messages for further universes are ignored.");
-                return null;
-            }
+            // Every held universe is re-submitted each second for as long as OSC runs: bound the set.
+            if (_held.Count >= MaxHeldUniverses) return null;
             held = new Held(new DmxSourceId(SourceProtocol, senderText[..senderText.LastIndexOf(':')]), universe);
             _held[key] = held;
         }
