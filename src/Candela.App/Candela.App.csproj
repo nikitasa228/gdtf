@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <!-- The editor is started as `candela-app`. -->
+    <AssemblyName>candela-app</AssemblyName>
+    <RootNamespace>Candela.App</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Candela.Engine/Candela.Engine.csproj" />
@@ -12,6 +17,16 @@
     <PackageReference Include="Hexa.NET.ImGuizmo" />
     <PackageReference Include="Hexa.NET.ImGui.Backends" />
     <PackageReference Include="Hexa.NET.ImGui.Backends.GLFW" />
+    <PackageReference Include="Silk.NET.Vulkan" />
+    <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" />
+    <PackageReference Include="StbImageWriteSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Bundled fonts (Inter: SIL OFL 1.1, Lucide icons: ISC); licences next to them and in the output folder. -->
+    <EmbeddedResource Include="Assets/Fonts/*.otf;Assets/Fonts/*.ttf">
+      <LogicalName>Fonts/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <None Include="Assets/Fonts/*.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="licenses" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Candela.App.Tests" />
