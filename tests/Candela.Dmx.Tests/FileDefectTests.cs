@@ -211,10 +211,11 @@ public class FileDefectTests
         var p = TestData.Profile("ROXX@Neo_Mini", "CCT Mode (3 CH)");
         Assert.True(p.Beams[0].ElectronicColor);
         var buffer = Full(p);
+        var tint = p.Functions[p.Channels[p.FindChannels("Tint")[0]].FirstFunction];
+        DmxEncoder.EncodeFunction(buffer, tint.Index, (tint.MinValue + tint.MaxValue) / 2f); // no green/magenta shift
         foreach (float kelvin in new[] { 2700f, 5600f, 10000f })
         {
             DmxEncoder.Encode(buffer, "CTC", kelvin);
-            DmxEncoder.Encode(buffer, "Tint", p.Functions[p.Channels[p.FindChannels("Tint")[0]].FirstFunction] is var tint ? (tint.MinValue + tint.MaxValue) / 2f : 0f);
             var bs = FixtureEvaluator.Evaluate(p, buffer).Beams[0];
             Assert.InRange(bs.Color.ToCct().Kelvin, kelvin * 0.95f, kelvin * 1.05f);
             Assert.True(bs.ColorTransmission > 0.95f, $"{kelvin} K: T = {bs.ColorTransmission}");
