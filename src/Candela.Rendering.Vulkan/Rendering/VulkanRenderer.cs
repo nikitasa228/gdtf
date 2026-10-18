@@ -664,7 +664,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
     {
         var d = new Decisions
         {
-            Shading = Enum.IsDefined(view.Shading) ? view.Shading : ViewShading.Full,
+            // Plain range checks: Enum.IsDefined reads the enum's runtime type cache, which the GC may collect under
+            // memory pressure and which is then rebuilt (allocating) on the next call.
+            Shading = view.Shading is ViewShading.Full or ViewShading.Colorless or ViewShading.Wireframe ? view.Shading : ViewShading.Full,
             Overlay = view.Overlay is OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Cables ? view.Overlay : OverlayMode.None,
         };
         bool full = d.Shading == ViewShading.Full;
@@ -681,7 +683,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.VolumeLights = full && settings.Volumetrics && (d.Haze || d.Smoke) && lights > 0;
         d.Volumetrics = full && settings.Volumetrics && (d.Haze || d.Smoke || d.Flame);
         var indirect = full && d.Lights ? settings.Indirect : IndirectLighting.Off;
-        if (!Enum.IsDefined(indirect))
+        if (indirect is not (IndirectLighting.Off or IndirectLighting.ReflectiveShadowMaps or IndirectLighting.RayTraced))
             indirect = IndirectLighting.Off;
         if (indirect == IndirectLighting.RayTraced && !Pipelines.RayTracing)
             indirect = IndirectLighting.ReflectiveShadowMaps;

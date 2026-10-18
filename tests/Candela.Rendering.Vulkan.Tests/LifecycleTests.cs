@@ -7,6 +7,9 @@ namespace Candela.Rendering.Vulkan.Tests;
 /// <summary>Resizing, creating and destroying targets and scene objects, shutdown without leaks, allocation-free frames.</summary>
 public sealed class LifecycleTests
 {
+    /// <summary>Measurement windows of the allocation tests; one allocation-free window passes.</summary>
+    private const int AllocationWindows = 6;
+
     [SkippableFact]
     public void ResizeRecreatesTheTargetImages()
     {
@@ -220,9 +223,12 @@ public sealed class LifecycleTests
             renderer.Context.WaitForSubmittedFrames();
 
             // A per-frame allocation shows up in every window; one-off runtime events (tiered JIT promoting a method and
-            // starting its background worker) do not recur, so one allocation-free window proves the steady state.
+            // starting its background worker) do not recur, so one allocation-free window proves the steady state. Tests
+            // run under forced full collections on another thread: caches that the GC may drop and rebuild (e.g. the
+            // runtime type cache behind Enum.IsDefined) must not be used per frame.
+            using var pressure = new GcPressure();
             var windows = new List<string>();
-            for (int window = 0; window < 4; window++)
+            for (int window = 0; window < AllocationWindows; window++)
             {
                 Array.Clear(phases);
                 long before = GC.GetAllocatedBytesForCurrentThread();
@@ -234,7 +240,7 @@ public sealed class LifecycleTests
                 windows.Add($"{allocated} bytes (SetLights {phases[0]}, SetLines {phases[1]}, UpdateInstance {phases[2]}, Render {phases[3]})");
             }
 
-            Assert.True(windows.Count < 4, "managed memory allocated in every window of 30 steady-state frames: " + string.Join("; ", windows));
+            Assert.True(windows.Count < AllocationWindows, "managed memory allocated in every window of 30 steady-state frames: " + string.Join("; ", windows));
             TestVulkan.AssertNoValidationErrors(renderer.Context);
         }
         finally
@@ -331,8 +337,9 @@ public sealed class LifecycleTests
                 Frame(frameIndex);
             renderer.Context.WaitForSubmittedFrames();
 
+            using var pressure = new GcPressure();
             var windows = new List<long>();
-            for (int window = 0; window < 4; window++)
+            for (int window = 0; window < AllocationWindows; window++)
             {
                 long before = GC.GetAllocatedBytesForCurrentThread();
                 for (int end = frameIndex + 25; frameIndex < end; frameIndex++)
@@ -343,7 +350,7 @@ public sealed class LifecycleTests
                 windows.Add(allocated);
             }
 
-            Assert.True(windows.Count < 4, "managed memory allocated in every window of 25 frames: " + string.Join(", ", windows));
+            Assert.True(windows.Count < AllocationWindows, "managed memory allocated in every window of 25 frames: " + string.Join(", ", windows));
             TestVulkan.AssertNoValidationErrors(renderer.Context);
         }
         finally
@@ -369,6 +376,33 @@ public sealed class LifecycleTests
         renderer.World.SetNoiseSources(new[] { new NoiseSource(new Vector3(0f, 2f, 1.5f), 75f) });
         renderer.World.UpdateInstance(scene.Instances[2], Matrix4x4.CreateTranslation(-3.2f, 1.6f, 0.5f), InstanceFlags.CastShadow | InstanceFlags.Selected);
         return scene;
+    }
+
+    /// <summary>Forces full blocking collections on a background thread until disposed.</summary>
+    private sealed class GcPressure : IDisposable
+    {
+        private readonly Thread _thread;
+        private volatile bool _stop;
+
+        public GcPressure()
+        {
+            _thread = new Thread(() =>
+            {
+                while (!_stop)
+                {
+                    GC.Collect(2, GCCollectionMode.Forced, blocking: true);
+                    Thread.Sleep(2);
+                }
+            })
+            { IsBackground = true, Name = "GC pressure" };
+            _thread.Start();
+        }
+
+        public void Dispose()
+        {
+            _stop = true;
+            _thread.Join();
+        }
     }
 
     private static int CountNonBackground(ImageData image)
