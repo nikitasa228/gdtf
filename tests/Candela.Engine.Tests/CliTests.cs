@@ -31,6 +31,8 @@ public sealed class CliTests
         Assert.Equal(Program.ExitUsage, Run("artnet-test", "--to", "not-an-ip").Code);
         Assert.Equal(Program.ExitUsage, Run("artnet-test", "--to", "127.0.0.1", "--universes", "0-3").Code);
         Assert.Equal(Program.ExitUsage, Run("import-worker", "only-one-argument").Code);
+        // a folder as the output is refused before anything is loaded or rendered
+        Assert.Equal(Program.ExitUsage, Run("render", TestEnvironment.Fokina, "--out", TestEnvironment.NewTempDirectory("cli-out-folder")).Code);
 
         string missing = Path.Combine(TestEnvironment.NewTempDirectory("cli-missing"), "nothing.mvr");
         var render = Run("render", missing, "--out", missing + ".png", "--library", TestEnvironment.Root);

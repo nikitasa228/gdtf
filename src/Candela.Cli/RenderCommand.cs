@@ -168,6 +168,7 @@ internal sealed class RenderOptions
         }
         if (o.Scene.Length == 0) throw new UsageException("render needs a scene file (.mvr or .candela).");
         if (o.Output.Length == 0) throw new UsageException("render needs --out <file.png>.");
+        if (Directory.Exists(o.Output)) throw new UsageException($"--out '{o.Output}' is a folder; give the name of the PNG file to write.");
         if (o.Camera.HasValue != o.Target.HasValue) throw new UsageException("--camera and --target go together.");
         return o;
     }
