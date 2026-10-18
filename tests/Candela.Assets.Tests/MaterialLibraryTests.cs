@@ -266,4 +266,26 @@ public class MaterialLibraryTests
         Geo.AssertNear(new Vector3(1f, 0.5f, 0f), lamp.EmissiveColor);
         Assert.Equal(2f * MaterialApproximation.EmissiveReferenceLuminance, lamp.EmissiveLuminance);
     }
+
+    [Theory]
+    [InlineData("Chrome", true)]
+    [InlineData("Brushed_Steel_02", true)]
+    [InlineData("MetalFrame", true)]
+    [InlineData("alu_profile", true)]
+    [InlineData("Хром", true)]
+    [InlineData("Environment", false)] // contains "iron"
+    [InlineData("Monochrome poster", false)] // contains "chrom"
+    [InlineData("Black_Glossy_Plastic", false)]
+    [InlineData("Piano lacquer", false)]
+    [InlineData("Painted steel", false)] // a painted metal is a dielectric surface
+    public void MetalNameHintsMatchWordsNotSubstrings(string name, bool metal)
+    {
+        // A strong white highlight over a dark diffuse colour: the "dominant highlight" rule fires unless the name says
+        // the surface is a dielectric; name hints alone need a highlight of at least 0.2.
+        var dark = MaterialApproximation.FromPhong(new PhongMaterial { Name = name, Diffuse = new Vector3(0.02f), Specular = new Vector3(0.9f), Shininess = 200 });
+        var grey = MaterialApproximation.FromPhong(new PhongMaterial { Name = name, Diffuse = new Vector3(0.5f), Specular = new Vector3(0.3f), Shininess = 50 });
+        bool dielectric = MaterialApproximation.IsDielectricName(name);
+        Assert.Equal(dielectric ? 0f : 1f, dark.Metallic);
+        Assert.Equal(metal ? 1f : 0f, grey.Metallic);
+    }
 }

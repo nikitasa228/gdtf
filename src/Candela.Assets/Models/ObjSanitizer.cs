@@ -34,6 +34,9 @@ internal static class ObjSanitizer
 
         /// <summary>Faces written to the sanitised OBJ.</summary>
         public int Faces { get; set; }
+
+        /// <summary>Named materials written to sanitised MTL files.</summary>
+        public int Materials { get; set; }
     }
 
     private static readonly byte[][] s_passThroughObj =
@@ -212,6 +215,7 @@ internal static class ObjSanitizer
                     report.DroppedStatements++;
                     continue;
                 }
+                report.Materials++;
                 Write(output, line);
                 Write(output, "\n"u8);
             }

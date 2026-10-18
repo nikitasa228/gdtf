@@ -126,4 +126,19 @@ public class ObjSanitizerTests
         // Y-up → Z-up: (0, 1, 0) became (0, 0, 1).
         Assert.Contains(mesh.Positions, p => Vector3.Distance(p, Vector3.UnitZ) < 1e-6f);
     }
+
+    [Fact]
+    public void AMaterialLibraryWithoutMaterialsIsNotKeptWithTheAsset()
+    {
+        // A crafted OBJ next to private files must not pull them into a project that is later shared.
+        using var dir = new TempDir();
+        dir.Write("notes.txt", "password = hunter2\n");
+        var path = dir.Write("box.obj", TestFiles.Obj("notes.txt", "M"));
+
+        var result = ModelImporter.Import(path);
+
+        Assert.DoesNotContain("notes.txt", result.Files.Keys);
+        Assert.Contains(result.Warnings, w => w.Contains("notes.txt", StringComparison.Ordinal));
+        Assert.Equal(12, result.TriangleCount);
+    }
 }

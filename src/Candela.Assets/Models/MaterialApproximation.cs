@@ -42,8 +42,9 @@ public sealed record PhongMaterial
 /// n = 1000 → 0.21. Without a specular highlight (specular ≈ black) roughness is at least 0.9; without an exponent 0.8.</item>
 /// <item>Metallic = 1 when the specular colour dominates a dark diffuse colour (max Ks &gt; 0.5 and &gt; 2 × max Kd), when the
 /// specular colour is clearly tinted (saturation &gt; 0.25 at max Ks &gt; 0.25 — dielectrics have white highlights), or
-/// when the name says metal (chrome, steel, aluminium, gold, …) and there is a highlight (max Ks ≥ 0.2). A metal's base
-/// colour is its specular colour (= F0).</item>
+/// when a word of the name starts with a metal (chrome, steel, aluminium, gold, …) and there is a highlight (max Ks ≥
+/// 0.2) — unless a word names a dielectric surface (plastic, paint, lacquer, rubber, wood, …): glossy black plastic is
+/// exported with exactly the "dominant highlight" pattern. A metal's base colour is its specular colour (= F0).</item>
 /// <item>Opacity &lt; 1: clear materials (named glass/window, or opacity ≤ 0.6 with roughness ≤ 0.3) become transmissive
 /// glass (transmission = 1 − opacity, IOR 1.5); everything else alpha-blends.</item>
 /// <item>Emission: the emissive colour normalised to its maximum, luminance = max × <see cref="EmissiveReferenceLuminance"/>.</item>
@@ -60,13 +61,24 @@ public static class MaterialApproximation
     /// <summary>Lowest roughness produced (perfect mirrors are not representable with GGX).</summary>
     public const float MinimumRoughness = 0.03f;
 
+    // Word stems matched against the start of each word of a material name ("Brushed_Steel", "MetalFrame", "хром-01"), so
+    // "Environment" (iron) or "Monochrome" (chrom) do not count.
     private static readonly string[] s_metalWords =
     {
-        "metal", "chrome", "chrom", "steel", "alumin", "alu_", "gold", "silver", "copper", "brass", "bronze", "iron", "nickel",
-        "zinc", "titan", "металл", "хром", "сталь", "алюмин", "золот", "серебр", "медь", "латун",
+        "metal", "chrom", "steel", "stainless", "alumin", "alu", "inox", "gold", "silver", "copper", "brass", "bronze", "iron",
+        "nickel", "zinc", "titan", "металл", "хром", "стал", "алюмин", "золот", "серебр", "мед", "латун", "бронз", "желез",
     };
 
-    private static readonly string[] s_glassWords = { "glass", "window", "стекл", "окно" };
+    // Dielectric surfaces that exporters often write with a strong white highlight (glossy black plastic, lacquer); a
+    // painted or plastic-coated metal is a dielectric surface too.
+    private static readonly string[] s_dielectricWords =
+    {
+        "plastic", "paint", "lacquer", "varnish", "enamel", "rubber", "vinyl", "ceramic", "porcelain", "tile", "wood", "fabric",
+        "cloth", "leather", "carpet", "molton", "velvet", "glass", "пластик", "краск", "окраш", "лак", "эмал", "резин", "винил",
+        "керам", "плитк", "дерев", "ткан", "кож", "ковр", "бархат", "стекл",
+    };
+
+    private static readonly string[] s_glassWords = { "glass", "window", "стекл", "окн" };
 
     /// <summary>Perceptual (glTF) roughness for a Phong exponent: (2 / (n + 2))^¼, clamped to [<see cref="MinimumRoughness"/>, 1].</summary>
     public static float RoughnessFromShininess(float exponent)
@@ -76,11 +88,14 @@ public static class MaterialApproximation
         return System.Math.Clamp(r, MinimumRoughness, 1f);
     }
 
-    /// <summary>True when the material name suggests a metal (see the class remarks).</summary>
-    public static bool IsMetalName(string? name) => ContainsAny(name, s_metalWords);
+    /// <summary>True when a word of the material name starts with a metal (see the class remarks).</summary>
+    public static bool IsMetalName(string? name) => HasWordStartingWith(name, s_metalWords);
 
-    /// <summary>True when the material name suggests glass.</summary>
-    public static bool IsGlassName(string? name) => ContainsAny(name, s_glassWords);
+    /// <summary>True when a word of the material name names a dielectric surface (plastic, paint, lacquer, wood, …).</summary>
+    public static bool IsDielectricName(string? name) => HasWordStartingWith(name, s_dielectricWords);
+
+    /// <summary>True when a word of the material name suggests glass.</summary>
+    public static bool IsGlassName(string? name) => HasWordStartingWith(name, s_glassWords);
 
     /// <summary>Converts a classic material to PBR metallic-roughness (textures are assigned by the caller).</summary>
     public static MaterialData FromPhong(PhongMaterial phong)
@@ -98,7 +113,7 @@ public static class MaterialApproximation
         bool dominant = s > 0.5f && s > 2f * d;
         bool tinted = s > 0.25f && Saturation(ks) > 0.25f;
         bool named = IsMetalName(phong.Name) && s >= 0.2f;
-        bool metal = dominant || tinted || named;
+        bool metal = (dominant || tinted || named) && !IsDielectricName(phong.Name);
 
         var baseColor = metal && Max(ksColour) > 0.05f ? ksColour : kd;
         float opacity = float.IsFinite(phong.Opacity) ? System.Math.Clamp(phong.Opacity, 0f, 1f) : 1f;
@@ -139,11 +154,27 @@ public static class MaterialApproximation
         return m;
     }
 
-    private static bool ContainsAny(string? name, string[] words)
+    /// <summary>
+    /// Splits a name into words at non-letters and lower→upper case changes ("BrushedSteel_02" → brushed, steel, 02) and
+    /// tests whether any word starts with one of <paramref name="stems"/> (case-insensitive).
+    /// </summary>
+    private static bool HasWordStartingWith(string? name, string[] stems)
     {
         if (string.IsNullOrEmpty(name)) return false;
-        foreach (var w in words)
-            if (name.Contains(w, StringComparison.OrdinalIgnoreCase)) return true;
+        int start = 0;
+        for (int i = 0; i <= name.Length; i++)
+        {
+            bool boundary = i == name.Length || !char.IsLetter(name[i])
+                || (i > start && char.IsUpper(name[i]) && char.IsLower(name[i - 1]));
+            if (!boundary) continue;
+            if (i > start)
+            {
+                var word = name.AsSpan(start, i - start);
+                foreach (var stem in stems)
+                    if (word.StartsWith(stem, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            start = i < name.Length && char.IsLetter(name[i]) ? i : i + 1;
+        }
         return false;
     }
 

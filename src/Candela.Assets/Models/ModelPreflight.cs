@@ -33,8 +33,20 @@ internal static class ModelPreflight
                 {
                     var report = new ObjSanitizer.Report();
                     ctx.ObjReport = report;
-                    // While reading an OBJ, Assimp opens only material libraries (textures are just referenced).
-                    companionFilter = (_, bytes) => ObjSanitizer.SanitizeMtl(bytes, report);
+                    // While reading an OBJ, Assimp opens only material libraries (textures are just referenced). A "material
+                    // library" without a single material is not one (e.g. "mtllib notes.txt"); it is not kept with the asset,
+                    // so a crafted OBJ cannot pull a neighbouring private file into a project that is later shared.
+                    companionFilter = (key, bytes) =>
+                    {
+                        int before = report.Materials;
+                        var cleaned = ObjSanitizer.SanitizeMtl(bytes, report);
+                        if (report.Materials == before)
+                        {
+                            ctx.Files.Discard(key);
+                            ctx.Warn($"'{key}' contains no materials; it is not kept with the model.");
+                        }
+                        return cleaned;
+                    };
                     var sanitized = ObjSanitizer.SanitizeObj(data, report);
                     // Assimp crashes on an OBJ that has vertices but no faces (it builds a point cloud).
                     if (report.Faces == 0)

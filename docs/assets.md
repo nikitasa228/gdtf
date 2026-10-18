@@ -170,9 +170,13 @@ stage light). glTF emissive colour × strength is relative, so 1 is given `Emiss
 
   Without an exponent roughness is 0.8; without a highlight (specular ≈ black) at least 0.9.
 * **Metallic** = 1 when (a) the specular colour dominates a dark diffuse colour (max Ks > 0.5 and > 2 × max Kd), (b) the
-  specular colour is clearly tinted (saturation > 0.25 at max Ks > 0.25 — dielectrics have white highlights), or (c) the
-  name says metal (chrome, steel, aluminium, gold, brass, …, also Russian names) and there is a highlight (max Ks ≥ 0.2).
-  A metal's base colour is its specular colour (its F0); otherwise base colour = diffuse colour.
+  specular colour is clearly tinted (saturation > 0.25 at max Ks > 0.25 — dielectrics have white highlights), or (c) a
+  word of the name starts with a metal (chrome, steel, aluminium, gold, brass, …, also Russian names) and there is a
+  highlight (max Ks ≥ 0.2) — **unless** a word names a dielectric surface (plastic, paint, lacquer, varnish, rubber,
+  vinyl, ceramic, wood, fabric, glass, …): glossy black plastic is exported with exactly pattern (a), and painted steel
+  is a paint surface. Names are split into words at non-letters and camel-case changes, so "MetalFrame" and
+  "Brushed_Steel" match while "Environment" (iron) and "Monochrome" (chrom) do not. A metal's base colour is its
+  specular colour (its F0); otherwise base colour = diffuse colour.
 * **MTL specifics**: `Tr` (transparency) is turned into `d = 1 − Tr` when a material has no `d` (Assimp ignores `Tr`);
   texture statements are matched case-insensitively (`map_kd`), and `norm`/`map_norm` normal maps and `map_emissive`
   are mapped to the spellings Assimp understands.
