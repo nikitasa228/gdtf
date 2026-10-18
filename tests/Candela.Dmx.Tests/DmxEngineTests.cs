@@ -229,6 +229,48 @@ public class DmxEngineTests
     }
 
     [Fact]
+    public void Reloading_profiles_keeps_motor_positions_and_moves_on_from_there()
+    {
+        // a library change clears the profile cache: every fixture gets a recompiled profile and a new state, which must
+        // continue the old motors (mid-move) instead of jumping to the target or travelling from the DMX start again
+        var scene = new Scene();
+        var (e, _) = AddFixture(scene, Viper, "Basic", 1, 1);
+        var (other, _) = AddFixture(scene, ArcPod, null, 2, 1);
+        var hub = new DmxInputHub();
+        hub.Submit(Console1, 1, Universe(ViperBasic, 1, ("Pan", 0f)));
+        var profiles = new FixtureProfileCache(TestData.Library);
+        using var engine = new DmxEngine(scene, profiles, hub);
+        double t = 0;
+        engine.Update(t);
+        hub.Submit(Console1, 1, Universe(ViperBasic, 1, ("Pan", 180f)));
+        for (int i = 0; i < 30; i++) engine.Update(t += 1.0 / 60);
+        var before = engine.GetState(e.Id)!;
+        int axis = before.Profile.Channels[before.Profile.FindChannels("Pan")[0]].Axis;
+        float midway = before.Axes[axis].Pan;
+        Assert.InRange(midway, 0.1f, MathF.PI - 0.1f);
+        Assert.True(before.IsAnimating);
+
+        profiles.Clear();
+        engine.ReloadProfiles();
+        engine.Update(t += 1.0 / 60);
+        var after = engine.GetState(e.Id)!;
+        Assert.NotSame(before, after);
+        Assert.NotSame(before.Profile, after.Profile);
+        Assert.Contains(e.Id, engine.Changed);
+        Assert.Contains(other.Id, engine.Changed);
+        Assert.Empty(engine.Removed);
+        float next = after.Axes[axis].Pan;
+        Assert.InRange(next, midway, midway + 0.2f); // one more frame of the same move, not a jump to π or back to 0
+        while (t < 6) engine.Update(t += 1.0 / 60);
+        Assert.Equal(MathF.PI, after.Axes[axis].Pan, 1e-4f);
+
+        // without a cache change nothing is recompiled and the states stay
+        engine.ReloadProfiles();
+        engine.Update(t += 1.0 / 60);
+        Assert.Same(after, engine.GetState(e.Id));
+    }
+
+    [Fact]
     public void A_fixture_that_was_idle_starts_moving_from_rest_on_its_next_dmx_change()
     {
         // idle fixtures are skipped; when DMX changes after a pause, the motors start from rest at that frame, they do not

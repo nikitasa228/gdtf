@@ -142,6 +142,23 @@ public sealed class DmxEngine : IDisposable
     }
 
     /// <summary>
+    /// Re-resolves every fixture's GDTF profile through <see cref="Profiles"/> at the next <see cref="Update"/> — after
+    /// the fixture library or the profile cache changed (a GDTF added, a substitute replaced by the real file) — without
+    /// resetting the fixtures: a fixture whose profile changed gets a new state that continues the old one's motor
+    /// positions, rotations and clock (<see cref="FixtureState.ContinueFrom"/>), so moving heads do not jump or travel
+    /// again; a fixture that now resolves for the first time starts where its DMX puts it, one that no longer resolves
+    /// is listed in <see cref="Removed"/>.
+    /// </summary>
+    public void ReloadProfiles()
+    {
+        foreach (var r in _runtimes)
+        {
+            r.Resolution = null;
+            _dirty.Add(r.Entity.Id);
+        }
+    }
+
+    /// <summary>
     /// Advances to <paramref name="timeSeconds"/>: applies pending scene changes, reads the needed universes once, and
     /// evaluates every fixture whose input changed or that is animating. <see cref="Changed"/> lists the results.
     /// </summary>
@@ -298,7 +315,9 @@ public sealed class DmxEngine : IDisposable
             {
                 if (r.State is null || !ReferenceEquals(r.State.Profile, profile))
                 {
-                    r.State = new FixtureState(profile, SeedOf(entity.Id));
+                    var fresh = new FixtureState(profile, SeedOf(entity.Id));
+                    if (r.State is { } previous) fresh.ContinueFrom(previous);
+                    r.State = fresh;
                     r.Buffer = new FixtureDmxBuffer(profile);
                 }
             }

@@ -393,6 +393,39 @@ public sealed class FixtureState
         if (!IsAnimating && double.IsFinite(Time) && double.IsFinite(time) && time > Time) Time = time;
     }
 
+    /// <summary>
+    /// Continues the mechanics of <paramref name="previous"/>, a state of the same fixture under an earlier profile (the
+    /// GDTF was re-resolved after a library change, a substitute was replaced by the real file, the mode changed): the
+    /// clock and the motor and rotation state of every motorised channel found in both profiles — by channel name and
+    /// geometry instance, else by attribute and instance — so the next evaluation moves the heads, zooms and wheels on
+    /// from where they physically are instead of jumping. Channels without a counterpart start where their DMX puts them.
+    /// Call it before the first evaluation of this state.
+    /// </summary>
+    public void ContinueFrom(FixtureState previous)
+    {
+        ArgumentNullException.ThrowIfNull(previous);
+        if (ReferenceEquals(previous, this) || !double.IsFinite(previous.Time)) return;
+        var old = previous.Profile;
+        var byName = new Dictionary<(string, string), int>();
+        var byAttribute = new Dictionary<(string, string), int>();
+        foreach (var ch in old.Channels)
+        {
+            if (old.MotorSlot[ch.Index] < 0) continue;
+            byName.TryAdd((ch.Name, ch.InstanceName), ch.Index);
+            byAttribute.TryAdd((ch.Attribute, ch.InstanceName), ch.Index);
+        }
+        foreach (var ch in Profile.Channels)
+        {
+            int slot = Profile.MotorSlot[ch.Index];
+            if (slot < 0) continue;
+            if (!byName.TryGetValue((ch.Name, ch.InstanceName), out int match) &&
+                !byAttribute.TryGetValue((ch.Attribute, ch.InstanceName), out match)) continue;
+            Motors[slot] = previous.Motors[old.MotorSlot[match]];
+        }
+        Time = previous.Time;
+        IsAnimating = previous.IsAnimating;
+    }
+
     /// <summary>Axis animations (one per <see cref="FixtureProfile.Axes"/> entry).</summary>
     public AxisState[] Axes { get; }
 

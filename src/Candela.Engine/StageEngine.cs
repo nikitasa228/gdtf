@@ -348,19 +348,16 @@ public sealed partial class StageEngine : IDisposable
     }
 
     /// <summary>
-    /// Recompiles every fixture after GDTF files were added to the library. The DMX engine keeps each fixture's profile
-    /// resolution until the fixture's GDTF name or mode changes (<see cref="DmxEngine.InvalidateAll"/> only re-reads
-    /// values), so a fixture that was unresolved — or resolved to a substitute — would never see the new file: the DMX
-    /// evaluation starts afresh instead (like opening the scene; motors travel to their positions again), and the poses
-    /// report every fixture that no longer has a state.
+    /// Recompiles every fixture after GDTF files were added to the library: the profile cache is cleared and the DMX
+    /// engine re-resolves every fixture (<see cref="DmxEngine.ReloadProfiles"/>), so a fixture that was unresolved — or
+    /// resolved to a substitute — picks up the new file. Fixtures keep their motor positions (a moving head does not
+    /// travel to its position again); the poses and the renderer binding rebuild the fixtures whose profile changed.
     /// </summary>
     internal void ReloadFixtureTypes()
     {
         Profiles.Clear();
         ElectricalProfiles.Invalidate();
-        Dmx.Dispose();
-        Dmx = CreateDmx(_scene);
-        Poses.ForgetAll();
+        Dmx.ReloadProfiles();
         _networkDirty = true;
     }
 
