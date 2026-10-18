@@ -87,6 +87,13 @@ public enum AttributeKind
     /// <summary><c>Tint</c>: green/magenta shift of the white point.</summary>
     Tint,
 
+    /// <summary>
+    /// Cross-fade between a fixture's white engine (CTC + Tint) and its colour engine (emitters, RGB, HSB, CIE), 0 = white,
+    /// 1 = colour: <c>Color XF</c> (ARRI), <c>ColorXFade</c>, <c>CTC&lt;&gt;RGB</c>, <c>ColorCrossfade</c> … Only effective when the beam has
+    /// a CTC channel.
+    /// </summary>
+    ColorCrossfade,
+
     /// <summary><c>ColorMacro(n)</c>: built-in colours, interpreted by channel set name where meaningful.</summary>
     ColorMacro,
 
@@ -370,6 +377,7 @@ public static class AttributeClassifier
         if (Is(s, "CTB")) return new(AttributeKind.Ctb);
         if (Is(s, "CTC") || IsCctAlias(s)) return new(AttributeKind.Ctc);
         if (Is(s, "Tint") || IsTintAlias(s)) return new(AttributeKind.Tint);
+        if (IsColorCrossfade(s)) return new(AttributeKind.ColorCrossfade);
         if (TryNumbered(s, "ColorMacro", out int macroN, out var macroRest) && macroRest.IsEmpty) return new(AttributeKind.ColorMacro, macroN);
 
         // ---- wheels (longer prefixes first)
@@ -546,6 +554,21 @@ public static class AttributeClassifier
         if (letters.SequenceEqual("randomburstpulse")) return Waveform.RandomPulse;
         if (letters.SequenceEqual("sinewave")) return Waveform.Sine;
         return null;
+    }
+
+    /// <summary>
+    /// Names of white ↔ colour engine cross-fades in real files: "Color XF", "ColorXFade", "ColorXfade", "ColorCrossfade",
+    /// "COLORCROSSFADE", "CTC&lt;&gt;RGB", "CTC&lt;&gt;XY", "CTC-Color CrossFade".
+    /// </summary>
+    private static bool IsColorCrossfade(ReadOnlySpan<char> s)
+    {
+        Span<char> buffer = stackalloc char[32];
+        int n = Letters(s, buffer);
+        if (n < 0) return false;
+        var letters = buffer[..n];
+        return letters.SequenceEqual("colorxf") || letters.SequenceEqual("colourxf") || letters.SequenceEqual("colorxfade") ||
+            letters.SequenceEqual("colorcrossfade") || letters.SequenceEqual("ctcrgb") || letters.SequenceEqual("ctcxy") ||
+            letters.SequenceEqual("ctccolorcrossfade") || letters.SequenceEqual("cctrgb");
     }
 
     private static bool IsCctAlias(ReadOnlySpan<char> s)

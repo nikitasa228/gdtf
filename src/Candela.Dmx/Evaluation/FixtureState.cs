@@ -293,6 +293,7 @@ public sealed class FixtureState
     internal readonly float[] OwnEmitterLevels;
     internal readonly BeamState SharedScratch;
     internal readonly float[] SpeedFactors = [1f, 1f, 1f, 1f, 1f, 1f];
+    internal readonly WhitePointCache WhiteCache = new();
 
     /// <summary>Creates the state of a fixture of <paramref name="profile"/>.</summary>
     /// <param name="profile">The compiled profile.</param>
@@ -446,6 +447,29 @@ public sealed class FixtureState
         perPart[..n].Fill(Matrix4x4.Identity);
         foreach (ref readonly var a in Axes.AsSpan())
             if ((uint)a.PartIndex < (uint)n) perPart[a.PartIndex] = a.Transform;
+    }
+}
+
+/// <summary>
+/// The last white point computed for a fixture (CCT + Δuv → XYZ with Y = 1), so that the beams of a multi-cell fixture
+/// share one locus computation per frame.
+/// </summary>
+internal sealed class WhitePointCache
+{
+    private float _kelvin = float.NaN;
+    private float _duv = float.NaN;
+    private Vector3 _xyz;
+
+    /// <summary>XYZ (Y = 1) of colour temperature <paramref name="kelvin"/> offset by <paramref name="duv"/> from the Planckian locus.</summary>
+    public Vector3 Xyz(float kelvin, float duv)
+    {
+        if (kelvin != _kelvin || duv != _duv)
+        {
+            _xyz = ColorSpaces.XyToXyz(Cct.XyFromCct(kelvin, duv));
+            _kelvin = kelvin;
+            _duv = duv;
+        }
+        return _xyz;
     }
 }
 

@@ -562,6 +562,22 @@ public sealed class ProfileBeam
     /// </summary>
     internal Vector3[] EmitterFullXyz { get; set; } = Array.Empty<Vector3>();
 
+    /// <summary>
+    /// True for LED engines that mix their colour electronically (emitters, no CMY flags): colour-temperature channels
+    /// move the white point by re-balancing emitters instead of filtering, so their luminous cost is the engine's
+    /// (<see cref="WhiteEfficiency"/>), not a filter's.
+    /// </summary>
+    public bool ElectronicColor { get; internal set; }
+
+    /// <summary>Largest white output of the beam's emitters per colour temperature, null when unknown (efficiency 1).</summary>
+    internal WhiteEfficiencyTable? WhiteTable { get; set; }
+
+    /// <summary>
+    /// Relative white output (0 … 1, 1 = the engine's brightest white) of the beam's emitters at <paramref name="kelvin"/>;
+    /// 1 when the beam has no emitter data.
+    /// </summary>
+    public float WhiteEfficiency(float kelvin) => WhiteTable?.At(kelvin) ?? 1f;
+
     /// <summary>True when one of <see cref="OwnChannels"/> drives a wheel, prism, animation, effect, beam shaper or blade.</summary>
     internal bool OwnMechanics { get; set; }
 

@@ -224,7 +224,7 @@ public static class FixtureEvaluator
             var acc = BeamAcc.Create();
             ResetWheels(shared);
             Array.Clear(state.EmitterLevels);
-            var ctx = new ApplyContext(p, fns, rt, time, state.Seed);
+            var ctx = new ApplyContext(p, fns, rt, time, state.Seed, state.WhiteCache);
             foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
             var ownLevels = state.OwnEmitterLevels;
             var beamStates = state.BeamArray;
@@ -459,14 +459,17 @@ public static class FixtureEvaluator
 
     private readonly struct ApplyContext
     {
-        public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, double time, uint seed)
+        public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, double time, uint seed, WhitePointCache whiteCache)
         {
             Profile = p;
             Functions = fns;
             Runtime = rt;
             Time = time;
             Seed = seed;
+            WhiteCache = whiteCache;
         }
+
+        public WhitePointCache WhiteCache { get; }
 
         public FixtureProfile Profile { get; }
         public ProfileFunction[] Functions { get; }
@@ -490,9 +493,12 @@ public static class FixtureEvaluator
         public bool Emitters;
         public float C, M, Y;
         public float MiredShift;
+        public float CtcKelvin;
+        public float Crossfade;
         public bool Rgb, Hsb, Cie, Macro;
         public Vector3 RgbValue;
         public float Hue, Saturation, Brightness;
+        public bool HasSaturation;
         public float CieX, CieY, CieBrightness;
         public Vector2 MacroXy;
         public float Tint;
@@ -508,6 +514,9 @@ public static class FixtureEvaluator
             Dimmer = 1f,
             Shutter = 1f,
             StrobeDuration = float.NaN,
+            CtcKelvin = float.NaN,
+            Crossfade = float.NaN,
+            Saturation = 1f,
             Brightness = 1f,
             CieBrightness = 1f,
             Zoom = float.NaN,
@@ -602,7 +611,7 @@ public static class FixtureEvaluator
                 acc.Hue = f.LevelScale <= 1f ? v * 360f : f.Unit == Gdtf.PhysicalUnit.Percent ? v * 3.6f : v;
                 break;
             case AttributeKind.HsbSaturation:
-                acc.Hsb = true;
+                acc.HasSaturation = true;
                 acc.Saturation = level;
                 break;
             case AttributeKind.HsbBrightness:
@@ -619,8 +628,15 @@ public static class FixtureEvaluator
             case AttributeKind.CieBrightness:
                 acc.CieBrightness = level;
                 break;
-            case AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc:
+            case AttributeKind.Cto or AttributeKind.Ctb:
                 acc.MiredShift += MiredShift(f, set, r, ctx.Profile, cls.Kind);
+                break;
+            case AttributeKind.Ctc:
+                if ((flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction)) == 0 && KelvinTarget(f, set, r) is var ctc && !float.IsNaN(ctc))
+                    acc.CtcKelvin = ctc;
+                break;
+            case AttributeKind.ColorCrossfade:
+                acc.Crossfade = level;
                 break;
             case AttributeKind.Tint:
                 acc.Tint += TintDuv(f, v);
@@ -730,13 +746,32 @@ public static class FixtureEvaluator
     }
 
     /// <summary>
-    /// Mired shift of a CTO/CTB/CTC function (from kelvin physicals, channel-set names or 0 … 1): CTO and CTB relative to
-    /// their neutral end (no filter), CTC relative to the beam's source.
+    /// Mired shift of a CTO/CTB function (from kelvin physicals, channel-set names or 0 … 1), relative to its neutral end
+    /// (no filter); a colour-temperature selector (no neutral end, see <see cref="ProfileFunction.NeutralKelvin"/>) is
+    /// relative to the beam's source, i.e. its value is the resulting CCT.
     /// </summary>
     private static float MiredShift(ProfileFunction f, ProfileChannelSet? set, in ChannelRuntime r, FixtureProfile p, AttributeKind kind)
     {
         if (set is not null && (set.Flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction)) != 0) return 0f;
+        float target = KelvinTarget(f, set, r);
+        if (float.IsNaN(target))
+        {
+            if (!float.IsNaN(f.KelvinFrom) || f.LevelScale > 1f || f.IsConstant) return 0f;
+            // a 0 … 1 insertion: a full conversion filter 5600 → 3200 K (CTB the reverse)
+            float level = Level(f, r.Value);
+            return kind == AttributeKind.Cto ? level * (1e6f / 3200f - 1e6f / 5600f) : -level * (1e6f / 3200f - 1e6f / 5600f);
+        }
         float source = p.BeamArray.Length > 0 ? p.BeamArray[0].SourceKelvin : 6500f;
+        float neutral = float.IsNaN(f.NeutralKelvin) ? source : f.NeutralKelvin;
+        return 1e6f / target - 1e6f / neutral;
+    }
+
+    /// <summary>
+    /// Colour temperature (K) a CTO/CTB/CTC function names at its current value — its kelvin physical value, or the kelvin
+    /// of the current channel set (interpolated in mired towards the next set) — or NaN when it names none.
+    /// </summary>
+    private static float KelvinTarget(ProfileFunction f, ProfileChannelSet? set, in ChannelRuntime r)
+    {
         float target = float.NaN;
         if (!float.IsNaN(f.KelvinFrom)) target = r.Value;
         else if (set is not null && !float.IsNaN(set.Kelvin))
@@ -750,19 +785,7 @@ public static class FixtureEvaluator
                 target = 1e6f / (1e6f / set.Kelvin + t * (1e6f / sets[i + 1].Kelvin - 1e6f / set.Kelvin));
             }
         }
-        else if (f.LevelScale <= 1f && !f.IsConstant)
-        {
-            float level = Level(f, r.Value);
-            return kind switch
-            {
-                AttributeKind.Cto => level * (1e6f / 3200f - 1e6f / 5600f),
-                AttributeKind.Ctb => -level * (1e6f / 3200f - 1e6f / 5600f),
-                _ => 0f,
-            };
-        }
-        if (!(target is >= 1000f and <= 25000f)) return 0f;
-        float neutral = float.IsNaN(f.NeutralKelvin) ? source : f.NeutralKelvin;
-        return 1e6f / target - 1e6f / neutral;
+        return target is >= 1000f and <= 25000f ? target : float.NaN;
     }
 
     /// <summary>Δuv of a Tint function (positive = greener): small absolute ranges are Δuv, symmetric ranges ±0.02, 0 … 1 centred at 0.5.</summary>
@@ -1020,25 +1043,56 @@ public static class FixtureEvaluator
             xyz += RgbToXyz(p, acc.RgbValue * acc.Brightness) * reference;
             any = true;
         }
+        float tint = acc.Tint, ctcKelvin = acc.CtcKelvin;
+        if (float.IsFinite(acc.Crossfade) && !float.IsNaN(ctcKelvin))
+        {
+            // two engines: the white one (CTC + tint, at the emitters' best output for that CCT) cross-faded with the colour one
+            float f = Math.Clamp(acc.Crossfade, 0f, 1f);
+            var white = ctx.WhiteCache.Xyz(ctcKelvin, tint) * (reference * pb.WhiteEfficiency(ctcKelvin));
+            var colour = any ? xyz : pb.SourceXyz * reference;
+            xyz = white * (1f - f) + colour * f;
+            any = true;
+            tint = 0f;
+            ctcKelvin = float.NaN; // consumed by the white engine
+        }
         if (!any) xyz = pb.SourceXyz * reference;
         var rgb = ColorSpaces.XyzToRec2020(xyz);
 
+        // a saturation channel without hue desaturates the fixture's (virtual) gels: colour macros and colour wheels
+        float gelSaturation = acc.HasSaturation && !acc.Hsb ? Math.Clamp(acc.Saturation, 0f, 1f) : 1f;
         if (acc.Macro)
         {
             var sourceRgb = ColorSpaces.XyzToRec2020(pb.SourceXyz * reference);
-            rgb = sourceRgb * Filters.PhysicalChannelTransmission(LightColor.FromXy(acc.MacroXy), 1f);
+            var gel = Filters.PhysicalChannelTransmission(LightColor.FromXy(acc.MacroXy), 1f);
+            rgb = sourceRgb * Vector3.Lerp(Vector3.One, gel, gelSaturation);
         }
 
-        // subtractive: CMY flags and colour-temperature filters, then colour wheels
-        if (pb.Subtractive is { } table && (acc.C > 0f || acc.M > 0f || acc.Y > 0f || acc.MiredShift != 0f))
+        // subtractive: CMY flags and colour temperature (CTC absolute, CTO/CTB shifts), then colour wheels
+        bool cmy = acc.C > 0f || acc.M > 0f || acc.Y > 0f;
+        bool temperature = !float.IsNaN(ctcKelvin) || acc.MiredShift != 0f;
+        if (pb.Subtractive is { } table && (cmy || temperature))
         {
-            float target = float.NaN;
-            if (acc.MiredShift != 0f)
+            float targetKelvin = float.NaN;
+            if (temperature)
             {
-                float mired = Math.Clamp(1e6f / pb.SourceKelvin + acc.MiredShift, 40f, 1000f);
-                target = 1e6f / mired;
+                float mired = (float.IsNaN(ctcKelvin) ? 1e6f / pb.SourceKelvin : 1e6f / ctcKelvin) + acc.MiredShift;
+                targetKelvin = 1e6f / Math.Clamp(mired, 40f, 1000f);
             }
-            rgb *= table.RgbTransmission(acc.C, acc.M, acc.Y, target);
+            if (pb.ElectronicColor && temperature)
+            {
+                // an LED engine re-balances its emitters: the chromatic change of a conversion filter, but the luminous
+                // cost of the engine at the new white point instead of the filter's
+                var conversion = table.RgbTransmission(0f, 0f, 0f, targetKelvin);
+                float filtered = ColorSpaces.LuminanceRec2020(table.SourceRgb * conversion);
+                float engine = pb.WhiteEfficiency(targetKelvin) / MathF.Max(pb.WhiteEfficiency(pb.SourceKelvin), WhiteEfficiencyTable.Floor);
+                if (filtered > 1e-4f) conversion *= engine / filtered;
+                rgb *= conversion;
+                if (cmy) rgb *= table.RgbTransmission(acc.C, acc.M, acc.Y, float.NaN);
+            }
+            else
+            {
+                rgb *= table.RgbTransmission(acc.C, acc.M, acc.Y, targetKelvin);
+            }
         }
         foreach (ref readonly var w in bs.ColorWheels.AsSpan())
         {
@@ -1046,9 +1100,9 @@ public static class FixtureEvaluator
             var t = p.WheelArray[w.Wheel].SlotTransmissionArray;
             var tr = t[w.Slot - 1];
             if (w.Blend > 0f) tr = Vector3.Lerp(tr, t[w.NextSlot - 1], w.Blend);
-            rgb *= tr;
+            rgb *= gelSaturation < 1f ? Vector3.Lerp(Vector3.One, tr, gelSaturation) : tr;
         }
-        if (acc.Tint != 0f) rgb = ApplyTint(rgb, acc.Tint);
+        if (tint != 0f) rgb = ApplyTint(rgb, tint);
 
         float flux = MathF.Max(ColorSpaces.LuminanceRec2020(rgb), 0f);
         if (!float.IsFinite(flux)) flux = 0f;

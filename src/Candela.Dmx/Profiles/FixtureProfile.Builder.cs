@@ -23,6 +23,8 @@ public sealed partial class FixtureProfile
         private readonly Dictionary<Wheel, int> _wheelIndex = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<string, int> _emitterIndex = new(StringComparer.Ordinal);
         private readonly Dictionary<BeamGeometry, BeamSolidAngleTable> _solidAngleCache = new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<string, WhiteEfficiencyTable?> _whiteTables = new(StringComparer.Ordinal);
+        private bool? _colouredEmitters;
         private int[] _beamFirst = Array.Empty<int>(); // per channel: first beam index affected
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
         private int[] _subtreeSize = Array.Empty<int>();
@@ -77,6 +79,7 @@ public sealed partial class FixtureProfile
             ResolveModeMasters();
             BuildRelations();
             BuildBeams();
+            ResolveColorTemperatureSelectors();
             BuildAxes();
             BuildOutputsAndModifiers();
             AssignMotion();
@@ -465,20 +468,28 @@ public sealed partial class FixtureProfile
             return i;
         }
 
-        /// <summary>True when the file's emitter colours carry real relative outputs (their Y differ), not a constant placeholder.</summary>
+        /// <summary>
+        /// True when the file's emitter colours carry measured relative outputs: their Y values differ, and no two emitters of
+        /// clearly different colour share the same Y (red and green both at 100 are placeholders, not measurements).
+        /// </summary>
         private bool EmitterYVaries()
         {
             if (_emitterYVaries is { } known) return known;
-            float? first = null;
-            bool varies = false;
+            var points = new List<(Vector2 Xy, float Y)>();
             foreach (var e in FixtureType.PhysicalDescriptions.Emitters)
+                if (e.Color is { } c && float.IsFinite(c.BigY) && c.BigY > 0f && TryEmitterChromaticity(e, out var xy)) points.Add((xy, c.BigY));
+            bool varies = false, placeholder = false;
+            for (int i = 0; i < points.Count; i++)
             {
-                if (e.Color is not { } c || !float.IsFinite(c.BigY)) continue;
-                if (first is null) first = c.BigY;
-                else if (MathF.Abs(c.BigY - first.Value) > 0.5f) varies = true;
+                for (int j = i + 1; j < points.Count; j++)
+                {
+                    float dy = MathF.Abs(points[i].Y - points[j].Y);
+                    if (dy > 0.5f) varies = true;
+                    else if (dy <= 1e-3f * MathF.Max(points[i].Y, points[j].Y) && Vector2.Distance(points[i].Xy, points[j].Xy) > 0.1f) placeholder = true;
+                }
             }
-            _emitterYVaries = varies;
-            return varies;
+            _emitterYVaries = varies && !placeholder;
+            return _emitterYVaries.Value;
         }
 
         private static bool TryEmitterChromaticity(GdtfEmitter e, out Vector2 xy)
@@ -754,7 +765,7 @@ public sealed partial class FixtureProfile
             beam.FieldRatio = Math.Clamp(ratio, 1f, 8f);
 
             float zoomMin = float.PositiveInfinity, zoomMax = 0f;
-            bool hasCmyOrCto = false;
+            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCrossfade = false;
             var emitterSet = new SortedSet<int>();
             foreach (int c in ChannelsOfBeam(beam))
             {
@@ -775,8 +786,14 @@ public sealed partial class FixtureProfile
                                 }
                             }
                             break;
-                        case AttributeKind.ColorSub or AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc:
-                            hasCmyOrCto = true;
+                        case AttributeKind.ColorSub:
+                            hasCmyOrCto = hasColorSub = true;
+                            break;
+                        case AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc:
+                            hasCmyOrCto = hasColorTemperature = true;
+                            break;
+                        case AttributeKind.ColorCrossfade:
+                            hasCrossfade = true;
                             break;
                         case AttributeKind.ColorAdd when f.Emitter >= 0:
                             emitterSet.Add(f.Emitter);
@@ -866,6 +883,71 @@ public sealed partial class FixtureProfile
                         beam.EmitterFullXyz[e] = pe.TristimulusPerLumen * pe.MaxFlux;
                     }
             }
+
+            // LED engines that mix colour (emitters in this mode, or several coloured emitters in the fixture) move their white
+            // point electronically; CMY channels and white-only LED engines mean real filters
+            beam.ElectronicColor = bg.LampType == LampType.Led && !hasColorSub && (emitterSet.Count > 0 || HasColouredEmitters());
+            if (beam.ElectronicColor && beam.Emitters.Length > 0 && (hasColorTemperature || hasCrossfade))
+            {
+                string key = string.Join(";", beam.Emitters.Select(e => FormattableString.Invariant($"{e.Chromaticity.X:F4},{e.Chromaticity.Y:F4},{e.MaxFlux:G6}")));
+                if (!_whiteTables.TryGetValue(key, out var white)) _whiteTables[key] = white = WhiteEfficiencyTable.Create(beam.Emitters);
+                beam.WhiteTable = white;
+            }
+        }
+
+        /// <summary>True when the fixture type describes at least two visible emitters of clearly different colour (an RGB… engine).</summary>
+        private bool HasColouredEmitters()
+        {
+            if (_colouredEmitters is { } known) return known;
+            var points = new List<Vector2>();
+            foreach (var e in FixtureType.PhysicalDescriptions.Emitters)
+                if (TryEmitterChromaticity(e, out var xy)) points.Add(xy);
+            bool coloured = false;
+            for (int i = 0; i < points.Count && !coloured; i++)
+                for (int j = i + 1; j < points.Count && !coloured; j++)
+                    coloured = Vector2.Distance(points[i], points[j]) > 0.1f;
+            _colouredEmitters = coloured;
+            return coloured;
+        }
+
+        /// <summary>
+        /// A CTO/CTB whose kelvin range runs from warmer to cooler than the source and whose channel has a separate "Open" /
+        /// "No function" range is a colour-temperature selector (its value is the resulting CCT, as for CTC), not a filter
+        /// that is neutral at one end of its range.
+        /// </summary>
+        private void ResolveColorTemperatureSelectors()
+        {
+            if (Beams.Count == 0) return;
+            float source = Beams[0].SourceKelvin;
+            foreach (var f in Functions)
+            {
+                if (f.Class.Kind is not (AttributeKind.Cto or AttributeKind.Ctb) || float.IsNaN(f.NeutralKelvin)) continue;
+                float lo = float.NaN, hi = float.NaN;
+                if (!float.IsNaN(f.KelvinFrom))
+                {
+                    lo = MathF.Min(f.KelvinFrom, f.KelvinTo);
+                    hi = MathF.Max(f.KelvinFrom, f.KelvinTo);
+                }
+                else
+                {
+                    foreach (var set in f.SetArray)
+                        if (!float.IsNaN(set.Kelvin))
+                        {
+                            lo = float.IsNaN(lo) ? set.Kelvin : MathF.Min(lo, set.Kelvin);
+                            hi = float.IsNaN(hi) ? set.Kelvin : MathF.Max(hi, set.Kelvin);
+                        }
+                }
+                if (lo < source / 1.03f && hi > source * 1.03f && HasOffState(Channels[f.Channel])) f.NeutralKelvin = float.NaN;
+            }
+        }
+
+        /// <summary>True when a function of the channel has a channel set meaning "open" or "no function".</summary>
+        private bool HasOffState(ProfileChannel ch)
+        {
+            for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                foreach (var set in Functions[k].SetArray)
+                    if ((set.Flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction)) != 0) return true;
+            return false;
         }
 
         private static PhotometryBeamType MapBeamType(GdtfBeamType type) => type switch
@@ -1024,11 +1106,12 @@ public sealed partial class FixtureProfile
 
         private void AssignMotion()
         {
-            bool ledSource = Beams.Count > 0 && Beams.All(b => b.Geometry.LampType == LampType.Led);
+            // CMY/CTO are motorised flags unless every beam is an LED engine that mixes its colour electronically
+            bool electronicColor = Beams.Count > 0 && Beams.All(b => b.ElectronicColor);
             foreach (var f in Functions)
             {
                 int slots = f.Wheel >= 0 ? Wheels[f.Wheel].SlotCount : 0;
-                (f.Motion, f.Limits) = MotorDynamics.DefaultMotion(f, Category, slots, mechanicalColor: !ledSource);
+                (f.Motion, f.Limits) = MotorDynamics.DefaultMotion(f, Category, slots, mechanicalColor: !electronicColor);
                 var kind = f.Class.Kind;
                 f.MotionGroup = FixtureEvaluator.MotionGroup(f.Class);
                 if (kind == AttributeKind.MotionSpeed) f.SpeedGroup = FixtureEvaluator.MotionGroupOf(f.Class.Code);
