@@ -121,6 +121,7 @@ public sealed class FixturePoses
     private readonly HashSet<Guid> _changedSet = new();
     private readonly List<Guid> _removed = new();
     private readonly List<Guid> _scratch = new();
+    private readonly HashSet<Guid> _forgotten = new();
 
     /// <summary>Number of fixtures with a pose.</summary>
     public int Count => _poses.Count;
@@ -152,6 +153,18 @@ public sealed class FixturePoses
         _changed.Clear();
         _changedSet.Clear();
         _removed.Clear();
+        _forgotten.Clear();
+    }
+
+    /// <summary>
+    /// Forgets every pose because the DMX evaluation was recreated (library changed): the next <see cref="Update"/>
+    /// reports the fixtures that come back as changed and those that have no state any more as removed.
+    /// </summary>
+    internal void ForgetAll()
+    {
+        foreach (var id in _poses.Keys) _forgotten.Add(id);
+        _poses.Clear();
+        _moved.Clear();
     }
 
     /// <summary>Applies the DMX engine's last update: new and changed states, removed fixtures, moved entities.</summary>
@@ -178,6 +191,12 @@ public sealed class FixturePoses
             _moved.Clear();
             foreach (var id in _scratch)
                 if (!_changedSet.Contains(id)) Refresh(scene, dmx, id);
+        }
+        if (_forgotten.Count > 0)
+        {
+            foreach (var id in _forgotten)
+                if (!_poses.ContainsKey(id) && !_removed.Contains(id)) _removed.Add(id);
+            _forgotten.Clear();
         }
     }
 

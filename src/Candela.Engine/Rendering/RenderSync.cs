@@ -62,6 +62,10 @@ public sealed class RenderSync : IDisposable
     private readonly List<Issue> _issues = new();
     private readonly Dictionary<Guid, bool> _layerVisible = new();
     private readonly AtmosphereState _atmosphere = new();
+    private readonly List<ModelVisual> _staleModels = new();
+    private readonly List<FixtureTypeVisual> _retiredTypes = new();
+    private readonly List<TextureHandle> _retiredTextures = new();
+    private readonly List<(FixtureProfile Profile, int Wheel, int Slot)> _scratchGobos = new();
     private Vector3[] _nodePositions = new Vector3[16];
     private MeshHandle _consoleMesh, _powerMesh, _hoistMesh;
     private MaterialHandle _defaultMaterial, _steelMaterial, _hoistMaterial, _greyMaterial;
@@ -161,6 +165,7 @@ public sealed class RenderSync : IDisposable
         UpdateFixtures();
         RefreshFlags();
         World.SetLights(_engine.Lights);
+        DestroyRetired();
         if (_linesDirty) UpdateLines();
         UpdateAtmosphere();
         World.SetNoiseSources(_engine.Simulation.NoiseSourceSpan);
@@ -257,7 +262,8 @@ public sealed class RenderSync : IDisposable
 
     private void OnAssetChanged(Guid assetId)
     {
-        if (_models.Remove(assetId, out var model)) model.Destroy(World);
+        // the old model is destroyed once the entities drawing it have been rebuilt (next update)
+        if (_models.Remove(assetId, out var model)) _staleModels.Add(model);
         foreach (var v in _entities.Values)
             if (v.AssetIds.Contains(assetId)) _rebuild.Add(v.Entity.Id);
     }
@@ -269,6 +275,8 @@ public sealed class RenderSync : IDisposable
         // models belong to the project's assets; fixture types and built-in materials stay valid across projects
         foreach (var m in _models.Values) m.Destroy(World);
         _models.Clear();
+        foreach (var m in _staleModels) m.Destroy(World);
+        _staleModels.Clear();
         _rebuild.Clear();
         _moved.Clear();
         foreach (var e in _scene.All()) _rebuild.Add(e.Id);
@@ -309,6 +317,50 @@ public sealed class RenderSync : IDisposable
             foreach (var id in _moved)
                 if (_entities.TryGetValue(id, out var v) && v.Kind != VisualKind.Cable) PlaceStatic(v);
             _moved.Clear();
+        }
+    }
+
+    /// <summary>A fixture type replaced by a new profile: destroyed by <see cref="DestroyRetired"/>.</summary>
+    private void Retire(FixtureTypeVisual type)
+    {
+        _retiredTypes.Add(type);
+        _scratchGobos.Clear();
+        foreach (var key in _gobos.Keys)
+            if (ReferenceEquals(key.Profile, type.Profile)) _scratchGobos.Add(key);
+        foreach (var key in _scratchGobos)
+        {
+            if (_gobos.Remove(key, out var texture) && texture.IsValid) _retiredTextures.Add(texture);
+        }
+    }
+
+    /// <summary>
+    /// Destroys models, fixture types and gobo textures that were replaced during this update, after every entity
+    /// drawing them was rebuilt and the new light list was sent.
+    /// </summary>
+    private void DestroyRetired()
+    {
+        if (_retiredTypes.Count > 0)
+        {
+            foreach (var type in _retiredTypes)
+            {
+                _scratch.Clear();
+                foreach (var v in _entities.Values)
+                    if (ReferenceEquals(v.FixtureType, type)) _scratch.Add(v.Entity.Id);
+                foreach (var id in _scratch) Rebuild(id);
+            }
+            foreach (var type in _retiredTypes)
+                if (type.Uploaded) type.Destroy(World);
+            _retiredTypes.Clear();
+        }
+        if (_staleModels.Count > 0)
+        {
+            foreach (var m in _staleModels) m.Destroy(World);
+            _staleModels.Clear();
+        }
+        if (_retiredTextures.Count > 0)
+        {
+            foreach (var t in _retiredTextures) World.DestroyTexture(t);
+            _retiredTextures.Clear();
         }
     }
 
@@ -599,9 +651,10 @@ public sealed class RenderSync : IDisposable
         }
         if (!ReferenceEquals(type.Profile, profile))
         {
-            // the profile cache was rebuilt (library changed): load the new profile's type
+            // the profile cache was rebuilt (library changed): load the new profile's type; the old one (and its gobo
+            // textures) is destroyed at the end of the update, when no fixture draws it any more
             _fixtureTypes.Remove(profile.Key);
-            if (type.Uploaded) type.Destroy(World);
+            Retire(type);
             BuildFixture(v, pose);
             return;
         }
@@ -855,6 +908,13 @@ public sealed class RenderSync : IDisposable
         _fixtureTypes.Clear();
         foreach (var m in _models.Values) m.Destroy(World);
         _models.Clear();
+        foreach (var m in _staleModels) m.Destroy(World);
+        _staleModels.Clear();
+        foreach (var t in _retiredTypes)
+            if (t.Uploaded) t.Destroy(World);
+        _retiredTypes.Clear();
+        foreach (var t in _retiredTextures) World.DestroyTexture(t);
+        _retiredTextures.Clear();
         foreach (var h in _builtinMaterials.Values) World.DestroyMaterial(h);
         _builtinMaterials.Clear();
         foreach (var t in _gobos.Values)
