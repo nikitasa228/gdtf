@@ -433,6 +433,8 @@ internal sealed class SettingsWindow
                 continue;
             var chord = new KeyChord(name, KeyNames.ModifiersOf(io.KeyCtrl, io.KeyShift, io.KeyAlt, io.KeySuper));
             _keys.SetChord(_captureAction!, _captureIndex, chord);
+            // The recorded press must not also run the command it was just bound to (shortcuts resume this frame).
+            _dispatcher.Consume(key);
             StopCapture();
             return;
         }

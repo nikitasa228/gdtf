@@ -481,6 +481,34 @@ public sealed class KeyBindingDispatchTests
     }
 
     [Fact]
+    public void A_chord_recorded_in_the_settings_does_not_also_run_its_command()
+    {
+        using var ui = new HeadlessImGui(new Vector2(800, 600));
+        ui.Frame(() => { });
+        var (commands, ran) = Registry(EditorActions.FileNew);
+        var dispatcher = new KeyBindingDispatcher(commands, KeyBindingsService.CreateDefault());
+
+        // The key editor records while shortcuts are suspended, binds the chord, consumes the press and resumes
+        // shortcuts in the same frame — as SettingsWindow.PollCapture does.
+        dispatcher.Suspended = true;
+        void Record()
+        {
+            if (!dispatcher.Suspended || !ImGui.IsKeyPressed(ImGuiKey.N, false))
+                return;
+            dispatcher.Consume(ImGuiKey.N);
+            dispatcher.Suspended = false;
+        }
+
+        Press(ui, dispatcher, ImGuiKey.N, KeyModifiers.Ctrl, Record);
+        Assert.False(dispatcher.Suspended);
+        Assert.Empty(ran);
+
+        // The next press is a shortcut again, and consumption lasted one frame only.
+        Press(ui, dispatcher, ImGuiKey.N, KeyModifiers.Ctrl, Record);
+        Assert.Equal(new[] { EditorActions.FileNew }, ran);
+    }
+
+    [Fact]
     public void Rebuild_applies_new_bindings()
     {
         using var ui = new HeadlessImGui(new Vector2(800, 600));
