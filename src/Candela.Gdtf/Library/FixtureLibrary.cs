@@ -60,6 +60,12 @@ public sealed record FixtureCategoryGroup(FixtureCategory Category, IReadOnlyLis
 /// callers wait for the same result). The parse cache keeps the <see cref="CacheCapacity"/> most recently used
 /// fixture types.
 /// </para>
+/// <para>
+/// Below the in-memory cache, parsed fixture types are kept on disk by <see cref="DiskCache"/> (by default the shared
+/// per-user <see cref="FixtureTypeDiskCache.Default"/>), so re-opening a fixture in a later session loads it in a
+/// fraction of the parse time. The disk cache is keyed by file content and reader version and is transparent: a
+/// missing, stale or damaged cache file only means the file is parsed again.
+/// </para>
 /// </remarks>
 public sealed class FixtureLibrary
 {
@@ -73,6 +79,7 @@ public sealed class FixtureLibrary
     private readonly List<string> _folders = new();
     private volatile Snapshot _snapshot = Snapshot.Empty;
     private long _clock;
+    private FixtureTypeDiskCache? _diskCache = FixtureTypeDiskCache.Default;
 
     /// <summary>Creates an empty library; <paramref name="specs"/> supplies categories and physical data (null: none).</summary>
     public FixtureLibrary(FixtureSpecsIndex? specs = null, int cacheCapacity = DefaultCacheCapacity)
@@ -87,6 +94,16 @@ public sealed class FixtureLibrary
 
     /// <summary>Maximum number of parsed fixture types kept in the cache.</summary>
     public int CacheCapacity { get; }
+
+    /// <summary>
+    /// Persistent cache used when a fixture type is parsed (default: <see cref="FixtureTypeDiskCache.Default"/>; null
+    /// parses every file from scratch). Changing it affects parses started afterwards.
+    /// </summary>
+    public FixtureTypeDiskCache? DiskCache
+    {
+        get => Volatile.Read(ref _diskCache);
+        set => Volatile.Write(ref _diskCache, value);
+    }
 
     /// <summary>All entries, sorted by manufacturer, model and newest revision first.</summary>
     public IReadOnlyList<FixtureLibraryEntry> Entries => _snapshot.Entries;
@@ -265,10 +282,7 @@ public sealed class FixtureLibrary
         var brandEntries = manufacturerKey.Length > 0 ? snapshot.EntriesOfManufacturer(manufacturerKey) : null;
         if (brandEntries is { Count: > 0 })
         {
-            FixtureLibraryEntry? best = null;
-            foreach (var e in brandEntries)
-                if (HasKey(e, modelKeys) && (best is null || IsBetter(e, best))) best = e;
-            if (best is not null) return new FixtureMatch(best, FixtureMatchKind.SameModel, 1);
+            if (BestMatch(brandEntries, modelKeys) is { } best) return new FixtureMatch(best, FixtureMatchKind.SameModel, 1);
         }
         else
         {
@@ -279,7 +293,7 @@ public sealed class FixtureLibrary
                 if (!snapshot.ByModelKey.TryGetValue(key, out var list)) continue;
                 var brands = list.Select(e => e.ManufacturerKey).Distinct(StringComparer.Ordinal).Count();
                 if (brands != 1) continue;
-                return new FixtureMatch(Newest(list), FixtureMatchKind.ModelOnly, 1);
+                return new FixtureMatch(BestMatch(list, new List<string> { key })!, FixtureMatchKind.ModelOnly, 1);
             }
             return null;
         }
@@ -350,9 +364,9 @@ public sealed class FixtureLibrary
     {
         ArgumentNullException.ThrowIfNull(entry);
         var slot = _cache.AddOrUpdate(entry.FilePath,
-            static (_, e) => new CacheSlot(e),
-            static (_, existing, e) => existing.IsFor(e) ? existing : new CacheSlot(e),
-            entry);
+            static (_, a) => new CacheSlot(a.Entry, a.Disk),
+            static (_, existing, a) => existing.IsFor(a.Entry) ? existing : new CacheSlot(a.Entry, a.Disk),
+            (Entry: entry, Disk: DiskCache));
         slot.LastAccess = Interlocked.Increment(ref _clock);
         FixtureType result;
         try
@@ -435,20 +449,47 @@ public sealed class FixtureLibrary
         {
             if (key.Length <= prefix.Length || !key.StartsWith(prefix, StringComparison.Ordinal)) continue;
             var rest = new List<string> { key[prefix.Length..] };
-            FixtureLibraryEntry? best = null;
-            foreach (var e in snapshot.ByManufacturer[brand])
-                if (HasKey(e, rest) && (best is null || IsBetter(e, best))) best = e;
-            if (best is not null) return best;
+            if (BestMatch(snapshot.ByManufacturer[brand], rest) is { } best) return best;
         }
         return null;
     }
 
-    private static bool HasKey(FixtureLibraryEntry e, List<string> keys)
+    /// <summary>
+    /// The entry that answers best to <paramref name="keys"/>: one whose file name gives the model beats one that only
+    /// has it as a specs alias (two models can share an alias: "Robin Spikie+" was once indistinguishable from
+    /// "Robin Spikie"), then the newest revision. Null when none answers.
+    /// </summary>
+    private static FixtureLibraryEntry? BestMatch(IEnumerable<FixtureLibraryEntry> entries, List<string> keys)
     {
-        foreach (var k in keys)
-            foreach (var ek in e.ModelKeys)
-                if (string.Equals(k, ek, StringComparison.Ordinal)) return true;
-        return false;
+        FixtureLibraryEntry? best = null;
+        int bestRank = int.MaxValue;
+        foreach (var e in entries)
+        {
+            int rank = MatchRank(e, keys);
+            if (rank < 0) continue;
+            if (best is null || rank < bestRank || (rank == bestRank && IsBetter(e, best)))
+            {
+                best = e;
+                bestRank = rank;
+            }
+        }
+        return best;
+    }
+
+    /// <summary>0 when a key matches the entry's file-name model, 1 when only a specs alias matches, −1 for no match.</summary>
+    private static int MatchRank(FixtureLibraryEntry e, List<string> keys)
+    {
+        int rank = -1;
+        for (int i = 0; i < e.ModelKeys.Count; i++)
+        {
+            foreach (var k in keys)
+            {
+                if (!string.Equals(k, e.ModelKeys[i], StringComparison.Ordinal)) continue;
+                if (i < e.FileKeyCount) return 0;
+                rank = 1;
+            }
+        }
+        return rank;
     }
 
     /// <summary>Newer revision wins; equal revisions fall back to the file name so results are deterministic.</summary>
@@ -456,14 +497,6 @@ public sealed class FixtureLibrary
     {
         int c = candidate.Revision.CompareTo(current.Revision);
         return c > 0 || (c == 0 && string.CompareOrdinal(candidate.FileName, current.FileName) < 0);
-    }
-
-    private static FixtureLibraryEntry Newest(IReadOnlyList<FixtureLibraryEntry> list)
-    {
-        var best = list[0];
-        for (int i = 1; i < list.Count; i++)
-            if (IsBetter(list[i], best)) best = list[i];
-        return best;
     }
 
     /// <summary>Normalised keys of a requested model name: as written and without a leading brand name.</summary>
@@ -594,12 +627,12 @@ public sealed class FixtureLibrary
         private readonly DateTime _stamp;
         private readonly long _size;
 
-        public CacheSlot(FixtureLibraryEntry entry)
+        public CacheSlot(FixtureLibraryEntry entry, FixtureTypeDiskCache? disk)
         {
             _stamp = entry.LastWriteTimeUtc;
             _size = entry.FileSize;
             string path = entry.FilePath;
-            Value = new Lazy<FixtureType>(() => GdtfReader.ReadFile(path), LazyThreadSafetyMode.ExecutionAndPublication);
+            Value = new Lazy<FixtureType>(() => disk is null ? GdtfReader.ReadFile(path) : disk.ReadFile(path), LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         public Lazy<FixtureType> Value { get; }

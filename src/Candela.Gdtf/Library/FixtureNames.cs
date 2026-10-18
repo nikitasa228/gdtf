@@ -45,20 +45,25 @@ public static class FixtureNames
 
     /// <summary>
     /// Lower-case letters and digits of <paramref name="text"/> only ("Robin_T1 Profile" → "robint1profile"); the key
-    /// two names share when they differ only in case, separators or punctuation.
+    /// two names share when they differ only in case, separators or punctuation. A <c>+</c> is a word of product names,
+    /// not punctuation, and is spelled out as "plus" the way file names write it ("Robin Spikie+" →
+    /// "robinspikieplus" = "Robin_SpikiePlus", "SIX+ BAR L" = "SIX_plus_BAR_L"), so "Spikie+" and "Spikie" stay apart.
     /// </summary>
     public static string Key(string? text)
     {
         if (string.IsNullOrEmpty(text)) return "";
         var sb = new StringBuilder(text.Length);
         foreach (char c in text)
+        {
             if (char.IsLetterOrDigit(c)) sb.Append(char.ToLowerInvariant(c));
+            else if (c == '+') sb.Append("plus");
+        }
         return sb.ToString();
     }
 
     /// <summary>
     /// Words of a name in lower case: split at anything that is not a letter or digit and at lower-to-upper case
-    /// changes ("MagicBlade R" → magic, blade, r).
+    /// changes ("MagicBlade R" → magic, blade, r); a <c>+</c> is the word "plus" (see <see cref="Key"/>).
     /// </summary>
     public static IReadOnlyList<string> Words(string? text)
     {
@@ -71,6 +76,7 @@ public static class FixtureNames
             if (!char.IsLetterOrDigit(c))
             {
                 Flush();
+                if (c == '+') words.Add("plus");
             }
             else
             {

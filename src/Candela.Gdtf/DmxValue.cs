@@ -100,6 +100,28 @@ public readonly struct DmxValue : IEquatable<DmxValue>
         return result;
     }
 
+    /// <summary>
+    /// The value as the <em>inclusive end of a range</em> in a channel with <paramref name="byteCount"/> bytes: the last
+    /// value before the next step of this value's own resolution starts. A range end written with fewer bytes than the
+    /// channel covers its whole step, so that ranges that meet in the file (<c>ModeTo="127/1"</c>,
+    /// <c>ModeFrom="128/1"</c>) also meet in the channel: <c>127/1</c> ends at 0x807F in a 16-bit channel (the mirrored
+    /// <c>128/1</c> = 0x8080 minus one), <c>127/1s</c> at 0x7FFF, and <c>255/1</c> at the channel maximum. Converting to
+    /// the same or fewer bytes is the same as <see cref="ToResolution"/>.
+    /// </summary>
+    /// <remarks>
+    /// This is the rule the spec uses for channel function ranges (end = next start − 1) applied to a single written
+    /// end value. Use it for <c>ModeTo</c> and other inclusive range ends; use <see cref="ToResolution"/> for starts.
+    /// </remarks>
+    public uint ToRangeEnd(int byteCount)
+    {
+        if (byteCount is < 1 or > MaxByteCount)
+            throw new ArgumentOutOfRangeException(nameof(byteCount), byteCount, "A DMX channel has 1 to 4 bytes.");
+        int own = EffectiveByteCount;
+        if (byteCount <= own) return ToResolution(byteCount);
+        if (Value >= MaxFor(own)) return MaxFor(byteCount);
+        return new DmxValue(Value + 1, own, Conversion).ToResolution(byteCount) - 1;
+    }
+
     /// <summary>Same value converted to another resolution, keeping the conversion mode.</summary>
     public DmxValue ConvertTo(int byteCount) => new(ToResolution(byteCount), byteCount, Conversion);
 

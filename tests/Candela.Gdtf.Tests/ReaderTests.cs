@@ -5,7 +5,7 @@ namespace Candela.Gdtf.Tests;
 /// <summary>Reader behaviour on synthetic descriptions: complete coverage of the format and tolerance of bad input.</summary>
 public sealed class ReaderTests
 {
-    private const string LedBar = """
+    internal const string LedBar = """
         <?xml version="1.0" encoding="UTF-8"?>
         <GDTF DataVersion="1.2">
           <FixtureType Name="Bar 4" ShortName="B4" LongName="Test Bar 4" Manufacturer="Test" Description="d" Thumbnail="thumbnail"

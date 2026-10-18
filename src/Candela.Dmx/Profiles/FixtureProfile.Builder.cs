@@ -18,6 +18,26 @@ public sealed partial class FixtureProfile
 
         /// <summary>GDTF's default Beam LuminousFlux (written by editors when the author left the field alone), lm.</summary>
         private const float GdtfDefaultFlux = 10000f;
+
+        /// <summary>GDTF's default Beam BeamAngle and FieldAngle, degrees.</summary>
+        private const float GdtfDefaultAngle = 25f;
+
+        /// <summary>GDTF's default Beam ColorTemperature, K.</summary>
+        private const float GdtfDefaultKelvin = 6000f;
+
+        /// <summary>GDTF's default Beam PowerConsumption, W.</summary>
+        private const float GdtfDefaultPower = 1000f;
+
+        /// <summary>
+        /// True when the file gives the beam a real luminous flux: written, positive, and not GDTF's default (GDTF Builder
+        /// writes every Beam attribute, so a written 10 000 lm is most likely the untouched default).
+        /// </summary>
+        private static bool HasRealFlux(BeamGeometry bg) =>
+            bg.IsLuminousFluxSpecified && bg.LuminousFlux > 0f && float.IsFinite(bg.LuminousFlux) && bg.LuminousFlux != GdtfDefaultFlux;
+
+        /// <summary>True when the file gives the beam a real electrical power (written, positive, not GDTF's 1000 W default).</summary>
+        private static bool HasRealPower(BeamGeometry bg) =>
+            bg.IsPowerConsumptionSpecified && bg.PowerConsumption > 0f && float.IsFinite(bg.PowerConsumption) && bg.PowerConsumption != GdtfDefaultPower;
         private readonly Dictionary<ChainKey, int> _instanceIndex = new();
         private readonly Dictionary<DmxChannel, List<int>> _instancesOf = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<Wheel, int> _wheelIndex = new(ReferenceEqualityComparer.Instance);
@@ -212,6 +232,19 @@ public sealed partial class FixtureProfile
             try
             {
                 return v.ToResolution(bytes);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return 0;
+            }
+        }
+
+        /// <summary><see cref="DmxValue.ToRangeEnd"/>, 0 for an invalid byte count.</summary>
+        private static uint SafeRangeEnd(DmxValue v, int bytes)
+        {
+            try
+            {
+                return v.ToRangeEnd(bytes);
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -502,8 +535,20 @@ public sealed partial class FixtureProfile
                     continue;
                 }
                 var m = Channels[master];
-                uint from = SafeResolution(src.ModeFrom, m.ByteCount), to = SafeResolution(src.ModeTo, m.ByteCount);
-                if (to < from) (from, to) = (to, from);
+                // The reader resolves the mode range in the master's resolution with range semantics (a ModeTo written
+                // with fewer bytes than the master covers its whole step, so adjacent ranges leave no gap).
+                uint from, to;
+                if (ReferenceEquals(src.ModeMasterChannel, m.Instance.Channel) && src.ModeMasterChannel.Resolution == m.ByteCount)
+                {
+                    from = src.ModeFromValue;
+                    to = src.ModeToValue;
+                }
+                else
+                {
+                    from = SafeResolution(src.ModeFrom, m.ByteCount);
+                    to = SafeRangeEnd(src.ModeTo, m.ByteCount);
+                    if (to < from) (from, to) = (SafeResolution(src.ModeTo, m.ByteCount), SafeRangeEnd(src.ModeFrom, m.ByteCount));
+                }
                 f.ModeMaster = master;
                 f.ModeFrom = from;
                 f.ModeTo = to;
@@ -874,11 +919,14 @@ public sealed partial class FixtureProfile
             var bg = beam.Geometry;
             beam.BeamType = MapBeamType(bg.BeamType);
 
-            // optics: native angle, field ratio, zoom range
+            // optics: native angle, field ratio, zoom range. An angle the file does not give is GDTF's placeholder; one it
+            // gives as exactly GDTF's 25°/25° is most likely the editor's untouched default (GDTF Builder writes every
+            // attribute), so _specs wins in both cases.
             float native = bg.BeamAngle;
-            float field = bg.FieldAngle;
-            bool gdtfDefaults = native == 25f && field == 25f;
-            if ((gdtfDefaults || !(native > 0f)) && Specs?.BeamAngleDeg is { } specBeam && specBeam.Min > 0)
+            float field = bg.IsFieldAngleSpecified ? bg.FieldAngle : float.NaN;
+            bool placeholderAngles = !bg.IsBeamAngleSpecified ||
+                (native == GdtfDefaultAngle && (!bg.IsFieldAngleSpecified || bg.FieldAngle == GdtfDefaultAngle));
+            if ((placeholderAngles || !(native > 0f)) && Specs?.BeamAngleDeg is { } specBeam && specBeam.Min > 0)
             {
                 native = (float)specBeam.Min;
                 field = Specs.FieldAngleDeg is { } sf && sf > native ? (float)sf : float.NaN;
@@ -951,21 +999,22 @@ public sealed partial class FixtureProfile
                 beam.ReferenceFlux = perBeam * table.SolidAngle(specAngle * DegToRad);
                 beam.PhotometrySource = PhotometrySource.SpecsCandela;
             }
-            else if (Specs?.LuminousFluxLm is { } lm && lm > 0 && double.IsFinite(lm) && !(bg.LuminousFlux > 0f && bg.LuminousFlux != GdtfDefaultFlux))
+            else if (Specs?.LuminousFluxLm is { } lm && lm > 0 && double.IsFinite(lm) && !HasRealFlux(bg))
             {
                 // the GDTF flux is missing or GDTF's default: the researched fixture flux, shared between the beams
                 beam.ReferenceFlux = (float)(lm * _beamShare[beam.Index]);
                 beam.PhotometrySource = PhotometrySource.SpecsFlux;
             }
-            else if (bg.LuminousFlux > 0f && float.IsFinite(bg.LuminousFlux))
+            else if (bg.IsLuminousFluxSpecified && bg.LuminousFlux > 0f && float.IsFinite(bg.LuminousFlux))
             {
                 // GDTF's default (10 000 lm) on every pixel of a multi-beam fixture is not 10 000 lm per pixel: read it as
                 // the fixture's total
                 beam.ReferenceFlux = bg.LuminousFlux == GdtfDefaultFlux && Beams.Count > 1 ? bg.LuminousFlux / Beams.Count : bg.LuminousFlux;
                 beam.PhotometrySource = PhotometrySource.GdtfFlux;
             }
-            else
+            else if (HasRealPower(bg) || (Specs?.PowerConsumptionW is { } w && w > 0 && double.IsFinite(w)))
             {
+                // no usable flux anywhere: the beam's (or the fixture's researched) electrical power × a typical efficacy
                 float efficacy = EffectiveLampType(bg, emitterSet.Count > 0) switch
                 {
                     LampType.Led => 40f,
@@ -973,13 +1022,25 @@ public sealed partial class FixtureProfile
                     LampType.Halogen => 18f,
                     _ => 15f,
                 };
-                float power = bg.PowerConsumption > 0f && float.IsFinite(bg.PowerConsumption) ? bg.PowerConsumption : 100f;
+                float power = HasRealPower(bg) ? bg.PowerConsumption : (float)(Specs!.PowerConsumptionW!.Value * _beamShare[beam.Index]);
                 beam.ReferenceFlux = power * efficacy;
                 beam.PhotometrySource = PhotometrySource.Estimated;
             }
+            else
+            {
+                // the file gives neither flux nor power: GDTF's default flux, read as the fixture's total
+                beam.ReferenceFlux = GdtfDefaultFlux / Math.Max(1, Beams.Count);
+                beam.PhotometrySource = PhotometrySource.Estimated;
+            }
 
-            // white source colour
+            // white source colour: the GDTF colour temperature, unless the file does not give it or gives GDTF's 6000 K
+            // default (5900 of the library's 12 239 beams) and _specs knows the source: a single CCT, or the top of the
+            // range of a source whose CTO/CMY filters work down from it
             float kelvin = bg.ColorTemperature;
+            if ((!bg.IsColorTemperatureSpecified || kelvin == GdtfDefaultKelvin) && Specs?.ColorTemperatureK is { } specCct &&
+                specCct.Max >= 1000 && specCct.Max <= 25000 && double.IsFinite(specCct.Max) &&
+                (specCct.Max - specCct.Min <= 1.0 || hasCmyOrCto))
+                kelvin = (float)specCct.Max;
             if (bg.EmitterSpectrum is { } spectrumEmitter && TryEmitterChromaticity(spectrumEmitter, out var sxy))
             {
                 var cct = Cct.FromXy(sxy);
@@ -1065,8 +1126,8 @@ public sealed partial class FixtureProfile
             int knownCount = 0;
             for (int b = 0; b < n; b++)
             {
-                float f = Beams[b].Geometry.LuminousFlux;
-                flux[b] = f > 0f && float.IsFinite(f) && f != GdtfDefaultFlux ? f : double.NaN;
+                var bg = Beams[b].Geometry;
+                flux[b] = HasRealFlux(bg) ? bg.LuminousFlux : double.NaN;
                 if (double.IsNaN(flux[b])) continue;
                 known += flux[b];
                 knownCount++;

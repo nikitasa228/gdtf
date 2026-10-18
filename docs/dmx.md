@@ -183,9 +183,11 @@ looks the same:
 `PeakCandela = reference peak at the current beam angle × Intensity × ColorTransmission`. The reference output of a
 beam at full white comes from, in order: `_specs` `maxLuminousIntensityCd` (the datasheet value, read as the peak at
 the narrowest zoom and shared between the fixture's beams; 1058 of the 1060 light-emitting files have it) → the
-GDTF Beam's `LuminousFlux` when it is not GDTF's default 10 000 lm → `_specs` `luminousFluxLm` → GDTF's default flux
-(split between the beams of a multi-beam fixture) → beam power × a typical efficacy of the lamp type (LED 40,
-discharge 45, halogen 18, tungsten 15 lm/W). The `_specs` values are shared between the beams in proportion to their
+GDTF Beam's `LuminousFlux` when the file gives it (`BeamGeometry.IsLuminousFluxSpecified`) and it is not GDTF's
+default 10 000 lm → `_specs` `luminousFluxLm` → a written default flux (split between the beams of a multi-beam
+fixture) → the beam power the file gives (not GDTF's default 1000 W), else `_specs` `powerConsumptionW`, × a typical
+efficacy of the lamp type (LED 40, discharge 45, halogen 18, tungsten 15 lm/W) → GDTF's default flux split between
+the beams when the file gives neither flux nor power. The `_specs` values are shared between the beams in proportion to their
 GDTF `LuminousFlux` when the file gives the beams different fluxes (a main engine and an aura ring, large and small
 cells: 89 of the library's multi-beam modes), a beam with GDTF's default or no flux counting as the mean of the
 others; equally otherwise. The lamp type is LED for a beam whose mode drives additive emitters, else the `_specs`
@@ -207,7 +209,8 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
 * **Indirect colour systems**: `ColorRGB_*` (in the fixture's GDTF colour space, sRGB when it is missing or
   degenerate), `HSB_Hue/Saturation/Brightness`, `CIE_X/CIE_Y/CIE_Brightness` (x, y as 0 … 1 or ×10⁴ integers).
 * **White sources**: the lamp's own colour temperature (Beam `ColorTemperature`, or the CCT of its emitter
-  spectrum; 6000 K when unknown).
+  spectrum; 6000 K when unknown). A colour temperature the file omits or writes as GDTF's 6000 K default gives way to
+  `_specs` `colorTemperatureK` when that names a single CCT, or a range on a source with CMY/CTO filters (its top).
 * **Subtractive**: `ColorSub_C/M/Y` (and R/G/B as complementary pairs) and `CTO`/`CTB`/`CTC` go through a spectral
   model of the source (CIE reference illuminant at the source CCT × idealised dichroic CMY bands × an ideal
   conversion filter to the target CCT), precomputed per source CCT. `CTC` names the resulting CCT. CTO/CTB with
@@ -241,7 +244,7 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
 * **Beam/field angle** from `Zoom` (GDTF physical degrees, clamped 0.1 … 179°; ranges named "No function" /
   "Disabled" leave it alone; `ZoomModeSpot`/`ZoomModeBeam` drive it only in modes without a `Zoom` channel — next to
   one they are presets or mode switches and would otherwise override it); without zoom, the Beam geometry's
-  angles (or `_specs` beamAngleDeg when the file carries GDTF's 25°/25° defaults). Field angle = beam angle × the
+  angles (or `_specs` beamAngleDeg when the file omits them or carries GDTF's 25°/25° defaults). Field angle = beam angle × the
   beam's field ratio (from the GDTF field angle, or the beam type's typical ratio).
 * **Focus** 0 … 1 within the function's range; `Focus(n)Distance` in metres. **Iris** opening 0 … 1 (1 = open),
   including iris pulses. **Frost** 1 − Π(1 − fᵢ) over all frost channels and frost pulses.

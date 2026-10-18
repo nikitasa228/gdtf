@@ -78,22 +78,34 @@ public sealed class GdtfImageSource : IImageSource
         }
     }
 
-    /// <summary>Decodes PNG/JPEG/BMP/TGA/GIF bytes to RGBA8 (top row first); null when the format is not supported.</summary>
+    /// <summary>
+    /// Largest image decoded, in pixels (64 MP, 256 MiB as RGBA8; wheel and texture images of the library are at most a
+    /// few megapixels). A few kilobytes of PNG can declare a gigapixel image, so larger ones are refused unread.
+    /// </summary>
+    public const long MaxPixels = 64L << 20;
+
+    /// <summary>
+    /// Decodes PNG/JPEG/BMP/TGA/GIF bytes to RGBA8 (top row first); null when the format is not supported, the data is
+    /// damaged or the image is larger than <see cref="MaxPixels"/>.
+    /// </summary>
     public static ImageData? Decode(byte[] encoded)
     {
         ArgumentNullException.ThrowIfNull(encoded);
         if (encoded.Length < 8) return null;
         try
         {
+            using (var header = new MemoryStream(encoded, writable: false))
+            {
+                if (ImageInfo.FromStream(header) is not { } info || info.Width <= 0 || info.Height <= 0 ||
+                    (long)info.Width * info.Height > MaxPixels)
+                    return null;
+            }
             var result = ImageResult.FromMemory(encoded, ColorComponents.RedGreenBlueAlpha);
             return new ImageData { Width = result.Width, Height = result.Height, Format = PixelFormat.Rgba8, Pixels = result.Data };
         }
-        catch (Exception e) when (e is InvalidOperationException or ArgumentException or IndexOutOfRangeException or NotSupportedException)
+        catch (Exception e) when (e is not OutOfMemoryException)
         {
-            return null;
-        }
-        catch (Exception e) when (e.GetType().Name.Contains("Stb", StringComparison.Ordinal))
-        {
+            // Untrusted image data: the decoder reports damage with a variety of exception types.
             return null;
         }
     }
