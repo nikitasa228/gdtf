@@ -21,7 +21,8 @@ public readonly record struct FixtureTypeCacheStatistics(long Hits, long Misses,
 /// <b>Key.</b> A cache file is keyed by the content of the GDTF archive and by the reader version, not by its path:
 /// a SHA-256 over the archive's table of contents (every entry's name, sizes and CRC-32 — the zip format's own content
 /// checksum, so nothing has to be decompressed or hashed again), the cache <see cref="FormatVersion"/> and the module
-/// version id of this assembly, which changes with every change of the reader code (builds are deterministic). The
+/// version ids of this assembly and Candela.Core, which change with every change of the reader code (builds are
+/// deterministic). The
 /// same file under another name or path hits the same entry; an edited file or an updated reader misses. Hashing the
 /// whole file instead would cost more than parsing it: 3D models make up 95 % of a typical <c>.gdtf</c>.
 /// </para>
@@ -53,7 +54,14 @@ public sealed class FixtureTypeDiskCache
     private const uint Magic = 0x43544643; // "CFTC" little endian
     private const int HeaderBytes = 4 + 4 + 16 + 32 + 4 + 32;
     private const int MaxPayloadBytes = 256 << 20;
-    private static readonly Guid ReaderModuleId = typeof(FixtureTypeDiskCache).Assembly.ManifestModule.ModuleVersionId;
+    /// <summary>
+    /// Identity of the reader code: the module version ids of this assembly and of Candela.Core (whose colour types the
+    /// model uses) combined. Deterministic builds give the same id for the same code, so any code change invalidates
+    /// the cache and an unchanged build keeps it.
+    /// </summary>
+    private static readonly Guid ReaderModuleId = CombineIds(
+        typeof(FixtureTypeDiskCache).Assembly.ManifestModule.ModuleVersionId,
+        typeof(Candela.Core.SceneGraph.Components.CieColor).Assembly.ManifestModule.ModuleVersionId);
     private static readonly Lazy<FixtureTypeDiskCache> DefaultCache = new(() => new FixtureTypeDiskCache(DefaultDirectory));
 
     private readonly object _pruneGate = new();
@@ -280,6 +288,16 @@ public sealed class FixtureTypeDiskCache
     }
 
     // ---------------------------------------------------------------- housekeeping
+
+    private static Guid CombineIds(Guid a, Guid b)
+    {
+        Span<byte> both = stackalloc byte[32];
+        a.TryWriteBytes(both);
+        b.TryWriteBytes(both[16..]);
+        Span<byte> hash = stackalloc byte[32];
+        SHA256.HashData(both, hash);
+        return new Guid(hash[..16]);
+    }
 
     private static void ValidateKey(string key)
     {
