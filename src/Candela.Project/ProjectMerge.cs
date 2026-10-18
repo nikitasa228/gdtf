@@ -212,7 +212,7 @@ public static class ProjectMerge
             var staging = new Scene();
             staging.Add(group);
             var clones = new Dictionary<Guid, Entity>(sourceEntities.Count);
-            var remap = new ReferenceRemapper(entityIds, assetIds, target.Assets, source.Assets, gdtfNames, fixtureIds, groupWorld, issues);
+            var remap = new ReferenceRemapper(entityIds, assetIds, target, source.Assets, gdtfNames, fixtureIds, groupWorld, issues);
             foreach (var e in sourceEntities)
             {
                 var newId = entityIds[e.Id];
@@ -236,6 +236,7 @@ public static class ProjectMerge
             foreach (var issue in source.LoadIssues)
             {
                 if (issue.Code == ProjectIssueCodes.SceneComponentUnknown && source.UnknownComponents.Count > 0) continue;
+                if (issue.Code == ProjectIssueCodes.AssetKept) continue;
                 var related = issue.Entities.Where(entityIds.ContainsKey).Select(id => entityIds[id]).ToArray();
                 issues.Add(issue with { Entities = related });
             }
@@ -245,6 +246,13 @@ public static class ProjectMerge
                 var name = source.Scene.Find(sourceId)?.Name ?? sourceId.ToString("D");
                 issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentUnknown,
                     $"'{name}' has {kept.Count} component(s) of a type this version of Candela does not know; they were not imported.", newId));
+            }
+            var notImported = source.KeptAssetIds.Where(id => !target.KeptAssetIds.Contains(id) && !target.Assets.Contains(id)).ToList();
+            if (notImported.Count > 0)
+            {
+                issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetKept,
+                    $"{notImported.Count} asset(s) of the imported project that this version of Candela cannot load were not imported; objects using them have no asset.",
+                    Array.Empty<Guid>()));
             }
 
             var result = new ProjectMergeResult(group, entityIds, assetIds, gdtfNames,
@@ -441,7 +449,7 @@ public static class ProjectMerge
     private sealed class ReferenceRemapper(
         Dictionary<Guid, Guid> entityIds,
         Dictionary<Guid, Guid> assetIds,
-        AssetStore targetAssets,
+        ProjectData target,
         AssetStore sourceAssets,
         Dictionary<string, string> gdtfNames,
         Dictionary<FixtureComponent, int>? fixtureIds,
@@ -562,8 +570,9 @@ public static class ProjectMerge
         {
             if (id == Guid.Empty) return id;
             if (assetIds.TryGetValue(id, out var mapped)) return mapped;
-            // Not in the imported project. Keep it when this project has that asset (the file was a copy of this project).
-            if (!sourceAssets.Contains(id) && targetAssets.Contains(id)) return id;
+            // Not in the imported project. Keep it when this project has that asset (the file was a copy of this project),
+            // loaded or kept verbatim.
+            if (!sourceAssets.Contains(id) && (target.Assets.Contains(id) || target.KeptAssetIds.Contains(id))) return id;
             Dangling(owner, $"'{owner.Name}' referred to a {what} asset ({id:D}) that is not in the imported project; the reference was removed.");
             return null;
         }

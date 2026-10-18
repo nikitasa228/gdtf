@@ -136,7 +136,10 @@ public sealed class TolerantLoadTests : IDisposable
             return TestData.Utf8(index.ToJsonString());
         });
         var loaded = ProjectFile.Load(_path);
-        Assert.Equal(3, loaded.LoadIssues.Count(i => i.Code == ProjectIssueCodes.AssetRecordInvalid));
+        Assert.Equal(2, loaded.LoadIssues.Count(i => i.Code == ProjectIssueCodes.AssetRecordInvalid));
+        // The unknown "Hologram" kind would be kept verbatim, but its file is not in the archive.
+        Assert.Single(loaded.LoadIssues, i => i.Code == ProjectIssueCodes.AssetMissing && i.Message.Contains("Hologram"));
+        Assert.Empty(loaded.KeptAssetIds);
         Assert.Equal(_project.Assets.Count, loaded.Assets.Count);
     }
 

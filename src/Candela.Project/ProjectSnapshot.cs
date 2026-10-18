@@ -30,9 +30,15 @@ public sealed class ProjectSnapshot
         Assets = project.Assets.Entries;
         Thumbnail = project.Thumbnail;
 
+        var kept = new List<KeptAsset>(project.KeptAssetsMutable.Count);
+        foreach (var k in project.KeptAssetsMutable.Values)
+            if (project.Assets.Find(k.Id) is null) kept.Add(k);
+        KeptAssets = kept;
+
         Gdtfs = ProjectData.CollectGdtfSpecs(scene);
         var known = new HashSet<Guid>();
         foreach (var a in Assets) known.Add(a.Id);
+        foreach (var k in kept) known.Add(k.Id);
         var missing = new Dictionary<Guid, List<Guid>>();
         int fixtures = 0;
         foreach (var entity in scene.All())
@@ -90,8 +96,8 @@ public sealed class ProjectSnapshot
     /// <summary>When the snapshot was taken.</summary>
     public DateTimeOffset CapturedUtc { get; }
 
-    /// <summary>Number of assets captured.</summary>
-    public int AssetCount => Assets.Count;
+    /// <summary>Number of assets captured (including assets kept verbatim, see <see cref="ProjectData.KeptAssetIds"/>).</summary>
+    public int AssetCount => Assets.Count + KeptAssets.Count;
 
     /// <summary>GDTF names used by the scene, in order of first use.</summary>
     public IReadOnlyList<string> GdtfNames => Gdtfs.Keys;
@@ -103,6 +109,9 @@ public sealed class ProjectSnapshot
     internal IReadOnlyDictionary<string, JsonElement> Settings { get; }
 
     internal IReadOnlyList<AssetEntry> Assets { get; }
+
+    /// <summary>Assets kept verbatim from loading (not shadowed by an asset of the same id in the store).</summary>
+    internal IReadOnlyList<KeptAsset> KeptAssets { get; }
 
     internal byte[]? Thumbnail { get; }
 

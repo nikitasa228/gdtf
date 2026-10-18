@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.Serialization;
@@ -118,7 +119,27 @@ internal static class ProjectWriter
             }
             index.Assets.Add(record);
         }
-        WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(index, CandelaJson.Options), level, stamp);
+        if (snapshot.KeptAssets.Count == 0)
+        {
+            WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(index, CandelaJson.Options), level, stamp);
+            return;
+        }
+
+        // Assets this version could not load go back exactly as they were read: every file under its original entry name
+        // and the record verbatim (it may hold fields only a newer version understands).
+        var root = JsonSerializer.SerializeToNode(index, CandelaJson.Options)!.AsObject();
+        var records = root["assets"]!.AsArray();
+        foreach (var kept in snapshot.KeptAssets)
+        {
+            // Its folder assets/{id}/ belongs to it alone (an asset of the same id in the store replaces it at capture).
+            foreach (var (entry, data) in kept.Files)
+            {
+                used.Add(entry);
+                WriteEntry(zip, entry, data, LevelFor(entry, level), stamp);
+            }
+            records.Add(JsonNode.Parse(kept.Record.GetRawText()));
+        }
+        WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options), level, stamp);
     }
 
     private static void WriteFixtures(ZipArchive zip, ProjectSnapshot snapshot, CompressionLevel level, DateTimeOffset stamp,

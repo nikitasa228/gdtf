@@ -71,7 +71,7 @@ internal static class ProjectReader
         foreach (var (entity, components) in unknownComponents) project.UnknownComponentsMutable[entity] = components;
         ReadSettings(access, project.Settings, hasManifest, issues);
         var assetUsers = CollectAssetUsers(scene);
-        ReadAssets(access, store, assetUsers, options, issues);
+        ReadAssets(access, project, assetUsers, options, issues);
         ReadFixtures(access, project, options, issues);
         ReadThumbnail(access, project, issues);
         project.LoadIssues = issues.ToList();
@@ -413,13 +413,34 @@ internal static class ProjectReader
         return users;
     }
 
-    private static void ReadAssets(ArchiveAccess access, AssetStore store, Dictionary<Guid, List<Guid>> users, ProjectLoadOptions options,
+    private static void ReadAssets(ArchiveAccess access, ProjectData project, Dictionary<Guid, List<Guid>> users, ProjectLoadOptions options,
         IssueCollector issues)
     {
-        var records = ReadAssetIndex(access, issues);
+        var store = project.Assets;
+        var items = ReadAssetIndex(access, issues, out bool fromIndex);
         var seen = new HashSet<Guid>();
-        foreach (var record in records)
+        var folders = AssetFolders(access);
+        foreach (var (record, raw) in items)
         {
+            if (record is null)
+            {
+                // A record this version cannot read (a newer asset kind, a changed field): keep it with its files.
+                var id = raw is { ValueKind: JsonValueKind.Object } r ? SceneJsonReader.ReadGuid(r, "id") : null;
+                if (id is { } keptId && keptId != Guid.Empty && seen.Add(keptId))
+                {
+                    var why = raw is { } rr && SceneJsonReader.ReadString(rr, "kind") is { } k && !Enum.TryParse<AssetKind>(k, out _)
+                        ? $"of a kind this version does not know ('{k}')"
+                        : "whose record this version cannot read";
+                    Keep(access, project, keptId, raw!.Value, folders, users, options, issues, why);
+                }
+                else
+                {
+                    issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetRecordInvalid,
+                        $"An asset record that repeats the id {id:D} was skipped.");
+                }
+                continue;
+            }
+
             IReadOnlyList<Guid> related = users.TryGetValue(record.Id, out var u) ? u : Array.Empty<Guid>();
             var label = string.IsNullOrEmpty(record.FileName) ? record.Id.ToString("D") : $"'{record.FileName}'";
             if (record.Id == Guid.Empty || !seen.Add(record.Id) || !Enum.IsDefined(record.Kind) || string.IsNullOrEmpty(record.Entry))
@@ -487,8 +508,16 @@ internal static class ProjectReader
             }
             catch (AssetImportException e)
             {
-                issues.Add(IssueSeverity.Error, IssueCategory.Scene, ProjectIssueCodes.AssetRejected,
-                    $"The asset {label} could not be loaded: {e.Message}", related);
+                // Intact files this version does not accept (written by a newer version?): keep them for the next save.
+                if (raw is { } element)
+                {
+                    Keep(access, project, record.Id, element, folders, users, options, issues, $"that this version cannot load ({e.Message})");
+                }
+                else
+                {
+                    issues.Add(IssueSeverity.Error, IssueCategory.Scene, ProjectIssueCodes.AssetRejected,
+                        $"The asset {label} could not be loaded: {e.Message}", related);
+                }
             }
             catch (InvalidOperationException e)
             {
@@ -496,11 +525,120 @@ internal static class ProjectReader
                     $"The asset {label} could not be added: {e.Message}", related);
             }
         }
+
+        if (!fromIndex) return;
+        // Folders that no record describes (a record was damaged beyond reading its id): recover them like a lost index.
+        var orphans = new HashSet<Guid>();
+        foreach (var id in folders.Keys)
+            if (!seen.Contains(id)) orphans.Add(id);
+        if (orphans.Count == 0) return;
+        foreach (var record in RecoverAssetRecords(access, orphans))
+        {
+            try
+            {
+                store.Add(record.Kind, record.FileName, access.Read(record.Entry) ?? throw new EntryReadException("missing"),
+                    ReadCompanions(access, record), id: record.Id);
+                IReadOnlyList<Guid> related = users.TryGetValue(record.Id, out var u) ? u : Array.Empty<Guid>();
+                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetIndexInvalid,
+                    $"The asset '{record.FileName}' ({record.Id:D}) had no usable record in assets/index.json; it was recovered from its folder as {record.Kind} (import settings are lost).",
+                    related);
+            }
+            catch (Exception e) when (e is EntryReadException or AssetImportException or InvalidOperationException)
+            {
+                issues.Add(IssueSeverity.Error, IssueCategory.Scene, ProjectIssueCodes.AssetCorrupt,
+                    $"The asset folder {record.Id:D} has no usable record and its files could not be recovered ({e.Message}).");
+            }
+        }
     }
 
-    private static List<AssetRecord> ReadAssetIndex(ArchiveAccess access, IssueCollector issues)
+    /// <summary>Companion files listed by a recovered record (unreadable ones are left out).</summary>
+    private static Dictionary<string, byte[]>? ReadCompanions(ArchiveAccess access, AssetRecord record)
     {
-        var records = new List<AssetRecord>();
+        if (record.Companions is not { Count: > 0 }) return null;
+        var files = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+        foreach (var c in record.Companions)
+        {
+            try
+            {
+                if (access.Read(c.Entry) is { } bytes) files[c.Path] = bytes;
+            }
+            catch (EntryReadException)
+            {
+                // The model loads without it, as when a companion is damaged.
+            }
+        }
+        return files;
+    }
+
+    /// <summary>
+    /// Keeps an asset this version cannot load (<see cref="ProjectData.KeptAssetIds"/>): its index record verbatim and every
+    /// file of its folder, so the next save writes them back unchanged. A damaged main file is reported instead.
+    /// </summary>
+    private static void Keep(ArchiveAccess access, ProjectData project, Guid id, JsonElement record, Dictionary<Guid, List<string>> folders,
+        Dictionary<Guid, List<Guid>> users, ProjectLoadOptions options, IssueCollector issues, string why)
+    {
+        IReadOnlyList<Guid> related = users.TryGetValue(id, out var u) ? u : Array.Empty<Guid>();
+        var name = SceneJsonReader.ReadString(record, "fileName") is { Length: > 0 } f ? $"'{f}'" : id.ToString("D");
+        var files = new List<(string Entry, byte[] Data)>();
+        try
+        {
+            if (folders.TryGetValue(id, out var entries))
+            {
+                foreach (var entry in entries)
+                    if (access.Read(entry) is { } bytes) files.Add((entry, bytes));
+            }
+            var main = SceneJsonReader.ReadString(record, "entry");
+            var mainFile = files.Find(x => x.Entry == main);
+            if (main is null || mainFile.Data is null)
+            {
+                issues.Add(IssueSeverity.Error, IssueCategory.Scene, ProjectIssueCodes.AssetMissing,
+                    $"The asset {name}, {why}, has no file in the project and was dropped.", related);
+                return;
+            }
+            long size = record.TryGetProperty("size", out var s) && s.ValueKind == JsonValueKind.Number && s.TryGetInt64(out long l) ? l : 0;
+            if (Damaged(mainFile.Data, size, SceneJsonReader.ReadString(record, "sha256"), options) is { } damage)
+            {
+                issues.Add(IssueSeverity.Error, IssueCategory.Scene, ProjectIssueCodes.AssetCorrupt,
+                    $"The asset {name}, {why}, is damaged ({damage}) and was dropped.", related);
+                return;
+            }
+        }
+        catch (EntryReadException e)
+        {
+            issues.Add(IssueSeverity.Error, IssueCategory.Scene, ProjectIssueCodes.AssetCorrupt,
+                $"The asset {name}, {why}, is damaged ({e.Message}) and was dropped.", related);
+            return;
+        }
+        project.KeptAssetsMutable[id] = new KeptAsset(id, record.Clone(), files);
+        issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetKept,
+            $"The asset {name} is an asset {why}; it is kept unchanged and saved with the project, but objects using it show it as missing here.",
+            related);
+    }
+
+    /// <summary>Asset id → every file entry under <c>assets/{id}/</c>, in name order.</summary>
+    private static Dictionary<Guid, List<string>> AssetFolders(ArchiveAccess access)
+    {
+        var folders = new Dictionary<Guid, List<string>>();
+        foreach (var name in access.EntryNames.Order(StringComparer.Ordinal))
+        {
+            if (!name.StartsWith(ArchivePaths.AssetsFolder, StringComparison.Ordinal)) continue;
+            var rest = name[ArchivePaths.AssetsFolder.Length..];
+            int slash = rest.IndexOf('/');
+            if (slash <= 0 || slash == rest.Length - 1 || !Guid.TryParse(rest[..slash], out var id)) continue;
+            if (!folders.TryGetValue(id, out var files)) folders[id] = files = new List<string>();
+            files.Add(name);
+        }
+        return folders;
+    }
+
+    /// <summary>
+    /// The records of <c>assets/index.json</c> with their raw JSON (record null when it cannot be read as the current
+    /// layout). Without a usable index the records are recovered from the folders (<paramref name="fromIndex"/> false).
+    /// </summary>
+    private static List<(AssetRecord? Record, JsonElement? Raw)> ReadAssetIndex(ArchiveAccess access, IssueCollector issues, out bool fromIndex)
+    {
+        var records = new List<(AssetRecord?, JsonElement?)>();
+        fromIndex = true;
         string? damage = null;
         try
         {
@@ -525,12 +663,17 @@ internal static class ProjectReader
                             if (record is not null)
                             {
                                 NullRepair.Repair(record);
-                                records.Add(record);
+                                records.Add((record, element.Clone()));
                                 continue;
                             }
                         }
                         catch (Exception e) when (SceneJsonReader.IsDataError(e))
                         {
+                            if (element.ValueKind == JsonValueKind.Object && SceneJsonReader.ReadGuid(element, "id") is { } id && id != Guid.Empty)
+                            {
+                                records.Add((null, element.Clone()));
+                                continue;
+                            }
                             issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetRecordInvalid,
                                 $"Asset record #{index} could not be read and was skipped: {e.Message}");
                             continue;
@@ -549,38 +692,26 @@ internal static class ProjectReader
         }
 
         // No usable index: recover assets from the folder layout assets/{guid}/{file}.
-        records = RecoverAssetRecords(access);
-        if (records.Count > 0 || damage != "missing")
+        fromIndex = false;
+        var recovered = RecoverAssetRecords(access, null);
+        foreach (var r in recovered) records.Add((r, null));
+        if (recovered.Count > 0 || damage != "missing")
         {
             issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.AssetIndexInvalid,
-                $"The asset list (assets/index.json) is {(damage == "missing" ? "missing" : $"damaged ({damage})")}; {records.Count} asset(s) were recovered from the archive folders (import settings and checks are lost).");
+                $"The asset list (assets/index.json) is {(damage == "missing" ? "missing" : $"damaged ({damage})")}; {recovered.Count} asset(s) were recovered from the archive folders (import settings and checks are lost).");
         }
         return records;
     }
 
-    private static List<AssetRecord> RecoverAssetRecords(ArchiveAccess access)
+    /// <summary>Records rebuilt from the folder layout (kind from the extension), for all folders or only <paramref name="only"/>.</summary>
+    private static List<AssetRecord> RecoverAssetRecords(ArchiveAccess access, HashSet<Guid>? only)
     {
-        var folders = new Dictionary<Guid, List<string>>();
-        var order = new List<Guid>();
-        foreach (var name in access.EntryNames.Order(StringComparer.Ordinal))
-        {
-            if (!name.StartsWith(ArchivePaths.AssetsFolder, StringComparison.Ordinal)) continue;
-            var rest = name[ArchivePaths.AssetsFolder.Length..];
-            int slash = rest.IndexOf('/');
-            if (slash <= 0 || !Guid.TryParse(rest[..slash], out var id) || slash == rest.Length - 1) continue;
-            if (!folders.TryGetValue(id, out var files))
-            {
-                folders[id] = files = new List<string>();
-                order.Add(id);
-            }
-            files.Add(rest[(slash + 1)..]);
-        }
-
         var records = new List<AssetRecord>();
-        foreach (var id in order)
+        foreach (var (id, entries) in AssetFolders(access))
         {
-            var files = folders[id];
+            if (only is not null && !only.Contains(id)) continue;
             var folder = ArchivePaths.AssetFolder(id);
+            var files = entries.Select(e => e[folder.Length..]).ToList();
             string? main = null;
             AssetKind kind = AssetKind.Image;
             foreach (var preferred in new[] { AssetKind.Model, AssetKind.Image, AssetKind.Gdtf })
