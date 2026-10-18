@@ -170,6 +170,34 @@ public class ModelImporterTests
     }
 
     [Fact]
+    public void GltfNodeTransformsAndInstancesAreConvertedToCandelaSpace()
+    {
+        // Two instances of the box: one lifted 1 m (glTF +Y) and moved 3 m along X, one turned 90° about the glTF up axis.
+        var model = TestFiles.GltfModel(withTexture: false);
+        var first = model.LogicalNodes[0];
+        first.LocalMatrix = Matrix4x4.CreateTranslation(3f, 1f, 0f);
+        var second = model.DefaultScene.CreateNode("turned");
+        second.Mesh = first.Mesh;
+        second.LocalMatrix = Matrix4x4.CreateRotationY(MathF.PI / 2) * Matrix4x4.CreateTranslation(-3f, 0f, 0f);
+
+        var result = ModelImporter.Import("two.glb", model.WriteGLB().ToArray());
+
+        Assert.Equal(2, result.Model.Parts.Count);
+        Assert.Same(result.Model.Parts[0].Mesh, result.Model.Parts[1].Mesh); // instanced, converted once
+        var lifted = result.Model.Parts.Single(p => p.Name == "box");
+        var turned = result.Model.Parts.Single(p => p.Name == "turned");
+        var liftedBounds = lifted.Mesh.ComputeBounds().Transform(lifted.Transform);
+        var turnedBounds = turned.Mesh.ComputeBounds().Transform(turned.Transform);
+        Geo.AssertNear(new Vector3(2.5f, -0.25f, 1f), liftedBounds.Min);
+        Geo.AssertNear(new Vector3(3.5f, 0.25f, 3f), liftedBounds.Max);
+        // Turned 90° about the vertical: 0.5 m deep along X, 1 m wide along Y, still 2 m high.
+        Geo.AssertSize(new Vector3(0.5f, 1f, 2f), turnedBounds.Size);
+        Assert.Equal(-3f, (turnedBounds.Min.X + turnedBounds.Max.X) / 2, 4);
+        Assert.Equal(0f, turnedBounds.Min.Z, 4);
+        Assert.True(Geo.SignedVolume(result.Model) > 1.9);
+    }
+
+    [Fact]
     public void GlbPbrMaterialMapsDirectlyAndEmbeddedTextureResolves()
     {
         var glb = TestFiles.Glb();
