@@ -135,6 +135,8 @@ public sealed partial class FixtureProfile
                     Snap = ch.LogicalChannels.Count > 0 ? ch.LogicalChannels[0].Snap : SnapMode.No,
                 };
                 pc.DefaultValue = Math.Min(ch.DefaultValue, pc.MaxValue);
+                // A virtual dimmer cannot be raised from the console; a default of 0 would black the fixture out for good.
+                if (pc.IsVirtual && pc.Class.Kind == AttributeKind.Dimmer && pc.DefaultValue == 0) pc.DefaultValue = pc.MaxValue;
                 if (ch.Highlight is { } hl) pc.HighlightValue = SafeResolution(hl, pc.ByteCount);
                 Channels.Add(pc);
                 _instanceIndex.TryAdd(new ChainKey(ch, inst.References, inst.References.Count), pc.Index);
@@ -263,47 +265,47 @@ public sealed partial class FixtureProfile
         private static float Finite(float v, float fallback) => float.IsFinite(v) ? v : fallback;
 
         /// <summary>
-        /// Slot positions of a wheel selection function: constant over each slot set, linear between adjacent slots
-        /// (split colours, continuous scrolling), wrapping from the last slot to the first.
+        /// Slot positions of a wheel selection function. A slot set whose physical values are offsets within ±0.5 (GDTF's
+        /// way of describing continuous wheel indexing, e.g. "Blue" −0.5…+0.5) maps linearly across the slot; other slot
+        /// sets hold the slot. Between sets the position is interpolated when the slots are adjacent (split colours) and
+        /// held otherwise. Going from the last slot to the first continues past the end (position n + 1 is slot 1 again),
+        /// so a wheel turning through "Open" keeps moving in one direction.
         /// </summary>
         private static void BuildSlotMap(ProfileFunction f, int slotCount)
         {
             var dmx = new List<uint>();
             var pos = new List<float>();
             var interp = new List<bool>();
-            ProfileChannelSet? prev = null;
+            int prevK = 0;
+            float offset = 0f;
             foreach (var s in f.Sets)
             {
                 int k = s.WheelSlot;
                 if (k <= 0) continue;
-                if (prev is not null && dmx.Count > 0)
+                if (prevK > 0 && slotCount > 1)
                 {
-                    int pk = prev.WheelSlot;
-                    bool adjacent = Math.Abs(k - pk) == 1;
-                    bool wrapUp = pk == slotCount && k == 1 && slotCount > 1;
-                    bool wrapDown = pk == 1 && k == slotCount && slotCount > 1;
-                    if ((adjacent || wrapUp || wrapDown) && s.DmxFrom > prev.DmxTo + 1)
-                    {
-                        interp[^1] = true;
-                        if (wrapUp || wrapDown)
-                        {
-                            // run onto the virtual position just past the end (or before the start) of the wheel
-                            dmx.Add(s.DmxFrom - 1);
-                            pos.Add(wrapUp ? slotCount + 1 : 0);
-                            interp.Add(false);
-                        }
-                    }
+                    if (prevK == slotCount && k == 1) offset += slotCount;
+                    else if (prevK == 1 && k == slotCount) offset -= slotCount;
+                }
+                bool continuous = s.HasPhysical && MathF.Abs(s.PhysicalFrom) <= 0.5001f && MathF.Abs(s.PhysicalTo) <= 0.5001f &&
+                    s.PhysicalFrom != s.PhysicalTo;
+                float p0 = k + offset + (continuous ? s.PhysicalFrom : 0f);
+                float p1 = k + offset + (continuous ? s.PhysicalTo : 0f);
+                if (dmx.Count > 0)
+                {
+                    bool adjacent = MathF.Abs(p0 - pos[^1]) <= 1.0001f;
+                    interp[^1] = adjacent && s.DmxFrom > dmx[^1];
                 }
                 dmx.Add(s.DmxFrom);
-                pos.Add(k);
-                interp.Add(false);
+                pos.Add(p0);
+                interp.Add(continuous);
                 if (s.DmxTo > s.DmxFrom)
                 {
                     dmx.Add(s.DmxTo);
-                    pos.Add(k);
+                    pos.Add(p1);
                     interp.Add(false);
                 }
-                prev = s;
+                prevK = k;
             }
             if (dmx.Count == 0)
             {
@@ -407,6 +409,8 @@ public sealed partial class FixtureProfile
                 facets[s] = slot.Facets.Count > 0 ? slot.Facets.Count : NameParsing.ParseFacetCount(slot.Name);
                 open[s] = slot.MediaPath is null && slot.MediaFileName is null && slot.Facets.Count == 0 && slot.AnimationSystem is null &&
                     (NameParsing.IsOpenSlotName(slot.Name) || (y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f && facets[s] == 0));
+                // an open slot is a hole: files often store the lamp's own colour there, which is not a filter
+                if (open[s] && y >= 0.9f) transmission[s] = Vector3.One;
             }
             i = Wheels.Count;
             Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open));
