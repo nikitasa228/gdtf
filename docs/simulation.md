@@ -147,7 +147,11 @@ far smaller than a cell, so the simulation converts them:
   S = 0.094 (Hussein, Capp & George 1994), followed until 0.2 m/s or the box diagonal. Where the jet is narrower than a
   cell it is widened to b' = h and slowed to u·b/b', which keeps its momentum flux (∝ u²b²) — the grid-filtered jet.
   Only the axial component is relaxed toward the jet (time constant 0.25 s, weighted by the profile and the squared
-  direction cosine), so buoyancy and cross flow still bend it and the surrounding air is entrained, not held;
+  direction cosine), so buoyancy and cross flow still bend it and the surrounding air is entrained, not held. Solids
+  shadow the jet: it stops at the first solid cell on its axis (after leaving the device's own body, when fixture
+  bodies are passed as obstacles), and a face is only driven when the straight line from the axis to it crosses no
+  solid (an O(1) summed-volume query, then a 3D DDA walk where needed) — so a fan blowing at or along a wall does not
+  move the air behind it (tested);
 * a **plume** (hot gases of a flame) holds its exit velocity U₀·r₀/R in the source sphere only where the air is slower,
   and is otherwise driven by its own buoyancy.
 
@@ -214,8 +218,14 @@ steps); the reference keeps 10⁻⁴. `SmokePerformanceTests` prints the current
   too little ambient air: a 2 MW flame's plume on a 0.4 m grid is 3–4× hotter 2.5 m above the flame than Heskestad's
   correlation (≈ 180 K), though its total heat is exact. Optional constant `Viscosity`/`Diffusivity` can compensate
   globally.
-* Fan jets and nozzle jets are imposed mean fields, not resolved turbulence; jets do not bend around obstacles in the
-  first cells from the nozzle.
+* Fan jets and nozzle jets are imposed mean fields, not resolved turbulence. Obstacles shadow them by line of sight
+  from the axis (a jet that hits a wall stops there and the projection spreads its air along the wall); the imposed
+  part does not bend around obstacles.
+* Semi-Lagrangian advection is not conservative next to walls: where a jet or plume impinges on a closed wall it
+  creates smoke in the first two cells (+30 % of the box's smoke in 200 steps for a fan in a 4 m box without the
+  fixer, +137 % with MacCormack). The global fixer restores the total, i.e. it moves that excess from the whole box
+  back to the wall layer — total mass is right, its distribution slightly favours walls hit by jets. The fixer is also
+  global across disconnected regions (a sealed pocket shares the correction of the rest of the box).
 * The atmosphere is one box with axis-aligned walls/openings; obstacles are voxelised boxes (no curved geometry);
   smoke does not stick to or deposit on surfaces; droplets do not evaporate locally (only the global dissipation).
 * Light absorption by the smoke (soot) is not represented by `Density` — it is scattering only.
