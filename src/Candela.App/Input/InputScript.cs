@@ -18,6 +18,12 @@ internal enum ScriptActionType
     /// <summary>Press at (x, y), move to (toX, toY) in <c>steps</c> frames, release.</summary>
     Drag,
 
+    /// <summary>Move to (x, y) and press a button with modifiers, without releasing it (a drag held across later actions).</summary>
+    Press,
+
+    /// <summary>Release the button pressed by <see cref="Press"/> at the current mouse position.</summary>
+    Release,
+
     /// <summary>Mouse wheel at (x, y) by <c>delta</c> notches (positive = away from the user / zoom in).</summary>
     Scroll,
 

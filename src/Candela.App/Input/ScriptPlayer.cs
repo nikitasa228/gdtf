@@ -211,6 +211,15 @@ internal sealed class ScriptPlayer
                     return frame + steps + 4;
                 }
 
+            case ScriptActionType.Press:
+                At(schedule, frame).Add(Step.Mouse(pos));
+                At(schedule, frame).Add(Step.Mods(mods));
+                At(schedule, frame + 1).Add(Step.ButtonEvent(a.Button, true));
+                return frame + 2;
+            case ScriptActionType.Release:
+                At(schedule, frame).Add(Step.ButtonEvent(a.Button, false));
+                At(schedule, frame + 1).Add(Step.Mods(KeyModifiers.None));
+                return frame + 2;
             case ScriptActionType.Scroll:
                 At(schedule, frame).Add(Step.Mouse(pos));
                 At(schedule, frame + 1).Add(Step.WheelEvent(a.Delta));
