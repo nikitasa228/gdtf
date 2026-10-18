@@ -226,6 +226,19 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         if (_picks.Count == 0)
             return;
         var session = _ctx.Session;
+        try
+        {
+            ProcessPicks(renderer, session);
+        }
+        finally
+        {
+            // A pick that throws (device lost, target gone) is not retried every frame.
+            _picks.Clear();
+        }
+    }
+
+    private void ProcessPicks(IRenderer renderer, Session.EditorSession session)
+    {
         foreach (var request in _picks)
         {
             PickResult? hit = _target is null ? null : renderer.Pick(_target, request.X, request.Y);
@@ -241,8 +254,6 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
                     break;
             }
         }
-
-        _picks.Clear();
     }
 
     /// <summary>Renders the view into its target (inside the GPU frame, after the UI was built).</summary>
