@@ -135,4 +135,44 @@ public sealed class UxReviewTests
     [InlineData(78f, 71f, 8f, true)]
     public void Transform_fields_stack_instead_of_cutting_their_numbers(float fieldWidth, float textWidth, float padding, bool stacked) =>
         Assert.Equal(stacked, Candela.App.Panels.PropertiesPanel.AxisFieldsStack(fieldWidth, textWidth, padding));
+
+    private static float TenPerChar(string s) => s.Length * 10f;
+
+    [Theory]
+    [InlineData("Ready", 100f, "Ready")] // fits: the same text
+    [InlineData("New needs the stage engine", 100f, "New needs…")] // 9 characters + ellipsis = 100 px
+    [InlineData("New needs the stage engine", 60f, "New n…")]
+    [InlineData("New needs the stage engine", 50f, "New…")] // trailing space dropped before the ellipsis
+    [InlineData("Anything", 5f, "")] // not even the ellipsis fits
+    [InlineData("", 0f, "")]
+    public void Status_message_is_shortened_with_an_ellipsis(string text, float width, string expected)
+    {
+        string result = TextFit.Truncate(text, width, TenPerChar);
+        Assert.Equal(expected, result);
+        Assert.True(TenPerChar(result) <= Math.Max(width, 0f) || result.Length == 0);
+        if (TenPerChar(text) <= width)
+            Assert.Same(text, result);
+    }
+
+    [Fact]
+    public void Shortening_never_splits_a_surrogate_pair()
+    {
+        string text = "ab\U0001F600cd"; // a, b, emoji (two UTF-16 units), c, d
+        for (float width = 10f; width <= 70f; width += 10f)
+        {
+            string result = TextFit.Truncate(text, width, TenPerChar);
+            foreach (char c in result.Where(char.IsHighSurrogate))
+                Assert.True(result.IndexOf(c) + 1 < result.Length && char.IsLowSurrogate(result[result.IndexOf(c) + 1]));
+            Assert.False(result.Length > 0 && char.IsHighSurrogate(result[^1]));
+        }
+    }
+
+    [Fact]
+    public void Dialogs_open_inside_the_main_window()
+    {
+        // Settings at 150 % (1290 × 840) in a 1280 × 800 window: it must not hang over the edge (it would become an OS window).
+        var size = PopupPlacement.FitInWindow(new Vector2(860, 560) * 1.5f, new Vector2(1280, 776));
+        Assert.True(size.X <= 1280 * 0.92f + 0.01f && size.Y <= 776 * 0.92f + 0.01f);
+        Assert.Equal(new Vector2(860, 560), PopupPlacement.FitInWindow(new Vector2(860, 560), new Vector2(1600, 876)));
+    }
 }

@@ -119,7 +119,7 @@ internal sealed class SettingsWindow
         }
 
         var viewport = ImGui.GetMainViewport();
-        ImGui.SetNextWindowSize(new Vector2(860, 560) * scale, ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(PopupPlacement.FitInWindow(new Vector2(860, 560) * scale, viewport.WorkSize), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.FirstUseEver, new Vector2(0.5f, 0.5f));
         if (_focusRequested)
         {

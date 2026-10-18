@@ -191,15 +191,19 @@ internal sealed class AboutWindow
             ImGui.PopFont();
             ImGui.TextDisabled(Loc.Format(Str.MsgAboutVersion, Version));
             ImGui.Spacing();
+            // Every line wraps at the same width: the window sizes itself to its content, and a long driver name must
+            // not widen it past the main window (it would turn into a separate OS window).
             ImGui.PushTextWrapPos(500 * scale);
             ImGui.TextUnformatted(Loc.Get(Str.MsgAboutText));
-            ImGui.PopTextWrapPos();
             ImGui.Separator();
             var info = _ctx.Gpu.Context.Info;
             ImGui.TextUnformatted($"GPU: {info.DeviceName} ({info.DriverName}, Vulkan {info.ApiVersion})");
             ImGui.TextUnformatted($"Dear ImGui {ImGui.GetVersionS()} · .NET {Environment.Version}");
             ImGui.Separator();
-            ImGui.TextDisabled(Loc.Get(Str.AboutLicenses));
+            ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
+            ImGui.TextUnformatted(Loc.Get(Str.AboutLicenses));
+            ImGui.PopStyleColor();
+            ImGui.PopTextWrapPos();
             if (WindowKeys.CloseRequested(_dispatcher))
                 open = false;
         }
@@ -234,7 +238,9 @@ internal sealed class ShortcutsWindow
     {
         if (!IsOpen)
             return;
-        ImGui.SetNextWindowSize(new Vector2(560, 520) * scale, ImGuiCond.FirstUseEver);
+        var viewport = ImGui.GetMainViewport();
+        ImGui.SetNextWindowSize(PopupPlacement.FitInWindow(new Vector2(560, 520) * scale, viewport.WorkSize), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.FirstUseEver, new Vector2(0.5f, 0.5f));
         bool open = true;
         if (ImGui.Begin(Labels.With(Icons.Keyboard, Str.MsgShortcutsTitle, "###Shortcuts"), &open, ImGuiWindowFlags.NoCollapse))
         {

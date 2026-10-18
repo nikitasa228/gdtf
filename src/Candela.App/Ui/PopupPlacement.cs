@@ -22,4 +22,11 @@ internal static class PopupPlacement
         float y = below ? buttonMin.Y : buttonMax.Y;
         return (new Vector2(x, y), new Vector2(right ? 1f : 0f, below ? 1f : 0f));
     }
+
+    /// <summary>
+    /// The first size of a dialog window: <paramref name="desired"/> (already scaled), but at most 92 % of the main
+    /// window's work area. A dialog larger than the main window would hang over its edge and, with multi-viewport
+    /// enabled, turn into a separate OS window.
+    /// </summary>
+    public static Vector2 FitInWindow(Vector2 desired, Vector2 workSize) => Vector2.Min(desired, workSize * 0.92f);
 }

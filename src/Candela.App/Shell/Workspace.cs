@@ -53,6 +53,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private readonly RenderPanel _render;
     private readonly PreviewPanel _preview;
     private ViewportPanel? _activeViewport;
+    private readonly FittedText _statusFit = new();
     private string? _pendingIni;
     private bool _styleDirty;
     private string _status = "";
@@ -413,13 +414,21 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 var texts = _statusTexts;
                 texts.Update(recent ? _status : null, session.Selection.Count, session.Undo.UndoDescription, _ctx.Gpu.Context.Info.DeviceName,
                     _ctx.Timer.FramesPerSecond, _ctx.Timer.Elapsed);
-                ImGui.TextColored(Theme.TextMuted, texts.Left);
-                ImGui.SameLine(0, 24 * scale);
+                // Right part at the right edge, selection count after the message; a message too long for the space
+                // left is shortened with an ellipsis (whole text in the tooltip) instead of pushing the rest off the window.
+                float gap = 24 * scale;
+                string right = texts.Right;
+                float rightX = ImGui.GetWindowWidth() - ImGui.CalcTextSize(right).X - 16 * scale;
+                float selectionWidth = session.Selection.IsEmpty ? 0f : ImGui.CalcTextSize(texts.Selection).X + gap;
+                float leftSpace = rightX - gap - selectionWidth - ImGui.GetCursorPosX();
+                string left = _statusFit.Get(texts.Left, MathF.Max(0f, leftSpace));
+                ImGui.TextColored(Theme.TextMuted, left);
+                if (_statusFit.IsShortened && ImGui.IsItemHovered())
+                    ImGui.SetTooltip(texts.Left);
+                ImGui.SameLine(0, gap);
                 if (!session.Selection.IsEmpty)
                     ImGui.TextColored(Theme.Accent, texts.Selection);
-                string right = texts.Right;
-                float w = ImGui.CalcTextSize(right).X;
-                ImGui.SameLine(MathF.Max(ImGui.GetCursorPosX() + 16, ImGui.GetWindowWidth() - w - 16 * scale));
+                ImGui.SameLine(MathF.Max(ImGui.GetCursorPosX() + 16, rightX));
                 ImGui.TextColored(Theme.TextMuted, right);
                 ImGui.EndMenuBar();
             }
