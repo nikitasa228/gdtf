@@ -7,6 +7,11 @@
 // noise hides 8-bit banding in the soft edges of light pools.
 //  Lux / noise overlay: surfaces show the overlay gradient colour of their analysis value (alpha blended in linear
 //  display space; values outside the range use the out-of-range colour).
+//  Noise overlay fog (FEATURE_NOISE_FOG): the air is tinted with the gradient colour of its sound level - a
+//  display-referred fog of density overlayRange.w x (position of the level in the gradient range) x gradient alpha
+//  per metre, integrated front to back along the view ray up to the surface (or NOISE_FOG_RANGE over the background)
+//  with NOISE_FOG_STEPS jittered, quadratically spaced samples. Being display-referred it is not tone mapped, so the
+//  fog shows the gradient colours exactly and does not depend on exposure or on the scene's lighting.
 //  Cable overlay: everything except instances with InstanceFlags.CableHighlight is desaturated and darkened.
 // draw.width = 1 / number of bloom levels (normalisation of the summed bloom pyramid).
 
@@ -18,6 +23,46 @@ layout(location = 0) in vec2 inUv;
 layout(location = 0) out vec4 outColor;
 
 const float CABLE_DIM = 0.32;
+const int NOISE_FOG_STEPS = 24;
+const float NOISE_FOG_RANGE = 60.0;
+
+vec3 displayTransform(vec3 hdr)
+{
+    if (draw.mode == TONE_AGX)
+        return tonemapAgx(hdr);
+    if (draw.mode == TONE_ACES)
+        return tonemapAces(hdr);
+    if (draw.mode == TONE_NEUTRAL)
+        return tonemapNeutral(hdr);
+    return clamp(hdr, 0.0, 1.0);
+}
+
+// Noise overlay fog along the ray origin + t direction, t in [0, tMax]: (display colour, transmittance).
+vec4 noiseFog(vec3 origin, vec3 direction, float tMax, float jitter)
+{
+    float lo = frame.overlayRange.x;
+    float hi = frame.overlayRange.y;
+    vec3 colour = vec3(0.0);
+    float transmittance = 1.0;
+    float previous = 0.0;
+    for (int i = 0; i < NOISE_FOG_STEPS; ++i)
+    {
+        float u = float(i + 1) / float(NOISE_FOG_STEPS);
+        float next = tMax * u * u;
+        float dt = next - previous;
+        float level = soundLevelAt(origin + direction * (previous + jitter * dt));
+        previous = next;
+        if (!(level >= lo) || hi <= lo)
+            continue;
+        vec4 g = overlayGradient(min(level, hi));
+        float density = frame.overlayRange.w * clamp((level - lo) / (hi - lo), 0.0, 1.0) * clamp(g.a, 0.0, 1.0);
+        float opacity = 1.0 - exp(-density * dt);
+        colour += transmittance * opacity * srgbDecode(g.rgb);
+        transmittance *= 1.0 - opacity;
+    }
+
+    return vec4(colour, transmittance);
+}
 
 void main()
 {
@@ -26,15 +71,7 @@ void main()
     if (hasFeature(FEATURE_BLOOM))
         hdr = mix(hdr, textureLod(bloomTexture, uv, 0.0).rgb * draw.width, frame.bloomIntensity);
 
-    vec3 display;
-    if (draw.mode == TONE_AGX)
-        display = tonemapAgx(hdr);
-    else if (draw.mode == TONE_ACES)
-        display = tonemapAces(hdr);
-    else if (draw.mode == TONE_NEUTRAL)
-        display = tonemapNeutral(hdr);
-    else
-        display = clamp(hdr, 0.0, 1.0);
+    vec3 display = displayTransform(hdr);
 
     if (frame.overlayMode != OVERLAY_NONE)
     {
@@ -50,6 +87,17 @@ void main()
         {
             vec4 g = overlayGradient(texelFetch(analysisTexture, p, 0).r);
             display = mix(display, srgbDecode(g.rgb), clamp(g.a, 0.0, 1.0));
+        }
+
+        if (hasFeature(FEATURE_NOISE_FOG))
+        {
+            vec2 renderUv = (vec2(p) + 0.5) * frame.renderSize.zw;
+            float depth = texelFetch(sceneDepth, p, 0).r;
+            vec3 origin, direction;
+            viewRay(renderUv, origin, direction);
+            float tMax = depth > 0.0 ? distance(origin, worldFromDepth(renderUv, depth)) : NOISE_FOG_RANGE;
+            vec4 fog = noiseFog(origin, direction, tMax, interleavedGradientNoise(gl_FragCoord.xy + vec2(13.0, 71.0)));
+            display = display * fog.a + fog.rgb;
         }
     }
 

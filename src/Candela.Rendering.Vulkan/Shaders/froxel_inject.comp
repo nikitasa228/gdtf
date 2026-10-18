@@ -8,7 +8,6 @@
 // with sigma_s = haze + smoke density x scattering at full density. Narrow beams that are ray marched at full
 // resolution (LIGHT_VIEW_RAYMARCHED) are skipped. With temporal accumulation the result is blended with the
 // previous frame's value reprojected to this froxel's world position (the jitter then integrates over the froxel).
-// The noise overlay adds coloured fog proportional to the sound level (display-referred emission).
 
 #include "lighting.glsl"
 #include "volume.glsl"
@@ -17,8 +16,6 @@ layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
 
 layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image3D outInjected;
 layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler3D historyVolume;
-
-const float NOISE_FOG_EXTINCTION = 0.5; // fraction of the fog strength that also dims what lies behind
 
 // World position at view depth z on the ray through normalised screen position uv.
 vec3 worldAtViewDepth(vec2 uv, float z)
@@ -71,19 +68,6 @@ void main()
         }
 
         source += sigmaS * scattered;
-    }
-
-    if (hasFeature(FEATURE_NOISE_FOG))
-    {
-        float level = soundLevelAt(P);
-        if (level >= frame.overlayRange.x)
-        {
-            float t = clamp((level - frame.overlayRange.x) / max(frame.overlayRange.y - frame.overlayRange.x, 1e-3), 0.0, 1.0);
-            vec4 c = overlayGradient(min(level, frame.overlayRange.y));
-            float k = frame.overlayRange.w * t * c.a;
-            source += srgbDecode(c.rgb) * (k / max(frame.exposure, 1e-30)); // display-referred after exposure
-            extinction += NOISE_FOG_EXTINCTION * k;
-        }
     }
 
     // Pre-exposed source (keeps the half-float volume in range); extinction in 1/m.

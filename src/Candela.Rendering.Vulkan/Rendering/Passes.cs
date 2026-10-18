@@ -455,6 +455,10 @@ internal sealed class TonemapPass : RenderPass
             barriers.Use(analysis, ImageUse.SampledFragment);
         if (t.GradientLut is { } lut)
             barriers.Use(lut, ImageUse.SampledFragment);
+
+        // The noise overlay's fog: scene depth and the sound sources / noise field.
+        barriers.Use(t.Depth, ImageUse.DepthSampledFragment);
+        PassRecording.DeclareMediaReads(context, barriers, compute: false);
     }
 
     public override void Execute(PassContext context)

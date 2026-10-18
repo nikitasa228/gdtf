@@ -81,8 +81,12 @@ public sealed unsafe class VulkanRenderer : IRenderer
     /// <summary>Absorption coefficient of luminous flames (soot), 1/m.</summary>
     public const float FlameAbsorption = 2f;
 
-    /// <summary>Strength of the noise overlay's fog per metre at the top of the gradient range.</summary>
-    public const float NoiseFogStrength = 0.15f;
+    /// <summary>
+    /// Density (1/m) of the noise overlay's display-referred coloured fog at the top of the gradient range
+    /// (proportional to the level's position in the range below it): 10 m of air at the maximum level shows the
+    /// gradient colour at about 40 %.
+    /// </summary>
+    public const float NoiseFogStrength = 0.05f;
 
     /// <summary>Froxel tile size, pixels.</summary>
     public const int FroxelTileSize = 8;
@@ -635,7 +639,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.Lights = lights > 0 && (full || d.Overlay == OverlayMode.Lux);
         d.Shadows = d.Lights && settings.Shadows && settings.MaxShadowedLights > 0 && _world.ShadowCastingLights > 0;
         d.VolumeLights = full && settings.Volumetrics && (d.Haze || d.Smoke) && lights > 0;
-        d.Volumetrics = (full && settings.Volumetrics && (d.Haze || d.Smoke || d.Flame)) || d.Overlay == OverlayMode.Noise;
+        d.Volumetrics = full && settings.Volumetrics && (d.Haze || d.Smoke || d.Flame);
         var indirect = full && d.Lights ? settings.Indirect : IndirectLighting.Off;
         if (!Enum.IsDefined(indirect))
             indirect = IndirectLighting.Off;
