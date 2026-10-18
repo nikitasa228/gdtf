@@ -33,6 +33,7 @@ internal sealed unsafe class PropertiesPanel : Panel
     private string _cachedLanguage = "";
     private string _headerText = "";
     private string _idText = "";
+    private string _idShort = "";
     private string _selectionText = "";
     private readonly AxisFormats _formats = new();
 
@@ -67,10 +68,16 @@ internal sealed unsafe class PropertiesPanel : Panel
             ImGui.Separator();
         }
 
+        // Long names wrap; the id is shortened when the panel is too narrow for it (the tooltip shows it whole).
         ImGui.PushFont(_ctx.Fonts.Heading, 0f);
+        ImGui.PushTextWrapPos(0f);
         ImGui.TextUnformatted(_headerText);
+        ImGui.PopTextWrapPos();
         ImGui.PopFont();
-        ImGui.TextDisabled(_idText);
+        bool idFits = ImGui.CalcTextSize(_idText).X <= ImGui.GetContentRegionAvail().X;
+        ImGui.TextDisabled(idFits ? _idText : _idShort);
+        if (!idFits && ImGui.IsItemHovered())
+            ImGui.SetTooltip(_idText);
         ImGui.Spacing();
 
         if (PropertyGrid.Begin("##props", LabelWidth))
@@ -104,6 +111,7 @@ internal sealed unsafe class PropertiesPanel : Panel
         _selectionText = $"{Icons.Layers}  {Loc.Format(Str.PropSelectionCount, selectionCount)}";
         _headerText = $"{IconFor(entity)}  {entity.Name}";
         _idText = entity.Id.ToString();
+        _idShort = _idText[..8] + "…";
         _componentNames.Clear();
         _componentDetails.Clear();
         foreach (var component in entity.Components)
