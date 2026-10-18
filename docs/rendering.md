@@ -539,7 +539,7 @@ background is not coloured.
 
 ## Accuracy and test coverage
 
-`tests/Candela.Rendering.Vulkan.Tests` (92 tests, about a minute on lavapipe once the SPIR-V cache is warm;
+`tests/Candela.Rendering.Vulkan.Tests` (93 tests, about a minute on lavapipe once the SPIR-V cache is warm;
 `xunit.runner.json` limits parallelism to two tests because lavapipe renders on the CPU) runs every test with the
 validation layer and synchronization validation and asserts **zero validation errors**, including leak reports at
 shutdown. Tests are skipped with a message when no Vulkan device exists. Images are 160 × 120 … 320 × 240.
@@ -555,7 +555,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `PickTests` | pick id, position within 1 cm, normal, depth; not-pickable instances |
 | `SceneTests` | incremental updates, stale handles, material updates, sRGB / Rec.709 → Rec.2020 conversions, mip chains, uploads staged in frames without rendering |
 | `LifecycleTests` | resize, several targets per world, memory returned after destroying everything, leak-free dispose, allocation-free steady-state frames (measured while another thread forces full collections, so GC-collectable runtime caches such as the one behind `Enum.IsDefined` cannot hide); every stage-2 feature on two targets across resizes and view switches, allocation-free with all of them |
-| `ShadowTests` | golden `shadow-box`; a point in the umbra gets ~0 direct light while the lux overlay elsewhere matches `LightMeter` within 1 %; cached tiles are not re-rendered until a caster in their frustum moves; `MaxShadowedLights` priority; `CastShadow` / `CastShadows` respected; 12 equally important lights all get working tiles (and share one VPL budget); two views in one frame keep each other's tiles; no acne: a shadow-casting floor lit at grazing angles (1 %) and a lit sphere (4 %, tessellation) match `LightMeter` |
+| `ShadowTests` | golden `shadow-box`; a point in the umbra gets ~0 direct light while the lux overlay elsewhere matches `LightMeter` within 1 %; cached tiles are not re-rendered until a caster in their frustum moves; `MaxShadowedLights` priority; `CastShadow` / `CastShadows` respected; 12 equally important lights all get working tiles (and share one VPL budget); a full atlas (256 tiles) makes room for 256 new lights; two views in one frame keep each other's tiles; no acne: a shadow-casting floor lit at grazing angles (1 %) and a lit sphere (4 %, tessellation) match `LightMeter` |
 | `CookieTests` | goldens `cookie-gobo` (orientation, rotation), `cookie-blades`, `cookie-prism` (3 facets, flux 1/N each), `cookie-iris`; frost widens the beam and blurs the gobo; blade insertion and rotation positions; the flux on the floor equals the light meter's integral (1 %) and frost and prism keep it (2 %) |
 | `VolumetricTests` | single scattering in uniform haze vs the numerical integral of σ·HG·I·e^(−σr)/r²·e^(−σl) within 5 % (froxels with and without temporal accumulation, and a ray-marched narrow beam); goldens `volumetric-beam` (side view), `volumetric-smoke` (density blob), `volumetric-flame`; an optically thick flame shows the blackbody luminance (5 %) and chromaticity (0.01); looking up a beam from inside it (ray marched, the same beam in the froxels, a wide beam) within 5 % of the integral; haze in a shadow stays dark (froxels and ray marching); the froxel history follows a trucking or panning camera (beam within 0.75 px of the converged image) |
 | `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % (Full and Colorless) |
@@ -712,7 +712,9 @@ cookies, photometric profiles and media of stages 1 and 2.
 * **Shadow frusta** are clamped to 80° half-angle: light beyond that (very wide floods) is unshadowed. Lights beyond
   `MaxShadowedLights`, and lights that do not fit in the atlas, are unshadowed (and have no reflective shadow map).
 * **Reflective shadow maps** test no visibility between a VPL and the receiver (light can leak through thin walls);
-  only one bounce; only the 32 most important shadowed lights contribute. The ray-traced GI shades its hits with the shadowed lights (up to
+  only one bounce; only the 32 most important shadowed lights contribute. Lights get shadow tiles (and so reflective
+  shadow maps) and GI evaluation only when their beam reaches into the view: a light that hits only surfaces outside
+  the view adds no indirect light to it. The ray-traced GI shades its hits with the shadowed lights (up to
   64 per view) plus emission; it is a noisy estimate that needs a few frames to converge after a change.
 * **Transparent surfaces** take the fog of the froxel volume at their depth; volumetric light between overlapping
   transparent layers is approximated by that single lookup. Transmission has no tint and no refraction.
