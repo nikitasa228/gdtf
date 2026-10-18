@@ -68,15 +68,16 @@ internal static class SceneJsonReader
         var ids = new HashSet<Guid>();
         foreach (var element in array.EnumerateArray())
         {
-            Layer? layer = null;
-            try
+            var reset = new List<string>();
+            if (!JsonSalvage.TryDeserialize<Layer>(null, element, reset, out var layer, out var error))
             {
-                layer = element.Deserialize<Layer>(CandelaJson.Options);
-            }
-            catch (Exception e) when (IsDataError(e))
-            {
-                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneLayerInvalid, $"A layer could not be read and was skipped: {e.Message}");
+                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneLayerInvalid, $"A layer could not be read and was skipped: {error?.Message}");
                 continue;
+            }
+            if (reset.Count > 0 && layer is not null)
+            {
+                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneValueRepaired,
+                    $"Unreadable value(s) {string.Join(", ", reset)} of layer '{layer.Name}' were reset to defaults.");
             }
             if (layer is null || layer.Id == Guid.Empty || !ids.Add(layer.Id))
             {
@@ -92,18 +93,19 @@ internal static class SceneJsonReader
     private static SceneSettings ReadSceneSettings(JsonElement root, IssueCollector issues)
     {
         if (!root.TryGetProperty("settings", out var element) || element.ValueKind == JsonValueKind.Null) return new SceneSettings();
-        try
-        {
-            var settings = element.Deserialize<SceneSettings>(CandelaJson.Options);
-            if (settings is not null) return settings;
-        }
-        catch (Exception e) when (IsDataError(e))
+        var reset = new List<string>();
+        if (!JsonSalvage.TryDeserialize<SceneSettings>(null, element, reset, out var settings, out var error))
         {
             issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneSettingsInvalid,
-                $"The scene settings could not be read; defaults are used: {e.Message}");
+                $"The scene settings could not be read; defaults are used: {error?.Message}");
             return new SceneSettings();
         }
-        return new SceneSettings();
+        if (reset.Count > 0)
+        {
+            issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneSettingsInvalid,
+                $"Unreadable scene setting(s) {string.Join(", ", reset)} were reset to defaults.");
+        }
+        return settings ?? new SceneSettings();
     }
 
     private static List<EntityRecord> ReadEntities(JsonElement root, IssueCollector issues, Dictionary<Guid, IReadOnlyList<JsonElement>>? unknown)
@@ -209,24 +211,40 @@ internal static class SceneJsonReader
                     id);
                 continue;
             }
+            var reset = new List<string>();
+            Component? component;
+            Exception? error;
             try
             {
-                var component = type is not null && !TypeIsFirst(element)
-                    ? TypeFirst(element, type).Deserialize<Component>(CandelaJson.Options)
-                    : element.Deserialize<Component>(CandelaJson.Options);
-                if (component is null) continue;
-                if (NullRepair.Repair(component) > 0)
-                {
-                    issues.Add(IssueSeverity.Note, IssueCategory.Scene, ProjectIssueCodes.SceneValueRepaired,
-                        $"Missing values in a {type ?? component.GetType().Name} component of '{name}' were replaced by defaults.", id);
-                }
-                list.Add(component);
+                var reordered = type is not null && !TypeIsFirst(element) ? TypeFirst(element, type) : null;
+                JsonSalvage.TryDeserialize(reordered, element, reset, out component, out error);
             }
             catch (Exception e) when (IsDataError(e))
             {
-                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentInvalid,
-                    $"A {type ?? "component"} of '{name}' could not be read and was dropped: {e.Message}", id);
+                component = null;
+                error = e;
             }
+            if (component is null)
+            {
+                if (error is not null)
+                {
+                    issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentInvalid,
+                        $"A {type ?? "component"} of '{name}' could not be read and was dropped: {error.Message}", id);
+                }
+                continue;
+            }
+            if (reset.Count > 0)
+            {
+                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneValueRepaired,
+                    $"Unreadable value(s) {string.Join(", ", reset)} of a {type ?? component.GetType().Name} component of '{name}' were reset to defaults; the rest of it was kept.",
+                    id);
+            }
+            if (NullRepair.Repair(component) > 0)
+            {
+                issues.Add(IssueSeverity.Note, IssueCategory.Scene, ProjectIssueCodes.SceneValueRepaired,
+                    $"Missing values in a {type ?? component.GetType().Name} component of '{name}' were replaced by defaults.", id);
+            }
+            list.Add(component);
         }
         return list;
     }
