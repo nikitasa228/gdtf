@@ -24,18 +24,21 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       acoustics, blackbody (docs/photometry.md)
 - [x] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics, encoder, DmxEngine
       (2000 fixtures ≈ 2 ms/frame, zero allocations; 387 GDTF attributes handled) — docs/dmx.md
-- [x] Art-Net receiver (ArtDmx, ArtPoll/PollReply discovery, ArtTimeCode, ArtSync), sACN receiver; DMX input hub
-      (docs/protocols.md); an Art-Net packet moves a fixture end to end through the engine (docs/engine.md)
+- [x] Art-Net 4 receiver (ArtDmx, ArtPoll/PollReply discovery, ArtTimeCode, ArtSync), sACN receiver (priority,
+      sync, discovery, termination), DMX input hub with HTP/LTP merge, built-in test console (docs/protocols.md); an
+      Art-Net packet moves a fixture end to end through the engine (docs/engine.md)
 
 ## M2 — Real-time renderer v1 + headless
 - [x] Vulkan device/instance (validation in debug), offscreen + swapchain targets, feature detection (RT, wireframe)
-- [x] Mesh/material/texture upload, bindless materials, built-in PBR material library
-- [x] Physically based spot lights from fixture state: cd profile, colour, zoom, gobo/iris/blade/prism/frost cookie
-- [x] Shadows (atlas), clustered forward shading, HDR, exposure (EV100), tone mapping
-- [x] Volumetric light in haze: froxel in-scattering (HG phase), shadows/cookies in the beam, temporal accumulation
+- [x] Mesh/material/texture upload, bindless materials, built-in PBR material library (Candela.Assets)
+- [x] Physically based spot lights: cd profile, colour, zoom, gobo/iris/blade/prism/frost cookie (renderer side;
+      fixture state → lights is Candela.Engine RenderSync)
+- [x] Shadows (atlas), clustered forward shading, HDR, exposure (EV100 + auto), bloom, tone mapping
+- [x] Volumetric light in haze: froxel in-scattering (HG phase), shadows/cookies in the beam, temporal accumulation,
+      smoke density volume, flame emission
 - [x] View modes Wireframe / Colorless / Full; perspective / orthographic; selection outline (vivid orange)
-- [x] `Candela.Cli render` → PNG on lavapipe; golden-image tests; Фокина.mvr renders (engine: scene → DMX → lights →
-      render world, docs/engine.md; renderer: docs/rendering.md)
+- [x] `candela render-test` → PNG on lavapipe with golden-image tests (96 renderer tests); `candela render` of
+      Фокина.mvr through Candela.Engine (scene → DMX → lights → render world, docs/engine.md)
 
 ## M3 — Editor shell
 - [ ] GLFW + ImGui docking: every panel is a dockable tab; drop-zone indicators; tab style per panel group
@@ -91,13 +94,13 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       accumulation, PNG/EXR output
 - [~] Render a frame or a timecode range (DMX recorded from the live input, replayed for each frame) → image sequence
       (DMX recorder/player with timecode seek, `candela render --look dmx-file --time`; path-traced sequences pending)
-- [x] Real-time indirect light: reflective shadow maps (all GPUs), ray-query GI/reflections (RT GPUs)
-- [x] Narrow-beam cone ray marching for sharp gobo beams
+- [x] Real-time indirect light: reflective shadow maps (all GPUs), ray-query GI (RT GPUs) — docs/rendering.md
+- [x] Narrow-beam ray marching for sharp gobo beams
 
 ## M7 — More protocols and polish
 - Protocol matrix (external control panel lists all of them; status shows what works):
   - [x] Art-Net (M1) - [x] sACN (M1) - [x] OSC - [x] PosiStageNet - [x] EntTec DMX USB Pro - [ ] CITP
-  - [~] ETC Eos (OSC) - [ ] BlackTrax (RTTrPM) - [ ] Kinesys - [ ] PangolinLD - [ ] LasergraphDSP - [ ] NDI (SDK)
+  - [~] ETC Eos (OSC: cues, show, command line; levels via Art-Net/sACN) - [ ] BlackTrax (RTTrPM) - [ ] Kinesys - [ ] PangolinLD - [ ] LasergraphDSP - [ ] NDI (SDK)
   - [ ] Compulite VC - [ ] MA-Net2 / MA-Net3 (proprietary, need MA's SDK — Art-Net/sACN from MA consoles work)
 - [ ] Performance: GPU-driven instancing, thousands of fixtures, async compute
 - [~] Windows packaging, crash reporting, autosave/recovery (autosave and recovery done: Candela.Project + engine)
