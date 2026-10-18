@@ -254,8 +254,8 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 `RiggingAnalyzer` runs these checks:
 
 * **Mounts.**
-  * A fixture is mounted when `MountedOn` names its carrier. Without `MountedOn`, a fixture that is a child of a truss
-    entity counts as hanging on it.
+  * A fixture is mounted when `MountedOn` names its carrier. Without `MountedOn`, a fixture under a truss entity in
+    the hierarchy hangs on that truss, and one under a rigging point entity hangs from that point.
   * An unmounted fixture more than 0.5 m above the floor gets `rigging.not-mounted` (warning, "not attached to a
     truss/pipe"). The floor is the highest `WallKind.Floor` rectangle below the fixture, taken as centred on its
     entity origin, or Z = 0.

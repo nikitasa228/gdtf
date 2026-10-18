@@ -134,7 +134,8 @@ public sealed record RiggingSolution(IReadOnlyList<TrussLoad> Trusses, IReadOnly
 /// </summary>
 /// <remarks>
 /// A fixture counts as hanging on a truss when its <c>MountedOn</c> is the truss (or an entity under it), or — without
-/// <c>MountedOn</c> — when it is a child of a truss entity. Cable segments are carried by a truss when their nodes are
+/// <c>MountedOn</c> — when it sits under a truss entity in the hierarchy (under a rigging point entity it hangs from that
+/// point). Cable segments are carried by a truss when their nodes are
 /// anchored to it or to fixtures hanging on it (a segment with only one end on a truss puts half its weight on it).
 /// Floors are <see cref="WallComponent"/>s of kind <see cref="WallKind.Floor"/>, taken as rectangles centred on their
 /// entity origin; without a floor below, the floor is at Z = 0.
@@ -246,6 +247,8 @@ public sealed class RiggingAnalyzer
                     continue;
                 }
             }
+            // Without MountedOn, a fixture placed under a truss or a hoist in the hierarchy hangs on it.
+            mount ??= StructureAncestor(e.Parent);
             if (mount is not null && mount.Has<RiggingPointComponent>())
             {
                 if (!hungFromPoint.TryGetValue(mount.Id, out var hung)) hungFromPoint[mount.Id] = hung = new List<Entity>();
@@ -461,14 +464,14 @@ public sealed class RiggingAnalyzer
                 }
                 if (trussById.ContainsKey(id))
                     parts.Add((id, $"truss '{target.Name}'", shares.GetValueOrDefault((pe.Id, id))));
-                else if (fixtureById.ContainsKey(id))
-                    parts.Add((id, $"'{target.Name}'", (weightByFixture.GetValueOrDefault(id) ?? 0) + Options.ClampWeightKg));
+                else if (fixtureById.TryGetValue(id, out var carried))
+                    parts.Add((id, FixtureLabel(target, carried), (weightByFixture.GetValueOrDefault(id) ?? 0) + Options.ClampWeightKg));
             }
             // Fixtures hung straight from the point.
             if (hungFromPoint.TryGetValue(pe.Id, out var hung))
                 foreach (var fe in hung)
                     if (!p.Carries.Contains(fe.Id))
-                        parts.Add((fe.Id, $"'{fe.Name}'", (weightByFixture.GetValueOrDefault(fe.Id) ?? 0) + Options.ClampWeightKg));
+                        parts.Add((fe.Id, FixtureLabel(fe, fixtureById[fe.Id]), (weightByFixture.GetValueOrDefault(fe.Id) ?? 0) + Options.ClampWeightKg));
 
             double total = parts.Sum(x => x.Item3);
             var result = new RiggingPointLoad { EntityId = pe.Id, Name = pe.Name, CapacityKg = p.CapacityKg, LoadKg = total, Shares = parts };
@@ -515,6 +518,14 @@ public sealed class RiggingAnalyzer
         return max;
     }
 
+    /// <summary>The nearest entity from <paramref name="entity"/> upwards that is a truss or a rigging point, or null.</summary>
+    private static Entity? StructureAncestor(Entity? entity)
+    {
+        for (var e = entity; e is not null; e = e.Parent)
+            if (e.Has<TrussComponent>() || e.Has<RiggingPointComponent>()) return e;
+        return null;
+    }
+
     private static Entity? TrussOf(Entity? entity)
     {
         for (var e = entity; e is not null; e = e.Parent)
@@ -543,7 +554,9 @@ public sealed class RiggingAnalyzer
 
     private static string Label(Entity e, FixtureComponent f, FixtureProfile? profile)
     {
-        string id = f.FixtureId > 0 ? $"#{f.FixtureId} '{e.Name}'" : $"'{e.Name}'";
+        string id = FixtureLabel(e, f);
         return profile is null ? id : $"{id} ({profile.DisplayName})";
     }
+
+    private static string FixtureLabel(Entity e, FixtureComponent f) => f.FixtureId > 0 ? $"#{f.FixtureId} '{e.Name}'" : $"'{e.Name}'";
 }

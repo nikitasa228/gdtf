@@ -336,6 +336,24 @@ public class ReviewRegressionTests
     }
 
     [Fact]
+    public void A_fixture_placed_under_a_hoist_in_the_hierarchy_hangs_from_it()
+    {
+        var kit = new SceneKit();
+        var hoist = new Entity("Hoist") { Local = new Core.Math.Transform(new Vector3(0, 0, 8)) };
+        hoist.Add(new Core.SceneGraph.Components.RiggingPointComponent { CapacityKg = 20f });
+        kit.Scene.Add(hoist);
+        var face = kit.Fixture(TestData.Face600, "Hung", 4, new Vector3(0, 0, -0.5f), parent: hoist);
+
+        var r = new RiggingAnalyzer(TestData.Profiles).Analyze(kit.Scene);
+        r.Issues.None(IssueCodes.RiggingNotMounted);
+        var point = r.Points.Single();
+        Assert.Equal(25.5, point.LoadKg, 6);
+        var issue = r.Issues.Single(IssueCodes.RiggingPointOverload);
+        Assert.Contains("#4 'Hung' 25.5 kg", issue.Message);
+        Assert.Contains(face.Id, issue.Entities);
+    }
+
+    [Fact]
     public void Uniform_overload_message_names_the_heaviest_fixtures()
     {
         var kit = new SceneKit();
