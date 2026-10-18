@@ -24,7 +24,7 @@ public sealed partial class SmokeSimulation
     {
         public SmokeEmitterKind Kind;
 
-        /// <summary>Centre of the injection sphere (sources) or the outlet centre (fans), world m.</summary>
+        /// <summary>Centre of the injection sphere (sources) or of the outlet (jets), world m.</summary>
         public Vector3 Center;
 
         public Vector3 Direction;
@@ -41,10 +41,10 @@ public sealed partial class SmokeSimulation
         /// <summary>Density added per second, density·m³/s.</summary>
         public float DensityRate;
 
-        /// <summary>Outlet diameter (fans), m.</summary>
+        /// <summary>Outlet diameter of a jet, m.</summary>
         public float Diameter;
 
-        /// <summary>Length of the applied fan jet, m.</summary>
+        /// <summary>Length over which a jet is imposed, m.</summary>
         public float Reach;
     }
 

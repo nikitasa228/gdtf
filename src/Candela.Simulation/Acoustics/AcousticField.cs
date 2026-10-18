@@ -75,8 +75,8 @@ public sealed class AcousticGrid
 /// </summary>
 /// <remarks>
 /// Levels are summed as intensities relative to the loudest source, Σ 10^((Lᵢ − L_max)/10)/dᵢ², so any range of input
-/// levels is safe and each source costs a few multiplications per receiver. Thread-safe for queries; grid evaluation
-/// runs over Z slices in parallel and is deterministic.
+/// levels is safe and each source costs a few multiplications per receiver. Queries may run concurrently with each
+/// other but not with <see cref="SetSources"/>; grid evaluation runs over Z slices in parallel and is deterministic.
 /// </remarks>
 public sealed class AcousticField
 {
