@@ -17,11 +17,13 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       MVR stub GDTF → library match — done; binary disk cache not yet. 4 of the 6 types in `stages/Фокина.mvr`
       (Ayrton Rivale Profile, MagicBlade R, Zonda 3 Wash, Martin Atomic 3000 LED) are not in the library, so
       same-brand substitutes are used until those GDTF files are added
-- [ ] MVR import (layers, fixtures, scene objects, trusses, supports, groups, addresses, embedded GDTF/3D) and export;
-      `stages/Фокина.mvr` loads with all 91 fixtures resolved
+- [x] MVR import (layers, fixtures, scene objects, trusses, supports, groups, addresses, embedded GDTF/3D) and export;
+      `stages/Фокина.mvr` loads with all 91 fixtures (5 GDTF specs; 4 resolved to same-brand substitutes, reported as
+      issues, until the real files are added) — docs/mvr.md
 - [x] Photometry: CIE colour science, CCT, emitter mixing, CMY/gels, beam distribution, cd/lux, light meter,
       acoustics, blackbody (docs/photometry.md)
-- [ ] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics
+- [x] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics, encoder, DmxEngine
+      (2000 fixtures ≈ 2 ms/frame, zero allocations; 387 GDTF attributes handled) — docs/dmx.md
 - [ ] Art-Net receiver (ArtDmx, ArtPoll/PollReply discovery, ArtTimeCode, ArtSync), sACN receiver; DMX input hub
 
 ## M2 — Real-time renderer v1 + headless
@@ -61,9 +63,11 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [ ] Cable link window: strip of all devices on a cable, click → select device
 - [ ] Console model: outputs → universes; fixtures cabled to a console are console-driven (locked controls);
       cable indices shown in the patch
-- [ ] Power network: sources, links (TRUE1 through), distros, dimmers (own draw vs `maxLoadW`), breaker checks
-- [ ] Data network: DMX chains, splitters, Y-split warning, address overlap, chain length
-- [ ] Rigging: fixtures mounted on trusses/pipes, truss/point load incl. cable weight, overload warnings
+- [x] Power network: sources, links (TRUE1 through), distros, dimmers (own draw vs `maxLoadW`), breaker checks
+      (engine side done in Candela.Electrical; editor tools in this milestone)
+- [x] Data network: DMX chains, splitters, Y-split warning, address overlap, chain length (Candela.Electrical)
+- [x] Rigging: fixtures mounted on trusses/pipes, truss/point load incl. cable weight, overload warnings
+      (Candela.Electrical RiggingAnalyzer) — docs/electrical.md
 - [ ] Cable overlay with legend
 
 ## M5 — Atmosphere, fire, overlays
