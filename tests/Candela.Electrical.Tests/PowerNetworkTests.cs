@@ -173,6 +173,25 @@ public class PowerNetworkTests
     }
 
     [Fact]
+    public void Distro_fed_from_an_unpowered_device_is_unpowered_but_lists_its_outlets()
+    {
+        var kit = new SceneKit();
+        var dark = kit.Fixture(TestData.Aeco20, "Dark", 1, new Vector3(0, 0, 0));
+        var distro = kit.Source("Floor distro", new Vector3(0, -5, 0), outlets: [SceneKit.Outlet("A"), SceneKit.Outlet("B")]);
+        kit.Cable("powercon-true1", "Odd", (dark, "Power Out"), (distro, PortResolver.MainsInPortName));
+        var load = kit.Fixture(TestData.Aeco20, "Load", 2, new Vector3(2, 0, 0));
+        kit.Cable("powercon-true1", "P", (distro, "A"), (load, "Power In"));
+
+        var s = kit.Solve();
+        Assert.Equal([dark.Id, distro.Id, load.Id], s.UnpoweredDevices);
+        Assert.Contains(s.Issues.WithCode(IssueCodes.PowerUnpowered), i => i.Message.Contains("Distro 'Floor distro'"));
+        var row = PowerReport.Build(s).Sources.Single(p => p.SourceEntityId == distro.Id);
+        Assert.False(row.IsPowered);
+        Assert.Equal(["A", "B"], row.Rows.Select(r => r.Outlet));
+        Assert.All(row.Rows, r => Assert.Equal(0, r.LoadW));
+    }
+
+    [Fact]
     public void Generator_feeds_a_three_phase_distro_and_imbalance_is_noted()
     {
         var kit = new SceneKit();

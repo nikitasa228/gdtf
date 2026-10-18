@@ -124,9 +124,12 @@ public sealed partial class NetworkSolver
             {
                 if (s.IsFed || !s.Valid) continue;
                 s.Powered = true;
-                ExpandSource(s);
+                ExpandSource(s, queueLoads: true);
                 Drain();
             }
+
+            // Distros whose feed has no power (and invalid sources) still list their outlets, with no load.
+            foreach (var s in sourceOrder) ExpandSource(s, queueLoads: false);
 
             ComputeLoads();
             CheckCircuitsAndCables(sourceOrder);
@@ -172,8 +175,8 @@ public sealed partial class NetworkSolver
             }
         }
 
-        /// <summary>Creates the circuits of a source's outlets and queues what is plugged into them.</summary>
-        private void ExpandSource(SourceState s)
+        /// <summary>Creates the circuits of a source's outlets and (when powered) queues what is plugged into them.</summary>
+        private void ExpandSource(SourceState s, bool queueLoads)
         {
             if (s.Expanded) return;
             s.Expanded = true;
@@ -190,7 +193,7 @@ public sealed partial class NetworkSolver
                     circuits[c - 1] = new CircuitState(s, outlet, c, threePhaseOutlet ? 0 : phase, s.VoltageV, s.FrequencyHz);
                     s.Circuits.Add(circuits[c - 1]);
                 }
-                if (!_powerOut.TryGetValue(new PortRef(s.Device.Id, outlet.Name), out var edges)) continue;
+                if (!queueLoads || !_powerOut.TryGetValue(new PortRef(s.Device.Id, outlet.Name), out var edges)) continue;
                 foreach (var e in edges)
                 {
                     int c = Math.Clamp(e.Circuit, 1, circuitCount);
@@ -249,7 +252,7 @@ public sealed partial class NetworkSolver
                             Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerVoltageMismatch,
                                 $"Distro '{target.Info.Name}' is set to {Fmt.Supply(distro.VoltageV, distro.FrequencyHz, distro.IsDc)} but is fed with {Fmt.Supply(w.Supply.VoltageV, w.Supply.FrequencyHz, w.Supply.IsDc)} from {FeedOrigin(w.Parent, w.Supply, w.Via)}.",
                                 target.Id, w.Edge.Cable.Entity.Id);
-                        ExpandSource(distro);
+                        ExpandSource(distro, queueLoads: true);
                     }
                     continue;
                 }
