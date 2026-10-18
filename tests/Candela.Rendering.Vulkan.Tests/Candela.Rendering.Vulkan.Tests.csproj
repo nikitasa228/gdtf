@@ -7,6 +7,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Golden/*.png" CopyToOutputDirectory="PreserveNewest" LinkBase="Golden" />
+    <!-- Software rendering (lavapipe) is memory hungry: at most two renderers run at once. -->
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <!-- Lets the golden-image tests regenerate the reference images in the source tree (CANDELA_UPDATE_GOLDEN=1). -->
