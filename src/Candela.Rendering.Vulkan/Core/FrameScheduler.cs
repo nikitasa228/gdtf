@@ -45,6 +45,17 @@ public sealed class VulkanFrame
 }
 
 /// <summary>
+/// Work that must be recorded into every frame before it is submitted, whether or not anything was rendered in it —
+/// e.g. uploads staged since the last render, whose staging memory is only reserved until the frame that was being
+/// recorded when they were staged completes.
+/// </summary>
+internal interface IFrameSubmitHook
+{
+    /// <summary>Records into <paramref name="frame"/>'s command buffer just before it is ended and submitted.</summary>
+    void BeforeSubmit(VulkanFrame frame);
+}
+
+/// <summary>
 /// Frames in flight: <see cref="Begin"/> waits for the slot's previous submission (never for the whole device),
 /// collects its GPU timings, releases staging space and destroys retired objects of completed frames;
 /// <see cref="Submit"/> ends the command buffer and submits it with the slot's fence (plus optional semaphores for
@@ -55,6 +66,7 @@ internal sealed unsafe class FrameScheduler : IDisposable
     private readonly VulkanContext _context;
     private readonly VulkanFrame[] _slots = new VulkanFrame[VulkanContext.FramesInFlight];
     private readonly GpuTiming[] _lastTimings = new GpuTiming[VulkanFrame.MaxTimestamps / 2];
+    private readonly List<IFrameSubmitHook> _submitHooks = new();
     private int _lastTimingCount;
     private ulong _lastTimingFrame;
 
@@ -166,11 +178,19 @@ internal sealed unsafe class FrameScheduler : IDisposable
         frame.Scopes[frame.ScopeCount++] = (name, begin, end);
     }
 
+    /// <summary>Registers work recorded into every frame just before submission (see <see cref="IFrameSubmitHook"/>).</summary>
+    public void AddSubmitHook(IFrameSubmitHook hook) => _submitHooks.Add(hook);
+
+    /// <summary>Unregisters a hook added with <see cref="AddSubmitHook"/>.</summary>
+    public void RemoveSubmitHook(IFrameSubmitHook hook) => _submitHooks.Remove(hook);
+
     /// <summary>Ends and submits the current frame's command buffer, optionally waiting on/signalling semaphores.</summary>
     public void Submit(VulkanFrame frame, ReadOnlySpan<SemaphoreSubmitInfo> waits, ReadOnlySpan<SemaphoreSubmitInfo> signals)
     {
         if (!ReferenceEquals(frame, Current))
             throw new InvalidOperationException("Submitting a frame that is not being recorded.");
+        for (int i = 0; i < _submitHooks.Count; i++)
+            _submitHooks[i].BeforeSubmit(frame);
         var vk = _context.Vk;
         Current = null;
         VkUtil.Check(vk.EndCommandBuffer(frame.CommandBuffer), "vkEndCommandBuffer");

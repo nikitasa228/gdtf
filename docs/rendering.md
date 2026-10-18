@@ -125,7 +125,10 @@ stale handles are rejected (`ArgumentException`) and double destruction is a no-
   model below. **Lines** (`SetLines`) go to a vertex buffer of `LineVertex`.
 * **Uploads**: every container keeps a CPU mirror and a dirty range; once per frame the dirty ranges are copied through
   the staging ring after one batched write-after-read barrier against earlier frames' reads. Growing a buffer replaces
-  it (old one deferred) and bumps a version so the per-slot descriptor sets are rewritten. No device-wide waits.
+  it (old one deferred) and bumps a version so the per-slot descriptor sets are rewritten. Mesh and texture data is
+  staged when created and copied by the next `Render`; whatever is still staged when a frame is submitted (objects
+  created after the viewports rendered, or frames that render no viewport) is recorded by a submit hook into that
+  frame, so staging memory is always consumed by the frame it was reserved in. No device-wide waits.
 
 ### Descriptor layout
 
@@ -272,7 +275,7 @@ The result is sRGB-encoded (IEC 61966-2-1) with a ±½ LSB triangular dither and
 
 ## Accuracy and test coverage
 
-`tests/Candela.Rendering.Vulkan.Tests` (40 tests, a few seconds on lavapipe once the SPIR-V cache is warm) runs every test with the validation
+`tests/Candela.Rendering.Vulkan.Tests` (41 tests, a few seconds on lavapipe once the SPIR-V cache is warm) runs every test with the validation
 layer and synchronization validation and asserts **zero validation errors**, including leak reports at shutdown.
 Tests are skipped with a message when no Vulkan device exists.
 
@@ -285,7 +288,7 @@ Tests are skipped with a message when no Vulkan device exists.
 | `ManyLightsTests` | 1000 lights, validation-clean, shaded luminance = CPU sum over all lights (3 %) |
 | `ToneMappingTests` | AgX / ACES / Neutral curves, exposure compensation |
 | `PickTests` | pick id, position within 1 cm, normal, depth; not-pickable instances |
-| `SceneTests` | incremental updates, stale handles, material updates, sRGB / Rec.709 → Rec.2020 conversions, mip chains |
+| `SceneTests` | incremental updates, stale handles, material updates, sRGB / Rec.709 → Rec.2020 conversions, mip chains, uploads staged in frames without rendering |
 | `LifecycleTests` | resize, several targets per world, memory returned after destroying everything, leak-free dispose, allocation-free steady-state frames |
 | `MemoryTests` | alignment, free-list reuse and coalescing, granularity, dedicated allocations |
 | `SwapchainTests` | headless surface: acquire/present, resize, minimise, misuse errors, ImGui handoff state |

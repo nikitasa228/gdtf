@@ -74,7 +74,7 @@ public readonly record struct RenderWorldStatistics(int Meshes, int Textures, in
 /// command buffer by <see cref="PrepareFrame"/> with the barriers it needs; nothing waits for the device.
 /// One world is shared by all render targets of a renderer. Main thread only.
 /// </summary>
-public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
+public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrameSubmitHook
 {
     private const BufferUsageFlags StorageUsage = BufferUsageFlags.StorageBufferBit;
 
@@ -102,6 +102,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
     private readonly FrameSets[] _frameSets = new FrameSets[VulkanContext.FramesInFlight];
     private readonly List<NoiseSource> _noiseSources = new();
     private readonly HashSet<string> _missingImages = new(StringComparer.Ordinal);
+    private readonly BarrierBatch _submitBarriers;
     private int[] _live = new int[64];
     private int _liveCount;
     private DescriptorSetLayout _setLayout;
@@ -111,6 +112,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
     {
         _context = context;
         _buildEdges = buildEdges;
+        _submitBarriers = new BarrierBatch(context.Vk);
         _textures = new TextureStore(context);
         try
         {
@@ -125,6 +127,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
             for (int i = 0; i < _frameSets.Length; i++)
                 _frameSets[i] = new FrameSets();
             CreateSetLayout();
+            context.Frames.AddSubmitHook(this);
         }
         catch
         {
@@ -441,6 +444,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
         if (_disposed)
             return;
         _disposed = true;
+        _context.Frames?.RemoveSubmitHook(this);
         for (int i = 0; i < _meshes.HighWater; i++)
         {
             var m = _meshes.AtIndex(i);
@@ -523,6 +527,38 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable
 
         _textures.RecordUploads(cmd, barriers);
         UpdateSceneSet(frame);
+    }
+
+    /// <summary>
+    /// Mesh and texture uploads staged after this frame's <see cref="PrepareFrame"/> (or in a frame without any
+    /// render) are recorded here, so staging memory is always consumed by the frame it was reserved for and a mesh
+    /// destroyed later is never copied after its buffer was freed.
+    /// </summary>
+    void IFrameSubmitHook.BeforeSubmit(VulkanFrame frame)
+    {
+        if (_disposed || (_pendingGeometry.Count == 0 && !_textures.HasPendingUploads))
+            return;
+        var cmd = frame.CommandBuffer;
+        var barriers = _submitBarriers;
+        barriers.CommandBuffer = cmd;
+        if (_pendingGeometry.Count > 0)
+        {
+            foreach (var (dst, src, srcOffset, size) in _pendingGeometry)
+            {
+                var copy = new BufferCopy(srcOffset, 0, size);
+                _context.Vk.CmdCopyBuffer(cmd, src, dst.Handle, 1, &copy);
+            }
+
+            BarrierBatch.Describe(BufferUse.ShaderRead, out var shaderStages, out var shaderAccess, out _);
+            BarrierBatch.Describe(BufferUse.GeometryInput, out var inputStages, out var inputAccess, out _);
+            barriers.AddGlobal(PipelineStageFlags2.CopyBit, AccessFlags2.TransferWriteBit, shaderStages | inputStages, shaderAccess | inputAccess);
+            barriers.Flush();
+            foreach (var (dst, _, _, _) in _pendingGeometry)
+                BarrierBatch.MarkWritten(ref dst.State, PipelineStageFlags2.CopyBit, AccessFlags2.TransferWriteBit, BufferUse.GeometryInput);
+            _pendingGeometry.Clear();
+        }
+
+        _textures.RecordUploads(cmd, barriers);
     }
 
     // ------------------------------------------------------------------ helpers

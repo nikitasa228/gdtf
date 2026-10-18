@@ -180,6 +180,55 @@ public sealed class SceneTests
         }
     }
 
+    [SkippableFact]
+    public void UploadsStagedOutsideRenderingAreNeitherLostNorOverwritten()
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var world = renderer.World;
+            var context = renderer.Context;
+            var view = new TopDownView(Width, Height, 12f);
+            var colorless = new ViewOptions { Shading = ViewShading.Colorless, ShowGrid = false };
+            using var target = renderer.CreateTarget(Width, Height);
+            var images = new ImageSource { ["checker"] = Checkerboard(64, 64) };
+
+            // An editor frame: the viewport renders, then the UI creates an object (staged after the render).
+            var frame = context.BeginFrame();
+            renderer.Render(target, view.Camera, colorless, new PreviewSettings(), 0f);
+            var box = world.CreateMesh(ProceduralMeshes.Box(Vector3.One));
+            var material = world.CreateMaterial(new MaterialData { BaseColorTexture = "checker" }, images);
+            world.CreateInstance(box, new[] { material }, Matrix4x4.CreateScale(2f) * Matrix4x4.CreateTranslation(1f, -1f, 1f),
+                InstanceFlags.None, 7);
+            context.SubmitFrame(frame);
+
+            // UI-only frames (no viewport visible) that stage and drop more data: the staging space of the first frame
+            // is recycled meanwhile.
+            for (int i = 0; i < 6; i++)
+            {
+                var uiFrame = context.BeginFrame();
+                var scratch = world.CreateTexture(Uniform(512, 512, (byte)(40 * i), 255, 0), srgb: true);
+                var scratchMesh = world.CreateMesh(ProceduralMeshes.Sphere(1f, 64, 32));
+                context.SubmitFrame(uiFrame);
+                world.DestroyTexture(scratch);
+                world.DestroyMesh(scratchMesh);
+            }
+
+            renderer.Render(target, view.Camera, colorless, new PreviewSettings(), 0f);
+            var (x, y, _) = view.NearestPixel(new Vector3(1f, -1f, 0f));
+            var hit = renderer.Pick(target, x, y);
+            Assert.NotNull(hit);
+            Assert.Equal(7u, hit!.Value.PickId);
+            Assert.InRange(MathF.Abs(hit.Value.WorldPosition.Z - 2f), 0f, 0.01f); // top face of the 2 m box: intact vertices
+            Assert.True(Vector3.Dot(hit.Value.Normal, Vector3.UnitZ) > 0.999f);
+            TestVulkan.AssertNoValidationErrors(context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     /// <summary>A 220/30 grey checkerboard with 8-pixel squares (sRGB-encoded RGBA8).</summary>
     internal static ImageData Checkerboard(int width, int height)
     {
