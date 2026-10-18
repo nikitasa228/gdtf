@@ -193,7 +193,12 @@ build/test jobs while measuring:
 | 1 thread (process CPU time, final code) | 128–155 | — | the work itself: velocity advection ≈ 33, projection ≈ 54–64, scalar advection ≈ 45–51, forces ≈ 5 ms |
 
 The 10 steps/s target is met when the four cores are available (11.9 steps/s at load ≈ 6, a 1.6× speed-up over one
-thread); on a saturated machine the wall time is bounded by the single-thread work of ≈ 130 ms.
+thread); on a saturated machine the wall time is bounded by the single-thread work of ≈ 130 ms. A later re-measurement
+(review, Release, machine load 7–31 from other jobs) gave 128–150 ms of CPU per step single-threaded (5.7–6.8 steps/s)
+and no gain from more threads at that load, so the target could not be re-confirmed then.
+
+Fans and nozzle jets are imposed over their whole reach (up to the box diagonal), in parallel over slices; eight wind
+machines add ≈ 20 ms per 64³ step on four threads (≈ 30 ms on one).
 
 The work per step fell from ≈ 205 to ≈ 130 ms of CPU time during optimisation (bounds-check-free interpolation,
 cell-centred midpoint velocities, branch-free CG rows, multigrid with fused passes). Projection was 76 ms with
@@ -309,7 +314,7 @@ wall or floor). Tests: the grid matches L₁ − 20·log₁₀ d at every cell a
 from `_specs` produce the expected field. Limits: no directivity, air absorption, screening by obstacles or room
 reverberation (a reverberant room adds a diffuse field that this model omits).
 
-## 4. Tests (`tests/Candela.Simulation.Tests`, ≈ 60 tests, < 30 s)
+## 4. Tests (`tests/Candela.Simulation.Tests`, ≈ 75 tests, ≈ 45 s in Release, ≈ 75 s in Debug on a busy machine)
 
 * Smoke physics: a closed box with a stirring fan conserves mass over 200 steps (0.00 % with the fixer); the projection
   removes > 99.8 % of the divergence (with obstacles, open faces); warm smoke rises and accelerates; a 1.9 kW plume
@@ -318,7 +323,9 @@ reverberation (a reverberant room adds a diffuse field that this model omits).
   rate; a fog machine injects its mass rate and throws fog forward; low fog sinks and hugs the floor; ventilation
   carries smoke at the draft speed; open ceilings let hot smoke out; dissipation and cooling follow their rates;
   viscosity/diffusion stay stable; trilinear sampling; voxelisation of rotated and matrix-placed boxes.
-* Solver: multigrid and Jacobi agree; odd grid sizes, sealed pockets and tiny grids work.
+* Solver: multigrid and Jacobi agree; odd grid sizes, sealed pockets and tiny grids work; a tolerance near float
+  precision in a closed box (singular system) never breaks the conjugate gradient down; strong diffusion conserves
+  smoke and heat; mirrored entity matrices give correctly placed obstacles.
 * State: identical results for identical inputs and any thread count; `Reset`; snapshots restore runs bit-identically;
   fixed sub-stepping and the hitch cap; invalid settings, emitters and obstacles are reported and skipped; the cell
   budget coarsens big domains.
