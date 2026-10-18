@@ -14,26 +14,84 @@ internal static class Resolver
         ResolveWheels(ctx);
         ResolveGeometries(ctx, geometryIndex);
         ResolveProperties(ctx, geometryIndex);
+        // The lookups every mode uses are built once: rebuilding them per mode costs modes × definitions, which a
+        // hostile file with thousands of both turns into minutes.
+        var names = new DefinitionIndex(ft);
         foreach (var mode in ft.DmxModes)
         {
             try
             {
-                ResolveMode(ctx, mode, geometryIndex);
+                ResolveMode(ctx, mode, geometryIndex, names);
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {
                 ctx.Warn($"DMXModes/{mode.Name}", $"References could not be resolved completely ({e.GetType().Name}: {e.Message}).");
             }
         }
+        var modes = new ModeIndex(ft.DmxModes);
         foreach (var rdm in ft.Protocols.Rdm)
             foreach (var sv in rdm.SoftwareVersions)
                 foreach (var p in sv.Personalities)
                 {
-                    p.DmxMode = ft.FindMode(p.DmxModeName);
+                    p.DmxMode = modes.Find(p.DmxModeName);
                     if (p.DmxMode is null && !string.IsNullOrEmpty(p.DmxModeName))
                         ctx.Warn("Protocols/FTRDM", $"DMX personality refers to unknown mode '{p.DmxModeName}'.");
                 }
         ft.InvalidateLookups();
+    }
+
+    /// <summary>
+    /// Name lookups of the definitions channel functions refer to, shared by all modes of a fixture type.
+    /// </summary>
+    private sealed class DefinitionIndex
+    {
+        public DefinitionIndex(FixtureType ft)
+        {
+            var pd = ft.PhysicalDescriptions;
+            Attributes = new NameIndex<GdtfAttribute>(ft.AttributeDefinitions.Attributes, a => a.Name);
+            Wheels = new NameIndex<Wheel>(ft.Wheels, w => w.Name);
+            Emitters = new NameIndex<Emitter>(pd.Emitters, e => e.Name);
+            Filters = new NameIndex<Filter>(pd.Filters, f => f.Name);
+            Gamuts = new NameIndex<Gamut>(pd.Gamuts, g => g.Name);
+            Profiles = new NameIndex<DmxProfile>(pd.DmxProfiles, p => p.Name);
+            ColorSpaces = new NameIndex<ColorSpace>(pd.AdditionalColorSpaces.Prepend(pd.ColorSpace), c => c.Name);
+        }
+
+        public NameIndex<GdtfAttribute> Attributes { get; }
+        public NameIndex<Wheel> Wheels { get; }
+        public NameIndex<Emitter> Emitters { get; }
+        public NameIndex<Filter> Filters { get; }
+        public NameIndex<Gamut> Gamuts { get; }
+        public NameIndex<DmxProfile> Profiles { get; }
+        public NameIndex<ColorSpace> ColorSpaces { get; }
+    }
+
+    /// <summary>
+    /// Mode lookup with the semantics of <see cref="FixtureType.FindMode"/> (empty name: the first mode; exact name, then
+    /// trimmed and case-insensitive), indexed so that resolving many personalities stays linear.
+    /// </summary>
+    private sealed class ModeIndex
+    {
+        private readonly List<DmxMode> _modes;
+        private readonly Dictionary<string, DmxMode> _exact = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, DmxMode> _loose = new(StringComparer.OrdinalIgnoreCase);
+
+        public ModeIndex(List<DmxMode> modes)
+        {
+            _modes = modes;
+            foreach (var m in modes)
+            {
+                _exact.TryAdd(m.Name, m);
+                _loose.TryAdd(m.Name.Trim(), m);
+            }
+        }
+
+        public DmxMode? Find(string? name)
+        {
+            if (string.IsNullOrEmpty(name)) return _modes.Count > 0 ? _modes[0] : null;
+            if (_exact.TryGetValue(name, out var m)) return m;
+            return _loose.TryGetValue(name.Trim(), out m) ? m : null;
+        }
     }
 
     // ---------------------------------------------------------------- generic tolerant lookup
@@ -72,7 +130,7 @@ internal static class Resolver
         var defs = ctx.FixtureType.AttributeDefinitions;
         var groups = new NameIndex<ActivationGroup>(defs.ActivationGroups, g => g.Name);
         var attributes = new NameIndex<GdtfAttribute>(defs.Attributes, a => a.Name);
-        var featureGroups = new NameIndex<FeatureGroup>(defs.FeatureGroups, g => g.Name);
+        var features = new FeatureIndex(defs);
 
         foreach (var a in defs.Attributes)
         {
@@ -85,7 +143,7 @@ internal static class Resolver
             }
             if (a.FeatureName is not null)
             {
-                a.Feature = FindFeature(featureGroups, defs, a.FeatureName);
+                a.Feature = features.Find(a.FeatureName);
                 if (a.Feature is null) ctx.Warn(path, $"Feature '{a.FeatureName}' is not defined.");
             }
             if (a.MainAttributeName is not null)
@@ -96,21 +154,40 @@ internal static class Resolver
         }
     }
 
-    private static Feature? FindFeature(NameIndex<FeatureGroup> groups, AttributeDefinitions defs, string node)
+    /// <summary>
+    /// Feature lookup by node <c>Group.Feature</c>: the feature of that group (trimmed, case-insensitive), else the first
+    /// feature of any group with the name after the first dot. Indexed, so resolving many attributes stays linear.
+    /// </summary>
+    private sealed class FeatureIndex
     {
-        int dot = node.IndexOf('.');
-        if (dot > 0)
+        private readonly NameIndex<FeatureGroup> _groups;
+        private readonly Dictionary<FeatureGroup, Dictionary<string, Feature>> _byGroup = new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<string, Feature> _any = new(StringComparer.OrdinalIgnoreCase);
+
+        public FeatureIndex(AttributeDefinitions defs)
         {
-            var group = groups.Find(node[..dot]);
-            string featureName = node[(dot + 1)..].Trim();
-            var hit = group?.Features.Find(f => string.Equals(f.Name.Trim(), featureName, StringComparison.OrdinalIgnoreCase));
-            if (hit is not null) return hit;
+            _groups = new NameIndex<FeatureGroup>(defs.FeatureGroups, g => g.Name);
+            foreach (var g in defs.FeatureGroups)
+            {
+                var own = new Dictionary<string, Feature>(StringComparer.OrdinalIgnoreCase);
+                foreach (var f in g.Features)
+                {
+                    own.TryAdd(f.Name.Trim(), f);
+                    _any.TryAdd(f.Name.Trim(), f);
+                }
+                _byGroup.TryAdd(g, own);
+            }
         }
-        string last = dot >= 0 ? node[(dot + 1)..].Trim() : node.Trim();
-        foreach (var g in defs.FeatureGroups)
-            foreach (var f in g.Features)
-                if (string.Equals(f.Name.Trim(), last, StringComparison.OrdinalIgnoreCase)) return f;
-        return null;
+
+        public Feature? Find(string node)
+        {
+            int dot = node.IndexOf('.');
+            string last = dot >= 0 ? node[(dot + 1)..].Trim() : node.Trim();
+            if (dot > 0 && _groups.Find(node[..dot]) is { } group &&
+                _byGroup.TryGetValue(group, out var own) && own.TryGetValue(last, out var hit))
+                return hit;
+            return _any.TryGetValue(last, out hit) ? hit : null;
+        }
     }
 
     private static void ResolveWheels(ReadContext ctx)
@@ -135,11 +212,58 @@ internal static class Resolver
         public NameIndex<GdtfGeometry> TopLevel { get; init; } = null!;
         public NameIndex<WiringObjectGeometry> WiringObjects { get; init; } = null!;
 
+        /// <summary>Picks per (mode root, name): files repeat geometry names, and channels repeat geometry names.</summary>
+        private readonly Dictionary<(GdtfGeometry? Root, string Name), GdtfGeometry?> _picked = new();
+
+        /// <summary>For a repeated name: its candidates per top-level tree, in tree order (built on first use).</summary>
+        private readonly Dictionary<IReadOnlyList<GdtfGeometry>, Dictionary<GdtfGeometry, List<GdtfGeometry>>> _byTree =
+            new(ReferenceEqualityComparer.Instance);
+
         public IReadOnlyList<GdtfGeometry> Find(string name)
         {
             if (ByName.TryGetValue(name, out var list)) return list;
             if (ByLooseName.TryGetValue(name.Trim(), out list)) return list;
             return Array.Empty<GdtfGeometry>();
+        }
+
+        /// <summary>
+        /// The geometry a channel of a mode with root <paramref name="modeRoot"/> means by <paramref name="name"/>: among
+        /// geometries with that name the first one in the mode's tree, else the first one. Only the candidates in the
+        /// root's own top-level tree are tested, so a name repeated thousands of times costs no scan per channel.
+        /// </summary>
+        public GdtfGeometry? Pick(string name, GdtfGeometry? modeRoot)
+        {
+            if (_picked.TryGetValue((modeRoot, name), out var picked)) return picked;
+            var candidates = Find(name);
+            picked = candidates.Count switch
+            {
+                0 => null,
+                1 => candidates[0],
+                _ when modeRoot is null => candidates[0],
+                _ => FirstInTree(candidates, modeRoot) ?? candidates[0],
+            };
+            _picked[(modeRoot, name)] = picked;
+            return picked;
+        }
+
+        private GdtfGeometry? FirstInTree(IReadOnlyList<GdtfGeometry> candidates, GdtfGeometry modeRoot)
+        {
+            if (!_byTree.TryGetValue(candidates, out var trees))
+            {
+                trees = new Dictionary<GdtfGeometry, List<GdtfGeometry>>(ReferenceEqualityComparer.Instance);
+                foreach (var g in candidates)
+                {
+                    var top = g.TopLevel;
+                    if (!trees.TryGetValue(top, out var inTree)) trees[top] = inTree = new List<GdtfGeometry>(1);
+                    inTree.Add(g);
+                }
+                _byTree[candidates] = trees;
+            }
+            if (!trees.TryGetValue(modeRoot.TopLevel, out var sameTree)) return null;
+            if (modeRoot.Parent is null) return sameTree[0]; // a top-level root contains its whole tree
+            foreach (var g in sameTree)
+                if (g.IsSelfOrDescendantOf(modeRoot)) return g;
+            return null;
         }
     }
 
@@ -258,7 +382,7 @@ internal static class Resolver
 
     // ---------------------------------------------------------------- DMX modes
 
-    private static void ResolveMode(ReadContext ctx, DmxMode mode, GeometryIndex index)
+    private static void ResolveMode(ReadContext ctx, DmxMode mode, GeometryIndex index, DefinitionIndex names)
     {
         var ft = ctx.FixtureType;
         string modePath = ReadContext.ChildPath("DMXModes", mode.Name);
@@ -285,21 +409,12 @@ internal static class Resolver
                 : $"Mode geometry '{mode.GeometryName}' is not defined; '{mode.Geometry.Name}' used.");
         }
 
-        var attributes = new NameIndex<GdtfAttribute>(ft.AttributeDefinitions.Attributes, a => a.Name);
-        var wheels = new NameIndex<Wheel>(ft.Wheels, w => w.Name);
-        var emitters = new NameIndex<Emitter>(ft.PhysicalDescriptions.Emitters, e => e.Name);
-        var filters = new NameIndex<Filter>(ft.PhysicalDescriptions.Filters, f => f.Name);
-        var gamuts = new NameIndex<Gamut>(ft.PhysicalDescriptions.Gamuts, g => g.Name);
-        var profiles = new NameIndex<DmxProfile>(ft.PhysicalDescriptions.DmxProfiles, p => p.Name);
-        var colorSpaces = new NameIndex<ColorSpace>(
-            ft.PhysicalDescriptions.AdditionalColorSpaces.Prepend(ft.PhysicalDescriptions.ColorSpace), c => c.Name);
-
         foreach (var ch in mode.Channels)
         {
             string path = ReadContext.ChildPath(modePath, ch.Name);
             if (ch.GeometryName is not null)
             {
-                ch.Geometry = PickGeometry(index.Find(ch.GeometryName), mode.Geometry);
+                ch.Geometry = index.Pick(ch.GeometryName, mode.Geometry);
                 if (ch.Geometry is null) ctx.Warn(path, $"Geometry '{ch.GeometryName}' is not defined.");
             }
             else
@@ -311,22 +426,23 @@ internal static class Resolver
             {
                 if (lc.AttributeName is not null && !IsNoFeature(lc.AttributeName))
                 {
-                    lc.Attribute = attributes.Find(lc.AttributeName);
+                    lc.Attribute = names.Attributes.Find(lc.AttributeName);
                     if (lc.Attribute is null) ctx.Warn(path, $"Attribute '{lc.AttributeName}' is not defined.");
                 }
                 foreach (var f in lc.Functions)
-                    ResolveFunction(ctx, f, path, attributes, wheels, emitters, filters, gamuts, profiles, colorSpaces);
+                    ResolveFunction(ctx, f, path, names);
             }
             ch.Resolution = ch.Offsets.Length > 0 ? ch.Offsets.Length : VirtualResolution(ch);
         }
 
         // Node references between channels and functions (need every channel's name and resolution first).
+        var nodes = new ModeNodeIndex(mode);
         foreach (var ch in mode.Channels)
         {
             string path = ReadContext.ChildPath(modePath, ch.Name);
             if (ch.InitialFunctionName is not null)
             {
-                ch.InitialFunction = FindOwnFunction(ch, ch.InitialFunctionName);
+                ch.InitialFunction = nodes.FindOwnFunction(ch, ch.InitialFunctionName);
                 if (ch.InitialFunction is null)
                     ctx.Warn(path, $"Initial function '{ch.InitialFunctionName}' is not a function of this channel; first function used.");
             }
@@ -338,7 +454,7 @@ internal static class Resolver
             foreach (var f in ch.Functions)
             {
                 if (f.ModeMasterName is null) continue;
-                var (masterChannel, masterFunction) = FindChannelOrFunction(mode, f.ModeMasterName);
+                var (masterChannel, masterFunction) = nodes.Find(f.ModeMasterName);
                 f.ModeMasterChannel = masterChannel;
                 f.ModeMasterFunction = masterFunction;
                 if (masterChannel is null)
@@ -357,19 +473,19 @@ internal static class Resolver
         }
 
         // DMX ranges need the mode masters: functions that cannot be active together do not end each other's range.
-        foreach (var ch in mode.Channels) ComputeRanges(ch);
+        foreach (var ch in mode.Channels) ComputeRanges(ch, ctx.Warnings, ReadContext.ChildPath(modePath, ch.Name));
 
         foreach (var rel in mode.Relations)
         {
             string path = ReadContext.ChildPath(modePath + "/Relations", rel.Name);
             if (rel.MasterName is not null)
             {
-                rel.Master = FindChannelOrFunction(mode, rel.MasterName).Channel;
+                rel.Master = nodes.Find(rel.MasterName).Channel;
                 if (rel.Master is null) ctx.Warn(path, $"Master '{rel.MasterName}' is not a channel of this mode.");
             }
             if (rel.FollowerName is not null)
             {
-                rel.Follower = FindChannelOrFunction(mode, rel.FollowerName).Function;
+                rel.Follower = nodes.Find(rel.FollowerName).Function;
                 if (rel.Follower is null) ctx.Warn(path, $"Follower '{rel.FollowerName}' is not a channel function of this mode.");
             }
         }
@@ -379,14 +495,14 @@ internal static class Resolver
             string path = ReadContext.ChildPath(modePath + "/FTMacros", macro.Name);
             if (macro.ChannelFunctionName is not null)
             {
-                macro.ChannelFunction = FindChannelOrFunction(mode, macro.ChannelFunctionName).Function;
+                macro.ChannelFunction = nodes.Find(macro.ChannelFunctionName).Function;
                 if (macro.ChannelFunction is null) ctx.Warn(path, $"Channel function '{macro.ChannelFunctionName}' is not defined.");
             }
             foreach (var step in macro.Steps)
                 foreach (var v in step.Values)
                 {
                     if (v.DmxChannelName is null) continue;
-                    v.DmxChannel = FindChannelOrFunction(mode, v.DmxChannelName).Channel;
+                    v.DmxChannel = nodes.Find(v.DmxChannelName).Channel;
                     if (v.DmxChannel is null) ctx.Warn(path, $"DMX channel '{v.DmxChannelName}' is not defined.");
                 }
         }
@@ -395,21 +511,10 @@ internal static class Resolver
 
     private static bool IsNoFeature(string name) => name.Trim().Equals("NoFeature", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>Among geometries with the same name prefer one in the mode's tree, then one in another top-level tree.</summary>
-    private static GdtfGeometry? PickGeometry(IReadOnlyList<GdtfGeometry> candidates, GdtfGeometry? modeRoot)
+    private static void ResolveFunction(ReadContext ctx, ChannelFunction f, string path, DefinitionIndex names)
     {
-        if (candidates.Count == 0) return null;
-        if (candidates.Count == 1 || modeRoot is null) return candidates[0];
-        foreach (var g in candidates)
-            if (g.IsSelfOrDescendantOf(modeRoot)) return g;
-        return candidates[0];
-    }
-
-    private static void ResolveFunction(
-        ReadContext ctx, ChannelFunction f, string path, NameIndex<GdtfAttribute> attributes, NameIndex<Wheel> wheels,
-        NameIndex<Emitter> emitters, NameIndex<Filter> filters, NameIndex<Gamut> gamuts, NameIndex<DmxProfile> profiles,
-        NameIndex<ColorSpace> colorSpaces)
-    {
+        var attributes = names.Attributes;
+        var profiles = names.Profiles;
         if (f.AttributeName is not null && !IsNoFeature(f.AttributeName))
         {
             f.Attribute = attributes.Find(f.AttributeName);
@@ -417,27 +522,27 @@ internal static class Resolver
         }
         if (f.WheelName is not null)
         {
-            f.Wheel = wheels.Find(f.WheelName);
+            f.Wheel = names.Wheels.Find(f.WheelName);
             if (f.Wheel is null) ctx.Warn(path, $"Function '{f.Name}': wheel '{f.WheelName}' is not defined.");
         }
         if (f.EmitterName is not null)
         {
-            f.Emitter = emitters.Find(f.EmitterName);
+            f.Emitter = names.Emitters.Find(f.EmitterName);
             if (f.Emitter is null) ctx.Warn(path, $"Function '{f.Name}': emitter '{f.EmitterName}' is not defined.");
         }
         if (f.FilterName is not null)
         {
-            f.Filter = filters.Find(f.FilterName);
+            f.Filter = names.Filters.Find(f.FilterName);
             if (f.Filter is null) ctx.Warn(path, $"Function '{f.Name}': filter '{f.FilterName}' is not defined.");
         }
         if (f.ColorSpaceName is not null)
         {
-            f.ColorSpace = colorSpaces.Find(f.ColorSpaceName);
+            f.ColorSpace = names.ColorSpaces.Find(f.ColorSpaceName);
             if (f.ColorSpace is null) ctx.Warn(path, $"Function '{f.Name}': colour space '{f.ColorSpaceName}' is not defined.");
         }
         if (f.GamutName is not null)
         {
-            f.Gamut = gamuts.Find(f.GamutName);
+            f.Gamut = names.Gamuts.Find(f.GamutName);
             if (f.Gamut is null) ctx.Warn(path, $"Function '{f.Name}': gamut '{f.GamutName}' is not defined.");
         }
         if (f.DmxProfileName is not null)
@@ -477,48 +582,109 @@ internal static class Resolver
         return attribute?.SubPhysicalUnits.Find(s => s.Type.ToString().Equals(type, StringComparison.OrdinalIgnoreCase));
     }
 
-    private static ChannelFunction? FindOwnFunction(DmxChannel ch, string node)
+    /// <summary>
+    /// Resolves node references within one mode — a channel (<c>Geometry_Attribute</c>) or a channel function
+    /// (<c>Channel.LogicalChannel.Function</c>) — tolerating other spellings (case, surrounding white space, a channel
+    /// prefix spelled differently). Every fallback is a dictionary lookup, so resolving all mode masters, relations
+    /// and macros of a mode stays linear; a scan of the channels per reference made hostile files with thousands of
+    /// dangling references take minutes.
+    /// </summary>
+    private sealed class ModeNodeIndex
     {
-        foreach (var f in ch.Functions)
-            if (string.Equals(f.FullName, node, StringComparison.Ordinal)) return f;
-        string trimmed = node.Trim();
-        foreach (var f in ch.Functions)
-            if (string.Equals(f.FullName.Trim(), trimmed, StringComparison.OrdinalIgnoreCase)) return f;
-        // Channel prefix spelled differently: match "LogicalChannel.Function" or just the function name.
-        foreach (var f in ch.Functions)
+        private readonly DmxMode _mode;
+        private readonly Dictionary<string, DmxChannel> _looseChannels = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, (DmxChannel Channel, int Order)> _channelNames = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<DmxChannel, FunctionIndex> _functions = new(ReferenceEqualityComparer.Instance);
+
+        public ModeNodeIndex(DmxMode mode)
         {
-            string tail = $"{f.LogicalChannel?.Name}.{f.Name}";
-            if (trimmed.EndsWith("." + tail, StringComparison.OrdinalIgnoreCase) || trimmed.Equals(tail, StringComparison.OrdinalIgnoreCase))
-                return f;
+            _mode = mode;
+            for (int i = 0; i < mode.Channels.Count; i++)
+            {
+                var c = mode.Channels[i];
+                _looseChannels.TryAdd(c.Name.Trim(), c);
+                _channelNames.TryAdd(c.Name, (c, i));
+            }
         }
-        int dot = trimmed.LastIndexOf('.');
-        string last = dot >= 0 ? trimmed[(dot + 1)..] : trimmed;
-        foreach (var f in ch.Functions)
-            if (string.Equals(f.Name.Trim(), last, StringComparison.OrdinalIgnoreCase)) return f;
-        return null;
+
+        /// <summary>
+        /// The channel (and function, when the node names one) of <paramref name="node"/>: exact channel or function
+        /// name; channel name trimmed and case-insensitive; else the first channel (in mode order) whose name followed
+        /// by a dot starts the node, with the function inside it (see <see cref="FindOwnFunction"/>), if any.
+        /// </summary>
+        public (DmxChannel? Channel, ChannelFunction? Function) Find(string node)
+        {
+            var ch = _mode.FindChannel(node);
+            if (ch is not null) return (ch, null);
+            var fn = _mode.FindFunction(node);
+            if (fn is not null) return (fn.LogicalChannel?.Channel, fn);
+
+            string trimmed = node.Trim();
+            if (_looseChannels.TryGetValue(trimmed, out ch)) return (ch, null);
+            DmxChannel? best = null;
+            int bestOrder = int.MaxValue;
+            for (int dot = trimmed.IndexOf('.'); dot >= 0; dot = trimmed.IndexOf('.', dot + 1))
+            {
+                if (_channelNames.TryGetValue(trimmed[..dot], out var hit) && hit.Order < bestOrder)
+                    (best, bestOrder) = (hit.Channel, hit.Order);
+            }
+            return best is null ? (null, null) : (best, FindOwnFunction(best, trimmed));
+        }
+
+        /// <summary>
+        /// A function of <paramref name="ch"/> named by <paramref name="node"/>: exact node name; node name trimmed and
+        /// case-insensitive; <c>LogicalChannel.Function</c> at the end of the node (channel prefix spelled
+        /// differently); else the function name after the last dot. The first function in file order wins.
+        /// </summary>
+        public ChannelFunction? FindOwnFunction(DmxChannel ch, string node)
+        {
+            if (_mode.FindFunction(node) is { } exact && ReferenceEquals(exact.LogicalChannel?.Channel, ch)) return exact;
+            if (!_functions.TryGetValue(ch, out var index)) _functions[ch] = index = new FunctionIndex(ch);
+            return index.Find(node);
+        }
     }
 
-    /// <summary>Resolves a node that names a channel (<c>Geometry_Attribute</c>) or a function (<c>Channel.Logical.Function</c>).</summary>
-    private static (DmxChannel? Channel, ChannelFunction? Function) FindChannelOrFunction(DmxMode mode, string node)
+    /// <summary>Lookups of one channel's functions by the spellings <see cref="ModeNodeIndex.FindOwnFunction"/> accepts.</summary>
+    private sealed class FunctionIndex
     {
-        var ch = mode.FindChannel(node);
-        if (ch is not null) return (ch, null);
-        var fn = mode.FindFunction(node);
-        if (fn is not null) return (fn.LogicalChannel?.Channel, fn);
+        private readonly Dictionary<string, ChannelFunction> _exact = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, ChannelFunction> _loose = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, (ChannelFunction Function, int Order)> _tails = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, ChannelFunction> _names = new(StringComparer.OrdinalIgnoreCase);
 
-        string trimmed = node.Trim();
-        foreach (var c in mode.Channels)
-            if (c.Name.Trim().Equals(trimmed, StringComparison.OrdinalIgnoreCase)) return (c, null);
-        // "Channel.Logical.Function": find the channel by its prefix, then the function inside it.
-        foreach (var c in mode.Channels)
+        public FunctionIndex(DmxChannel ch)
         {
-            string prefix = c.Name + ".";
-            if (!trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
-            var own = FindOwnFunction(c, trimmed);
-            if (own is not null) return (c, own);
-            return (c, null);
+            int order = 0;
+            foreach (var f in ch.Functions)
+            {
+                string full = f.FullName;
+                _exact.TryAdd(full, f);
+                _loose.TryAdd(full.Trim(), f);
+                _tails.TryAdd($"{f.LogicalChannel?.Name}.{f.Name}", (f, order++));
+                _names.TryAdd(f.Name.Trim(), f);
+            }
         }
-        return (null, null);
+
+        public ChannelFunction? Find(string node)
+        {
+            if (_exact.TryGetValue(node, out var f)) return f;
+            string trimmed = node.Trim();
+            if (_loose.TryGetValue(trimmed, out f)) return f;
+
+            // "…X.LogicalChannel.Function" or "LogicalChannel.Function": every suffix after a dot is a candidate tail.
+            ChannelFunction? best = null;
+            int bestOrder = int.MaxValue;
+            if (_tails.TryGetValue(trimmed, out var hit)) (best, bestOrder) = (hit.Function, hit.Order);
+            for (int dot = trimmed.IndexOf('.'); dot >= 0; dot = trimmed.IndexOf('.', dot + 1))
+            {
+                if (_tails.TryGetValue(trimmed[(dot + 1)..], out hit) && hit.Order < bestOrder)
+                    (best, bestOrder) = (hit.Function, hit.Order);
+            }
+            if (best is not null) return best;
+
+            int last = trimmed.LastIndexOf('.');
+            return _names.TryGetValue(last >= 0 ? trimmed[(last + 1)..] : trimmed, out f) ? f : null;
+        }
     }
 
     // ---------------------------------------------------------------- DMX ranges
@@ -530,26 +696,49 @@ internal static class Resolver
     /// in DMX order among the functions that can be active at the same time as this one (see
     /// <see cref="CanBeActiveTogether"/>): files list one function per mode-master range, all starting at 0.
     /// </summary>
-    internal static void ComputeRanges(DmxChannel ch)
+    internal static void ComputeRanges(DmxChannel ch) => ComputeRanges(ch, null, "");
+
+    /// <summary>
+    /// Most candidates skipped per channel while looking for the function that ends another one's range (real channels
+    /// skip a few thousand at most). A hostile channel with tens of thousands of mutually exclusive functions would make
+    /// the search quadratic; past this budget the remaining functions end at the next larger DMXFrom, as they would
+    /// without mode masters, and a warning says so.
+    /// </summary>
+    internal const int MaxRangeSkips = 1 << 20;
+
+    /// <inheritdoc cref="ComputeRanges(DmxChannel)"/>
+    internal static void ComputeRanges(DmxChannel ch, WarningSink? warnings, string path)
     {
         var functions = ch.Functions.ToList();
         foreach (var f in functions) f.DmxFromValue = ch.ToChannelValue(f.DmxFrom);
 
         var order = Enumerable.Range(0, functions.Count).OrderBy(i => functions[i].DmxFromValue).ThenBy(i => i).ToArray();
+        // Functions with the same DMXFrom never end each other's range: start each search at the next larger DMXFrom.
+        var nextLarger = NextLarger(order.Length, i => functions[order[i]].DmxFromValue);
         var conditions = new Condition[functions.Count][];
         for (int i = 0; i < functions.Count; i++) conditions[i] = Conditions(functions[i]);
+        long skips = 0;
+        bool exhausted = false;
         for (int oi = 0; oi < order.Length; oi++)
         {
             var f = functions[order[oi]];
             uint to = ch.MaxValue;
-            for (int oj = oi + 1; oj < order.Length; oj++)
+            for (int oj = nextLarger[oi]; oj < order.Length; oj++)
             {
                 var g = functions[order[oj]];
-                if (g.DmxFromValue <= f.DmxFromValue) continue;
-                bool together = f.ModeMasterChannel is null || g.ModeMasterChannel is null
-                    ? CanBeActiveTogether(f, g) // no master, or one that did not resolve (compared by spelling)
-                    : !Exclusive(conditions[order[oi]], conditions[order[oj]]);
-                if (!together) continue;
+                if (!exhausted)
+                {
+                    bool together = f.ModeMasterChannel is null || g.ModeMasterChannel is null
+                        ? CanBeActiveTogether(f, g) // no master, or one that did not resolve (compared by spelling)
+                        : !Exclusive(conditions[order[oi]], conditions[order[oj]]);
+                    if (!together)
+                    {
+                        if (++skips <= MaxRangeSkips) continue;
+                        exhausted = true;
+                        warnings?.Add(path, $"Channel has too many mutually exclusive functions to work out all DMX ranges; " +
+                            "the remaining functions end at the next larger DMXFrom.");
+                    }
+                }
                 to = g.DmxFromValue - 1;
                 break;
             }
@@ -558,18 +747,25 @@ internal static class Resolver
             if (f.ChannelSets.Count == 0) continue;
             foreach (var s in f.ChannelSets) s.DmxFromValue = ch.ToChannelValue(s.DmxFrom);
             var sets = f.ChannelSets.OrderBy(s => s.DmxFromValue).ToArray();
+            var nextSet = NextLarger(sets.Length, i => sets[i].DmxFromValue);
             for (int si = 0; si < sets.Length; si++)
             {
-                uint end = f.DmxToValue;
-                for (int sj = si + 1; sj < sets.Length; sj++)
-                {
-                    if (sets[sj].DmxFromValue <= sets[si].DmxFromValue) continue;
-                    end = sets[sj].DmxFromValue - 1;
-                    break;
-                }
+                uint end = nextSet[si] < sets.Length ? sets[nextSet[si]].DmxFromValue - 1 : f.DmxToValue;
                 sets[si].DmxToValue = System.Math.Max(end, sets[si].DmxFromValue);
             }
         }
+    }
+
+    /// <summary>
+    /// For values sorted ascending: per position, the first later position with a larger value (<paramref name="count"/>
+    /// when there is none).
+    /// </summary>
+    private static int[] NextLarger(int count, Func<int, uint> value)
+    {
+        var next = new int[count];
+        for (int i = count - 1; i >= 0; i--)
+            next[i] = i + 1 >= count ? count : value(i + 1) > value(i) ? i + 1 : next[i + 1];
+        return next;
     }
 
     /// <summary>
