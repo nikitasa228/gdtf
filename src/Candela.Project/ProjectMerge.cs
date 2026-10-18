@@ -322,8 +322,7 @@ public static class ProjectMerge
                         continue;
                     }
                 }
-                else if (!planned.Exists(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)) &&
-                         LibraryAgrees(options.TargetGdtfProvider, name, data))
+                else if (!taken.Contains(name) && LibraryAgrees(options.TargetGdtfProvider, name, data))
                 {
                     map[name] = name;
                     taken.Add(name);
@@ -528,7 +527,7 @@ public sealed class ProjectImportCommand : IUndoableCommand
     private readonly ProjectData _target;
     private readonly ProjectMerge.MergePlan _plan;
     private readonly List<Guid> _assetsAdded = new();
-    private readonly List<string> _gdtfsAdded = new();
+    private readonly List<(string Name, byte[] Data)> _gdtfsAdded = new();
     private bool _done;
     private bool _firstRun = true;
 
@@ -579,7 +578,7 @@ public sealed class ProjectImportCommand : IUndoableCommand
         {
             if (_target.GdtfFiles.ContainsKey(name)) continue;
             _target.GdtfFiles[name] = data;
-            _gdtfsAdded.Add(name);
+            _gdtfsAdded.Add((name, data));
         }
         scene.Add(_plan.Group, parent);
         _done = true;
@@ -592,10 +591,10 @@ public sealed class ProjectImportCommand : IUndoableCommand
         if (!_done) return;
         var scene = _target.Scene;
         if (_plan.Group.Scene == scene) scene.Remove(_plan.Group);
-        foreach (var name in _gdtfsAdded)
+        foreach (var (name, added) in _gdtfsAdded)
         {
-            if (_target.GdtfFiles.TryGetValue(name, out var data) && _plan.Gdtfs.Exists(g => g.Name == name && ReferenceEquals(g.Data, data)))
-                _target.GdtfFiles.Remove(name);
+            // Only remove the copy this import added (not one put there under the same name since).
+            if (_target.GdtfFiles.TryGetValue(name, out var data) && ReferenceEquals(data, added)) _target.GdtfFiles.Remove(name);
         }
         foreach (var id in _assetsAdded) _target.Assets.Remove(id);
         if (_plan.Result.AddedLayers.Count > 0)
