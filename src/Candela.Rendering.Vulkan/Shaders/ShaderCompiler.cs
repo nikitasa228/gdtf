@@ -217,9 +217,17 @@ internal sealed unsafe class ShaderCompiler : IDisposable
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             var bytes = new byte[words.Length * 4];
             System.Buffer.BlockCopy(words, 0, bytes, 0, bytes.Length);
-            string tmp = $"{path}.{Environment.ProcessId}.{Environment.CurrentManagedThreadId}.tmp";
-            File.WriteAllBytes(tmp, bytes);
-            File.Move(tmp, path, overwrite: true);
+            string tmp = $"{path}.{Environment.ProcessId}.{Guid.NewGuid():N}.tmp";
+            try
+            {
+                File.WriteAllBytes(tmp, bytes);
+                File.Move(tmp, path, overwrite: true);
+            }
+            finally
+            {
+                if (File.Exists(tmp))
+                    File.Delete(tmp);
+            }
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {

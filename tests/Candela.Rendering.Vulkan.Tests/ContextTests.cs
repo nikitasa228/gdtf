@@ -55,6 +55,53 @@ public sealed class ContextTests
     }
 
     [SkippableFact]
+    public void PipelineCacheIsPersistedAndDamagedFilesAreIgnored()
+    {
+        string directory = Path.Combine(TestVulkan.CacheDirectory, "pipeline-cache-test-" + Guid.NewGuid().ToString("N"));
+        var options = TestVulkan.Options();
+        options.CacheDirectory = directory;
+        try
+        {
+            VulkanRenderer? first = null;
+            try
+            {
+                first = VulkanRenderer.Create(options);
+            }
+            catch (VulkanUnavailableException e)
+            {
+                Skip.If(true, $"No Vulkan device available: {e.Message}");
+            }
+
+            TestRenderers.DisposeAndAssertClean(first!);
+            string file = Assert.Single(Directory.GetFiles(directory, "pipeline-*.bin"));
+            Assert.Empty(Directory.GetFiles(directory, "*.tmp", SearchOption.AllDirectories));
+
+            // A truncated file (crash or full disk while writing) and a garbled payload are both rejected before the
+            // driver sees them.
+            byte[] good = File.ReadAllBytes(file);
+            foreach (var damaged in new[] { good[..(good.Length / 2)], Garble(good) })
+            {
+                File.WriteAllBytes(file, damaged);
+                var renderer = VulkanRenderer.Create(options);
+                TestRenderers.DisposeAndAssertClean(renderer);
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+                Directory.Delete(directory, recursive: true);
+        }
+
+        static byte[] Garble(byte[] data)
+        {
+            var copy = (byte[])data.Clone();
+            for (int i = copy.Length / 2; i < copy.Length; i += 7)
+                copy[i] ^= 0x5A;
+            return copy;
+        }
+    }
+
+    [SkippableFact]
     public void DisposeWithoutResourcesIsLeakFree()
     {
         var context = TestVulkan.CreateContextOrSkip();

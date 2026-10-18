@@ -1,15 +1,22 @@
 using System.Buffers.Binary;
+using System.Security.Cryptography;
 using Silk.NET.Vulkan;
 
 namespace Candela.Rendering.Vulkan;
 
 /// <summary>
 /// The <c>VkPipelineCache</c>, persisted as <c>pipeline-&lt;vendor&gt;-&lt;device&gt;-&lt;cache uuid&gt;.bin</c> in the cache
-/// directory. The file's header (VkPipelineCacheHeaderVersionOne) is checked against the device before the data is
-/// handed to the driver, so a cache from another GPU or driver version is ignored rather than trusted.
+/// directory. The file starts with a small envelope (magic, payload length, SHA-256 of the payload) so a truncated or
+/// otherwise damaged file is never handed to the driver; the payload's own header (VkPipelineCacheHeaderVersionOne) is
+/// then checked against the device, so a cache from another GPU or driver version is ignored rather than trusted.
+/// Files are written to a unique temporary name and renamed, so concurrent writers (several contexts or processes)
+/// never interleave.
 /// </summary>
 internal sealed unsafe class PipelineCacheStore : IDisposable
 {
+    private const int EnvelopeSize = 8 + 8 + 32;
+    private static ReadOnlySpan<byte> Magic => "CANDPC01"u8;
+
     private readonly Vk _vk;
     private readonly Device _device;
     private readonly string? _path;
@@ -63,11 +70,28 @@ internal sealed unsafe class PipelineCacheStore : IDisposable
             var data = new byte[(int)size];
             fixed (byte* p = data)
                 VkUtil.Check(_vk.GetPipelineCacheData(_device, Cache, &size, p), "vkGetPipelineCacheData");
+            var payload = data.AsSpan(0, (int)size);
+            var envelope = new byte[EnvelopeSize];
+            Magic.CopyTo(envelope);
+            BinaryPrimitives.WriteUInt64LittleEndian(envelope.AsSpan(8), (ulong)size);
+            SHA256.HashData(payload, envelope.AsSpan(16));
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-            string tmp = _path + "." + Environment.ProcessId + ".tmp";
-            using (var stream = File.Create(tmp))
-                stream.Write(data, 0, (int)size);
-            File.Move(tmp, _path, overwrite: true);
+            string tmp = $"{_path}.{Environment.ProcessId}.{Guid.NewGuid():N}.tmp";
+            try
+            {
+                using (var stream = File.Create(tmp))
+                {
+                    stream.Write(envelope);
+                    stream.Write(payload);
+                }
+
+                File.Move(tmp, _path, overwrite: true);
+            }
+            finally
+            {
+                if (File.Exists(tmp))
+                    File.Delete(tmp);
+            }
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or VulkanException)
         {
@@ -90,8 +114,16 @@ internal sealed unsafe class PipelineCacheStore : IDisposable
             return null;
         try
         {
-            var data = File.ReadAllBytes(_path);
-            if (data.Length < 32)
+            var file = File.ReadAllBytes(_path);
+            if (file.Length < EnvelopeSize + 32 || !file.AsSpan(0, 8).SequenceEqual(Magic))
+                return null;
+            ulong length = BinaryPrimitives.ReadUInt64LittleEndian(file.AsSpan(8));
+            if (length != (ulong)(file.Length - EnvelopeSize))
+                return null;
+            var data = file.AsSpan(EnvelopeSize).ToArray();
+            Span<byte> hash = stackalloc byte[32];
+            SHA256.HashData(data, hash);
+            if (!hash.SequenceEqual(file.AsSpan(16, 32)))
                 return null;
             uint headerSize = BinaryPrimitives.ReadUInt32LittleEndian(data);
             uint headerVersion = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(4));
@@ -102,7 +134,7 @@ internal sealed unsafe class PipelineCacheStore : IDisposable
                          vendor == vendorId && device == deviceId && fileUuid == uuid;
             return valid ? data : null;
         }
-        catch (IOException e)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             _log(VulkanLogLevel.Warning, $"Pipeline cache not loaded: {e.Message}");
             return null;
