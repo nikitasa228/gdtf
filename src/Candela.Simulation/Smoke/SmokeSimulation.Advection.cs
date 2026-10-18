@@ -281,7 +281,7 @@ public sealed partial class SmokeSimulation
 
                 var g = new Vector3(i + 0.5f, j + 0.5f, k + 0.5f);
                 var forward = Backtrace(g, _cellVelocity[c], -s);
-                SampleTwo(_density2, _temperature2, forward, out float dRound, out _, out _, out float tRound, out _, out _);
+                SampleTwo(_density2, _temperature2, forward, out float dRound, out _, out _, out float tRound, out _, out _, withBounds: false);
                 float dHat = _density2[c], tHat = _temperature2[c];
                 float d = dHat + 0.5f * (_density[c] - dRound);
                 float t = tHat + 0.5f * (_temperature[c] - tRound);

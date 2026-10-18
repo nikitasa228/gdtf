@@ -48,7 +48,8 @@ internal sealed class PressureMultigrid
     private readonly Level[] _levels;
     private readonly ParallelOptions _parallelOptions;
     private readonly bool _allowParallel;
-    private readonly Action<int> _initRedSlice, _redSlice, _blackSlice, _correctedBlackSlice, _restrictSlice;
+    private readonly Action<int> _initRedSlice, _redSlice, _blackSlice, _correctedBlackSlice, _restrictSlice, _finalRedSlice;
+    private readonly double[] _dotPartials;
     private Level _current = null!;
     private Level _coarse = null!;
 
@@ -105,6 +106,8 @@ internal sealed class PressureMultigrid
         _blackSlice = k => SmoothSlice(k, 1);
         _correctedBlackSlice = CorrectedBlackSlice;
         _restrictSlice = RestrictSlice;
+        _finalRedSlice = FinalRedSlice;
+        _dotPartials = new double[_levels[0].Nz];
     }
 
     /// <summary>Number of levels including the fine grid.</summary>
@@ -130,13 +133,27 @@ internal sealed class PressureMultigrid
         }
     }
 
-    /// <summary>z = M⁻¹·r: one V-cycle with zero initial guess.</summary>
-    public void Apply(float[] r, float[] z)
+    /// <summary>
+    /// z = M⁻¹·r: one V-cycle with zero initial guess. Returns r·z, which conjugate gradients needs next and which the
+    /// last fine-level sweep computes on the way (summed per slice in slice order, so it is deterministic).
+    /// </summary>
+    public double Apply(float[] r, float[] z)
     {
         var fine = _levels[0];
         fine.B = r;
         fine.X = z;
         VCycle(0);
+        double dot = 0;
+        if (_levels.Length == 1)
+        {
+            for (int c = 0; c < fine.Cells; c++)
+                dot += (double)r[c] * z[c];
+            return dot;
+        }
+
+        for (int k = 0; k < fine.Nz; k++)
+            dot += _dotPartials[k];
+        return dot;
     }
 
     private void VCycle(int l)
@@ -166,7 +183,21 @@ internal sealed class PressureMultigrid
         Run(coarse, null, _restrictSlice, fine: level);
         VCycle(l + 1);
         Run(level, coarse, _correctedBlackSlice);
-        Run(level, coarse, _redSlice);
+        Run(level, coarse, l == 0 ? _finalRedSlice : _redSlice);
+    }
+
+    /// <summary>The last red sweep of the fine level, which also sums b·x over slice k (all its cells are final then).</summary>
+    private void FinalRedSlice(int k)
+    {
+        SmoothSlice(k, 0);
+        var L = _current;
+        int start = L.Nx * L.Ny * k, end = start + L.Nx * L.Ny;
+        double dot = 0;
+        var x = L.X;
+        var b = L.B;
+        for (int c = start; c < end; c++)
+            dot += (double)b[c] * x[c];
+        _dotPartials[k] = dot;
     }
 
     /// <summary>Runs <paramref name="body"/> over the slices of <paramref name="level"/> (or of the coarse level for restriction).</summary>

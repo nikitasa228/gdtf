@@ -79,7 +79,7 @@ public sealed partial class SmokeSimulation
         int ci = (int)ClampCoord(x + 0.5f, _nx - 1), cj = (int)ClampCoord(y + 0.5f, _ny - 1), ck = (int)ClampCoord(z + 0.5f, _nz - 1);
         if (_solid[CellIndex(ci, cj, ck)] != 0)
             return 0f;
-        SampleTwo(f, f, new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), out float a, out _, out _, out _, out _, out _);
+        SampleTwo(f, f, new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), out float a, out _, out _, out _, out _, out _, withBounds: false);
         return a;
     }
 
@@ -90,7 +90,7 @@ public sealed partial class SmokeSimulation
     /// diluted by them.
     /// </summary>
     private void SampleTwo(float[] a, float[] b, Vector3 g, out float va, out float minA, out float maxA,
-        out float vb, out float minB, out float maxB)
+        out float vb, out float minB, out float maxB, bool withBounds = true)
     {
         if (g.X < _ambientLo.X || g.Y < _ambientLo.Y || g.Z < _ambientLo.Z
             || g.X > _ambientHi.X || g.Y > _ambientHi.Y || g.Z > _ambientHi.Z)
@@ -118,12 +118,18 @@ public sealed partial class SmokeSimulation
         float b001 = Unsafe.Add(ref pb, o001), b101 = Unsafe.Add(ref pb, o101), b011 = Unsafe.Add(ref pb, o011);
         float b111 = Unsafe.Add(ref pb, o111);
 
+        bool s000 = false, s100 = false, s010 = false, s110 = false, s001 = false, s101 = false, s011 = false, s111 = false;
         if (_hasObstacles)
         {
             ref byte ps = ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(_solid), c000);
-            bool s000 = ps != 0, s100 = Unsafe.Add(ref ps, o100) != 0, s010 = Unsafe.Add(ref ps, o010) != 0;
-            bool s110 = Unsafe.Add(ref ps, o110) != 0, s001 = Unsafe.Add(ref ps, o001) != 0, s101 = Unsafe.Add(ref ps, o101) != 0;
-            bool s011 = Unsafe.Add(ref ps, o011) != 0, s111 = Unsafe.Add(ref ps, o111) != 0;
+            s000 = ps != 0;
+            s100 = Unsafe.Add(ref ps, o100) != 0;
+            s010 = Unsafe.Add(ref ps, o010) != 0;
+            s110 = Unsafe.Add(ref ps, o110) != 0;
+            s001 = Unsafe.Add(ref ps, o001) != 0;
+            s101 = Unsafe.Add(ref ps, o101) != 0;
+            s011 = Unsafe.Add(ref ps, o011) != 0;
+            s111 = Unsafe.Add(ref ps, o111) != 0;
             if (s000) w000 = 0f;
             if (s100) w100 = 0f;
             if (s010) w010 = 0f;
@@ -142,6 +148,14 @@ public sealed partial class SmokeSimulation
             float inv = 1f / sum;
             w000 *= inv; w100 *= inv; w010 *= inv; w110 *= inv;
             w001 *= inv; w101 *= inv; w011 *= inv; w111 *= inv;
+        }
+
+        if (!withBounds)
+        {
+            minA = minB = maxA = maxB = 0f;
+        }
+        else if (_hasObstacles)
+        {
             minA = minB = float.PositiveInfinity;
             maxA = maxB = float.NegativeInfinity;
             Bound(s000, a000, b000, ref minA, ref maxA, ref minB, ref maxB);

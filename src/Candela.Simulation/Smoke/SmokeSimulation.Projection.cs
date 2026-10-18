@@ -19,7 +19,6 @@ public sealed partial class SmokeSimulation
     private Action<int> _updateSlice = null!;
     private Action<int> _searchSlice = null!;
     private Action<int> _searchMultigridSlice = null!;
-    private Action<int> _dotResidualSlice = null!;
     private Action<int> _applyPressureSlice = null!;
     private float _cgAlpha, _cgBeta;
 
@@ -41,7 +40,6 @@ public sealed partial class SmokeSimulation
         _updateSlice = UpdateSlice;
         _searchSlice = SearchSlice;
         _searchMultigridSlice = SearchMultigridSlice;
-        _dotResidualSlice = DotResidualSlice;
         _applyPressureSlice = ApplyPressureSlice;
     }
 
@@ -106,21 +104,7 @@ public sealed partial class SmokeSimulation
     }
 
     /// <summary>z = V-cycle(r); returns r·z.</summary>
-    private double Precondition()
-    {
-        _multigrid!.Apply(_residual, _z);
-        RunSlices(_nz, _dotResidualSlice);
-        return SumOfSlices();
-    }
-
-    private void DotResidualSlice(int k)
-    {
-        int start = k * _nx * _ny, end = start + _nx * _ny;
-        double dot = 0;
-        for (int c = start; c < end; c++)
-            dot += (double)_residual[c] * _z[c];
-        _slicePartials[k] = dot;
-    }
+    private double Precondition() => _multigrid!.Apply(_residual, _z);
 
     /// <summary>p = z + β·p with z from the multigrid preconditioner.</summary>
     private void SearchMultigridSlice(int k)
