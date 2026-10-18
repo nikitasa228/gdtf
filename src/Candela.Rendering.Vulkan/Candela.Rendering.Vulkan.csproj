@@ -1,4 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- XML docs are required on the public API; internal members are documented where it helps. -->
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Candela.Rendering/Candela.Rendering.csproj" />
   </ItemGroup>
@@ -9,6 +14,12 @@
     <PackageReference Include="Silk.NET.Shaderc" />
     <PackageReference Include="Silk.NET.Shaderc.Native" />
     <PackageReference Include="StbImageWriteSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- GLSL sources are embedded and compiled at run time (shaderc); flat folder, logical name "Shaders/<file>". -->
+    <EmbeddedResource Include="Shaders/*.glsl;Shaders/*.vert;Shaders/*.frag;Shaders/*.comp">
+      <LogicalName>Shaders/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Candela.Rendering.Vulkan.Tests" />
