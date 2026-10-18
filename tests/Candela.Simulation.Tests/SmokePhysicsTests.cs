@@ -332,7 +332,7 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
         });
         sim.Fill(1f);
         SmokeTestScenes.Run(sim, 60); // 2 s
-        Assert.Equal(0.8 * 0.8, sim.AverageDensity(), 3);
+        Assert.Equal(0.8 * 0.8, sim.AverageDensity(), 1e-3);
     }
 
     [Fact]
@@ -379,7 +379,7 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     {
         var sim = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 4f), 0.25f);
         sim.Fill(0.25f);
-        Assert.Equal(0.25f, sim.DensityAt(new Vector3(0.3f, -1.1f, 2.7f)), 5);
+        Assert.Equal(0.25f, sim.DensityAt(new Vector3(0.3f, -1.1f, 2.7f)), 1e-5f);
         Assert.Equal(0f, sim.DensityAt(new Vector3(0f, 0f, -0.5f)));
         Assert.Equal(0f, sim.DensityAt(new Vector3(float.NaN, 0f, 1f)));
 
@@ -389,9 +389,9 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
         // At a cell centre the sample is the cell value; halfway between two centres it is their mean.
         var centre = sim.Bounds.Min + new Vector3(8.5f, 8.5f, 8.5f) * sim.CellSize;
         int c = 8 + sim.SizeX * (8 + sim.SizeY * 8);
-        Assert.Equal(density[c], sim.DensityAt(centre), 5);
+        Assert.Equal(density[c], sim.DensityAt(centre), 1e-5f);
         var mid = centre + new Vector3(0.5f * sim.CellSize, 0f, 0f);
-        Assert.Equal(0.5f * (density[c] + density[c + 1]), sim.DensityAt(mid), 5);
+        Assert.Equal(0.5f * (density[c] + density[c + 1]), sim.DensityAt(mid), 1e-5f);
     }
 
     [Fact]
@@ -426,7 +426,7 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
         sim.Fill(1f);
         sim.SetObstacles([ObstacleBox.FromAabb(new Aabb(new Vector3(-1f, -1f, 0f), new Vector3(1f, 1f, 1f)))]);
         Assert.Equal(0f, sim.DensityAt(new Vector3(0f, 0f, 0.5f)));
-        Assert.Equal(1f, sim.DensityAt(new Vector3(0f, 0f, 2.5f)), 5);
+        Assert.Equal(1f, sim.DensityAt(new Vector3(0f, 0f, 2.5f)), 1e-5f);
         sim.SetObstacles([]);
         Assert.Equal(0, sim.ObstacleCount);
         Assert.False(sim.IsSolid(8, 8, 1));

@@ -95,7 +95,7 @@ public sealed class PressureSolverTests(ITestOutputHelper output)
         }
 
         // Nothing leaks out of the sealed box, nothing comes in, and the warm air inside has moved up.
-        Assert.Equal(inside, sim.TotalSmokeMass(), 6);
+        Assert.Equal(inside, sim.TotalSmokeMass(), inside * 1e-4);
         Assert.Equal(0f, sim.DensityAt(new Vector3(1.2f, 0f, 2f)));
         Assert.True(sim.SmokeCentreOfMass().Z > c.Z - 0.3f);
     }

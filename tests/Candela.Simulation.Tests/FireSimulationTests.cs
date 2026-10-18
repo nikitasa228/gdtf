@@ -41,7 +41,7 @@ public sealed class FireSimulationTests(ITestOutputHelper output)
             $"Φ = {flux / 1e3:F0} klm, I = {intensity / 1e3:F1} kcd, tip {FlameModel.FlameTipVelocity(0.75f * q):F1} m/s");
         Assert.InRange(q, minQ, maxQ);
         Assert.InRange(intensity, minCd, maxCd);
-        Assert.Equal(height, FlameModel.FlameHeight(q, FlameEmitter.DefaultNozzleDiameter), 3);
+        Assert.Equal(height, FlameModel.FlameHeight(q, FlameEmitter.DefaultNozzleDiameter), 1e-3f);
         // ≈ 0.15 lm per watt of heat (χ_r = 0.25 × 0.62 lm/W at 1800 K).
         Assert.InRange(flux / q, 0.14f, 0.17f);
     }
@@ -151,7 +151,7 @@ public sealed class FireSimulationTests(ITestOutputHelper output)
         // 0.2 s after the 0.3 s shot ended the flame is (almost) gone although the output is still up.
         Assert.True(fire.TryGetStatus(FlameId, out var status));
         Assert.False(status.Burning);
-        Assert.Equal(0f, status.Valve, 2);
+        Assert.Equal(0f, status.Valve, 0.01f);
         Run(fire, 0.5, Flame(1f, burnTime: 0.3f));
         Assert.Equal(0f, fire.TotalLuminousFlux);
         Assert.True(fire.TryGetStatus(FlameId, out _), "the device waits for the output to be released");
@@ -209,7 +209,7 @@ public sealed class FireSimulationTests(ITestOutputHelper output)
         foreach (float t in volume.Temperature)
             emission += t > 0f ? BlackbodyRadiator.Luminance(t) : 0.0;
         emission *= 4.0 * Math.PI * Math.Pow(volume.CellSize, 3) * volume.EmissionCoefficient;
-        Assert.Equal(1.0, emission / volume.LuminousFlux, 2);
+        Assert.Equal(1.0, emission / volume.LuminousFlux, 0.01);
 
         // One global grid for the renderer.
         var box = fire.CombinedBounds;
@@ -247,8 +247,8 @@ public sealed class FireSimulationTests(ITestOutputHelper output)
         double heat = plumes.Sum(p => SimulationConstants.AirDensity * SimulationConstants.AirSpecificHeat * p.ExitSpeed
             * Math.PI * p.NozzleDiameter * p.NozzleDiameter / 4 * p.TemperatureExcess);
         double sootRate = plumes.Sum(p => p.MassRate);
-        Assert.Equal(1.0, heat / ((1 - fire.Settings.RadiantFraction) * status.HeatRelease), 3);
-        Assert.Equal(1.0, sootRate / (fire.Settings.SootYield * FlameModel.FuelMassRate(status.HeatRelease)), 3);
+        Assert.Equal(1.0, heat / ((1 - fire.Settings.RadiantFraction) * status.HeatRelease), 1e-3);
+        Assert.Equal(1.0, sootRate / (fire.Settings.SootYield * FlameModel.FuelMassRate(status.HeatRelease)), 1e-3);
         Assert.InRange(plumes.Max(p => p.Position.Z), 4.5f, 6.5f);   // the top section of the 5 m flame
         Assert.InRange(plumes.Min(p => p.Position.Z), 0.5f, 2f);     // the bottom section
 
