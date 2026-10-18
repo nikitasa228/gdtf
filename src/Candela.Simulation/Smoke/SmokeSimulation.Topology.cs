@@ -21,6 +21,8 @@ public sealed partial class SmokeSimulation
     private bool[] _componentClosed = Array.Empty<bool>();
     private double[] _componentSums = Array.Empty<double>();
     private bool _anyClosedComponent;
+    private bool _anyOpenComponent;
+    private int[] _closedCells = Array.Empty<int>();
     private bool _hasObstacles;
     private DomainFaces _inflowFaces;
 
@@ -294,6 +296,18 @@ public sealed partial class SmokeSimulation
         _componentClosed = closed.ToArray();
         _componentSums = new double[_componentCells.Length];
         _anyClosedComponent = Array.IndexOf(_componentClosed, true) >= 0;
+        _anyOpenComponent = Array.IndexOf(_componentClosed, false) >= 0;
+
+        // Cells of closed regions in ascending order: the pressure solve keeps its residual free of their null space.
+        int closedCount = 0;
+        for (int c = 0; c < _cellCount; c++)
+            closedCount += _component[c] >= 0 && _componentClosed[_component[c]] ? 1 : 0;
+        _closedCells = closedCount == 0 ? Array.Empty<int>() : new int[closedCount];
+        for (int c = 0, n = 0; c < _cellCount; c++)
+        {
+            if (_component[c] >= 0 && _componentClosed[_component[c]])
+                _closedCells[n++] = c;
+        }
     }
 
     /// <summary>Sets wall faces to zero and inflow faces to the airflow's normal component.</summary>

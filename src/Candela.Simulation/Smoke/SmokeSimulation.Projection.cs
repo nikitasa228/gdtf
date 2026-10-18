@@ -21,6 +21,7 @@ public sealed partial class SmokeSimulation
     private Action<int> _searchSlice = null!;
     private Action<int> _searchMultigridSlice = null!;
     private Action<int> _applyPressureSlice = null!;
+    private Action<int> _jacobiStartSlice = null!;
     private float _cgAlpha, _cgBeta;
 
     /// <summary>Creates the per-slice delegates once, so stepping does not allocate closures.</summary>
@@ -43,6 +44,7 @@ public sealed partial class SmokeSimulation
         _searchSlice = SearchSlice;
         _searchMultigridSlice = SearchMultigridSlice;
         _applyPressureSlice = ApplyPressureSlice;
+        _jacobiStartSlice = JacobiStartSlice;
     }
 
     /// <summary>
@@ -67,6 +69,8 @@ public sealed partial class SmokeSimulation
         bool multigrid = _multigrid is not null;
         RunSlices(_nz, _initialResidualSlice);
         float maxR = MaxOfSlices();
+        if (_anyClosedComponent)
+            maxR = ProjectClosedResidual(maxR, recomputeJacobi: !multigrid);
         double rz = multigrid ? Precondition() : SumOfSlices();
         if (multigrid)
             _z.AsSpan(0, _cellCount).CopyTo(_search);
@@ -76,7 +80,7 @@ public sealed partial class SmokeSimulation
         {
             RunSlices(_nz, _matVecSlice);
             double pq = SumOfSlices();
-            if (!(pq > 0) || !double.IsFinite(pq) || !double.IsFinite(rz))
+            if (!(pq > 0) || !double.IsFinite(pq) || !(rz > 0) || !double.IsFinite(rz))
                 break;
             _cgAlpha = (float)(rz / pq);
             RunSlices(_nz, _updateSlice);
@@ -85,11 +89,15 @@ public sealed partial class SmokeSimulation
             iterations++;
             if (maxR <= tolerance)
                 break;
+            if (_anyClosedComponent)
+                maxR = ProjectClosedResidual(maxR, recomputeJacobi: false);
             if (multigrid)
                 rzNext = Precondition();
-            if (!double.IsFinite(rzNext))
+            // r·M⁻¹r of a symmetric positive definite preconditioner is positive for r ≠ 0: anything else is a
+            // breakdown (rounding), and continuing would only make the pressure worse.
+            if (!(rzNext > 0) || !double.IsFinite(rzNext))
                 break;
-            _cgBeta = rz > 0 ? (float)(rzNext / rz) : 0f;
+            _cgBeta = (float)(rzNext / rz);
             rz = rzNext;
             RunSlices(_nz, multigrid ? _searchMultigridSlice : _searchSlice);
         }
@@ -103,6 +111,61 @@ public sealed partial class SmokeSimulation
 
         RunSlices(_nz + 1, _applyPressureSlice);
         return (iterations, maxB / h2, maxR / h2);
+    }
+
+    /// <summary>
+    /// Removes the mean of the residual over every closed fluid region (sequential over <c>_closedCells</c>, so
+    /// deterministic). In exact arithmetic it is zero already — the right-hand side was made consistent and A·x has no
+    /// component in the null space — but float rounding in r −= α·q lets a constant creep in, which the multigrid
+    /// preconditioner (an approximate inverse of the singular operator) amplifies until the conjugate gradient breaks
+    /// down. Returns the updated max |r|: exact when the whole box is closed; otherwise the larger of the previous
+    /// maximum and the maximum over the closed cells (a bound that differs from the exact value only by rounding).
+    /// With <paramref name="recomputeJacobi"/> the Jacobi start values p = r/n and r·p are recomputed into
+    /// <c>_search</c> and the slice partials.
+    /// </summary>
+    private float ProjectClosedResidual(float maxR, bool recomputeJacobi)
+    {
+        var cells = _closedCells;
+        var r = _residual;
+        Array.Clear(_componentSums);
+        for (int n = 0; n < cells.Length; n++)
+        {
+            int c = cells[n];
+            _componentSums[_component[c]] += r[c];
+        }
+
+        for (int id = 0; id < _componentSums.Length; id++)
+            _componentSums[id] = _componentClosed[id] ? _componentSums[id] / _componentCells[id] : 0;
+
+        float closedMax = 0f;
+        for (int n = 0; n < cells.Length; n++)
+        {
+            int c = cells[n];
+            if (_diag[c] == 0f)
+                continue; // a single sealed cell: its row of A is empty and r stays 0
+            float value = r[c] - (float)_componentSums[_component[c]];
+            r[c] = value;
+            closedMax = MathF.Max(closedMax, MathF.Abs(value));
+        }
+
+        if (recomputeJacobi)
+            RunSlices(_nz, _jacobiStartSlice);
+        return _anyOpenComponent ? MathF.Max(maxR, closedMax) : closedMax;
+    }
+
+    /// <summary>p = r/n and the partial Σ r²/n of slice k (Jacobi start after the residual was projected).</summary>
+    private void JacobiStartSlice(int k)
+    {
+        int start = k * _nx * _ny, end = start + _nx * _ny;
+        double rz = 0;
+        for (int c = start; c < end; c++)
+        {
+            float z = _residual[c] * _invDiag[c];
+            _search[c] = z;
+            rz += (double)_residual[c] * z;
+        }
+
+        _slicePartials[k] = rz;
     }
 
     /// <summary>z = V-cycle(r); returns r·z.</summary>

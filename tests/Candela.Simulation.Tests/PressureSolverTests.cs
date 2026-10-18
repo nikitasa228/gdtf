@@ -100,6 +100,53 @@ public sealed class PressureSolverTests(ITestOutputHelper output)
         Assert.True(sim.SmokeCentreOfMass().Z > c.Z - 0.3f);
     }
 
+    [Theory]
+    [InlineData(PressurePreconditioner.Multigrid, DomainFaces.None)]
+    [InlineData(PressurePreconditioner.Multigrid, DomainFaces.AllButFloor)]
+    [InlineData(PressurePreconditioner.Jacobi, DomainFaces.None)]
+    public void TightTolerance_InAClosedBox_NeverBreaksDown(PressurePreconditioner preconditioner, DomainFaces open)
+    {
+        // Regression: in a closed box (singular Poisson system) float rounding let a constant creep into the CG
+        // residual; the multigrid preconditioner amplified it until the iteration broke down after a few steps and left
+        // up to 20 % of the divergence in the flow (and later velocities of 10⁹ m/s). A tolerance near float precision
+        // makes every solve run long enough to expose it.
+        var sim = new SmokeSimulation(new SmokeSimulationSettings
+        {
+            Bounds = new Aabb(new Vector3(-2f, -2f, 0f), new Vector3(2f, 2f, 4f)),
+            CellSize = 0.125f,
+            OpenFaces = open,
+            DissipationPerSecond = 0f,
+            TemperatureRelaxationRate = 0f,
+            PressureTolerance = 1e-6f,
+            PressurePreconditioner = preconditioner,
+        });
+        // A sealed pocket as well, so an open box also has a singular region.
+        var c = new Vector3(0.5f, 0.5f, 2f);
+        sim.SetObstacles([
+            ObstacleBox.FromAabb(new Aabb(c - new Vector3(0.8f), c + new Vector3(0.8f, 0.8f, -0.6f))),
+            ObstacleBox.FromAabb(new Aabb(c + new Vector3(-0.8f, -0.8f, 0.6f), c + new Vector3(0.8f))),
+            ObstacleBox.FromAabb(new Aabb(c - new Vector3(0.8f), c + new Vector3(-0.6f, 0.8f, 0.8f))),
+            ObstacleBox.FromAabb(new Aabb(c + new Vector3(0.6f, -0.8f, -0.8f), c + new Vector3(0.8f))),
+            ObstacleBox.FromAabb(new Aabb(c - new Vector3(0.8f), c + new Vector3(0.8f, -0.6f, 0.8f))),
+            ObstacleBox.FromAabb(new Aabb(c + new Vector3(-0.8f, 0.6f, -0.8f), c + new Vector3(0.8f))),
+        ]);
+        sim.AddSmoke(c, 0.4f, 1f, 40f);
+        sim.AddSmoke(new Vector3(-0.5f, 0f, 1f), 0.8f, 1f, 10f);
+        var fan = SmokeEmitter.Fan(new Vector3(-1.8f, -1.2f, 0.6f), new Vector3(1f, 0.6f, 0.1f), 0.6f, 0.3f, 6f);
+        float worst = 0f;
+        for (int n = 0; n < 30; n++)
+        {
+            sim.StepOnce([fan]);
+            float before = sim.LastStatistics.MaxDivergenceBefore;
+            worst = MathF.Max(worst, sim.MaxDivergence() / before);
+            Assert.True(sim.LastStatistics.PressureIterations < sim.Settings.MaxPressureIterations);
+        }
+
+        output.WriteLine($"{preconditioner} {open}: worst measured divergence after/before {worst:E2}");
+        Assert.True(worst < 1e-4f, $"divergence after/before reached {worst:E2}");
+        Assert.True(sim.VelocityAt(new Vector3(0f, 0f, 1f)).Length() < 10f);
+    }
+
     [Fact]
     public void TinyGrids_Work()
     {
