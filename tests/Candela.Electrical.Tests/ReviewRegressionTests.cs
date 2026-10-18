@@ -281,8 +281,12 @@ public class ReviewRegressionTests
             [
                 new Port
                 {
-                    Name = "Power In", Direction = PortDirection.Input, Signal = SignalKind.Power, Connector = ConnectorCatalog.Resolve("powerCON TRUE1"),
-                    Role = PortRole.PowerIn, Origin = PortOrigin.Specs,
+                    Name = "Power In",
+                    Direction = PortDirection.Input,
+                    Signal = SignalKind.Power,
+                    Connector = ConnectorCatalog.Resolve("powerCON TRUE1"),
+                    Role = PortRole.PowerIn,
+                    Origin = PortOrigin.Specs,
                 },
             ],
         };

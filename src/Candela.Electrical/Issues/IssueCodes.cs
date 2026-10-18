@@ -43,7 +43,10 @@ public static class IssueCodes
     /// <summary>[Error] The fixture's patched universe is not the one arriving at its input.</summary>
     public const string DataUniverseMismatch = "data.universe-mismatch";
 
-    /// <summary>[Warning] A DMX/Ethernet cable branches to more than two devices without a splitter.</summary>
+    /// <summary>
+    /// [Warning] A DMX/Ethernet cable branches to more than two devices without a splitter, or both thru sockets (XLR
+    /// 3-pin and 5-pin) of one fixture are cabled, which branches its line the same way.
+    /// </summary>
     public const string DataYSplit = "data.y-split";
 
     /// <summary>[Warning] More than 32 devices on one DMX segment.</summary>
@@ -127,10 +130,16 @@ public static class IssueCodes
     /// <summary>[Error] A fixture is mounted on an entity that does not exist.</summary>
     public const string RiggingMountMissing = "rigging.mount-missing";
 
-    /// <summary>[Error] A truss carries more than its maximum uniform load.</summary>
+    /// <summary>
+    /// [Error] A truss carries more than its maximum uniform load, or (without a point rating) its loads bend it more
+    /// than its maximum uniform load would.
+    /// </summary>
     public const string RiggingTrussOverload = "rigging.truss-overload";
 
-    /// <summary>[Error] A single load on a truss exceeds its maximum point load.</summary>
+    /// <summary>
+    /// [Error] A single load on a truss exceeds its maximum point load, or all loads together bend it more than that
+    /// point load at mid-span would.
+    /// </summary>
     public const string RiggingTrussPointOverload = "rigging.truss-point-overload";
 
     /// <summary>[Error] A rigging point carries more than its capacity.</summary>
