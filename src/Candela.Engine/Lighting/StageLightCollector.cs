@@ -30,6 +30,17 @@ public sealed class StageLightCollector
     /// <summary>Full field angle of the flame hemispheres, rad (270°): with 176° beams two opposed lights are isotropic within 5 %.</summary>
     public const float FlameHemisphereFieldAngle = 270f * MathF.PI / 180f;
 
+    /// <summary>
+    /// Largest field angle (10 %) relative to the beam angle (50 %) passed to the renderer. Real optics stay well below
+    /// it (profiles ≈ 1.2, washes ≈ 1.6–2, PARs ≈ 2.5), but some GDTF files write the zoom range into the Beam geometry
+    /// (Ayrton Rivale Wash: BeamAngle 4°, FieldAngle 57°), and a ratio of 14 applied at a wide zoom would spread the
+    /// light over more than a hemisphere.
+    /// </summary>
+    public const float MaxFieldToBeamRatio = 3f;
+
+    /// <summary>Widest field angle passed to the renderer, rad (170°).</summary>
+    public const float MaxFieldAngle = 170f * MathF.PI / 180f;
+
     /// <summary>Prism facet offset (fraction of the field radius) assumed when a prism slot gives no facet translation.</summary>
     public const float DefaultPrismOffset = 0.6f;
 
@@ -71,7 +82,7 @@ public sealed class StageLightCollector
                 light.Color = beam.Color.Rgb;
                 light.PeakCandela = candela;
                 light.BeamAngle = beam.BeamAngle;
-                light.FieldAngle = beam.FieldAngle;
+                light.FieldAngle = PlausibleField(beam.BeamAngle, beam.FieldAngle);
                 light.BeamType = beam.BeamType;
                 light.SourceRadius = SourceRadius(beam.Beam.Geometry.BeamRadius);
                 light.Iris = float.IsFinite(beam.Iris) ? Math.Clamp(beam.Iris, 0f, 1f) : 1f;
@@ -201,6 +212,13 @@ public sealed class StageLightCollector
         }
         float field = float.IsFinite(light.FieldAngle) && light.FieldAngle > 0f ? light.FieldAngle : light.BeamAngle;
         light.PrismSpread = float.IsFinite(field) ? offset * 0.5f * field : 0f;
+    }
+
+    /// <summary>The field angle limited to <see cref="MaxFieldToBeamRatio"/> × the beam angle and <see cref="MaxFieldAngle"/>.</summary>
+    public static float PlausibleField(float beamAngle, float fieldAngle)
+    {
+        if (!float.IsFinite(fieldAngle) || !(beamAngle > 0f) || !float.IsFinite(beamAngle)) return fieldAngle;
+        return MathF.Max(beamAngle, MathF.Min(fieldAngle, MathF.Min(beamAngle * MaxFieldToBeamRatio, MaxFieldAngle)));
     }
 
     private static float SourceRadius(float radius) => float.IsFinite(radius) && radius > 0f ? Math.Clamp(radius, 0.001f, 2f) : 0.05f;

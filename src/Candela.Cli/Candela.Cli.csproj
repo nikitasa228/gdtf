@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Candela.Cli.Tests" />
+    <InternalsVisibleTo Include="Candela.Engine.Tests" />
   </ItemGroup>
 </Project>

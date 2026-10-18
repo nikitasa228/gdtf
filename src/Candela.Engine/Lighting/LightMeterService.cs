@@ -90,6 +90,28 @@ public sealed class LightMeterService
         return result;
     }
 
+    /// <summary>Calibration constant of incident-light meters with a flat receptor (ISO 2720), lx·s.</summary>
+    public const float IncidentCalibration = 250f;
+
+    /// <summary>
+    /// The exposure an incident-light meter would suggest for the lit part of a horizontal area: the median illuminance
+    /// of the points of a 32 × 32 grid over <paramref name="area"/>'s footprint at height <paramref name="height"/> that
+    /// receive light (≥ 1 lx), as <c>EV100 = log2(E · 100 / C)</c> with <see cref="IncidentCalibration"/>. Returns
+    /// <paramref name="fallback"/> when nothing is lit.
+    /// </summary>
+    public float IncidentEv100(Core.Math.Aabb area, float height, float fallback = 6f)
+    {
+        if (area.IsEmpty) return fallback;
+        const int n = 32;
+        var size = area.Size;
+        var lux = IlluminanceOnGrid(new Vector3(area.Min.X + size.X / (2 * n), area.Min.Y + size.Y / (2 * n), height),
+            new Vector3(size.X / n, 0f, 0f), new Vector3(0f, size.Y / n, 0f), n, n);
+        var lit = lux.Where(e => e >= 1f && float.IsFinite(e)).Order().ToArray();
+        if (lit.Length == 0) return fallback;
+        float median = lit[lit.Length / 2];
+        return Math.Clamp(MathF.Log2(median * 100f / IncidentCalibration), -6f, 20f);
+    }
+
     /// <summary>
     /// The light plot of the scene: one row per fixture with its id, type, mode, DMX address, power, weight and
     /// position, ordered by fixture id, plus totals.

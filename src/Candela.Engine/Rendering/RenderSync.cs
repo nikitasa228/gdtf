@@ -192,11 +192,18 @@ public sealed class RenderSync : IDisposable
         _engine.SceneReplaced -= OnSceneReplaced;
         _engine.Selection.Changed -= OnSelectionChanged;
         _engine.Assets.AssetChanged -= OnAssetChanged;
-        DestroyAll(destroySharedResources: true);
-        World.SetLights(ReadOnlySpan<SpotLight>.Empty);
-        World.SetLines(ReadOnlySpan<LineVertex>.Empty);
-        World.SetNoiseSources(ReadOnlySpan<NoiseSource>.Empty);
-        World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+        try
+        {
+            DestroyAll(destroySharedResources: true);
+            World.SetLights(ReadOnlySpan<SpotLight>.Empty);
+            World.SetLines(ReadOnlySpan<LineVertex>.Empty);
+            World.SetNoiseSources(ReadOnlySpan<NoiseSource>.Empty);
+            World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+        }
+        catch (ObjectDisposedException)
+        {
+            // The renderer was disposed first: everything this binding created is gone with it.
+        }
     }
 
     // ------------------------------------------------------------------ scene changes

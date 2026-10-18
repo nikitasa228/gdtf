@@ -153,15 +153,15 @@ public static class ImportWorker
     }
 
     /// <summary>
-    /// Finds the worker program: <paramref name="configuredPath"/>, then <see cref="EnvironmentVariable"/>, then the
-    /// <c>candela</c> program next to the running one. Null when none exists.
+    /// Finds the worker program. A <paramref name="configuredPath"/> is used alone (null when that file does not exist, so
+    /// a configured but missing worker falls back to in-process imports); otherwise <see cref="EnvironmentVariable"/>, then
+    /// the <c>candela</c> program next to the running one. Null when none exists.
     /// </summary>
     public static string? FindWorker(string? configuredPath = null)
     {
-        foreach (var candidate in new[] { configuredPath, Environment.GetEnvironmentVariable(EnvironmentVariable) })
-        {
-            if (!string.IsNullOrWhiteSpace(candidate) && File.Exists(candidate)) return Path.GetFullPath(candidate);
-        }
+        if (configuredPath is not null) return File.Exists(configuredPath) ? Path.GetFullPath(configuredPath) : null;
+        if (Environment.GetEnvironmentVariable(EnvironmentVariable) is { Length: > 0 } fromEnvironment && File.Exists(fromEnvironment))
+            return Path.GetFullPath(fromEnvironment);
         string dir = AppContext.BaseDirectory;
         string[] names = OperatingSystem.IsWindows() ? new[] { "candela.exe", "candela.dll" } : new[] { "candela", "candela.dll" };
         foreach (var name in names)

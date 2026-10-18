@@ -27,9 +27,9 @@ public sealed record StageEngineOptions
 
     /// <summary>
     /// Path of the program that imports 3D models in a separate process (<c>candela import-worker</c>): the
-    /// <c>candela</c> executable or <c>candela.dll</c>. Null searches next to the running program and in
-    /// <c>CANDELA_IMPORT_WORKER</c>; when nothing is found, models are imported inside the application process (see
-    /// docs/engine.md).
+    /// <c>candela</c> executable or <c>candela.dll</c>. Null searches <c>CANDELA_IMPORT_WORKER</c> and next to the running
+    /// program; a path that does not exist means "no worker". Without a worker, models are imported inside the
+    /// application process and a note says so (see docs/engine.md).
     /// </summary>
     public string? ImportWorkerPath { get; init; }
 

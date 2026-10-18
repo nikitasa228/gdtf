@@ -1,9 +1,12 @@
+using Candela.Engine;
 using Candela.Rendering.Vulkan;
 
 namespace Candela.Cli;
 
 /// <summary>
-/// Headless entry point. Exit codes: 0 success, 1 failure, 2 usage error, 3 no usable Vulkan device.
+/// Headless entry point (<c>candela</c>). Exit codes: 0 success; 1 failure (file not readable, render or I/O error);
+/// 2 usage error; 3 no usable Vulkan device; 4 the input has errors (<c>validate</c> found error-level issues,
+/// <c>import-worker</c> rejected the model).
 /// </summary>
 internal static class Program
 {
@@ -11,12 +14,16 @@ internal static class Program
     internal const int ExitFailure = 1;
     internal const int ExitUsage = 2;
     internal const int ExitNoVulkan = 3;
+    internal const int ExitInputErrors = 4;
 
-    private static int Main(string[] args)
+    private static int Main(string[] args) => Run(args, Console.Out, Console.Error);
+
+    /// <summary>Runs a command line (also used by tests in-process).</summary>
+    internal static int Run(string[] args, TextWriter output, TextWriter error)
     {
         if (args.Length == 0 || args[0] is "-h" or "--help" or "help")
         {
-            PrintUsage(Console.Out);
+            PrintUsage(output);
             return args.Length == 0 ? ExitUsage : ExitOk;
         }
 
@@ -24,29 +31,39 @@ internal static class Program
         {
             switch (args[0])
             {
+                case "render":
+                    return RenderCommand.Run(RenderOptions.Parse(args[1..]), output, error);
                 case "render-test":
-                    return RenderTestCommand.Run(RenderTestOptions.Parse(args[1..]), Console.Out);
+                    return RenderTestCommand.Run(RenderTestOptions.Parse(args[1..]), output);
+                case "artnet-test":
+                    return ArtNetTestCommand.Run(ArtNetTestOptions.Parse(args[1..]), output, error);
+                case "info":
+                    return InfoCommand.Run(InfoOptions.Parse(args[1..]), output, error);
+                case "validate":
+                    return ValidateCommand.Run(ValidateOptions.Parse(args[1..]), output, error);
+                case ImportWorker.CommandName:
+                    return ImportWorkerCommand.Run(args[1..], error);
                 default:
-                    Console.Error.WriteLine($"Unknown command '{args[0]}'.");
-                    PrintUsage(Console.Error);
+                    error.WriteLine($"Unknown command '{args[0]}'.");
+                    PrintUsage(error);
                     return ExitUsage;
             }
         }
         catch (UsageException e)
         {
-            Console.Error.WriteLine(e.Message);
-            PrintUsage(Console.Error);
+            error.WriteLine(e.Message);
+            PrintUsage(error);
             return ExitUsage;
         }
         catch (VulkanUnavailableException e)
         {
-            Console.Error.WriteLine($"No usable Vulkan device: {e.Message}");
-            Console.Error.WriteLine("Install a Vulkan 1.3 driver (GPU vendor driver, or Mesa lavapipe for software rendering).");
+            error.WriteLine($"No usable Vulkan device: {e.Message}");
+            error.WriteLine("Install a Vulkan 1.3 driver (GPU vendor driver, or Mesa lavapipe for software rendering).");
             return ExitNoVulkan;
         }
         catch (Exception e) when (e is VulkanException or ShaderCompilationException or IOException or UnauthorizedAccessException or DllNotFoundException)
         {
-            Console.Error.WriteLine($"render-test failed: {e.Message}");
+            error.WriteLine($"{args[0]} failed: {e.Message}");
             return ExitFailure;
         }
     }
@@ -56,16 +73,32 @@ internal static class Program
         writer.WriteLine("Candela command-line tool");
         writer.WriteLine();
         writer.WriteLine("Usage:");
-        writer.WriteLine("  candela render-test --out <dir> [--width W] [--height H] [--frames N] [--tonemapper agx|aces|neutral]");
-        writer.WriteLine("                      [--device <name>] [--validation] [--haze <1/m>] [--no-shadows] [--shadow-resolution N]");
-        writer.WriteLine("                      [--indirect off|rsm|raytraced] [--no-bloom] [--bloom <k>] [--auto-exposure]");
-        writer.WriteLine("                      [--exposure-compensation <stops>] [--scale <0.5-1>] [--volumetric-slices N] [--overlays]");
+        writer.WriteLine("  candela render <scene.mvr|scene.candela> --out <file.png> [--width W] [--height H]");
+        writer.WriteLine("                 [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov <deg>]");
+        writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]");
+        writer.WriteLine("                 [--look open-white|show|dmx-file <recording.cdmx>] [--time <s>] [--ev <EV100>|auto]");
+        writer.WriteLine("                 [--auto-exposure] [--frames N] [--grid] [--device <name>] [--library <dir>]... [--cache <dir>]");
+        writer.WriteLine("      Loads the scene through the engine, applies the look, simulates --time seconds (DMX, motors, smoke,");
+        writer.WriteLine("      fire), renders it and writes the PNG. Prints issues and timings. Defaults: 1280 x 720, auto view,");
+        writer.WriteLine("      full shading, no overlay, the scene's haze, look open-white, time 0, exposure from an incident-light reading of the floor.");
         writer.WriteLine();
-        writer.WriteLine("  Renders the built-in procedural test scene (stage floor, wall, boxes, spheres, three coloured shadow-casting");
-        writer.WriteLine("  spot lights, an emissive panel) and writes full.png, colorless.png and wireframe.png to <dir> (with");
-        writer.WriteLine("  --overlays also lux.png, noise.png and cables.png). Prints the renderer information, frame timings and");
-        writer.WriteLine("  shadow / volumetric / indirect statistics. Defaults: 1280 x 720, 5 timed frames per view, AgX, shadows");
-        writer.WriteLine("  1024, reflective shadow maps, bloom 0.04, camera exposure, no haze.");
+        writer.WriteLine("  candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset O]");
+        writer.WriteLine("                      [--scene <file>] [--library <dir>]...");
+        writer.WriteLine("      Sends the Art-Net test show (pan/tilt sweep, colour chase, dimmer wave, zoom) with ArtSync and");
+        writer.WriteLine("      ArtTimeCode, to check Art-Net reception without a console. Default rig: 8 moving heads (12 ch) and");
+        writer.WriteLine("      8 RGBW pars per universe; with --scene the fixtures patched in that scene (their GDTF modes).");
+        writer.WriteLine("      Defaults: universes 1-4, 30 s, 40 fps, offset 1 (port-address = universe - offset).");
+        writer.WriteLine();
+        writer.WriteLine("  candela info <file.gdtf|file.mvr|file.candela> [--library <dir>]...");
+        writer.WriteLine("      Prints a summary: fixture type, modes and physical data; or the scene's layers, fixtures and GDTFs.");
+        writer.WriteLine();
+        writer.WriteLine("  candela validate <scene.mvr|scene.candela> [--library <dir>]... [--plot]");
+        writer.WriteLine("      Prints every issue of the scene (patch, power, data, rigging, assets); --plot adds the light plot.");
+        writer.WriteLine();
+        writer.WriteLine("  candela render-test --out <dir> [options]   (renderer self-test with a procedural scene; see --help of the");
+        writer.WriteLine("                                               renderer documentation)");
+        writer.WriteLine();
+        writer.WriteLine("Exit codes: 0 ok, 1 failure, 2 usage error, 3 no Vulkan device, 4 the input has errors.");
     }
 }
 

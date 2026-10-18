@@ -15,9 +15,9 @@ public sealed record OpenWhiteOptions
 
     /// <summary>
     /// How far each head's aim point stays towards the head's own floor position, 0 … 1: 0 aims every head at
-    /// <see cref="Target"/> (one hot spot), 0.35 (default) spreads the pools around it like a typical "all on" look.
+    /// <see cref="Target"/> (one hot spot), 0.75 (default) points every head mostly down, leaning towards the target, so the pools spread over the stage.
     /// </summary>
-    public float Spread { get; init; } = 0.35f;
+    public float Spread { get; init; } = 0.75f;
 
     /// <summary>Zoom position within the fixture's zoom range, 0 (narrowest) … 1 (widest); default the middle.</summary>
     public float Zoom { get; init; } = 0.5f;
@@ -47,7 +47,7 @@ public static class StageLooks
         options ??= new OpenWhiteOptions();
         var scene = engine.Scene;
         var target = options.Target ?? StageCentre(engine);
-        float spread = float.IsFinite(options.Spread) ? Math.Clamp(options.Spread, 0f, 1f) : 0.35f;
+        float spread = float.IsFinite(options.Spread) ? Math.Clamp(options.Spread, 0f, 1f) : 0.75f;
         float zoom = float.IsFinite(options.Zoom) ? Math.Clamp(options.Zoom, 0f, 1f) : 0.5f;
 
         var edits = new List<(FixtureComponent Fixture, Dictionary<string, float> Values)>();
