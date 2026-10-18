@@ -35,7 +35,11 @@ public sealed class RenderSyncReviewTests
         var before = world.Meshes[world.Instances[sync.InstancesOf(entity.Id).Single().Handle.Value].Mesh.Value];
         float extentBefore = before.Positions.Max(p => p.X);
 
+        string path = Path.Combine(TestEnvironment.NewTempDirectory("asset-change-file"), "show.candela");
+        Assert.True(engine.SaveAs(path).Success);
+        Assert.False(engine.IsModified);
         engine.Assets.SetImportOptions(assetId, ImportOptions.Default with { UnitScale = 0.5f, GuessUnits = false, UpAxis = SourceUpAxis.Z });
+        Assert.True(engine.IsModified, "changing an asset's import options is an unsaved change");
         engine.Tick(Frame);
         var after = world.Meshes[world.Instances[sync.InstancesOf(entity.Id).Single().Handle.Value].Mesh.Value];
         Assert.Equal(extentBefore * 0.5f, after.Positions.Max(p => p.X), 3);

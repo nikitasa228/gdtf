@@ -14,6 +14,8 @@ public sealed partial class StageEngine
     private AutosaveOptions? _autosaveOptions;
     private RecoverableSession? _recovered;
     private long _autosavedVersion = -1;
+    private long _assetEdits;
+    private long _autosavedAssetEdits = -1;
     private string? _autosavedSettings;
 
     /// <summary>The autosave session of the open project, or null when autosave is off (see <see cref="EnableAutosave"/>).</summary>
@@ -59,6 +61,7 @@ public sealed partial class StageEngine
             // the saved file now holds everything the autosaves hold: they are discarded and tracking restarts
             // (a recovered session is continued by this service, so its crash data goes too)
             _autosavedVersion = _scene.Version;
+            _autosavedAssetEdits = _assetEdits;
             _autosavedSettings = AutosaveSettingsKey();
             _ = _autosave.MarkSaved();
         }
@@ -241,6 +244,7 @@ public sealed partial class StageEngine
     {
         if (_autosaveOptions is not { } options || _disposed) return;
         _autosavedVersion = _scene.Version;
+        _autosavedAssetEdits = _assetEdits;
         _autosavedSettings = AutosaveSettingsKey();
         if (_recovered is { } resume && (resume.ProjectId == Guid.Empty || resume.ProjectId == _project.Id))
             options = new AutosaveOptions
@@ -284,12 +288,16 @@ public sealed partial class StageEngine
     private string AutosaveSettingsKey() =>
         Core.Serialization.CandelaJson.Serialize(Settings, indented: false) + Core.Serialization.CandelaJson.Serialize(View, indented: false);
 
-    /// <summary>Autosave capture (main thread): a snapshot when the scene or the engine/view settings changed, else null.</summary>
+    /// <summary>
+    /// Autosave capture (main thread): a snapshot when the scene, an asset (import options, removal) or the engine/view
+    /// settings changed, else null.
+    /// </summary>
     private ProjectSnapshot? CaptureAutosave()
     {
         string settings = AutosaveSettingsKey();
-        if (_scene.Version == _autosavedVersion && settings == _autosavedSettings) return null;
+        if (_scene.Version == _autosavedVersion && _assetEdits == _autosavedAssetEdits && settings == _autosavedSettings) return null;
         _autosavedVersion = _scene.Version;
+        _autosavedAssetEdits = _assetEdits;
         _autosavedSettings = settings;
         WriteSettingsSections();
         return ProjectSnapshot.Capture(_project, SaveOptions());

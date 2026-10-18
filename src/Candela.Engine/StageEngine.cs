@@ -79,6 +79,7 @@ public sealed partial class StageEngine : IDisposable
 
         Dmx = CreateDmx(_scene);
         _scene.Changed += OnSceneChanged;
+        _project.Assets.AssetChanged += OnAssetChanged;
         foreach (var issue in _libraryIssues) Issues.Report(issue);
     }
 
@@ -301,6 +302,7 @@ public sealed partial class StageEngine : IDisposable
         _autosave = null;
         Protocols.Dispose();
         _scene.Changed -= OnSceneChanged;
+        _project.Assets.AssetChanged -= OnAssetChanged;
         Dmx.Dispose();
         Images.Dispose();
     }
@@ -315,12 +317,14 @@ public sealed partial class StageEngine : IDisposable
         CloseAutosaveSession();
         _recovered = recovered;
         _scene.Changed -= OnSceneChanged;
+        _project.Assets.AssetChanged -= OnAssetChanged;
         Dmx.Dispose();
         _project = project;
         var scene = project.Scene;
         _scene = scene;
         Dmx = CreateDmx(scene);
         _scene.Changed += OnSceneChanged;
+        _project.Assets.AssetChanged += OnAssetChanged;
         Poses.Clear();
         Simulation.Reset();
         Undo.Clear();
@@ -384,6 +388,14 @@ public sealed partial class StageEngine : IDisposable
             break;
         }
         _consoleNetwork = _hasConsoles ? Network.Solve(_scene) : null;
+    }
+
+    /// <summary>An asset was replaced or removed (import options changed …): the project has unsaved changes.</summary>
+    private void OnAssetChanged(Guid assetId)
+    {
+        IsModified = true;
+        _assetEdits++;
+        Models.Invalidate(assetId);
     }
 
     private void OnSceneChanged(SceneChange change)

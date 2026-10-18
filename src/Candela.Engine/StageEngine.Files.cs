@@ -230,7 +230,10 @@ public sealed partial class StageEngine
         }
         else
         {
+            // take back the asset this failed import added (nothing else changed)
+            bool modified = IsModified;
             if (Assets.Count > before) Assets.Remove(entry.Id);
+            IsModified = modified;
             return Fail(EngineIssueCodes.ImportFailed, $"'{Path.GetFileName(path)}' cannot be decoded: {error}", IssueCategory.Scene);
         }
         var entity = new Entity(Path.GetFileNameWithoutExtension(path)) { Local = options.Placement };
