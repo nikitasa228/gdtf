@@ -39,19 +39,39 @@ public class PerformanceTests(ITestOutputHelper output)
     private static readonly bool Optimized =
         typeof(FixtureEvaluator).Assembly.GetCustomAttribute<DebuggableAttribute>()?.IsJITOptimizerDisabled != true;
 
-    /// <summary>Median of the frame times of the best of three runs (other processes on a shared machine cause outliers).</summary>
-    private static double BestMedian(Func<double> frame, int warmup, int frames)
+    /// <summary>
+    /// Median and fastest frame time of the best of three runs (other processes on a shared machine cause outliers).
+    /// </summary>
+    private static (double Median, double Fastest) Measure(Func<double> frame, int warmup, int frames)
     {
-        double best = double.PositiveInfinity;
+        double median = double.PositiveInfinity, fastest = double.PositiveInfinity;
         for (int run = 0; run < 3; run++)
         {
             for (int i = 0; i < warmup; i++) frame();
             var times = new double[frames];
             for (int i = 0; i < frames; i++) times[i] = frame();
             Array.Sort(times);
-            best = Math.Min(best, times[frames / 2]);
+            median = Math.Min(median, times[frames / 2]);
+            fastest = Math.Min(fastest, times[0]);
         }
-        return best;
+        return (median, fastest);
+    }
+
+    /// <summary>One-minute load average of the machine (Linux), NaN when unknown.</summary>
+    private static double LoadAverage()
+    {
+        try
+        {
+            if (!File.Exists("/proc/loadavg")) return double.NaN;
+            string first = File.ReadAllText("/proc/loadavg").Split(' ')[0];
+            return double.TryParse(first, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double l)
+                ? l
+                : double.NaN;
+        }
+        catch (IOException)
+        {
+            return double.NaN;
+        }
     }
 
     [Fact]
@@ -100,7 +120,7 @@ public class PerformanceTests(ITestOutputHelper output)
             return Stopwatch.GetElapsedTime(start).TotalMilliseconds;
         }
 
-        double engineMs = BestMedian(EngineFrame, 10, 60);
+        var (engineMs, engineFastestMs) = Measure(EngineFrame, 10, 60);
         Assert.Equal(FixtureCount, engine.Changed.Count);
         long before = GC.GetAllocatedBytesForCurrentThread();
         EngineFrame(); // a whole frame: network input, merge, copy, parallel evaluation
@@ -119,31 +139,23 @@ public class PerformanceTests(ITestOutputHelper output)
             for (int i = 0; i < states.Length; i++) FixtureEvaluator.Evaluate(states[i], buffers[i], t, null, applyDynamics: true);
             return Stopwatch.GetElapsedTime(start).TotalMilliseconds;
         }
-        double singleMs = BestMedian(SingleThreadFrame, 5, 30);
-
-        // CPU time of the single-threaded evaluation: unlike wall time it does not grow when other processes share the
-        // machine (the reference machine runs builds and tests of other modules at the same time)
-        const int cpuFrames = 30;
-        var process = Process.GetCurrentProcess();
-        var cpuBefore = process.TotalProcessorTime;
-        long wallStart = Stopwatch.GetTimestamp();
-        double measuredWall = 0;
-        for (int i = 0; i < cpuFrames; i++) measuredWall += SingleThreadFrame();
-        double batchWall = Stopwatch.GetElapsedTime(wallStart).TotalMilliseconds;
-        process.Refresh();
-        // the batch also spent CPU on refilling the buffers with random DMX: charge the evaluation its share of the wall time
-        double singleCpuMs = (process.TotalProcessorTime - cpuBefore).TotalMilliseconds * (measuredWall / batchWall) / cpuFrames;
+        var (singleMs, singleFastestMs) = Measure(SingleThreadFrame, 5, 30);
+        double load = LoadAverage();
+        bool contended = load > Environment.ProcessorCount;
 
         output.WriteLine($"{FixtureCount} fixtures ({beams} beams, {channels} channels, {universes} universes), every slot changing every frame, " +
-            $"{(Optimized ? "optimised" : "debug")} build, {Environment.ProcessorCount} cores:");
-        output.WriteLine($"  DmxEngine.Update (universe merge + copy + evaluation on {engine.MaxDegreeOfParallelism} threads): median {engineMs:F2} ms");
-        output.WriteLine($"  FixtureEvaluator on one thread: median {singleMs:F2} ms wall, {singleCpuMs:F2} ms CPU " +
-            $"({singleCpuMs * 1000.0 / FixtureCount:F2} µs per fixture)");
+            $"{(Optimized ? "optimised" : "debug")} build, {Environment.ProcessorCount} cores, load average {load:F1}:");
+        output.WriteLine($"  DmxEngine.Update (universe merge + copy + evaluation on {engine.MaxDegreeOfParallelism} threads): " +
+            $"median {engineMs:F2} ms, fastest {engineFastestMs:F2} ms");
+        output.WriteLine($"  FixtureEvaluator on one thread: median {singleMs:F2} ms, fastest {singleFastestMs:F2} ms " +
+            $"({singleMs * 1000.0 / FixtureCount:F2} µs per fixture)");
 
-        // budget: 5 ms per frame for the optimised build (the unoptimised JIT is several times slower) — met by the parallel
-        // engine on an idle machine, or by a single core's CPU time when other processes compete for the cores
+        // budget: 5 ms per frame for the optimised build (the unoptimised JIT is several times slower). When other processes
+        // load the machine beyond its cores (as builds and tests of other modules do on the reference machine), the median
+        // measures them, not the engine: the fastest frame — one that ran without being preempted — is compared instead.
         double budget = Optimized ? 5.0 : 30.0;
-        Assert.True(Math.Min(engineMs, singleCpuMs) < budget, $"engine frame {engineMs:F2} ms, single-thread CPU {singleCpuMs:F2} ms");
+        double measured = contended ? engineFastestMs : engineMs;
+        Assert.True(measured < budget, $"engine frame {measured:F2} ms ({(contended ? "fastest, machine loaded" : "median")})");
 
         before = GC.GetAllocatedBytesForCurrentThread();
         SingleThreadFrame();

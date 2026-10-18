@@ -110,8 +110,14 @@ public sealed partial class FixtureProfile
     /// <summary>Per channel: where its bytes are in the fixture's DMX (shared by every buffer of the profile).</summary>
     internal ChannelSlots[] SlotLayout { get; }
 
-    /// <summary>Per channel: true when one of its functions is motorised or rotates (needs motor dynamics).</summary>
-    internal bool[] ChannelMoves { get; }
+    /// <summary>
+    /// Per channel: index of its motor state in <see cref="FixtureState"/> when one of its functions is motorised or
+    /// rotates (needs motor dynamics), −1 for electronic channels.
+    /// </summary>
+    internal int[] MotorSlot { get; }
+
+    /// <summary>Number of channels with a motor state.</summary>
+    internal int MotorCount { get; }
 
     /// <summary>Channels whose functions affect every beam (evaluated once per frame, not per beam).</summary>
     internal int[] SharedBeamChannels { get; }
@@ -205,12 +211,14 @@ public sealed partial class FixtureProfile
         FollowerRelations = b.FollowerRelations;
         FollowerChannels = Enumerable.Range(0, b.FollowerRelations.Length).Where(c => b.FollowerRelations[c].Length > 0).ToArray();
         SlotLayout = Array.ConvertAll(ChannelArray, ChannelSlots.Of);
-        ChannelMoves = Array.ConvertAll(ChannelArray, ch =>
+        MotorSlot = new int[ChannelArray.Length];
+        foreach (var ch in ChannelArray)
         {
+            bool moves = false;
             for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
-                if (FunctionArray[k].Motion != MotionKind.None || FunctionArray[k].IsRotation) return true;
-            return false;
-        });
+                moves |= FunctionArray[k].Motion != MotionKind.None || FunctionArray[k].IsRotation;
+            MotorSlot[ch.Index] = moves ? MotorCount++ : -1;
+        }
         FlameChannel = b.FlameChannel;
         ColorSpacePrimaries = b.ColorSpacePrimaries;
         IsRelationMaster = b.IsRelationMaster;

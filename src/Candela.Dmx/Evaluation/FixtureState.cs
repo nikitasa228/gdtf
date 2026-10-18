@@ -292,6 +292,7 @@ public sealed class BeamState
 public sealed class FixtureState
 {
     internal readonly ChannelRuntime[] Runtime;
+    internal readonly MotorRuntime[] Motors;
     internal readonly float[] EmitterLevels;
     internal readonly float[] OwnEmitterLevels;
     internal readonly BeamState SharedScratch;
@@ -308,6 +309,7 @@ public sealed class FixtureState
         Seed = seed;
         Runtime = new ChannelRuntime[profile.Channels.Count];
         for (int i = 0; i < Runtime.Length; i++) Runtime[i].Function = -1;
+        Motors = new MotorRuntime[profile.MotorCount];
         Axes = new AxisState[profile.Axes.Count];
         for (int i = 0; i < Axes.Length; i++) Axes[i].PartIndex = profile.Axes[i].PartIndex;
         EmitterLevels = new float[profile.Emitters.Count];
@@ -527,7 +529,7 @@ internal sealed class EvaluationCache
     }
 }
 
-/// <summary>Per-channel evaluation state (internal; one per profile channel).</summary>
+/// <summary>Per-channel evaluation state (internal; one per profile channel; 32 bytes so a frame touches little memory).</summary>
 internal struct ChannelRuntime
 {
     public uint Dmx;
@@ -538,7 +540,17 @@ internal struct ChannelRuntime
     public float Relation;
     public int SetIndex;
     public ChannelSetFlags SetFlags;
+}
+
+/// <summary>Motor state of a channel that moves (only those have one, see <see cref="FixtureProfile.MotorSlot"/>).</summary>
+internal struct MotorRuntime
+{
+    /// <summary>Position motor (control units).</summary>
     public MotorState Motor;
+
+    /// <summary>Continuous rotation: angle (deg) and speed (deg/s).</summary>
     public MotorState Spin;
-    public AttributeKind MotorKind;
+
+    /// <summary>The quantity <see cref="Motor"/> currently carries.</summary>
+    public AttributeKind Kind;
 }

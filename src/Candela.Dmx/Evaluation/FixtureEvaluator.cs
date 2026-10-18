@@ -136,51 +136,54 @@ public static class FixtureEvaluator
         }
 
         // 6: dynamics and rotations
-        var moves = p.ChannelMoves;
+        var motorSlot = p.MotorSlot;
+        var motors = state.Motors;
         for (int c = 0; c < rt.Length; c++)
         {
             ref var r = ref rt[c];
-            if (r.Function < 0 || !moves[c])
+            int slot = motorSlot[c];
+            if (r.Function < 0 || slot < 0)
             {
                 r.Value = r.Target; // electronic: follows DMX
                 continue;
             }
+            ref var m = ref motors[slot];
             var f = fns[r.Function];
             var qty = f.MotorQuantity;
             if (applyDynamics && f.Motion == MotionKind.Position)
             {
-                if (r.MotorKind != qty) ContinueMotor(ref r, f, p, qty);
-                MotorDynamics.Step(ref r.Motor, r.Target, motorDt, f.LimitsRef, speed[f.MotionGroup]);
-                r.Value = (float)r.Motor.Position;
-                animating |= r.Motor.IsMoving;
+                if (m.Kind != qty) ContinueMotor(ref m, r.Target, f, p, qty);
+                MotorDynamics.Step(ref m.Motor, r.Target, motorDt, f.LimitsRef, speed[f.MotionGroup]);
+                r.Value = (float)m.Motor.Position;
+                animating |= m.Motor.IsMoving;
             }
             else
             {
                 r.Value = r.Target;
-                r.Motor.Position = r.Target;
-                r.Motor.Velocity = 0;
-                r.Motor.Initialized = true;
+                m.Motor.Position = r.Target;
+                m.Motor.Velocity = 0;
+                m.Motor.Initialized = true;
             }
-            r.MotorKind = qty;
+            m.Kind = qty;
 
             if (f.IsRotation)
             {
                 float spinSpeed = (r.SetFlags & ChannelSetFlags.NoFunction) != 0 ? 0f : SpinSpeed(f, r.Physical);
                 if (restart)
                 {
-                    r.Spin.Initialized = true;
-                    r.Spin.Velocity = spinSpeed;
-                    r.Spin.Position = spinSpeed * rotationDt;
+                    m.Spin.Initialized = true;
+                    m.Spin.Velocity = spinSpeed;
+                    m.Spin.Position = spinSpeed * rotationDt;
                 }
                 else
                 {
-                    MotorDynamics.StepRotation(ref r.Spin, spinSpeed, rotationDt, applyDynamics ? f.SpinAcceleration : double.PositiveInfinity);
+                    MotorDynamics.StepRotation(ref m.Spin, spinSpeed, rotationDt, applyDynamics ? f.SpinAcceleration : double.PositiveInfinity);
                 }
-                animating |= r.Spin.Velocity != 0;
+                animating |= m.Spin.Velocity != 0;
             }
-            else if (r.Spin.Velocity != 0)
+            else if (m.Spin.Velocity != 0)
             {
-                r.Spin.Velocity = 0;
+                m.Spin.Velocity = 0;
             }
         }
 
@@ -200,8 +203,8 @@ public static class FixtureEvaluator
                 {
                     case AttributeKind.Pan: pan += r.Value; break;
                     case AttributeKind.Tilt: tilt += r.Value; break;
-                    case AttributeKind.PanRotate: pan += Turn(r.Spin.Position); break;
-                    case AttributeKind.TiltRotate: tilt += Turn(r.Spin.Position); break;
+                    case AttributeKind.PanRotate: pan += Turn(motors[motorSlot[c]].Spin.Position); break;
+                    case AttributeKind.TiltRotate: tilt += Turn(motors[motorSlot[c]].Spin.Position); break;
                     case AttributeKind.Rotation: SetComponent(ref rot, n, GetComponent(rot, n) + r.Value * DegToRad); break;
                     case AttributeKind.Translation: SetComponent(ref trans, n, GetComponent(trans, n) + r.Value); break;
                 }
@@ -237,7 +240,7 @@ public static class FixtureEvaluator
         var acc = BeamAcc.Create();
         ResetWheels(shared);
         Array.Clear(state.EmitterLevels);
-        var ctx = new ApplyContext(p, fns, rt, time, state.Seed, state.Cache);
+        var ctx = new ApplyContext(p, fns, rt, state.Motors, time, state.Seed, state.Cache);
         foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
         if (single)
         {
@@ -397,26 +400,26 @@ public static class FixtureEvaluator
             or AttributeKind.WheelSelectSpin;
 
     /// <summary>Starts a motor for a new quantity from where the mechanism physically is (e.g. a spinning gobo being indexed).</summary>
-    private static void ContinueMotor(ref ChannelRuntime r, ProfileFunction f, FixtureProfile p, AttributeKind qty)
+    private static void ContinueMotor(ref MotorRuntime m, float target, ProfileFunction f, FixtureProfile p, AttributeKind qty)
     {
-        var previous = r.MotorKind;
-        if (qty == AttributeKind.SlotIndex && previous == AttributeKind.SlotRotate && r.Spin.Initialized)
+        var previous = m.Kind;
+        if (qty == AttributeKind.SlotIndex && previous == AttributeKind.SlotRotate && m.Spin.Initialized)
         {
-            double pos = r.Spin.Position;
-            pos += 360.0 * Math.Round((r.Target - pos) / 360.0);
-            r.Motor = new MotorState { Position = pos, Velocity = r.Spin.Velocity, Initialized = true };
+            double pos = m.Spin.Position;
+            pos += 360.0 * Math.Round((target - pos) / 360.0);
+            m.Motor = new MotorState { Position = pos, Velocity = m.Spin.Velocity, Initialized = true };
             return;
         }
-        if (qty == AttributeKind.WheelSelect && previous == AttributeKind.WheelSpin && r.Spin.Initialized && f.Wheel >= 0)
+        if (qty == AttributeKind.WheelSelect && previous == AttributeKind.WheelSpin && m.Spin.Initialized && f.Wheel >= 0)
         {
             int slots = p.WheelArray[f.Wheel].SlotCount;
-            double pos = 1.0 + r.Spin.Position / 360.0 * slots;
-            pos += slots * Math.Round((r.Target - pos) / slots);
-            r.Motor = new MotorState { Position = pos, Velocity = r.Spin.Velocity / 360.0 * slots, Initialized = true };
+            double pos = 1.0 + m.Spin.Position / 360.0 * slots;
+            pos += slots * Math.Round((target - pos) / slots);
+            m.Motor = new MotorState { Position = pos, Velocity = m.Spin.Velocity / 360.0 * slots, Initialized = true };
             return;
         }
         if (previous == AttributeKind.Ignored || previous == qty) return;
-        r.Motor = default; // different quantity: the first step jumps
+        m.Motor = default; // different quantity: the first step jumps
     }
 
     /// <summary>Rotation speed in deg/s of a spin function's physical value (0 … 1 ranges are read as turns per second).</summary>
@@ -479,15 +482,22 @@ public static class FixtureEvaluator
 
     private readonly struct ApplyContext
     {
-        public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, double time, uint seed, EvaluationCache cache)
+        public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, MotorRuntime[] motors, double time, uint seed,
+            EvaluationCache cache)
         {
             Profile = p;
             Functions = fns;
             Runtime = rt;
+            Motors = motors;
             Time = time;
             Seed = seed;
             Cache = cache;
         }
+
+        public MotorRuntime[] Motors { get; }
+
+        /// <summary>Rotation state of a rotating channel (angle in deg, speed in deg/s).</summary>
+        public ref readonly MotorState SpinOf(int channel) => ref Motors[Profile.MotorSlot[channel]].Spin;
 
         public EvaluationCache Cache { get; }
 
@@ -698,7 +708,7 @@ public static class FixtureEvaluator
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake or AttributeKind.WheelIndex
                 or AttributeKind.WheelSpin or AttributeKind.WheelShake or AttributeKind.WheelRandom or AttributeKind.SlotIndex
                 or AttributeKind.SlotRotate or AttributeKind.SlotShake or AttributeKind.EffectRate or AttributeKind.AnimationInsertion:
-                ApplyWheel(bs, f, ref r, set, n, in ctx, ref animating);
+                ApplyWheel(bs, f, c, ref r, set, n, in ctx, ref animating);
                 break;
             case AttributeKind.Frost:
                 acc.FrostKeep *= 1f - level;
@@ -846,7 +856,7 @@ public static class FixtureEvaluator
         return (v / maxAbs - 0.5f) * 0.04f;
     }
 
-    private static void ApplyWheel(BeamState bs, ProfileFunction f, ref ChannelRuntime r, ProfileChannelSet? set, int n, in ApplyContext ctx,
+    private static void ApplyWheel(BeamState bs, ProfileFunction f, int c, ref ChannelRuntime r, ProfileChannelSet? set, int n, in ApplyContext ctx,
         ref bool animating)
     {
         var arr = f.Class.Wheel switch
@@ -882,8 +892,9 @@ public static class FixtureEvaluator
                 }
                 if (f.Class.Kind == AttributeKind.WheelSelectSpin)
                 {
-                    w.Rotation = Turn(r.Spin.Position) * DegToRad;
-                    w.RotationSpeed = (float)r.Spin.Velocity * DegToRad;
+                    ref readonly var spin = ref ctx.SpinOf(c);
+                    w.Rotation = Turn(spin.Position) * DegToRad;
+                    w.RotationSpeed = (float)spin.Velocity * DegToRad;
                 }
                 else if (f.Class.Kind == AttributeKind.WheelSelectShake && (flags & ChannelSetFlags.NoFunction) == 0)
                 {
@@ -899,7 +910,7 @@ public static class FixtureEvaluator
                 break;
             case AttributeKind.WheelSpin:
                 {
-                    double angle = r.Spin.Position;
+                    double angle = ctx.SpinOf(c).Position;
                     float turn = Turn(angle);
                     w.WheelAngle = turn * DegToRad;
                     w.Position = 1f + turn / 360f * slots;
@@ -927,8 +938,11 @@ public static class FixtureEvaluator
                 w.RotationSpeed = 0f;
                 break;
             case AttributeKind.SlotRotate:
-                w.Rotation = Turn(r.Spin.Position) * DegToRad;
-                w.RotationSpeed = (float)r.Spin.Velocity * DegToRad;
+                {
+                    ref readonly var spin = ref ctx.SpinOf(c);
+                    w.Rotation = Turn(spin.Position) * DegToRad;
+                    w.RotationSpeed = (float)spin.Velocity * DegToRad;
+                }
                 break;
             case AttributeKind.SlotShake:
                 {

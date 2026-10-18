@@ -20,7 +20,7 @@ Art-Net / sACN … ──Submit──▶ DmxInputHub ──TryRead (each patched
                                                      axes · beams · device outputs · channel values
 ```
 
-`tests/Candela.Dmx.Tests` (76 tests, ≈ 20–90 s depending on the machine) runs real fixtures from the repository
+`tests/Candela.Dmx.Tests` (83 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
 library through every stage; one test evaluates **every mode of all 1091 GDTF files** with random DMX.
 
 ## Units and conventions
@@ -178,17 +178,36 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
 * **Additive emitters** (`ColorAdd_*`): each function is linked to a GDTF `Emitter` (the function's Emitter link, else
   an emitter whose name matches the attribute's colour code), else a standard LED primary from
   `Candela.Photometry` for the code (R, G, B, W, WW, CW, A, L, UV, RY, GY, …). Emitters share the beam's reference
-  flux by their relative output (the GDTF emitter colour's Y when the file gives real values, typical LED shares
-  otherwise) and are mixed by luminous flux in CIE XYZ. Full white is therefore the mix of all emitters at full.
+  flux by their relative output — the GDTF emitter colour's Y when the file gives measured values, typical LED shares
+  when it does not (all Y equal, or two clearly different colours with the same Y, e.g. red = green = 100) — and are
+  mixed by luminous flux in CIE XYZ. Full white is therefore the mix of all emitters at full. A mode whose only additive
+  attributes are `ColorAdd_C/M/Y` is CMY colour mixing written with the wrong attribute (10 files: spots with CMY
+  flags, virtual CMY modes of LED fixtures) and is read as `ColorSub_C/M/Y`.
 * **Indirect colour systems**: `ColorRGB_*` (in the fixture's GDTF colour space, sRGB when it is missing or
   degenerate), `HSB_Hue/Saturation/Brightness`, `CIE_X/CIE_Y/CIE_Brightness` (x, y as 0 … 1 or ×10⁴ integers).
 * **White sources**: the lamp's own colour temperature (Beam `ColorTemperature`, or the CCT of its emitter
   spectrum; 6000 K when unknown).
 * **Subtractive**: `ColorSub_C/M/Y` (and R/G/B as complementary pairs) and `CTO`/`CTB`/`CTC` go through a spectral
   model of the source (CIE reference illuminant at the source CCT × idealised dichroic CMY bands × an ideal
-  conversion filter to the target CCT), precomputed per source CCT. CTO/CTB with kelvin physicals give the target
-  CCT directly (neutral at their highest/lowest kelvin); kelvin channel sets ("3200K") interpolate in mired; 0 … 1
-  ranges map to a full 5600 → 3200 K conversion. `Tint` shifts Δuv (±0.02 for symmetric ranges).
+  conversion filter to the target CCT), precomputed per source CCT. `CTC` names the resulting CCT. CTO/CTB with
+  kelvin physicals shift the colour temperature relative to their neutral end (no filter at the highest / lowest
+  kelvin); a CTO/CTB whose kelvin range runs from warmer to cooler than the source *and* has a separate "Open" range is
+  a colour-temperature selector and names the resulting CCT like CTC. Kelvin channel sets ("3200K") interpolate in
+  mired; 0 … 1 ranges map to a full 5600 → 3200 K conversion. `Tint` shifts Δuv (±0.02 for symmetric ranges).
+* **Electronic colour temperature**: in an LED engine that mixes its colour (emitters in the mode, or several coloured
+  emitters in the fixture, and no CMY flags) CTC/CTO/CTB re-balance the emitters instead of filtering: the colour
+  moves like under a conversion filter, but the luminous output follows the engine's efficiency at the new white
+  point — the largest flux its emitters can produce at that CCT relative to the source CCT (an exact small linear
+  program solved once per profile on a 10-mired grid, `WhiteEfficiencyTable`), never more than before. Without
+  emitter data the white point moves without a luminous cost.
+* **White and colour engines**: fixtures with a CTC channel and a cross-fade between their white and their colour
+  engine (`Color XF` of ARRI SkyPanel / L-series / Orbiter, `ColorXFade`, `CTC<>RGB`, `ColorCrossfade` … in 81 files;
+  0 = white, 1 = colour) mix the two in XYZ: the white engine is the Planckian colour of the CTC value with the tint,
+  at the emitters' best output for that CCT (the brightest white of the engine = the reference output); the colour
+  engine is the emitter / RGB / HSB / CIE mix, unaffected by CTC and tint. At the default cross-fade the RGBW channels
+  therefore do not darken the fixture.
+* **Saturation without hue**: an `HSB_Saturation` channel in a fixture without `HSB_Hue` (a "saturation" of virtual
+  gels) desaturates the colour-wheel and colour-macro filters (0 = white, 1 = the full gel).
 * **Colour wheels**: each slot's CIE colour and its Y (transmission) become a linear Rec.2020 transmission;
   open slots (no filter, media, facets; named "Open"/"White" or D65 at Y ≈ 100 %) pass everything. A position
   between two slots blends their transmissions (split colour); wheel spin, index and random positions follow.
@@ -286,22 +305,27 @@ Steady-state frames allocate nothing; idle fixtures cost nothing.
 
 2000 fixtures of a realistic mix (MAC Viper Profile, Robin Esprite 16-bit, ArcPod 27Q, Robin Tetra1 10-pixel,
 MAC Encore, Arolla Aqua LT, Paladin Panel 10-cell, Entour Haze: 6750 beams, 69 250 channels, 179 universes) with
-**every slot changing every frame** — the worst case — on this machine (4-core Xeon VM, shared):
+**every slot changing every frame** — the worst case: every motor moves, every pixel changes colour — measured on this
+machine (4-core Xeon VM, shared with the builds and tests of other modules, load average 9–16 during the runs):
 
 | Build | `DmxEngine.Update` (4 threads) | `FixtureEvaluator` on one thread |
 |---|---|---|
-| Release | **≈ 2.7 ms** per frame | ≈ 4.2 ms (2.1 µs per fixture) |
-| Debug (unoptimised JIT) | ≈ 9 ms | ≈ 20 ms |
+| Release | **≈ 2.5 ms** per frame (fastest frame ≈ 2.0 ms) | ≈ 3.5–4.8 ms (≈ 1.3 µs per fixture with its data in cache) |
+| Debug (unoptimised JIT) | ≈ 11–22 ms | ≈ 14–20 ms |
 
-`PerformanceTests` asserts < 5 ms per frame for optimised builds (run `dotnet test -c Release`) and that frames do not
-allocate. What makes it fast: flat arrays on the per-frame path, 8-bit channels decoded by table lookup, channel sets
-found by binary search, shared beam channels evaluated once, emitter mixing as a precomputed XYZ sum, mechanics
-resolved once per fixture when pixels have none of their own, and the parallel evaluation in the engine.
+`PerformanceTests` (run `dotnet test -c Release` for the optimised numbers) asserts < 5 ms per frame for optimised
+builds — the median, or the fastest frame when the machine's load average exceeds its core count (then the median
+measures the other processes) — and that frames do not allocate. What makes it fast: flat arrays on the per-frame
+path; 8-bit channels decoded by table lookup and channel sets found by binary search; a 32-byte runtime record per
+channel with motor state only for channels that move; motor steps without divisions or square roots; channels shared
+by all beams evaluated once, one-beam fixtures evaluated in place; colour-temperature filters, white points and beam
+solid angles computed once per fixture and frame; emitter mixing as a precomputed XYZ sum; mechanics resolved once
+per fixture when pixels have none of their own; and the parallel evaluation in the engine.
 
 ## Attribute coverage
 
 The 1091 GDTF files of the repository use **1168 distinct attribute names** in 30 800 (file, attribute) pairs.
-`AttributeClassifier` models **379 names covering 22 510 pairs (73 %)** — every attribute that changes light output,
+`AttributeClassifier` models **387 names covering 22 591 pairs (73 %)** — every attribute that changes light output,
 position or a device output in a way the GDTF file describes. Attribute names are matched case-insensitively,
 with the numbered forms `Gobo(n)…`, `Shutter(n)…`, `Blade(n)…`, etc.
 
@@ -327,6 +351,7 @@ Library counts are the number of files using the names.
 | CIE | 46 / 46 / 15 | 3 | `CIE_X`, `CIE_Y`, `CIE_Brightness` |
 | CTO / CTB / CTC | 337 / 24 / 239 | 1 / 1 / 4 | `CTO`, `CTB`, `CTC` (235), `CCT`, `COLORTEMPERATURE`, `Color Temperature` |
 | Tint | 176 | 2 | `Tint` (161), `Green / Magenta` (15) |
+| White ↔ colour cross-fade | 81 | 8 | `ColorXFade` (22), `ColorXfade` (19), `CTC<>RGB` (14), `CTC<>XY` (10), `Color XF` (8), `COLORCROSSFADE` (3), `CTC-Color CrossFade` (3), `ColorCrossfade` (2) |
 | ColorMacro | 335 | 4 | `ColorMacro1` (309), `ColorMacro2` (21), … (by channel-set name) |
 | Wheel select | 2407 | 120 | `Color1` (589), `Effects1` (340), `Gobo1` (300), `Prism1` (266), `Gobo2` (195), `Color2` (139), … |
 | Select spin / shake | 75 / 338 | 6 / 6 | `Gobo1SelectSpin` (28), `Gobo1SelectShake` (191), `Gobo2SelectShake` (130), … |
@@ -345,7 +370,7 @@ Library counts are the number of files using the names.
 
 ### Ignored, and why
 
-789 names (328 of them used by a single file) do not change light, position or a device output in a way the GDTF
+781 names (328 of them used by a single file) do not change light, position or a device output in a way the GDTF
 describes. The classifier returns `AttributeKind.Ignored`; their channels are still decoded (raw DMX, active function
 and physical value are in `FixtureState` for the properties panel), they only do not feed the physical state.
 
@@ -358,7 +383,7 @@ and physical value are in `FixtureState` for the properties panel), they only do
 | LED driver | `LEDFrequency` (386), `LEDFrequencyAdjust` (59), `FreqTweak`, `Refresh Rate` | PWM frequency, invisible at render frame rates |
 | Built-in effect engines and macros | `Effects1Fade` (93), `EffectsSync` (55), `ColorEffects1` (62), `ColorMacro1Rate` (101), `Prism1Macro` (74), `ShaperMacros` (37), `Sparkle` (42), `RainbowEffect` (31), `Effects1Adjust1`, `Effects1Color…`, `Pattern…`, `Shape…`, `Macro…`, `Playmode`, `PositionEffect` | fixture-internal programs whose output is defined by firmware, not by the GDTF |
 | Sound to light | `Color1WheelAudio` (38), `Gobo1WheelAudio` (36), `ColorMacroAudio` | needs audio input |
-| Cross-fades between colour systems | `ColorXFade` (22), `Crossfade` (18), `CTC<>RGB` (14), `CTC<>XY`, `XY<>GEL`, `RGB<>GEL`, `GEL<>RAW`, `XY_Crossfade`, `ColorMixMTime` | timing or blend between colour engines; the active colour system is evaluated |
+| Fades and other colour-system blends | `Crossfade` (18, a fade *time*), `XY<>GEL`, `RGB<>GEL`, `GEL<>RAW`, `XY1<>XY2`, `XY_Crossfade`, `LAYER1<>LAYER2`, `ColorMixMTime` | fade timing, or blends with gel / second-point / layer engines that are not modelled (the white ↔ colour cross-fades are, see above) |
 | Gel pickers | `GelSelector`, `GelCategory`, `GelSource`, `Lee …`, `Rosco …`, `Storaro`, `Cinelux`, `Cal Color`, `Brand` | the colours live in a gel database the GDTF does not contain |
 | Calibration and emulation | `ColorConsistency`, `ColorAdjust_*`, `TintCalibration`, `Green-BlueCorrection`, `WhitePoint`, `ColorGamma`, `TungstenEmulation`, `TungstenEffect`, `HalogenSimulation`, `Redshift`, `Incand`, `ExtendedCTO`, `CTCDisable` | per-unit trims and lamp emulations without a physical description |
 | Aura / background layers | `BackgroundDimmer`, `Background Dimmer`, `Back Dimmer`, `ForegroundDimmer`, `BackgroundColor`, `Effects1…Aura/Backlight` | light the lens or body, not a Beam geometry |
@@ -386,6 +411,10 @@ and physical value are in `FixtureState` for the properties panel), they only do
   evaluator motion identical at 24 and 60 fps, MSpeed scaling.
 * **Patch**: ranges per break, overlaps naming both fixtures, shared addresses, slot 512 overflow, unknown file /
   mode / universe / address, missing break, MVR stub resolution, 4750 fixtures checked in milliseconds.
+* **Colour engines**: ARRI L5-C white engine follows CCT at the emitters' efficiency and ignores RGBW, the colour
+  engine and the cross-fade between them, placeholder emitter outputs, a CTO channel that selects the CCT (PRstage
+  Fresnel), saturation of virtual gels, electronic CTC cheaper than a filter (Elation Fuze Profile), CMY written as
+  ColorAdd (LIGHT SKY F1000).
 * **Engine**: live vs manual control, change detection, the console-driven predicate, incremental add / repatch /
   re-mode / remove, unknown GDTF, dynamics across frames, parallel = sequential, no allocations per frame.
 * **Library-wide**: every mode of all 1091 files (7272 modes, 221 048 channel instances) compiles and evaluates
@@ -395,6 +424,8 @@ and physical value are in `FixtureState` for the properties panel), they only do
 ## Limitations
 
 * Fixture-internal effect engines, macros and gel pickers are not simulated (see *Ignored*).
-* CTO/CTB/CTC on LED engines are applied as ideal conversion filters on the emitter mix, not by re-balancing the
-  emitters as the fixture firmware does; the resulting white point matches, the spectrum does not.
+* CTO/CTB/CTC on LED engines move the colour like a conversion filter (chromatic adaptation of the current mix) with
+  the engine's luminous cost; the firmware's actual emitter levels, and so the spectrum, are not reproduced.
+* The colour of an emitter mix is only as good as the file's emitter data: files whose emitter Y values are not
+  photometric (but not obviously placeholders) give a tinted full-on white (e.g. some RGBW washes come out bluish).
 * `_specs` gives one candela value per fixture; multi-beam fixtures share it equally between their beams.
