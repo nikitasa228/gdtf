@@ -9,12 +9,35 @@ namespace Candela.Dmx;
 /// positions for wheels, 0 … 1 for normalised levels) per second and per second². Infinite values mean "no limit";
 /// <see cref="Instant"/> marks electronic attributes that follow DMX immediately.
 /// </summary>
-/// <param name="MaxSpeed">Largest speed, units/s (∞ = jumps).</param>
-/// <param name="MaxAcceleration">Largest acceleration, units/s² (∞ = speed changes instantly).</param>
-public readonly record struct MotorLimits(float MaxSpeed, float MaxAcceleration)
+public readonly record struct MotorLimits
 {
+    private readonly float _maxAcceleration;
+
+    /// <summary>Creates limits.</summary>
+    /// <param name="maxSpeed">Largest speed, units/s (∞ = jumps).</param>
+    /// <param name="maxAcceleration">Largest acceleration, units/s² (∞ = speed changes instantly).</param>
+    public MotorLimits(float maxSpeed, float maxAcceleration)
+    {
+        MaxSpeed = maxSpeed;
+        MaxAcceleration = maxAcceleration;
+    }
+
+    /// <summary>Largest speed, units/s (∞ = jumps).</summary>
+    public float MaxSpeed { get; init; }
+
+    /// <summary>Largest acceleration, units/s² (∞ = speed changes instantly).</summary>
+    public float MaxAcceleration
+    {
+        get => _maxAcceleration;
+        init
+        {
+            _maxAcceleration = value;
+            InverseAcceleration = value > 0f ? 1.0 / value : double.PositiveInfinity;
+        }
+    }
+
     /// <summary>1 / <see cref="MaxAcceleration"/> (s²/unit), precomputed for the per-frame integration.</summary>
-    internal double InverseAcceleration { get; } = MaxAcceleration > 0f ? 1.0 / MaxAcceleration : double.PositiveInfinity;
+    internal double InverseAcceleration { get; init; }
 
     /// <summary>No dynamics: the value follows its target immediately.</summary>
     public static MotorLimits Instant => new(float.PositiveInfinity, float.PositiveInfinity);
@@ -255,7 +278,16 @@ public sealed class ProfileFunction
     public MotionKind Motion { get; internal set; }
 
     /// <summary>Speed/acceleration limits for <see cref="Motion"/>.</summary>
-    public MotorLimits Limits { get; internal set; } = MotorLimits.Instant;
+    public MotorLimits Limits
+    {
+        get => _limits;
+        internal set => _limits = value;
+    }
+
+    private MotorLimits _limits = MotorLimits.Instant;
+
+    /// <summary>The limits by reference (per-frame path; no struct copy).</summary>
+    internal ref readonly MotorLimits LimitsRef => ref _limits;
 
     /// <summary>Smallest control value the function produces.</summary>
     public float MinValue { get; internal set; }

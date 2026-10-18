@@ -41,7 +41,14 @@ public static class MotorDynamics
     /// Advances a position motor by <paramref name="dt"/> seconds toward <paramref name="target"/>. A non-initialised
     /// motor, instant limits or non-finite input jump straight to the target.
     /// </summary>
-    public static void Step(ref MotorState state, double target, double dt, MotorLimits limits)
+    public static void Step(ref MotorState state, double target, double dt, MotorLimits limits) => Step(ref state, target, dt, limits, 1f);
+
+    /// <summary>
+    /// <see cref="Step(ref MotorState, double, double, MotorLimits)"/> with the limits scaled by a speed factor (MSpeed
+    /// channels): speed × <paramref name="speedFactor"/>, acceleration × <paramref name="speedFactor"/>² — without
+    /// building scaled limits on the per-frame path.
+    /// </summary>
+    internal static void Step(ref MotorState state, double target, double dt, in MotorLimits limits, float speedFactor)
     {
         if (!double.IsFinite(target)) return;
         if (!state.Initialized || limits.IsInstant || !double.IsFinite(state.Position) || !double.IsFinite(state.Velocity))
@@ -54,8 +61,9 @@ public static class MotorDynamics
         if (!(dt > 0)) return;
         double x = state.Position, v = state.Velocity;
         if (x == target && v == 0) return; // at rest on the target
-        double vmax = limits.MaxSpeed > 0f ? limits.MaxSpeed : 1e-6;
-        double amax = limits.MaxAcceleration;
+        double f = speedFactor > 0f && float.IsFinite(speedFactor) ? speedFactor : 1.0;
+        double vmax = limits.MaxSpeed > 0f ? limits.MaxSpeed * f : 1e-6;
+        double amax = limits.MaxAcceleration * (f * f);
         double eps = 1e-7 * Math.Max(1.0, Math.Abs(target));
 
         if (!double.IsFinite(amax) || amax <= 0)
@@ -70,7 +78,7 @@ public static class MotorDynamics
             return;
         }
 
-        double invA = limits.InverseAcceleration;
+        double invA = f == 1.0 ? limits.InverseAcceleration : limits.InverseAcceleration / (f * f);
         double settleSpeed2 = 2 * amax * eps + 1e-24; // squared speed below which the motor stops within eps
         double remaining = dt;
         for (int iter = 0; iter < 16 && remaining > 0; iter++)

@@ -150,8 +150,7 @@ public static class FixtureEvaluator
             if (applyDynamics && f.Motion == MotionKind.Position)
             {
                 if (r.MotorKind != qty) ContinueMotor(ref r, f, p, qty);
-                var limits = f.Limits.Scaled(speed[f.MotionGroup]);
-                MotorDynamics.Step(ref r.Motor, r.Target, motorDt, limits);
+                MotorDynamics.Step(ref r.Motor, r.Target, motorDt, f.LimitsRef, speed[f.MotionGroup]);
                 r.Value = (float)r.Motor.Position;
                 animating |= r.Motor.IsMoving;
             }
@@ -217,45 +216,7 @@ public static class FixtureEvaluator
         }
 
         // 8: beams
-        var beams = p.BeamArray;
-        if (beams.Length > 0)
-        {
-            var shared = state.SharedScratch;
-            var acc = BeamAcc.Create();
-            ResetWheels(shared);
-            Array.Clear(state.EmitterLevels);
-            var ctx = new ApplyContext(p, fns, rt, time, state.Seed, state.Cache);
-            foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
-            var ownLevels = state.OwnEmitterLevels;
-            var beamStates = state.BeamArray;
-            bool sharedFinalized = false;
-            for (int b = 0; b < beams.Length; b++)
-            {
-                var pb = beams[b];
-                var bs = beamStates[b];
-                var beamAcc = acc;
-                state.EmitterLevels.AsSpan().CopyTo(ownLevels);
-                if (pb.OwnMechanics)
-                {
-                    // the beam has its own wheels, prisms or blades: start from the shared ones, then resolve
-                    CopyWheels(shared, bs);
-                    ApplyOwn(ref beamAcc, bs, ownLevels, pb.OwnChannels, in ctx, ref animating);
-                    FinalizeAllWheels(p, bs);
-                }
-                else
-                {
-                    // the mechanics are the fixture's: resolve them once and copy the result into every beam
-                    if (!sharedFinalized)
-                    {
-                        FinalizeAllWheels(p, shared);
-                        sharedFinalized = true;
-                    }
-                    ApplyOwn(ref beamAcc, bs, ownLevels, pb.OwnChannels, in ctx, ref animating);
-                    CopyWheels(shared, bs);
-                }
-                Finalize(pb, bs, ref beamAcc, ownLevels, curve, in ctx, ref animating);
-            }
-        }
+        if (p.BeamArray.Length > 0) EvaluateBeams(state, p, fns, rt, time, curve, ref animating);
 
         // 9: device outputs
         if (p.OutputChannels.Length > 0) state.Outputs = Outputs(p, fns, rt);
@@ -263,6 +224,58 @@ public static class FixtureEvaluator
         state.Time = time;
         state.Version++;
         state.IsAnimating = animating;
+    }
+
+    /// <summary>Step 8: every beam's intensity, colour, photometry, optics and mechanics.</summary>
+    private static void EvaluateBeams(FixtureState state, FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, double time, DimmerCurve curve,
+        ref bool animating)
+    {
+        var beams = p.BeamArray;
+        // a single beam (most spots and washes) takes the shared channels directly; several beams start from a scratch copy
+        bool single = beams.Length == 1;
+        var shared = single ? state.BeamArray[0] : state.SharedScratch;
+        var acc = BeamAcc.Create();
+        ResetWheels(shared);
+        Array.Clear(state.EmitterLevels);
+        var ctx = new ApplyContext(p, fns, rt, time, state.Seed, state.Cache);
+        foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
+        if (single)
+        {
+            var pb = beams[0];
+            ApplyOwn(ref acc, shared, state.EmitterLevels, pb.OwnChannels, in ctx, ref animating);
+            FinalizeAllWheels(p, shared);
+            Finalize(pb, shared, ref acc, state.EmitterLevels, curve, in ctx, ref animating);
+            return;
+        }
+        var ownLevels = state.OwnEmitterLevels;
+        var beamStates = state.BeamArray;
+        bool sharedFinalized = false;
+        for (int b = 0; b < beams.Length; b++)
+        {
+            var pb = beams[b];
+            var bs = beamStates[b];
+            var beamAcc = acc;
+            state.EmitterLevels.AsSpan().CopyTo(ownLevels);
+            if (pb.OwnMechanics)
+            {
+                // the beam has its own wheels, prisms or blades: start from the shared ones, then resolve
+                CopyWheels(shared, bs);
+                ApplyOwn(ref beamAcc, bs, ownLevels, pb.OwnChannels, in ctx, ref animating);
+                FinalizeAllWheels(p, bs);
+            }
+            else
+            {
+                // the mechanics are the fixture's: resolve them once and copy the result into every beam
+                if (!sharedFinalized)
+                {
+                    FinalizeAllWheels(p, shared);
+                    sharedFinalized = true;
+                }
+                ApplyOwn(ref beamAcc, bs, ownLevels, pb.OwnChannels, in ctx, ref animating);
+                CopyWheels(shared, bs);
+            }
+            Finalize(pb, bs, ref beamAcc, ownLevels, curve, in ctx, ref animating);
+        }
     }
 
     // ------------------------------------------------------------------ channel decoding
