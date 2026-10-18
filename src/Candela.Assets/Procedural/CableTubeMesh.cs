@@ -49,6 +49,13 @@ public static class CableTubeMesh
     }
 
     /// <summary>Builds a tube along the polyline. Fewer than two distinct points yield an empty mesh.</summary>
+    public static MeshData Create(Vector3[] points, CableTubeOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+        return Create(points.AsSpan(), options);
+    }
+
+    /// <summary>Builds a tube along the polyline. Fewer than two distinct points yield an empty mesh.</summary>
     public static MeshData Create(ReadOnlySpan<Vector3> points, CableTubeOptions? options = null)
     {
         var o = options ?? new CableTubeOptions();
