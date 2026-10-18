@@ -312,7 +312,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 85 tests and runs in about 20 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` has 87 tests and runs in about 20 s. It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.

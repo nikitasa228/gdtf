@@ -20,7 +20,7 @@ Art-Net / sACN … ──Submit──▶ DmxInputHub ──TryRead (each patched
                                                      axes · beams · device outputs · channel values
 ```
 
-`tests/Candela.Dmx.Tests` (103 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
+`tests/Candela.Dmx.Tests` (141 tests, ≈ 15–60 s depending on the machine) runs real fixtures from the repository
 library through every stage; one test evaluates **every mode of all 1091 GDTF files** with random DMX.
 
 ## Units and conventions
@@ -51,7 +51,14 @@ documented defaults and a profile warning.
 A profile is one GDTF fixture type in one DMX mode, compiled once and shared (immutable, thread-safe) by every
 fixture of that type. `FixtureProfileCache` keys it by file path + size + write time + mode, finds GDTF files by file
 name or — for MVR stub names such as `Manufacturer@Model` — by manufacturer and model (`FixtureLibrary.FindBySpec`), and
-caches failures too (`ProfileResolution.ErrorKind`: unknown file, unreadable file, unknown mode).
+caches failures too (`ProfileResolution.ErrorKind`: unknown file, unreadable file, unknown mode). When the stub resolves
+to a *similar* model (a substitute), `Resolve(spec, mode, patchSpacing)` gives the stand-in's mode that fits the
+fixtures' patch spacing rather than the mode of the requested name, which belongs to the missing model
+(`SubstituteModes.Choose`: the requested mode when the stand-in has it and its first-break footprint fits the spacing,
+else the largest mode that fits, else the smallest; without a spacing the requested mode, else the first), and says so
+in `ProfileResolution.Substitution` (`FixtureSubstitution`: requested GDTF and mode, stand-in file, spacing).
+`PatchSpacing.Infer` is the smallest distance between start addresses of one universe — fixtures patched back to
+back in their real mode are that far apart. A mode that the stand-in lacks no longer leaves the fixture unresolved.
 
 Compilation (`FixtureProfile.Builder`):
 
@@ -67,7 +74,15 @@ Compilation (`FixtureProfile.Builder`):
    vs percent ranges), wheel, emitter, channel sets sorted by DMX value with names pre-parsed (`NameParsing`: open /
    closed / no function, invert pan/tilt, kelvin, colour names, waveforms, dimmer curves, prism facets), wheel slot
    maps (see below), colour-temperature neutral points, motion limits. A shutter function named "Open" or "Closed"
-   gives that state to the DMX values not covered by a named channel set.
+   gives that state to the DMX values not covered by a named channel set; a set named just "Off" in a strobe function
+   ("Strobe Off") or in a function whose physical value is a constant open shutter means *strobe off, shutter open*,
+   not *light off* (1060 sets of 15 files). **Dimmer names**: "Open"/"Closed" channel sets of a dimmer that contradict
+   its physical range ("Closed" at DMX 255 of a 0 → 1 dimmer: Ayrton MagicPanel 602, ACME AM-WASH300) follow the DMX
+   convention — more DMX is brighter: an increasing range drops the contradicting names, a decreasing range whose names
+   all contradict it is reversed (LIGHT SKY IPL1015), a decreasing range that agrees with its names is an inverted
+   dimmer. **Misattributed dimmers**: a `Dimmer` function on a channel of another attribute (a control channel, a
+   prism's "Animation2Adjust", a background dimmer) does not dim the beam; on an HSB/CIE channel it keeps the channel's
+   meaning. Each case adds a profile warning.
    **Placeholder ranges**: a physical range left at GDTF's default 0 … 1 (and no channel set with real values) is
    not taken literally where it would break the fixture: `Zoom` maps onto the `_specs` beamAngleDeg range (not a
    0 … 1° pencil beam; without a known zoom range, or when the mode also has a real zoom — e.g. a "zoom lens
@@ -79,7 +94,12 @@ Compilation (`FixtureProfile.Builder`):
    the real values (e.g. "Min to Max" 10 … 60°) takes its range from the sets. Each case adds a profile warning.
 5. **Mode masters** resolved to channel instances (the master is looked up along the follower's geometry-reference
    chain, so each pixel's functions depend on that pixel's master) with the master range at the master's resolution.
-6. **Relations** (`Multiply`, `Override`) resolved to channel instances, again per reference chain.
+6. **Relations** (`Multiply`, `Override`) resolved to channel instances, again per reference chain, and ordered so
+   that every master is evaluated before its followers (chains such as grand master → pixel dimmer → pixel colour;
+   relations closing a cycle are dropped with a warning). A dimmer's `Override` of a level (dimmer, additive colour,
+   RGB, HSB/CIE brightness) is read as `Multiply` — a virtual dimmer written with the wrong type; replacing the colour
+   by the dimmer level would make the colour channels inoperative (warning "… Override relation(s) of a dimmer over a
+   level read as Multiply").
 7. **Beams** — every Beam geometry instance, with the channels that affect all beams (evaluated once per frame) and
    the channels of each beam (evaluated per beam), photometry and source colour (below).
 8. **Axes** — every Axis part moved by Pan, Tilt, PanRotate, TiltRotate, `Rot_*` or `XYZ_*`; a channel attached to a
@@ -98,9 +118,11 @@ scrolling through "Open" keeps turning in one direction. A function without slot
 
 ## Patch (`Patch`, `PatchIssueProvider`)
 
-`Patch.Build(scene, profiles)` lists every `FixtureComponent` with its resolved profile and the slots each DMX break
+`Patch.Build(scene, profiles, substitutions)` lists every `FixtureComponent` with its resolved profile and the slots each DMX break
 occupies (address from `FixtureComponent.Addresses` matched by break number; a single-break mode accepts the only
-address whatever break number an MVR file wrote). `PatchIssueProvider` (`IIssueProvider`, category *Patch*) reports,
+address whatever break number an MVR file wrote), and what a fixture stands in for (`PatchEntry.Substitution`: from the
+profile cache for MVR stubs, or from `substitutions` for fixtures an import already gave the stand-in's file name — the
+engine supplies its record of them). `PatchIssueProvider` (`IIssueProvider`, category *Patch*) reports,
 naming fixtures as `Fixture 101 'Spot 1'`:
 
 | Code | Severity | When |
@@ -108,14 +130,14 @@ naming fixtures as `Fixture 101 'Spot 1'`:
 | `patch.unknown-gdtf` | error | no GDTF file set, or the file is not in the library and no same-model file matched |
 | `patch.unreadable-gdtf` | error | the file exists but cannot be parsed |
 | `patch.unknown-mode` | error | the DMX mode does not exist (the message lists the modes that do) |
-| `patch.substitute-gdtf` | warning | an MVR stub was matched to a *similar* model of the same manufacturer |
+| `patch.substitute-gdtf` | warning | fixtures are drawn with a *similar* model of the same manufacturer (a stand-in): one issue per requested type and stand-in, naming its mode, the patch spacing and the requested mode, with all its fixtures |
 | `patch.matched-gdtf` | note | an MVR stub was matched to the same model under another file name |
 | `patch.invalid-universe` | error | universe < 1 |
 | `patch.invalid-address` | error | address outside 1 … 512 |
-| `patch.out-of-range` | error | the footprint runs past slot 512 |
+| `patch.out-of-range` | error | the footprint runs past slot 512 (a warning per stand-in type when only the stand-in's footprint does: the real model fits) |
 | `patch.missing-break` | warning | a break of a multi-break mode has no address |
 | `patch.unpatched` | note | a fixture has no address at all |
-| `patch.overlap` | error | two fixtures share slots (message gives both ranges and the shared slots), or two DMX breaks of one fixture do |
+| `patch.overlap` | error | two fixtures share slots (message gives both ranges and the shared slots), or two DMX breaks of one fixture do; overlaps that only stand-ins' larger footprints cause (the fixtures do not overlap within the patch spacing) are one warning per stand-in type |
 | `patch.shared-address` | warning | identical type, mode and range: a deliberate "same address" patch |
 
 `Patch.At(universe, slot)` indexes a universe's slots on its first query (a whole patch view costs O(slots +
@@ -141,8 +163,13 @@ milliseconds), at most 500 overlap issues per analysis.
    from a rotation speed into an angle); a manual function whose mode master is not set manually moves that master
    into its range; and a manual master that can produce its value inside the range a manual dependent needs takes
    that function (`Gobo1` = 3 with `Gobo1PosRotate` = 200 selects slot 3 in the wheel's rotation mode).
-4. **Relations**: a `Multiply` relation scales its follower's level by the master's level (virtual dimmers — a
-   relation master is not multiplied into the beams again); `Override` replaces the follower's value.
+4. **Relations**, masters before followers: a `Multiply` relation scales its follower's level by the master's level,
+   which includes the master's own relations (a chain multiplies through); `Override` replaces the follower's value
+   only while the master is away from its default — an untouched master leaves its followers alone. A relation master
+   is not applied to a beam a second time as a beam dimmer where it already reaches the beam's light through its
+   followers: a dimmer master is left out of a beam when a dimmer following it is applied to the beam or when every
+   colour channel of the beam follows it; otherwise — a master whose relations reach only virtual head colours while
+   addressed pixel colours light the beam (Cyclops CPX-412OB II, BeamZ StarColor 540) — it dims the beam directly.
 5. **Fixture-wide modifiers**: DimmerCurve (linear / square / inverse square / S-curve by channel-set name), MSpeed
    channels (scale the motion limits of their group: position, colour, gobo, beam, shaper, or all), pan/tilt invert
    switches recognised in channel-set names.
@@ -253,7 +280,10 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
   "Disabled" leave it alone; `ZoomModeSpot`/`ZoomModeBeam` drive it only in modes without a `Zoom` channel — next to
   one they are presets or mode switches and would otherwise override it); without zoom, the Beam geometry's
   angles (or `_specs` beamAngleDeg when the file omits them or carries GDTF's 25°/25° defaults). Field angle = beam angle × the
-  beam's field ratio (from the GDTF field angle, or the beam type's typical ratio).
+  beam's field ratio, at most 179°. The ratio comes from the GDTF field angle only when the Beam's angles are a
+  beam/field pair: angles that equal the zoom range (the mode's zoom extremes or `_specs` beamAngleDeg — Ayrton Rivale
+  Wash 4°/57°, Clay Paky Aleda B-EYE K10 4°/60°: 53 beams in the library) or a ratio above 4 (no optic has one) give
+  the beam type's typical ratio and a warning. Taken literally, the Rivale's 14× ratio gave a 244° field at mid zoom.
 * **Focus** 0 … 1 within the function's range; `Focus(n)Distance` in metres. **Iris** opening 0 … 1 (1 = open),
   including iris pulses. **Frost** 1 − Π(1 − fᵢ) over all frost channels and frost pulses.
 * **Wheels** (`WheelState` per colour wheel, gobo wheel, prism, animation wheel/system, effects wheel, beam shaper;
@@ -317,13 +347,31 @@ fits), writes coarse/fine/ultra bytes at the channel's resolution, and returns t
 evaluating the result gives the value back within the DMX quantisation (tested for every function of eight modes). Manual values in `FixtureComponent.ManualAttributes` are
 physical control values (wheel selection: slot position) and are compiled once into `AttributeOverrides`.
 
+`DmxLooks` builds ready-made states from a fixture's own channel functions:
+
+* `OpenWhite(buffer, zoom)` — GDTF defaults, then highlight values, then every intensity channel at its brightest
+  value (the dimmer function and DMX value with the highest level that the channel actually selects, never a range
+  named "Closed"/"Blackout"), shutter and strobe channels open without strobing (a shutter function on a channel of
+  another attribute included), additive emitters at full, indirect RGB white, HSB/CIE brightness full and saturation
+  off, zoom at `zoom` of its range. Every beam of the library's 7272 modes lights except in eight cases the files
+  themselves leave dark (listed with their reasons in `LibraryWideTests`: a shutter with only "closed" and strobe
+  ranges, colour functions on the wrong channel …), and every addressed master dimmer dims the beams it covers.
+* `SetColor(buffer, target)` — colours the fixture as close to a chromaticity as its colour system allows: additive
+  emitter levels solved for the target in CIE XYZ (non-negative least squares), CMY or RGB/CMY filters, indirect RGB,
+  HSB, every slot of its colour wheels; each candidate is evaluated and the one whose light — all beams together,
+  weighted by their flux, so an unaddressed effect ring counts for what it emits — comes closest in xy while still
+  letting light through wins (a little light lost is worth a better colour). Returns the xy distance reached, NaN for a
+  dark fixture or one without a colour system (buffer unchanged).
+
 ## Engine (`DmxEngine`)
 
 `new DmxEngine(scene, profileCache, inputHub)`, then `Update(timeSeconds)` once per frame on the main thread:
 
 1. Pending scene changes (fixture entities or components added, removed, changed) are applied incrementally from
    `Scene.Changed`: a new profile and state only when GDTF file or mode changed; addresses and manual values are
-   re-read; removal is O(1).
+   re-read; removal is O(1). Fixtures drawn with a substitute are resolved with their type's patch spacing, so
+   repatching them can change the stand-in's mode (every fixture of the type follows, even when only one reported the
+   edit).
 2. Every universe that a fixture is patched in is read from the `DmxInputHub` once (merge, version check).
 3. For each fixture the **console-driven** predicate (`ConsoleDriven`, supplied later by the engine from the cable
    topology; default: driven when every universe it is patched in has a live source) decides between DMX (its slots
@@ -337,6 +385,12 @@ physical control values (wheel selection: slot position) and are compiled once i
    and the panels. `BuildPatch()` gives the patch for issue checks.
 
 Steady-state frames allocate nothing; idle fixtures cost nothing.
+
+`ReloadProfiles()` re-resolves every fixture at the next `Update` after the library or the profile cache changed (a
+GDTF added, a substitute replaced by the real file) without resetting anything: a fixture whose profile changed gets
+a new state that continues the old one's motor positions, rotations and clock (`FixtureState.ContinueFrom`, matched
+by attribute and instance), so moving heads neither jump nor travel again; a fixture resolving for the first time
+starts where its DMX puts it.
 
 ## Performance
 
@@ -465,7 +519,24 @@ and physical value are in `FixtureState` for the properties panel), they only do
   re-mode / remove, unknown GDTF, dynamics across frames, a move after an idle pause starts from rest, parallel =
   sequential, no allocations per frame.
 * **Library-wide**: every mode of all 1091 files (7272 modes, 221 048 channel instances) compiles and evaluates
-  random DMX (and random manual values) to finite, in-range values.
+  random DMX (and random manual values) to finite, in-range values; open white lights every beam except the eight
+  listed cases the files leave dark, and every addressed master dimmer dims what it covers; no field angle above 179°.
+* **Relations** (real pixel fixtures): MagicPanel 602 in every mode lights every pixel at open white and its master
+  dims them; pixel virtual dimmer × master; a grand master carried through a chain to pixel colours; a virtual dimmer
+  written as `Override` scales colours; an `Override` master replaces only while in use; a master whose relations miss
+  the pixel colours still dims the pixels; LED bars light every pixel; dimmer names against the range; "Strobe Off";
+  a `Dimmer` function on another attribute's channel; open white finds the brightest dimmer range.
+* **Looks** (`DmxLooks.SetColor`): additive RGBW reaches saturated colours exactly with the dimmer open; CMY, a colour
+  wheel and HSB come closer than white; the whole fixture's colour counts when an effect ring is out of reach; dark
+  fixtures and fixtures without colour are left alone; deterministic.
+* **Substitutes**: patch spacing inference; the stand-in's mode by spacing; resolution with the substitution; a
+  stand-in patched at its spacing has no errors and one warning; overlaps and slot-512 overruns only the stand-in
+  causes are warnings while real collisions stay errors; an engine-supplied substitution; `DmxEngine` follows spacing
+  changes.
+* **Photometry**: the datasheet peak shared by the beams' own peaks (a diffuse liquid-effect ring keeps a pixel's
+  flux, Zonda 3 FX); a datasheet peak that is one pixel's read per pixel (MagicPanel 602) while a fixture's total
+  stays shared (Rayzor 760); a zoom range written as beam/field angle; fields never above a hemisphere.
+* **Reload**: `ReloadProfiles` keeps motor positions and moves on from there.
 * **Performance**: 2000 fixtures per frame (above).
 
 ## Limitations
@@ -478,7 +549,11 @@ and physical value are in `FixtureState` for the properties panel), they only do
 * `_specs` gives one candela value per fixture; multi-beam fixtures share it by the beams' own peaks, from the GDTF
   flux when the file gives different fluxes, from equal fluxes otherwise (e.g. the decorative RGB rings of a wash whose
   beams all keep GDTF's default flux get as much flux as the main beam). Only a value that clearly is one cell's (see *Photometry*) is
-  read per beam; elsewhere the datasheet and the files' fluxes disagree in both directions (about 40 of the library's
-  fixtures emit less than 3 lm/W of their power at full white, about 60 more than 150 lm/W), and the datasheet wins.
+  read per beam; elsewhere the datasheet and the files' fluxes disagree in both directions (45 of the 1058
+  fixtures with a datasheet peak and power emit less than 3 lm/W at full white in their largest mode, 41 more than
+  150 lm/W), and the datasheet wins.
 * Placeholder ranges are recognised only when they are exactly GDTF's default 0 … 1; other implausible ranges in the
   files (e.g. a zoom written as 0.1 … 15°) are taken as written.
+* GDTF does not define when an `Override` relation acts. Candela reads a dimmer's `Override` of a level as `Multiply`
+  (a virtual dimmer) and lets other `Override`s replace their follower only while the master is away from its default;
+  a file that means a permanent override gets it once its master is moved.

@@ -74,10 +74,24 @@ false only when nothing happened (the open scene is then unchanged).
 **GDTF files that are not in the library.** Complete GDTFs embedded in an MVR, and the GDTF copies of a project, are
 extracted to `{cache}/gdtf/{content hash}/` and added to the library when the library has no file of that name, so a
 project opens and evaluates on a computer without those files (tested with an empty library). Library files win over
-project copies of the same name. Whenever GDTF files are added to the library (also `Import` of a `.gdtf`), the DMX
-evaluation starts afresh: `DmxEngine` keeps a fixture's profile resolution until its GDTF name or mode changes, so a
-fixture that was unresolved (or stood in by a substitute) only picks up the new file this way; motors travel to their
-positions again, like after opening the scene. Changing an asset's import options marks the project modified.
+project copies of the same name. Whenever GDTF files are added to the library (also `Import` of a `.gdtf`), every
+fixture is resolved again (`DmxEngine.ReloadProfiles`): a fixture that was unresolved, or resolved to a substitute,
+picks up the new file, fixtures an MVR import drew with a stand-in switch to the real GDTF of their model (below), and
+every fixture keeps its motor positions — a moving head does not travel to its position again, and fixtures whose
+profile did not change keep their state. Changing an asset's import options marks the project modified.
+
+**Stand-in GDTFs (substitutes).** When the library has no file of a model an MVR asks for, the MVR importer draws it
+with a similar model of the same manufacturer (`mvr.gdtf-substitute`; Фокина's MagicBlade R as an Ayrton MagicPanel
+602). The importer keeps the mode of the requested name, which belongs to the missing model and may be far wider (the
+MagicBlade's 44-channel "Extended" became the panel's 160-channel "Extended": 73 overlap errors on Фокина). After the
+import the engine gives each stand-in type the mode that best fits its patch spacing (`SubstituteModes.Choose`: the
+requested mode when it fits, else the largest that fits, else the smallest; note `engine.substitute-mode`) and records
+every stand-in in `EngineSettings.Substitutes` (requested GDTF and mode, stand-in file, spacing; saved with the
+project). The patch judges stand-ins by that record (`PatchIssueProvider.Substitutions`): one `patch.substitute-gdtf`
+warning per type with all its fixtures, and overlaps or slots past 512 that only the stand-in's larger footprint causes
+are one warning per type, not errors. When the real GDTF arrives (library reload, `.gdtf` import), the stand-ins switch
+to it in the requested mode (else the mode that fits the spacing) and leave the record (`engine.substitute-replaced`).
+`SubstitutionOf(entityId)` says what a fixture stands in for.
 
 **MVR models** become model assets with the MVR conventions as import options (3DS millimetres Z-up, glTF metres Y-up);
 the MVR module's managed decode is reused (and cached), so opening an MVR never needs the native importer.
@@ -135,9 +149,10 @@ so embedded and generated images never require the native importer again.
    and field angle, beam type, source radius (`BeamRadius`), gobo texture of the current wheel slot (a wheel between
    two slots projects the nearer one, blurred), gobo rotation and blur (focus distance from the middle of the range,
    frost), iris, framing blades (insertion, tilt from A/B, module rotation), prism (facets and spread from the wheel
-   slot's facet offsets), frost, `CastShadow`; plus two hemispherical lights per flame light sample. The field angle is
-   limited to 3 × the beam angle and 170°: some GDTFs (Ayrton Rivale Wash) write their zoom range into the Beam's
-   angles, which would otherwise spread the light over more than a hemisphere.
+   slot's facet offsets), frost, `CastShadow`; plus two hemispherical lights per flame light sample. The field angle
+   comes from the DMX profile, which already reads beam/field angles that are a zoom range or an implausible ratio as
+   the type's typical ratio (docs/dmx.md); the collector only keeps it within the renderer's 170° cone as a sanity
+   clamp, lists the fixtures it had to clamp (`ClampedFieldFixtures`) and reports them (`engine.field-clamped`).
 6. **Render sync** (below).
 
 The result depends only on the scene, the DMX received and the sequence of frame times (tested: two engines, same
@@ -163,7 +178,7 @@ update).
 | Lights | `SetLights` every frame; gobo textures are created once per wheel slot from the GDTF media (alpha = transmission = linear luminance × alpha of the picture, RGB = tint of coloured glass). |
 | Walls, floors, ceilings | `WallMesh` + the built-in material (`MaterialLibrary`) with its UV scale. |
 | Images | `ImagePlaneMesh` + `ImagePlaneMesh.CreateMaterial`; reference drawings unlit (`InstanceFlags.Reference`), posters lit. |
-| Imported models | Decoded through `EngineModels`; material overrides by slot with built-in materials. |
+| Imported models | Decoded through `EngineModels` — on a background task by default (`LoadModelsInBackground`; a native format goes through the import worker, which may take up to its timeout; the objects appear when their model has decoded, `PendingModels` counts the decodes, `CompletePendingLoads` waits for them too); material overrides by slot with built-in materials. Decoded models live in the project's `AssetStore` (`SetDecodedModel`), so the store, the renderer and the light meter share one copy. |
 | Trusses | Their model, or `TrussMesh` in aluminium. |
 | Cables | Tube meshes (`CableTubeMesh`, catenary sag from the slack factor, dark rubber tinted by the type) plus coloured lines (`SetLines`, the cable type's colour) for the cable overlay; rebuilt when an anchor entity moves. |
 | Consoles, power sources, rigging points | Simple primitives (desk, distro box, hoist). |
@@ -222,6 +237,25 @@ functions' physical ranges refined by pattern search on the fixture's real geome
 The values are checked to reproduce the encoded intensity when compiled back; otherwise every channel's value is
 carried. One undo step.
 
+`StageLooks.ApplyDemo(engine, options)` sets a deterministic, show-like state for judging the picture (`candela render
+--look demo`). The rig is split into groups — fixtures of one type at one height in one line: a row across the stage,
+or the pair of columns at the same distance left and right of the centre line (a fixture is in its row when the row
+has three or more fixtures of its type and height, or at least as many as its column pair) — taken from the top of the
+rig down. Each group takes the next colour of `DemoPalette` (white D65, deep blue, magenta, amber, cyan, red; made
+with whatever the fixture has, `DmxLooks.SetColor`) and a pattern, symmetric about the stage's centre line:
+
+| Group | Pattern |
+|---|---|
+| Moving heads less than 3.5 m above the floor (narrowest zoom) | downstage rows fan up and out over the audience (−Y), or cross over it (every other such group); side column pairs cross over the stage, or fan up (every other pair); other rows fan up |
+| Overhead washes (wide zoom) | pools on the floor in the group's colour and the one after next, alternating every 1.5 m outwards from the centre line |
+| Overhead spots and beams (narrowest zoom) | cross onto the floor of the other side, or fan across the downstage edge (alternating by group) |
+| Every other overhead group with a gobo wheel | a gobo |
+| Fixed lights, strobes, atmospheric devices | their group's colour at full; strobes dark (a still image of a strobe is a lottery); hazers at `HazeOutput` (0.6) with their fans at half, fog off |
+
+Dimmers are at full and shutters open (`DmxLooks.OpenWhite`), heads are aimed like in open white (grid and pattern
+search on the fixture's geometry). One undo step; the same scene always gets the same look (tested: mirror partners
+share colour and mirror their beams on Фокина).
+
 `GdtfTestPatternEncoder.ForScene(engine)` builds the Art-Net test show (`ArtNetTestPattern`) over the scene's patched
 fixtures with their own GDTF channel functions (pan/tilt/zoom/focus over their ranges, emitters by colour code, CMY as
 complements, shutter open).
@@ -236,7 +270,7 @@ complements, shutter open).
 candela render <scene.mvr|scene.candela> --out <file.png> [--width W --height H]
                [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov deg]
                [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]
-               [--look open-white|show|dmx-file <recording.cdmx>] [--time <s>] [--ev <EV100>|auto]
+               [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev <EV100>|auto]
                [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--device <name>]
                [--library <dir>]... [--cache <dir>]
 candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset 0|1] [--scene <file>]
@@ -246,8 +280,8 @@ candela import-worker <input> <output-dir> [options]     (hidden: used by the en
 candela render-test --out <dir> [options]                (renderer self-test, see docs/rendering.md)
 ```
 
-**render** loads the scene through `StageEngine`, applies the look (`open-white` default; `show` = as saved;
-`dmx-file` plays a recording from its start), ticks the simulation for `--time` seconds at 30 frames per second
+**render** loads the scene through `StageEngine`, applies the look (`open-white` default; `demo` = the show-like
+state of `StageLooks.ApplyDemo`; `show` = as saved; `dmx-file` plays a recording from its start), ticks the simulation for `--time` seconds at 30 frames per second
 (motors travel, haze builds up, flames burn), renders `--frames` frames (temporal accumulation) and writes the PNG,
 printing the scene, camera, exposure, timings and the most severe issues. `--view auto` frames the scene from the front
 left, elevated; `front`, `top`, `side` look along the axes. The preset views frame the content itself rather than its
@@ -260,7 +294,9 @@ the picture. `--out` must name a file (a folder is a usage error). `--overlay lu
 the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
 temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure defaults to an
 incident-light reading of the lit floor (`--ev auto`); `--ev` sets EV100, `--auto-exposure` lets the renderer adapt.
-`render stages/Фокина.mvr --out f.png --width 480 --height 270` takes about 6 s on lavapipe.
+The demo look uses auto exposure unless `--ev` is given: its floor — coloured pools and spill — says little about how
+bright its beams in the haze are. `render stages/Фокина.mvr --out f.png --width 480 --height 270` takes about 10 s on
+lavapipe; with `--look demo` (12 frames of auto exposure) about 15 s at 320 × 180 and 55 s at 960 × 540.
 
 **artnet-test** sends `ArtNetTestPattern` (pan/tilt sweep, colour chase, dimmer wave, zoom) with ArtSync and
 ArtTimeCode to a node, a directed broadcast or `127.0.0.1` — 8 moving heads (12 ch) and 8 RGBW pars per universe, or
@@ -286,22 +322,32 @@ adds the light plot).
 | `engine.recording-damaged` | warning | a DMX recording is truncated or damaged |
 | `engine.settings-invalid` | warning | a project's `engine`/`view` section could not be read |
 | `engine.library-missing` | warning/error | no library folder, or it cannot be scanned |
+| `engine.field-clamped` | warning | a fixture's field angle was wider than the renderer's 170° cone and was clamped |
+| `engine.substitute-mode` | note | an MVR import's stand-in GDTF uses another of its modes, to fit the patch spacing |
+| `engine.substitute-replaced` | note | fixtures that stood in for a missing model now use its GDTF, which the library has |
 
 Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (electrical), `asset.*` (asset store),
 `mvr.*`, `project.*`, and the simulations' issues.
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (69 tests, ≈ 45 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (75 tests, ≈ 50 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
   patch spacing equals the manufacturers' footprints (Rivale Profile 42, MagicBlade R 44, Zonda 3 Wash/FX 26,
   Atomic 3000 LED 3), and GDTFs with the real names, modes and footprints in place of the substitutes resolve every
   type exactly with a clean patch (docs/mvr.md); the info/validate CLI checks follow the library the same way; every
-  fixture has a state and a pose; after open white, RenderSync draws every model part of every fixture (pick ids map
-  back) and exactly one light per lit beam (≥ 59 lit fixtures; the MagicPanel stand-in evaluates dark, see
-  limitations); identical results for identical input sequences; export → reopen keeps ids, specs and addresses.
+  fixture has a state and a pose; the stand-ins use the mode that fits their patch spacing (no patch errors, one
+  substitute warning per type, the record survives save and reopen, and the real GDTF replaces the stand-in when it
+  arrives); after open white, RenderSync draws every model part of every fixture (pick ids map back) and exactly one
+  light per lit beam — every fixture lit, the pixel-mapped MagicBlade stand-in included, except a pure strobe between
+  flashes — with no field wider than 4 × its beam and nothing clamped; identical results for identical input
+  sequences; export → reopen keeps ids, specs and addresses.
+* **Demo look**: on Фокина the same look twice, strobes dark and everything else at full, ≥ 30 mirror pairs with the
+  same colour and mirrored beams, ≥ 5 colours with white and ≥ 3 saturated ones, low heads fanning up, over the
+  audience, across the stage and crossing, overhead heads down, Rivale stand-ins at their narrowest zoom, gobos on
+  some overhead heads; a hazer runs and fog stays off; one undo step.
 * **Pipeline**: an Art-Net packet (real UDP receiver on loopback) makes a MAC Viper DMX-driven and its head instances
   move over several frames (motor dynamics; the base does not move); console-driven status follows a DMX cable from a
   console (unplugging returns the fixture to manual; without consoles live universes drive); a hazer fills the air
@@ -323,12 +369,15 @@ a device):
 * **Fire**: a flame projector (synthetic GENERATOR FIRE GDTF) burns from its manual values, lights the floor through
   the flame light samples, sends a temperature grid above 1000 K to the render world, feeds soot into the smoke and
   dies down when its valve closes.
-* **CLI**: usage errors and missing files give their exit codes; every documented `render` option parses; `info` on
-  the MVR and a GDTF; `validate` exits with 4 on Фокина's patch overlaps and prints the light plot; `import-worker`
+* **CLI**: usage errors and missing files give their exit codes; every documented `render` option parses (the demo
+  look with auto exposure unless `--ev`); `info` on the MVR and a GDTF; `validate` exits with 0 on Фокина (no patch
+  errors with the fitting stand-in modes, no `data.no-signal` without consoles or data cables) and prints the light
+  plot; `import-worker`
   writes a package with the given units or the reason it cannot; `artnet-test` sends ArtDmx packets to a UDP port;
   engine options from the user settings default to the repository library, and a missing library stays reported.
 * **Rendering** (Vulkan): `candela render` on Фокина.mvr at 480 × 270 gives a lit, not blown-out stage that spans most
-  of the picture; the thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames
+  of the picture; `--look demo` at 320 × 180 gives saturated light of at least three hues and beams in the air above
+  the stage; the thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames
   differ; a GDTF deleted since the scan gives a dark thumbnail, not an exception; `--look dmx-file` plays a recording
   for `--time` before rendering.
 * **Integration review**: lights against independent computations (position = the beam part's pose, unit direction
@@ -346,10 +395,11 @@ a device):
 
 ## Known limitations
 
-* Fixtures of the `Фокина.mvr` stand-in `Ayrton@MagicPanel_602` (Extended mode) evaluate to zero intensity at full
-  dimmer: the pixel beams take their dimmer from per-pixel virtual dimmers that are relation masters (a Candela.Dmx
-  behaviour, reported for that module); the real MagicBlade R GDTF is not in the library anyway (it is published only
-  on GDTF-Share, behind a login or CAPTCHA; see docs/mvr.md).
+* Stand-ins look like the model they stand in for only roughly: Фокина's MagicBlade R (a batten of seven pixels) is
+  drawn as a MagicPanel 602 (a 6 × 6 panel); the real GDTFs are published only on GDTF-Share, behind a login or
+  CAPTCHA (docs/mvr.md). The MVR importer still picks the stand-in's mode by name; the engine corrects it afterwards.
+* The demo look's patterns follow from positions and fixture categories only (no knowledge of the set, the camera or
+  the performers); a rig with no symmetry gets fans that are not symmetric either.
 * The light meter ignores gobos, blades, iris, prisms and shadows (the GPU lux overlay applies them).
 * Fixture lens glow (emissive lenses following the intensity) is not drawn; beams light the scene and the haze.
 * The DMX recorder samples the input once per engine frame (not every received packet).

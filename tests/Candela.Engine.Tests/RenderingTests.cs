@@ -114,6 +114,63 @@ public sealed class RenderingTests
     }
 
     [SkippableFact]
+    public void Cli_render_of_fokina_with_the_demo_look_shows_coloured_beams_in_the_air()
+    {
+        using (CreateRendererOrSkip())
+        {
+            // only probes for a device; the CLI creates its own renderer
+        }
+        string dir = TestEnvironment.NewTempDirectory("cli-demo");
+        string png = Path.Combine(dir, "demo.png");
+        var output = new StringWriter();
+        var error = new StringWriter();
+        int code = Cli.Program.Run(
+            ["render",
+                TestEnvironment.Fokina,
+                "--out",
+                png,
+                "--width",
+                "320",
+                "--height",
+                "180",
+                "--look",
+                "demo",
+                "--cache",
+                Path.Combine(dir, "cache"),
+                "--library",
+                TestEnvironment.Root],
+            output, error);
+        Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
+        string text = output.ToString();
+        Assert.Contains("demo on 91 fixtures", text, StringComparison.Ordinal);
+        Assert.Contains("auto exposure", text, StringComparison.Ordinal);
+        File.Copy(png, Path.Combine(OutputDirectory, "fokina-demo.png"), overwrite: true);
+
+        Assert.True(ImageImporter.TryDecode(File.ReadAllBytes(png), out var image, out var problem), problem);
+        var (mean, bright) = Luminance(image!);
+        Assert.True(mean > 0.04, $"the image is (nearly) black: mean luminance {mean:0.000}");
+        Assert.True(bright < 0.6, $"the image is blown out: {bright:P1} bright pixels");
+
+        // saturated light of several hues (60° sectors), and beams in the haze above the stage (the top third of the
+        // auto view is air)
+        var sectors = new int[6];
+        int pixels = image!.Width * image.Height, air = 0;
+        for (int i = 0; i < pixels; i++)
+        {
+            double r = image.Pixels[4 * i] / 255.0, g = image.Pixels[4 * i + 1] / 255.0, b = image.Pixels[4 * i + 2] / 255.0;
+            double max = Math.Max(r, Math.Max(g, b)), min = Math.Min(r, Math.Min(g, b));
+            double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            if (i / image.Width < image.Height / 3 && luminance > 0.15) air++;
+            if (max < 0.15 || (max - min) / max < 0.35) continue;
+            double hue = max == r ? 60 * (((g - b) / (max - min) + 6) % 6) : max == g ? 60 * ((b - r) / (max - min) + 2) : 60 * ((r - g) / (max - min) + 4);
+            sectors[(int)(hue / 60) % 6]++;
+        }
+        int hues = sectors.Count(n => n > pixels * 0.005);
+        Assert.True(hues >= 3, $"only {hues} hues: {string.Join(", ", sectors)}");
+        Assert.True(air > pixels / 3 * 0.1, $"no beams in the air: {air} lit pixels in the top third");
+    }
+
+    [SkippableFact]
     public void Thumbnail_of_a_file_deleted_since_the_scan_is_a_dark_picture_not_an_exception()
     {
         using var renderer = CreateRendererOrSkip();

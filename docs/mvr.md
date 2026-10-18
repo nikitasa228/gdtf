@@ -235,9 +235,13 @@ Every fixture ends up with a library GDTF that has real geometry and DMX modes. 
 * one `mvr.mode-footprint` warning (MagicBlade R);
 * one note for Depence's unknown `<FixtureTypeId>` element.
 
-There are no import errors. The substitutes are not good enough for the show, though: the MagicPanel 602 stand-in's
-160-channel `Extended` mode overlaps the 44-channel MagicBlade patch (`candela validate` reports 73 `patch.overlap` and
-4 `patch.out-of-range` errors, all caused by it), and the other stand-ins have the wrong optics and photometry.
+There are no import errors. The substitutes are not good enough for the show, though: as imported, the MagicPanel 602
+stand-in's 160-channel `Extended` mode overlaps the 44-channel MagicBlade patch (73 `patch.overlap` and 4
+`patch.out-of-range` errors, all caused by it), and the other stand-ins have the wrong optics and photometry. The
+engine (`StageEngine.Open`/`Import`, docs/engine.md) therefore gives every stand-in type the mode that fits its patch
+spacing — the MagicPanel's 20-channel `Standard` for the 44-channel spacing, `engine.substitute-mode` — and records the
+stand-ins, so the patch reports one `patch.substitute-gdtf` warning per type and no patch errors (`candela validate`
+exits 0), and switches them to the real GDTFs once the library has them.
 
 #### What the scene expects, and where the real GDTFs are
 
@@ -432,4 +436,6 @@ Writing the result again gives the same bytes.
 * **Not implemented.** MVR-xchange, the network protocol for live scene exchange that accompanies MVR 1.6. Elements
   of newer MVR versions are kept as unknown elements but not interpreted.
 * **Substitutes.** A substitute GDTF is a best effort by name within the brand. The UI should show it as a substitute.
-  `mvr.mode-footprint` flags patches the substitute does not fit.
+  `mvr.mode-footprint` flags patches the substitute does not fit. The importer keeps a stand-in mode of the requested
+  name even when it is far wider than the patch spacing; `Candela.Engine` corrects it after the import
+  (`SubstituteModes.Choose` in Candela.Dmx), so a caller of `MvrImporter` alone still gets the wide mode.

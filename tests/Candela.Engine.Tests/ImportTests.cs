@@ -129,7 +129,7 @@ public sealed class ImportTests
         // opened on a machine whose worker hangs (and with an empty model cache): frames keep coming
         string script = Path.Combine(TestEnvironment.NewTempDirectory("bg-hang"), "hanging-worker.sh");
         File.WriteAllText(script, "#!/bin/sh\nsleep 30\n");
-        File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         using (var engine = new StageEngine(new StageEngineOptions
         {
             Library = TestEnvironment.Library,
