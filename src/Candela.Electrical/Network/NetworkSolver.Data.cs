@@ -38,6 +38,7 @@ public sealed partial class NetworkSolver
             var feeds = new Dictionary<Guid, List<DataFeed>>();
             var reportedCables = new HashSet<Guid>();
             var reportedSegments = new HashSet<(Guid, string, int)>();
+            var reportedThru = new HashSet<Guid>();
             int maxPerSegment = Math.Max(1, _owner.Options.MaxDmxDevicesPerSegment);
 
             foreach (var console in _deviceOrder)
@@ -143,6 +144,7 @@ public sealed partial class NetworkSolver
                             bool splitter = dmx && IsDmxSplitter(target);
                             bool converter = f.Signal == SignalKind.Ethernet && !dmxInput && dmxOutputs > 0;
                             int convertedPort = 0;
+                            Port? firstThru = null, secondThru = null;
                             foreach (var o in target.Info.Ports)
                             {
                                 if (ReferenceEquals(o, input) || o.Direction == PortDirection.Input || !o.Signal.CarriesData() ||
@@ -160,10 +162,21 @@ public sealed partial class NetworkSolver
                                     continue;
                                 }
                                 if (!SameDataFamily(o.Signal, f.Signal)) continue;
+                                if (dmx && !splitter && o.Signal == SignalKind.Dmx512 && _plugged.ContainsKey(new PortRef(target.Id, o.Name)))
+                                {
+                                    if (firstThru is null) firstThru = o;
+                                    else secondThru ??= o;
+                                }
                                 next.Add(splitter
                                     ? new DataFrame(target, o, f.Signal, f.FirstUniverse, f.UniverseCount, depth, 0, 0f, float.PositiveInfinity, (target.Id, o.Name), path)
                                     : new DataFrame(target, o, f.Signal, f.FirstUniverse, f.UniverseCount, depth, segCount, segRun, segMax, f.SegmentKey, path));
                             }
+                            // The XLR 3-pin and 5-pin thru sockets of a fixture are one line: using both branches it
+                            // without a splitter, like a Y-cable.
+                            if (secondThru is not null && reportedThru.Add(target.Id))
+                                Add(IssueSeverity.Warning, IssueCategory.Data, IssueCodes.DataYSplit,
+                                    $"{target.Info.Label} sends the DMX line from {lineName} out of both '{firstThru!.Name}' and '{secondThru.Name}': its thru sockets are the same line, so this branches it without a splitter.",
+                                    target.Id);
                         }
                         for (int i = next.Count - 1; i >= 0; i--) stack.Push(next[i]);
                     }

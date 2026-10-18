@@ -42,6 +42,33 @@ public class ReviewRegressionTests
     }
 
     [Fact]
+    public void Using_both_the_3_pin_and_5_pin_thru_of_a_fixture_is_a_y_split()
+    {
+        var kit = new SceneKit();
+        var desk = kit.Console("Desk", new Vector3(0, -12, 0), SceneKit.DmxOutput("DMX A", 1));
+        var spots = Row(kit, Cobra100, 3, channels: 15);
+        kit.Cable("dmx-xlr5", "1", (desk, "DMX A"), (spots[0], "DMX 5Pin IN"));
+        kit.Cable("dmx-xlr5", "2", (spots[0], "DMX 5Pin OUT"), (spots[1], "DMX 5Pin IN"));
+        kit.Cable("dmx-xlr3", "3", (spots[0], "DMX 3Pin OUT"), (spots[2], "DMX 3Pin IN"));
+
+        var s = kit.Solve();
+        var issue = s.Issues.Single(IssueCodes.DataYSplit);
+        Assert.Equal(IssueSeverity.Warning, issue.Severity);
+        Assert.Contains("#1 'Fx 1'", issue.Message);
+        Assert.Contains("'DMX 5Pin OUT'", issue.Message);
+        Assert.Contains("'DMX 3Pin OUT'", issue.Message);
+        Assert.All(spots, f => Assert.True(s.IsConsoleDriven(f.Id)));
+
+        // One thru in use is a plain daisy chain.
+        var kit2 = new SceneKit();
+        var desk2 = kit2.Console("Desk", new Vector3(0, -12, 0), SceneKit.DmxOutput("DMX A", 1));
+        kit2.Chain("dmx-xlr3", "D", (desk2, "DMX A"), Row(kit2, Cobra100, 3, channels: 15), "DMX 3Pin IN", "DMX 3Pin OUT");
+        var s2 = kit2.Solve();
+        s2.Issues.None(IssueCodes.DataYSplit);
+        Assert.Contains("XLR 3-pin to 5-pin", s2.Issues.Single(IssueCodes.CableAdapterNeeded).Message); // only at the desk's 5-pin output
+    }
+
+    [Fact]
     public void A_real_dmx_splitter_starts_new_segments()
     {
         var head = TestData.Profile(TestData.Naja);
