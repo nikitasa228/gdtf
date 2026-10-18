@@ -19,6 +19,18 @@ internal static class Fmt
 
     public static string Pct(double percent) => string.Create(CultureInfo.InvariantCulture, $"{percent:0} %");
 
+    /// <summary>A current above <paramref name="limit"/>, with two decimals when one would print it equal to the limit.</summary>
+    public static string A(double amperes, double limit) =>
+        amperes > limit && Math.Round(amperes, 1) <= Math.Round(limit, 1) ? string.Create(CultureInfo.InvariantCulture, $"{amperes:0.00} A") : A(amperes);
+
+    /// <summary>A mass above <paramref name="limit"/>, with two decimals when one would print it equal to the limit.</summary>
+    public static string Kg(double kilograms, double limit) =>
+        kilograms > limit && Math.Round(kilograms, 1) <= Math.Round(limit, 1) ? string.Create(CultureInfo.InvariantCulture, $"{kilograms:0.00} kg") : Kg(kilograms);
+
+    /// <summary>A power above <paramref name="limit"/>, with one decimal when none would print it equal to the limit.</summary>
+    public static string W(double watts, double limit) =>
+        watts > limit && Math.Round(watts) <= Math.Round(limit) ? string.Create(CultureInfo.InvariantCulture, $"{watts:0.0} W") : W(watts);
+
     public static string Supply(float voltageV, float frequencyHz, bool dc) =>
         dc ? string.Create(CultureInfo.InvariantCulture, $"{voltageV:0} V DC") : string.Create(CultureInfo.InvariantCulture, $"{voltageV:0} V {frequencyHz:0} Hz");
 

@@ -269,6 +269,35 @@ public class ReviewRegressionTests
     }
 
     [Fact]
+    public void A_load_just_above_the_breaker_is_not_printed_equal_to_it()
+    {
+        var heater = new FixtureProfile
+        {
+            GdtfSpec = "Test@Heater",
+            DisplayName = "Test 3.5 kW load",
+            PowerW = 3505, // 3505 W / (0.95 × 230 V) = 16.04 A
+            PowerSource = PowerDataSource.Specs,
+            Ports =
+            [
+                new Port
+                {
+                    Name = "Power In", Direction = PortDirection.Input, Signal = SignalKind.Power, Connector = ConnectorCatalog.Resolve("powerCON TRUE1"),
+                    Role = PortRole.PowerIn, Origin = PortOrigin.Specs,
+                },
+            ],
+        };
+        var kit = new SceneKit(new InMemoryFixtureProfileProvider().Add("Test@Heater", heater));
+        var wall = kit.Source("Wall", new Vector3(0, -5, 0), outlets: SceneKit.Outlet("Socket", "powerCON TRUE1", 16f));
+        var load = kit.Fixture("Test@Heater", "Heater", 9, new Vector3(0, 0, 0));
+        kit.Cable("powercon-true1", "P", (wall, "Socket"), (load, "Power In"));
+
+        var s = kit.Solve();
+        Assert.Contains("16.04 A on a 16.0 A breaker", s.Issues.Single(IssueCodes.PowerBreakerOverload).Message);
+        Assert.Contains("carries 16.04 A", s.Issues.Single(IssueCodes.PowerInletOverload).Message);
+        Assert.Contains("carries 16.04 A", s.Issues.Single(IssueCodes.PowerCableOverload).Message);
+    }
+
+    [Fact]
     public void Cable_overload_names_the_devices_it_feeds()
     {
         var kit = new SceneKit();

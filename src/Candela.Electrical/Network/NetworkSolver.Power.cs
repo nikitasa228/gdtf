@@ -344,7 +344,7 @@ public sealed partial class NetworkSolver
                         {
                             var behind = node.Children.Where(c => ReferenceEquals(c.Via, port)).SelectMany(Subtree).ToList();
                             Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerLinkOverload,
-                                $"Link output '{port.Name}' ({port.Connector.DisplayName}) of {device.Info.Label} carries {Fmt.A(amps)} ({Fmt.W(sum.W)} for {Fmt.Count(behind.Count, "linked device", "linked devices")}: {Fmt.List(behind.Select(n => n.Device.Info.Label))}) but is rated {Fmt.A(lim)}.",
+                                $"Link output '{port.Name}' ({port.Connector.DisplayName}) of {device.Info.Label} carries {Fmt.A(amps, lim)} ({Fmt.W(sum.W)} for {Fmt.Count(behind.Count, "linked device", "linked devices")}: {Fmt.List(behind.Select(n => n.Device.Info.Label))}) but is rated {Fmt.A(lim)}.",
                                 [device.Id, .. behind.Select(n => n.Device.Id)]);
                         }
                     }
@@ -358,7 +358,7 @@ public sealed partial class NetworkSolver
                         distCurrent += amps;
                         if (port.MaxThroughCurrentA is { } chLimit && amps > chLimit + 1e-6)
                             Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerChannelOverload,
-                                $"Output '{port.Name}' of {device.LongLabel} carries {Fmt.A(amps)} ({Fmt.W(sum.W)}) but each channel is rated {Fmt.A(chLimit)}.",
+                                $"Output '{port.Name}' of {device.LongLabel} carries {Fmt.A(amps, chLimit)} ({Fmt.W(sum.W)}) but each channel is rated {Fmt.A(chLimit)}.",
                                 [device.Id, .. node.Children.Where(c => ReferenceEquals(c.Via, port)).Select(c => c.Device.Id)]);
                     }
                 }
@@ -371,10 +371,10 @@ public sealed partial class NetworkSolver
                     load += PhaseLoad.Single(supply.Phase, inW, inVa);
                     if (dist?.MaxLoadW is { } maxW && distW > maxW + 1e-6)
                         Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerDistributionOverload,
-                            $"{device.LongLabel} delivers {Fmt.W(distW)} to its loads but is rated {Fmt.W(maxW)}.", device.Id);
+                            $"{device.LongLabel} delivers {Fmt.W(distW, maxW)} to its loads but is rated {Fmt.W(maxW)}.", device.Id);
                     if (dist?.MaxLoadCurrentA is { } maxA && distCurrent > maxA + 1e-6)
                         Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerDistributionOverload,
-                            $"The outputs of {device.LongLabel} carry {Fmt.A(distCurrent)} in total but are rated {Fmt.A(maxA)}.", device.Id);
+                            $"The outputs of {device.LongLabel} carry {Fmt.A(distCurrent, maxA)} in total but are rated {Fmt.A(maxA)}.", device.Id);
                 }
 
                 node.OwnW = own;
@@ -384,7 +384,7 @@ public sealed partial class NetworkSolver
                 float? inletLimit = node.Input.MaxThroughCurrentA ?? node.Input.Connector.RatedCurrentA;
                 if (inletLimit is { } inLim && node.InputCurrentA > inLim + 1e-6)
                     Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerInletOverload,
-                        $"Power inlet '{node.Input.Name}' ({node.Input.Connector.DisplayName}) of {device.Info.Label} carries {Fmt.A(node.InputCurrentA)} ({Fmt.W(load.W)} including {Fmt.Count(Subtree(node).Count() - 1, "device", "devices")} behind it) but is rated {Fmt.A(inLim)}.",
+                        $"Power inlet '{node.Input.Name}' ({node.Input.Connector.DisplayName}) of {device.Info.Label} carries {Fmt.A(node.InputCurrentA, inLim)} ({Fmt.W(load.W)} including {Fmt.Count(Subtree(node).Count() - 1, "device", "devices")} behind it) but is rated {Fmt.A(inLim)}.",
                         device.Id);
 
                 if (profile is not null && _owner.Options.ReportDimmedElectronicLoads && supply.Dimmed && own > 0 && !IsResistive(profile.LightSourceType))
@@ -415,7 +415,7 @@ public sealed partial class NetworkSolver
                     {
                         string where = c.Outlet.Circuits > 1 ? $"Circuit {c.Number} of outlet '{c.Outlet.Name}'" : $"Outlet '{c.Outlet.Name}'";
                         Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerBreakerOverload,
-                            $"{where} of '{s.Device.Info.Name}' is overloaded: {Fmt.Count(c.All.Count, "device draws", "devices draw")} {Fmt.W(load.W)} = {Fmt.A(amps)} on a {Fmt.A(breaker)} breaker ({Fmt.Pct(100 * amps / breaker)}): {Fmt.List(c.All.Select(n => n.Device.Info.Label))}.",
+                            $"{where} of '{s.Device.Info.Name}' is overloaded: {Fmt.Count(c.All.Count, "device draws", "devices draw")} {Fmt.W(load.W)} = {Fmt.A(amps, breaker)} on a {Fmt.A(breaker)} breaker ({Fmt.Pct(100 * amps / breaker)}): {Fmt.List(c.All.Select(n => n.Device.Info.Label))}.",
                             [s.Device.Id, .. c.All.Select(n => n.Device.Id)]);
                     }
                 }
@@ -462,7 +462,7 @@ public sealed partial class NetworkSolver
                         .Select(n => n.Device)
                         .ToList();
                     Add(IssueSeverity.Error, IssueCategory.Power, IssueCodes.PowerCableOverload,
-                        $"{cable.Type.DisplayName} '{cable.Label}' carries {Fmt.A(peak)} ({Fmt.W(watts)}) but is rated {Fmt.A(rated)}; it feeds {Fmt.List(behind.Select(d => d.Info.Label))}.",
+                        $"{cable.Type.DisplayName} '{cable.Label}' carries {Fmt.A(peak, rated)} ({Fmt.W(watts)}) but is rated {Fmt.A(rated)}; it feeds {Fmt.List(behind.Select(d => d.Info.Label))}.",
                         [cable.Entity.Id, .. behind.Select(d => d.Id)]);
                 }
             }

@@ -357,18 +357,18 @@ public sealed class RiggingAnalyzer
             {
                 uniformReported = true;
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussOverload,
-                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)} ({Fmt.Count(fixtureIds.Count, "fixture", "fixtures")} {Fmt.Kg(fixtureKg)}, clamps {Fmt.Kg(clamps)}, cables {Fmt.Kg(load.CableWeightKg)}) but its maximum uniform load is {Fmt.Kg(maxUniform)}. Heaviest: {heaviestFixtures}.",
+                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg, maxUniform)} ({Fmt.Count(fixtureIds.Count, "fixture", "fixtures")} {Fmt.Kg(fixtureKg)}, clamps {Fmt.Kg(clamps)}, cables {Fmt.Kg(load.CableWeightKg)}) but its maximum uniform load is {Fmt.Kg(maxUniform)}. Heaviest: {heaviestFixtures}.",
                     [e.Id, .. fixtureIds]));
             }
             if (load.MaxPointLoadKg is { } maxPoint)
             {
                 if (heaviest.WeightKg > maxPoint + 1e-6)
                     issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussPointOverload,
-                        $"{heaviest.Description} weighs {Fmt.Kg(heaviest.WeightKg)} with its clamp, more than the maximum point load of the {what} ({Fmt.Kg(maxPoint)}).",
+                        $"{heaviest.Description} weighs {Fmt.Kg(heaviest.WeightKg, maxPoint)} with its clamp, more than the maximum point load of the {what} ({Fmt.Kg(maxPoint)}).",
                         e.Id, heaviest.EntityId));
                 else if (pointEq > maxPoint + 1e-6)
                     issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussPointOverload,
-                        $"The {what} is overloaded: its loads bend it as much as {Fmt.Kg(pointEq)} hung at mid-span, more than its maximum point load of {Fmt.Kg(maxPoint)} ({heaviestFixtures}).",
+                        $"The {what} is overloaded: its loads bend it as much as {Fmt.Kg(pointEq, maxPoint)} hung at mid-span, more than its maximum point load of {Fmt.Kg(maxPoint)} ({heaviestFixtures}).",
                         [e.Id, .. fixtureIds]));
             }
             else if (!uniformReported && load.MaxUniformLoadKg is { } maxUdl && uniformEq > maxUdl + 1e-6)
@@ -376,7 +376,7 @@ public sealed class RiggingAnalyzer
                 // Without a point-load rating, concentrated loads are judged by the uniform load that bends the truss
                 // as much (a load table's uniform rating is a bending limit for all but the shortest spans).
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingTrussOverload,
-                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)}, but concentrated near mid-span it bends the truss like {Fmt.Kg(uniformEq)} spread evenly, more than its maximum uniform load of {Fmt.Kg(maxUdl)} ({heaviestFixtures}).",
+                    $"The {what} is overloaded: it carries {Fmt.Kg(load.LoadKg)}, but concentrated near mid-span it bends the truss like {Fmt.Kg(uniformEq, maxUdl)} spread evenly, more than its maximum uniform load of {Fmt.Kg(maxUdl)} ({heaviestFixtures}).",
                     [e.Id, .. fixtureIds]));
             }
         }
@@ -478,7 +478,7 @@ public sealed class RiggingAnalyzer
             results.Add(result);
             if (p.CapacityKg > 0 && total > p.CapacityKg + 1e-6)
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Rigging, IssueCodes.RiggingPointOverload,
-                    $"Rigging point '{pe.Name}' carries {Fmt.Kg(total)} ({Fmt.List(parts.Select(x => $"{x.Item2} {Fmt.Kg(x.Item3)}"))}) but is rated {Fmt.Kg(p.CapacityKg)}.",
+                    $"Rigging point '{pe.Name}' carries {Fmt.Kg(total, p.CapacityKg)} ({Fmt.List(parts.Select(x => $"{x.Item2} {Fmt.Kg(x.Item3)}"))}) but is rated {Fmt.Kg(p.CapacityKg)}.",
                     [pe.Id, .. parts.Select(x => x.Item1)]));
         }
         return results;
