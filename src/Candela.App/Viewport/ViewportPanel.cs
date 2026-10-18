@@ -49,6 +49,7 @@ internal sealed unsafe class ViewportPanel : Panel
     private Matrix4x4 _pivotStart;
     private Matrix4x4 _gizmoMatrix;
     private bool _gizmoDragging;
+    private bool _gizmoVisible;
     private IRenderTarget? _target;
     private ImTextureID _texture;
     private int _registeredVersion = -1;
@@ -241,10 +242,6 @@ internal sealed unsafe class ViewportPanel : Panel
         _visibleThisFrame = true;
 
         var drawList = ImGui.GetWindowDrawList();
-        ImGui.SetNextItemAllowOverlap();
-        ImGui.InvisibleButton("##viewport-input", avail,
-            ImGuiButtonFlags.MouseButtonLeft | ImGuiButtonFlags.MouseButtonRight | ImGuiButtonFlags.MouseButtonMiddle);
-        bool hovered = ImGui.IsItemHovered();
         var max = _imageMin + avail;
         if (_texture != new ImTextureID(0UL))
             drawList.AddImage(new ImTextureRef(null, _texture), _imageMin, max);
@@ -253,7 +250,25 @@ internal sealed unsafe class ViewportPanel : Panel
         if (_host.IsActive(this))
             drawList.AddRect(_imageMin, max, Theme.U32(Theme.WithAlpha(Theme.Accent, 0.35f)));
 
+        // The gizmo runs before the input surface: ImGuizmo only starts a drag when no ImGui item is hovered or active,
+        // so the surface is left out while the mouse is over (or dragging) a gizmo handle.
         DrawGizmo(drawList);
+        bool gizmoHot = _gizmoVisible && (ImGuizmo.IsOver() || ImGuizmo.IsUsing());
+        ImGui.SetCursorScreenPos(_imageMin);
+        bool hovered;
+        if (gizmoHot)
+        {
+            ImGui.Dummy(avail);
+            hovered = ImGui.IsWindowHovered();
+        }
+        else
+        {
+            ImGui.SetNextItemAllowOverlap();
+            ImGui.InvisibleButton("##viewport-input", avail,
+                ImGuiButtonFlags.MouseButtonLeft | ImGuiButtonFlags.MouseButtonRight | ImGuiButtonFlags.MouseButtonMiddle);
+            hovered = ImGui.IsItemHovered();
+        }
+
         bool overOverlay = DrawToolbar();
         overOverlay |= DrawViewCube(drawList, hovered);
         DrawStats(drawList);
@@ -284,7 +299,7 @@ internal sealed unsafe class ViewportPanel : Panel
         var io = ImGui.GetIO();
         var mouse = io.MousePos;
         var settings = _ctx.Settings.Settings;
-        bool gizmoBusy = ImGuizmo.IsUsing() || ImGuizmo.IsOver();
+        bool gizmoBusy = _gizmoVisible && (ImGuizmo.IsUsing() || ImGuizmo.IsOver());
         if (hovered && (ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseClicked(ImGuiMouseButton.Right) ||
                         ImGui.IsMouseClicked(ImGuiMouseButton.Middle) || io.MouseWheel != 0))
             _host.SetActiveViewport(this);
@@ -441,9 +456,12 @@ internal sealed unsafe class ViewportPanel : Panel
         if (tools.Tool == EditorTool.Select || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
             primary.Locked)
         {
+            _gizmoVisible = false;
             EndGizmoDrag();
             return;
         }
+
+        _gizmoVisible = true;
 
         ImGuizmo.SetDrawlist(drawList);
         ImGuizmo.SetRect(_imageMin.X, _imageMin.Y, _imageSize.X, _imageSize.Y);

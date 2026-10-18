@@ -165,6 +165,14 @@ internal sealed unsafe class ImGuiHost : IDisposable
         ImGuiImplGLFW.SetCurrentContext(_imgui);
         ImGuiImplVulkan.SetCurrentContext(_imgui);
         ImGuizmo.SetImGuiContext(_imgui);
+        // Larger, bolder gizmos than ImGuizmo's defaults (readable on high-resolution viewports).
+        ImGuizmo.SetGizmoSizeClipSpace(0.16f);
+        var gizmoStyle = ImGuizmo.GetStyle();
+        gizmoStyle.TranslationLineThickness = 4f;
+        gizmoStyle.TranslationLineArrowSize = 8f;
+        gizmoStyle.RotationLineThickness = 3f;
+        gizmoStyle.RotationOuterLineThickness = 3.5f;
+        gizmoStyle.CenterCircleSize = 7f;
 
         var io = ImGui.GetIO();
         io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.DockingEnable;

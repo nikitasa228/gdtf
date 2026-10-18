@@ -133,9 +133,9 @@ internal static class Theme
         var frameHover = Rgb(0x363940);
         var frameActive = Rgb(0x40444C);
         var border = Rgb(0x34363C);
-        var header = WithAlpha(Accent, 0.22f);
-        var headerHover = WithAlpha(Accent, 0.32f);
-        var headerActive = WithAlpha(Accent, 0.45f);
+        var header = Rgb(0x33363D);
+        var headerHover = Rgb(0x3C4048);
+        var headerActive = WithAlpha(Accent, 0.40f);
 
         c[(int)ImGuiCol.Text] = Text;
         c[(int)ImGuiCol.TextDisabled] = Rgb(0x6C6F76);
