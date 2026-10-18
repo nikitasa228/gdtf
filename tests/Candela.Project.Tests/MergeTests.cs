@@ -331,6 +331,76 @@ public sealed class MergeTests
     }
 
     [Fact]
+    public void A_fixture_using_a_case_variant_name_follows_its_renamed_gdtf()
+    {
+        var target = new ProjectData(new Scene("Target"));
+        target.GdtfFiles[TestData.GdtfA] = TestData.LibraryGdtf(TestData.GdtfA)!;
+        var source = new ProjectData(new Scene("Source"));
+        source.GdtfFiles[TestData.GdtfA] = TestData.LibraryGdtf(TestData.GdtfB)!; // same name, different file
+        var lower = new Entity("Lower-case spec");
+        lower.Add(new FixtureComponent { GdtfSpec = TestData.GdtfA.ToLowerInvariant() });
+        source.Scene.Add(lower);
+        var exact = new Entity("Exact spec");
+        exact.Add(new FixtureComponent { GdtfSpec = TestData.GdtfA });
+        source.Scene.Add(exact);
+        Assert.Same(source.GdtfFiles[TestData.GdtfA], source.FindGdtf(TestData.GdtfA.ToLowerInvariant()));
+
+        var result = ProjectMerge.Import(target, source);
+        foreach (var e in new[] { lower, exact })
+        {
+            var spec = target.Scene.Find(result.EntityIds[e.Id])!.Get<FixtureComponent>()!.GdtfSpec;
+            Assert.Equal(TestData.LibraryGdtf(TestData.GdtfB), target.FindGdtf(spec)); // the imported file, not the project's own
+        }
+        var issue = Assert.Single(result.Issues, i => i.Code == ProjectIssueCodes.MergeGdtfRenamed);
+        Assert.Equal(new[] { result.EntityIds[lower.Id], result.EntityIds[exact.Id] }.Order(), issue.Entities.Order());
+    }
+
+    [Fact]
+    public void Data_this_version_cannot_use_is_reported_and_not_imported()
+    {
+        using var dir = new TempDir();
+        var source = TestData.RichProject();
+        var path = dir.File("newer.candela");
+        ProjectFile.Save(path, source, new ProjectSaveOptions { GdtfProvider = TestData.LibraryGdtf });
+        var image = source.Assets.Entries.Single(a => a.Kind == AssetKind.Image);
+        var console = source.Scene.All().Single(e => e.Name == "Console");
+        TestData.RewriteArchive(path, (name, data) =>
+        {
+            if (name == "assets/index.json") return TestData.Utf8(System.Text.Encoding.UTF8.GetString(data).Replace("\"kind\": \"Image\"", "\"kind\": \"Video\""));
+            if (name != "scene.json") return data;
+            var scene = System.Text.Json.Nodes.JsonNode.Parse(data)!.AsObject();
+            var entity = scene["entities"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == console.Id.ToString("D"))!;
+            entity["components"]!.AsArray().Add(System.Text.Json.Nodes.JsonNode.Parse("""{"$type":"laserProjector"}"""));
+            return TestData.Utf8(scene.ToJsonString());
+        });
+        var loaded = ProjectFile.Load(path);
+        Assert.Single(loaded.KeptAssetIds);
+        Assert.Single(loaded.UnknownComponents);
+
+        // Into another project: the unknown component and the kept asset stay behind, with issues that say so.
+        var target = new ProjectData(new Scene("Venue"));
+        var result = ProjectMerge.Import(target, loaded);
+        Assert.Empty(target.UnknownComponents);
+        Assert.Empty(target.KeptAssetIds);
+        var component = Assert.Single(result.Issues, i => i.Code == ProjectIssueCodes.SceneComponentUnknown);
+        Assert.Contains("not imported", component.Message);
+        Assert.Equal(new[] { result.EntityIds[console.Id] }, component.Entities);
+        Assert.Contains("not imported", Assert.Single(result.Issues, i => i.Code == ProjectIssueCodes.AssetKept).Message);
+        var poster = source.Scene.Query<ImageComponent>().Single().Entity;
+        Assert.Equal(Guid.Empty, target.Scene.Find(result.EntityIds[poster.Id])!.Get<ImageComponent>()!.ImageAssetId);
+
+        // Into itself: the project keeps the asset, so the copy keeps its reference; the file still saves everything.
+        var self = ProjectMerge.Import(loaded, loaded);
+        Assert.Equal(image.Id, loaded.Scene.Find(self.EntityIds[poster.Id])!.Get<ImageComponent>()!.ImageAssetId);
+        Assert.DoesNotContain(self.Issues, i => i.Code == ProjectIssueCodes.AssetKept);
+        var again = dir.File("again.candela");
+        ProjectFile.Save(again, loaded);
+        var reloaded = ProjectFile.Load(again);
+        Assert.Equal(new[] { image.Id }, reloaded.KeptAssetIds);
+        Assert.Single(reloaded.UnknownComponents);
+    }
+
+    [Fact]
     public void Merge_handles_every_component_type_of_core()
     {
         // When Core gains a component type, ProjectMerge's ReferenceRemapper must be reviewed for references it carries.

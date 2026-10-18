@@ -404,6 +404,32 @@ public sealed class DataSafetyTests : IDisposable
     }
 
     [Fact]
+    public void A_null_that_differs_from_the_default_survives_saving_and_merging()
+    {
+        // ProtocolId = null means "no protocol input" (offline programming); its default is Art-Net.
+        var project = new ProjectData(new Scene("Offline"));
+        var desk = new Entity("Desk");
+        desk.Add(new ConsoleComponent { ProtocolId = null });
+        project.Scene.Add(desk);
+
+        var path = _dir.File("offline.candela");
+        ProjectFile.Save(path, project);
+        Assert.Contains("\"protocolId\": null", Encoding.UTF8.GetString(TestData.ReadEntry(path, "scene.json")));
+        Assert.DoesNotContain("\"label\": null", Encoding.UTF8.GetString(TestData.ReadEntry(path, "scene.json"))); // default-null values stay omitted
+        var loaded = ProjectFile.Load(path);
+        Assert.Null(loaded.Scene.Find(desk.Id)!.Get<ConsoleComponent>()!.ProtocolId);
+        Assert.Equal(TestData.SceneJson(project.Scene), TestData.SceneJson(loaded.Scene));
+
+        var merged = ProjectMerge.Import(loaded, loaded);
+        Assert.Null(loaded.Scene.Find(merged.EntityIds[desk.Id])!.Get<ConsoleComponent>()!.ProtocolId);
+
+        // A console that does use a protocol keeps it, of course.
+        desk.Get<ConsoleComponent>()!.ProtocolId = "sacn";
+        ProjectFile.Save(path, project);
+        Assert.Equal("sacn", ProjectFile.Load(path).Scene.Find(desk.Id)!.Get<ConsoleComponent>()!.ProtocolId);
+    }
+
+    [Fact]
     public void Odd_values_and_names_round_trip()
     {
         var project = new ProjectData(new Scene("Odd \"quotes\" / slashes \\ and ünïcödé 🎭"));

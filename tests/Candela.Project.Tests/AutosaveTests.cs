@@ -241,6 +241,121 @@ public sealed class AutosaveTests : IDisposable
     }
 
     [Fact]
+    public async Task A_new_session_never_overwrites_or_deletes_crash_data_that_was_not_recovered()
+    {
+        var project = new ProjectData(new Scene("Crashed"));
+        project.Scene.Add(new Entity("Unsaved work"));
+        using (var crashed = AutosaveService.ForProject(project, SaveOptions, Options(), startDirty: true))
+        {
+            await crashed.SaveNowAsync();
+        } // the process "crashes": no CompleteSession
+        var crashFile = Assert.Single(Directory.GetFiles(AutosaveDir, "*.candela"));
+        var crashBytes = File.ReadAllBytes(crashFile);
+
+        // The program starts again and the user opens the project file before deciding about the recovery offer.
+        var reopened = new ProjectData(new Scene("Crashed")) { Id = project.Id };
+        var session = AutosaveService.ForProject(reopened, SaveOptions, Options(keep: 1), startDirty: true);
+        Assert.NotEqual(project.Id.ToString("D"), session.SessionKey);
+        for (int i = 0; i < 3; i++)
+        {
+            reopened.Scene.Add(new Entity("Edit " + i));
+            Assert.True(Tick(session));
+        }
+        session.CompleteSession();
+
+        var recoverable = Assert.Single(AutosaveService.FindRecoverable(AutosaveDir));
+        Assert.Equal(project.Id, recoverable.ProjectId);
+        Assert.Equal(crashBytes, File.ReadAllBytes(Assert.Single(recoverable.Files)));
+        Assert.Contains(recoverable.Load().Scene.All(), e => e.Name == "Unsaved work");
+    }
+
+    [Fact]
+    public async Task A_recovered_session_is_resumed_and_cleaned_up_on_a_clean_exit()
+    {
+        var project = new ProjectData(new Scene("Resume"));
+        project.Scene.Add(new Entity("Before the crash"));
+        using (var crashed = AutosaveService.ForProject(project, SaveOptions, Options(), startDirty: true))
+        {
+            await crashed.SaveNowAsync();
+        }
+
+        var offer = Assert.Single(AutosaveService.FindRecoverable(AutosaveDir));
+        var recovered = offer.Load();
+        using var resumed = AutosaveService.ForProject(recovered, SaveOptions, new AutosaveOptions
+        {
+            Directory = Path.Combine(_dir.Path, "elsewhere"), // the recovered session's own folder wins
+            Interval = Interval,
+            TimeProvider = _clock,
+            Resume = offer,
+        });
+        Assert.Equal(offer.SessionKey, resumed.SessionKey);
+        Assert.Equal(offer.Directory, resumed.Directory);
+        Assert.Empty(AutosaveService.FindRecoverable(AutosaveDir)); // it is live again
+
+        recovered.Scene.Add(new Entity("After the recovery"));
+        Assert.True(Tick(resumed));
+        Assert.Equal(2, resumed.Files.Count); // continues the series: the recovered file became the older copy
+        resumed.CompleteSession();
+        Assert.Empty(AutosaveService.FindRecoverable(AutosaveDir));
+        Assert.Empty(Directory.GetFiles(AutosaveDir));
+
+        var other = new ProjectData(new Scene("Other"));
+        Assert.Throws<ArgumentException>(() => new AutosaveService(other.Id, () => null, new AutosaveOptions { Resume = offer }));
+    }
+
+    [Fact]
+    public async Task Saving_the_project_removes_the_autosaves_it_supersedes()
+    {
+        var project = new ProjectData(new Scene("Saved"));
+        var path = _dir.File("saved.candela");
+        using (var service = AutosaveService.ForProject(project, SaveOptions, Options()))
+        {
+            project.Scene.Add(new Entity("Edit"));
+            Assert.True(Tick(service));
+            Assert.Single(service.Files);
+
+            ProjectFile.Save(path, project, SaveOptions);
+            await service.MarkSaved();
+            Assert.Empty(service.Files);
+            Assert.False(Tick(service)); // nothing changed since the save
+
+            project.Scene.Add(new Entity("Edit after saving"));
+            Assert.True(Tick(service));
+            Assert.Single(service.Files);
+            await service.MarkSaved();
+        } // a crash right after saving offers nothing older than the file
+        Assert.Empty(AutosaveService.FindRecoverable(AutosaveDir));
+    }
+
+    [Fact]
+    public void Recovery_that_is_older_than_the_saved_file_is_flagged()
+    {
+        var project = new ProjectData(new Scene("Stale"));
+        var path = _dir.File("stale.candela");
+        ProjectFile.Save(path, project, SaveOptions);
+        using (var service = AutosaveService.ForProject(project, SaveOptions, Options()))
+        {
+            project.Scene.Add(new Entity("Edit"));
+            Assert.True(Tick(service));
+            _clock.Advance(TimeSpan.FromMinutes(2));
+            ProjectFile.Save(path, project, SaveOptions); // saved, but the program ends before MarkSaved
+        }
+        var offer = Assert.Single(AutosaveService.FindRecoverable(AutosaveDir));
+        Assert.Equal(Path.GetFullPath(path), offer.OriginalPath);
+        Assert.Equal(_clock.GetUtcNow().UtcDateTime, offer.OriginalModifiedUtc);
+        Assert.True(offer.IsOlderThanOriginal);
+        offer.Delete();
+
+        // The usual case: the autosave is newer than the file.
+        using (var service = AutosaveService.ForProject(project, SaveOptions, Options()))
+        {
+            project.Scene.Add(new Entity("Unsaved edit"));
+            Assert.True(Tick(service));
+        }
+        Assert.False(Assert.Single(AutosaveService.FindRecoverable(AutosaveDir)).IsOlderThanOriginal);
+    }
+
+    [Fact]
     public void Autosave_file_names_are_parsed_strictly()
     {
         var id = Guid.NewGuid().ToString("D");
