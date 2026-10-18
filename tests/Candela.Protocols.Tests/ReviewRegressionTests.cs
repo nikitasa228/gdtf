@@ -298,4 +298,24 @@ public class ReviewRegressionTests
         Assert.Empty(hub.Sources());
         Assert.True(sw.Elapsed < TimeSpan.FromSeconds(20), $"restarts took {sw.Elapsed}");
     }
+
+    [Fact]
+    public void Art_sync_sender_table_is_bounded_and_sync_keeps_working()
+    {
+        var time = new ManualTime();
+        var hub = new DmxInputHub(() => time.UtcDateTime);
+        using var receiver = new ArtNetReceiver(hub, time);
+        Assert.True(receiver.Start(TestSupport.LoopbackOptions()));
+        var buffer = new byte[600];
+        var sync = buffer[..ArtSyncPacket.Write(buffer)];
+        for (uint i = 0; i < ArtNetReceiver.MaxStreams + 500; i++)
+            receiver.ProcessPacket(sync, new Networking.IPv4Endpoint(0x0A000000u + i, 6454));
+
+        var console = TestSupport.Sender("10.200.0.1");
+        receiver.ProcessPacket(sync, console);
+        receiver.ProcessPacket(buffer[..ArtDmxPacket.Write(buffer, 0, new byte[] { 50, 0 })], console);
+        Assert.False(TestSupport.HasUniverse(hub, 1)); // held for the next ArtSync
+        receiver.ProcessPacket(sync, console);
+        Assert.Equal(50, TestSupport.Read(hub, 1)[0]);
+    }
 }

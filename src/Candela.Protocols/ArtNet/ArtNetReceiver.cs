@@ -276,6 +276,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         lock (_gate)
         {
             if (!ReferenceEquals(rt, _runtime)) return;
+            if (_syncTicks.Count >= MaxStreams && !_syncTicks.ContainsKey(sender.Address)) ForgetStaleSyncSenders(now);
             _syncTicks[sender.Address] = now.Ticks;
             // ArtSync from one controller releases only that controller's frames (Art-Net 4: ArtSync from another IP
             // than the ArtDmx sender is ignored).
@@ -446,6 +447,22 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             _streams.Remove(key);
         }
         return true;
+    }
+
+    /// <summary>Bounds the ArtSync sender table (one entry per controller IP): forgets controllers whose sync timed out,
+    /// or all of them when every one is live (a flood); they re-enter sync mode with their next ArtSync.</summary>
+    private void ForgetStaleSyncSenders(DateTime now)
+    {
+        long cutoff = now.Ticks - SyncTimeout.Ticks;
+        List<uint>? stale = null;
+        foreach (var (address, ticks) in _syncTicks)
+            if (ticks < cutoff) (stale ??= new()).Add(address);
+        if (stale is null)
+        {
+            _syncTicks.Clear();
+            return;
+        }
+        foreach (var address in stale) _syncTicks.Remove(address);
     }
 
     private void DropPending(Stream stream)
