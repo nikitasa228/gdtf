@@ -14,6 +14,12 @@ public sealed record ProfileResolution(FixtureProfile? Profile, FixtureLibraryEn
 {
     /// <summary>True when a profile is available.</summary>
     public bool Success => Profile is not null;
+
+    /// <summary>
+    /// For a <see cref="FixtureMatchKind.Substitute"/>: what the fixture asked for, the stand-in, and the patch spacing its
+    /// mode was chosen for (<see cref="SubstituteModes.Choose"/>); null otherwise.
+    /// </summary>
+    public FixtureSubstitution? Substitution { get; init; }
 }
 
 /// <summary>Why a fixture has no profile.</summary>
@@ -58,7 +64,15 @@ public sealed class FixtureProfileCache
     /// Resolves <paramref name="gdtfSpec"/> (a GDTF file name, or <c>Manufacturer@Model</c>) and <paramref name="mode"/>
     /// (null = first mode) to a compiled profile. Never throws for bad input; failures are described in the result.
     /// </summary>
-    public ProfileResolution Resolve(string? gdtfSpec, string? mode)
+    public ProfileResolution Resolve(string? gdtfSpec, string? mode) => Resolve(gdtfSpec, mode, null);
+
+    /// <summary>
+    /// <see cref="Resolve(string?, string?)"/> for a fixture whose type is patched <paramref name="patchSpacing"/> channels
+    /// apart (<see cref="PatchSpacing"/>): when the library has only a similar model (a substitute), its mode is chosen
+    /// to fit that spacing (<see cref="SubstituteModes.Choose"/>) — the requested mode name belongs to the missing model —
+    /// and <see cref="ProfileResolution.Substitution"/> says so. Exact matches ignore the spacing.
+    /// </summary>
+    public ProfileResolution Resolve(string? gdtfSpec, string? mode, int? patchSpacing)
     {
         if (string.IsNullOrWhiteSpace(gdtfSpec))
             return new ProfileResolution(null, null, null, "No GDTF file is set.", ProfileErrorKind.UnknownFile);
@@ -71,6 +85,23 @@ public sealed class FixtureProfileCache
         }
         if (entry is null)
             return new ProfileResolution(null, null, null, $"GDTF file '{gdtfSpec}' is not in the fixture library.", ProfileErrorKind.UnknownFile);
+        if (kind == FixtureMatchKind.Substitute)
+        {
+            string? chosen = mode;
+            try
+            {
+                chosen = SubstituteModes.Choose(Library.GetFixtureType(entry), mode, patchSpacing)?.Name ?? mode;
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                // unreadable: Get reports it
+            }
+            return Get(entry, chosen) with
+            {
+                MatchKind = kind,
+                Substitution = new FixtureSubstitution(gdtfSpec.Trim(), mode, entry.FileName, patchSpacing),
+            };
+        }
         var resolved = Get(entry, mode);
         return resolved with { MatchKind = kind };
     }

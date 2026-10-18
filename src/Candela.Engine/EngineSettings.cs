@@ -42,9 +42,28 @@ public sealed class EngineSettings
     /// </summary>
     public float IdleNoiseShare { get; set; } = 0.25f;
 
+    /// <summary>
+    /// Fixtures that stand in for models the library had no GDTF of when the scene was imported (an MVR import chose a
+    /// similar model of the same manufacturer). Kept with the project so the patch judges them as stand-ins and the
+    /// engine switches them to the real GDTF once it is added to the library (<see cref="StageEngine.SubstitutionOf"/>).
+    /// </summary>
+    public List<SubstitutedFixture> Substitutes { get; set; } = new();
+
     /// <summary>A copy with every value made finite and in range (for settings read from a file).</summary>
     public EngineSettings Sanitized() => new()
     {
+        Substitutes = (Substitutes ?? new List<SubstitutedFixture>())
+            .Where(s => s is not null && s.EntityId != Guid.Empty && !string.IsNullOrWhiteSpace(s.RequestedSpec) && !string.IsNullOrWhiteSpace(s.StandIn))
+            .Select(s => new SubstitutedFixture
+            {
+                EntityId = s.EntityId,
+                RequestedSpec = s.RequestedSpec.Trim(),
+                RequestedMode = s.RequestedMode,
+                StandIn = s.StandIn.Trim(),
+                PatchSpacing = s.PatchSpacing is > 0 and <= 512 ? s.PatchSpacing : null,
+            })
+            .DistinctBy(s => s.EntityId)
+            .ToList(),
         SimulationPaused = SimulationPaused,
         SimulateSmoke = SimulateSmoke,
         SimulateFire = SimulateFire,
@@ -54,6 +73,25 @@ public sealed class EngineSettings
         MotorDynamics = MotorDynamics,
         IdleNoiseShare = float.IsFinite(IdleNoiseShare) ? Math.Clamp(IdleNoiseShare, 0f, 1f) : 0.25f,
     };
+}
+
+/// <summary>A fixture drawn with a stand-in GDTF (see <see cref="EngineSettings.Substitutes"/>).</summary>
+public sealed class SubstitutedFixture
+{
+    /// <summary>The fixture's entity.</summary>
+    public Guid EntityId { get; set; }
+
+    /// <summary>The fixture type the scene asks for (the MVR <c>GDTFSpec</c>, e.g. <c>Ayrton@MagicBlade R.gdtf</c>).</summary>
+    public string RequestedSpec { get; set; } = "";
+
+    /// <summary>The DMX mode the scene asks for, or null.</summary>
+    public string? RequestedMode { get; set; }
+
+    /// <summary>GDTF file name of the stand-in (the fixture's <c>GdtfSpec</c> while it stands in).</summary>
+    public string StandIn { get; set; } = "";
+
+    /// <summary>Channels between the start addresses of the fixtures of this type, or null when unknown.</summary>
+    public int? PatchSpacing { get; set; }
 }
 
 /// <summary>

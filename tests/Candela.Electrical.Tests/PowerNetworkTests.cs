@@ -156,6 +156,18 @@ public class PowerNetworkTests
     }
 
     [Fact]
+    public void Without_power_sources_or_power_cables_fixtures_are_not_reported_as_unpowered()
+    {
+        // an imported MVR: patched lights, no distro, no cables — the scene has no power network yet
+        var kit = new SceneKit();
+        var a = kit.Fixture(TestData.Naja, "A", 1, new Vector3(0, 0, 6));
+        var b = kit.Fixture(TestData.Naja, "B", 2, new Vector3(2, 0, 6));
+        var s = kit.Solve();
+        Assert.Empty(s.Issues.WithCode(IssueCodes.PowerUnpowered));
+        Assert.Equal([a.Id, b.Id], s.UnpoweredDevices); // still listed for the power report
+    }
+
+    [Fact]
     public void Fixture_without_a_power_cable_is_unpowered()
     {
         var kit = new SceneKit();

@@ -1,6 +1,7 @@
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Dmx.Input;
+using Candela.Gdtf;
 
 namespace Candela.Dmx;
 
@@ -47,6 +48,7 @@ public sealed class DmxEngine : IDisposable
     private WorkerPool? _pool;
     private int _maxParallelism = Math.Max(1, Environment.ProcessorCount);
     private bool _universeSetDirty = true;
+    private Dictionary<(string Spec, string Mode), int?>? _spacing;
     private bool _disposed;
 
     /// <summary>Creates the engine for <paramref name="scene"/> and loads every fixture already in it.</summary>
@@ -264,6 +266,7 @@ public sealed class DmxEngine : IDisposable
     private void ApplySceneChanges()
     {
         _removed.Clear();
+        _spacing = null;
         foreach (var id in _dirty)
         {
             var entity = _scene.Find(id);
@@ -289,6 +292,22 @@ public sealed class DmxEngine : IDisposable
             Refresh(existing, entity, fixture);
         }
         _dirty.Clear();
+
+        // a substitute's mode follows the patch spacing of its type, which other fixtures' edits can change
+        foreach (var r in _runtimes)
+        {
+            if (r.Resolution?.Substitution is not { } sub) continue;
+            if (sub.PatchSpacing == SpacingOf(r.Fixture)) continue;
+            r.Resolution = null;
+            Refresh(r, r.Entity, r.Fixture);
+        }
+    }
+
+    /// <summary>Patch spacing of a fixture's type (spec + mode) over the whole scene, computed once per batch of scene changes.</summary>
+    private int? SpacingOf(FixtureComponent fixture)
+    {
+        _spacing ??= PatchSpacing.ByType(_scene.Query<FixtureComponent>().Select(x => x.Component));
+        return _spacing.GetValueOrDefault(PatchSpacing.Key(fixture.GdtfSpec, fixture.GdtfMode));
     }
 
     /// <summary>Removes a runtime in O(1) by moving the last one into its slot (evaluation order is irrelevant).</summary>
@@ -310,7 +329,11 @@ public sealed class DmxEngine : IDisposable
         {
             r.Spec = fixture.GdtfSpec;
             r.Mode = fixture.GdtfMode;
-            r.Resolution = Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode);
+            var resolution = Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode);
+            // a stand-in for a missing model takes the mode that fits its type's patch spacing (as Patch.Build does)
+            if (resolution.MatchKind == FixtureMatchKind.Substitute)
+                resolution = Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode, SpacingOf(fixture));
+            r.Resolution = resolution;
             if (r.Resolution.Profile is { } profile)
             {
                 if (r.State is null || !ReferenceEquals(r.State.Profile, profile))

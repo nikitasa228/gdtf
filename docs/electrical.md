@@ -208,7 +208,7 @@ ends.
 | Inlet current (own + everything behind) above the inlet connector rating | `power.inlet-overload` | error |
 | Cable current above the cable type rating (the message names what the cable feeds) | `power.cable-overload` | error |
 | Distribution channel above `maxLoadPerChannelA`; total above `maxLoadW` / `maxLoadCurrentA` | `power.channel-overload`, `power.distribution-overload` | error |
-| Fixture needing mains with no supply; fed distro whose feed has no power | `power.unpowered` | warning |
+| Fixture needing mains with no supply (only once the scene has a power network: a power source or a power cable; the fixtures stay listed in `UnpoweredDevices`); fed distro whose feed has no power | `power.unpowered` | warning |
 | Supply not in `supportedPowerNetworks`, outside the voltage/frequency range, or DC on a mains fixture | `power.voltage-mismatch` | error |
 | Three-phase distro fed from a single-phase outlet or lead | `power.phase-mismatch` | error |
 | Three-phase source with (max − min) / max > 20 % and max ≥ 2 A | `power.phase-imbalance` | note |

@@ -71,7 +71,7 @@ public sealed partial class StageEngine : IDisposable
         LightMeter = new LightMeterService(this);
         Recorder = new DmxRecorder(Input);
 
-        _providers.Add(new PatchIssueProvider(Profiles));
+        _providers.Add(new PatchIssueProvider(Profiles) { Substitutions = SubstitutionOf });
         _providers.Add(new ElectricalIssueProvider(Network));
         _providers.Add(new RiggingIssueProvider(Rigging));
         _providers.Add(new EngineIssueProvider(this));
@@ -354,13 +354,15 @@ public sealed partial class StageEngine : IDisposable
     /// <summary>
     /// Recompiles every fixture after GDTF files were added to the library: the profile cache is cleared and the DMX
     /// engine re-resolves every fixture (<see cref="DmxEngine.ReloadProfiles"/>), so a fixture that was unresolved — or
-    /// resolved to a substitute — picks up the new file. Fixtures keep their motor positions (a moving head does not
+    /// resolved to a substitute — picks up the new file, and fixtures an MVR import drew with a stand-in switch to the real
+    /// GDTF of their model when the library now has it. Fixtures keep their motor positions (a moving head does not
     /// travel to its position again); the poses and the renderer binding rebuild the fixtures whose profile changed.
     /// </summary>
     internal void ReloadFixtureTypes()
     {
         Profiles.Clear();
         ElectricalProfiles.Invalidate();
+        ReplaceStandInsWithRealGdtfs();
         Dmx.ReloadProfiles();
         _networkDirty = true;
     }

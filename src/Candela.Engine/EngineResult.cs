@@ -75,4 +75,10 @@ public static class EngineIssueCodes
 
     /// <summary>Fixtures whose field angle is wider than the renderer's spot cone (170°) are drawn with 170°.</summary>
     public const string FieldClamped = "engine.field-clamped";
+
+    /// <summary>An MVR import's stand-in GDTF uses another of its modes than the importer chose, to fit the patch spacing.</summary>
+    public const string SubstituteMode = "engine.substitute-mode";
+
+    /// <summary>Fixtures that stood in for a missing model were switched to its GDTF, which the library now has.</summary>
+    public const string SubstituteReplaced = "engine.substitute-replaced";
 }
