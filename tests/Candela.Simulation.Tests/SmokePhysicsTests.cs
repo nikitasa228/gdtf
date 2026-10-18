@@ -346,6 +346,38 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Airflow_IntoADeadEndPocket_IsBlocked()
+    {
+        // Regression: a pocket that obstacles seal off from every outlet but which touches the inflow face kept the
+        // prescribed draft on that face; the projection cannot remove a net inflow, so the pocket stayed 100 %
+        // divergent (MaxDivergence ≈ MaxDivergenceBefore) step after step while the solver reported convergence.
+        var sim = new SmokeSimulation(new SmokeSimulationSettings
+        {
+            Bounds = new Aabb(new Vector3(-3f, -2f, 0f), new Vector3(3f, 2f, 3f)),
+            CellSize = 0.25f,
+            OpenFaces = DomainFaces.XMin | DomainFaces.XMax,
+            Airflow = new Vector3(0.5f, 0f, 0f),
+            AirflowResponseTime = 0.2f,
+            DissipationPerSecond = 0f,
+        });
+        sim.SetObstacles([
+            ObstacleBox.FromAabb(new Aabb(new Vector3(-3.5f, 0.4f, -1f), new Vector3(-1.9f, 0.6f, 4f))),
+            ObstacleBox.FromAabb(new Aabb(new Vector3(-3.5f, 1.4f, -1f), new Vector3(-1.9f, 1.6f, 4f))),
+            ObstacleBox.FromAabb(new Aabb(new Vector3(-2.1f, 0.4f, -1f), new Vector3(-1.9f, 1.6f, 4f))),
+        ]);
+        SmokeTestScenes.Run(sim, 30);
+        var stats = sim.LastStatistics;
+        output.WriteLine($"divergence {stats.MaxDivergenceBefore:E2} → solver {stats.MaxDivergenceAfter:E2}, measured {sim.MaxDivergence():E2} 1/s");
+        Assert.True(sim.MaxDivergence() <= 1e-3f * stats.MaxDivergenceBefore + 1e-6f);
+        Assert.True(sim.VelocityAt(new Vector3(-2.7f, 1f, 1.5f)).Length() < 0.05f, "no draft inside the dead-end pocket");
+        // The draft still crosses the room: 0.5 m/s in through the 70 % of the inlet face that is not sealed off,
+        // ≈ 0.35 m/s across the full section downstream.
+        float u = sim.VelocityAt(new Vector3(1.5f, 0f, 1.5f)).X;
+        output.WriteLine($"draft downstream {u:F3} m/s");
+        Assert.InRange(u, 0.25f, 0.45f);
+    }
+
+    [Fact]
     public void Airflow_IntoAClosedBox_IsReportedAndIgnored()
     {
         var sim = new SmokeSimulation(new SmokeSimulationSettings

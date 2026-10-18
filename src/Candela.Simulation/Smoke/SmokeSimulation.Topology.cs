@@ -223,6 +223,7 @@ public sealed partial class SmokeSimulation
         }
 
         LabelComponents();
+        CloseDeadEndInflow();
         BuildSolidPrefix();
         _multigrid?.SetTopology(_uFlags, _vFlags, _wFlags, _diag, _invDiag);
         EnforceBoundaryVelocities(_u, _v, _w);
@@ -308,6 +309,48 @@ public sealed partial class SmokeSimulation
         {
             if (_component[c] >= 0 && _componentClosed[_component[c]])
                 _closedCells[n++] = c;
+        }
+    }
+
+    /// <summary>
+    /// Turns the ventilation inflow faces of closed fluid regions into walls. Air cannot be blown into a pocket that
+    /// obstacles seal off from every outlet (incompressible flow has nowhere to go), and a prescribed inflow there would
+    /// leave the pocket permanently divergent: the projection can only remove the part of the divergence with zero mean
+    /// (regression: such a pocket kept 100 % of its divergence, step after step).
+    /// </summary>
+    private void CloseDeadEndInflow()
+    {
+        if (_inflowFaces == DomainFaces.None || !_anyClosedComponent)
+            return;
+        for (int k = 0; k < _nz; k++)
+        {
+            for (int j = 0; j < _ny; j++)
+            {
+                Close(_uFlags, UIndex(0, j, k), CellIndex(0, j, k));
+                Close(_uFlags, UIndex(_nx, j, k), CellIndex(_nx - 1, j, k));
+            }
+
+            for (int i = 0; i < _nx; i++)
+            {
+                Close(_vFlags, VIndex(i, 0, k), CellIndex(i, 0, k));
+                Close(_vFlags, VIndex(i, _ny, k), CellIndex(i, _ny - 1, k));
+            }
+        }
+
+        for (int j = 0; j < _ny; j++)
+        {
+            for (int i = 0; i < _nx; i++)
+            {
+                Close(_wFlags, WIndex(i, j, 0), CellIndex(i, j, 0));
+                Close(_wFlags, WIndex(i, j, _nz), CellIndex(i, j, _nz - 1));
+            }
+        }
+
+        void Close(byte[] flags, int face, int cell)
+        {
+            int id = _component[cell];
+            if (flags[face] == FaceInflow && id >= 0 && _componentClosed[id])
+                flags[face] = FaceWall;
         }
     }
 
