@@ -587,3 +587,64 @@ public sealed class SettingsRobustnessTests
         Assert.Equal("Default", s.KeyBindingPreset);
     }
 }
+
+/// <summary>Hand-edited or damaged key binding files never stop the editor from starting.</summary>
+public sealed class KeyBindingFileRobustnessTests
+{
+    private const string Damaged = """
+        { "bindings": {
+            "edit.undo": [null, "", "Ctrl+Z"],
+            "edit.redo": null,
+            "": ["F5"],
+            "view.top": ["Ctrl+", "NoSuchKey", "  "]
+        } }
+        """;
+
+    [Fact]
+    public void A_damaged_custom_set_is_repaired_at_start()
+    {
+        using var dir = new TempDir();
+        var settings = new Candela.Core.Settings.AppSettings { KeyBindingPreset = "Custom" };
+        string custom = dir.Write("keybindings.custom.json", Damaged);
+        var service = new Candela.App.Input.KeyBindingsService(settings, new Candela.Core.Presets.FilePresetStore(dir.File("presets")), custom, TestLog.Create());
+        Assert.True(service.Library.IsCustom);
+        var bindings = service.Current.Bindings;
+        Assert.Equal(new[] { "Ctrl+Z" }, bindings[Candela.Core.Settings.EditorActions.Undo]);
+        Assert.Empty(bindings[Candela.Core.Settings.EditorActions.Redo]);
+        Assert.False(bindings.ContainsKey(""));
+        Assert.True(bindings.ContainsKey(Candela.App.Input.AppActions.NewViewport)); // newer actions get their defaults
+
+        // The dispatcher's lookup and the display code accept the repaired set.
+        var map = new Candela.App.Input.KeyBindingMap(service.Current);
+        Assert.Equal(2, map.InvalidCount); // "Ctrl+" and "NoSuchKey"
+        Assert.Equal(Candela.Core.Settings.EditorActions.Undo, map.Resolve(new Candela.Core.Settings.KeyChord("Z", Candela.Core.Settings.KeyModifiers.Ctrl)));
+        foreach (var chords in bindings.Values)
+            foreach (var chord in chords)
+                Assert.False(string.IsNullOrEmpty(Candela.App.Input.KeyNames.DisplayChord(chord)));
+    }
+
+    [Fact]
+    public void A_damaged_named_preset_is_repaired_and_a_missing_one_falls_back()
+    {
+        using var dir = new TempDir();
+        var store = new Candela.Core.Presets.FilePresetStore(dir.File("presets"));
+        store.Save(Candela.Core.Settings.KeyBindingSet.PresetKind, "Hand edited", Damaged);
+        store.Save(Candela.Core.Settings.KeyBindingSet.PresetKind, "No table", "{ \"bindings\": null }");
+        var settings = new Candela.Core.Settings.AppSettings { KeyBindingPreset = "Hand edited" };
+        var service = new Candela.App.Input.KeyBindingsService(settings, store, dir.File("custom.json"), TestLog.Create());
+        Assert.Equal("Hand edited", service.Library.CurrentName);
+        Assert.Empty(service.Current.Bindings[Candela.Core.Settings.EditorActions.Redo]);
+        _ = new Candela.App.Input.KeyBindingMap(service.Current);
+
+        service.Select("No table");
+        Assert.NotNull(service.Current.Bindings);
+        _ = new Candela.App.Input.KeyBindingMap(service.Current);
+
+        service.Select("Does not exist");
+        Assert.Equal("Default", service.Library.CurrentName);
+
+        // A map over a set without a table (a set built in code) is empty, not a crash.
+        var map = new Candela.App.Input.KeyBindingMap(new Candela.Core.Settings.KeyBindingSet { Bindings = null! });
+        Assert.Null(map.Resolve(new Candela.Core.Settings.KeyChord("Z", Candela.Core.Settings.KeyModifiers.Ctrl)));
+    }
+}

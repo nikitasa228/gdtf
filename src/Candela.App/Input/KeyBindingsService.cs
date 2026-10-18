@@ -54,8 +54,9 @@ internal sealed class KeyBindingsService
         try
         {
             Library.Select(name);
+            Sanitize(Library.Current);
         }
-        catch (Exception e) when (e is KeyNotFoundException or System.Text.Json.JsonException or IOException)
+        catch (Exception e) when (IsUnreadable(e))
         {
             _log.Warn("Keys", $"The key binding preset '{name}' could not be loaded: {e.Message}");
             Library.ResetToDefault();
@@ -96,9 +97,49 @@ internal sealed class KeyBindingsService
     /// <summary>Deletes a saved preset (the current set becomes Custom when it was that preset).</summary>
     public void Delete(string name)
     {
-        Library.Delete(name);
+        try
+        {
+            Library.Delete(name);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            _log.Warn("Keys", $"The key binding preset '{name}' could not be deleted: {e.Message}");
+        }
+
         Persist();
     }
+
+    /// <summary>
+    /// Repairs a binding set read from a file: a missing table, unnamed actions, null chord lists and empty or null chord
+    /// strings (hand-edited or damaged files) are removed, so nothing downstream meets a null. Returns the same set.
+    /// </summary>
+    public static KeyBindingSet Sanitize(KeyBindingSet set)
+    {
+        ArgumentNullException.ThrowIfNull(set);
+        set.Bindings ??= new Dictionary<string, List<string>>();
+        List<string>? unnamed = null, empty = null;
+        foreach (var (action, chords) in set.Bindings)
+        {
+            if (string.IsNullOrWhiteSpace(action))
+                (unnamed ??= new List<string>()).Add(action);
+            else if (chords is null)
+                (empty ??= new List<string>()).Add(action);
+            else
+                chords.RemoveAll(string.IsNullOrWhiteSpace);
+        }
+
+        // Changed after the enumeration (replacing a value would invalidate it).
+        if (unnamed is not null)
+            foreach (var action in unnamed)
+                set.Bindings.Remove(action);
+        if (empty is not null)
+            foreach (var action in empty)
+                set.Bindings[action] = new List<string>();
+        return set;
+    }
+
+    private static bool IsUnreadable(Exception e) =>
+        e is KeyNotFoundException or System.Text.Json.JsonException or IOException or UnauthorizedAccessException or NotSupportedException;
 
     /// <summary>Back to the default bindings.</summary>
     public void ResetToDefault()
@@ -151,8 +192,9 @@ internal sealed class KeyBindingsService
             {
                 if (File.Exists(_customFile) && CandelaJson.Deserialize<KeyBindingSet>(File.ReadAllText(_customFile)) is { } custom)
                 {
-                    custom.Bindings ??= new Dictionary<string, List<string>>();
-                    Library.SetCustom(custom);
+                    Library.SetCustom(Sanitize(custom));
+                    // A custom set saved by an older version lacks newer actions: add their defaults.
+                    AppActions.AddDefaults(Library.Current);
                     return;
                 }
             }
@@ -170,8 +212,9 @@ internal sealed class KeyBindingsService
             try
             {
                 Library.Select(name);
+                Sanitize(Library.Current);
             }
-            catch (Exception e) when (e is KeyNotFoundException or System.Text.Json.JsonException or IOException)
+            catch (Exception e) when (IsUnreadable(e))
             {
                 _log.Warn("Keys", $"The key binding preset '{name}' is missing or damaged; the defaults are used.");
                 Library.ResetToDefault();

@@ -16,6 +16,8 @@ internal sealed class KeyBindingMap
     public KeyBindingMap(KeyBindingSet set)
     {
         ArgumentNullException.ThrowIfNull(set);
+        if (set.Bindings is null)
+            return;
         foreach (var (action, chords) in set.Bindings)
         {
             if (chords is null)
@@ -25,9 +27,9 @@ internal sealed class KeyBindingMap
                 KeyChord chord;
                 try
                 {
-                    chord = KeyChord.Parse(text);
+                    chord = KeyChord.Parse(text ?? "");
                 }
-                catch (FormatException)
+                catch (Exception e) when (e is FormatException or ArgumentException)
                 {
                     InvalidCount++;
                     continue;
