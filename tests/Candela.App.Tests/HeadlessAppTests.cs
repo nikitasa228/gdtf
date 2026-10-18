@@ -174,6 +174,69 @@ public sealed class HeadlessAppTests : IDisposable
     }
 
     [SkippableFact]
+    public void Shortcuts_work_again_after_fly_mode_was_interrupted_by_a_tab_switch()
+    {
+        // Right button held (fly mode suspends the shortcuts), then the viewport's tab is covered by a new viewport, and
+        // the button is released while the first viewport is hidden: Ctrl+A must still select everything afterwards.
+        string before = _dir.File("fly-before.png");
+        string end = _dir.File("fly-end.png");
+        string script = _dir.Write("fly.json", $$"""
+            { "actions": [
+                { "type": "wait", "frames": 3 },
+                { "type": "press", "x": 700, "y": 400, "button": "right" },
+                { "type": "move", "x": 710, "y": 405 },
+                { "type": "wait", "frames": 2 },
+                { "type": "action", "id": "view.newViewport" },
+                { "type": "wait", "frames": 3 },
+                { "type": "release", "button": "right" },
+                { "type": "wait", "frames": 2 },
+                { "type": "move", "x": 700, "y": 400 },
+                { "type": "screenshot", "path": "{{before.Replace("\\", "/")}}" },
+                { "type": "key", "chord": "Ctrl+A" },
+                { "type": "wait", "frames": 3 }
+            ] }
+            """);
+        var run = RunApp(new[] { "--screenshot", end, "--script", script });
+        Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
+        // The status bar's left part gains the orange "8 selected".
+        double changed = DifferentPixels(LoadPng(before), LoadPng(end), 80, 876, 400, 898);
+        Assert.True(changed > 0.01, $"Ctrl+A did nothing after the interrupted fly ({changed:P2} of the status bar changed)");
+    }
+
+    [SkippableFact]
+    public void A_session_with_resizes_tear_offs_and_new_viewports_has_no_validation_errors()
+    {
+        string script = _dir.Write("stress.json", """
+            { "actions": [
+                { "type": "wait", "frames": 2 },
+                { "type": "layout", "name": "viewports-4" },
+                { "type": "select", "names": ["Gold sphere", "Painted box"] },
+                { "type": "wait", "frames": 2 },
+                { "type": "window", "width": 1000, "height": 640 },
+                { "type": "wait", "frames": 2 },
+                { "type": "undock", "panel": "Properties", "x": 1050, "y": 40, "width": 400, "height": 420 },
+                { "type": "undock", "panel": "Viewport4", "x": 1050, "y": 500, "width": 480, "height": 320 },
+                { "type": "wait", "frames": 3 },
+                { "type": "action", "id": "view.newViewport" },
+                { "type": "setting", "name": "uiScale", "value": "1.5" },
+                { "type": "wait", "frames": 2 },
+                { "type": "window", "width": 1400, "height": 820 },
+                { "type": "panel", "panel": "Viewport5", "open": false },
+                { "type": "setting", "name": "uiScale", "value": "1" },
+                { "type": "wait", "frames": 2 },
+                { "type": "layout", "name": "default" },
+                { "type": "wait", "frames": 3 }
+            ] }
+            """);
+        var run = RunApp(new[] { "--validation", "--screenshot", _dir.File("stress.png"), "--script", script });
+        Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
+        Assert.Contains("validation on", run.Output);
+        Assert.DoesNotContain("ERR [", run.Output);
+        Assert.DoesNotContain("VUID-", run.Output);
+        Assert.DoesNotContain("SYNC-", run.Output);
+    }
+
+    [SkippableFact]
     public void Without_a_vulkan_driver_the_editor_explains_and_exits_with_code_3()
     {
         var run = RunApp(new[] { "--screenshot", _dir.File("none.png") },

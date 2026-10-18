@@ -281,7 +281,34 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
     }
 
     /// <inheritdoc/>
-    public override void OnClosed() => ReleaseTarget();
+    public override void OnClosed()
+    {
+        EndInteraction();
+        ReleaseTarget();
+    }
+
+    /// <summary>
+    /// Call once per frame after the panels were drawn: a viewport that was not drawn this frame (its tab was switched
+    /// away, its window closed or collapsed) ends a navigation, box selection or gizmo drag it had begun — otherwise the
+    /// shortcuts suspended for fly mode would stay off until the view is shown again.
+    /// </summary>
+    public void EndInteractionIfHidden()
+    {
+        if (_lastDrawnFrame != _ctx.Timer.FrameCount)
+            EndInteraction();
+    }
+
+    /// <summary>True while a navigation, box selection or gizmo drag is in progress (tests).</summary>
+    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive;
+
+    private void EndInteraction()
+    {
+        if (_navigation == NavigationOperation.Fly)
+            _host.SuspendShortcuts(false);
+        _navigation = NavigationOperation.None;
+        _selecting = false;
+        EndGizmoDrag();
+    }
 
     /// <summary>Releases the render target and its ImGui texture (panel closed, workspace disposed).</summary>
     public void ReleaseTarget()
@@ -307,7 +334,10 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         _wasFocused = focused;
         var avail = ImGui.GetContentRegionAvail();
         if (avail.X < 8 || avail.Y < 8)
+        {
+            EndInteraction(); // no input is handled this frame, so nothing may stay half-done
             return;
+        }
         _imageMin = ImGui.GetCursorScreenPos();
         _imageSize = avail;
         _framebufferScale = ImGui.GetWindowViewport().FramebufferScale.X is > 0 and var fb ? fb : 1f;

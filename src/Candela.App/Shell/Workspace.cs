@@ -231,6 +231,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
             _dock.DrawPanel(panel, _panels, scale, _drawPanelContent);
         }
+
+        foreach (var viewport in _viewports)
+            viewport.EndInteractionIfHidden();
     }
 
     /// <summary>Renders every visible viewport (inside the GPU frame).</summary>
