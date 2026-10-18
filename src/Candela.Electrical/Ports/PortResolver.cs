@@ -107,8 +107,10 @@ public sealed class PortResolver
         {
             i++;
             if (o is null) continue;
-            bool ethernet = o.Signal?.Contains("ether", StringComparison.OrdinalIgnoreCase) == true ||
-                            o.Signal?.Contains("net", StringComparison.OrdinalIgnoreCase) == true;
+            // "Ethernet", "Art-Net", "network", "sACN" / "E1.31": a network port carrying several universes.
+            bool ethernet = o.Signal is { } sig &&
+                            (sig.Contains("ether", StringComparison.OrdinalIgnoreCase) || sig.Contains("net", StringComparison.OrdinalIgnoreCase) ||
+                             sig.Contains("sacn", StringComparison.OrdinalIgnoreCase) || sig.Contains("e1.31", StringComparison.OrdinalIgnoreCase));
             string name = string.IsNullOrWhiteSpace(o.PortName) ? $"Output {i}" : o.PortName.Trim();
             AddUnique(ports, new Port
             {

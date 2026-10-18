@@ -147,6 +147,22 @@ public class ReviewRegressionTests
         Assert.False(s.IsConsoleDriven(c.Id));
     }
 
+    [Theory]
+    [InlineData("Ethernet", SignalKind.Ethernet)]
+    [InlineData("Art-Net", SignalKind.Ethernet)]
+    [InlineData("sACN", SignalKind.Ethernet)]
+    [InlineData("E1.31", SignalKind.Ethernet)]
+    [InlineData("DMX512", SignalKind.Dmx512)]
+    public void Console_output_signal_names_map_to_dmx_or_network_ports(string written, SignalKind expected)
+    {
+        var console = new Core.SceneGraph.Components.ConsoleComponent();
+        console.Outputs.Clear();
+        console.Outputs.Add(new Core.SceneGraph.Components.ConsoleOutput { PortName = "Out", Signal = written, FirstUniverse = 5, UniverseCount = 4 });
+        var port = PortResolver.FromConsole(console).Single();
+        Assert.Equal(expected, port.Signal);
+        Assert.Equal(expected == SignalKind.Ethernet ? 4 : 1, port.UniverseCount);
+    }
+
     // ------------------------------------------------------------------ port ratings and directions from GDTF
 
     [Fact]

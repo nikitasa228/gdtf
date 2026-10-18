@@ -121,7 +121,8 @@ Fixture ports are built in this order:
 Every library fixture that `_specs` says needs mains power gets a power inlet, and every fixture with wired DMX gets a
 data input (tested over all 1091 files).
 
-**Consoles** get one port per `ConsoleOutput`: XLR5 for DMX512, etherCON for Ethernet, plus universe and count.
+**Consoles** get one port per `ConsoleOutput`: XLR5 for DMX512, etherCON for Ethernet (also written "Art-Net",
+"sACN", "E1.31"), plus universe and count.
 **Power sources** get one port per outlet (breaker, phase, connector) and a `Mains In` input, so a distro can itself
 be fed from a generator or another distro.
 
@@ -311,7 +312,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 80 tests and runs in about 20 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` has 85 tests and runs in about 20 s. It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.
