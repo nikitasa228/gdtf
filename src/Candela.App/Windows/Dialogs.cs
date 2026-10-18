@@ -25,7 +25,7 @@ internal enum MessageKind
 /// </summary>
 internal sealed class MessageBoxes
 {
-    private const string PopupId = "##message-box";
+    private const string PopupId = "###message-box";
     private readonly Queue<Message> _queue = new();
     private Message? _current;
 
@@ -70,7 +70,7 @@ internal sealed class MessageBoxes
         ImGui.SetNextWindowSizeConstraints(new Vector2(380, 0) * scale, new Vector2(620, 600) * scale);
         if (!ImGui.IsPopupOpen(PopupId))
             ImGui.OpenPopup(PopupId);
-        if (!ImGui.BeginPopupModal($"{m.Title}{PopupId}", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
+        if (!ImGui.BeginPopupModal(m.WindowTitle, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
             return;
         var (icon, color) = m.Kind switch
         {
@@ -146,6 +146,7 @@ internal sealed class MessageBoxes
     {
         public MessageKind Kind { get; } = kind;
         public string Title { get; } = title;
+        public string WindowTitle { get; } = title + PopupId;
         public string Text { get; } = text;
         public Action<bool>? OnAnswer { get; } = onAnswer;
         public Action<string>? OnName { get; } = onName;

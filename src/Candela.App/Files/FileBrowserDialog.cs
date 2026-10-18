@@ -13,7 +13,7 @@ namespace Candela.App.Files;
 /// </summary>
 internal sealed class FileBrowserDialog
 {
-    private const string PopupId = "##file-browser";
+    private const string PopupId = "###file-browser";
     private readonly string _recentPlacesFile;
     private FileBrowserModel? _model;
     private Action<string>? _onAccept;
@@ -50,7 +50,7 @@ internal sealed class FileBrowserDialog
         _places = FileBrowserModel.StandardPlaces(Loc.Get(Str.BrowserHome), Loc.Get(Str.BrowserDocuments),
             Loc.Get(Str.BrowserDesktop), Loc.Get(Str.BrowserWorkingFolder));
         _onAccept = onAccept ?? throw new ArgumentNullException(nameof(onAccept));
-        _title = title;
+        _title = title + PopupId;
         string start = startFolder is { Length: > 0 } && Directory.Exists(startFolder) ? startFolder
             : _model.RecentPlaces.FirstOrDefault(Directory.Exists) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         if (!_model.Navigate(start) && !_model.Navigate(Environment.CurrentDirectory))
@@ -77,7 +77,7 @@ internal sealed class FileBrowserDialog
         ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
         ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
         bool open = true;
-        if (!ImGui.BeginPopupModal($"{_title}{PopupId}", &open, ImGuiWindowFlags.NoSavedSettings))
+        if (!ImGui.BeginPopupModal(_title, &open, ImGuiWindowFlags.NoSavedSettings))
         {
             if (!open)
                 Close();
@@ -285,7 +285,7 @@ internal sealed class FileBrowserDialog
     {
         if (!_confirmOverwrite)
             return;
-        const string id = "##overwrite";
+        const string id = "###overwrite";
         if (!ImGui.IsPopupOpen(id))
             ImGui.OpenPopup(id);
         if (ImGui.BeginPopupModal($"{Loc.Get(Str.BrowserOverwrite)}{id}", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))

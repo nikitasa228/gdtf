@@ -188,7 +188,13 @@ internal sealed class EditorApplication : IDisposable
             bool capture = screenshotMode && (frame == targetFrames - 1 || _script?.WantsScreenshot(frame) == true);
             bool presented = RunFrameSafely(frame, capture);
             if (!screenshotMode)
+            {
+                // Interactive runs replay an input script too; the counter stops once the script is done.
+                if (presented && _script is { } script && frame <= script.FrameCount)
+                    frame++;
                 continue;
+            }
+
             attempts++;
             if (presented)
             {
