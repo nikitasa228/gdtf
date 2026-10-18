@@ -50,7 +50,9 @@ public sealed class Scene
 
     /// <summary>
     /// Scene-wide settings. Changing one of their values, or assigning another object (null assigns defaults), raises
-    /// <see cref="SceneChangeKind.SettingsChanged"/>.
+    /// <see cref="SceneChangeKind.SettingsChanged"/>. A settings object belongs to one scene at a time: assigning the
+    /// settings of another scene throws <see cref="InvalidOperationException"/> (assign a copy, e.g.
+    /// <see cref="Serialization.CandelaJson.DeepClone{T}"/>).
     /// </summary>
     public SceneSettings Settings
     {
@@ -59,6 +61,8 @@ public sealed class Scene
         {
             value ??= new SceneSettings();
             if (ReferenceEquals(_settings, value)) return;
+            if (value.Owner is { } other && !ReferenceEquals(other, this) && ReferenceEquals(other._settings, value))
+                throw new InvalidOperationException($"These settings belong to the scene '{other.Name}'; assign a copy.");
             if (ReferenceEquals(_settings.Owner, this)) _settings.Owner = null;
             _settings = value;
             value.Owner = this;

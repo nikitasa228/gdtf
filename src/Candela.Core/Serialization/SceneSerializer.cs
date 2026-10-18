@@ -116,8 +116,10 @@ public static class SceneSerializer
     /// Builds a scene from its record. Records must list parents before their children (as <see cref="ToFile"/> writes
     /// them). Damage is repaired and reported to <paramref name="issues"/>: null records and components are skipped,
     /// a missing, empty or repeated entity id is replaced by a new one, an entity whose parent was not listed before it
-    /// becomes a root, a non-finite transform becomes the identity. The components and layers of the record are used
-    /// as they are (not copied).
+    /// becomes a root, a non-finite transform becomes the identity. The components, layers and settings of the record are
+    /// used as they are, except those that still belong to another scene or entity (a record made by <see cref="ToFile"/>
+    /// from a live scene, or one object listed twice): those are copied, so building a scene never changes another one
+    /// and <c>FromFile(ToFile(scene))</c> is an independent copy with the same ids.
     /// </summary>
     /// <param name="file">The record (e.g. deserialised <c>scene.json</c>).</param>
     /// <param name="issues">Receives what was repaired or skipped; null to ignore.</param>
@@ -130,13 +132,13 @@ public static class SceneSerializer
         var scene = new Scene(file.Name ?? "") { Id = file.Id == Guid.Empty ? Guid.NewGuid() : file.Id };
         scene.UnknownProperties = file.UnknownProperties;
 
-        var layers = file.Layers?.Where(l => l is not null).ToList();
+        var layers = file.Layers?.Where(l => l is not null).Select(l => l.Owner is null ? l : CandelaJson.DeepClone(l)).ToList();
         if (layers is { Count: > 0 })
         {
             scene.Layers.Clear();
             scene.Layers.AddRange(layers);
         }
-        scene.Settings = file.Settings ?? new SceneSettings();
+        scene.Settings = file.Settings is { } settings ? settings.Owner is null ? settings : CandelaJson.DeepClone(settings) : new SceneSettings();
 
         if (file.Entities is null) return scene;
         var created = new Dictionary<Guid, Entity>(file.Entities.Count);
@@ -186,13 +188,22 @@ public static class SceneSerializer
                         Report(issues, IssueSeverity.Warning, ComponentInvalidCode, $"An empty component of '{name}' was dropped.", id);
                         continue;
                     }
-                    if (c.Owner is not null)
+                    var component = c;
+                    if (component.Owner is { } holder)
                     {
-                        Report(issues, IssueSeverity.Warning, ComponentInvalidCode,
-                            $"A {c.GetType().Name} of '{name}' is already attached to '{c.Owner.Name}' and was dropped.", id);
-                        continue;
+                        // Still attached (a record of a live scene, or listed twice): the scene gets its own copy.
+                        try
+                        {
+                            component = component.Clone();
+                        }
+                        catch (Exception x) when (IsReadFailure(x))
+                        {
+                            Report(issues, IssueSeverity.Warning, ComponentInvalidCode,
+                                $"A {c.GetType().Name} of '{name}' is attached to '{holder.Name}' and could not be copied; it was dropped: {x.Message}", id);
+                            continue;
+                        }
                     }
-                    e.Add(c);
+                    e.Add(component);
                 }
             }
 

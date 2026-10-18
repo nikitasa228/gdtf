@@ -30,7 +30,8 @@ public enum KeyModifiers
 /// "Escape", "Enter", "Space", "Tab", "Backspace", "Up", "Down", "Left", "Right", "Home", "End", "PageUp", "PageDown",
 /// "Numpad0".."Numpad9", "Minus", "Equal", "Comma", "Period", see <see cref="IsKnownKey"/>).
 /// The text form is the modifiers and exactly one key joined by '+', e.g. "Ctrl+Shift+S" (<see cref="ToString"/> writes
-/// it, <see cref="Parse"/> reads it back).
+/// it, <see cref="Parse"/> reads it back). Key names are compared ignoring case, like modifier names are read: "ctrl+s"
+/// in a hand-edited preset is the same chord as Ctrl+S.
 /// </summary>
 /// <param name="Key">The key name (kept as written; the windowing layer maps names to physical keys).</param>
 /// <param name="Modifiers">Modifier keys held with <paramref name="Key"/>.</param>
@@ -52,6 +53,14 @@ public readonly record struct KeyChord(string Key, KeyModifiers Modifiers = KeyM
     };
 
     private static readonly HashSet<string> KnownKeys = BuildKnownKeys();
+
+    /// <summary>Same modifiers and the same key name, ignoring case (the key is kept as written, but "s" is the S key).</summary>
+    public bool Equals(KeyChord other) =>
+        Modifiers == other.Modifiers && string.Equals(Key, other.Key, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Hash consistent with <see cref="Equals(KeyChord)"/> (key name hashed ignoring case).</summary>
+    public override int GetHashCode() =>
+        HashCode.Combine(Modifiers, Key is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(Key));
 
     /// <summary>"Ctrl+Shift+Alt+Super+Key" (modifiers in this fixed order, only those that are set).</summary>
     public override string ToString()

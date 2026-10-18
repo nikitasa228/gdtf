@@ -218,11 +218,14 @@ public class SerializationTests
         Assert.Equal("Child", Assert.Single(first.Children).Name);
         var second = scene.Roots.Single(e => e != first);
         Assert.Equal("", second.Name);
-        Assert.Empty(second.Components);
+        // The component listed twice is attached to the first entity; the second one gets its own copy.
+        var copy = Assert.IsType<GroupComponent>(Assert.Single(second.Components));
+        Assert.NotSame(shared, copy);
+        Assert.Same(second, copy.Owner);
         Assert.Equal(Transform.Identity, second.Local);
         Assert.Contains(issues, i => i.Code == SceneSerializer.EntityInvalidCode);
         Assert.Contains(issues, i => i.Code == SceneSerializer.EntityIdInvalidCode && i.Entities.Contains(second.Id));
-        Assert.Equal(2, issues.Count(i => i.Code == SceneSerializer.ComponentInvalidCode));
+        Assert.Single(issues, i => i.Code == SceneSerializer.ComponentInvalidCode); // the null component
         Assert.Contains(issues, i => i.Code == SceneSerializer.TransformInvalidCode);
     }
 

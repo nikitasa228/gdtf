@@ -68,11 +68,11 @@ public sealed class AddEntitiesCommand : IUndoableCommand
     /// <summary>The subtree roots added by <see cref="Do"/>, in order.</summary>
     public IReadOnlyList<Entity> Entities { get; }
 
-    /// <inheritdoc/>
-    public void Do()
-    {
-        foreach (var (e, parent, index) in _items) _scene.Add(e, parent, index);
-    }
+    /// <summary>
+    /// Adds every subtree. All or nothing: when one cannot be added (e.g. an id the scene already uses), the ones added
+    /// before it are removed again and the exception is rethrown, so a failed paste leaves the scene as it was.
+    /// </summary>
+    public void Do() => SceneEdit.AddAll(_scene, _items);
 
     /// <inheritdoc/>
     public void Undo()
@@ -117,14 +117,19 @@ public sealed class DuplicateEntitiesCommand : IUndoableCommand
     /// <summary>The copied subtree roots (select them after <see cref="Do"/>).</summary>
     public IReadOnlyList<Entity> Copies => Result.Roots;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Adds the copies under their originals' parents (at the root when a parent has left the scene since). All or
+    /// nothing, like <see cref="AddEntitiesCommand.Do"/>.
+    /// </summary>
     public void Do()
     {
-        for (int i = 0; i < Result.Roots.Count; i++)
+        var items = new (Entity Entity, Entity? Parent, int Index)[Result.Roots.Count];
+        for (int i = 0; i < items.Length; i++)
         {
             var parent = _parents[i];
-            _scene.Add(Result.Roots[i], parent is not null && parent.Scene == _scene ? parent : null);
+            items[i] = (Result.Roots[i], parent is not null && parent.Scene == _scene ? parent : null, -1);
         }
+        SceneEdit.AddAll(_scene, items);
     }
 
     /// <inheritdoc/>
@@ -397,6 +402,37 @@ public static class ModifyComponentCommand
     /// <inheritdoc cref="ModifyComponentCommand{T}.Create"/>
     public static ModifyComponentCommand<T> Create<T>(T component, Action<T> edit, string? description = null) where T : Component =>
         ModifyComponentCommand<T>.Create(component, edit, description);
+}
+
+/// <summary>Scene edits shared by several commands.</summary>
+internal static class SceneEdit
+{
+    /// <summary>
+    /// Adds detached subtrees in order; when one add fails, removes the subtrees this call added (in reverse order) and
+    /// rethrows, so the scene is left as it was.
+    /// </summary>
+    public static void AddAll(SceneModel scene, (Entity Entity, Entity? Parent, int Index)[] items)
+    {
+        int i = 0;
+        bool wasInScene = false;
+        try
+        {
+            for (; i < items.Length; i++)
+            {
+                var (entity, parent, index) = items[i];
+                wasInScene = entity.Scene == scene;
+                scene.Add(entity, parent, index);
+            }
+        }
+        catch
+        {
+            // The failing entity was taken only when the add itself succeeded and a change handler threw afterwards.
+            if (i < items.Length && !wasInScene && items[i].Entity.Scene == scene) scene.Remove(items[i].Entity);
+            for (int j = i - 1; j >= 0; j--)
+                if (items[j].Entity.Scene == scene) scene.Remove(items[j].Entity);
+            throw;
+        }
+    }
 }
 
 /// <summary>Shared wording of command descriptions.</summary>

@@ -52,9 +52,13 @@ public sealed class Selection
         Changed?.Invoke();
     }
 
-    /// <summary>Adds <paramref name="id"/> as the primary selection (moved to the end when already selected).</summary>
+    /// <summary>
+    /// Adds <paramref name="id"/> as the primary selection (moved to the end when already selected; no change when it
+    /// already is the primary one).
+    /// </summary>
     public void Add(Guid id)
     {
+        if (_ids.Count > 0 && _ids[^1] == id) return;
         if (!_set.Add(id)) _ids.Remove(id);
         _ids.Add(id);
         Changed?.Invoke();

@@ -82,6 +82,8 @@ public sealed class Layer
 /// <remarks>
 /// Layer ids should be unique. When a malformed file repeats one, <see cref="Find"/> returns the first layer with that
 /// id in list order, like a linear search would.
+/// A layer object belongs to one scene at a time (its changes are raised on that scene): adding a layer that is still in
+/// another scene's list throws; copy it (new <see cref="Layer"/> with the same values) or remove it there first.
 /// </remarks>
 public sealed class LayerCollection : IList<Layer>, IReadOnlyList<Layer>
 {
@@ -96,7 +98,10 @@ public sealed class LayerCollection : IList<Layer>, IReadOnlyList<Layer>
 
     bool ICollection<Layer>.IsReadOnly => false;
 
-    /// <summary>The layer at <paramref name="index"/>; setting replaces it (raises one change).</summary>
+    /// <summary>
+    /// The layer at <paramref name="index"/>; setting replaces it (raises one change). A layer of another scene is refused
+    /// (<see cref="InvalidOperationException"/>).
+    /// </summary>
     public Layer this[int index]
     {
         get => _items[index];
@@ -105,6 +110,7 @@ public sealed class LayerCollection : IList<Layer>, IReadOnlyList<Layer>
             ArgumentNullException.ThrowIfNull(value);
             var old = _items[index];
             if (ReferenceEquals(old, value)) return;
+            EnsureNotInOtherScene(value);
             _items[index] = value;
             Detached(old);
             Attached(value);
@@ -119,29 +125,39 @@ public sealed class LayerCollection : IList<Layer>, IReadOnlyList<Layer>
     public bool Contains(Guid id) => _byId.ContainsKey(id);
 
     /// <summary>Appends a layer.</summary>
+    /// <exception cref="InvalidOperationException">The layer is in the layer list of another scene.</exception>
     public void Add(Layer layer) => Insert(_items.Count, layer);
 
-    /// <summary>Appends several layers, raising a single change.</summary>
+    /// <summary>
+    /// Appends several layers, raising a single change. Every layer is checked first, so a null entry or a layer of
+    /// another scene leaves the list unchanged.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="layers"/> or one of its entries is null.</exception>
+    /// <exception cref="InvalidOperationException">A layer is in the layer list of another scene.</exception>
     public void AddRange(IEnumerable<Layer> layers)
     {
         ArgumentNullException.ThrowIfNull(layers);
-        Layer? only = null;
-        int added = 0;
-        foreach (var layer in layers)
+        var list = layers.ToList();
+        foreach (var layer in list)
         {
             ArgumentNullException.ThrowIfNull(layer, nameof(layers));
+            EnsureNotInOtherScene(layer);
+        }
+        foreach (var layer in list)
+        {
             _items.Add(layer);
             Attached(layer);
-            only = layer;
-            added++;
         }
-        if (added > 0) Raise(added == 1 ? only : null);
+        if (list.Count > 0) Raise(list.Count == 1 ? list[0] : null);
     }
 
     /// <summary>Inserts a layer at <paramref name="index"/> (0 makes it the default layer).</summary>
+    /// <exception cref="InvalidOperationException">The layer is in the layer list of another scene.</exception>
     public void Insert(int index, Layer layer)
     {
         ArgumentNullException.ThrowIfNull(layer);
+        if ((uint)index > (uint)_items.Count) throw new ArgumentOutOfRangeException(nameof(index));
+        EnsureNotInOtherScene(layer);
         _items.Insert(index, layer);
         Attached(layer);
         Raise(layer);
@@ -206,6 +222,16 @@ public sealed class LayerCollection : IList<Layer>, IReadOnlyList<Layer>
     IEnumerator<Layer> IEnumerable<Layer>.GetEnumerator() => _items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
+
+    /// <summary>
+    /// Refuses a layer that is in another scene's list: its changes would be raised on one scene only, so the other
+    /// would miss them (and lose them when the layer is removed from the first).
+    /// </summary>
+    private void EnsureNotInOtherScene(Layer layer)
+    {
+        if (layer.Owner is { } other && !ReferenceEquals(other, _scene) && other.Layers.Contains(layer))
+            throw new InvalidOperationException($"The layer {layer} belongs to the scene '{other.Name}'; add a copy or remove it there first.");
+    }
 
     /// <summary>Adds a layer without raising a change (scene construction).</summary>
     internal void AddSilently(Layer layer)
