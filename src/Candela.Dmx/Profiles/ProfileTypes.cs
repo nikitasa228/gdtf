@@ -185,6 +185,12 @@ public sealed class ProfileFunction
     /// <summary>Colour temperature at <see cref="DmxTo"/> for CTO/CTB/CTC functions, K (NaN when not known).</summary>
     public float KelvinTo { get; internal set; } = float.NaN;
 
+    /// <summary>
+    /// Colour temperature at which a CTO/CTB function inserts no filter, K: the warm-converting CTO is neutral at its
+    /// highest kelvin, CTB at its lowest. NaN for CTC (relative to the source) and for functions without kelvin data.
+    /// </summary>
+    public float NeutralKelvin { get; internal set; } = float.NaN;
+
     /// <summary>Strobe waveform of the function (shutter, iris, frost pulses, StrobeMode).</summary>
     public Waveform Waveform { get; internal set; }
 

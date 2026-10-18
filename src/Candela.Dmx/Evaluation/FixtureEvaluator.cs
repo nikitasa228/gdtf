@@ -700,7 +700,10 @@ public static class FixtureEvaluator
         return d;
     }
 
-    /// <summary>Mired shift of a CTO/CTB/CTC function relative to the beam's source (from kelvin physicals, channel-set names or 0 … 1).</summary>
+    /// <summary>
+    /// Mired shift of a CTO/CTB/CTC function (from kelvin physicals, channel-set names or 0 … 1): CTO and CTB relative to
+    /// their neutral end (no filter), CTC relative to the beam's source.
+    /// </summary>
     private static float MiredShift(ProfileFunction f, ProfileChannelSet? set, in ChannelRuntime r, FixtureProfile p, AttributeKind kind)
     {
         if (set is not null && (set.Flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction)) != 0) return 0f;
@@ -729,7 +732,8 @@ public static class FixtureEvaluator
             };
         }
         if (!(target is >= 1000f and <= 25000f)) return 0f;
-        return 1e6f / target - 1e6f / source;
+        float neutral = float.IsNaN(f.NeutralKelvin) ? source : f.NeutralKelvin;
+        return 1e6f / target - 1e6f / neutral;
     }
 
     /// <summary>Δuv of a Tint function (positive = greener): small absolute ranges are Δuv, symmetric ranges ±0.02, 0 … 1 centred at 0.5.</summary>

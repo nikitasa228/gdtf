@@ -232,10 +232,30 @@ public sealed partial class FixtureProfile
 
             if (src.Wheel is { } wheel) f.Wheel = WheelIndexOf(wheel);
             if (cls.Kind == AttributeKind.ColorAdd) f.Emitter = EmitterIndexOf(src, cls.Code ?? "");
-            if (cls.Kind is AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc && IsKelvin(f.PhysicalFrom) && IsKelvin(f.PhysicalTo))
+            if (cls.Kind is AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc)
             {
-                f.KelvinFrom = f.PhysicalFrom;
-                f.KelvinTo = f.PhysicalTo;
+                float lo = float.NaN, hi = float.NaN;
+                if (IsKelvin(f.PhysicalFrom) && IsKelvin(f.PhysicalTo))
+                {
+                    f.KelvinFrom = f.PhysicalFrom;
+                    f.KelvinTo = f.PhysicalTo;
+                    (lo, hi) = (MathF.Min(f.PhysicalFrom, f.PhysicalTo), MathF.Max(f.PhysicalFrom, f.PhysicalTo));
+                }
+                else
+                {
+                    foreach (var set in sets)
+                        if (!float.IsNaN(set.Kelvin))
+                        {
+                            lo = float.IsNaN(lo) ? set.Kelvin : MathF.Min(lo, set.Kelvin);
+                            hi = float.IsNaN(hi) ? set.Kelvin : MathF.Max(hi, set.Kelvin);
+                        }
+                }
+                f.NeutralKelvin = cls.Kind switch
+                {
+                    AttributeKind.Cto => hi,
+                    AttributeKind.Ctb => lo,
+                    _ => float.NaN,
+                };
             }
             f.Waveform = cls.Waveform;
             if (f.Wheel >= 0 && cls.Kind is AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake)
