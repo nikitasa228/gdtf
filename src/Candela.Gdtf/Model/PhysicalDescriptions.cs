@@ -228,20 +228,24 @@ public sealed class DmxProfile
     public List<DmxProfilePoint> Points { get; } = new();
 
     /// <summary>
-    /// Evaluates the curve at <paramref name="dmxPercentage"/> (0 … 100). Within the segment that starts at point
-    /// <c>i</c>, the result is <c>CFC0 + CFC1·t + CFC2·t² + CFC3·t³</c> with <c>t</c> the position inside the segment
-    /// normalised to 0 … 1. Without points the curve is linear (percentage / 100).
+    /// Evaluates the curve at <paramref name="dmxPercentage"/> (0 … 100) as DIN SPEC 15800 defines it: take the point
+    /// with the largest DMXPercentage at or below the input (none: the output is 0) and return
+    /// <c>CFC3·(x − P)³ + CFC2·(x − P)² + CFC1·(x − P) + CFC0</c>. The input <c>x</c> and the point's percentage
+    /// <c>P</c> are used as fractions of the DMX range (percent / 100), which makes the "Linear" profile GDTF Builder
+    /// writes (a point at 0 % with CFC1 = 1) the identity on 0 … 1. A last point at 100 % starts no segment: GDTF Builder
+    /// closes every curve with one (with CFC0 = 0, which read literally would switch the output off at full), so the
+    /// value at 100 % continues the segment before it. Without points the curve is linear (percentage / 100).
     /// </summary>
     public float Evaluate(float dmxPercentage)
     {
         if (Points.Count == 0) return dmxPercentage / 100f;
         int i = Points.Count - 1;
-        while (i > 0 && Points[i].DmxPercentage > dmxPercentage) i--;
+        while (i >= 0 && Points[i].DmxPercentage > dmxPercentage) i--;
+        if (i < 0) return 0f;
+        if (i > 0 && i == Points.Count - 1 && Points[i].DmxPercentage >= 100f) i--;
         var p = Points[i];
-        float end = i + 1 < Points.Count ? Points[i + 1].DmxPercentage : 100f;
-        float span = end - p.DmxPercentage;
-        float t = span > 1e-6f ? System.Math.Clamp((dmxPercentage - p.DmxPercentage) / span, 0f, 1f) : 0f;
-        return p.Cfc0 + t * (p.Cfc1 + t * (p.Cfc2 + t * p.Cfc3));
+        float d = (dmxPercentage - p.DmxPercentage) / 100f;
+        return p.Cfc0 + d * (p.Cfc1 + d * (p.Cfc2 + d * p.Cfc3));
     }
 }
 
