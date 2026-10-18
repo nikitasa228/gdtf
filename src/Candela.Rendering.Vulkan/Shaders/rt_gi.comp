@@ -44,7 +44,7 @@ layout(buffer_reference, scalar, buffer_reference_align = 4) readonly buffer RtI
     uint i[];
 };
 
-const uint RT_RAYS = 2u;
+const uint RT_RAYS = 4u;
 const float RT_MAX_DISTANCE = 100.0;
 
 vec3 cosineDirection(vec3 N, float u1, float u2)
@@ -156,7 +156,9 @@ void main()
         vec4 clip = frame.previousViewProjection * vec4(P, 1.0);
         if (clip.w > 1e-6)
         {
-            vec2 prevUv = clip.xy / clip.w * 0.5 + 0.5;
+            // P lies under a full-resolution pixel centre; shift by its offset from this pixel's centre so that a
+            // still camera reads exactly this texel of the history (no drift or blur through repeated filtering).
+            vec2 prevUv = clip.xy / clip.w * 0.5 + 0.5 + (uv - centre);
             float prevDepth = isOrthographic() ? viewDepth : clip.w;
             if (all(greaterThanEqual(prevUv, vec2(0.0))) && all(lessThanEqual(prevUv, vec2(1.0))))
             {

@@ -74,7 +74,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
     public const float VolumeHistoryWeight = 0.8f;
 
     /// <summary>Weight of the reprojected ray-traced GI history.</summary>
-    public const float IndirectHistoryWeight = 0.85f;
+    public const float IndirectHistoryWeight = 0.9f;
 
     /// <summary>Speed of the auto-exposure adaptation (1/s; 1 − e^(−speed·dt) of the remaining difference per frame).</summary>
     public const float ExposureAdaptationSpeed = 1.5f;
@@ -348,7 +348,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
             p.SceneSet = _world.CurrentSceneSet;
 
             FinishFrameData(t, settings, ref decisions, ref p.Data);
-            p.IndirectHistoryWeight = decisions.Indirect == IndirectLighting.RayTraced && t.IndirectHistoryValid && t.HasPreviousFrame &&
+            p.IndirectHistoryWeight = decisions.Indirect == IndirectLighting.RayTraced && settings.TemporalAccumulation && t.IndirectHistoryValid &&
+                                      t.HasPreviousFrame &&
                                       t.IndirectHistoryMode == IndirectLighting.RayTraced ? IndirectHistoryWeight : 0f;
 
             // Per-view constants and the light-list counter are reset by transfer commands in this command buffer.

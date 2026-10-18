@@ -251,7 +251,7 @@ public sealed class LifecycleTests
         {
             var scene = BuildStageTwoScene(renderer, out _);
             var camera = ProceduralTestScene.CreateCamera();
-            var everything = new PreviewSettings { AutoExposure = true, VolumetricSlices = 32 };
+            var everything = new PreviewSettings { AutoExposure = true, VolumetricSlices = 32, Indirect = IndirectLighting.RayTraced };
             var scaled = new PreviewSettings { ResolutionScale = 0.6f, Indirect = IndirectLighting.Off, Bloom = false, VolumetricSlices = 16 };
             var selected = new ViewOptions { ShowBeamOutlines = true };
             using var a = renderer.CreateVulkanTarget(160, 120);
@@ -303,6 +303,7 @@ public sealed class LifecycleTests
             var scene = BuildStageTwoScene(renderer, out var lights);
             var camera = ProceduralTestScene.CreateCamera();
             var settings = new PreviewSettings { AutoExposure = true, VolumetricSlices = 32 };
+            var rayTraced = new PreviewSettings { Indirect = IndirectLighting.RayTraced, ResolutionScale = 0.75f, VolumetricSlices = 16 };
             var views = new[]
             {
                 new ViewOptions { ShowBeamOutlines = true },
@@ -312,6 +313,7 @@ public sealed class LifecycleTests
                 new ViewOptions { Shading = ViewShading.Colorless },
             };
             using var target = renderer.CreateTarget(96, 64);
+            using var second = renderer.CreateTarget(80, 60);
             var box = scene.Instances[2];
             void Frame(int i)
             {
@@ -321,6 +323,7 @@ public sealed class LifecycleTests
                 renderer.World.UpdateInstance(box, Matrix4x4.CreateTranslation(-3.2f, 1.6f + 0.001f * (i % 7), 0.5f),
                     InstanceFlags.CastShadow | InstanceFlags.Selected);
                 renderer.Render(target, camera, views[i % views.Length], settings, 1f / 60f);
+                renderer.Render(second, camera, views[0], rayTraced, 1f / 60f); // ray-traced GI (or its fallback)
             }
 
             int frameIndex = 0;
