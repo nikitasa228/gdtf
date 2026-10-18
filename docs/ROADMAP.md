@@ -13,8 +13,9 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [x] GDTF reader: fixture type, geometry tree, models (3DS/glTF), DMX modes/channels/functions/sets, wheels (colour,
       gobo images, prisms), emitters, filters, physical descriptions, wiring objects — all 1091 files parse, channel
       counts match `_specs` for 7272 modes, all 4982 models load (docs/gdtf.md)
-- [~] Fixture library: scan folders, categories (PROFILE … GENERATOR FIRE), `_specs` physical data, caching,
-      MVR stub GDTF → library match — done; binary disk cache not yet. 4 of the 6 types in `stages/Фокина.mvr`
+- [x] Fixture library: scan folders, categories (PROFILE … GENERATOR FIRE), `_specs` physical data, caching,
+      MVR stub GDTF → library match, binary disk cache keyed by content + reader version (8–9× faster re-open;
+      hostile-input limits; reviewed). 4 of the 6 types in `stages/Фокина.mvr`
       (Ayrton Rivale Profile, MagicBlade R, Zonda 3 Wash, Martin Atomic 3000 LED) are not in the library, so
       same-brand substitutes are used until those GDTF files are added
 - [x] MVR import (layers, fixtures, scene objects, trusses, supports, groups, addresses, embedded GDTF/3D) and export;
