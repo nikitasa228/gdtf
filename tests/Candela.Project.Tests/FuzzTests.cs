@@ -179,6 +179,10 @@ public sealed class FuzzTests
             if (again.Assets.Count != project.Assets.Count || again.KeptAssetIds.Count != project.KeptAssetIds.Count)
                 Count(failures, "round trip changed the assets", null);
             if (again.Settings.Count != project.Settings.Count) Count(failures, "round trip changed the settings", null);
+            if (EmbeddedGdtfs(again) < EmbeddedGdtfs(project)) Count(failures, "round trip lost GDTF copies", null);
+            if (again.UnknownComponents.Sum(u => u.Value.Count) != project.UnknownComponents.Sum(u => u.Value.Count))
+                Count(failures, "round trip changed the unknown components", null);
+            if (again.Thumbnail?.Length != project.Thumbnail?.Length) Count(failures, "round trip changed the thumbnail", null);
         }
         catch (Exception e)
         {
@@ -186,6 +190,8 @@ public sealed class FuzzTests
         }
         return true;
     }
+
+    private static int EmbeddedGdtfs(ProjectData project) => project.UsedGdtfSpecs().Count(n => project.FindGdtf(n) is not null);
 
     private static void Count(Dictionary<string, int> failures, string stage, Exception? e)
     {
