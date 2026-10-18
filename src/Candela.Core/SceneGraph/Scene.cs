@@ -1,42 +1,127 @@
 namespace Candela.Core.SceneGraph;
 
 /// <summary>
-/// The edited document: a forest of entities, layers and scene-wide settings. All mutations raise
-/// <see cref="Changed"/> and bump <see cref="Version"/>, which renderers and analysers use to update incrementally.
+/// The edited document: a forest of entities, layers and scene-wide settings. Every mutation — structure, transforms,
+/// names, visibility, locks, layers, components, settings — raises <see cref="Changed"/> and bumps
+/// <see cref="Version"/>, which renderers, analysers and the project's modified flag use to update incrementally.
+/// Lookups that run per frame (<see cref="Find"/>, <see cref="FindLayer"/>, <see cref="IsEntityVisible"/>,
+/// <see cref="IsEntityLocked"/>) are dictionary lookups that never allocate.
 /// The scene is owned by the main thread; background work must not touch it.
 /// </summary>
 public sealed class Scene
 {
     private readonly List<Entity> _roots = new();
     private readonly Dictionary<Guid, Entity> _byId = new();
+    private SceneSettings _settings;
+    private string _name;
 
+    /// <summary>Creates an empty scene with one layer named "Default".</summary>
     public Scene(string name = "Untitled")
     {
-        Name = name;
-        Layers.Add(new Layer { Name = "Default" });
+        _name = name ?? "";
+        Layers = new LayerCollection(this);
+        Layers.AddSilently(new Layer { Name = "Default" });
+        _settings = new SceneSettings { Owner = this };
     }
 
+    /// <summary>Stable identity of the document (kept in the project file).</summary>
     public Guid Id { get; init; } = Guid.NewGuid();
-    public string Name { get; set; }
-    public List<Layer> Layers { get; } = new();
-    public SceneSettings Settings { get; set; } = new();
 
+    /// <summary>Display name; changing it raises <see cref="SceneChangeKind.SceneRenamed"/>. Null is stored as "".</summary>
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            value ??= "";
+            if (_name == value) return;
+            _name = value;
+            Raise(new SceneChange(SceneChangeKind.SceneRenamed, null));
+        }
+    }
+
+    /// <summary>
+    /// Layers in display order; the first one is <see cref="DefaultLayer"/>. Adding, removing or editing a layer raises
+    /// <see cref="SceneChangeKind.LayersChanged"/>.
+    /// </summary>
+    public LayerCollection Layers { get; }
+
+    /// <summary>
+    /// Scene-wide settings. Changing one of their values, or assigning another object (null assigns defaults), raises
+    /// <see cref="SceneChangeKind.SettingsChanged"/>.
+    /// </summary>
+    public SceneSettings Settings
+    {
+        get => _settings;
+        set
+        {
+            value ??= new SceneSettings();
+            if (ReferenceEquals(_settings, value)) return;
+            if (ReferenceEquals(_settings.Owner, this)) _settings.Owner = null;
+            _settings = value;
+            value.Owner = this;
+            NotifySettingsChanged();
+        }
+    }
+
+    /// <summary>Top-level entities in order.</summary>
     public IReadOnlyList<Entity> Roots => _roots;
+
+    /// <summary>Number of entities in the scene (all levels).</summary>
     public int Count => _byId.Count;
 
-    /// <summary>Incremented on every change.</summary>
+    /// <summary>Incremented on every change (never decreases, also not on undo).</summary>
     public long Version { get; private set; }
 
+    /// <summary>Raised after every change, on the thread that made it (the main thread).</summary>
     public event Action<SceneChange>? Changed;
 
-    public Layer DefaultLayer => Layers[0];
+    /// <summary>
+    /// The layer new entities go to when they name none: the first layer. When the layer list was emptied, a new layer
+    /// named "Default" is created on demand, so a scene always has one.
+    /// </summary>
+    public Layer DefaultLayer
+    {
+        get
+        {
+            if (Layers.Count == 0) Layers.Add(new Layer { Name = "Default" });
+            return Layers[0];
+        }
+    }
 
-    /// <summary>Adds an entity (with its existing subtree) under <paramref name="parent"/> or as a root.</summary>
+    /// <summary>
+    /// Adds a detached entity (with its existing subtree) under <paramref name="parent"/> or as a root, at
+    /// <paramref name="index"/> among its siblings (-1 = last). Entities without a layer (<see cref="Guid.Empty"/>) take
+    /// the layer of their parent, roots the <see cref="DefaultLayer"/>. Raises <see cref="SceneChangeKind.Added"/> once for
+    /// the subtree root. Ids are checked before anything changes, so a duplicate id leaves the scene untouched.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The entity belongs to a scene or has a parent, the parent is not in this scene, or an id of the subtree is already
+    /// used (in the scene or twice in the subtree).
+    /// </exception>
     public Entity Add(Entity entity, Entity? parent = null, int index = -1)
     {
+        ArgumentNullException.ThrowIfNull(entity);
         if (entity.Scene is not null) throw new InvalidOperationException($"{entity} already belongs to a scene.");
+        if (entity.Parent is not null)
+            throw new InvalidOperationException($"{entity} is a child of {entity.Parent}; only the root of a detached subtree can be added.");
         if (parent is not null && parent.Scene != this) throw new InvalidOperationException("Parent is not in this scene.");
-        if (entity.LayerId == Guid.Empty) entity.LayerId = parent?.LayerId ?? DefaultLayer.Id;
+
+        HashSet<Guid>? subtreeIds = entity.Children.Count > 0 ? new HashSet<Guid>() : null;
+        foreach (var e in entity.SelfAndDescendants())
+        {
+            if (_byId.ContainsKey(e.Id) || (subtreeIds is not null && !subtreeIds.Add(e.Id)))
+                throw new InvalidOperationException($"Duplicate entity id {e.Id}.");
+        }
+
+        if (entity.LayerId == Guid.Empty)
+            entity.LayerId = parent is not null && parent.LayerId != Guid.Empty ? parent.LayerId : DefaultLayer.Id;
+        if (subtreeIds is not null)
+        {
+            foreach (var e in entity.SelfAndDescendants())
+                if (e.LayerId == Guid.Empty && e.Parent is { } p) e.LayerId = p.LayerId; // parents come first
+        }
+
         if (parent is null)
         {
             if (index < 0 || index > _roots.Count) index = _roots.Count;
@@ -49,16 +134,20 @@ public sealed class Scene
         }
         foreach (var e in entity.SelfAndDescendants())
         {
-            if (!_byId.TryAdd(e.Id, e)) throw new InvalidOperationException($"Duplicate entity id {e.Id}.");
+            _byId.Add(e.Id, e);
             e.Scene = this;
         }
         Raise(new SceneChange(SceneChangeKind.Added, entity));
         return entity;
     }
 
-    /// <summary>Removes an entity and its subtree. Returns the former parent and sibling index (for undo).</summary>
+    /// <summary>
+    /// Removes an entity and its subtree (the subtree stays intact and detached, ready to be added again by undo).
+    /// Returns the former parent and sibling index.
+    /// </summary>
     public (Entity? Parent, int Index) Remove(Entity entity)
     {
+        ArgumentNullException.ThrowIfNull(entity);
         if (entity.Scene != this) throw new InvalidOperationException($"{entity} is not in this scene.");
         var parent = entity.Parent;
         int index;
@@ -80,10 +169,15 @@ public sealed class Scene
         return (parent, index);
     }
 
-    /// <summary>Moves an entity under another parent (null = root), optionally keeping its world transform.</summary>
+    /// <summary>
+    /// Moves an entity under another parent (null = root) at <paramref name="index"/> (-1 = last), optionally keeping its
+    /// world transform. Raises <see cref="SceneChangeKind.Reparented"/>.
+    /// </summary>
     public void Reparent(Entity entity, Entity? newParent, bool keepWorldTransform = true, int index = -1)
     {
+        ArgumentNullException.ThrowIfNull(entity);
         if (entity.Scene != this) throw new InvalidOperationException($"{entity} is not in this scene.");
+        if (newParent is not null && newParent.Scene != this) throw new InvalidOperationException("The new parent is not in this scene.");
         if (newParent == entity || (newParent is not null && entity.IsAncestorOf(newParent)))
             throw new InvalidOperationException("Cannot parent an entity under itself or its descendant.");
         var world = entity.World;
@@ -103,84 +197,55 @@ public sealed class Scene
         Raise(new SceneChange(SceneChangeKind.Reparented, entity) { FormerParent = oldParent });
     }
 
+    /// <summary>The entity with <paramref name="id"/>, or null. O(1), allocation-free.</summary>
     public Entity? Find(Guid id) => _byId.GetValueOrDefault(id);
 
-    /// <summary>All entities, depth-first in tree order.</summary>
-    public IEnumerable<Entity> All()
-    {
-        foreach (var r in _roots)
-            foreach (var e in r.SelfAndDescendants())
-                yield return e;
-    }
+    /// <summary>All entities, depth-first in tree order (parents before their children).</summary>
+    public IEnumerable<Entity> All() => Entity.Traverse(null, _roots);
 
-    /// <summary>All entities that carry a component of type <typeparamref name="T"/>.</summary>
+    /// <summary>All entities that carry a component of type <typeparamref name="T"/>, in tree order.</summary>
     public IEnumerable<(Entity Entity, T Component)> Query<T>() where T : Component
     {
         foreach (var e in All())
-            foreach (var c in e.Components)
-                if (c is T t) yield return (e, t);
+        {
+            var components = e.Components;
+            for (int i = 0; i < components.Count; i++)
+                if (components[i] is T t) yield return (e, t);
+        }
     }
 
-    public Layer? FindLayer(Guid id) => Layers.FirstOrDefault(l => l.Id == id);
+    /// <summary>The layer with <paramref name="id"/>, or null. O(1), allocation-free (safe to call per frame).</summary>
+    public Layer? FindLayer(Guid id) => Layers.Find(id);
+
+    /// <summary>
+    /// True when <paramref name="entity"/> is drawn: it and all its ancestors are <see cref="Entity.Visible"/> and its layer
+    /// is visible (an unknown layer counts as visible). Allocation-free.
+    /// </summary>
+    public bool IsEntityVisible(Entity entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        return entity.IsVisibleInHierarchy && Layers.Find(entity.LayerId) is not { Visible: false };
+    }
+
+    /// <summary>
+    /// True when <paramref name="entity"/> must not be selected or moved in the viewport: it is <see cref="Entity.Locked"/>
+    /// or its layer is locked. Allocation-free.
+    /// </summary>
+    public bool IsEntityLocked(Entity entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        return entity.Locked || Layers.Find(entity.LayerId) is { Locked: true };
+    }
+
+    /// <summary>
+    /// For changes to scene-level data the scene cannot see by itself (e.g. after editing a settings object in place
+    /// through reflection). Raises <see cref="SceneChangeKind.SettingsChanged"/>.
+    /// </summary>
+    public void NotifySettingsChanged() => Raise(new SceneChange(SceneChangeKind.SettingsChanged, null));
 
     internal void Raise(SceneChange change)
     {
         Version++;
         Changed?.Invoke(change);
     }
-
-    /// <summary>For changes to scene-level data (settings, layers).</summary>
-    public void NotifySettingsChanged() => Raise(new SceneChange(SceneChangeKind.SettingsChanged, null));
-}
-
-public sealed class Layer
-{
-    public Guid Id { get; init; } = Guid.NewGuid();
-    public string Name { get; set; } = "Layer";
-    public bool Visible { get; set; } = true;
-    public bool Locked { get; set; }
-}
-
-public enum SceneChangeKind
-{
-    Added,
-    Removed,
-    Reparented,
-    Renamed,
-    TransformChanged,
-    ComponentAdded,
-    ComponentRemoved,
-    ComponentChanged,
-    SettingsChanged,
-}
-
-/// <summary>What changed. <see cref="Entity"/> is null only for scene-level changes.</summary>
-public sealed record SceneChange(SceneChangeKind Kind, Entity? Entity, Component? Component = null)
-{
-    public Entity? FormerParent { get; init; }
-}
-
-/// <summary>Scene-wide settings stored in the project.</summary>
-public sealed class SceneSettings
-{
-    /// <summary>Display units in the UI (the engine itself is always metric).</summary>
-    public UnitSystem DisplayUnits { get; set; } = UnitSystem.Metric;
-
-    /// <summary>Uniform haze everywhere, as volume scattering coefficient in 1/m (0 = clean air).</summary>
-    public float BaseHazeScattering { get; set; } = 0.02f;
-
-    /// <summary>Henyey–Greenstein anisotropy of haze particles (0 = isotropic, ~0.6–0.85 for stage haze).</summary>
-    public float HazeAnisotropy { get; set; } = 0.7f;
-
-    /// <summary>Luminance of the surroundings in cd/m² (a dark venue is close to 0).</summary>
-    public float AmbientLuminance { get; set; } = 0.05f;
-
-    /// <summary>Viewport grid spacing in metres.</summary>
-    public float GridSpacing { get; set; } = 1f;
-}
-
-public enum UnitSystem
-{
-    Metric,
-    Imperial,
 }
