@@ -23,6 +23,7 @@ The scene is owned by the main thread; background work must not touch it.
   `Add(entity, parent, index)` adds a detached subtree in one step (one `Added` change; ids are checked before
   anything changes); `Remove` detaches a subtree intact (ready for undo); `Reparent` keeps the world transform by
   default. Entities without a layer take their parent's layer, roots the default layer.
+  `SceneSerializer.FromFile(SceneSerializer.ToFile(scene))` is an independent copy with the same ids.
 * **`Entity`** — id, name, local `Transform`, `LayerId`, `Visible`, `Locked`, children, components. `WorldMatrix` is
   cached and recomputed lazily, **iteratively** (no recursion: a 100 000-level chain from a hostile file is fine) and
   without allocation. Moving an entity whose subtree is already dirty costs O(1).
@@ -32,6 +33,9 @@ The scene is owned by the main thread; background work must not touch it.
 * **Layers** — `LayerCollection` behaves like a list (`Add`, `Insert`, `Remove`, `Move`, `Clear`, indexer) and keeps an
   id index in sync, so `Scene.FindLayer`, `Layers.Find`, `IsEntityVisible` and `IsEntityLocked` are dictionary lookups
   that never allocate (safe per entity per frame). A file that repeats a layer id resolves to the first such layer.
+* **Ownership** — a `Layer` object and a `SceneSettings` object belong to one scene at a time (their changes are raised
+  on that scene). Adding a layer that is still in another scene's list, or assigning another scene's settings, throws
+  `InvalidOperationException`: add a copy (`CandelaJson.DeepClone`) or take it out of the other scene first.
 * **Visibility and locking** — `Entity.IsVisibleInHierarchy` (entity and ancestors), `Scene.IsEntityVisible` (also the
   layer; an unknown layer counts as visible), `Scene.IsEntityLocked` (entity or layer locked).
 
@@ -44,7 +48,7 @@ A detached entity or layer changes silently (it raises once, as `Added` / `Layer
 | Kind | Raised by | `SceneChange` fields |
 |---|---|---|
 | `Added`, `Removed` | `Scene.Add` / `Remove`, `Entity.AddChild` / `RemoveChild` in a scene | `Entity` = subtree root; `FormerParent` for `Removed` |
-| `Reparented` | `Scene.Reparent` | `FormerParent` |
+| `Reparented` | `Scene.Reparent`, `ReparentCommand` (do, undo, redo) | `FormerParent`; one change also covers the local transform recomputed to keep the world placement (no separate `TransformChanged`) |
 | `Renamed` | `Entity.Name` | |
 | `TransformChanged` | `Entity.Local`, `Entity.World` | the subtree's world transforms changed with it |
 | `ComponentAdded`, `ComponentRemoved` | `Entity.Add` / `Remove` | `Component` |
@@ -56,8 +60,8 @@ A detached entity or layer changes silently (it raises once, as `Added` / `Layer
 | `SettingsChanged` | any `SceneSettings` value, assigning `Scene.Settings`, `Scene.NotifySettingsChanged()` | `Entity` null |
 | `SceneRenamed` | `Scene.Name` | `Entity` null |
 
-New kinds are only ever appended; consumers switch over the kinds they care about. Setting a value to what it already
-is raises nothing. `UnknownProperties` (opaque data of newer versions, §5) is not editable state and changes silently.
+New kinds are only ever appended; consumers switch over the kinds they care about. One mutation raises exactly one
+change; setting a value to what it already is (or reparenting an entity to the place it already has) raises nothing. `UnknownProperties` (opaque data of newer versions, §5) is not editable state and changes silently.
 
 ## 3. Components and references
 
@@ -136,13 +140,18 @@ Every user edit is an `IUndoableCommand` executed through `UndoStack` (grouping 
 edits such as gizmo drags and slider drags, capacity 500). Command **descriptions are computed once, when the command is
 created**, and stored: menus read them every frame without allocating, and renaming an entity later does not rewrite
 the history. Core's commands: `AddEntityCommand`, `AddEntitiesCommand` (several subtrees, one step: paste, import),
-`DuplicateEntitiesCommand`, `RemoveEntityCommand`, `ReparentCommand` (restores the sibling position),
+`DuplicateEntitiesCommand`, `RemoveEntityCommand`, `ReparentCommand` (restores the sibling position and local
+transform in one change),
 `SetTransformCommand`, `SetValueCommand<T>` (any property: names, flags, layers, settings), `SetValueCommand.ForComponent`
 (raises `ComponentChanged`), `AddComponentCommand`, `RemoveComponentCommand`, `ModifyComponentCommand` (snapshot-based
-in-place edit of any component, exact for nulls), `CompositeCommand`.
+in-place edit of any component, exact for nulls), `CompositeCommand`. `AddEntitiesCommand` and
+`DuplicateEntitiesCommand` add all or nothing: when one subtree cannot be added (an id already in use, a change handler
+that throws), the ones added before it are removed again and the exception propagates, so nothing half-applied is left
+outside the undo history.
 
 `Selection` keeps the selected ids in order (the last is the primary one) with a hash set beside the list, so
-`Contains` is O(1) and allocation-free.
+`Contains` is O(1) and allocation-free. `Changed` is raised only when the selection really changes (adding the current
+primary again is not a change).
 
 ## 6. JSON and `scene.json`
 
@@ -161,7 +170,8 @@ camelCase, enums as strings, vectors as arrays, non-finite numbers as `"NaN"` / 
 `SceneSerializer` writes `SceneFile` (format 1: `formatVersion`, `id`, `name`, `layers`, `settings`, `entities` flat with
 parents before children; each record has `id`, `parent`, `name`, `layer`, `visible`, `locked`, `transform`,
 `components`). Reading is **tolerant**: `FromJson(json, issues)` reads every layer, entity and component on its own, and
-`FromFile(file, issues)` repairs the record. Only text that is not JSON (`JsonException`), a root that is not an object
+`FromFile(file, issues)` repairs the record; layers, settings and components of the record that still belong to a live
+scene (a record made by `ToFile`, or an object listed twice) are copied rather than taken over. Only text that is not JSON (`JsonException`), a root that is not an object
 and a newer format (`InvalidDataException`) throw. The `$type` discriminator may stand anywhere in a component object.
 
 | Damage | Result | Issue code |
@@ -182,24 +192,26 @@ kept verbatim) and hands the result to `SceneSerializer.FromFile`, so scenes are
 
 `KeyChord.Parse` reads `"Ctrl+Shift+S"`: `+`-separated parts (spaces ignored), modifiers in any order and any case —
 `Ctrl` (`Control`), `Shift`, `Alt` (`Option`), `Super` (`Cmd`, `Command`, `Win`, `Windows`, `Meta`) — and **exactly one
-key**, kept as written. It rejects, with a message that quotes the offending part: an empty text or empty part
+key**, kept as written (chords compare key names ignoring case, so `"ctrl+s"` equals `Ctrl+S`). It rejects, with a message that quotes the offending part: an empty text or empty part
 (`"Ctrl++S"`), a repeated modifier, no key, **more than one key** (`"Ctrl+A+B"`) and **unknown modifiers**
 (`"Hyper+S"`). `TryParse` returns false for the same inputs; `TryParse(text, out chord, out error)` gives the message
 for the key binding editor. `ToString` writes the canonical form (`Ctrl+Shift+Alt+Super+Key`). Key names Candela
 documents are listed by `KeyChord.IsKnownKey`; other single key names still parse (the windowing layer may know more).
 `KeyBindingSet` skips chords that do not parse (a hand-edited preset still works) and `FindInvalidChords` lists them.
-Every chord of the built-in *Default* preset parses back to the chord it was made from.
+Every chord of the built-in *Default* preset parses back to the chord it was made from, and its text round-trips
+through `ToString` unchanged.
 
 ## 8. Renderer diagnostics: PNG files
 
 `Candela.Rendering.Vulkan.ImageFiles.WritePng` (CLI renders, tests, golden images) writes an RGBA8 image as **RGB**
 (PNG colour type 2, a quarter smaller) when every alpha byte is 255 — rendered frames always are — and as RGBA
 (colour type 6) otherwise. Readers that ask for RGBA get alpha 255 from an RGB file, so both read back to the same
-pixels; bytes beyond `Width × Height × 4` are ignored.
+pixels; bytes beyond `Width × Height × 4` are ignored. The tests check the files with a strict decoder written from the
+PNG specification (chunk CRCs, IHDR fields, zlib stream, every filter type), not only with the lenient stb reader.
 
 ## 9. Tests
 
-`tests/Candela.Core.Tests` (about 185 tests, a few seconds):
+`tests/Candela.Core.Tests` (about 200 tests, a few seconds):
 
 * `SceneChangeTests` — every kind is raised once with a version bump, also through undo/redo; detached entities are
   silent; layer list operations keep the index in sync; per-frame lookups allocate nothing.
@@ -212,6 +224,9 @@ pixels; bytes beyond `Width × Height × 4` are ignored.
   codes, a 100 000-level hierarchy, world matrices under arbitrary edits without allocation.
 * `KeyChordTests`, `CommandTests` (descriptions fixed and allocation-free, selection), `SceneTests`,
   `PresetAndSettingsTests`.
+* `ReviewRegressionTests` — scene copies through `ToFile`/`FromFile`, one-scene ownership of layers and settings,
+  selection no-op adds, case-insensitive chords, all-or-nothing multi-adds, one change per reparent, linear detached
+  chains, independence of copies.
 
-`tests/Candela.Rendering.Vulkan.Tests/ImageFilesTests` checks the PNG colour type, exact read-back, size, padding and
-argument validation without a GPU.
+`tests/Candela.Rendering.Vulkan.Tests/ImageFilesTests` checks the PNG colour type, exact read-back, size, padding,
+argument validation and strict PNG validity without a GPU.

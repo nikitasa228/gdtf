@@ -238,7 +238,7 @@ public sealed class Scene
         {
             entity.SetLocalSilently(given);
         }
-        else if (keepWorldTransform)
+        else if (keepWorldTransform && !ReferenceEquals(oldParent, newParent)) // a reorder keeps the local transform exactly
         {
             if (newParent is not null && Matrix4x4.Invert(newParent.WorldMatrix, out var inverse)) world *= inverse;
             entity.SetLocalSilently(Transform.FromMatrix(world));

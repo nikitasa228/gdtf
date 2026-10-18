@@ -168,6 +168,16 @@ public class ReviewRegressionTests
     }
 
     [Fact]
+    public void A_preset_without_a_binding_table_can_be_edited()
+    {
+        var set = CandelaJson.Deserialize<KeyBindingSet>("{\"bindings\": null}")!;
+        Assert.Empty(set.ChordsFor(EditorActions.Undo));
+        Assert.Empty(set.FindInvalidChords());
+        set.Set(EditorActions.Undo, new KeyChord("Z", KeyModifiers.Ctrl));
+        Assert.Equal(new[] { new KeyChord("Z", KeyModifiers.Ctrl) }, set.ChordsFor(EditorActions.Undo));
+    }
+
+    [Fact]
     public void Every_chord_of_the_default_preset_round_trips_through_its_text()
     {
         foreach (var (action, texts) in KeyBindingSet.CreateDefault().Bindings)
@@ -256,9 +266,13 @@ public class ReviewRegressionTests
 
         scene.Reparent(truss, null, index: 0); // already the first root
         Assert.Empty(changes);
+        var rotated = new Transform(new Vector3(0.1f, 0.2f, 0.3f), Quaternion.CreateFromYawPitchRoll(0.3f, 0.2f, 0.1f), new Vector3(1, 2, 3));
+        other.Local = rotated;
+        changes.Clear();
         scene.Reparent(other, null, index: 0); // a real move among the roots
         Assert.Equal(SceneChangeKind.Reparented, Assert.Single(changes).Kind);
         Assert.Same(other, scene.Roots[0]);
+        Assert.Equal(rotated, other.Local); // a reorder keeps the local transform exactly (no matrix round trip)
 
         // Through the command: one change for do, one for undo, one for redo.
         changes.Clear();

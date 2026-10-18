@@ -36,6 +36,14 @@ public class CommandTests
         };
         Assert.Equal(expected, commands.Select(c => c.Description));
 
+        // Every command type of Core is in the list above, so a new command cannot skip this check.
+        static Type Definition(Type t) => t.IsGenericType ? t.GetGenericTypeDefinition() : t;
+        var covered = commands.Select(c => Definition(c.GetType())).ToHashSet();
+        var all = typeof(IUndoableCommand).Assembly.GetTypes()
+            .Where(t => typeof(IUndoableCommand).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false })
+            .Select(Definition);
+        Assert.Empty(all.Except(covered).Select(t => t.Name));
+
         // Renaming afterwards does not change what the history shows for the step that was made.
         spot.Name = "Renamed";
         truss.Name = "Renamed truss";

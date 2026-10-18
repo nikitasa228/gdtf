@@ -250,8 +250,8 @@ public sealed class KeyBindingSet
         }
     }
 
-    /// <summary>Replaces the chords of <paramref name="action"/>.</summary>
-    public void Set(string action, params KeyChord[] chords) => Bindings[action] = chords.Select(c => c.ToString()).ToList();
+    /// <summary>Replaces the chords of <paramref name="action"/> (also in a preset read with <c>"bindings": null</c>).</summary>
+    public void Set(string action, params KeyChord[] chords) => (Bindings ??= new())[action] = chords.Select(c => c.ToString()).ToList();
 
     /// <summary>The built-in "Default" preset.</summary>
     public static KeyBindingSet CreateDefault()
