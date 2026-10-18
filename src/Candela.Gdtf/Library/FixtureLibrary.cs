@@ -282,10 +282,7 @@ public sealed class FixtureLibrary
         var brandEntries = manufacturerKey.Length > 0 ? snapshot.EntriesOfManufacturer(manufacturerKey) : null;
         if (brandEntries is { Count: > 0 })
         {
-            FixtureLibraryEntry? best = null;
-            foreach (var e in brandEntries)
-                if (HasKey(e, modelKeys) && (best is null || IsBetter(e, best))) best = e;
-            if (best is not null) return new FixtureMatch(best, FixtureMatchKind.SameModel, 1);
+            if (BestMatch(brandEntries, modelKeys) is { } best) return new FixtureMatch(best, FixtureMatchKind.SameModel, 1);
         }
         else
         {
@@ -296,7 +293,7 @@ public sealed class FixtureLibrary
                 if (!snapshot.ByModelKey.TryGetValue(key, out var list)) continue;
                 var brands = list.Select(e => e.ManufacturerKey).Distinct(StringComparer.Ordinal).Count();
                 if (brands != 1) continue;
-                return new FixtureMatch(Newest(list), FixtureMatchKind.ModelOnly, 1);
+                return new FixtureMatch(BestMatch(list, new List<string> { key })!, FixtureMatchKind.ModelOnly, 1);
             }
             return null;
         }
@@ -452,20 +449,47 @@ public sealed class FixtureLibrary
         {
             if (key.Length <= prefix.Length || !key.StartsWith(prefix, StringComparison.Ordinal)) continue;
             var rest = new List<string> { key[prefix.Length..] };
-            FixtureLibraryEntry? best = null;
-            foreach (var e in snapshot.ByManufacturer[brand])
-                if (HasKey(e, rest) && (best is null || IsBetter(e, best))) best = e;
-            if (best is not null) return best;
+            if (BestMatch(snapshot.ByManufacturer[brand], rest) is { } best) return best;
         }
         return null;
     }
 
-    private static bool HasKey(FixtureLibraryEntry e, List<string> keys)
+    /// <summary>
+    /// The entry that answers best to <paramref name="keys"/>: one whose file name gives the model beats one that only
+    /// has it as a specs alias (two models can share an alias: "Robin Spikie+" was once indistinguishable from
+    /// "Robin Spikie"), then the newest revision. Null when none answers.
+    /// </summary>
+    private static FixtureLibraryEntry? BestMatch(IEnumerable<FixtureLibraryEntry> entries, List<string> keys)
     {
-        foreach (var k in keys)
-            foreach (var ek in e.ModelKeys)
-                if (string.Equals(k, ek, StringComparison.Ordinal)) return true;
-        return false;
+        FixtureLibraryEntry? best = null;
+        int bestRank = int.MaxValue;
+        foreach (var e in entries)
+        {
+            int rank = MatchRank(e, keys);
+            if (rank < 0) continue;
+            if (best is null || rank < bestRank || (rank == bestRank && IsBetter(e, best)))
+            {
+                best = e;
+                bestRank = rank;
+            }
+        }
+        return best;
+    }
+
+    /// <summary>0 when a key matches the entry's file-name model, 1 when only a specs alias matches, −1 for no match.</summary>
+    private static int MatchRank(FixtureLibraryEntry e, List<string> keys)
+    {
+        int rank = -1;
+        for (int i = 0; i < e.ModelKeys.Count; i++)
+        {
+            foreach (var k in keys)
+            {
+                if (!string.Equals(k, e.ModelKeys[i], StringComparison.Ordinal)) continue;
+                if (i < e.FileKeyCount) return 0;
+                rank = 1;
+            }
+        }
+        return rank;
     }
 
     /// <summary>Newer revision wins; equal revisions fall back to the file name so results are deterministic.</summary>
@@ -473,14 +497,6 @@ public sealed class FixtureLibrary
     {
         int c = candidate.Revision.CompareTo(current.Revision);
         return c > 0 || (c == 0 && string.CompareOrdinal(candidate.FileName, current.FileName) < 0);
-    }
-
-    private static FixtureLibraryEntry Newest(IReadOnlyList<FixtureLibraryEntry> list)
-    {
-        var best = list[0];
-        for (int i = 1; i < list.Count; i++)
-            if (IsBetter(list[i], best)) best = list[i];
-        return best;
     }
 
     /// <summary>Normalised keys of a requested model name: as written and without a leading brand name.</summary>
