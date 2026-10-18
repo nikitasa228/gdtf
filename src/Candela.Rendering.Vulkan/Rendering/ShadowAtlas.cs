@@ -211,9 +211,14 @@ internal sealed unsafe class ShadowAtlas : IDisposable
             Free(index);
         }
 
-        int slot = FreeSlot();
-        if (slot < 0)
-            return -1;
+        // A tile record and atlas space, evicting the least recently used tiles this frame does not need for either.
+        int slot;
+        while ((slot = FreeSlot()) < 0)
+        {
+            if (!EvictLeastRecentlyUsed(frame))
+                return -1;
+        }
+
         int x, y, size = wantedSize;
         while (!TryPlace(size, out x, out y))
         {
@@ -224,9 +229,6 @@ internal sealed unsafe class ShadowAtlas : IDisposable
                 return -1;
         }
 
-        slot = FreeSlot();
-        if (slot < 0)
-            return -1;
         ref var t = ref _tiles[slot];
         t = new Tile { Used = true, Key = key, X = x, Y = y, Size = size, LastUsed = frame, NeedRsm = needRsm };
         Occupy(x, y, size, true);

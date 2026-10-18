@@ -238,6 +238,46 @@ public sealed class ShadowTests
     }
 
     [SkippableFact]
+    public void AFullAtlasMakesRoomForNewLights()
+    {
+        // 256 tiles (the most the atlas has), then 256 other lights: the stale tiles are evicted for the new ones.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(40f, scene.Lambert(new Vector3(0.6f)));
+            var view = new TopDownView(64, 64, 34f);
+            using var target = renderer.CreateTarget(64, 64);
+            var settings = new PreviewSettings { MaxShadowedLights = 256, Volumetrics = false, Indirect = IndirectLighting.Off, Bloom = false };
+            SpotLight[] Lights(float z)
+            {
+                var lights = new SpotLight[256];
+                for (int i = 0; i < lights.Length; i++)
+                {
+                    var p = new Vector3(-15f + 2f * (i % 16), -15f + 2f * (i / 16), z);
+                    lights[i] = StageScene.Spot(p, p with { Z = 0f }, 5000f, 20f, 30f);
+                    lights[i].FixtureId = Guid.NewGuid();
+                }
+
+                return lights;
+            }
+
+            renderer.World.SetLights(Lights(4f));
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false }, settings, 0f);
+            Assert.Equal(256, renderer.LastStatistics.ShadowedLights);
+            renderer.World.SetLights(Lights(5f));
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false }, settings, 0f);
+            Assert.Equal(256, renderer.LastStatistics.ShadowedLights);
+            Assert.Equal(256, renderer.LastStatistics.ShadowTilesRendered);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void TwoViewsInOneFrameShareTheAtlasWithoutReRendering()
     {
         var renderer = TestRenderers.CreateOrSkip();
