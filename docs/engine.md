@@ -49,7 +49,7 @@ while (running)
 | `LightMeter`, `Recorder`, `Play`, `Player` | Illuminance and light plot; DMX recording and playback. |
 | `Lights`, `LightCollector`, `Time`, `Frame` | The frame's photometric lights and clock. |
 | `Render`, `AttachRenderWorld`, `DetachRenderWorld` | The renderer binding. |
-| `Autosave`, `EnableAutosave`, `DisableAutosave`, `Recover` | Autosave of the open project and recovery of crashed sessions. |
+| `Autosave`, `EnableAutosave`, `DisableAutosave`, `Recover` | Autosave of the open project (`AutosaveService`, driven by `Tick`; a project is autosaved only when its scene or `engine`/`view` settings changed; a successful save discards the session's autosaves) and recovery of crashed sessions. Opening another project closes the session normally; on a clean exit the application calls `DisableAutosave()` before disposing the engine (disposing alone keeps the recovery files). |
 
 **Construction.** `new StageEngine(StageEngineOptions)`: `LibraryFolders` (empty → the repository during development:
 the folder containing `Candela.sln`, searched upwards from the program and the current directory), `SpecsIndexPath`
@@ -272,7 +272,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (29 tests, ≈ 30 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (36 tests, ≈ 25 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, 4 substitutes and no errors; every fixture has a state and a pose; after
@@ -297,6 +297,13 @@ a device):
 * **Recordings**: 120 frames of two universes with timecode round-trip through a file (< 8 KiB) and play back
   byte-exact, including a lost universe and seeking backwards; seek by timecode; truncated and damaged files; the
   engine records its own input and plays it back to its fixtures.
+* **Fire**: a flame projector (synthetic GENERATOR FIRE GDTF) burns from its manual values, lights the floor through
+  the flame light samples, sends a temperature grid above 1000 K to the render world, feeds soot into the smoke and
+  dies down when its valve closes.
+* **CLI**: usage errors and missing files give their exit codes; every documented `render` option parses; `info` on
+  the MVR and a GDTF; `validate` exits with 4 on Фокина's patch overlaps and prints the light plot; `import-worker`
+  writes a package with the given units or the reason it cannot; `artnet-test` sends ArtDmx packets to a UDP port;
+  engine options from the user settings default to the repository library, and a missing library stays reported.
 * **Rendering** (Vulkan): `candela render` on Фокина.mvr at 480 × 270 gives a lit, not blown-out stage; the
   thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames differ.
 

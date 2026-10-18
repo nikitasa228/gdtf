@@ -53,6 +53,13 @@ public sealed partial class StageEngine
         }
         ProjectPath = saved.Path ?? Path.GetFullPath(path);
         IsModified = false;
+        if (_autosave is not null)
+        {
+            // the saved file now holds everything the autosaves hold: they are discarded and tracking restarts
+            _autosavedVersion = _scene.Version;
+            _autosavedSettings = AutosaveSettingsKey();
+            _ = _autosave.MarkSaved();
+        }
         var issues = Sorted(saved.Issues);
         Report(issues);
         return new EngineResult(true, $"Saved '{Path.GetFileName(path)}' ({saved.StoredGdtfs.Count} GDTF files, {Assets.Count} assets, " +
@@ -217,7 +224,7 @@ public sealed partial class StageEngine
     {
         if (_autosaveOptions is not { } options || _disposed) return;
         _autosavedVersion = _scene.Version;
-        _autosavedSettings = null;
+        _autosavedSettings = AutosaveSettingsKey();
         try
         {
             _autosave = new AutosaveService(_project.Id, CaptureAutosave, options);
@@ -247,10 +254,13 @@ public sealed partial class StageEngine
         _autosave = null;
     }
 
+    private string AutosaveSettingsKey() =>
+        Core.Serialization.CandelaJson.Serialize(Settings, indented: false) + Core.Serialization.CandelaJson.Serialize(View, indented: false);
+
     /// <summary>Autosave capture (main thread): a snapshot when the scene or the engine/view settings changed, else null.</summary>
     private ProjectSnapshot? CaptureAutosave()
     {
-        string settings = Core.Serialization.CandelaJson.Serialize(Settings, indented: false) + Core.Serialization.CandelaJson.Serialize(View, indented: false);
+        string settings = AutosaveSettingsKey();
         if (_scene.Version == _autosavedVersion && settings == _autosavedSettings) return null;
         _autosavedVersion = _scene.Version;
         _autosavedSettings = settings;
