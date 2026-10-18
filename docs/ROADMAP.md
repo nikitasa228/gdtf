@@ -24,16 +24,18 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       acoustics, blackbody (docs/photometry.md)
 - [x] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics, encoder, DmxEngine
       (2000 fixtures ≈ 2 ms/frame, zero allocations; 387 GDTF attributes handled) — docs/dmx.md
-- [ ] Art-Net receiver (ArtDmx, ArtPoll/PollReply discovery, ArtTimeCode, ArtSync), sACN receiver; DMX input hub
+- [x] Art-Net receiver (ArtDmx, ArtPoll/PollReply discovery, ArtTimeCode, ArtSync), sACN receiver; DMX input hub
+      (docs/protocols.md); an Art-Net packet moves a fixture end to end through the engine (docs/engine.md)
 
 ## M2 — Real-time renderer v1 + headless
-- [ ] Vulkan device/instance (validation in debug), offscreen + swapchain targets, feature detection (RT, wireframe)
-- [ ] Mesh/material/texture upload, bindless materials, built-in PBR material library
-- [ ] Physically based spot lights from fixture state: cd profile, colour, zoom, gobo/iris/blade/prism/frost cookie
-- [ ] Shadows (atlas), clustered forward shading, HDR, exposure (EV100), tone mapping
-- [ ] Volumetric light in haze: froxel in-scattering (HG phase), shadows/cookies in the beam, temporal accumulation
-- [ ] View modes Wireframe / Colorless / Full; perspective / orthographic; selection outline (vivid orange)
-- [ ] `Candela.Cli render` → PNG on lavapipe; golden-image tests; Фокина.mvr renders
+- [x] Vulkan device/instance (validation in debug), offscreen + swapchain targets, feature detection (RT, wireframe)
+- [x] Mesh/material/texture upload, bindless materials, built-in PBR material library
+- [x] Physically based spot lights from fixture state: cd profile, colour, zoom, gobo/iris/blade/prism/frost cookie
+- [x] Shadows (atlas), clustered forward shading, HDR, exposure (EV100), tone mapping
+- [x] Volumetric light in haze: froxel in-scattering (HG phase), shadows/cookies in the beam, temporal accumulation
+- [x] View modes Wireframe / Colorless / Full; perspective / orthographic; selection outline (vivid orange)
+- [x] `Candela.Cli render` → PNG on lavapipe; golden-image tests; Фокина.mvr renders (engine: scene → DMX → lights →
+      render world, docs/engine.md; renderer: docs/rendering.md)
 
 ## M3 — Editor shell
 - [ ] GLFW + ImGui docking: every panel is a dockable tab; drop-zone indicators; tab style per panel group
@@ -61,37 +63,44 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [ ] Port picker popup when a device has several matching inputs/outputs
 - [ ] Ports from GDTF wiring objects + specs; connector illustrations in the properties panel with the connected cable
 - [ ] Cable link window: strip of all devices on a cable, click → select device
-- [ ] Console model: outputs → universes; fixtures cabled to a console are console-driven (locked controls);
-      cable indices shown in the patch
+- [~] Console model: outputs → universes; fixtures cabled to a console are console-driven (locked controls);
+      cable indices shown in the patch (engine: console-driven status from the data network locks manual values,
+      docs/engine.md; locked controls and the patch view in the editor)
 - [x] Power network: sources, links (TRUE1 through), distros, dimmers (own draw vs `maxLoadW`), breaker checks
       (engine side done in Candela.Electrical; editor tools in this milestone)
 - [x] Data network: DMX chains, splitters, Y-split warning, address overlap, chain length (Candela.Electrical)
 - [x] Rigging: fixtures mounted on trusses/pipes, truss/point load incl. cable weight, overload warnings
       (Candela.Electrical RiggingAnalyzer) — docs/electrical.md
-- [ ] Cable overlay with legend
+- [~] Cable overlay with legend (cables drawn as tubes + coloured lines, connected devices highlighted; legend in the
+      editor)
 
 ## M5 — Atmosphere, fire, overlays
-- [ ] Smoke/haze fluid simulation (GPU, CPU reference): HAZE/FOG emitters from DMX, FAN airflow, obstacles,
-      dissipation; feeds volumetric rendering and path tracer
-- [ ] Fire simulation for GENERATOR FIRE fixtures: flame jets from DMX, blackbody emission lighting the scene, smoke
-- [ ] Lux overlay with gradient editor in the viewport corner (movable colour stops, min/max range, outside → grey,
-      presets: Default / Custom / save as named)
-- [ ] Noise overlay: SPL on surfaces + coloured volumetric fog, own gradient + presets
+- [~] Smoke/haze fluid simulation (GPU, CPU reference): HAZE/FOG emitters from DMX, FAN airflow, obstacles,
+      dissipation; feeds volumetric rendering and path tracer (CPU solver driven by the DMX device outputs in the engine,
+      density grid rendered; GPU solver pending)
+- [~] Fire simulation for GENERATOR FIRE fixtures: flame jets from DMX, blackbody emission lighting the scene, smoke
+      (CPU simulation driven by DMX in the engine, flames light the scene and are rendered; no GENERATOR FIRE GDTF in the
+      library yet)
+- [~] Lux overlay with gradient editor in the viewport corner (movable colour stops, min/max range, outside → grey,
+      presets: Default / Custom / save as named) (GPU overlay and CPU light meter done; gradient editor in the editor)
+- [~] Noise overlay: SPL on surfaces + coloured volumetric fog, own gradient + presets (sources from `_specs` noise ×
+      device activity, GPU overlay done; gradient editor in the editor)
 
 ## M6 — Final render and indirect light
 - [ ] Path tracer (ray query): PBR materials, spot lights with cookies, heterogeneous media, fire emission, progressive
       accumulation, PNG/EXR output
-- [ ] Render a frame or a timecode range (DMX recorded from the live input, replayed for each frame) → image sequence
-- [ ] Real-time indirect light: reflective shadow maps (all GPUs), ray-query GI/reflections (RT GPUs)
-- [ ] Narrow-beam cone ray marching for sharp gobo beams
+- [~] Render a frame or a timecode range (DMX recorded from the live input, replayed for each frame) → image sequence
+      (DMX recorder/player with timecode seek, `candela render --look dmx-file --time`; path-traced sequences pending)
+- [x] Real-time indirect light: reflective shadow maps (all GPUs), ray-query GI/reflections (RT GPUs)
+- [x] Narrow-beam cone ray marching for sharp gobo beams
 
 ## M7 — More protocols and polish
 - Protocol matrix (external control panel lists all of them; status shows what works):
-  - [ ] Art-Net (M1) - [ ] sACN (M1) - [ ] OSC - [ ] PosiStageNet - [ ] EntTec DMX USB Pro - [ ] CITP
-  - [ ] ETC Eos (OSC) - [ ] BlackTrax (RTTrPM) - [ ] Kinesys - [ ] PangolinLD - [ ] LasergraphDSP - [ ] NDI (SDK)
+  - [x] Art-Net (M1) - [x] sACN (M1) - [x] OSC - [x] PosiStageNet - [x] EntTec DMX USB Pro - [ ] CITP
+  - [~] ETC Eos (OSC) - [ ] BlackTrax (RTTrPM) - [ ] Kinesys - [ ] PangolinLD - [ ] LasergraphDSP - [ ] NDI (SDK)
   - [ ] Compulite VC - [ ] MA-Net2 / MA-Net3 (proprietary, need MA's SDK — Art-Net/sACN from MA consoles work)
 - [ ] Performance: GPU-driven instancing, thousands of fixtures, async compute
-- [ ] Windows packaging, crash reporting, autosave/recovery
+- [~] Windows packaging, crash reporting, autosave/recovery (autosave and recovery done: Candela.Project + engine)
 
 ## Known limitations
 - SketchUp `.skp` cannot be read (closed format); export to DAE/FBX/glTF from SketchUp.
