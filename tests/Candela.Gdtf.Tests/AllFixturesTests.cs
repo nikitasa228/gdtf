@@ -16,6 +16,7 @@ public sealed class AllFixturesFixture
     public AllFixturesFixture()
     {
         var results = new ConcurrentBag<FixtureSummary>();
+        var cpuBefore = Process.GetCurrentProcess().TotalProcessorTime;
         var sw = Stopwatch.StartNew();
         Parallel.ForEach(TestData.GdtfFiles, file =>
         {
@@ -34,11 +35,24 @@ public sealed class AllFixturesFixture
             }
         });
         Elapsed = sw.Elapsed;
+        CpuTime = Process.GetCurrentProcess().TotalProcessorTime - cpuBefore;
         Summaries = results.OrderBy(r => r.FileName, StringComparer.Ordinal).ToList();
     }
 
     /// <summary>Wall-clock time of the parallel full parse.</summary>
     public TimeSpan Elapsed { get; }
+
+    /// <summary>
+    /// Processor time the test process used meanwhile (the parse, plus whatever other tests ran in parallel): the work
+    /// itself, which unlike the wall-clock time does not grow when other processes load the machine.
+    /// </summary>
+    public TimeSpan CpuTime { get; }
+
+    /// <summary>
+    /// The wall-clock time the parse takes on an otherwise idle machine, estimated from <see cref="CpuTime"/> spread
+    /// over the cores.
+    /// </summary>
+    public TimeSpan IdleMachineEstimate => CpuTime / Environment.ProcessorCount;
 
     /// <summary>One summary per file, sorted by file name.</summary>
     public IReadOnlyList<FixtureSummary> Summaries { get; }
@@ -70,11 +84,15 @@ public sealed class AllFixturesTests
         Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures));
 
         int withWarnings = _all.Summaries.Count(s => s.WarningCount > 0);
-        _output.WriteLine($"Parsed {_all.Summaries.Count} files in {_all.Elapsed.TotalSeconds:F1} s (parallel, {Environment.ProcessorCount} cores).");
+        _output.WriteLine($"Parsed {_all.Summaries.Count} files in {_all.Elapsed.TotalSeconds:F1} s (parallel, {Environment.ProcessorCount} cores, " +
+            $"{_all.CpuTime.TotalSeconds:F1} s processor time).");
         _output.WriteLine($"{withWarnings} files have warnings ({_all.Summaries.Sum(s => s.WarningCount)} in total).");
         foreach (var s in _all.Summaries.OrderByDescending(s => s.WarningCount).Take(5))
             _output.WriteLine($"  {s.WarningCount,4}  {s.FileName}");
-        Assert.True(_all.Elapsed < TimeSpan.FromSeconds(90), $"Full parse took {_all.Elapsed}.");
+        // Wall-clock time alone fails on a machine busy with other work (131 s once under a load average of 37); the
+        // processor time measures the parse itself. Only both being slow is a real regression.
+        Assert.True(_all.Elapsed < TimeSpan.FromSeconds(90) || _all.IdleMachineEstimate < TimeSpan.FromSeconds(60),
+            $"Full parse took {_all.Elapsed} ({_all.CpuTime} processor time on {Environment.ProcessorCount} cores).");
         // Only accessories (two Elation brackets) come without DMX modes; mode counts are checked against the specs below.
         Assert.True(_all.Summaries.Count(s => s.Modes.Count == 0) <= 2);
     }
