@@ -8,14 +8,16 @@ namespace Candela.Engine.Tests;
 public sealed class FokinaTests
 {
     [Fact]
-    public void Opening_the_mvr_resolves_every_fixture_with_four_substitutes()
+    public void Opening_the_mvr_resolves_every_fixture_with_a_substitute_per_missing_model()
     {
+        // four of the five models are not in the repository's library (FokinaFixtureTypes); each gets a substitute
+        var missing = FokinaFixtureTypes.MissingFrom(TestEnvironment.Library);
         using var engine = TestEnvironment.CreateEngine();
         var result = engine.Open(TestEnvironment.Fokina);
 
         Assert.True(result.Success, result.Summary);
         Assert.Equal(91, engine.Scene.Query<FixtureComponent>().Count());
-        Assert.Equal(4, result.Issues.Count(i => i.Code == MvrIssueCodes.GdtfSubstitute));
+        Assert.Equal(missing.Count, result.Issues.Count(i => i.Code == MvrIssueCodes.GdtfSubstitute));
         Assert.DoesNotContain(result.Issues, i => i.Severity == IssueSeverity.Error);
         Assert.Null(engine.ProjectPath);
         Assert.False(engine.IsModified);
@@ -26,10 +28,14 @@ public sealed class FokinaTests
             Assert.NotNull(engine.Dmx.GetState(entity.Id));
         Assert.Equal(91, engine.Poses.Count);
 
-        // the substitute patch overlaps are real problems of the file and stay visible in the issue list
+        // the MagicBlade R stand-in (160 channels on a 44-channel spacing) overlaps its neighbours: a real problem of the
+        // resolved scene that stays visible in the issue list next to the substitute warnings
         engine.RefreshIssues();
-        Assert.Contains(engine.Issues.Current, i => i.Code == "patch.overlap");
-        Assert.Contains(engine.Issues.Current, i => i.Code == MvrIssueCodes.GdtfSubstitute);
+        if (missing.Contains(FokinaFixtureTypes.MagicBladeR))
+            Assert.Contains(engine.Issues.Current, i => i.Code == "patch.overlap");
+        else
+            Assert.DoesNotContain(engine.Issues.Current, i => i.Code == "patch.overlap");
+        Assert.Equal(missing.Count > 0, engine.Issues.Current.Any(i => i.Code == MvrIssueCodes.GdtfSubstitute));
     }
 
     [Fact]

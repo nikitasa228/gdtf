@@ -96,10 +96,12 @@ public sealed class CliTests
     [Fact]
     public void Info_and_validate_describe_the_mvr_and_its_issues()
     {
+        // substitutes and their overlaps only while the library lacks the scene's models (FokinaFixtureTypes)
+        var missing = FokinaFixtureTypes.MissingFrom(TestEnvironment.Library);
         var info = Run("info", TestEnvironment.Fokina, "--library", TestEnvironment.Root);
         Assert.Equal(Program.ExitOk, info.Code);
-        Assert.Contains("91 of 4 type(s)", info.Output, StringComparison.Ordinal);
-        Assert.Contains("library substitute", info.Output, StringComparison.Ordinal);
+        Assert.Contains("91 of ", info.Output, StringComparison.Ordinal);
+        Assert.Equal(missing.Count > 0, info.Output.Contains("library substitute", StringComparison.Ordinal));
 
         var gdtf = Run("info", Path.Combine(TestEnvironment.Root, SceneBuilder.MacViper), "--library", TestEnvironment.Root);
         Assert.Equal(Program.ExitOk, gdtf.Code);
@@ -108,8 +110,15 @@ public sealed class CliTests
         Assert.Contains("760000 cd", gdtf.Output, StringComparison.Ordinal);
 
         var validate = Run("validate", TestEnvironment.Fokina, "--library", TestEnvironment.Root, "--plot");
-        Assert.Equal(Program.ExitInputErrors, validate.Code); // the substitutes' footprints overlap
-        Assert.Contains("patch.overlap", validate.Output, StringComparison.Ordinal);
+        if (missing.Contains(FokinaFixtureTypes.MagicBladeR))
+        {
+            Assert.Equal(Program.ExitInputErrors, validate.Code); // the MagicBlade R stand-in's footprint overlaps
+            Assert.Contains("patch.overlap", validate.Output, StringComparison.Ordinal);
+        }
+        else
+        {
+            Assert.DoesNotContain("patch.overlap", validate.Output, StringComparison.Ordinal);
+        }
         Assert.Contains("Light plot", validate.Output, StringComparison.Ordinal);
         Assert.Contains("Total:", validate.Output, StringComparison.Ordinal);
     }
