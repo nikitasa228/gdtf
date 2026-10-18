@@ -242,7 +242,7 @@ internal sealed class ShortcutsWindow
                     ImGui.TextUnformatted(command.Icon.Length > 0 ? $"{command.Icon}  {command.Text}" : command.Text);
                     ImGui.TableNextColumn();
                     var chords = _keys.Current.Bindings.TryGetValue(command.Id, out var list) ? list : null;
-                    ImGui.TextColored(Theme.Accent, chords is { Count: > 0 } ? string.Join("   ", chords) : "—");
+                    ImGui.TextColored(Theme.Accent, chords is { Count: > 0 } ? string.Join("   ", chords.Select(KeyNames.DisplayChord)) : "—");
                 }
 
                 ImGui.EndTable();

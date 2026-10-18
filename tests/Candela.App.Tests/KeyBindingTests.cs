@@ -88,6 +88,39 @@ public sealed class KeyBindingMapTests
     }
 }
 
+public sealed class KeyDisplayTests
+{
+    [Theory]
+    [InlineData("Ctrl+Comma", "Ctrl+,")]
+    [InlineData("Ctrl+Shift+S", "Ctrl+Shift+S")]
+    [InlineData("Numpad7", "Num 7")]
+    [InlineData("Ctrl+Numpad1", "Ctrl+Num 1")]
+    [InlineData("Alt+0", "Alt+0")]
+    [InlineData("F12", "F12")]
+    [InlineData("Delete", "Delete")]
+    [InlineData("Ctrl+NumpadAdd", "Ctrl+Num +")]
+    [InlineData("Shift+Slash", "Shift+/")]
+    [InlineData("PageDown", "Page Down")]
+    [InlineData("Ctrl+Backslash", "Ctrl+\\")]
+    public void Chords_show_symbols_and_short_keypad_names(string chord, string expected) =>
+        Assert.Equal(expected, KeyNames.DisplayChord(chord));
+
+    [Fact]
+    public void Every_default_chord_has_a_readable_display_form()
+    {
+        foreach (var (_, chords) in KeyBindingsService.CreateDefault().Bindings)
+        {
+            foreach (var chord in chords)
+            {
+                string display = KeyNames.DisplayChord(chord);
+                Assert.DoesNotContain("Comma", display);
+                Assert.DoesNotContain("Numpad", display);
+                Assert.Same(display, KeyNames.DisplayChord(chord)); // cached: menus ask every frame
+            }
+        }
+    }
+}
+
 public sealed class KeyBindingsServiceTests
 {
     private static KeyBindingsService Create(AppSettings settings, IPresetStore store, string customFile) =>

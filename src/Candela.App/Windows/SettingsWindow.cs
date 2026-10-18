@@ -326,7 +326,7 @@ internal sealed class SettingsWindow
             {
                 ImGui.PushID(i);
                 bool capturing = _captureAction == command.Id && _captureIndex == i;
-                string text = capturing ? Loc.Get(Str.SettingsPressKey) : chords![i];
+                string text = capturing ? Loc.Get(Str.SettingsPressKey) : KeyNames.DisplayChord(chords![i]);
                 if (capturing)
                     ImGui.PushStyleColor(ImGuiCol.Button, Theme.WithAlpha(Theme.Accent, 0.6f));
                 if (ImGui.Button(text))

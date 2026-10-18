@@ -59,6 +59,59 @@ internal static class KeyNames
         return m;
     }
 
+    private static readonly Dictionary<string, string> DisplayCache = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// How a chord string of the binding set ("Ctrl+Comma", "Ctrl+Numpad7") is shown in menus, the shortcut list and the
+    /// key binding editor: punctuation keys as their symbol and keypad keys with a short "Num" prefix ("Ctrl+,",
+    /// "Ctrl+Num 7"), modifiers unchanged. Results are cached, so menus can ask every frame without allocating.
+    /// </summary>
+    public static string DisplayChord(string chord)
+    {
+        ArgumentNullException.ThrowIfNull(chord);
+        if (DisplayCache.TryGetValue(chord, out var cached))
+            return cached;
+        int split = chord.LastIndexOf('+');
+        string key = split >= 0 && split < chord.Length - 1 ? chord[(split + 1)..] : chord;
+        string display = split >= 0 && split < chord.Length - 1 ? chord[..(split + 1)] + DisplayKey(key) : DisplayKey(key);
+        if (DisplayCache.Count > 1024)
+            DisplayCache.Clear();
+        DisplayCache[chord] = display;
+        return display;
+    }
+
+    /// <summary>Display form of one key name (see <see cref="DisplayChord"/>).</summary>
+    public static string DisplayKey(string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        switch (key.ToUpperInvariant())
+        {
+            case "COMMA": return ",";
+            case "PERIOD": return ".";
+            case "SLASH": return "/";
+            case "SEMICOLON": return ";";
+            case "APOSTROPHE": return "'";
+            case "MINUS": return "-";
+            case "EQUAL": return "=";
+            case "LEFTBRACKET": return "[";
+            case "RIGHTBRACKET": return "]";
+            case "BACKSLASH": return "\\";
+            case "GRAVEACCENT": return "`";
+            case "PAGEUP": return "Page Up";
+            case "PAGEDOWN": return "Page Down";
+            case "NUMPADDECIMAL": return "Num .";
+            case "NUMPADDIVIDE": return "Num /";
+            case "NUMPADMULTIPLY": return "Num *";
+            case "NUMPADSUBTRACT": return "Num -";
+            case "NUMPADADD": return "Num +";
+            case "NUMPADENTER": return "Num Enter";
+        }
+
+        if (key.Length == 7 && key.StartsWith("Numpad", StringComparison.OrdinalIgnoreCase) && char.IsAsciiDigit(key[6]))
+            return "Num " + key[6];
+        return key;
+    }
+
     private static Dictionary<string, ImGuiKey> Build()
     {
         var d = new Dictionary<string, ImGuiKey>(StringComparer.OrdinalIgnoreCase);

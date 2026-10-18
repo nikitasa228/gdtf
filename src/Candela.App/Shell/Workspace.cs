@@ -735,7 +735,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private void Notify(string text) => SetStatus(text);
 
     private static string ChordText(KeyBindingsService keys, string action) =>
-        keys.Current.Bindings.TryGetValue(action, out var list) && list is { Count: > 0 } ? list[0] : "";
+        keys.Current.Bindings.TryGetValue(action, out var list) && list is { Count: > 0 } ? KeyNames.DisplayChord(list[0]) : "";
 
     private void ReportMissingMenu(string path) => _ctx.Log.Warn("Script", $"No menu item '{path}'.");
 
