@@ -409,7 +409,7 @@ internal sealed unsafe class DockWorkspace
                 continue;
             for (int i = 0; i < windows.Size; i++)
             {
-                if (windows.Data[i] != null && windows.Data[i]->ID == wid)
+                if (!windows.Data[i].IsNull && windows.Data[i].ID == wid)
                 {
                     result.Add(p);
                     break;
@@ -424,8 +424,8 @@ internal sealed unsafe class DockWorkspace
         for (int i = 0; i < windows.Size; i++)
         {
             var w = windows.Data[i];
-            if (w != null && _panelsByWindowId.TryGetValue(w->ID, out var p) && p.Id == panelId)
-                return new ImGuiWindowPtr(w);
+            if (!w.IsNull && _panelsByWindowId.TryGetValue(w.ID, out var p) && p.Id == panelId)
+                return w;
         }
 
         return null;
@@ -439,7 +439,7 @@ internal sealed unsafe class DockWorkspace
         for (int i = 1; i < windows.Size; i++)
         {
             var w = windows.Data[i];
-            if (w != null && _panelsByWindowId.TryGetValue(w->ID, out var p) && p.Id == panelId)
+            if (!w.IsNull && _panelsByWindowId.TryGetValue(w.ID, out var p) && p.Id == panelId)
             {
                 (windows.Data[0], windows.Data[i]) = (windows.Data[i], windows.Data[0]);
                 return;
@@ -464,7 +464,7 @@ internal sealed unsafe class DockWorkspace
         ImGuiP.DockBuilderSetNodeSize(DockSpaceId, Vector2.Max(size, new Vector2(320, 240)));
         uint left, rest, right, center, bottom, main;
         ImGuiP.DockBuilderSplitNode(DockSpaceId, ImGuiDir.Left, 0.18f, &left, &rest);
-        ImGuiP.DockBuilderSplitNode(rest, ImGuiDir.Right, 0.26f, &right, &center);
+        ImGuiP.DockBuilderSplitNode(rest, ImGuiDir.Right, 0.30f, &right, &center);
         ImGuiP.DockBuilderSplitNode(center, ImGuiDir.Down, 0.26f, &bottom, &main);
         foreach (var name in plan.Left)
             ImGuiP.DockBuilderDockWindow(name, left);

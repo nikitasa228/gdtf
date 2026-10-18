@@ -36,7 +36,7 @@ internal interface IScriptTarget
     void SetSetting(string name, string value);
 
     /// <summary>The main window (for marking the cursor as inside it).</summary>
-    Hexa.NET.GLFW.GLFWwindowPtr MainWindow { get; }
+    Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr MainWindow { get; }
 }
 
 /// <summary>

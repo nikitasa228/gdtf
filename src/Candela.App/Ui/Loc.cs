@@ -117,6 +117,7 @@ internal static class Loc
         (Str.ViewShowStats, "Frame Statistics", "Статистика кадра"),
         (Str.ViewShowViewCube, "View Cube", "Куб вида"),
         (Str.ViewFrameSelection, "Frame Selection", "Показать выделенное"),
+        (Str.ViewToggleProjection, "Perspective / Orthographic", "Перспектива / ортография"),
         (Str.ViewNewViewport, "New Viewport", "Новый вьюпорт"),
         (Str.ViewResetLayout, "Reset Layout", "Сбросить раскладку"),
 
@@ -125,6 +126,8 @@ internal static class Loc
         (Str.ToolRotate, "Rotate", "Поворот"),
         (Str.ToolWall, "Wall", "Стена"),
         (Str.ToolFloor, "Floor", "Пол"),
+        (Str.ToolCable, "Cable", "Кабель"),
+        (Str.ToolNeedsEngine, "Arrives with the stage engine in the next build phase.", "Появится вместе с движком сцены на следующем этапе."),
         (Str.ToolSnapping, "Snapping", "Привязка"),
         (Str.ToolSpaceLocal, "Local Axes", "Локальные оси"),
         (Str.ToolSpaceWorld, "World Axes", "Мировые оси"),
@@ -345,5 +348,7 @@ internal static class Loc
         (Str.StatusReady, "Ready", "Готово"),
         (Str.StatusSelected, "{0} selected", "Выделено: {0}"),
         (Str.StatusUndo, "Undo: {0}", "Отмена: {0}"),
+        (Str.StatusModified, "modified", "изменено"),
+        (Str.StatusDocsMissing, "The documentation folder was not found next to the program.", "Папка документации не найдена рядом с программой."),
     };
 }

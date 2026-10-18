@@ -65,11 +65,15 @@ internal sealed unsafe class FontSet
     private static ImFontPtr AddWithIcons(ImFontAtlasPtr atlas, byte[] textFont, byte[] iconFont, string name)
     {
         var text = ImGui.ImFontConfig();
+        // Inter has its own glyphs (alternates) in the private use area where the icon font lives: exclude that range from
+        // the text font so the merged icons win. ImGui copies the list.
+        uint* exclude = stackalloc uint[] { Icons.RangeFirst, 0xF8FF, 0 };
         try
         {
             text.FontDataOwnedByAtlas = true;
             text.OversampleH = 2;
             text.OversampleV = 1;
+            text.GlyphExcludeRanges = exclude;
             SetName(text, name);
             var font = AddFromMemory(atlas, textFont, text);
 

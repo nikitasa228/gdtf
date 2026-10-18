@@ -16,6 +16,10 @@ internal sealed unsafe class MainWindow : IDisposable
     /// <summary>The GLFW window handle.</summary>
     public GLFWwindowPtr Handle => _window;
 
+    /// <summary>The same window as the ImGui GLFW backend's handle type.</summary>
+    public Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr BackendHandle =>
+        new((Hexa.NET.ImGui.Backends.GLFW.GLFWwindow*)_window.Handle);
+
     /// <summary>True once the native window was destroyed.</summary>
     public bool IsDisposed => _window.Handle == null;
 

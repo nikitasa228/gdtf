@@ -50,8 +50,9 @@ internal sealed class ViewportCamera
 
     private Vector3 _target = new(0f, 1.5f, 1.0f);
     private float _yaw;
-    private float _pitch = 0.32f;
-    private float _distance = 11f;
+    // Defaults frame the stage like the render-test camera (eye (0, −9, 3.8) looking at (0, 1.5, 1)).
+    private float _pitch = 0.26f;
+    private float _distance = 10.9f;
     private float _orthoHeight = 10f;
     private float _fovY = 50f * MathF.PI / 180f;
 

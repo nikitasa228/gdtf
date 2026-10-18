@@ -77,7 +77,7 @@ internal sealed unsafe class ImGuiHost : IDisposable
     public void RenderDrawData(CommandBuffer commandBuffer)
     {
         var drawData = ImGui.GetDrawData();
-        if (drawData.IsNull || drawData.CmdListsCount == 0 && drawData.Textures == null)
+        if (drawData.IsNull)
             return;
         ImGuiImplVulkan.RenderDrawData(drawData, new VkCommandBuffer(commandBuffer.Handle), default);
     }
@@ -181,7 +181,7 @@ internal sealed unsafe class ImGuiHost : IDisposable
         io.ConfigErrorRecoveryEnableAssert = false;
         io.ConfigErrorRecoveryEnableTooltip = true;
 
-        if (!ImGuiImplGLFW.InitForVulkan(window.Handle, true))
+        if (!ImGuiImplGLFW.InitForVulkan(window.BackendHandle, true))
             throw new InvalidOperationException("The Dear ImGui GLFW backend could not be initialised.");
         _glfwReady = true;
 

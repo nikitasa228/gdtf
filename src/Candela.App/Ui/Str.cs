@@ -57,6 +57,7 @@ internal enum Str
     ViewShowStats,
     ViewShowViewCube,
     ViewFrameSelection,
+    ViewToggleProjection,
     ViewNewViewport,
     ViewResetLayout,
 
@@ -66,6 +67,8 @@ internal enum Str
     ToolRotate,
     ToolWall,
     ToolFloor,
+    ToolCable,
+    ToolNeedsEngine,
     ToolSnapping,
     ToolSpaceLocal,
     ToolSpaceWorld,
@@ -294,4 +297,6 @@ internal enum Str
     StatusReady,
     StatusSelected,
     StatusUndo,
+    StatusModified,
+    StatusDocsMissing,
 }

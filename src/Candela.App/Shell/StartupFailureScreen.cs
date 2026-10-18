@@ -64,7 +64,7 @@ internal static class StartupFailureScreen
         bool glfwReady = false, glReady = false;
         try
         {
-            glfwReady = ImGuiImplGLFW.InitForOpenGL(window.Handle, true);
+            glfwReady = ImGuiImplGLFW.InitForOpenGL(window.BackendHandle, true);
             glReady = glfwReady && ImGuiImplOpenGL3.Init("#version 130");
             if (!glReady)
             {

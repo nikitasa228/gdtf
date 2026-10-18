@@ -1,0 +1,364 @@
+using System.Globalization;
+using System.Numerics;
+using Candela.App.Ui;
+using Hexa.NET.ImGui;
+
+namespace Candela.App.Files;
+
+/// <summary>
+/// The portable file dialog (GLFW has none): a modal window with places and recent folders on the left, the folder's
+/// entries in a sortable table, the path bar, a file-name field and the type filter. Double-click opens a folder or
+/// accepts a file; saving over an existing file asks first. <see cref="Show"/> opens it; the callback receives the
+/// chosen path.
+/// </summary>
+internal sealed class FileBrowserDialog
+{
+    private const string PopupId = "##file-browser";
+    private readonly string _recentPlacesFile;
+    private FileBrowserModel? _model;
+    private Action<string>? _onAccept;
+    private string _title = "";
+    private string _pathText = "";
+    private bool _openRequested;
+    private bool _confirmOverwrite;
+    private string _pendingPath = "";
+    private int _selected = -1;
+    private IReadOnlyList<(string Label, string Path)> _places = Array.Empty<(string, string)>();
+
+    /// <summary>Creates the dialog; recently used folders are kept in <paramref name="recentPlacesFile"/>.</summary>
+    public FileBrowserDialog(string recentPlacesFile)
+    {
+        _recentPlacesFile = recentPlacesFile;
+    }
+
+    /// <summary>True while the dialog is open.</summary>
+    public bool IsOpen => _model is not null;
+
+    /// <summary>The model of the open dialog (scripts and tests).</summary>
+    internal FileBrowserModel? Model => _model;
+
+    /// <summary>Opens the dialog.</summary>
+    /// <param name="mode">Open, save or folder.</param>
+    /// <param name="title">Window title.</param>
+    /// <param name="filters">Type filters (first = default).</param>
+    /// <param name="startFolder">Folder to show first (null = the most recent place or the documents folder).</param>
+    /// <param name="fileName">Initial file name (save).</param>
+    /// <param name="onAccept">Receives the chosen path.</param>
+    public void Show(FileBrowserMode mode, string title, IReadOnlyList<FileFilter> filters, string? startFolder, string? fileName, Action<string> onAccept)
+    {
+        _model = new FileBrowserModel(mode, filters, _recentPlacesFile) { FileName = fileName ?? "" };
+        _places = FileBrowserModel.StandardPlaces(Loc.Get(Str.BrowserHome), Loc.Get(Str.BrowserDocuments),
+            Loc.Get(Str.BrowserDesktop), Loc.Get(Str.BrowserWorkingFolder));
+        _onAccept = onAccept ?? throw new ArgumentNullException(nameof(onAccept));
+        _title = title;
+        string start = startFolder is { Length: > 0 } && Directory.Exists(startFolder) ? startFolder
+            : _model.RecentPlaces.FirstOrDefault(Directory.Exists) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (!_model.Navigate(start) && !_model.Navigate(Environment.CurrentDirectory))
+            _model.Navigate(Path.GetPathRoot(Environment.CurrentDirectory) ?? "/");
+        _pathText = _model.CurrentDirectory;
+        _openRequested = true;
+        _confirmOverwrite = false;
+        _selected = -1;
+    }
+
+    /// <summary>Draws the dialog when open (call once per frame at top level).</summary>
+    public unsafe void Draw(float scale)
+    {
+        if (_model is null)
+            return;
+        if (_openRequested)
+        {
+            _openRequested = false;
+            ImGui.OpenPopup(PopupId);
+        }
+
+        var viewport = ImGui.GetMainViewport();
+        var size = Vector2.Min(new Vector2(860, 540) * scale, viewport.WorkSize * 0.92f);
+        ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
+        ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+        bool open = true;
+        if (!ImGui.BeginPopupModal($"{_title}{PopupId}", &open, ImGuiWindowFlags.NoSavedSettings))
+        {
+            if (!open)
+                Close();
+            return;
+        }
+
+        var model = _model;
+        DrawPathBar(model, scale);
+        float footer = ImGui.GetFrameHeightWithSpacing() * 2.2f + (model.Error.Length > 0 ? ImGui.GetTextLineHeightWithSpacing() : 0);
+        float placesWidth = 190f * scale;
+        ImGui.BeginChild("##places", new Vector2(placesWidth, -footer), ImGuiChildFlags.Borders);
+        DrawPlaces(model);
+        ImGui.EndChild();
+        ImGui.SameLine();
+        ImGui.BeginChild("##entries", new Vector2(0, -footer), ImGuiChildFlags.Borders);
+        DrawEntries(model);
+        ImGui.EndChild();
+
+        if (model.Error.Length > 0)
+            ImGui.TextColored(Theme.Error, $"{Icons.TriangleAlert}  {model.Error}");
+        DrawFooter(model, scale);
+        DrawOverwriteConfirmation();
+
+        if (ImGui.IsKeyPressed(ImGuiKey.Escape) && !_confirmOverwrite)
+        {
+            ImGui.CloseCurrentPopup();
+            Close();
+        }
+
+        ImGui.EndPopup();
+        if (!open)
+            Close();
+    }
+
+    /// <summary>Accepts a path programmatically (scripts): as if typed into the name field and confirmed.</summary>
+    internal bool AcceptForTesting(string path)
+    {
+        if (_model is null)
+            return false;
+        _model.FileName = path;
+        return TryAccept(_model, confirmOverwrite: false);
+    }
+
+    private void DrawPathBar(FileBrowserModel model, float scale)
+    {
+        if (IconButton(Icons.ArrowUp, Loc.Get(Str.BrowserUp)))
+            Navigate(model, Directory.GetParent(model.CurrentDirectory)?.FullName);
+        ImGui.SameLine();
+        if (IconButton(Icons.Refresh, ""))
+            model.Refresh();
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(-1);
+        if (ImGui.InputText("##path", ref _pathText, 1024, ImGuiInputTextFlags.EnterReturnsTrue))
+            Navigate(model, _pathText);
+        _ = scale;
+    }
+
+    private void DrawPlaces(FileBrowserModel model)
+    {
+        ImGui.TextDisabled(Loc.Get(Str.BrowserPlaces));
+        foreach (var (label, path) in _places)
+        {
+            string icon = label == Loc.Get(Str.BrowserHome) ? Icons.House : path.Length <= 3 || path == "/" ? Icons.HardDrive : Icons.Folder;
+            if (ImGui.Selectable($"{icon}  {label}##{path}", model.CurrentDirectory == path))
+                Navigate(model, path);
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip(path);
+        }
+
+        if (model.RecentPlaces.Count > 0)
+        {
+            ImGui.Spacing();
+            ImGui.TextDisabled(Loc.Get(Str.BrowserRecentPlaces));
+            foreach (var path in model.RecentPlaces)
+            {
+                string name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                if (name.Length == 0)
+                    name = path;
+                if (ImGui.Selectable($"{Icons.History}  {name}##recent{path}", model.CurrentDirectory == path))
+                    Navigate(model, path);
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip(path);
+            }
+        }
+    }
+
+    private void DrawEntries(FileBrowserModel model)
+    {
+        const ImGuiTableFlags flags = ImGuiTableFlags.Sortable | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY |
+                                      ImGuiTableFlags.Resizable | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingStretchProp;
+        if (!ImGui.BeginTable("##files", 3, flags))
+            return;
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableSetupColumn(Loc.Get(Str.BrowserName), ImGuiTableColumnFlags.DefaultSort | ImGuiTableColumnFlags.WidthStretch, 4f);
+        ImGui.TableSetupColumn(Loc.Get(Str.BrowserSize), ImGuiTableColumnFlags.WidthStretch, 1f);
+        ImGui.TableSetupColumn(Loc.Get(Str.BrowserModified), ImGuiTableColumnFlags.WidthStretch, 1.6f);
+        ImGui.TableHeadersRow();
+        var sort = ImGui.TableGetSortSpecs();
+        if (!sort.IsNull && sort.SpecsDirty && sort.SpecsCount > 0)
+        {
+            var spec = sort.Specs;
+            var column = spec.ColumnIndex switch { 1 => FileSortColumn.Size, 2 => FileSortColumn.Modified, _ => FileSortColumn.Name };
+            model.SortBy(column, spec.SortDirection == ImGuiSortDirection.Descending);
+            sort.SpecsDirty = false;
+        }
+
+        var entries = model.Entries;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var e = entries[i];
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+            string icon = e.IsDirectory ? Icons.Folder : Icons.File;
+            if (e.IsDirectory)
+                ImGui.PushStyleColor(ImGuiCol.Text, Theme.Warning);
+            bool clicked = ImGui.Selectable($"{icon}  {e.Name}##{i}", _selected == i,
+                ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick);
+            if (e.IsDirectory)
+                ImGui.PopStyleColor();
+            if (clicked)
+            {
+                _selected = i;
+                if (!e.IsDirectory || model.Mode == FileBrowserMode.SelectFolder)
+                    model.FileName = e.Name;
+                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                {
+                    if (e.IsDirectory)
+                    {
+                        Navigate(model, e.FullPath);
+                        break;
+                    }
+
+                    TryAccept(model, confirmOverwrite: true);
+                }
+            }
+
+            ImGui.TableNextColumn();
+            if (!e.IsDirectory)
+                ImGui.TextDisabled(FileBrowserModel.FormatSize(e.Size));
+            ImGui.TableNextColumn();
+            if (e.Modified != DateTime.MinValue)
+                ImGui.TextDisabled(e.Modified.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture));
+        }
+
+        ImGui.EndTable();
+    }
+
+    private void DrawFooter(FileBrowserModel model, float scale)
+    {
+        float buttonWidth = 110f * scale;
+        float labelWidth = 90f * scale;
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextUnformatted(Loc.Get(Str.BrowserFileName));
+        ImGui.SameLine(labelWidth);
+        ImGui.SetNextItemWidth(-buttonWidth - ImGui.GetStyle().ItemSpacing.X);
+        string name = model.FileName;
+        if (ImGui.InputText("##filename", ref name, 512, ImGuiInputTextFlags.EnterReturnsTrue))
+        {
+            model.FileName = name;
+            TryAccept(model, confirmOverwrite: true);
+        }
+        else
+        {
+            model.FileName = name;
+        }
+
+        ImGui.SameLine();
+        string accept = model.Mode switch
+        {
+            FileBrowserMode.Save => Loc.Get(Str.BrowserSave),
+            FileBrowserMode.SelectFolder => Loc.Get(Str.BrowserSelectFolder),
+            _ => Loc.Get(Str.BrowserOpen),
+        };
+        ImGui.PushStyleColor(ImGuiCol.Button, Theme.WithAlpha(Theme.Accent, 0.75f));
+        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Theme.Accent);
+        if (ImGui.Button(accept, new Vector2(buttonWidth, 0)))
+            TryAccept(model, confirmOverwrite: true);
+        ImGui.PopStyleColor(2);
+
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextUnformatted(Loc.Get(Str.BrowserFileType));
+        ImGui.SameLine(labelWidth);
+        ImGui.SetNextItemWidth(-buttonWidth - ImGui.GetStyle().ItemSpacing.X);
+        if (ImGui.BeginCombo("##filter", model.Filter.Label))
+        {
+            for (int i = 0; i < model.Filters.Count; i++)
+                if (ImGui.Selectable(model.Filters[i].Label, i == model.FilterIndex))
+                    model.SelectFilter(i);
+            ImGui.EndCombo();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button(Loc.Get(Str.BrowserCancel), new Vector2(buttonWidth, 0)))
+        {
+            ImGui.CloseCurrentPopup();
+            Close();
+        }
+
+        bool hidden = model.ShowHidden;
+        if (ImGui.Checkbox(Loc.Get(Str.BrowserShowHidden), ref hidden))
+            model.SetShowHidden(hidden);
+    }
+
+    private void DrawOverwriteConfirmation()
+    {
+        if (!_confirmOverwrite)
+            return;
+        const string id = "##overwrite";
+        if (!ImGui.IsPopupOpen(id))
+            ImGui.OpenPopup(id);
+        if (ImGui.BeginPopupModal($"{Loc.Get(Str.BrowserOverwrite)}{id}", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
+        {
+            ImGui.TextUnformatted(Loc.Format(Str.BrowserOverwriteQuestion, Path.GetFileName(_pendingPath)));
+            ImGui.Spacing();
+            if (ImGui.Button(Loc.Get(Str.MsgYes), new Vector2(100, 0) * ImGui.GetStyle().FontScaleMain))
+            {
+                _confirmOverwrite = false;
+                ImGui.CloseCurrentPopup();
+                Finish(_pendingPath);
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button(Loc.Get(Str.MsgNo), new Vector2(100, 0) * ImGui.GetStyle().FontScaleMain))
+            {
+                _confirmOverwrite = false;
+                ImGui.CloseCurrentPopup();
+            }
+
+            ImGui.EndPopup();
+        }
+    }
+
+    private bool TryAccept(FileBrowserModel model, bool confirmOverwrite)
+    {
+        var path = model.Resolve();
+        if (path is null)
+            return false;
+        if (model.Mode == FileBrowserMode.Save && confirmOverwrite && FileBrowserModel.WouldOverwrite(path))
+        {
+            _pendingPath = path;
+            _confirmOverwrite = true;
+            return false;
+        }
+
+        Finish(path);
+        return true;
+    }
+
+    private void Finish(string path)
+    {
+        var callback = _onAccept;
+        _model?.AddRecentPlace(path);
+        Close();
+        if (ImGui.GetCurrentContext().IsNull == false)
+            ImGui.CloseCurrentPopup();
+        callback?.Invoke(path);
+    }
+
+    private void Navigate(FileBrowserModel model, string? path)
+    {
+        if (path is null)
+            return;
+        if (model.Navigate(path))
+        {
+            _pathText = model.CurrentDirectory;
+            _selected = -1;
+        }
+    }
+
+    private void Close()
+    {
+        _model = null;
+        _onAccept = null;
+        _confirmOverwrite = false;
+    }
+
+    private static bool IconButton(string icon, string tooltip)
+    {
+        bool clicked = ImGui.Button(icon);
+        if (tooltip.Length > 0 && ImGui.IsItemHovered())
+            ImGui.SetTooltip(tooltip);
+        return clicked;
+    }
+}

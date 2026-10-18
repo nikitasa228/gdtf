@@ -4,7 +4,10 @@ namespace Candela.App.Viewport;
 
 /// <summary>One face of the view cube projected to the screen.</summary>
 /// <param name="View">The axis view a click on this face snaps to.</param>
-/// <param name="Corners">The four corners in screen pixels (counter-clockwise as seen).</param>
+/// <param name="C0">First corner in screen pixels.</param>
+/// <param name="C1">Second corner.</param>
+/// <param name="C2">Third corner.</param>
+/// <param name="C3">Fourth corner (the corners go around the face).</param>
 /// <param name="Depth">View-space depth of the face centre (smaller = nearer the viewer), for back-to-front drawing.</param>
 /// <param name="Facing">Cosine between the face normal and the direction to the viewer (≤ 0 = back face).</param>
 internal readonly record struct ViewCubeFace(ViewDirection View, Vector2 C0, Vector2 C1, Vector2 C2, Vector2 C3, float Depth, float Facing)
