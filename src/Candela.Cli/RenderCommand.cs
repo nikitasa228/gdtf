@@ -44,6 +44,12 @@ internal sealed class RenderOptions
     public double Time { get; private set; }
     /// <summary>Exposure value at ISO 100, or null for the incident-light reading of the stage floor.</summary>
     public float? Ev100 { get; private set; }
+
+    /// <summary>
+    /// True when the command line sets the exposure (<c>--ev</c> or <c>--auto-exposure</c>); otherwise the demo look
+    /// uses auto exposure, as its floor (coloured pools and spill) says little about how bright its beams are.
+    /// </summary>
+    public bool ExposureGiven { get; private set; }
     public bool Floor { get; private set; } = true;
 
     public bool AutoExposure { get; private set; }
@@ -138,9 +144,11 @@ internal sealed class RenderOptions
                 case "--ev":
                     string ev = CliArgs.Value(args, ref i, name);
                     o.Ev100 = ev.Equals("auto", StringComparison.OrdinalIgnoreCase) ? null : CliArgs.Number(name, ev, -10f, 25f);
+                    o.ExposureGiven = true;
                     break;
                 case "--auto-exposure":
                     o.AutoExposure = true;
+                    o.ExposureGiven = true;
                     break;
                 case "--frames":
                     o.Frames = CliArgs.Integer(name, CliArgs.Value(args, ref i, name), 1, 1000);
@@ -176,6 +184,7 @@ internal sealed class RenderOptions
         if (o.Output.Length == 0) throw new UsageException("render needs --out <file.png>.");
         if (Directory.Exists(o.Output)) throw new UsageException($"--out '{o.Output}' is a folder; give the name of the PNG file to write.");
         if (o.Camera.HasValue != o.Target.HasValue) throw new UsageException("--camera and --target go together.");
+        if (o.Look == RenderLook.Demo && !o.ExposureGiven) o.AutoExposure = true;
         return o;
     }
 }
@@ -305,8 +314,10 @@ internal static class RenderCommand
 
         engine.RefreshIssues();
         var issues = engine.Issues.Current;
-        output.WriteLine(string.Create(CultureInfo.InvariantCulture,
-            $"Camera:   eye {Format(camera.Position)}, EV100 {camera.Ev100:0.#}{(options.AutoExposure ? " (auto exposure)" : options.Ev100 is null ? " (incident reading of the floor)" : "")}"));
+        string exposure = options.AutoExposure
+            ? string.Create(CultureInfo.InvariantCulture, $"auto exposure (adapting from EV100 {camera.Ev100:0.#})")
+            : string.Create(CultureInfo.InvariantCulture, $"EV100 {camera.Ev100:0.#}{(options.Ev100 is null ? " (incident reading of the floor)" : "")}");
+        output.WriteLine($"Camera:   eye {Format(camera.Position)}, {exposure}");
         output.WriteLine($"Image:    {options.Width} x {options.Height}, {options.Mode}, overlay {options.Overlay}, {renderer.Info.DeviceName}");
         output.WriteLine(string.Create(CultureInfo.InvariantCulture,
             $"Timing:   load {loadMs:0} ms, look + simulation {simulateMs:0} ms, render {renderMs:0} ms ({frames} frames), total {total.Elapsed.TotalMilliseconds:0} ms"));

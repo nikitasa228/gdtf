@@ -91,6 +91,18 @@ public sealed class CliTests
         Assert.Null(defaults.Ev100);
         Assert.Equal(RenderLook.OpenWhite, defaults.Look);
         Assert.True(defaults.Floor);
+        Assert.False(defaults.AutoExposure);
+
+        // the demo look exposes automatically unless the exposure is given
+        var demo = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "demo"]);
+        Assert.Equal(RenderLook.Demo, demo.Look);
+        Assert.True(demo.AutoExposure);
+        var fixedEv = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "DEMO", "--ev", "7"]);
+        Assert.Equal(RenderLook.Demo, fixedEv.Look);
+        Assert.False(fixedEv.AutoExposure);
+        Assert.Equal(7f, fixedEv.Ev100);
+        Assert.False(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "demo", "--ev", "auto"]).AutoExposure);
+        Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "party"]));
     }
 
     [Fact]

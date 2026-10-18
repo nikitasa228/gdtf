@@ -58,9 +58,10 @@ public static class DmxLooks
     /// Colours the fixture as close to <paramref name="target"/>'s chromaticity as its colour system allows, keeping the
     /// rest of <paramref name="buffer"/> (call <see cref="OpenWhite"/> first). Every way the fixture can make colour is
     /// tried — additive emitters (levels solved for the target in CIE XYZ), CMY or RGB/CMY filters, indirect RGB, HSB,
-    /// every slot of its colour wheels — each result is evaluated, and the closest colour (CIE 1931 xy) that still lets
-    /// light through wins. Returns the xy distance reached (0 = exact), or NaN when the fixture has no beam or no colour
-    /// system (then the buffer is unchanged).
+    /// every slot of its colour wheels — each result is evaluated, and the one whose light (all beams together, weighted
+    /// by their flux) comes closest to the target's chromaticity (CIE 1931 xy) while still letting light through wins.
+    /// Returns the xy distance reached (0 = exact), or NaN when the fixture has no beam, is dark, or has no colour system
+    /// (then the buffer is unchanged).
     /// </summary>
     public static float SetColor(FixtureDmxBuffer buffer, LightColor target)
     {
@@ -73,15 +74,21 @@ public static class DmxLooks
         float bestScore = float.PositiveInfinity, bestDistance = float.NaN;
         FixtureDmxBuffer? best = null;
         var trial = new FixtureDmxBuffer(p);
+        var scratch = new FixtureState(p);
+        FixtureEvaluator.Evaluate(scratch, start, 0, null, applyDynamics: false);
+        float startFlux = Mix(scratch).Flux;
+        if (!(startFlux > 0f)) return float.NaN; // dark: nothing to colour
 
         void Consider()
         {
-            var beam = Brightest(FixtureEvaluator.Evaluate(p, trial));
-            if (beam is null || !(beam.ColorTransmission > 0.005f)) return;
-            float distance = Vector2.Distance(beam.Color.ToXy(), want);
+            FixtureEvaluator.Evaluate(scratch, trial, 0, null, applyDynamics: false);
+            var (xy, flux) = Mix(scratch);
+            float transmission = flux / startFlux;
+            if (!(transmission > 0.005f) || !float.IsFinite(xy.X) || !float.IsFinite(xy.Y)) return;
+            float distance = Vector2.Distance(xy, want);
             // a little light lost is worth a better colour; a much darker result has to be clearly closer
-            float score = distance + 0.01f * (1f - beam.ColorTransmission);
-            if (score >= bestScore) return;
+            float score = distance + 0.01f * (1f - MathF.Min(transmission, 1f));
+            if (!(score < bestScore)) return;
             bestScore = score;
             bestDistance = distance;
             best ??= new FixtureDmxBuffer(p);
@@ -109,12 +116,24 @@ public static class DmxLooks
         return bestDistance;
     }
 
-    private static BeamState? Brightest(FixtureState state)
+    /// <summary>
+    /// The colour (CIE 1931 xy) and luminous flux (lm) of all the fixture's beams together — what the fixture looks
+    /// like, whichever beam the colour channels reach (an unaddressed aura or effect ring stays as it is).
+    /// </summary>
+    private static (Vector2 Xy, float Flux) Mix(FixtureState state)
     {
-        BeamState? best = null;
+        var xyz = Vector3.Zero;
+        float flux = 0f;
         foreach (var b in state.Beams)
-            if (best is null || b.PeakCandela > best.PeakCandela) best = b;
-        return best;
+        {
+            if (!(b.Flux > 0f) || !float.IsFinite(b.Flux)) continue;
+            var c = b.Color.ToXyz();
+            if (!(c.Y > 0f)) continue;
+            xyz += c * (b.Flux / c.Y);
+            flux += b.Flux;
+        }
+        float sum = xyz.X + xyz.Y + xyz.Z;
+        return sum > 0f ? (new Vector2(xyz.X / sum, xyz.Y / sum), flux) : (new Vector2(float.NaN), 0f);
     }
 
     private static Vector3 Normalized(Vector3 rgb)
