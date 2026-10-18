@@ -43,7 +43,7 @@ public sealed class ManyLightsTests
             }
 
             world.SetLights(lights);
-            var view = new TopDownView(Width, Height, 14f, ev100: 8f);
+            var view = new TopDownView(Width, Height, 14f, ev100: 10.5f);
             using var target = renderer.CreateTarget(Width, Height);
             var options = new ViewOptions { Shading = ViewShading.Full, ShowGrid = false, BackgroundLuminance = 0f };
             for (int frame = 0; frame < 3; frame++)
