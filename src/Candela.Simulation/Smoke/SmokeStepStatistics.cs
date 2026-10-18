@@ -7,7 +7,11 @@ namespace Candela.Simulation;
 /// <param name="SubSteps">Fixed sub-steps run.</param>
 /// <param name="PressureIterations">Conjugate-gradient iterations of the last pressure solve.</param>
 /// <param name="MaxDivergenceBefore">Largest |∇·u| of a fluid cell before the last projection, 1/s.</param>
-/// <param name="MaxDivergenceAfter">Largest |∇·u| of a fluid cell after the last projection, 1/s.</param>
+/// <param name="MaxDivergenceAfter">
+/// Largest |∇·u| of a fluid cell after the last projection, 1/s, from the solver's (recursively updated) residual. It
+/// matches <see cref="SmokeSimulation.MaxDivergence"/> at the default tolerance; with a tolerance near float precision
+/// (below ≈ 10⁻⁵) the measured divergence levels off at ≈ 4×10⁻⁶ × the divergence before the projection.
+/// </param>
 /// <param name="IgnoredEmitters">Emitters skipped in the last sub-step (non-finite position, outside the box, inside a solid).</param>
 /// <param name="DroppedTime">Simulation time discarded because the sub-step cap was reached, s.</param>
 /// <param name="MassCorrection">

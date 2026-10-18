@@ -95,7 +95,11 @@ normal velocity (**free slip**: the tangential velocity is untouched). An **open
 pressure φ = 0 outside (Dirichlet), so air and smoke leave and enter freely. With a ventilation draft the faces it
 enters through are inflow faces with prescribed velocity. A fluid region with no open face (a closed room, a sealed
 pocket inside obstacles) is singular: its right-hand side's mean is removed so the system stays consistent (connected
-regions are labelled when the obstacles change).
+regions are labelled when the obstacles change), and the conjugate-gradient residual is projected the same way after
+every iteration. Without that, float rounding lets a constant creep into the residual; the multigrid preconditioner (an
+approximate inverse of the singular operator) amplifies it until the iteration breaks down — in a closed box at a
+tolerance of 10⁻⁶ the "projected" flow kept up to 3300× the divergence it started with (regression-tested). A
+non-positive r·M⁻¹r also ends the solve.
 
 The symmetric system is solved by conjugate gradients **preconditioned with a geometric multigrid V-cycle** (MGPCG,
 McAdams et al. 2010), warm-started from the previous step's pressure, until the largest remaining cell divergence is
