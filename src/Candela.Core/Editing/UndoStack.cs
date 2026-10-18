@@ -3,10 +3,16 @@ namespace Candela.Core.Editing;
 /// <summary>An edit that can be undone. Every change the user makes to the scene goes through one.</summary>
 public interface IUndoableCommand
 {
-    /// <summary>Shown in Edit → Undo "…".</summary>
+    /// <summary>
+    /// Shown in Edit → Undo "…". Read on every frame by menus and toolbars, so implementations compute it once (when the
+    /// command is created) and return the stored string.
+    /// </summary>
     string Description { get; }
 
+    /// <summary>Applies the edit (first execution and redo).</summary>
     void Do();
+
+    /// <summary>Reverts what <see cref="Do"/> applied.</summary>
     void Undo();
 
     /// <summary>
@@ -25,12 +31,22 @@ public sealed class UndoStack
     private int _groupDepth;
     private bool _mergeBarrier;
 
+    /// <summary>Creates an empty history that keeps at most <paramref name="capacity"/> undo steps.</summary>
     public UndoStack(int capacity = 500) => Capacity = capacity;
 
+    /// <summary>Maximum number of undo steps kept; the oldest step is dropped beyond it.</summary>
     public int Capacity { get; }
+
+    /// <summary>True when there is a step to undo.</summary>
     public bool CanUndo => _done.Count > 0;
+
+    /// <summary>True when there is an undone step to redo.</summary>
     public bool CanRedo => _undone.Count > 0;
+
+    /// <summary>Description of the step <see cref="Undo"/> would revert, or null. Allocation-free.</summary>
     public string? UndoDescription => CanUndo ? _done[^1].Description : null;
+
+    /// <summary>Description of the step <see cref="Redo"/> would apply again, or null. Allocation-free.</summary>
     public string? RedoDescription => CanRedo ? _undone[^1].Description : null;
 
     /// <summary>Raised after any execute/undo/redo.</summary>
@@ -55,6 +71,7 @@ public sealed class UndoStack
         if (_groupDepth++ == 0) _group = new CompositeCommand(description);
     }
 
+    /// <summary>Ends the group started by the matching <see cref="BeginGroup"/>; an empty group records nothing.</summary>
     public void EndGroup()
     {
         if (_groupDepth == 0) throw new InvalidOperationException("EndGroup without BeginGroup.");
@@ -75,6 +92,7 @@ public sealed class UndoStack
     /// <summary>Stops the next command from merging into the previous one (call when a drag ends).</summary>
     public void BreakMerge() => _mergeBarrier = true;
 
+    /// <summary>Reverts the most recent step (no-op when there is none).</summary>
     public void Undo()
     {
         if (!CanUndo) return;
@@ -86,6 +104,7 @@ public sealed class UndoStack
         Changed?.Invoke();
     }
 
+    /// <summary>Applies the most recently undone step again (no-op when there is none).</summary>
     public void Redo()
     {
         if (!CanRedo) return;
@@ -97,6 +116,7 @@ public sealed class UndoStack
         Changed?.Invoke();
     }
 
+    /// <summary>Forgets the whole history (e.g. after loading another project).</summary>
     public void Clear()
     {
         _done.Clear();
@@ -129,14 +149,19 @@ public sealed class UndoStack
 /// <summary>Several commands undone/redone together (in reverse order on undo).</summary>
 public sealed class CompositeCommand(string description) : IUndoableCommand
 {
+    /// <inheritdoc/>
     public string Description { get; } = description;
+
+    /// <summary>The commands of the step, in execution order.</summary>
     public List<IUndoableCommand> Commands { get; } = new();
 
+    /// <inheritdoc/>
     public void Do()
     {
         foreach (var c in Commands) c.Do();
     }
 
+    /// <inheritdoc/>
     public void Undo()
     {
         for (int i = Commands.Count - 1; i >= 0; i--) Commands[i].Undo();
