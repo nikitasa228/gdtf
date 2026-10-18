@@ -42,6 +42,7 @@ internal sealed class EditorApplication : IDisposable
     private bool _swapchainDirty;
     private int _consecutiveFailures;
     private readonly RepeatedErrorFilter _failures = new();
+    private readonly RepeatedErrorFilter _platformFailures = new();
     private int _exitCode = ExitCodes.Ok;
     private bool _quitRequested;
     private float _appliedDpi;
@@ -310,7 +311,15 @@ internal sealed class EditorApplication : IDisposable
         }
         catch (Exception e) when (!IsFatal(e))
         {
-            _log.Error("UI", "Rendering a torn-off panel window failed", e);
+            switch (_platformFailures.Record(e))
+            {
+                case ErrorLogKind.Full:
+                    _log.Error("UI", "Rendering a torn-off panel window failed", e);
+                    break;
+                case ErrorLogKind.Count:
+                    _log.Error("UI", $"Rendering a torn-off panel window failed {_platformFailures.Repeats} times: {e.Message}");
+                    break;
+            }
         }
 
         workspace.AfterFrame();
