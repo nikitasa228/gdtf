@@ -335,15 +335,18 @@ reverberation (a reverberant room adds a diffuse field that this model omits).
 
 * Smoke physics: a closed box with a stirring fan conserves mass over 200 steps (0.00 % with the fixer); the projection
   removes > 99.8 % of the divergence (with obstacles, open faces); warm smoke rises and accelerates; a 1.9 kW plume
-  rises at ≈ 0.8 m/s one metre above the source after 3 s (Heskestad's steady value: 1.3 m/s); neutral smoke stays put; a 2 cm wall keeps the far side clean; a fan
-  carries smoke along its axis; a hazer raises the average density of a closed room linearly and by exactly its mass
-  rate; a fog machine injects its mass rate and throws fog forward; low fog sinks and hugs the floor; ventilation
-  carries smoke at the draft speed; open ceilings let hot smoke out; dissipation and cooling follow their rates;
-  viscosity/diffusion stay stable; trilinear sampling; voxelisation of rotated and matrix-placed boxes.
+  rises at ≈ 0.8 m/s one metre above the source after 3 s (Heskestad's steady value: 1.3 m/s); neutral smoke stays
+  put; a 2 cm wall keeps the far side clean; a fan carries smoke along its axis but not through or behind walls; a
+  hazer raises the average density of a closed room linearly and by exactly its mass rate; a fog machine injects its
+  mass rate and throws fog forward; low fog sinks and hugs the floor; ventilation carries smoke at the draft speed but
+  does not blow into pockets sealed off from every outlet; open ceilings let hot smoke out; dissipation and cooling
+  follow their rates; viscosity/diffusion stay stable; trilinear sampling; voxelisation of rotated and matrix-placed
+  boxes.
 * Solver: multigrid and Jacobi agree; odd grid sizes, sealed pockets and tiny grids work; a tolerance near float
   precision in a closed box (singular system) never breaks the conjugate gradient down; strong diffusion conserves
   smoke and heat; mirrored entity matrices give correctly placed obstacles.
-* State: identical results for identical inputs and any thread count; `Reset`; snapshots restore runs bit-identically;
+* State: identical results for identical inputs and any thread count (open and closed boxes); `Reset`; snapshots
+  restore runs bit-identically; temperatures stay within physical bounds under stalled hot and cold sources;
   fixed sub-stepping and the hitch cap; invalid settings, emitters and obstacles are reported and skipped; the cell
   budget coarsens big domains.
 * Fire: magnitudes for 3/5/8 m flames and a candle; light only while burning; ignition growth over ≈ 0.2 s; colour
