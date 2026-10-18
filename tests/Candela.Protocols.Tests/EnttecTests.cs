@@ -43,6 +43,7 @@ internal sealed class FakeEnttecTransport : IEnttecTransport
     public int Read(Span<byte> buffer)
     {
         if (_unplugged) throw new IOException("Device removed");
+        if (ReadFailure is { } failure) throw failure;
         if (_partial is null)
         {
             if (!_incoming.TryTake(out _partial, 20)) return 0;
@@ -63,7 +64,16 @@ internal sealed class FakeEnttecTransport : IEnttecTransport
 
     public void Close() => IsOpen = false;
 
-    public void Dispose() => Close();
+    public bool Disposed { get; private set; }
+
+    /// <summary>When set, <see cref="Read"/> throws this instead of reading (unexpected driver failures).</summary>
+    public Exception? ReadFailure { get; set; }
+
+    public void Dispose()
+    {
+        Close();
+        Disposed = true;
+    }
 }
 
 public class EnttecTests

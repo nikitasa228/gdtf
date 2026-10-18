@@ -90,7 +90,10 @@ Data for other universes is still accepted (Art-Net broadcast, sACN unicast) unl
 * **IP plan.** The console and the Candela computer must be in the same subnet. Classic Art-Net uses 2.x.x.x/8 or
   10.x.x.x/8. Most consoles also work in an ordinary 192.168.x.x/24 network. With several network cards, select the
   one that faces the lighting network.
-* **Multicast.** If a multicast group cannot be joined (no multicast route, VPN adapters, containers), the status
+* **Multicast.** With a selected interface, sACN and PosiStageNet groups are joined on that interface. With *all
+  interfaces*, they are joined on every operational adapter, so multicast from the lighting network arrives even when
+  the computer's default route points at Wi-Fi or the office LAN, or when an isolated lighting network has no gateway.
+  If a multicast group cannot be joined on any adapter (VPN adapters, containers), the status
   becomes **Warning** and lists the universes that failed. Unicast still works: set the console to send sACN unicast
   to Candela's IP. On Linux each socket holds 20 memberships by default, so Candela joins further groups through extra
   membership sockets. At most 512 universes are joined.
@@ -179,7 +182,7 @@ into the same show through `ITestPatternEncoder`.
   * node report `#0001 [nnnn] …`;
   * NumPorts, and PortTypes `0x80` (DMX512 output from Art-Net);
   * GoodOutputA: bit 7 when data arrived within 4 s, bit 3 when merging, bit 1 when the hub merges LTP;
-  * GoodOutputB `0xC0`, and SwOut;
+  * GoodOutputB `0xF0` (RDM disabled, continuous output, no RDM discovery), and SwOut;
   * Style StNode, MAC of the interface, BindIp and BindIndex;
   * Status1 `0xD0`, Status2 `0x08` (15-bit port-addresses), and RefreshRate 44.
 * **ArtTimeCode (0x9700).** Fields are range-checked: frames below the type's rate, hours up to 23, type 0–3. Valid
@@ -307,8 +310,10 @@ protocols.StatusChanged += (_, e) => ui.Refresh(e.Status);
 if (hub.TryRead(universe, buffer, out var version) && version != lastVersion) { /* evaluate fixtures */ }
 ```
 
-`Apply` stops protocols that are no longer enabled. It starts new ones, and restarts running ones only when the
-options changed, so DMX does not drop out when unrelated settings are saved. Two protocols configured on the same
+`Apply` stops protocols that are no longer enabled. It starts new ones, and restarts a running one only when an
+option *that protocol uses* changed (`ExternalProtocolBase.OptionsSignature`: for Art-Net the interface, subscribed
+universes, offset, port, names and codes; for sACN the interface, subscribed universes, port and preview/multicast
+switches; and so on). Editing an OSC pattern or the EntTec port therefore does not interrupt Art-Net or sACN. Two protocols configured on the same
 UDP port are refused: the later one in display order gets an Error status. `ProtocolManager.GetNetworkInterfaces()`
 and `GetSerialPorts()` feed the settings window.
 
@@ -317,7 +322,11 @@ and `GetSerialPorts()` feed the settings window.
 * **Allocation-free receive path.** Receive loops use `Socket.ReceiveFrom(Span<byte>, SocketFlags, SocketAddress)`
   into one reused buffer, and senders are identified by integers. Art-Net, sACN and EntTec processing allocates
   nothing once a sender and universe have been seen (checked by tests). OSC necessarily allocates its message objects.
-* **Isolation.** A failing datagram handler is counted as a bad packet. It never stops the receive thread.
+* **Isolation.** A failing datagram handler is counted as a bad packet. It never stops the receive thread. Exceptions
+  thrown by `StatusChanged` subscribers are contained as well, because status changes are often raised on receive,
+  timer and serial-reader threads, where an escaping exception would end the program.
+* **Bounded state.** Art-Net and sACN track at most 4096 streams (sender/port/universe or CID/universe); idle streams
+  (10 s) make room, and further live ones are ignored with a warning. OSC holds at most 1024 sender universes.
 * **Fuzzing.** Thousands of random, truncated and bit-flipped datagrams go through every parser and receiver in the
   tests. None throws, and every receiver still works afterwards.
 * **Clean stop.** Stopping a protocol closes its socket or port, joins its thread and withdraws its sources from the
