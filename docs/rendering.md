@@ -216,8 +216,8 @@ wraps each pass in a debug label and GPU timestamps, and runs passes in `RenderS
 | 900 `Overlays` | grid, lines (+ beam outlines), selection mask, outline | all | over the display image, depth-tested against the scene depth |
 
 After the last pass the display image is transitioned to `SHADER_READ_ONLY_OPTIMAL` (fragment-shader read).
-Recording allocates no managed memory in steady state (draw lists, barrier batches, light plans and arrays are
-reused; verified by `LifecycleTests.SteadyStateFramesDoNotAllocateManagedMemory` and, with every stage-2 feature on
+Recording allocates no managed memory in steady state (draw lists, barrier batches, light plans, baked overlay
+gradients and arrays are reused; verified by `LifecycleTests.SteadyStateFramesDoNotAllocateManagedMemory` and, with every stage-2 feature on
 two targets, `SteadyStateFramesWithEveryFeatureDoNotAllocate`). Every synchronisation goes through the tracked
 resource states (synchronization2 barriers, `discard` for full overwrites), and every test runs with synchronization
 validation.
@@ -533,7 +533,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `ToneMappingTests` | AgX / ACES / Neutral curves, exposure compensation (stops of exposure) |
 | `PickTests` | pick id, position within 1 cm, normal, depth; not-pickable instances |
 | `SceneTests` | incremental updates, stale handles, material updates, sRGB / Rec.709 → Rec.2020 conversions, mip chains, uploads staged in frames without rendering |
-| `LifecycleTests` | resize, several targets per world, memory returned after destroying everything, leak-free dispose, allocation-free steady-state frames; every stage-2 feature on two targets across resizes and view switches, allocation-free with all of them |
+| `LifecycleTests` | resize, several targets per world, memory returned after destroying everything, leak-free dispose, allocation-free steady-state frames (measured while another thread forces full collections, so GC-collectable runtime caches such as the one behind `Enum.IsDefined` cannot hide); every stage-2 feature on two targets across resizes and view switches, allocation-free with all of them |
 | `ShadowTests` | golden `shadow-box`; a point in the umbra gets ~0 direct light while the lux overlay elsewhere matches `LightMeter` within 1 %; cached tiles are not re-rendered until a caster in their frustum moves; `MaxShadowedLights` priority; `CastShadow` / `CastShadows` respected |
 | `CookieTests` | goldens `cookie-gobo` (orientation, rotation), `cookie-blades`, `cookie-prism` (3 facets, flux 1/N each), `cookie-iris`; frost widens the beam and blurs the gobo; blade insertion and rotation positions |
 | `VolumetricTests` | single scattering in uniform haze vs the numerical integral of σ·HG·I·e^(−σr)/r²·e^(−σl) within 5 % (froxels with and without temporal accumulation, and a ray-marched narrow beam); goldens `volumetric-beam` (side view), `volumetric-smoke` (density blob), `volumetric-flame`; an optically thick flame shows the blackbody luminance (5 %) and chromaticity (0.01) |
