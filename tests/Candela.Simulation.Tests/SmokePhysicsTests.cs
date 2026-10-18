@@ -446,6 +446,30 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
         Assert.Equal(new Vector3(0f, 1.5f, 2.5f), placed.Center);
     }
 
+    [Theory]
+    [InlineData(1f, 1f, 1f)]
+    [InlineData(-1f, 1f, 1f)]
+    [InlineData(1f, -2f, 0.5f)]
+    [InlineData(-1f, -1f, -1f)]
+    public void FromLocalBox_PlacesMirroredEntitiesCorrectly(float sx, float sy, float sz)
+    {
+        // Regression: a world matrix with a negative determinant (mirrored entity, common in MVR exports) produced the
+        // identity rotation, so the obstacle stood up to half a box away from the geometry it stands for.
+        var world = Matrix4x4.CreateScale(sx, sy, sz) * Matrix4x4.CreateRotationZ(0.5236f) * Matrix4x4.CreateRotationX(0.3f)
+            * Matrix4x4.CreateTranslation(1f, 2f, 3f);
+        var lo = new Vector3(0f, 0f, 0f);
+        var hi = new Vector3(2f, 0.5f, 1f);
+        var box = ObstacleBox.FromLocalBox(lo, hi, world);
+        var inverse = Quaternion.Conjugate(box.Rotation);
+        for (int c = 0; c < 8; c++)
+        {
+            var corner = new Vector3((c & 1) == 0 ? lo.X : hi.X, (c & 2) == 0 ? lo.Y : hi.Y, (c & 4) == 0 ? lo.Z : hi.Z);
+            var local = Vector3.Transform(Vector3.Transform(corner, world) - box.Center, inverse);
+            var error = Vector3.Abs(Vector3.Abs(local) - box.HalfExtents);
+            Assert.True(MathF.Max(error.X, MathF.Max(error.Y, error.Z)) < 1e-4f, $"corner {c} is {error} off");
+        }
+    }
+
     [Fact]
     public void SetObstacles_RemovesSmokeInsideNewSolids()
     {

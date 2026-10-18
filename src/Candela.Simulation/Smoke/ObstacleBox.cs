@@ -18,6 +18,8 @@ public readonly record struct ObstacleBox(Vector3 Center, Vector3 HalfExtents, Q
     /// <summary>
     /// The box <paramref name="localMin"/>–<paramref name="localMax"/> of an entity's local space placed by its world
     /// matrix (row-vector convention, <c>v' = v · M</c>). Scale and rotation are taken from the matrix; shear is ignored.
+    /// Mirroring matrices (negative determinant) are fine: a box is symmetric about its own mid-planes, so the
+    /// reflection is replaced by the rotation that maps it onto the same box.
     /// </summary>
     public static ObstacleBox FromLocalBox(Vector3 localMin, Vector3 localMax, Matrix4x4 world)
     {
@@ -30,10 +32,17 @@ public readonly record struct ObstacleBox(Vector3 Center, Vector3 HalfExtents, Q
         var rotation = Quaternion.Identity;
         if (scale.X > 1e-12f && scale.Y > 1e-12f && scale.Z > 1e-12f)
         {
+            ax /= scale.X;
+            ay /= scale.Y;
+            az /= scale.Z;
+            // A mirror (left-handed basis) is not a rotation; flipping one axis gives the rotation that covers the same
+            // box (regression: mirrored entities were placed with the identity rotation, up to half a box off).
+            if (Vector3.Dot(Vector3.Cross(ax, ay), az) < 0f)
+                az = -az;
             var r = new Matrix4x4(
-                ax.X / scale.X, ax.Y / scale.X, ax.Z / scale.X, 0f,
-                ay.X / scale.Y, ay.Y / scale.Y, ay.Z / scale.Y, 0f,
-                az.X / scale.Z, az.Y / scale.Z, az.Z / scale.Z, 0f,
+                ax.X, ax.Y, ax.Z, 0f,
+                ay.X, ay.Y, ay.Z, 0f,
+                az.X, az.Y, az.Z, 0f,
                 0f, 0f, 0f, 1f);
             rotation = Quaternion.Normalize(Quaternion.CreateFromRotationMatrix(r));
         }
