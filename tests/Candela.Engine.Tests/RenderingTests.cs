@@ -96,6 +96,56 @@ public sealed class RenderingTests
     }
 
     [SkippableFact]
+    public void Cli_render_plays_a_dmx_recording_before_rendering()
+    {
+        using (CreateRendererOrSkip())
+        {
+            // only probes for a device
+        }
+        string dir = TestEnvironment.NewTempDirectory("cli-dmx");
+        var hub = new Dmx.Input.DmxInputHub();
+        var recorder = new DmxRecorder(hub);
+        recorder.Start(0, "Full");
+        var full = Enumerable.Repeat((byte)255, 512).ToArray();
+        for (int u = 1; u <= 7; u++) hub.Submit(new Dmx.Input.DmxSourceId("artnet", "desk"), u, full);
+        recorder.Capture(0);
+        recorder.Capture(1);
+        string take = Path.Combine(dir, "full" + DmxRecording.Extension);
+        recorder.Stop()!.Save(take);
+
+        string png = Path.Combine(dir, "dmx.png");
+        var output = new StringWriter();
+        var error = new StringWriter();
+        int code = Cli.Program.Run(
+            ["render",
+                TestEnvironment.Fokina,
+                "--out",
+                png,
+                "--width",
+                "160",
+                "--height",
+                "90",
+                "--frames",
+                "1",
+                "--mode",
+                "colorless",
+                "--look",
+                "dmx-file",
+                take,
+                "--time",
+                "0.5",
+                "--cache",
+                Path.Combine(dir, "cache"),
+                "--library",
+                TestEnvironment.Root],
+            output, error);
+        Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
+        Assert.Contains("DMX recording 'Full'", output.ToString(), StringComparison.Ordinal);
+        Assert.Contains("simulated 0.5 s", output.ToString(), StringComparison.Ordinal);
+        Assert.True(File.Exists(png));
+    }
+
+    [SkippableFact]
     public void Thumbnail_of_a_real_fixture_shows_the_fixture_and_is_cached()
     {
         using var renderer = CreateRendererOrSkip();

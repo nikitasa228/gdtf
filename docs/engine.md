@@ -272,7 +272,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (36 tests, ≈ 25 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (37 tests, ≈ 25 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, 4 substitutes and no errors; every fixture has a state and a pose; after
@@ -305,7 +305,8 @@ a device):
   writes a package with the given units or the reason it cannot; `artnet-test` sends ArtDmx packets to a UDP port;
   engine options from the user settings default to the repository library, and a missing library stays reported.
 * **Rendering** (Vulkan): `candela render` on Фокина.mvr at 480 × 270 gives a lit, not blown-out stage; the
-  thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames differ.
+  thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames differ;
+  `--look dmx-file` plays a recording for `--time` before rendering.
 
 ## Known limitations
 
