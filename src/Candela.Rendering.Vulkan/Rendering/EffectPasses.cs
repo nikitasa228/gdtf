@@ -83,7 +83,7 @@ internal sealed class FroxelIntegratePass : RenderPass
 
 /// <summary>
 /// Volumetric composite over the opaque scene (volumetric.frag): froxel in-scattering and transmittance at each
-/// pixel's depth plus the full-resolution ray-marched narrow beams.
+/// pixel's depth plus the volumetric beams, upsampled from half resolution with depth-aware weights.
 /// </summary>
 internal sealed class VolumeCompositePass : RenderPass
 {
@@ -92,8 +92,8 @@ internal sealed class VolumeCompositePass : RenderPass
     {
     }
 
-    public override bool IsActive(PassContext context) => context.VolumetricsActive && context.Shading == ViewShading.Full ||
-                                                         context.VolumetricsActive && context.Target.FroxelIntegrated is not null;
+    public override bool IsActive(PassContext context) =>
+        context.VolumetricsActive && context.Target.FroxelIntegrated is not null && context.Target.CompositeSet.Handle != 0;
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {
@@ -106,12 +106,15 @@ internal sealed class VolumeCompositePass : RenderPass
         PassRecording.DeclareMediaReads(context, barriers, compute: false);
         if (t.FroxelIntegrated is { } volume)
             barriers.Use(volume, ImageUse.SampledFragment);
+        if (context.BeamsActive && (t.BeamResolved ?? t.BeamScatter) is { } beams)
+            barriers.Use(beams, ImageUse.SampledFragment);
     }
 
     public override void Execute(PassContext context)
     {
         PassRecording.Begin(context, context.Target.Hdr, null, null, depthClear: false);
         PassRecording.BindGraphics(context, context.Pipelines.VolumeComposite);
+        context.Pipelines.BindPassSet(context.Cmd, PipelineBindPoint.Graphics, context.Target.CompositeSet);
         PassRecording.DrawFullscreen(context);
         context.Context.Vk.CmdEndRendering(context.Cmd);
     }
@@ -202,6 +205,10 @@ internal sealed class ExposurePass : RenderPass
         barriers.Use(exposure, BufferUse.ComputeWrite);
         barriers.Flush();
         PassRecording.BindCompute(context, context.Pipelines.ExposureReduce);
+        context.Pipelines.Push(cmd, new GpuDrawConstants
+        {
+            Mode = context.Settings.Metering == ExposureMetering.Stage ? ShaderConstants.MeteringStage : ShaderConstants.MeteringAverage,
+        });
         vk.CmdDispatch(cmd, 1, 1, 1);
 
         int slot = context.Frame.SlotIndex;

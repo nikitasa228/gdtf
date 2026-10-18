@@ -80,7 +80,7 @@ public sealed class PostTests
             using var target = renderer.CreateTarget(160, 120);
             var camera = RenderCamera.LookAt(new Vector3(0f, -3f, 4f), new Vector3(0f, 0.5f, 0f), 50f);
             camera.Ev100 = 2f; // far too bright: auto exposure has to correct it
-            var settings = new PreviewSettings { AutoExposure = true, Bloom = false, Volumetrics = false };
+            var settings = new PreviewSettings { AutoExposure = true, Metering = ExposureMetering.Average, Bloom = false, Volumetrics = false };
             var view = new ViewOptions { ShowGrid = false };
 
             float Converge()

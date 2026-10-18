@@ -41,7 +41,7 @@ internal struct GpuMaterial
     public float Ior;
 }
 
-/// <summary>A placed mesh (160 bytes), see <c>Instance</c> in common.glsl.</summary>
+/// <summary>A placed mesh (192 bytes), see <c>Instance</c> in common.glsl.</summary>
 [StructLayout(LayoutKind.Sequential)]
 internal struct GpuInstance
 {
@@ -52,6 +52,17 @@ internal struct GpuInstance
     public uint MaterialSlotOffset;
     public uint MaterialSlotCount;
     public Vector4 BoundingSphere;
+
+    /// <summary>Additive emitted luminance, linear Rec.2020 cd/m² (lens glow), seen along <see cref="EmissionAxis"/>.</summary>
+    public Vector3 Emission;
+
+    /// <summary>1 / (half-angle)² of the directional falloff of <see cref="Emission"/> (rad⁻²); 0 = uniform.</summary>
+    public float EmissionSharpness;
+
+    /// <summary>World direction of the directional emission (unit; unused when uniform).</summary>
+    public Vector3 EmissionAxis;
+
+    public float Pad0;
 }
 
 /// <summary>A spot light (224 bytes), see <c>Light</c> in common.glsl and <see cref="LightPacker"/>.</summary>
@@ -86,7 +97,10 @@ internal struct GpuLight
     public float PrismRotation;
     public float BoundingAngle;
     public float SolidAngle;
-    public float Pad0;
+
+    /// <summary>Layer coordinate of the profile in <see cref="BeamScatteringTable"/> (family × exponent steps + exponent index).</summary>
+    public float BeamLayer;
+
     public Vector4 BladeA;
     public Vector4 BladeB;
     public Vector4 BladeC;
@@ -155,7 +169,7 @@ internal struct GpuVpl
     public float Pad2;
 }
 
-/// <summary>Per-view constants (uniform buffer, 960 bytes), see <c>FrameData</c> in common.glsl.</summary>
+/// <summary>Per-view constants (uniform buffer, 992 bytes), see <c>FrameData</c> in common.glsl.</summary>
 [StructLayout(LayoutKind.Sequential)]
 internal struct GpuFrameData
 {
@@ -208,7 +222,7 @@ internal struct GpuFrameData
     public Vector4 SelectionColor;
     public Vector4 PixelFootprint;
     public float LightRangeScale;
-    public uint RaymarchCount;
+    public uint BeamCount;
     public uint Features;
     public uint OverlayMode;
     public uint VplCount;
@@ -219,6 +233,28 @@ internal struct GpuFrameData
     public float RenderScale;
     public uint ShadowTileCount;
     public float VolumeHistoryWeight;
+
+    /// <summary>Beam culling tiles along x and y (<see cref="ShaderConstants.BeamTileSize"/> half-resolution pixels each).</summary>
+    public uint BeamTilesX;
+
+    public uint BeamTilesY;
+
+    /// <summary>Mask words per tile (one bit per beam).</summary>
+    public uint BeamWordsPerTile;
+
+    /// <summary>BEAM_FLAG_* bits.</summary>
+    public uint BeamFlags;
+
+    /// <summary>Weight of the accumulated beam modulation ratio (0 = none).</summary>
+    public float BeamHistoryWeight;
+
+    /// <summary>0.25 … 1: scales the segments and cookie samples per beam crossing.</summary>
+    public float BeamQuality;
+
+    /// <summary>Scattering coefficient of the beam envelope image, 1/m.</summary>
+    public float BeamSigmaRef;
+
+    public float BeamPad0;
 }
 
 /// <summary>Push constants of every draw (32 bytes), see <c>DrawConstants</c> in common.glsl.</summary>

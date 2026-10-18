@@ -94,7 +94,9 @@ internal static class ShaderConstants
     public const uint LightPrism = 1u << 3;
 
     // Per-view light flags (LightView.flags).
-    public const uint LightViewRaymarched = 1u << 0;
+
+    /// <summary>The light is a volumetric beam of the view (per-pixel single scattering; skipped by the froxels).</summary>
+    public const uint LightViewBeam = 1u << 0;
     public const uint LightViewRsm = 1u << 1;
 
     /// <summary>LightView.shadowSlot of a light without a shadow map.</summary>
@@ -145,6 +147,10 @@ internal static class ShaderConstants
     // Auto exposure histogram.
     public const uint HistogramBins = 128;
 
+    // Metering of the auto exposure (push constant `mode` of exposure.comp).
+    public const uint MeteringAverage = 0;
+    public const uint MeteringStage = 1;
+
     /// <summary>log2 luminance (cd/m²) of the first histogram bin.</summary>
     public const float HistogramMinLog2 = -14f;
 
@@ -153,6 +159,21 @@ internal static class ShaderConstants
 
     /// <summary>Exposed value below which a light's contribution counts as negligible (sets its range).</summary>
     public const float LightRangeEpsilon = 2e-5f;
+
+    /// <summary>Beam culling tile edge in half-resolution pixels (twice that at the internal resolution).</summary>
+    public const int BeamTileSize = 16;
+
+    /// <summary>Statistics words in front of the beam tile masks (pairs, busiest tile, tiles with beams, …).</summary>
+    public const uint BeamMaskHeader = 16;
+
+    /// <summary>Most beams per view (32-bit mask words per tile × 32).</summary>
+    public const int MaxBeams = 8192;
+
+    /// <summary>Mask words of the most beams (shared memory of the culling work group).</summary>
+    public const int MaxBeamWords = MaxBeams / 32;
+
+    /// <summary>FrameData.beamFlags: a valid beam history exists (one modulation sample per segment instead of two).</summary>
+    public const uint BeamFlagHistory = 1u << 0;
 
     /// <summary>All values as GLSL #define pairs.</summary>
     public static IEnumerable<(string Name, string Value)> Defines => new (string, string)[]
@@ -226,7 +247,7 @@ internal static class ShaderConstants
         ("LIGHT_GOBO", I(LightGobo)),
         ("LIGHT_BLADES", I(LightBlades)),
         ("LIGHT_PRISM", I(LightPrism)),
-        ("LIGHT_VIEW_RAYMARCHED", I(LightViewRaymarched)),
+        ("LIGHT_VIEW_BEAM", I(LightViewBeam)),
         ("LIGHT_VIEW_RSM", I(LightViewRsm)),
         ("NO_SHADOW", I(NoShadow) + "u"),
         ("MAX_PRISM_FACETS", I(MaxPrismFacets)),
@@ -257,7 +278,16 @@ internal static class ShaderConstants
         ("OVERLAY_CABLES", I(OverlayCables)),
         ("DRAW_MODE_DEFAULT", I(DrawModeDefault)),
         ("DRAW_MODE_SELECTED", I(DrawModeSelected)),
+        ("BEAM_TILE_SIZE", I(BeamTileSize)),
+        ("BEAM_MASK_HEADER", I(BeamMaskHeader) + "u"),
+        ("MAX_BEAM_WORDS", I(MaxBeamWords)),
+        ("BEAM_FLAG_HISTORY", I(BeamFlagHistory) + "u"),
+        ("BEAM_TABLE_Y_STEPS", I(BeamScatteringTable.YSteps)),
+        ("BEAM_TABLE_V_STEPS", I(BeamScatteringTable.VSteps)),
+        ("BEAM_TABLE_LAYERS", I(BeamScatteringTable.Layers)),
         ("HISTOGRAM_BINS", I(HistogramBins)),
+        ("METERING_AVERAGE", I(MeteringAverage) + "u"),
+        ("METERING_STAGE", I(MeteringStage) + "u"),
         ("HISTOGRAM_MIN_LOG2", F(HistogramMinLog2)),
         ("HISTOGRAM_MAX_LOG2", F(HistogramMaxLog2)),
         ("INSTANCE_FLAG_CAST_SHADOW", I((long)InstanceFlags.CastShadow)),

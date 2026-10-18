@@ -13,8 +13,10 @@ namespace Candela.Rendering.Vulkan;
 /// the tile size halving for every factor of 4 the score is below the best light's (at least 1/8 of the full
 /// resolution), then reduced — the least important of the largest tiles first — until all of them fit the view's
 /// share of the atlas;</item>
-/// <item>the <see cref="PreviewSettings.MaxRaymarchedBeams"/> highest-scoring narrow beams (field angle below
-/// <see cref="NarrowBeamFieldAngle"/>) that are ray marched at full resolution and skipped by the froxel injection;</item>
+/// <item>the volumetric beams: the <see cref="PreviewSettings.MaxRaymarchedBeams"/> highest-scoring spot lights whose
+/// bounding cone is at most <see cref="MaxBeamBoundingAngle"/> wide get per-pixel single scattering and are skipped by
+/// the froxel injection (diffuse and very wide emitters, and the lights beyond the limit, stay in the froxels), with
+/// the load estimate that scales the per-pixel sample counts (<see cref="BeamQuality"/>);</item>
 /// <item>the lights whose reflective shadow maps feed indirect light — the <see cref="MaxRsmLights"/> highest-scoring
 /// shadowed lights, each with <see cref="MinVplsPerLight"/> plus a share of the rest of the <see cref="VplBudget"/>
 /// virtual point lights proportional to its score —, or the lights the ray-traced GI evaluates at its hits;</item>
@@ -23,8 +25,18 @@ namespace Candela.Rendering.Vulkan;
 /// </summary>
 internal sealed class LightPlanner
 {
-    /// <summary>Beams narrower than this full field angle are ray marched (rad, 15°).</summary>
-    public const float NarrowBeamFieldAngle = 15f * MathF.PI / 180f;
+    /// <summary>Widest bounding half-angle (cut-off, iris and prism spread) of a volumetric beam, rad (80°).</summary>
+    public const float MaxBeamBoundingAngle = 80f * MathF.PI / 180f;
+
+    /// <summary>
+    /// Beam crossings per pixel (sum over the beams of their share of the screen, prism facets counted) that the
+    /// per-pixel integration affords at full quality; above it the segments and cookie samples per crossing shrink
+    /// in proportion (down to <see cref="MinBeamQuality"/>).
+    /// </summary>
+    public const float BeamBudget = 48f;
+
+    /// <summary>Lowest quality factor of the beam integration (a quarter of the segments and samples).</summary>
+    public const float MinBeamQuality = 0.25f;
 
     /// <summary>Virtual point lights per view.</summary>
     public const int VplBudget = 256;
@@ -53,10 +65,19 @@ internal sealed class LightPlanner
     /// <summary>Lights in descending score order (last plan).</summary>
     public ReadOnlySpan<int> Order => _order;
 
-    /// <summary>Ray-marched beams in the last plan.</summary>
-    public int RaymarchCount { get; private set; }
+    /// <summary>Volumetric beams in the last plan (first entries of the list buffer).</summary>
+    public int BeamCount { get; private set; }
 
-    /// <summary>Lights after the ray-marched beams in the list buffer (RSM lights or GI lights).</summary>
+    /// <summary>Estimated beam crossings per pixel of the last plan (share of the screen per beam, facets counted).</summary>
+    public float BeamCoverage { get; private set; }
+
+    /// <summary>Quality factor of the beam integration in the last plan (1 = full, down to <see cref="MinBeamQuality"/>).</summary>
+    public float BeamQuality { get; private set; } = 1f;
+
+    /// <summary>Lights in view that stay in the froxel volume (not beams) in the last plan.</summary>
+    public int FroxelLights { get; private set; }
+
+    /// <summary>Lights after the beams in the list buffer (RSM lights or GI lights).</summary>
     public int IndirectLightCount { get; private set; }
 
     /// <summary>Virtual point lights in the last plan.</summary>
@@ -100,24 +121,34 @@ internal sealed class LightPlanner
             }
         }
 
-        // Lists: ray-marched beams first, then the indirect-light lights.
+        // Lists: volumetric beams first (score order), then the indirect-light lights.
         target.Lists.Resize(0);
-        RaymarchCount = 0;
-        if (inputs.MaxRaymarchedBeams > 0)
+        BeamCount = 0;
+        BeamCoverage = 0f;
+        FroxelLights = 0;
+        if (inputs.VolumeLights)
         {
-            for (int k = 0; k < n && RaymarchCount < inputs.MaxRaymarchedBeams; k++)
+            int maxBeams = Math.Clamp(inputs.MaxRaymarchedBeams, 0, ShaderConstants.MaxBeams);
+            for (int k = 0; k < n; k++)
             {
                 int i = _order[k];
                 if (_scores[i] <= 0f)
                     break;
                 ref readonly var l = ref lights[i];
-                if (2f * l.HalfField >= NarrowBeamFieldAngle || l.BoundingAngle > 2f * NarrowBeamFieldAngle || l.Shape == ShaderConstants.ShapeLambertian)
+                if (BeamCount >= maxBeams || !IsBeam(l))
+                {
+                    FroxelLights++;
                     continue;
-                target.LightViews[i].Flags |= ShaderConstants.LightViewRaymarched;
+                }
+
+                target.LightViews[i].Flags |= ShaderConstants.LightViewBeam;
                 Append(target, (uint)i);
-                RaymarchCount++;
+                BeamCount++;
+                BeamCoverage += ScreenShare(l, inputs) * Math.Max((int)l.PrismFacets, 1);
             }
         }
+
+        BeamQuality = QualityFor(BeamCoverage);
 
         IndirectLightCount = 0;
         VplCount = 0;
@@ -178,26 +209,44 @@ internal sealed class LightPlanner
             BuildOutlines(lights, target.BeamLines);
     }
 
+    /// <summary>Quality factor of the beam integration for a load of <paramref name="beamsPerPixel"/> beam crossings per pixel.</summary>
+    public static float QualityFor(float beamsPerPixel) =>
+        beamsPerPixel > BeamBudget && float.IsFinite(beamsPerPixel) ? Math.Max(BeamBudget / beamsPerPixel, MinBeamQuality) : 1f;
+
+    /// <summary>
+    /// Replaces the CPU estimate of the beam load by a GPU measurement (tile-beam pairs per tile of an earlier frame).
+    /// </summary>
+    public void UseMeasuredBeamLoad(float beamsPerTile) => BeamQuality = QualityFor(beamsPerTile);
+
+    /// <summary>True when a light can be a volumetric beam: a profiled spot light with a bounded cone.</summary>
+    public static bool IsBeam(in GpuLight light) =>
+        light.Shape != ShaderConstants.ShapeLambertian && light.BoundingAngle <= MaxBeamBoundingAngle && light.MaxIntensity > 0f;
+
+    /// <summary>
+    /// Estimated share of the screen covered by a light's beam (at most 1): its cone up to where it meets the floor
+    /// (Z = 0; 30 m at most, 10 m when it points up) seen from the side (length × cap radius) or end-on (cap disc),
+    /// whichever is larger, projected at the distance of the cone's centre.
+    /// </summary>
+    public static float ScreenShare(in GpuLight light, in PlanInputs inputs)
+    {
+        float length = light.Direction.Z < -0.05f ? Math.Clamp(-light.Position.Z / light.Direction.Z, 0.5f, 30f) : 10f;
+        float capRadius = length * MathF.Tan(MathF.Min(light.BoundingAngle, 1.4f)) + light.SourceRadius;
+        var centre = light.Position + light.Direction * (0.5f * length);
+        float area = MathF.Max(length * capRadius, MathF.PI * capRadius * capRadius);
+        float scale = inputs.Orthographic
+            ? 0.5f * MathF.Max(inputs.OrthoHeight, 1e-3f)
+            : MathF.Max(Vector3.Distance(centre, inputs.CameraPosition), 0.5f) * MathF.Max(inputs.TanHalfFovY, 1e-3f);
+        // Screen area in units of the half height squared: 2 x 2 x aspect.
+        return MathF.Min(area / (scale * scale * 4f * MathF.Max(inputs.Aspect, 0.1f)), 1f);
+    }
+
     /// <summary>Estimated contribution of a light to the view (see the class remarks).</summary>
     public static float Score(in GpuLight light, in PlanInputs inputs)
     {
         if (light.MaxIntensity <= 0f)
             return 0f;
         float flux = light.MaxIntensity * MathF.Max(light.SolidAngle, 1e-6f);
-        float range = MathF.Min(MathF.Sqrt(light.MaxIntensity * inputs.LightRangeScale), 60f);
-        float angle = MathF.Min(light.BoundingAngle, 1.4f);
-        Vector4 sphere;
-        if (light.BoundingAngle < 1.05f)
-        {
-            var centre = light.Position + light.Direction * (0.5f * range);
-            float radius = MathF.Sqrt(0.25f * range * range + range * MathF.Tan(angle) * range * MathF.Tan(angle));
-            sphere = new Vector4(centre, radius);
-        }
-        else
-        {
-            sphere = new Vector4(light.Position, range);
-        }
-
+        var sphere = BoundingSphere(light, inputs);
         if (!inputs.Frustum.Intersects(sphere))
             return 0f;
         var c = new Vector3(sphere.X, sphere.Y, sphere.Z);
@@ -206,6 +255,21 @@ internal sealed class LightPlanner
             ? sphere.W / MathF.Max(0.5f * inputs.OrthoHeight, 1e-3f)
             : sphere.W / (distance * MathF.Max(inputs.TanHalfFovY, 1e-3f));
         return flux * (0.25f + MathF.Min(screen, 1f)) / (distance * distance);
+    }
+
+    /// <summary>Bounding sphere of a light's beam up to its range (at most 60 m), or of its range for wide lights.</summary>
+    private static Vector4 BoundingSphere(in GpuLight light, in PlanInputs inputs)
+    {
+        float range = MathF.Min(MathF.Sqrt(light.MaxIntensity * inputs.LightRangeScale), 60f);
+        float angle = MathF.Min(light.BoundingAngle, 1.4f);
+        if (light.BoundingAngle < 1.05f)
+        {
+            var centre = light.Position + light.Direction * (0.5f * range);
+            float radius = MathF.Sqrt(0.25f * range * range + range * MathF.Tan(angle) * range * MathF.Tan(angle));
+            return new Vector4(centre, radius);
+        }
+
+        return new Vector4(light.Position, range);
     }
 
     /// <summary>
@@ -324,6 +388,10 @@ internal struct PlanInputs
     public Vector3 CameraPosition;
     public bool Orthographic;
     public float TanHalfFovY;
+
+    /// <summary>Width / height of the view.</summary>
+    public float Aspect;
+
     public float OrthoHeight;
     public float LightRangeScale;
     public bool Shadows;
@@ -334,6 +402,11 @@ internal struct PlanInputs
     public bool Rsm;
     public bool RayTracedGi;
     public int VplCapacity;
+
+    /// <summary>Volumetric light is drawn in this view (media present): beams are planned.</summary>
+    public bool VolumeLights;
+
+    /// <summary>Most volumetric beams (<see cref="PreviewSettings.MaxRaymarchedBeams"/>).</summary>
     public int MaxRaymarchedBeams;
     public bool BeamOutlines;
     public ulong FrameNumber;

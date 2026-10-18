@@ -1,0 +1,110 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Temporal accumulation of the beam single scattering (half resolution). The scatter pass gives, per pixel, the
+// estimate L (noisy where gobos, blades, shadows or smoke were sampled) and the noise-free envelope B of the same
+// beams without modulation. Only the modulation ratio rho = L / B is accumulated: it is reprojected from the
+// previous frame (world position of the pixel's representative sample, rejected when the depth disagrees),
+// clipped to the mean +- one standard deviation of the current 3 x 3 neighbourhood (variance clipping) and blended
+// with the history weight. The output is
+// B x rho: the shape and position of every beam always come from the current frame, so panning beams and moving
+// heads do not smear, while gobo patterns and shadows in the air converge over a few frames. Pixels without
+// beams pass L through.
+
+#include "volume.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+// rgb = resolved beam light (pre-exposed), a = validity depth of the scatter pass (input of the depth-aware upsampling).
+layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image2D outResolved;
+// rgb = accumulated modulation ratio, a = view depth (next frame's history).
+layout(set = SET_PASS, binding = BINDING_PASS_STORAGE1, rgba16f) uniform writeonly image2D outHistory;
+layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler2D currentScatter;
+layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED1) uniform sampler2D currentBase;
+layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED2) uniform sampler2D historyRatio;
+
+// Envelope below which a pixel counts as having no beam (pre-exposed luminance).
+const float MIN_ENVELOPE = 1e-6;
+
+// Width of the variance clipping box in standard deviations of the current neighbourhood.
+const float CLIP_SPREAD = 1.0;
+
+vec3 ratioAt(ivec2 p, ivec2 size, out bool valid)
+{
+    p = clamp(p, ivec2(0), size - 1);
+    vec3 l = texelFetch(currentScatter, p, 0).rgb;
+    vec3 b = texelFetch(currentBase, p, 0).rgb;
+    valid = b.r + b.g + b.b > MIN_ENVELOPE;
+    return valid ? l / max(b, vec3(MIN_ENVELOPE)) : vec3(0.0);
+}
+
+void main()
+{
+    ivec2 size = imageSize(outResolved);
+    ivec2 id = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(id, size)))
+        return;
+    vec4 current = texelFetch(currentScatter, id, 0);
+    vec4 envelope = texelFetch(currentBase, id, 0);
+    vec3 base = envelope.rgb;
+    float viewDepth = envelope.a;
+    bool beam = base.r + base.g + base.b > MIN_ENVELOPE;
+    if (!beam)
+    {
+        imageStore(outResolved, id, current);
+        imageStore(outHistory, id, vec4(1.0, 1.0, 1.0, -1.0));
+        return;
+    }
+
+    vec3 rho = current.rgb / max(base, vec3(MIN_ENVELOPE));
+    vec3 result = rho;
+    if (frame.beamHistoryWeight > 0.0)
+    {
+        // Representative sample of this pixel (see beam_scatter.comp) as a world position: the centre of the
+        // 2 x 2 block at the stored view depth is close enough for reprojection.
+        vec2 uv = (vec2(id) + 0.5) / vec2(size);
+        vec3 origin, direction;
+        viewRay(uv, origin, direction);
+        float stretch = 1.0 / max(dot(direction, frame.cameraForward.xyz), 1e-4);
+        vec3 P = origin + direction * ((viewDepth - viewDepthOf(origin)) * stretch);
+        vec4 clip = frame.previousViewProjection * vec4(P, 1.0);
+        if (clip.w > 1e-6)
+        {
+            vec2 prevUv = clip.xy / clip.w * 0.5 + 0.5;
+            float prevDepth = isOrthographic() ? viewDepth : clip.w;
+            if (all(greaterThanEqual(prevUv, vec2(0.0))) && all(lessThanEqual(prevUv, vec2(1.0))))
+            {
+                vec4 history = textureLod(historyRatio, prevUv, 0.0);
+                bool depthMatch = history.a > 0.0 && abs(history.a - prevDepth) <= 0.05 * max(prevDepth, 1e-3);
+                if (depthMatch && all(equal(history, history)))
+                {
+                    // Variance clipping: the history may only deviate from the mean of the current modulation around
+                    // this pixel by about its spread, so the pattern of a moving gobo or shadow does not lag behind.
+                    vec3 sum = vec3(0.0);
+                    vec3 sumSq = vec3(0.0);
+                    float n = 0.0;
+                    for (int j = -1; j <= 1; ++j)
+                    {
+                        for (int i = -1; i <= 1; ++i)
+                        {
+                            bool valid;
+                            vec3 r = ratioAt(id + ivec2(i, j), size, valid);
+                            if (valid)
+                            {
+                                sum += r;
+                                sumSq += r * r;
+                                n += 1.0;
+                            }
+                        }
+                    }
+
+                    vec3 mean = sum / n;
+                    vec3 spread = sqrt(max(sumSq / n - mean * mean, vec3(0.0)));
+                    result = mix(rho, clamp(history.rgb, mean - CLIP_SPREAD * spread, mean + CLIP_SPREAD * spread), frame.beamHistoryWeight);
+                }
+            }
+        }
+    }
+
+    imageStore(outResolved, id, vec4(finiteLight(base * result), current.a));
+    imageStore(outHistory, id, vec4(clamp(result, vec3(0.0), vec3(HALF_SAFE_MAX)), viewDepth));
+}

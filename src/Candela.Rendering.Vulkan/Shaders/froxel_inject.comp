@@ -5,8 +5,8 @@
 //   S = sigma_s x sum over cluster lights of HG(g, cos) x I(theta) x cookie x shadow / d^2     (cd/m2 per metre)
 //     + kappa x L_blackbody(T)                                                                 (flame emission)
 //   sigma_t = sigma_s (haze and smoke do not absorb) + kappa (flame)
-// with sigma_s = haze + smoke density x scattering at full density. Narrow beams that are ray marched at full
-// resolution (LIGHT_VIEW_RAYMARCHED) are skipped. With temporal accumulation the result is blended with the
+// with sigma_s = haze + smoke density x scattering at full density. Beams that are integrated per pixel
+// (LIGHT_VIEW_BEAM, beam_scatter.comp) are skipped, so no light is counted twice. With temporal accumulation the result is blended with the
 // previous frame's value reprojected to this froxel's world position (the jitter then integrates over the froxel).
 
 #include "lighting.glsl"
@@ -55,7 +55,7 @@ void main()
         {
             uint index = clusterLights[cluster.x + i];
             LightView lv = lightViews[index];
-            if ((lv.flags & LIGHT_VIEW_RAYMARCHED) != 0u)
+            if ((lv.flags & LIGHT_VIEW_BEAM) != 0u)
                 continue;
             Light light = lights[index];
             vec3 L;

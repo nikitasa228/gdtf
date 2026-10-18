@@ -5,7 +5,7 @@ namespace Candela.Rendering.Vulkan.Tests;
 
 /// <summary>
 /// Volumetric light: single scattering of a spot beam in uniform haze against a numerically integrated reference
-/// (froxel path for a wide beam, full-resolution ray marching for a narrow one), golden images of a beam in haze, a
+/// (the froxel path, and the per-pixel beam integration of beam_scatter.comp), golden images of beams in haze, a
 /// smoke blob from a <see cref="VolumeGrid"/> and a glowing flame volume, and the luminance of an optically thick
 /// flame against the blackbody luminance.
 /// </summary>
@@ -24,9 +24,9 @@ public sealed class VolumetricTests
     [InlineData(true)]
     public void FroxelSingleScatteringMatchesTheIntegral(bool temporal)
     {
-        // A wide beam (field angle above the ray-marching limit) goes through the froxel volume.
+        // With no volumetric beams allowed the wide beam goes through the froxel volume.
         var light = StageScene.Spot(LightPosition, Vector3.Zero, 10000f, 40f, 60f, shadows: false);
-        float measured = MeasureCentre(light, temporal, maxRaymarched: 16, out var renderer, out int raymarched);
+        float measured = MeasureCentre(light, temporal, maxRaymarched: 0, out var renderer, out int raymarched);
         try
         {
             Assert.Equal(0, raymarched);
@@ -40,13 +40,15 @@ public sealed class VolumetricTests
         }
     }
 
-    [SkippableFact]
-    public void RaymarchedNarrowBeamMatchesTheIntegral()
+    [SkippableTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void BeamSingleScatteringMatchesTheIntegral(bool temporal)
     {
-        // The ray-marched beam is excluded from the froxel injection: were it counted twice, the result would exceed the
+        // The volumetric beam is excluded from the froxel injection: were it counted twice, the result would exceed the
         // reference by the froxels' share (about half of it for this narrow beam).
         var light = StageScene.Spot(LightPosition, Vector3.Zero, 40000f, 8f, 12f, shadows: false);
-        float measured = MeasureCentre(light, temporal: false, maxRaymarched: 16, out var renderer, out int raymarched);
+        float measured = MeasureCentre(light, temporal, maxRaymarched: 16, out var renderer, out int raymarched);
         try
         {
             Assert.Equal(1, raymarched);
@@ -60,10 +62,13 @@ public sealed class VolumetricTests
         }
     }
 
-    [SkippableFact]
-    public void UniformSmokeScattersLikeHazeOfTheSameCoefficient()
+    [SkippableTheory]
+    [InlineData(0)]
+    [InlineData(16)]
+    public void UniformSmokeScattersLikeHazeOfTheSameCoefficient(int maxBeams)
     {
-        // Smoke density 0.04 x 0.5 /m at full density = the haze test's 0.02 /m, through the 3D texture over a box.
+        // Smoke density 0.04 x 0.5 /m at full density = the haze test's 0.02 /m, through the 3D texture over a box; in
+        // the froxels and as a volumetric beam (smoke sampled along the beam, its extinction along the light path).
         var renderer = TestRenderers.CreateOrSkip();
         try
         {
@@ -88,7 +93,8 @@ public sealed class VolumetricTests
             var camera = RenderCamera.LookAt(CameraPosition, CameraPosition + Vector3.UnitY, 40f);
             camera.Ev100 = 2f;
             renderer.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f },
-                new PreviewSettings { TemporalAccumulation = false, Bloom = false, VolumetricSlices = 128 }, 1f / 60f);
+                new PreviewSettings { TemporalAccumulation = false, Bloom = false, VolumetricSlices = 128, MaxRaymarchedBeams = maxBeams }, 1f / 60f);
+            Assert.Equal(maxBeams > 0 ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
             float measured = CentreLuminance(renderer.ReadHdr(target));
             float expected = ReferenceInScattering(light);
             Assert.InRange(MathF.Abs(measured - expected) / expected, 0f, 0.05f);
@@ -122,7 +128,7 @@ public sealed class VolumetricTests
             var image = scene.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f },
                 new PreviewSettings { VolumetricSlices = 64, Indirect = IndirectLighting.Off }, frames: 6);
             TestVulkan.AssertNoValidationErrors(renderer.Context);
-            Assert.Equal(1, renderer.LastStatistics.RaymarchedBeams);
+            Assert.Equal(2, renderer.LastStatistics.RaymarchedBeams);
             GoldenImageTests.CompareWithGolden(image, "volumetric-beam");
         }
         finally
@@ -225,10 +231,11 @@ public sealed class VolumetricTests
     [InlineData(true, 16)]
     [InlineData(true, 0)]
     [InlineData(false, 16)]
+    [InlineData(false, 0)]
     public void LookingUpTheBeamMatchesTheIntegral(bool narrow, int maxRaymarched)
     {
         // From inside the beam towards the light (strong forward scattering, steep gradients along the view ray):
-        // the ray-marched narrow beam, the same beam in the froxels and a wide beam in the froxels.
+        // a narrow and a wide beam, each as a volumetric beam and in the froxels.
         var renderer = TestRenderers.CreateOrSkip();
         try
         {
@@ -244,7 +251,7 @@ public sealed class VolumetricTests
             camera.Ev100 = 6f;
             var settings = new PreviewSettings { TemporalAccumulation = false, VolumetricSlices = 128, Bloom = false, MaxRaymarchedBeams = maxRaymarched };
             renderer.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, settings, 1f / 60f);
-            Assert.Equal(narrow && maxRaymarched > 0 ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
+            Assert.Equal(maxRaymarched > 0 ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
             float measured = CentreLuminance(renderer.ReadHdr(target));
             float expected = ReferenceInScattering(light, eye, Vector3.Normalize(look - eye));
             Assert.InRange(MathF.Abs(measured - expected) / expected, 0f, 0.05f);
@@ -257,12 +264,13 @@ public sealed class VolumetricTests
     }
 
     [SkippableTheory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void ShadowedHazeStaysDark(bool narrow)
+    [InlineData(false, 0)]
+    [InlineData(false, 16)]
+    [InlineData(true, 16)]
+    public void ShadowedHazeStaysDark(bool narrow, int maxBeams)
     {
-        // A plate 1 m below the light blocks the middle of the beam: the haze under it (froxels, or the ray-marched
-        // narrow beam) gets no light.
+        // A plate 1 m below the light blocks the middle of the beam: the haze under it (froxels, or the volumetric
+        // beam) gets no light.
         var renderer = TestRenderers.CreateOrSkip();
         try
         {
@@ -276,10 +284,10 @@ public sealed class VolumetricTests
             using var target = renderer.CreateTarget(Width, Height);
             var camera = RenderCamera.LookAt(CameraPosition, CameraPosition + Vector3.UnitY, 40f);
             camera.Ev100 = 2f;
-            var settings = new PreviewSettings { TemporalAccumulation = false, Bloom = false, Indirect = IndirectLighting.Off };
+            var settings = new PreviewSettings { TemporalAccumulation = false, Bloom = false, Indirect = IndirectLighting.Off, MaxRaymarchedBeams = maxBeams };
             var options = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
             renderer.Render(target, camera, options, settings, 1f / 60f);
-            Assert.Equal(narrow ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
+            Assert.Equal(maxBeams > 0 ? 1 : 0, renderer.LastStatistics.RaymarchedBeams);
             float shadowed = CentreLuminance(renderer.ReadHdr(target));
             settings.Shadows = false;
             renderer.Render(target, camera, options, settings, 1f / 60f);

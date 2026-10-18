@@ -1,0 +1,135 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Beam tile culling: one work group per screen tile of BEAM_TILE_SIZE x BEAM_TILE_SIZE half-resolution pixels
+// (twice that at the internal resolution). The group finds the farthest scene depth of the tile, builds the tile's
+// view frustum (four side planes through the corner rays, the far plane at that depth) and tests the truncated cone
+// of every beam against it (support function of the cone: a beam is culled when it lies entirely outside one plane).
+// The result is one bit per beam of the per-view beam list, written to the tile's mask in deterministic list
+// (= score) order; the statistics words count the tile-beam pairs, the busiest tile and the tiles with beams.
+
+#define BEAM_MASKS_WRITABLE
+#include "beam.glsl"
+
+layout(local_size_x = 256) in;
+
+shared float groupDepth[256];
+shared uint groupMask[MAX_BEAM_WORDS];
+
+// Unit plane through the view rays of two tile corners (a, b), facing the interior point `inside`; w = offset.
+vec4 tilePlane(vec2 uvA, vec2 uvB, vec3 inside)
+{
+    vec3 oa, da, ob, db;
+    viewRay(uvA, oa, da);
+    viewRay(uvB, ob, db);
+    vec3 n = cross(da, (ob + db) - oa);
+    float len = length(n);
+    n = len > 1e-12 ? n / len : vec3(0.0);
+    if (dot(n, inside - oa) < 0.0)
+        n = -n;
+    return vec4(n, dot(n, oa));
+}
+
+bool outsidePlane(vec4 plane, vec3 S, vec3 a, float lens, float h, float tanHalf)
+{
+    return beamConeSupport(S, a, lens, h, tanHalf, plane.xyz) < plane.w;
+}
+
+void main()
+{
+    uint tilesX = frame.beamTiles.x;
+    uint tile = gl_WorkGroupID.y * tilesX + gl_WorkGroupID.x;
+    uint lid = gl_LocalInvocationIndex;
+    uint words = frame.beamWordsPerTile;
+
+    // Farthest scene depth of the tile (reverse-Z: the smallest depth value; 0 = background).
+    ivec2 renderSize = ivec2(frame.renderSize.xy);
+    ivec2 origin = ivec2(gl_WorkGroupID.xy) * (2 * BEAM_TILE_SIZE);
+    ivec2 local = ivec2(lid % 16u, lid / 16u) * 2;
+    float far = 1.0;
+    for (int j = 0; j < 2; ++j)
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            ivec2 p = min(origin + local + ivec2(i, j), renderSize - 1);
+            far = min(far, texelFetch(sceneDepth, p, 0).r);
+        }
+    }
+
+    groupDepth[lid] = far;
+    for (uint w = lid; w < words; w += 256u)
+        groupMask[w] = 0u;
+    barrier();
+    for (uint stride = 128u; stride > 0u; stride >>= 1)
+    {
+        if (lid < stride)
+            groupDepth[lid] = min(groupDepth[lid], groupDepth[lid + stride]);
+        barrier();
+    }
+
+    float farDepth = groupDepth[0];
+    vec2 uv0 = vec2(origin) * frame.renderSize.zw;
+    vec2 uv1 = min(vec2(origin + 2 * BEAM_TILE_SIZE), frame.renderSize.xy) * frame.renderSize.zw;
+    float maxViewDepth = 1e30;
+    if (farDepth > 0.0)
+    {
+        // The farthest point of the tile: any corner ray at that depth gives the view depth.
+        maxViewDepth = viewDepthOf(worldFromDepth(0.5 * (uv0 + uv1), farDepth));
+    }
+
+    vec3 oc, dc;
+    viewRay(0.5 * (uv0 + uv1), oc, dc);
+    vec3 inside = oc + dc;
+    vec4 left = tilePlane(vec2(uv0.x, uv1.y), uv0, inside);
+    vec4 top = tilePlane(uv0, vec2(uv1.x, uv0.y), inside);
+    vec4 right = tilePlane(vec2(uv1.x, uv0.y), uv1, inside);
+    vec4 bottom = tilePlane(uv1, vec2(uv0.x, uv1.y), inside);
+    vec3 forward = frame.cameraForward.xyz;
+    float cameraDepth = dot(frame.cameraPosition.xyz, forward);
+
+    for (uint i = lid; i < frame.beamCount; i += 256u)
+    {
+        Light light = lights[raymarchList[i]];
+        float lens = light.sourceRadius;
+        float h = beamRange(light);
+        float tanHalf = tan(clamp(light.boundingAngle, 1e-4, 1.5));
+        vec3 S = light.position;
+        vec3 a = light.direction;
+        if (outsidePlane(left, S, a, lens, h, tanHalf) || outsidePlane(top, S, a, lens, h, tanHalf) ||
+            outsidePlane(right, S, a, lens, h, tanHalf) || outsidePlane(bottom, S, a, lens, h, tanHalf))
+            continue;
+        // Entirely behind the tile's farthest surface.
+        float nearest = -beamConeSupport(S, a, lens, h, tanHalf, -forward) - cameraDepth;
+        if (nearest > maxViewDepth)
+            continue;
+        atomicOr(groupMask[i >> 5], 1u << (i & 31u));
+    }
+
+    barrier();
+    uint count = 0u;
+    uint base = BEAM_MASK_HEADER + tile * words;
+    for (uint w = lid; w < words; w += 256u)
+    {
+        uint bits = groupMask[w];
+        beamMasks[base + w] = bits;
+        count += uint(bitCount(bits));
+    }
+
+    // Statistics: tile-beam pairs, the most beams in one tile, tiles with beams.
+    groupDepth[lid] = float(count);
+    barrier();
+    for (uint stride = 128u; stride > 0u; stride >>= 1)
+    {
+        if (lid < stride)
+            groupDepth[lid] += groupDepth[lid + stride];
+        barrier();
+    }
+
+    if (lid == 0u)
+    {
+        uint total = uint(groupDepth[0] + 0.5);
+        atomicAdd(beamMasks[0], total);
+        atomicMax(beamMasks[1], total);
+        if (total > 0u)
+            atomicAdd(beamMasks[2], 1u);
+    }
+}

@@ -38,6 +38,9 @@ internal static class ShaderPrograms
     public static readonly ShaderVariant FroxelInject = new("froxel_inject.comp");
     public static readonly ShaderVariant FroxelIntegrate = new("froxel_integrate.comp");
     public static readonly ShaderVariant VolumeComposite = new("volumetric.frag");
+    public static readonly ShaderVariant BeamCull = new("beam_cull.comp");
+    public static readonly ShaderVariant BeamScatter = new("beam_scatter.comp");
+    public static readonly ShaderVariant BeamTemporal = new("beam_temporal.comp");
     public static readonly ShaderVariant BloomDownsampleFirst = new("bloom_down.comp", ("FIRST", "1"));
     public static readonly ShaderVariant BloomDownsample = new("bloom_down.comp");
     public static readonly ShaderVariant BloomUpsample = new("bloom_up.comp");
@@ -53,7 +56,7 @@ internal static class ShaderPrograms
         MeshVertex, Prepass, PrepassAlphaMask, Forward, ForwardTransparent, Colorless, Wire, LinesVertex, EdgesVertex,
         LinesFragment, FullscreenVertex, Tonemap, Grid, ClusterAssign, ShadowVertex, ShadowFragment, ShadowFragmentMask,
         ShadowFragmentRsm, ShadowFragmentRsmMask, Analysis, Selection, Outline, DepthUpsample, FroxelInject, FroxelIntegrate,
-        VolumeComposite, BloomDownsampleFirst, BloomDownsample, BloomUpsample, Histogram, ExposureReduce, VplGenerate,
+        VolumeComposite, BeamCull, BeamScatter, BeamTemporal, BloomDownsampleFirst, BloomDownsample, BloomUpsample, Histogram, ExposureReduce, VplGenerate,
         IndirectGather, RayTracedGi, IndirectFilter,
     };
 }

@@ -38,10 +38,25 @@ public readonly record struct RenderInstanceInfo(InstanceHandle Handle, string P
 /// <para><b>Flags.</b> Selected (selection), Hidden (entity or layer hidden), CableHighlight (cables and the devices
 /// they plug into), CastShadow (component setting), Reference (reference drawings). Every entity drawn gets a pick id;
 /// <see cref="TryGetEntity"/> maps it back.</para>
+/// <para><b>Lens glow.</b> The instances of a fixture's beam geometry parts (the lens) emit the luminance of the lit
+/// beam through <see cref="IRenderWorld.SetInstanceEmission(InstanceHandle, Vector3, Vector3, float)"/>: peak candela
+/// / lens area (π·r², r = the beam geometry's BeamRadius as the light collector uses it) in the beam's colour, summed
+/// when several beams share a part, at most <see cref="MaxLensLuminance"/>, seen along the part's −Z axis (where the
+/// light leaves) and falling off like the beam (half at half the widest beam angle), so a lens glares only for eyes in
+/// its beam; the renderer's bloom adds the glare. Updated every frame, sent only when it changes.</para>
+/// <para><b>Flames.</b> Every flame of the fire simulation keeps its own temperature grid (its box and resolution):
+/// the first is <see cref="AtmosphereState.FlameTemperature"/>, the others <see cref="AtmosphereState.FlameTemperatures"/>.
+/// The grids are reused between steps (no allocation while the flames keep their sizes).</para>
 /// <para>Main thread only. Steady-state frames (nothing edited, fixtures moving) do not allocate.</para>
 /// </remarks>
 public sealed class RenderSync : IDisposable
 {
+    /// <summary>
+    /// Largest lens luminance sent to the renderer, cd/m² (a 1 mm lens of a 10⁶ cd beam stays finite in single precision;
+    /// the renderer clamps the pre-exposed result to its half-float range).
+    /// </summary>
+    public const float MaxLensLuminance = 1e9f;
+
     private static readonly Vector3 ConsoleSize = new(1.2f, 0.7f, 0.25f);
     private static readonly Vector3 PowerSourceSize = new(0.45f, 0.3f, 0.6f);
 
@@ -62,6 +77,8 @@ public sealed class RenderSync : IDisposable
     private readonly List<Issue> _issues = new();
     private readonly Dictionary<Guid, bool> _layerVisible = new();
     private readonly AtmosphereState _atmosphere = new();
+    private readonly List<VolumeGrid> _flameGrids = new();
+    private readonly List<VolumeGrid> _moreFlames = new();
     private readonly List<ModelVisual> _staleModels = new();
     private readonly List<FixtureTypeVisual> _retiredTypes = new();
     private readonly List<TextureHandle> _retiredTextures = new();
@@ -80,7 +97,6 @@ public sealed class RenderSync : IDisposable
     private float _lastAnisotropy = float.NaN;
     private float? _hazeOverride;
     private VolumeGrid? _smokeGrid;
-    private VolumeGrid? _flameGrid;
     private Scene _scene;
     private AssetStore _assets;
     private bool _disposed;
@@ -164,6 +180,7 @@ public sealed class RenderSync : IDisposable
         UploadLoadedFixtureTypes();
         UpdateFixtures();
         RefreshFlags();
+        UpdateLensGlow();
         World.SetLights(_engine.Lights);
         DestroyRetired();
         if (_linesDirty) UpdateLines();
@@ -720,6 +737,55 @@ public sealed class RenderSync : IDisposable
         type.Draws = draws.ToArray();
     }
 
+    /// <summary>
+    /// Lens glow: every instance of a fixture's beam geometry part emits the luminance of the beams of that part (see
+    /// the class remarks); only changes are sent to the render world.
+    /// </summary>
+    private void UpdateLensGlow()
+    {
+        foreach (var v in _entities.Values)
+        {
+            if (v.Kind != VisualKind.Fixture || !v.HasFixtureInstances || !_engine.Poses.TryGet(v.Entity.Id, out var pose)) continue;
+            var beams = pose.State.Beams;
+            var span = CollectionsMarshal.AsSpan(v.Instances);
+            for (int i = 0; i < span.Length; i++)
+            {
+                ref var r = ref span[i];
+                if (r.Part < 0) continue;
+                var glow = Vector3.Zero;
+                float halfAngle = 0f;
+                for (int b = 0; b < beams.Count; b++)
+                {
+                    var beam = beams[b];
+                    if (beam.PartIndex != r.Part) continue;
+                    var lens = LensLuminance(beam);
+                    if (lens == Vector3.Zero) continue;
+                    glow += lens;
+                    if (float.IsFinite(beam.BeamAngle)) halfAngle = MathF.Max(halfAngle, 0.5f * beam.BeamAngle);
+                }
+                glow = Vector3.Min(glow, new Vector3(MaxLensLuminance));
+                var axis = r.Part < pose.PartWorld.Length ? Vector3.TransformNormal(-Vector3.UnitZ, pose.PartWorld[r.Part]) : Vector3.Zero;
+                if (glow == r.Emission && axis == r.EmissionAxis && halfAngle == r.EmissionHalfAngle) continue;
+                r.Emission = glow;
+                r.EmissionAxis = axis;
+                r.EmissionHalfAngle = halfAngle;
+                World.SetInstanceEmission(r.Handle, glow, axis, halfAngle);
+            }
+        }
+    }
+
+    /// <summary>Luminance of a beam's lens, cd/m² per Rec.2020 channel: peak candela / (π r²) in the beam's colour.</summary>
+    private static Vector3 LensLuminance(BeamState beam)
+    {
+        float candela = beam.PeakCandela;
+        if (!(candela > 0f) || !float.IsFinite(candela)) return Vector3.Zero;
+        float radius = beam.Beam.Geometry.BeamRadius;
+        radius = float.IsFinite(radius) && radius > 0f ? Math.Clamp(radius, 0.001f, 2f) : 0.05f;
+        var color = beam.Color.Rgb;
+        if (!IsFinite(color)) return Vector3.Zero;
+        return Vector3.Max(color, Vector3.Zero) * MathF.Min(candela / (MathF.PI * radius * radius), MaxLensLuminance);
+    }
+
     // ------------------------------------------------------------------ gobos
 
     private TextureHandle ResolveGobo(FixtureProfile profile, int wheelIndex, int slot)
@@ -827,9 +893,10 @@ public sealed class RenderSync : IDisposable
         var fire = simulation.Fire;
         if (fire.Volumes.Count == 0 || !_engine.Settings.SimulateFire)
         {
-            if (_atmosphere.FlameTemperature is not null)
+            if (_atmosphere.FlameTemperature is not null || _atmosphere.FlameTemperatures is not null)
             {
                 _atmosphere.FlameTemperature = null;
+                _atmosphere.FlameTemperatures = null;
                 changed = true;
             }
             _fireStep = -1;
@@ -837,12 +904,40 @@ public sealed class RenderSync : IDisposable
         else if (fire.StepCount != _fireStep)
         {
             _fireStep = fire.StepCount;
-            _flameGrid = FlameComposite.Update(_flameGrid, fire.Volumes);
-            _atmosphere.FlameTemperature = _flameGrid;
+            UpdateFlameGrids(fire.Volumes);
             changed = true;
         }
 
         if (changed) World.SetAtmosphere(_atmosphere);
+    }
+
+    /// <summary>
+    /// One temperature grid per flame (its own box and resolution, reusing the grid objects and their value arrays):
+    /// the first goes to <see cref="AtmosphereState.FlameTemperature"/>, the others to
+    /// <see cref="AtmosphereState.FlameTemperatures"/>.
+    /// </summary>
+    private void UpdateFlameGrids(IReadOnlyList<Candela.Simulation.FlameVolume> volumes)
+    {
+        int n = 0;
+        _moreFlames.Clear();
+        for (int i = 0; i < volumes.Count; i++)
+        {
+            var v = volumes[i];
+            int count = v.SizeX * v.SizeY * v.SizeZ;
+            if (v.Bounds.IsEmpty || v.SizeX <= 0 || v.SizeY <= 0 || v.SizeZ <= 0 || count <= 0) continue;
+            if (n == _flameGrids.Count) _flameGrids.Add(new VolumeGrid());
+            var grid = _flameGrids[n++];
+            if (grid.Values.Length < count) grid.Values = new float[Math.Max(count, 2 * grid.Values.Length)];
+            grid.Min = v.Bounds.Min;
+            grid.Max = v.Bounds.Max;
+            grid.SizeX = v.SizeX;
+            grid.SizeY = v.SizeY;
+            grid.SizeZ = v.SizeZ;
+            v.Temperature.CopyTo(grid.Values);
+            if (n > 1) _moreFlames.Add(grid);
+        }
+        _atmosphere.FlameTemperature = n > 0 ? _flameGrids[0] : null;
+        _atmosphere.FlameTemperatures = _moreFlames.Count > 0 ? _moreFlames : null;
     }
 
     // ------------------------------------------------------------------ resources
@@ -951,7 +1046,17 @@ public sealed class RenderSync : IDisposable
         Cable,
     }
 
-    private record struct InstanceRecord(InstanceHandle Handle, Matrix4x4 Local, int Part, Matrix4x4 World, string Name, bool CastShadow, bool Reference);
+    private record struct InstanceRecord(InstanceHandle Handle, Matrix4x4 Local, int Part, Matrix4x4 World, string Name, bool CastShadow, bool Reference)
+    {
+        /// <summary>Lens glow last sent to the render world (cd/m², Rec.2020).</summary>
+        public Vector3 Emission;
+
+        /// <summary>World axis of the lens glow last sent (the part's −Z).</summary>
+        public Vector3 EmissionAxis;
+
+        /// <summary>Half-angle of the lens glow last sent, rad.</summary>
+        public float EmissionHalfAngle;
+    }
 
     private sealed class EntityVisual(Entity entity, uint pickId)
     {

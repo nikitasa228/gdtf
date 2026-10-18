@@ -82,6 +82,9 @@ internal sealed class PassContext
     /// <summary>The froxel volume runs (media present, or the noise overlay's fog).</summary>
     public bool VolumetricsActive { get; set; }
 
+    /// <summary>Volumetric beams are integrated per pixel in this view (beam culling, scattering, temporal passes).</summary>
+    public bool BeamsActive { get; set; }
+
     /// <summary>Indirect light of this view.</summary>
     public IndirectLighting Indirect { get; set; }
 

@@ -50,7 +50,7 @@ internal struct LastFrameInfo
 /// </remarks>
 public sealed unsafe class VulkanRenderTarget : IRenderTarget
 {
-    private const int MaxPassSets = 24;
+    private const int MaxPassSets = 32;
 
     /// <summary>Renders a feature's resources survive without being used.</summary>
     internal const int KeepUnusedRenders = 60;
@@ -68,7 +68,15 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     private const int SlotBloom = 10;
     private const int SlotExposure = 11;
     private const int SlotIndirectScratch = 12;
-    private readonly int[] _unusedRenders = new int[13];
+    private const int SlotBeamScatter = 13;
+    private const int SlotBeamBase = 14;
+    private const int SlotBeamResolved = 15;
+    private const int SlotBeamHistory0 = 16;
+    private const int SlotBeamHistory1 = 17;
+    private const int SlotBeamMasks = 18;
+    private readonly int[] _unusedRenders = new int[19];
+    private readonly GpuImage?[] _beamHistory = new GpuImage?[2];
+    private readonly DescriptorSet[] _beamTemporalSets = new DescriptorSet[2];
     private readonly VulkanRenderer _renderer;
     private readonly VulkanContext _context;
     private readonly DescriptorSignature _signature = new();
@@ -193,6 +201,33 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
     internal GpuBuffer? Vpls { get; private set; }
 
+    /// <summary>Beam single scattering of the frame (half resolution): rgb = L, a = view depth of the sample.</summary>
+    internal GpuImage? BeamScatter { get; private set; }
+
+    /// <summary>The noise-free beam envelope (half resolution): rgb = L without modulation × the reference coefficient.</summary>
+    internal GpuImage? BeamBase { get; private set; }
+
+    /// <summary>Temporally resolved beam light (half resolution): rgb = light, a = view depth.</summary>
+    internal GpuImage? BeamResolved { get; private set; }
+
+    /// <summary>Statistics words + one bit per beam for every culling tile.</summary>
+    internal GpuBuffer? BeamMasks { get; private set; }
+
+    /// <summary>Host-visible copies of the beam statistics words, one per frame slot.</summary>
+    internal GpuBuffer?[] BeamStatsReadback { get; } = new GpuBuffer?[VulkanContext.FramesInFlight];
+
+    /// <summary>Frame number that wrote each beam statistics read-back buffer (0 = none).</summary>
+    internal ulong[] BeamStatsFrame { get; } = new ulong[VulkanContext.FramesInFlight];
+
+    /// <summary>Culling tiles of the frame that wrote each beam statistics read-back buffer.</summary>
+    internal uint[] BeamStatsTiles { get; } = new uint[VulkanContext.FramesInFlight];
+
+    /// <summary>History image of the beam modulation ratio (ping-pong pair).</summary>
+    internal GpuImage? BeamHistory(int i) => _beamHistory[i];
+
+    /// <summary>Temporal pass set that reads history <paramref name="readIndex"/> and writes the other one.</summary>
+    internal DescriptorSet BeamTemporalSet(int readIndex) => _beamTemporalSets[readIndex];
+
     internal GpuBuffer? Exposure { get; private set; }
 
     internal GpuBuffer?[] ExposureReadback { get; } = new GpuBuffer?[VulkanContext.FramesInFlight];
@@ -243,6 +278,13 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
     internal DescriptorSet FilterToIndirectSet { get; private set; }
 
+    internal DescriptorSet BeamCullSet { get; private set; }
+
+    internal DescriptorSet BeamScatterSet { get; private set; }
+
+    /// <summary>Set 2 of the volumetric composite (the resolved beam image, or a placeholder).</summary>
+    internal DescriptorSet CompositeSet { get; private set; }
+
     internal LastFrameInfo Last;
 
     // Temporal state.
@@ -254,6 +296,21 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     internal float VolumeHistoryExposure;
     internal bool IndirectHistoryValid;
     internal IndirectLighting IndirectHistoryMode;
+
+    /// <summary>History image the next beam temporal pass reads (it writes the other one).</summary>
+    internal int BeamHistoryIndex;
+
+    /// <summary>The beam history holds the previous frame's accumulated modulation.</summary>
+    internal bool BeamHistoryValid;
+
+    /// <summary>Frames accumulated in the beam history (progressive averaging until the history weight is reached).</summary>
+    internal int BeamHistoryFrames;
+
+    /// <summary>
+    /// Beam statistics read back from the GPU (a frame or two old): tile-beam pairs, busiest tile, tiles with beams and
+    /// the number of tiles of that frame.
+    /// </summary>
+    internal (uint Pairs, uint MaxPerTile, uint Tiles, uint TotalTiles) LastBeamGpuStats;
     internal float AdaptedLog2Luminance = float.NaN;
 
     /// <inheritdoc/>
@@ -315,6 +372,12 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             RetireImage(IndirectHistory);
             RetireImage(IndirectScratch);
             Indirect = IndirectHistory = IndirectScratch = null;
+            RetireImage(BeamScatter);
+            RetireImage(BeamBase);
+            RetireImage(BeamResolved);
+            RetireImage(_beamHistory[0]);
+            RetireImage(_beamHistory[1]);
+            BeamScatter = BeamBase = BeamResolved = _beamHistory[0] = _beamHistory[1] = null;
             for (int i = 0; i < BloomLevels; i++)
                 RetireImage(_bloom[i]);
             BloomLevels = 0;
@@ -368,6 +431,29 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             (uint)Math.Max(r.IndirectHeight, 1), 1, TargetFormats.HdrStorage, ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit,
             "indirect filter scratch", out var indirectScratch);
         IndirectScratch = indirectScratch;
+
+        bool beams = r.BeamWidth > 0;
+        uint bw = (uint)Math.Max(r.BeamWidth, 1), bh = (uint)Math.Max(r.BeamHeight, 1);
+        var beamUsage = ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit;
+        Ensure(SlotBeamScatter, BeamScatter, beams, bw, bh, 1, TargetFormats.HdrStorage, beamUsage, "beam scattering", out var beamScatter);
+        BeamScatter = beamScatter;
+        Ensure(SlotBeamBase, BeamBase, beams, bw, bh, 1, TargetFormats.HdrStorage, beamUsage, "beam envelope", out var beamBase);
+        BeamBase = beamBase;
+        Ensure(SlotBeamResolved, BeamResolved, beams && r.BeamHistory, bw, bh, 1, TargetFormats.HdrStorage, beamUsage, "beam light",
+            out var beamResolved);
+        BeamResolved = beamResolved;
+        for (int i = 0; i < 2; i++)
+        {
+            Ensure(i == 0 ? SlotBeamHistory0 : SlotBeamHistory1, _beamHistory[i], beams && r.BeamHistory, bw, bh, 1, TargetFormats.HdrStorage,
+                beamUsage, i == 0 ? "beam history 0" : "beam history 1", out var beamHistory);
+            if (!ReferenceEquals(beamHistory, _beamHistory[i]))
+                BeamHistoryValid = false;
+            _beamHistory[i] = beamHistory;
+        }
+
+        if (!beams || !r.BeamHistory)
+            BeamHistoryValid = false;
+        EnsureBeamMasks(beams ? (ulong)r.BeamTilesX * (ulong)r.BeamTilesY * (ulong)r.BeamWords : 0ul);
 
         ulong vplBytes = (ulong)Math.Max(r.VplCapacity, 0) * (ulong)sizeof(GpuVpl);
         if (r.VplCapacity <= 0)
@@ -433,6 +519,13 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         sig.Add(Exposure?.Handle.Handle ?? 0);
         sig.Add(tlas.Handle);
         sig.Add(rtData?.Handle.Handle ?? 0);
+        sig.Add(BeamScatter?.View.Handle ?? 0);
+        sig.Add(BeamBase?.View.Handle ?? 0);
+        sig.Add(BeamResolved?.View.Handle ?? 0);
+        sig.Add(_beamHistory[0]?.View.Handle ?? 0);
+        sig.Add(_beamHistory[1]?.View.Handle ?? 0);
+        sig.Add(BeamMasks?.Handle.Handle ?? 0);
+        sig.Add(shared.BeamTable?.View.Handle ?? 0);
         sig.Add((ulong)BloomLevels);
         for (int i = 0; i < BloomLevels; i++)
             sig.Add(_bloom[i]!.View.Handle);
@@ -482,6 +575,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         w.Buffer(set, ShaderConstants.BindingExposure, storage, (Exposure ?? shared.DummyBuffer).Handle);
 
         InjectSet = IntegrateSet = GatherSet = RayTracingSet = FilterToScratchSet = FilterToIndirectSet = default;
+        BeamCullSet = BeamScatterSet = CompositeSet = default;
+        _beamTemporalSets[0] = _beamTemporalSets[1] = default;
         if (FroxelInjected is not null)
         {
             InjectSet = Allocate(_renderer.Pipelines.PassSetLayout);
@@ -490,6 +585,30 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             IntegrateSet = Allocate(_renderer.Pipelines.PassSetLayout);
             w.Image(IntegrateSet, ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, default, FroxelIntegrated!.View, ImageLayout.General);
             w.Image(IntegrateSet, ShaderConstants.BindingPassSampled0, image, shared.NearestClamp, FroxelInjected.View, read);
+            CompositeSet = Allocate(_renderer.Pipelines.PassSetLayout);
+            // The temporally resolved beam light, or the frame's own estimate without temporal accumulation.
+            w.Image(CompositeSet, ShaderConstants.BindingPassSampled0, image, shared.NearestClamp, (BeamResolved ?? BeamScatter ?? shared.Dummy2D).View,
+                read);
+        }
+
+        if (BeamScatter is not null && BeamBase is not null && BeamMasks is not null && shared.BeamTable is not null)
+        {
+            BeamCullSet = Allocate(_renderer.Pipelines.PassSetLayout);
+            w.Buffer(BeamCullSet, ShaderConstants.BindingPassBuffer, storage, BeamMasks.Handle);
+            BeamScatterSet = Allocate(_renderer.Pipelines.PassSetLayout);
+            w.Buffer(BeamScatterSet, ShaderConstants.BindingPassBuffer, storage, BeamMasks.Handle);
+            w.Image(BeamScatterSet, ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, default, BeamScatter.View, ImageLayout.General);
+            w.Image(BeamScatterSet, ShaderConstants.BindingPassStorage1, DescriptorType.StorageImage, default, BeamBase.View, ImageLayout.General);
+            w.Image(BeamScatterSet, ShaderConstants.BindingPassSampled0, image, shared.LinearClamp, shared.BeamTable.View, read);
+            for (int i = 0; i < 2 && BeamResolved is not null && _beamHistory[0] is not null && _beamHistory[1] is not null; i++)
+            {
+                var temporalSet = _beamTemporalSets[i] = Allocate(_renderer.Pipelines.PassSetLayout);
+                w.Image(temporalSet, ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, default, BeamResolved.View, ImageLayout.General);
+                w.Image(temporalSet, ShaderConstants.BindingPassStorage1, DescriptorType.StorageImage, default, _beamHistory[1 - i]!.View, ImageLayout.General);
+                w.Image(temporalSet, ShaderConstants.BindingPassSampled0, image, shared.NearestClamp, BeamScatter.View, read);
+                w.Image(temporalSet, ShaderConstants.BindingPassSampled1, image, shared.NearestClamp, BeamBase.View, read);
+                w.Image(temporalSet, ShaderConstants.BindingPassSampled2, image, shared.LinearClamp, _beamHistory[i]!.View, read);
+            }
         }
 
         if (Indirect is not null)
@@ -556,10 +675,23 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         RetireImage(Indirect);
         RetireImage(IndirectHistory);
         RetireImage(IndirectScratch);
+        RetireImage(BeamScatter);
+        RetireImage(BeamBase);
+        RetireImage(BeamResolved);
+        RetireImage(_beamHistory[0]);
+        RetireImage(_beamHistory[1]);
         for (int i = 0; i < BloomLevels; i++)
             RetireImage(_bloom[i]);
         BloomLevels = 0;
         RetirePool();
+        if (BeamMasks is not null)
+            _context.DeferDispose(BeamMasks);
+        foreach (var b in BeamStatsReadback)
+        {
+            if (b is not null)
+                _context.DeferDispose(b);
+        }
+
         _context.DeferDispose(FrameUniform);
         _context.DeferDispose(Clusters);
         _context.DeferDispose(ClusterLights);
@@ -591,6 +723,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         HasPreviousFrame = false;
         VolumeHistoryValid = false;
         IndirectHistoryValid = false;
+        BeamHistoryValid = false;
     }
 
     private (int Width, int Height) Clamp(int width, int height)
@@ -683,6 +816,49 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             : GpuImage.Create2D(_context, w, h, format, usage, name, dedicated: (ulong)w * h >= 256 * 256);
     }
 
+    /// <summary>
+    /// Keeps the beam mask buffer large enough for <paramref name="maskWords"/> words behind the statistics header (grows,
+    /// never shrinks while in use) and the statistics read-back buffers; releases them after
+    /// <see cref="KeepUnusedRenders"/> renders without beams.
+    /// </summary>
+    private void EnsureBeamMasks(ulong maskWords)
+    {
+        if (maskWords == 0)
+        {
+            if (BeamMasks is not null && Unused(SlotBeamMasks))
+            {
+                _context.DeferDispose(BeamMasks);
+                BeamMasks = null;
+                for (int i = 0; i < BeamStatsReadback.Length; i++)
+                {
+                    if (BeamStatsReadback[i] is { } b)
+                        _context.DeferDispose(b);
+                    BeamStatsReadback[i] = null;
+                    BeamStatsFrame[i] = 0;
+                }
+            }
+
+            return;
+        }
+
+        Used(SlotBeamMasks);
+        ulong bytes = (ShaderConstants.BeamMaskHeader + maskWords) * 4ul;
+        if (BeamMasks is null || BeamMasks.Size < bytes)
+        {
+            ulong size = BeamMasks is null ? bytes : Math.Max(bytes, BeamMasks.Size * 2);
+            if (BeamMasks is not null)
+                _context.DeferDispose(BeamMasks);
+            BeamMasks = GpuBuffer.Create(_context, VkUtil.AlignUp(size, 256), BufferUsageFlags.StorageBufferBit | BufferUsageFlags.TransferDstBit |
+                BufferUsageFlags.TransferSrcBit, MemoryUsage.GpuOnly, "beam tile masks");
+        }
+
+        for (int i = 0; i < BeamStatsReadback.Length; i++)
+        {
+            BeamStatsReadback[i] ??= GpuBuffer.Create(_context, ShaderConstants.BeamMaskHeader * 4ul, BufferUsageFlags.TransferDstBit,
+                MemoryUsage.Readback, "beam statistics read-back");
+        }
+    }
+
     private void EnsureBloom(int levels)
     {
         levels = Math.Clamp(levels, 0, _bloom.Length);
@@ -746,9 +922,9 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         var sizes = stackalloc DescriptorPoolSize[5];
         uint n = 0;
         sizes[n++] = new DescriptorPoolSize(DescriptorType.UniformBuffer, 2);
-        sizes[n++] = new DescriptorPoolSize(DescriptorType.StorageBuffer, 24);
-        sizes[n++] = new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 64);
-        sizes[n++] = new DescriptorPoolSize(DescriptorType.StorageImage, 32);
+        sizes[n++] = new DescriptorPoolSize(DescriptorType.StorageBuffer, 32);
+        sizes[n++] = new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 96);
+        sizes[n++] = new DescriptorPoolSize(DescriptorType.StorageImage, 48);
         if (_renderer.Pipelines.RayTracing)
             sizes[n++] = new DescriptorPoolSize(DescriptorType.AccelerationStructureKhr, 2);
         var poolInfo = new DescriptorPoolCreateInfo
@@ -787,6 +963,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         _context.DeferDestroy(() => context.Vk.DestroyDescriptorPool(context.Device, pool, null));
         _pool = default;
         ViewSet = InjectSet = IntegrateSet = GatherSet = RayTracingSet = FilterToScratchSet = FilterToIndirectSet = default;
+        BeamCullSet = BeamScatterSet = CompositeSet = default;
+        _beamTemporalSets[0] = _beamTemporalSets[1] = default;
     }
 
     private void DisposeResources()
@@ -807,6 +985,18 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         Indirect?.Dispose();
         IndirectHistory?.Dispose();
         IndirectScratch?.Dispose();
+        BeamScatter?.Dispose();
+        BeamBase?.Dispose();
+        BeamResolved?.Dispose();
+        _beamHistory[0]?.Dispose();
+        _beamHistory[1]?.Dispose();
+        BeamMasks?.Dispose();
+        for (int i = 0; i < BeamStatsReadback.Length; i++)
+        {
+            BeamStatsReadback[i]?.Dispose();
+            BeamStatsReadback[i] = null;
+        }
+
         for (int i = 0; i < _bloom.Length; i++)
         {
             _bloom[i]?.Dispose();
