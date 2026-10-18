@@ -18,11 +18,19 @@ public delegate bool ConsoleDrivenPredicate(Entity entity, FixtureComponent fixt
 /// added, removed, repatched, re-moded, manual values changed) are picked up incrementally from scene change events.
 /// </summary>
 /// <remarks>
-/// Main-thread only, like the scene. <see cref="Update"/> does not allocate in steady state: fixtures whose DMX did not
-/// change and that are not animating (no strobe, rotation or moving motor) are skipped entirely.
+/// Main-thread only, like the scene: <see cref="Update"/> reads the scene, the input hub and the console-driven delegate
+/// on the calling thread and then evaluates the fixtures that need it on <see cref="MaxDegreeOfParallelism"/> threads
+/// (each fixture's state is independent; profiles are immutable), returning when all are done. It does not allocate in
+/// steady state: fixtures whose DMX did not change and that are not animating (no strobe, rotation or moving motor) are
+/// skipped entirely.
 /// </remarks>
 public sealed class DmxEngine : IDisposable
 {
+    /// <summary>Fewest fixtures to evaluate in one frame before the work is spread over several threads.</summary>
+    public const int ParallelThreshold = 96;
+
+    private const int ParallelChunk = 16;
+
     private readonly Scene _scene;
     private readonly DmxInputHub _hub;
     private readonly Dictionary<Guid, Runtime> _byEntity = new();
@@ -31,6 +39,12 @@ public sealed class DmxEngine : IDisposable
     private readonly List<Guid> _removed = new();
     private readonly Dictionary<int, UniverseBuffer> _universes = new();
     private readonly List<Guid> _changed = new();
+    private readonly Action<int> _evaluateOne;
+    private Runtime[] _work = Array.Empty<Runtime>();
+    private int _workCount;
+    private double _frameTime;
+    private WorkerPool? _pool;
+    private int _maxParallelism = Math.Max(1, Environment.ProcessorCount);
     private bool _universeSetDirty = true;
     private bool _disposed;
 
@@ -40,8 +54,26 @@ public sealed class DmxEngine : IDisposable
         _scene = scene ?? throw new ArgumentNullException(nameof(scene));
         Profiles = profiles ?? throw new ArgumentNullException(nameof(profiles));
         _hub = hub ?? throw new ArgumentNullException(nameof(hub));
+        _evaluateOne = EvaluateOne;
         foreach (var (entity, _) in scene.Query<FixtureComponent>()) _dirty.Add(entity.Id);
         scene.Changed += OnSceneChanged;
+    }
+
+    /// <summary>
+    /// Most threads used to evaluate fixtures in one <see cref="Update"/> (default: the processor count; 1 evaluates on
+    /// the calling thread only). Results do not depend on it.
+    /// </summary>
+    public int MaxDegreeOfParallelism
+    {
+        get => _maxParallelism;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
+            if (value == _maxParallelism) return;
+            _maxParallelism = value;
+            _pool?.Dispose();
+            _pool = null;
+        }
     }
 
     /// <summary>Profiles of the fixture types in the scene.</summary>
@@ -128,6 +160,9 @@ public sealed class DmxEngine : IDisposable
             u.WasLive = u.Live;
         }
 
+        // decide on this thread (scene, delegate, universes); evaluate afterwards, possibly in parallel
+        if (_work.Length < _runtimes.Count) _work = new Runtime[Math.Max(_runtimes.Count, _work.Length * 2)];
+        _workCount = 0;
         foreach (var r in _runtimes)
         {
             if (r.State is not { } state || r.Buffer is not { } buffer) continue;
@@ -150,11 +185,29 @@ public sealed class DmxEngine : IDisposable
             r.Driven = driven;
             r.NeedsEvaluation = false;
             if (!inputChanged && !state.IsAnimating) continue;
-            FixtureEvaluator.Evaluate(state, buffer, timeSeconds, driven ? null : r.Manual, ApplyDynamics);
+            _work[_workCount++] = r;
             _changed.Add(r.Entity.Id);
         }
+
+        _frameTime = timeSeconds;
+        if (_workCount >= ParallelThreshold && _maxParallelism > 1)
+        {
+            _pool ??= new WorkerPool(_maxParallelism - 1, "Candela DMX");
+            _pool.For(_workCount, ParallelChunk, _evaluateOne);
+        }
+        else
+        {
+            for (int i = 0; i < _workCount; i++) EvaluateOne(i);
+        }
+        Array.Clear(_work, 0, _workCount);
         Time = timeSeconds;
         Frame++;
+    }
+
+    private void EvaluateOne(int index)
+    {
+        var r = _work[index];
+        FixtureEvaluator.Evaluate(r.State!, r.Buffer!, _frameTime, r.Driven ? null : r.Manual, ApplyDynamics);
     }
 
     /// <summary>Builds the patch of the scene (for the patch view and issue checks).</summary>
@@ -166,6 +219,8 @@ public sealed class DmxEngine : IDisposable
         if (_disposed) return;
         _disposed = true;
         _scene.Changed -= OnSceneChanged;
+        _pool?.Dispose();
+        _pool = null;
     }
 
     private void OnSceneChanged(SceneChange change)
@@ -198,7 +253,7 @@ public sealed class DmxEngine : IDisposable
                 if (existing is not null)
                 {
                     _byEntity.Remove(id);
-                    _runtimes.Remove(existing);
+                    RemoveRuntime(existing);
                     _removed.Add(id);
                     _universeSetDirty = true;
                 }
@@ -206,13 +261,23 @@ public sealed class DmxEngine : IDisposable
             }
             if (existing is null)
             {
-                existing = new Runtime(entity, fixture);
+                existing = new Runtime(entity, fixture) { Slot = _runtimes.Count };
                 _byEntity[id] = existing;
                 _runtimes.Add(existing);
             }
             Refresh(existing, entity, fixture);
         }
         _dirty.Clear();
+    }
+
+    /// <summary>Removes a runtime in O(1) by moving the last one into its slot (evaluation order is irrelevant).</summary>
+    private void RemoveRuntime(Runtime r)
+    {
+        int last = _runtimes.Count - 1;
+        var moved = _runtimes[last];
+        _runtimes[r.Slot] = moved;
+        moved.Slot = r.Slot;
+        _runtimes.RemoveAt(last);
     }
 
     /// <summary>Re-reads a fixture component: profile (when GDTF or mode changed), addresses and manual values.</summary>
@@ -296,6 +361,7 @@ public sealed class DmxEngine : IDisposable
 
         public Entity Entity;
         public FixtureComponent Fixture;
+        public int Slot;
         public string? Spec;
         public string? Mode;
         public ProfileResolution? Resolution;
