@@ -5,6 +5,8 @@ namespace Candela.Core.SceneGraph.Components;
 /// <summary>An imported 3D model (asset stored in the project) with optional per-slot material overrides.</summary>
 public sealed class MeshComponent : Component
 {
+    /// <summary>The imported model asset of the project.</summary>
+    [AssetReference]
     public Guid ModelAssetId { get; set; }
 
     /// <summary>Material slot index of the model → material id (see <see cref="MaterialIds"/>).</summary>
@@ -56,6 +58,8 @@ public enum ImageMode
 /// <summary>An image placed in the scene on a rectangle in the local XZ plane (facing −Y).</summary>
 public sealed class ImageComponent : Component
 {
+    /// <summary>The image asset of the project.</summary>
+    [AssetReference]
     public Guid ImageAssetId { get; set; }
     public ImageMode Mode { get; set; } = ImageMode.Reference;
     public float Width { get; set; } = 2f;
@@ -94,16 +98,22 @@ public sealed class TrussComponent : Component
     public float MaxPointLoadKg { get; set; }
 
     /// <summary>Optional model asset; when empty the renderer generates the profile procedurally.</summary>
+    [AssetReference]
     public Guid? ModelAssetId { get; set; }
 }
 
 /// <summary>A hoist / hanging point that carries a structure (MVR Support).</summary>
 public sealed class RiggingPointComponent : Component
 {
+    /// <summary>Working load limit in kg.</summary>
     public float CapacityKg { get; set; } = 500f;
 
     /// <summary>Entities (usually trusses) suspended from this point.</summary>
+    [EntityReference]
     public List<Guid> Carries { get; set; } = new();
+
+    /// <inheritdoc/>
+    protected internal override void RemapEntityReferences(EntityReferenceRemapper remapper) => remapper.RemapAll(Carries);
 }
 
 /// <summary>Marks an entity that only groups children (MVR GroupObject, editor folders).</summary>

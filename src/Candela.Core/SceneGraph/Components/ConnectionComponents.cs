@@ -16,37 +16,142 @@ public sealed class CableComponent : Component
     /// <summary>Label printed on the cable / shown in the patch ("U1-03").</summary>
     public string? Label { get; set; }
 
+    /// <summary>Points of the cable (a tree through <see cref="Segments"/>).</summary>
     public List<CableNode> Nodes { get; set; } = new();
+
+    /// <summary>Straight runs between nodes of this cable.</summary>
     public List<CableSegment> Segments { get; set; } = new();
+
+    /// <summary>Nodes plugged into device ports.</summary>
     public List<CableEndpoint> Endpoints { get; set; } = new();
 
     /// <summary>Extra length for sag and service loops, as a factor of the routed length (1.05 = +5 %).</summary>
     public float SlackFactor { get; set; } = 1.05f;
 
-    public CableNode? FindNode(Guid id) => Nodes.Find(n => n.Id == id);
+    /// <summary>The node with <paramref name="id"/>, or null.</summary>
+    public CableNode? FindNode(Guid id) => Nodes.Find(n => n?.Id == id);
+
+    /// <summary>
+    /// Anchors and endpoints follow the remapper. A removed anchor releases its node where it is now (its world position
+    /// expressed in the cable's space, when the original entities can be resolved); a removed endpoint leaves the node
+    /// unplugged. With <see cref="EntityReferenceRemapper.RegenerateLocalIds"/>, node ids are renewed and segments and
+    /// endpoints follow them; references to node ids the cable does not have are left as they are.
+    /// </summary>
+    protected internal override void RemapEntityReferences(EntityReferenceRemapper remapper)
+    {
+        Dictionary<Guid, Guid>? nodeIds = null;
+        if (remapper.RegenerateLocalIds && Nodes is { Count: > 0 })
+        {
+            nodeIds = new Dictionary<Guid, Guid>(Nodes.Count);
+            foreach (var node in Nodes)
+            {
+                if (node is null) continue;
+                var fresh = Guid.NewGuid();
+                nodeIds.TryAdd(node.Id, fresh); // a repeated id keeps pointing at its first node, as in CableGeometry
+                node.Id = fresh;
+            }
+        }
+
+        if (Nodes is not null)
+        {
+            Matrix4x4? toCable = null;
+            bool toCableResolved = false;
+            foreach (var node in Nodes)
+            {
+                if (node?.Anchor is not { } anchor) continue;
+                if (remapper.TryRemap(anchor.EntityId, out var entityId))
+                {
+                    if (entityId != anchor.EntityId) node.Anchor = anchor with { EntityId = entityId };
+                    continue;
+                }
+                if (remapper.TryGetOriginalWorldMatrix(anchor.EntityId, out var anchorWorld))
+                {
+                    if (!toCableResolved)
+                    {
+                        toCable = OriginalWorldToCable(remapper);
+                        toCableResolved = true;
+                    }
+                    if (toCable is { } m) node.Position = Vector3.Transform(Vector3.Transform(anchor.LocalOffset, anchorWorld), m);
+                }
+                node.Anchor = null;
+            }
+        }
+
+        if (nodeIds is not null && Segments is not null)
+        {
+            for (int i = 0; i < Segments.Count; i++)
+            {
+                var s = Segments[i];
+                Segments[i] = new CableSegment(nodeIds.GetValueOrDefault(s.FromNode, s.FromNode), nodeIds.GetValueOrDefault(s.ToNode, s.ToNode));
+            }
+        }
+
+        if (Endpoints is not null)
+        {
+            int write = 0;
+            for (int read = 0; read < Endpoints.Count; read++)
+            {
+                var ep = Endpoints[read];
+                if (ep is not null)
+                {
+                    if (nodeIds is not null && nodeIds.TryGetValue(ep.NodeId, out var node)) ep.NodeId = node;
+                    if (!remapper.TryRemap(ep.EntityId, out var device)) continue; // the device is not there: the end hangs free
+                    ep.EntityId = device;
+                }
+                Endpoints[write++] = ep!;
+            }
+            if (write < Endpoints.Count) Endpoints.RemoveRange(write, Endpoints.Count - write);
+        }
+    }
+
+    /// <summary>World → this cable's local space of the original cable entity, when it can be resolved.</summary>
+    private Matrix4x4? OriginalWorldToCable(EntityReferenceRemapper remapper)
+    {
+        if (Owner is not { } owner) return null;
+        if (!remapper.TryGetOriginalWorldMatrix(remapper.OriginalIdOf(owner.Id), out var cableWorld)) return null;
+        return Matrix4x4.Invert(cableWorld, out var inverse) ? inverse : null;
+    }
 }
 
+/// <summary>A point of a cable.</summary>
 public sealed class CableNode
 {
+    /// <summary>Id of the node, unique within its cable.</summary>
+    [LocalId]
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    /// <summary>Position in the cable entity's local space (metres). Ignored while <see cref="Anchor"/> is set.</summary>
+    /// <summary>
+    /// Position in the cable entity's local space (metres). Ignored while <see cref="Anchor"/> is set (then it is the
+    /// fallback used when the anchor entity is missing).
+    /// </summary>
     public Vector3 Position { get; set; }
 
     /// <summary>When set, the node follows this entity at the given local offset.</summary>
     public CableAnchor? Anchor { get; set; }
 }
 
-public readonly record struct CableAnchor(Guid EntityId, Vector3 LocalOffset);
+/// <summary>Attachment of a cable node to an entity.</summary>
+/// <param name="EntityId">The entity the node follows.</param>
+/// <param name="LocalOffset">Offset in that entity's local space (metres).</param>
+public readonly record struct CableAnchor([property: EntityReference] Guid EntityId, Vector3 LocalOffset);
 
 /// <summary>A straight run between two nodes of the same cable.</summary>
-public readonly record struct CableSegment(Guid FromNode, Guid ToNode);
+/// <param name="FromNode">Id of the first node (<see cref="CableNode.Id"/>).</param>
+/// <param name="ToNode">Id of the second node.</param>
+public readonly record struct CableSegment([property: LocalId] Guid FromNode, [property: LocalId] Guid ToNode);
 
 /// <summary>A cable node plugged into a port of a device (port names come from GDTF wiring objects / the catalogue).</summary>
 public sealed class CableEndpoint
 {
+    /// <summary>The plugged node (<see cref="CableNode.Id"/> of the same cable).</summary>
+    [LocalId]
     public Guid NodeId { get; set; }
+
+    /// <summary>The device entity the node is plugged into.</summary>
+    [EntityReference]
     public Guid EntityId { get; set; }
+
+    /// <summary>Port name on the device.</summary>
     public string PortName { get; set; } = "";
 }
 

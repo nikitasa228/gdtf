@@ -1,69 +1,241 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+
 namespace Candela.Core.Settings;
 
+/// <summary>Modifier keys of a <see cref="KeyChord"/>.</summary>
 [Flags]
 public enum KeyModifiers
 {
+    /// <summary>No modifier.</summary>
     None = 0,
+
+    /// <summary>Shift.</summary>
     Shift = 1,
+
+    /// <summary>Control (Ctrl).</summary>
     Ctrl = 2,
+
+    /// <summary>Alt (Option on macOS).</summary>
     Alt = 4,
+
+    /// <summary>Super: the Windows key, Command on macOS, Meta/Super on Linux.</summary>
     Super = 8,
 }
 
 /// <summary>
 /// A key with modifiers. Keys are named, windowing-independent strings ("A".."Z", "0".."9", "F1".."F12", "Delete",
 /// "Escape", "Enter", "Space", "Tab", "Backspace", "Up", "Down", "Left", "Right", "Home", "End", "PageUp", "PageDown",
-/// "Numpad0".."Numpad9", "Minus", "Equal", "Comma", "Period").
+/// "Numpad0".."Numpad9", "Minus", "Equal", "Comma", "Period", see <see cref="IsKnownKey"/>).
+/// The text form is the modifiers and exactly one key joined by '+', e.g. "Ctrl+Shift+S" (<see cref="ToString"/> writes
+/// it, <see cref="Parse"/> reads it back).
 /// </summary>
+/// <param name="Key">The key name (kept as written; the windowing layer maps names to physical keys).</param>
+/// <param name="Modifiers">Modifier keys held with <paramref name="Key"/>.</param>
 public readonly record struct KeyChord(string Key, KeyModifiers Modifiers = KeyModifiers.None)
 {
+    private static readonly Dictionary<string, KeyModifiers> ModifierNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Ctrl"] = KeyModifiers.Ctrl,
+        ["Control"] = KeyModifiers.Ctrl,
+        ["Shift"] = KeyModifiers.Shift,
+        ["Alt"] = KeyModifiers.Alt,
+        ["Option"] = KeyModifiers.Alt,
+        ["Super"] = KeyModifiers.Super,
+        ["Cmd"] = KeyModifiers.Super,
+        ["Command"] = KeyModifiers.Super,
+        ["Win"] = KeyModifiers.Super,
+        ["Windows"] = KeyModifiers.Super,
+        ["Meta"] = KeyModifiers.Super,
+    };
+
+    private static readonly HashSet<string> KnownKeys = BuildKnownKeys();
+
+    /// <summary>"Ctrl+Shift+Alt+Super+Key" (modifiers in this fixed order, only those that are set).</summary>
     public override string ToString()
     {
-        var parts = new List<string>();
-        if (Modifiers.HasFlag(KeyModifiers.Ctrl)) parts.Add("Ctrl");
-        if (Modifiers.HasFlag(KeyModifiers.Shift)) parts.Add("Shift");
-        if (Modifiers.HasFlag(KeyModifiers.Alt)) parts.Add("Alt");
-        if (Modifiers.HasFlag(KeyModifiers.Super)) parts.Add("Super");
-        parts.Add(Key);
-        return string.Join("+", parts);
+        var sb = new StringBuilder();
+        if ((Modifiers & KeyModifiers.Ctrl) != 0) sb.Append("Ctrl+");
+        if ((Modifiers & KeyModifiers.Shift) != 0) sb.Append("Shift+");
+        if ((Modifiers & KeyModifiers.Alt) != 0) sb.Append("Alt+");
+        if ((Modifiers & KeyModifiers.Super) != 0) sb.Append("Super+");
+        sb.Append(Key);
+        return sb.ToString();
     }
 
+    /// <summary>
+    /// True for the key names Candela documents (letters, digits, F1–F24, navigation and editing keys, punctuation names
+    /// such as "Comma", numpad keys), compared case-insensitively. A windowing layer may support more names; chords with
+    /// other key names still parse.
+    /// </summary>
+    public static bool IsKnownKey(string? key) => key is not null && KnownKeys.Contains(key);
+
+    /// <summary>
+    /// Reads "Ctrl+Shift+S": '+'-separated parts (spaces around parts are ignored), modifiers in any order — Ctrl
+    /// (Control), Shift, Alt (Option), Super (Cmd, Command, Win, Windows, Meta), case-insensitive — and exactly one key,
+    /// kept as written.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is null.</exception>
+    /// <exception cref="FormatException">
+    /// The text is empty, has an empty part, repeats a modifier, has no key, has more than one key, or names an unknown
+    /// modifier. The message says which, quoting the offending part.
+    /// </exception>
     public static KeyChord Parse(string text)
     {
-        var mods = KeyModifiers.None;
-        string key = "";
-        foreach (var p in text.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        ArgumentNullException.ThrowIfNull(text);
+        if (!TryParse(text, out var chord, out var error)) throw new FormatException(error);
+        return chord;
+    }
+
+    /// <summary>Like <see cref="Parse"/>, but returns false instead of throwing (also for null).</summary>
+    public static bool TryParse([NotNullWhen(true)] string? text, out KeyChord chord) => TryParse(text, out chord, out _);
+
+    /// <summary>
+    /// Like <see cref="Parse"/>, but returns false instead of throwing; <paramref name="error"/> then explains the problem
+    /// (for the key binding editor).
+    /// </summary>
+    public static bool TryParse([NotNullWhen(true)] string? text, out KeyChord chord, [NotNullWhen(false)] out string? error)
+    {
+        chord = default;
+        if (string.IsNullOrWhiteSpace(text))
         {
-            switch (p.ToLowerInvariant())
-            {
-                case "ctrl" or "control": mods |= KeyModifiers.Ctrl; break;
-                case "shift": mods |= KeyModifiers.Shift; break;
-                case "alt": mods |= KeyModifiers.Alt; break;
-                case "super" or "cmd" or "win": mods |= KeyModifiers.Super; break;
-                default: key = p; break;
-            }
+            error = "The key chord is empty; write modifiers and one key joined by '+', e.g. 'Ctrl+S'.";
+            return false;
         }
-        if (key.Length == 0) throw new FormatException($"No key in '{text}'.");
-        return new KeyChord(key, mods);
+
+        var mods = KeyModifiers.None;
+        string? key = null;
+        string? secondKey = null;
+        string? unknownModifier = null;
+        foreach (var raw in text.Split('+'))
+        {
+            var part = raw.Trim();
+            if (part.Length == 0)
+            {
+                error = $"'{text}' has an empty part; write modifiers and one key joined by single '+' signs, e.g. 'Ctrl+S'.";
+                return false;
+            }
+            if (ModifierNames.TryGetValue(part, out var mod))
+            {
+                if ((mods & mod) != 0)
+                {
+                    error = $"'{text}' names the modifier {mod} twice.";
+                    return false;
+                }
+                mods |= mod;
+                continue;
+            }
+            if (key is null)
+            {
+                key = part;
+                continue;
+            }
+            // A second non-modifier part: either a second key or a misspelt / unsupported modifier written before the
+            // key. Unknown names in front of a known key read as modifiers, which gives the more useful message.
+            if (!IsKnownKey(key)) unknownModifier ??= key;
+            else if (!IsKnownKey(part)) unknownModifier ??= part;
+            secondKey ??= part;
+            key = part;
+        }
+
+        if (unknownModifier is not null)
+        {
+            error = $"'{text}' has the unknown modifier '{unknownModifier}'; modifiers are Ctrl, Shift, Alt and Super, and a chord has exactly one key.";
+            return false;
+        }
+        if (secondKey is not null)
+        {
+            error = $"'{text}' has more than one key; a chord is modifiers (Ctrl, Shift, Alt, Super) plus exactly one key, e.g. 'Ctrl+S'.";
+            return false;
+        }
+        if (key is null)
+        {
+            error = $"'{text}' has no key; a chord is modifiers (Ctrl, Shift, Alt, Super) plus exactly one key, e.g. 'Ctrl+S'.";
+            return false;
+        }
+        chord = new KeyChord(key, mods);
+        error = null;
+        return true;
+    }
+
+    private static HashSet<string> BuildKnownKeys()
+    {
+        var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (char c = 'A'; c <= 'Z'; c++) keys.Add(c.ToString());
+        for (int i = 0; i <= 9; i++)
+        {
+            keys.Add(i.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            keys.Add("Numpad" + i.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+        for (int i = 1; i <= 24; i++) keys.Add("F" + i.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        foreach (var k in new[]
+                 {
+                     "Delete", "Escape", "Enter", "Space", "Tab", "Backspace", "Insert", "Up", "Down", "Left", "Right", "Home",
+                     "End", "PageUp", "PageDown", "Minus", "Equal", "Comma", "Period", "Slash", "Semicolon", "Apostrophe",
+                     "LeftBracket", "RightBracket", "Backslash", "GraveAccent", "NumpadDecimal", "NumpadDivide",
+                     "NumpadMultiply", "NumpadSubtract", "NumpadAdd", "NumpadEnter", "NumpadEqual", "PrintScreen", "Pause",
+                     "CapsLock", "ScrollLock", "NumLock", "Menu",
+                 })
+        {
+            keys.Add(k);
+        }
+        return keys;
     }
 }
 
-/// <summary>Action → key chords. Stored as presets of kind <see cref="PresetKind"/>.</summary>
+/// <summary>
+/// Action → key chords (text form, see <see cref="KeyChord"/>). Stored as presets of kind <see cref="PresetKind"/>.
+/// A preset edited by hand may contain chords that do not parse; the lookups skip them (and
+/// <see cref="FindInvalidChords"/> lists them for the settings window) instead of failing the whole preset.
+/// </summary>
 public sealed class KeyBindingSet
 {
+    /// <summary>Preset kind (folder name) of key binding presets.</summary>
     public const string PresetKind = "keybindings";
 
+    /// <summary>Action id (<see cref="EditorActions"/>) → chords in text form.</summary>
     public Dictionary<string, List<string>> Bindings { get; set; } = new();
 
-    public IEnumerable<KeyChord> ChordsFor(string action) =>
-        Bindings.TryGetValue(action, out var list) ? list.Select(KeyChord.Parse) : Enumerable.Empty<KeyChord>();
+    /// <summary>The chords bound to <paramref name="action"/> that parse (invalid entries are skipped).</summary>
+    public IEnumerable<KeyChord> ChordsFor(string action)
+    {
+        if (Bindings is null || !Bindings.TryGetValue(action, out var list) || list is null) yield break;
+        foreach (var text in list)
+            if (KeyChord.TryParse(text, out var chord)) yield return chord;
+    }
 
     /// <summary>Actions bound to <paramref name="chord"/> (normally one; more means a conflict to show in settings).</summary>
-    public IEnumerable<string> ActionsFor(KeyChord chord) =>
-        Bindings.Where(kv => kv.Value.Any(s => KeyChord.Parse(s) == chord)).Select(kv => kv.Key);
+    public IEnumerable<string> ActionsFor(KeyChord chord)
+    {
+        if (Bindings is null) yield break;
+        foreach (var (action, list) in Bindings)
+        {
+            if (list is null) continue;
+            foreach (var text in list)
+            {
+                if (!KeyChord.TryParse(text, out var c) || c != chord) continue;
+                yield return action;
+                break;
+            }
+        }
+    }
 
+    /// <summary>Every stored chord that does not parse, with the reason (for the settings window).</summary>
+    public IEnumerable<(string Action, string? Text, string Error)> FindInvalidChords()
+    {
+        if (Bindings is null) yield break;
+        foreach (var (action, list) in Bindings)
+        {
+            if (list is null) continue;
+            foreach (var text in list)
+                if (!KeyChord.TryParse(text, out _, out var error)) yield return (action, text, error);
+        }
+    }
+
+    /// <summary>Replaces the chords of <paramref name="action"/>.</summary>
     public void Set(string action, params KeyChord[] chords) => Bindings[action] = chords.Select(c => c.ToString()).ToList();
 
+    /// <summary>The built-in "Default" preset.</summary>
     public static KeyBindingSet CreateDefault()
     {
         var k = new KeyBindingSet();

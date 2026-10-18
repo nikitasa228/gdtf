@@ -13,8 +13,25 @@ namespace Candela.Core.Serialization;
 /// </summary>
 public static class CandelaJson
 {
+    /// <summary>Indented options for files (project parts, presets, settings).</summary>
     public static JsonSerializerOptions Options { get; } = CreateOptions(indented: true);
+
+    /// <summary>Compact options for in-memory JSON.</summary>
     public static JsonSerializerOptions CompactOptions { get; } = CreateOptions(indented: false);
+
+    /// <summary>
+    /// Compact options that write every null. <see cref="CompactOptions"/> omits nulls, which read back as the property's
+    /// default — a value set to null whose default is not null (e.g. <c>ConsoleComponent.ProtocolId</c>) would come back as
+    /// the default. Copies and undo snapshots use these options so they are exact.
+    /// </summary>
+    internal static JsonSerializerOptions CopyOptions { get; } = CreateCopyOptions();
+
+    private static JsonSerializerOptions CreateCopyOptions()
+    {
+        var o = new JsonSerializerOptions(CompactOptions) { DefaultIgnoreCondition = JsonIgnoreCondition.Never };
+        o.MakeReadOnly(populateMissingResolver: true);
+        return o;
+    }
 
     private static JsonSerializerOptions CreateOptions(bool indented)
     {
@@ -39,21 +56,37 @@ public static class CandelaJson
         return o;
     }
 
+    /// <summary>Serialises <paramref name="value"/> with <see cref="Options"/> (or <see cref="CompactOptions"/>).</summary>
     public static string Serialize<T>(T value, bool indented = true) =>
         JsonSerializer.Serialize(value, indented ? Options : CompactOptions);
 
+    /// <summary>Deserialises with <see cref="Options"/>.</summary>
     public static T? Deserialize<T>(string json) => JsonSerializer.Deserialize<T>(json, Options);
 
-    /// <summary>Deep copy through JSON. For components the copy keeps its concrete type.</summary>
+    /// <summary>
+    /// Exact deep copy through JSON (nulls included, see <see cref="CopyOptions"/>). For components the copy keeps its
+    /// concrete type and is detached.
+    /// </summary>
     public static T DeepClone<T>(T value) where T : class
     {
+        ArgumentNullException.ThrowIfNull(value);
         if (value is Component c)
-            return (T)(object)JsonSerializer.Deserialize<Component>(JsonSerializer.Serialize(c, CompactOptions), CompactOptions)!;
-        return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, value.GetType(), CompactOptions), CompactOptions)!;
+        {
+            return (T)(object)(JsonSerializer.Deserialize<Component>(JsonSerializer.SerializeToUtf8Bytes(c, CopyOptions), CopyOptions)
+                               ?? throw new InvalidOperationException($"A {c.GetType().Name} could not be copied."));
+        }
+        return JsonSerializer.Deserialize<T>(JsonSerializer.SerializeToUtf8Bytes(value, value.GetType(), CopyOptions), CopyOptions)
+               ?? throw new InvalidOperationException($"A {value.GetType().Name} could not be copied.");
     }
 
-    /// <summary>Component → JSON including its "$type".</summary>
+    /// <summary>Component → compact JSON including its "$type" (nulls omitted, as in files).</summary>
     public static string SerializeComponent(Component component) => JsonSerializer.Serialize(component, CompactOptions);
+
+    /// <summary>
+    /// Component → compact JSON including its "$type" and every null, for exact undo snapshots (read back with
+    /// <see cref="PopulateComponent"/>).
+    /// </summary>
+    public static string SnapshotComponent(Component component) => JsonSerializer.Serialize(component, CopyOptions);
 
     /// <summary>
     /// Overwrites every public settable property of <paramref name="target"/> with the values stored in
@@ -61,7 +94,8 @@ public static class CandelaJson
     /// </summary>
     public static void PopulateComponent(Component target, string json)
     {
-        var source = JsonSerializer.Deserialize<Component>(json, CompactOptions)
+        ArgumentNullException.ThrowIfNull(target);
+        var source = JsonSerializer.Deserialize<Component>(json, CopyOptions)
                      ?? throw new InvalidDataException("Component JSON is empty.");
         if (source.GetType() != target.GetType())
             throw new InvalidDataException($"Cannot populate {target.GetType().Name} from {source.GetType().Name}.");

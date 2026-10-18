@@ -27,6 +27,7 @@ public sealed class FixtureComponent : Component
     public bool CastShadow { get; set; } = true;
 
     /// <summary>Entity that carries the fixture's weight (truss, pipe, rigging point, wall bracket); null = free-standing.</summary>
+    [EntityReference]
     public Guid? MountedOn { get; set; }
 
     /// <summary>
@@ -37,6 +38,9 @@ public sealed class FixtureComponent : Component
 
     /// <summary>Optional point the fixture is focused on (world space, metres), as in MVR focus points.</summary>
     public System.Numerics.Vector3? FocusPoint { get; set; }
+
+    /// <inheritdoc/>
+    protected internal override void RemapEntityReferences(EntityReferenceRemapper remapper) => MountedOn = remapper.Remap(MountedOn);
 }
 
 /// <summary>
