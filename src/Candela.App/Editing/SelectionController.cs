@@ -180,6 +180,40 @@ internal static class SelectionController
         return true;
     }
 
+    /// <summary>Half size (m) of the box framed around an entity without geometry (a light, a group, a cable point).</summary>
+    public const float PointFrameHalfSize = 0.5f;
+
+    /// <summary>
+    /// What Frame Selection (F) and the issues panel frame: the union of the geometry bounds of <paramref name="ids"/>
+    /// (from <paramref name="boundsOf"/>), with entities that have no geometry contributing a
+    /// <see cref="PointFrameHalfSize"/> box around their origin — so selecting a light or a group frames it rather than
+    /// the whole stage. Empty when none of the ids is in the scene.
+    /// </summary>
+    public static Aabb FramingBounds(SceneModel scene, IReadOnlyList<Guid> ids, BoundsLookup boundsOf)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(ids);
+        ArgumentNullException.ThrowIfNull(boundsOf);
+        var bounds = Aabb.Empty;
+        for (int i = 0; i < ids.Count; i++)
+        {
+            if (boundsOf(ids[i], out var b) && !b.IsEmpty)
+            {
+                bounds.Include(b);
+            }
+            else if (scene.Find(ids[i]) is { } e)
+            {
+                var p = e.WorldPosition;
+                bounds.Include(new Aabb(p - new Vector3(PointFrameHalfSize), p + new Vector3(PointFrameHalfSize)));
+            }
+        }
+
+        return bounds;
+    }
+
+    /// <summary>World bounds of an entity's geometry; false when it has none.</summary>
+    public delegate bool BoundsLookup(Guid entityId, out Aabb bounds);
+
     /// <summary>Normalised screen rectangle of a drag from <paramref name="a"/> to <paramref name="b"/>.</summary>
     public static (Vector2 Min, Vector2 Max) Rect(Vector2 a, Vector2 b) => (Vector2.Min(a, b), Vector2.Max(a, b));
 

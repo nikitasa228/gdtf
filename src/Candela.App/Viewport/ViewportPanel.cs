@@ -213,10 +213,8 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         var content = _ctx.Session.Content;
         if (content is null)
             return;
-        var bounds = Aabb.Empty;
-        foreach (var id in _ctx.Session.Selection.Ids)
-            if (content.TryGetBounds(id, out var b))
-                bounds.Include(b);
+        // A user action: the delegate over the current content is made per call (the content changes with the scene).
+        var bounds = SelectionController.FramingBounds(_ctx.Session.Scene, _ctx.Session.Selection.Ids, content.TryGetBounds);
         if (bounds.IsEmpty)
             bounds = content.SceneBounds;
         Camera.Frame(bounds, _imageSize.Y > 0 ? _imageSize.X / _imageSize.Y : 16f / 9f);

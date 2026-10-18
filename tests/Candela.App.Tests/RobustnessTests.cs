@@ -921,3 +921,33 @@ public sealed class EulerDisplayTests
         Near(Candela.App.Editing.TransformMath.ToEulerDegrees(q), display.Get(b, q));
     }
 }
+
+/// <summary>Frame Selection on objects without geometry frames them, not the whole stage.</summary>
+public sealed class FramingBoundsTests
+{
+    [Fact]
+    public void Entities_without_geometry_frame_a_small_box_around_their_origin()
+    {
+        var scene = new Candela.Core.SceneGraph.Scene("t");
+        var light = scene.Add(new Candela.Core.SceneGraph.Entity("light") { Local = new Candela.Core.Math.Transform(new Vector3(4, 2, 6)) });
+        var box = scene.Add(new Candela.Core.SceneGraph.Entity("box"));
+        var boxBounds = new Candela.Core.Math.Aabb(new Vector3(-1, -1, 0), new Vector3(1, 1, 2));
+        bool Lookup(Guid id, out Candela.Core.Math.Aabb b)
+        {
+            b = id == box.Id ? boxBounds : Candela.Core.Math.Aabb.Empty;
+            return id == box.Id;
+        }
+
+        var lightOnly = Candela.App.Editing.SelectionController.FramingBounds(scene, new[] { light.Id }, Lookup);
+        Assert.False(lightOnly.IsEmpty);
+        Assert.Equal(new Vector3(4, 2, 6), lightOnly.Center);
+        Assert.Equal(new Vector3(1f), lightOnly.Size);
+
+        var both = Candela.App.Editing.SelectionController.FramingBounds(scene, new[] { box.Id, light.Id }, Lookup);
+        Assert.Equal(new Vector3(-1, -1, 0), both.Min);
+        Assert.Equal(new Vector3(4.5f, 2.5f, 6.5f), both.Max);
+
+        // Unknown ids frame nothing (the caller then frames the whole stage).
+        Assert.True(Candela.App.Editing.SelectionController.FramingBounds(scene, new[] { Guid.NewGuid() }, Lookup).IsEmpty);
+    }
+}
