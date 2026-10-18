@@ -259,8 +259,28 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
     }
 
     /// <summary>Queues a selection click at viewport pixel coordinates (scripts and tests).</summary>
-    internal void QueuePick(Vector2 pixel, bool shift, bool focus = false) =>
-        _picks.Add(new PickRequest(focus ? PickKind.Focus : PickKind.Select, (int)(pixel.X * _framebufferScale), (int)(pixel.Y * _framebufferScale), shift));
+    internal void QueuePick(Vector2 pixel, bool shift, bool focus = false) => AddPick(focus ? PickKind.Focus : PickKind.Select, _imageMin + pixel, shift);
+
+    /// <summary>
+    /// The render-target pixel under <paramref name="screen"/>: the offset from the image's top-left corner
+    /// <paramref name="imageMin"/> (UI coordinates) times the window's <paramref name="framebufferScale"/>, clamped to
+    /// the <paramref name="width"/> × <paramref name="height"/> target. Without the clamp a click on the last column or
+    /// row of an image with a fractional size lands one pixel outside the target, misses and clears the selection.
+    /// </summary>
+    internal static (int X, int Y) PixelOf(Vector2 screen, Vector2 imageMin, float framebufferScale, int width, int height)
+    {
+        float scale = float.IsFinite(framebufferScale) && framebufferScale > 0f ? framebufferScale : 1f;
+        float x = (screen.X - imageMin.X) * scale, y = (screen.Y - imageMin.Y) * scale;
+        int px = float.IsFinite(x) ? (int)Math.Clamp(MathF.Floor(x), 0f, MathF.Max(width - 1, 0)) : 0;
+        int py = float.IsFinite(y) ? (int)Math.Clamp(MathF.Floor(y), 0f, MathF.Max(height - 1, 0)) : 0;
+        return (px, py);
+    }
+
+    private void AddPick(PickKind kind, Vector2 screen, bool shift)
+    {
+        var (x, y) = PixelOf(screen, _imageMin, _framebufferScale, _target?.Width ?? 1, _target?.Height ?? 1);
+        _picks.Add(new PickRequest(kind, x, y, shift));
+    }
 
     /// <inheritdoc/>
     public override void OnClosed() => ReleaseTarget();
@@ -408,7 +428,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
 
             if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy)
             {
-                _picks.Add(new PickRequest(PickKind.Focus, ToPixelX(mouse), ToPixelY(mouse), false));
+                AddPick(PickKind.Focus, mouse, false);
                 _selecting = false;
             }
         }
@@ -433,7 +453,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
             if (SelectionController.IsBoxDrag(_pressPosition, mouse))
                 BoxSelect(_pressPosition, mouse, _selectShift);
             else
-                _picks.Add(new PickRequest(PickKind.Select, ToPixelX(_pressPosition), ToPixelY(_pressPosition), _selectShift));
+                AddPick(PickKind.Select, _pressPosition, _selectShift);
         }
     }
 
@@ -881,10 +901,6 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
 
         public string SnappedCaption(ViewDirection view, bool perspective) => (perspective ? _snappedPersp : _snappedOrtho)[(int)view];
     }
-
-    private int ToPixelX(Vector2 screen) => (int)MathF.Floor((screen.X - _imageMin.X) * _framebufferScale);
-
-    private int ToPixelY(Vector2 screen) => (int)MathF.Floor((screen.Y - _imageMin.Y) * _framebufferScale);
 
     /// <summary>Localised view-cube face / view name.</summary>
     public static string FaceLabel(ViewDirection view) => view switch

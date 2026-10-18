@@ -443,3 +443,77 @@ public sealed class GizmoDragTests
         Assert.Empty(drag.Entities);
     }
 }
+
+/// <summary>Camera edge cases: far plane at the zoom limit, entering fly mode from an orthographic view.</summary>
+public sealed class CameraRobustnessTests
+{
+    [Fact]
+    public void Zoomed_out_to_the_limit_the_target_stays_inside_the_depth_range()
+    {
+        var camera = new Candela.App.Viewport.ViewportCamera { Distance = Candela.App.Viewport.ViewportCamera.MaxDistance };
+        Assert.Equal(Candela.App.Viewport.ViewportCamera.MaxDistance, camera.Distance);
+        Assert.True(camera.Far > camera.Distance * 1.5f, $"far {camera.Far} m clips the target at {camera.Distance} m");
+        Assert.True(camera.Near < camera.Distance);
+
+        // The stage (around the target) still projects inside the view.
+        Assert.True(camera.WorldToScreen(camera.Target, new Vector2(800, 600), out var pixel));
+        Assert.InRange(pixel.X, 399f, 401f);
+        var clip = Vector4.Transform(new Vector4(camera.Target, 1f), camera.ViewMatrix * camera.ProjectionMatrix(800f / 600f));
+        Assert.InRange(clip.Z / clip.W, 0f, 1f);
+    }
+
+    [Fact]
+    public void Flying_from_a_zoomed_orthographic_view_keeps_the_apparent_size()
+    {
+        var camera = new Candela.App.Viewport.ViewportCamera();
+        camera.SnapTo(Candela.App.Viewport.ViewDirection.Top);
+        camera.Zoom(-12f); // zoom the plan view far out: only the orthographic height changes
+        float visible = camera.OrthoHeight;
+        Assert.True(visible > 30f);
+
+        camera.Look(0f, 0f); // right mouse button in the top view: fly mode
+        Assert.Equal(Candela.Rendering.ProjectionKind.Perspective, camera.Projection);
+        float apparent = 2f * camera.Distance * MathF.Tan(camera.FovY * 0.5f);
+        Assert.Equal(visible, apparent, 0.01f * visible);
+        Assert.Null(camera.SnappedView);
+    }
+}
+
+/// <summary>Picking coordinates at different framebuffer scales (high-DPI monitors) and at the image edges.</summary>
+public sealed class PickPixelTests
+{
+    [Theory]
+    [InlineData(1f)]
+    [InlineData(1.25f)]
+    [InlineData(2f)]
+    public void Pixels_follow_the_framebuffer_scale_and_stay_inside_the_target(float scale)
+    {
+        var imageMin = new Vector2(300.5f, 40.25f);
+        var avail = new Vector2(457.4f, 290.3f); // a fractional panel size
+        int w = Math.Max(1, (int)MathF.Round(avail.X * scale)), h = Math.Max(1, (int)MathF.Round(avail.Y * scale));
+
+        // Centre of the image → centre of the target.
+        var (cx, cy) = Candela.App.Viewport.ViewportPanel.PixelOf(imageMin + avail * 0.5f, imageMin, scale, w, h);
+        Assert.InRange(cx, w / 2 - 1, w / 2 + 1);
+        Assert.InRange(cy, h / 2 - 1, h / 2 + 1);
+
+        // The last point inside the image (ImGui's hover rectangle is [min, max)) is the last target pixel, not outside it.
+        var last = imageMin + avail - new Vector2(0.01f);
+        var (lx, ly) = Candela.App.Viewport.ViewportPanel.PixelOf(last, imageMin, scale, w, h);
+        Assert.Equal(w - 1, lx);
+        Assert.Equal(h - 1, ly);
+
+        // The first point is pixel 0; points outside clamp; non-finite input is safe.
+        Assert.Equal((0, 0), Candela.App.Viewport.ViewportPanel.PixelOf(imageMin, imageMin, scale, w, h));
+        Assert.Equal((0, 0), Candela.App.Viewport.ViewportPanel.PixelOf(imageMin - new Vector2(5f), imageMin, scale, w, h));
+        Assert.Equal((0, 0), Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(float.NaN), imageMin, scale, w, h));
+    }
+
+    [Fact]
+    public void A_high_dpi_click_maps_to_twice_the_ui_offset()
+    {
+        var (x, y) = Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(110f, 70f), new Vector2(10f, 20f), 2f, 1000, 1000);
+        Assert.Equal((200, 100), (x, y));
+        Assert.Equal((50, 25), Candela.App.Viewport.ViewportPanel.PixelOf(new Vector2(60f, 45f), new Vector2(10f, 20f), 0f, 1000, 1000)); // bad scale = 1
+    }
+}

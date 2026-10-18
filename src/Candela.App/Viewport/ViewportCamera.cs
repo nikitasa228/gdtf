@@ -125,8 +125,11 @@ internal sealed class ViewportCamera
     /// <summary>Near plane distance, m (scaled with the orbit distance so close-ups keep precision).</summary>
     public float Near => Projection == ProjectionKind.Orthographic ? 0.1f : Math.Clamp(_distance * 0.002f, 0.01f, 0.5f);
 
-    /// <summary>Far plane distance, m.</summary>
-    public float Far => Projection == ProjectionKind.Orthographic ? OrthoEyeDistance * 2f + 2000f : 5000f;
+    /// <summary>
+    /// Far plane distance, m: at least 5 km, and in perspective always well beyond the target, so zooming out to
+    /// <see cref="MaxDistance"/> never clips the stage away (the renderer's reverse-Z depth keeps the precision).
+    /// </summary>
+    public float Far => Projection == ProjectionKind.Orthographic ? OrthoEyeDistance * 2f + 2000f : MathF.Max(5000f, _distance * 4f);
 
     /// <summary>Direction from the eye for given yaw/pitch.</summary>
     public static Vector3 DirectionOf(float yaw, float pitch)
@@ -238,12 +241,14 @@ internal sealed class ViewportCamera
     /// <summary>Mouse look from the eye position (fly mode): the eye stays, the target moves.</summary>
     public void Look(float dxPixels, float dyPixels, float speed = 1f)
     {
-        var eye = Eye;
         if (Projection == ProjectionKind.Orthographic)
         {
-            Projection = ProjectionKind.Perspective;
-            eye = _target - Forward * _distance;
+            // Flying needs a perspective eye: switch the way the projection toggle does, keeping the apparent size
+            // (the orbit distance may be stale after zooming the orthographic view).
+            ToggleProjection();
         }
+
+        var eye = Eye;
 
         const float radiansPerPixel = 0.2f * MathF.PI / 180f;
         Yaw += dxPixels * radiansPerPixel * speed;
