@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <!-- The tool is invoked as `candela <command>`. -->
+    <AssemblyName>candela</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Candela.Engine/Candela.Engine.csproj" />
