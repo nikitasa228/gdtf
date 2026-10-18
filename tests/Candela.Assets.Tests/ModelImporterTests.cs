@@ -33,6 +33,45 @@ public class ModelImporterTests
     }
 
     [Fact]
+    public void WindowsNativeLibraryShipsAndNeedsNoVisualCppRuntime()
+    {
+        // Loading can only be exercised on Windows; here the shipped win-x64 binary is checked: a 64-bit PE whose only
+        // import is KERNEL32.dll (C runtime linked statically), so it loads without a Visual C++ redistributable.
+        var dll = Path.Combine(AppContext.BaseDirectory, "runtimes", "win-x64", "native", "assimp.dll");
+        Assert.True(File.Exists(dll), $"{dll} is missing from the build output");
+        var pe = File.ReadAllBytes(dll);
+        Assert.Equal((byte)'M', pe[0]);
+        Assert.Equal((byte)'Z', pe[1]);
+        int header = BitConverter.ToInt32(pe, 0x3C);
+        Assert.Equal(0x00004550u, BitConverter.ToUInt32(pe, header)); // "PE\0\0"
+        Assert.Equal(0x8664, BitConverter.ToUInt16(pe, header + 4)); // x64
+        int sections = BitConverter.ToUInt16(pe, header + 6);
+        int optional = header + 24;
+        int optionalSize = BitConverter.ToUInt16(pe, header + 20);
+        Assert.Equal(0x20B, BitConverter.ToUInt16(pe, optional)); // PE32+
+        uint importRva = BitConverter.ToUInt32(pe, optional + 112 + 8); // data directory 1
+        int sectionTable = optional + optionalSize;
+        int Offset(uint rva)
+        {
+            for (int i = 0; i < sections; i++)
+            {
+                int sec = sectionTable + i * 40;
+                uint va = BitConverter.ToUInt32(pe, sec + 12), size = BitConverter.ToUInt32(pe, sec + 8), raw = BitConverter.ToUInt32(pe, sec + 20);
+                if (rva >= va && rva < va + System.Math.Max(size, BitConverter.ToUInt32(pe, sec + 16))) return (int)(rva - va + raw);
+            }
+            throw new InvalidDataException($"RVA {rva:X} is outside every section");
+        }
+        var imports = new List<string>();
+        for (int d = Offset(importRva); BitConverter.ToUInt32(pe, d + 12) != 0; d += 20)
+        {
+            int name = Offset(BitConverter.ToUInt32(pe, d + 12));
+            int end = Array.IndexOf(pe, (byte)0, name);
+            imports.Add(System.Text.Encoding.ASCII.GetString(pe, name, end - name));
+        }
+        Assert.Equal(new[] { "KERNEL32.DLL" }, imports.Select(i => i.ToUpperInvariant()).ToArray());
+    }
+
+    [Fact]
     public void ObjWithMtlAndPngIsConvertedToZUpWithTexture()
     {
         using var dir = new TempDir();

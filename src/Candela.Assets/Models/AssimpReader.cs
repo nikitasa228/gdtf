@@ -154,7 +154,7 @@ internal static class AssimpReader
                             meta.TryGetValue(key, out var e) && e.Data is not null && TryInt(e.Data, out int v) ? v : fallback;
                         raw.Basis = SourceMetadata.FbxBasis(I("UpAxis", -1), I("UpAxisSign", 1), I("FrontAxis", -1),
                             I("FrontAxisSign", 1), I("CoordAxis", -1), I("CoordAxisSign", 1));
-                        if (raw.Basis is { } b)
+                        if (raw.Basis is not null)
                             raw.UpAxis = I("UpAxis", 1) == 2 ? SourceUpAxis.Z : SourceUpAxis.Y;
                         if (meta.TryGetValue("UnitScaleFactor", out var u) && u.Data is not null && TryDouble(u.Data, out double cm)
                             && cm > 0 && double.IsFinite(cm))
@@ -190,7 +190,7 @@ internal static class AssimpReader
                 resetRoot = true;
                 break;
             default:
-                // Not reached for the supported formats (glTF and PLY have their own readers); Assimp's Y-up convention.
+                // Not reached for the supported formats (glTF, PLY and STL have their own readers); Assimp's Y-up convention.
                 raw.UpAxis = SourceUpAxis.Y;
                 break;
         }

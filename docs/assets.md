@@ -360,7 +360,8 @@ loading counts as a use) manage the cache.
 
 AssimpNet 5.0.0-beta1 ships Assimp 5 for `linux-x64` (`libassimp.so`, needs glibc ≥ 2.27 and `libz.so.1`), `win-x64`
 and `win-x86` (`assimp.dll`, built with the C runtime linked statically — its only import is `KERNEL32.dll`, so no
-Visual C++ redistributable is needed) and `osx-x64`; the build copies them to `runtimes/{rid}/native`.
+Visual C++ redistributable is needed — `WindowsNativeLibraryShipsAndNeedsNoVisualCppRuntime` checks the PE import
+table) and `osx-x64`; the build copies them to `runtimes/{rid}/native`. Loading is exercised by the tests on linux-x64.
 `AssimpNative.EnsureLoaded()` (called before the first Assimp import) fixes two problems of the managed binding:
 
 * On Linux the binding calls `dlopen` through `[DllImport("libdl.so")]`, but glibc 2.34+ systems only ship
