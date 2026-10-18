@@ -189,6 +189,32 @@ public sealed class GdtfArchive : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// Feeds the archive's table of contents into <paramref name="hash"/>: every entry in archive order with its name,
+    /// uncompressed and compressed size and CRC-32 (the zip format's own checksum of the entry's content). Two archives
+    /// with the same digest have the same entries with the same content (up to CRC-32 collisions of same-sized
+    /// entries), which is what <see cref="FixtureTypeDiskCache"/> keys on without decompressing anything.
+    /// </summary>
+    internal void AppendContentDigest(System.Security.Cryptography.IncrementalHash hash)
+    {
+        Span<byte> number = stackalloc byte[8 + 8 + 4];
+        lock (_gate)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            foreach (var e in _zip.Entries)
+            {
+                byte[] name = System.Text.Encoding.UTF8.GetBytes(e.FullName);
+                System.Buffers.Binary.BinaryPrimitives.WriteInt32LittleEndian(number, name.Length);
+                hash.AppendData(number[..4]);
+                hash.AppendData(name);
+                System.Buffers.Binary.BinaryPrimitives.WriteInt64LittleEndian(number, e.Length);
+                System.Buffers.Binary.BinaryPrimitives.WriteInt64LittleEndian(number[8..], e.CompressedLength);
+                System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(number[16..], e.Crc32);
+                hash.AppendData(number);
+            }
+        }
+    }
+
     /// <summary>Closes the file / releases the memory.</summary>
     public void Dispose()
     {

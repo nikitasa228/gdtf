@@ -60,6 +60,12 @@ public sealed record FixtureCategoryGroup(FixtureCategory Category, IReadOnlyLis
 /// callers wait for the same result). The parse cache keeps the <see cref="CacheCapacity"/> most recently used
 /// fixture types.
 /// </para>
+/// <para>
+/// Below the in-memory cache, parsed fixture types are kept on disk by <see cref="DiskCache"/> (by default the shared
+/// per-user <see cref="FixtureTypeDiskCache.Default"/>), so re-opening a fixture in a later session loads it in a
+/// fraction of the parse time. The disk cache is keyed by file content and reader version and is transparent: a
+/// missing, stale or damaged cache file only means the file is parsed again.
+/// </para>
 /// </remarks>
 public sealed class FixtureLibrary
 {
@@ -73,6 +79,7 @@ public sealed class FixtureLibrary
     private readonly List<string> _folders = new();
     private volatile Snapshot _snapshot = Snapshot.Empty;
     private long _clock;
+    private FixtureTypeDiskCache? _diskCache = FixtureTypeDiskCache.Default;
 
     /// <summary>Creates an empty library; <paramref name="specs"/> supplies categories and physical data (null: none).</summary>
     public FixtureLibrary(FixtureSpecsIndex? specs = null, int cacheCapacity = DefaultCacheCapacity)
@@ -87,6 +94,16 @@ public sealed class FixtureLibrary
 
     /// <summary>Maximum number of parsed fixture types kept in the cache.</summary>
     public int CacheCapacity { get; }
+
+    /// <summary>
+    /// Persistent cache used when a fixture type is parsed (default: <see cref="FixtureTypeDiskCache.Default"/>; null
+    /// parses every file from scratch). Changing it affects parses started afterwards.
+    /// </summary>
+    public FixtureTypeDiskCache? DiskCache
+    {
+        get => Volatile.Read(ref _diskCache);
+        set => Volatile.Write(ref _diskCache, value);
+    }
 
     /// <summary>All entries, sorted by manufacturer, model and newest revision first.</summary>
     public IReadOnlyList<FixtureLibraryEntry> Entries => _snapshot.Entries;
@@ -350,9 +367,9 @@ public sealed class FixtureLibrary
     {
         ArgumentNullException.ThrowIfNull(entry);
         var slot = _cache.AddOrUpdate(entry.FilePath,
-            static (_, e) => new CacheSlot(e),
-            static (_, existing, e) => existing.IsFor(e) ? existing : new CacheSlot(e),
-            entry);
+            static (_, a) => new CacheSlot(a.Entry, a.Disk),
+            static (_, existing, a) => existing.IsFor(a.Entry) ? existing : new CacheSlot(a.Entry, a.Disk),
+            (Entry: entry, Disk: DiskCache));
         slot.LastAccess = Interlocked.Increment(ref _clock);
         FixtureType result;
         try
@@ -594,12 +611,12 @@ public sealed class FixtureLibrary
         private readonly DateTime _stamp;
         private readonly long _size;
 
-        public CacheSlot(FixtureLibraryEntry entry)
+        public CacheSlot(FixtureLibraryEntry entry, FixtureTypeDiskCache? disk)
         {
             _stamp = entry.LastWriteTimeUtc;
             _size = entry.FileSize;
             string path = entry.FilePath;
-            Value = new Lazy<FixtureType>(() => GdtfReader.ReadFile(path), LazyThreadSafetyMode.ExecutionAndPublication);
+            Value = new Lazy<FixtureType>(() => disk is null ? GdtfReader.ReadFile(path) : disk.ReadFile(path), LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         public Lazy<FixtureType> Value { get; }
