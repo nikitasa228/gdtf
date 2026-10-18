@@ -78,6 +78,7 @@ public sealed partial class FixtureProfile
             BuildOutputsAndModifiers();
             AssignMotion();
             BuildColorSpace();
+            BuildDecodeTables();
             BuildLookups();
             return new FixtureProfile(this);
         }
@@ -223,7 +224,7 @@ public sealed partial class FixtureProfile
                 sets.Add(set);
             }
             sets.Sort((x, y) => x.DmxFrom.CompareTo(y.DmxFrom));
-            f.Sets = sets;
+            f.SetSets(sets.ToArray());
 
             float maxAbs = MathF.Max(MathF.Abs(f.PhysicalFrom), MathF.Abs(f.PhysicalTo));
             foreach (var s in sets)
@@ -679,6 +680,11 @@ public sealed partial class FixtureProfile
             {
                 Beams[b].OwnChannels = own[b]?.ToArray() ?? Array.Empty<int>();
                 Beams[b].ExcludedDimmers = excluded[b]?.ToArray() ?? Array.Empty<int>();
+                foreach (int c in Beams[b].OwnChannels)
+                    for (int k = Channels[c].FirstFunction; k < Channels[c].FirstFunction + Channels[c].FunctionCount; k++)
+                        if (Functions[k].Class.Wheel != WheelFamily.None ||
+                            Functions[k].Class.Kind is AttributeKind.BladeA or AttributeKind.BladeB or AttributeKind.BladeRotation or AttributeKind.BladeSoft)
+                            Beams[b].OwnMechanics = true;
             }
 
             foreach (var beam in Beams)
@@ -841,6 +847,13 @@ public sealed partial class FixtureProfile
                     beam.EmitterSlot[e] = i++;
                 }
                 beam.Emitters = list;
+                beam.EmitterFullXyz = new Vector3[Emitters.Count];
+                for (int e = 0; e < Emitters.Count; e++)
+                    if (beam.EmitterSlot[e] >= 0)
+                    {
+                        var pe = list[beam.EmitterSlot[e]];
+                        beam.EmitterFullXyz[e] = pe.TristimulusPerLumen * pe.MaxFlux;
+                    }
             }
         }
 
@@ -1005,6 +1018,69 @@ public sealed partial class FixtureProfile
             {
                 int slots = f.Wheel >= 0 ? Wheels[f.Wheel].SlotCount : 0;
                 (f.Motion, f.Limits) = MotorDynamics.DefaultMotion(f, Category, slots, mechanicalColor: !ledSource);
+                var kind = f.Class.Kind;
+                f.MotionGroup = FixtureEvaluator.MotionGroup(f.Class);
+                if (kind == AttributeKind.MotionSpeed) f.SpeedGroup = FixtureEvaluator.MotionGroupOf(f.Class.Code);
+                f.IsRotation = FixtureEvaluator.IsRotation(kind);
+                f.MotorQuantity = FixtureEvaluator.Quantity(kind);
+                if (f.Motion == MotionKind.Rotation) f.SpinAcceleration = f.Limits.MaxAcceleration;
+                f.ColorCode = kind switch
+                {
+                    AttributeKind.ColorRgb or AttributeKind.ColorSub => f.Class.Code switch
+                    {
+                        "R" => 0,
+                        "G" => 1,
+                        "B" => 2,
+                        "C" => 3,
+                        "M" => 4,
+                        "Y" => 5,
+                        _ => -1,
+                    },
+                    AttributeKind.BladeSoft => f.Class.Code == "B" ? 7 : 6,
+                    _ => -1,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Decodes every value of each 8-bit channel without mode-master conditions once (shared by the instances of a
+        /// GDTF channel, e.g. all pixels), so that the per-frame decode is a table lookup.
+        /// </summary>
+        private void BuildDecodeTables()
+        {
+            var shared = new Dictionary<DmxChannel, DecodeEntry[]>(ReferenceEqualityComparer.Instance);
+            var fns = Functions.ToArray();
+            foreach (var ch in Channels)
+            {
+                if (ch.ByteCount != 1 || ch.FunctionCount == 0 || ch.FunctionCount > short.MaxValue) continue;
+                bool dependent = false;
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                    dependent |= fns[k].ModeMaster >= 0 || fns[k].SetArray.Length > short.MaxValue;
+                if (dependent) continue;
+                if (shared.TryGetValue(ch.Source, out var table) && table.Length == 256 && SameLayout(ch, table))
+                {
+                    ch.Decode = table;
+                    continue;
+                }
+                table = new DecodeEntry[256];
+                for (uint v = 0; v < 256; v++)
+                {
+                    int fn = FixtureEvaluator.SelectFunction(ch, fns, null, v);
+                    var f = fns[fn];
+                    int set = f.SetIndexAt(v);
+                    float physical = FixtureEvaluator.PhysicalAt(f, v, set);
+                    table[v] = new DecodeEntry(fn - ch.FirstFunction, set, physical, f.UsesSlotPosition ? f.SlotPositionAt(v) : physical);
+                }
+                ch.Decode = table;
+                shared.TryAdd(ch.Source, table);
+            }
+
+            // instances of one GDTF channel compile the same function list; check before sharing anyway
+            bool SameLayout(ProfileChannel ch, DecodeEntry[] table)
+            {
+                for (int v = 0; v < 256; v++)
+                    if (table[v].Function >= ch.FunctionCount) return false;
+                return true;
             }
         }
 

@@ -75,30 +75,31 @@ public static class FixtureEvaluator
         double motorDt = applyDynamics && !restart ? Math.Min(elapsed, 60.0) : 0;
 
         var fns = p.FunctionArray;
+        var channels = p.ChannelArray;
         var rt = state.Runtime;
         bool animating = false;
 
         // 1–2: raw values and active functions
-        for (int c = 0; c < rt.Length; c++) rt[c].Dmx = dmx.GetValue(c);
-        for (int c = 0; c < rt.Length; c++) Select(p, fns, rt, c);
+        dmx.ReadAll(rt);
+        for (int c = 0; c < rt.Length; c++) Select(channels[c], fns, rt, c);
 
         // 3: manual overrides
         overrides?.Apply(rt, fns);
 
         // 4: relations (virtual dimmers)
-        for (int c = 0; c < rt.Length; c++)
+        var relations = p.RelationArray;
+        foreach (int c in p.FollowerChannels)
         {
-            rt[c].Relation = 1f;
-            var rels = p.FollowerRelations[c];
-            if (rels.Length == 0 || rt[c].Function < 0) continue;
-            foreach (int ri in rels)
+            ref var follower = ref rt[c];
+            if (follower.Function < 0) continue;
+            foreach (int ri in p.FollowerRelations[c])
             {
-                var r = p.Relations[ri];
-                if (rt[c].Function != r.FollowerFunction) continue;
+                var r = relations[ri];
+                if (follower.Function != r.FollowerFunction) continue;
                 ref var m = ref rt[r.Master];
                 float masterLevel = m.Function >= 0 ? Level(fns[m.Function], m.Target) : 1f;
-                if (r.Type == Gdtf.RelationType.Multiply) rt[c].Relation *= masterLevel;
-                else rt[c].Target = masterLevel * fns[rt[c].Function].LevelScale;
+                if (r.Type == Gdtf.RelationType.Multiply) follower.Relation *= masterLevel;
+                else follower.Target = masterLevel * fns[follower.Function].LevelScale;
             }
         }
 
@@ -112,7 +113,7 @@ public static class FixtureEvaluator
             ref var r = ref rt[c];
             if (r.Function < 0) continue;
             var f = fns[r.Function];
-            var set = r.SetIndex >= 0 ? f.Sets[r.SetIndex] : null;
+            var set = r.SetIndex >= 0 ? f.SetArray[r.SetIndex] : null;
             if (set is not null)
             {
                 invertPan |= (set.Flags & ChannelSetFlags.InvertPan) != 0;
@@ -126,7 +127,7 @@ public static class FixtureEvaluator
                 case AttributeKind.MotionSpeed:
                     {
                         float factor = SpeedFactor(f, r, set);
-                        int g = MotionGroupOf(f.Class.Code);
+                        int g = f.SpeedGroup;
                         if (g < 0) speed.AsSpan().Fill(factor);
                         else speed[g] = factor;
                         break;
@@ -144,12 +145,11 @@ public static class FixtureEvaluator
                 continue;
             }
             var f = fns[r.Function];
-            var kind = f.Class.Kind;
-            var qty = Quantity(kind);
-            if (f.Motion == MotionKind.Position && applyDynamics)
+            var qty = f.MotorQuantity;
+            if (applyDynamics && f.Motion == MotionKind.Position)
             {
                 if (r.MotorKind != qty) ContinueMotor(ref r, f, p, qty);
-                var limits = f.Limits.Scaled(speed[MotionGroup(f.Class)]);
+                var limits = f.Limits.Scaled(speed[f.MotionGroup]);
                 MotorDynamics.Step(ref r.Motor, r.Target, motorDt, limits);
                 r.Value = (float)r.Motor.Position;
                 animating |= r.Motor.IsMoving;
@@ -163,9 +163,9 @@ public static class FixtureEvaluator
             }
             r.MotorKind = qty;
 
-            if (IsRotation(kind))
+            if (f.IsRotation)
             {
-                var set = r.SetIndex >= 0 ? f.Sets[r.SetIndex] : null;
+                var set = r.SetIndex >= 0 ? f.SetArray[r.SetIndex] : null;
                 float spinSpeed = set is not null && (set.Flags & ChannelSetFlags.NoFunction) != 0 ? 0f : SpinSpeed(f, r.Physical);
                 if (restart)
                 {
@@ -175,8 +175,7 @@ public static class FixtureEvaluator
                 }
                 else
                 {
-                    double accel = applyDynamics ? RotationAcceleration(kind, p) : double.PositiveInfinity;
-                    MotorDynamics.StepRotation(ref r.Spin, spinSpeed, rotationDt, accel);
+                    MotorDynamics.StepRotation(ref r.Spin, spinSpeed, rotationDt, applyDynamics ? f.SpinAcceleration : double.PositiveInfinity);
                 }
                 animating |= r.Spin.Velocity != 0;
             }
@@ -187,11 +186,12 @@ public static class FixtureEvaluator
         }
 
         // 7: axes
+        var axisChannels = p.AxisChannels;
         for (int a = 0; a < state.Axes.Length; a++)
         {
             float pan = 0, tilt = 0;
             Vector3 rot = default, trans = default;
-            foreach (int c in p.Axes[a].Channels)
+            foreach (int c in axisChannels[a])
             {
                 ref var r = ref rt[c];
                 if (r.Function < 0) continue;
@@ -217,7 +217,8 @@ public static class FixtureEvaluator
         }
 
         // 8: beams
-        if (p.Beams.Count > 0)
+        var beams = p.BeamArray;
+        if (beams.Length > 0)
         {
             var shared = state.SharedScratch;
             var acc = BeamAcc.Create();
@@ -226,15 +227,33 @@ public static class FixtureEvaluator
             var ctx = new ApplyContext(p, fns, rt, time, state.Seed);
             foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
             var ownLevels = state.OwnEmitterLevels;
-            for (int b = 0; b < p.Beams.Count; b++)
+            var beamStates = state.BeamArray;
+            bool sharedFinalized = false;
+            for (int b = 0; b < beams.Length; b++)
             {
-                var pb = p.Beams[b];
-                var bs = (BeamState)state.Beams[b];
+                var pb = beams[b];
+                var bs = beamStates[b];
                 var beamAcc = acc;
-                CopyWheels(shared, bs);
                 state.EmitterLevels.AsSpan().CopyTo(ownLevels);
-                foreach (int c in pb.OwnChannels) Apply(ref beamAcc, bs, ownLevels, c, in ctx, ref animating);
-                Finalize(pb, bs, ref beamAcc, ownLevels, state.BeamLevels, curve, in ctx, ref animating);
+                if (pb.OwnMechanics)
+                {
+                    // the beam has its own wheels, prisms or blades: start from the shared ones, then resolve
+                    CopyWheels(shared, bs);
+                    foreach (int c in pb.OwnChannels) Apply(ref beamAcc, bs, ownLevels, c, in ctx, ref animating);
+                    FinalizeAllWheels(p, bs);
+                }
+                else
+                {
+                    // the mechanics are the fixture's: resolve them once and copy the result into every beam
+                    if (!sharedFinalized)
+                    {
+                        FinalizeAllWheels(p, shared);
+                        sharedFinalized = true;
+                    }
+                    foreach (int c in pb.OwnChannels) Apply(ref beamAcc, bs, ownLevels, c, in ctx, ref animating);
+                    CopyWheels(shared, bs);
+                }
+                Finalize(pb, bs, ref beamAcc, ownLevels, curve, in ctx, ref animating);
             }
         }
 
@@ -248,30 +267,21 @@ public static class FixtureEvaluator
 
     // ------------------------------------------------------------------ channel decoding
 
-    private static void Select(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, int c)
+    private static void Select(ProfileChannel ch, ProfileFunction[] fns, ChannelRuntime[] rt, int c)
     {
-        var ch = p.Channels[c];
-        uint v = rt[c].Dmx;
-        int end = ch.FirstFunction + ch.FunctionCount;
-        int best = -1, fallback = -1, available = -1;
-        for (int k = ch.FirstFunction; k < end; k++)
-        {
-            var f = fns[k];
-            if (f.ModeMaster >= 0)
-            {
-                uint mv = rt[f.ModeMaster].Dmx;
-                if (mv < f.ModeFrom || mv > f.ModeTo) continue;
-            }
-            if (available < 0) available = k;
-            if (v >= f.DmxFrom && v <= f.DmxTo)
-            {
-                best = k;
-                break;
-            }
-            if (v >= f.DmxFrom && (fallback < 0 || f.DmxFrom >= fns[fallback].DmxFrom)) fallback = k;
-        }
-        if (best < 0) best = fallback >= 0 ? fallback : available >= 0 ? available : ch.InitialFunction;
         ref var r = ref rt[c];
+        r.Relation = 1f;
+        uint v = r.Dmx;
+        if (ch.Decode is { } table)
+        {
+            ref readonly var e = ref table[Math.Min(v, 255u)];
+            r.Function = ch.FirstFunction + e.Function;
+            r.SetIndex = e.Set;
+            r.Physical = e.Physical;
+            r.Target = e.Target;
+            return;
+        }
+        int best = SelectFunction(ch, fns, rt, v);
         r.Function = best;
         if (best < 0)
         {
@@ -281,27 +291,51 @@ public static class FixtureEvaluator
             return;
         }
         var fn = fns[best];
-        r.SetIndex = SetIndexAt(fn, v);
+        r.SetIndex = fn.SetIndexAt(v);
         r.Physical = PhysicalAt(fn, v, r.SetIndex);
         r.Target = fn.UsesSlotPosition ? fn.SlotPositionAt(v) : r.Physical;
     }
 
-    internal static int SetIndexAt(ProfileFunction f, uint v)
+    /// <summary>
+    /// The active function of a channel at DMX value <paramref name="v"/>: the first function (in GDTF order) whose
+    /// mode-master condition holds and whose range contains the value; else the available function starting closest
+    /// below the value; else the first available one; else the initial function. Mode masters are read from
+    /// <paramref name="rt"/> (null: no conditions are checked). −1 when the channel has no functions.
+    /// </summary>
+    internal static int SelectFunction(ProfileChannel ch, ProfileFunction[] fns, ChannelRuntime[]? rt, uint v)
     {
-        var sets = f.Sets;
-        for (int i = sets.Count - 1; i >= 0; i--)
+        int end = ch.FirstFunction + ch.FunctionCount;
+        int fallback = -1, available = -1;
+        uint fallbackFrom = 0;
+        for (int k = ch.FirstFunction; k < end; k++)
         {
-            var s = sets[i];
-            if (v >= s.DmxFrom) return v <= s.DmxTo ? i : -1;
+            var f = fns[k];
+            int master = f.ModeMaster;
+            if (master >= 0 && rt is not null)
+            {
+                uint mv = rt[master].Dmx;
+                if (mv < f.ModeFrom || mv > f.ModeTo) continue;
+            }
+            if (available < 0) available = k;
+            uint from = f.DmxFrom;
+            if (v < from) continue;
+            if (v <= f.DmxTo) return k;
+            if (fallback < 0 || from >= fallbackFrom)
+            {
+                fallback = k;
+                fallbackFrom = from;
+            }
         }
-        return -1;
+        return fallback >= 0 ? fallback : available >= 0 ? available : ch.InitialFunction;
     }
+
+    internal static int SetIndexAt(ProfileFunction f, uint v) => f.SetIndexAt(v);
 
     internal static float PhysicalAt(ProfileFunction f, uint v, int setIndex)
     {
         if (setIndex >= 0)
         {
-            var s = f.Sets[setIndex];
+            var s = f.SetArray[setIndex];
             if (s.HasPhysical)
             {
                 if (s.DmxTo <= s.DmxFrom) return s.PhysicalFrom;
@@ -332,13 +366,13 @@ public static class FixtureEvaluator
     // ------------------------------------------------------------------ dynamics helpers
 
     /// <summary>The physical quantity a motor carries: wheel slot selections share one so a wheel moves continuously between them.</summary>
-    private static AttributeKind Quantity(AttributeKind kind) => kind switch
+    internal static AttributeKind Quantity(AttributeKind kind) => kind switch
     {
         AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake => AttributeKind.WheelSelect,
         _ => kind,
     };
 
-    private static bool IsRotation(AttributeKind kind) =>
+    internal static bool IsRotation(AttributeKind kind) =>
         kind is AttributeKind.PanRotate or AttributeKind.TiltRotate or AttributeKind.WheelSpin or AttributeKind.SlotRotate
             or AttributeKind.WheelSelectSpin;
 
@@ -355,7 +389,7 @@ public static class FixtureEvaluator
         }
         if (qty == AttributeKind.WheelSelect && previous == AttributeKind.WheelSpin && r.Spin.Initialized && f.Wheel >= 0)
         {
-            int slots = p.Wheels[f.Wheel].SlotCount;
+            int slots = p.WheelArray[f.Wheel].SlotCount;
             double pos = 1.0 + r.Spin.Position / 360.0 * slots;
             pos += slots * Math.Round((r.Target - pos) / slots);
             r.Motor = new MotorState { Position = pos, Velocity = r.Spin.Velocity / 360.0 * slots, Initialized = true };
@@ -373,14 +407,8 @@ public static class FixtureEvaluator
         return Math.Clamp(physical, -36000f, 36000f);
     }
 
-    private static double RotationAcceleration(AttributeKind kind, FixtureProfile p) => kind switch
-    {
-        AttributeKind.PanRotate or AttributeKind.TiltRotate => p.Category == Gdtf.FixtureCategory.Scanner ? 3600.0 : 360.0,
-        _ => 1080.0,
-    };
-
     /// <summary>Motion groups for MSpeed channels: 0 position, 1 colour, 2 gobo, 3 beam (zoom/focus/iris/frost/prism), 4 shaper, 5 other.</summary>
-    private static int MotionGroup(AttributeClass c) => c.Kind switch
+    internal static int MotionGroup(AttributeClass c) => c.Kind switch
     {
         AttributeKind.Pan or AttributeKind.Tilt or AttributeKind.Rotation or AttributeKind.Translation => 0,
         AttributeKind.ColorSub or AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc => 1,
@@ -397,7 +425,7 @@ public static class FixtureEvaluator
     };
 
     /// <summary>Motion group named by an MSpeed attribute prefix (<c>PositionMSpeed</c> → position …); −1 = all groups.</summary>
-    private static int MotionGroupOf(string? code)
+    internal static int MotionGroupOf(string? code)
     {
         if (string.IsNullOrEmpty(code)) return -1;
         if (code.StartsWith("Position", StringComparison.OrdinalIgnoreCase) || code.StartsWith("Pan", StringComparison.OrdinalIgnoreCase) ||
@@ -502,7 +530,7 @@ public static class FixtureEvaluator
         ref var r = ref ctx.Runtime[c];
         if (r.Function < 0) return;
         var f = ctx.Functions[r.Function];
-        var set = r.SetIndex >= 0 ? f.Sets[r.SetIndex] : null;
+        var set = r.SetIndex >= 0 ? f.SetArray[r.SetIndex] : null;
         var flags = set?.Flags ?? ChannelSetFlags.None;
         var cls = f.Class;
         float v = r.Value;
@@ -555,18 +583,18 @@ public static class FixtureEvaluator
                 }
                 break;
             case AttributeKind.ColorSub:
-                ApplySubtractive(ref acc, cls.Code, level);
+                ApplySubtractive(ref acc, f.ColorCode, level);
                 break;
             case AttributeKind.ColorRgb:
                 acc.Rgb = true;
-                switch (cls.Code)
+                switch (f.ColorCode)
                 {
-                    case "R": acc.RgbValue.X = level; break;
-                    case "G": acc.RgbValue.Y = level; break;
-                    case "B": acc.RgbValue.Z = level; break;
-                    case "C": acc.RgbValue.X = 1f - level; break;
-                    case "M": acc.RgbValue.Y = 1f - level; break;
-                    case "Y": acc.RgbValue.Z = 1f - level; break;
+                    case 0: acc.RgbValue.X = level; break;
+                    case 1: acc.RgbValue.Y = level; break;
+                    case 2: acc.RgbValue.Z = level; break;
+                    case 3: acc.RgbValue.X = 1f - level; break;
+                    case 4: acc.RgbValue.Y = 1f - level; break;
+                    case 5: acc.RgbValue.Z = 1f - level; break;
                 }
                 break;
             case AttributeKind.HsbHue:
@@ -657,7 +685,7 @@ public static class FixtureEvaluator
                         case AttributeKind.BladeB: blade.B = level; break;
                         case AttributeKind.BladeRotation: blade.Rotation = v * DegToRad; break;
                         default:
-                            if (cls.Code == "B") blade.SoftB = level; else blade.SoftA = level;
+                            if (f.ColorCode == 7) blade.SoftB = level; else blade.SoftA = level;
                             break;
                     }
                 }
@@ -668,16 +696,17 @@ public static class FixtureEvaluator
         }
     }
 
-    private static void ApplySubtractive(ref BeamAcc acc, string? code, float level)
+    /// <summary>Adds a subtractive filter (code 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y; see <see cref="ProfileFunction.ColorCode"/>).</summary>
+    private static void ApplySubtractive(ref BeamAcc acc, int code, float level)
     {
         switch (code)
         {
-            case "C": acc.C = MathF.Max(acc.C, level); break;
-            case "M": acc.M = MathF.Max(acc.M, level); break;
-            case "Y": acc.Y = MathF.Max(acc.Y, level); break;
-            case "R": acc.M = MathF.Max(acc.M, level); acc.Y = MathF.Max(acc.Y, level); break; // a red filter = magenta + yellow
-            case "G": acc.C = MathF.Max(acc.C, level); acc.Y = MathF.Max(acc.Y, level); break;
-            case "B": acc.C = MathF.Max(acc.C, level); acc.M = MathF.Max(acc.M, level); break;
+            case 3: acc.C = MathF.Max(acc.C, level); break;
+            case 4: acc.M = MathF.Max(acc.M, level); break;
+            case 5: acc.Y = MathF.Max(acc.Y, level); break;
+            case 0: acc.M = MathF.Max(acc.M, level); acc.Y = MathF.Max(acc.Y, level); break; // a red filter = magenta + yellow
+            case 1: acc.C = MathF.Max(acc.C, level); acc.Y = MathF.Max(acc.Y, level); break;
+            case 2: acc.C = MathF.Max(acc.C, level); acc.M = MathF.Max(acc.M, level); break;
         }
     }
 
@@ -707,15 +736,15 @@ public static class FixtureEvaluator
     private static float MiredShift(ProfileFunction f, ProfileChannelSet? set, in ChannelRuntime r, FixtureProfile p, AttributeKind kind)
     {
         if (set is not null && (set.Flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction)) != 0) return 0f;
-        float source = p.Beams.Count > 0 ? p.Beams[0].SourceKelvin : 6500f;
+        float source = p.BeamArray.Length > 0 ? p.BeamArray[0].SourceKelvin : 6500f;
         float target = float.NaN;
         if (!float.IsNaN(f.KelvinFrom)) target = r.Value;
         else if (set is not null && !float.IsNaN(set.Kelvin))
         {
             target = set.Kelvin;
-            var sets = f.Sets;
+            var sets = f.SetArray;
             int i = r.SetIndex;
-            if (i + 1 < sets.Count && !float.IsNaN(sets[i + 1].Kelvin) && set.DmxTo > set.DmxFrom)
+            if (i + 1 < sets.Length && !float.IsNaN(sets[i + 1].Kelvin) && set.DmxTo > set.DmxFrom)
             {
                 float t = (float)(r.Dmx - set.DmxFrom) / (set.DmxTo - set.DmxFrom + 1);
                 target = 1e6f / (1e6f / set.Kelvin + t * (1e6f / sets[i + 1].Kelvin - 1e6f / set.Kelvin));
@@ -763,7 +792,7 @@ public static class FixtureEvaluator
         if (n >= arr.Length) n = arr.Length - 1;
         ref var w = ref arr[n];
         var flags = set?.Flags ?? ChannelSetFlags.None;
-        int slots = f.Wheel >= 0 ? ctx.Profile.Wheels[f.Wheel].SlotCount : 1;
+        int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
         if (f.Wheel >= 0) w.Wheel = f.Wheel;
         switch (f.Class.Kind)
         {
@@ -876,20 +905,34 @@ public static class FixtureEvaluator
         }
     }
 
+    /// <summary>Resolves slot, blend, facets and insertion of every wheel-like mechanism of a beam from its position.</summary>
+    private static void FinalizeAllWheels(FixtureProfile p, BeamState bs)
+    {
+        if (bs.ColorWheels.Length > 0) FinalizeWheels(p, bs.ColorWheels, prisms: false);
+        if (bs.Gobos.Length > 0) FinalizeWheels(p, bs.Gobos, prisms: false);
+        if (bs.Prisms.Length > 0) FinalizeWheels(p, bs.Prisms, prisms: true);
+        if (bs.AnimationWheels.Length > 0) FinalizeWheels(p, bs.AnimationWheels, prisms: false);
+        if (bs.Effects.Length > 0) FinalizeWheels(p, bs.Effects, prisms: false);
+        if (bs.BeamShapers.Length > 0) FinalizeWheels(p, bs.BeamShapers, prisms: false);
+    }
+
     private static void FinalizeWheels(FixtureProfile p, WheelState[] arr, bool prisms)
     {
         for (int i = 0; i < arr.Length; i++)
         {
             ref var w = ref arr[i];
-            if (w.Wheel < 0 || !float.IsFinite(w.Position))
+            // A wheel named only by a rotation/rate/insertion function (no slot selection channel, or the selection
+            // function of this mode has no wheel) rests on its home slot.
+            if (w.Wheel >= 0 && !float.IsFinite(w.Position)) w.Position = 1f;
+            if (w.Wheel < 0)
             {
-                if (w.Wheel < 0 && float.IsNaN(w.Position) && w.Insertion > 0f) continue; // wheel-less prism/effect set in ApplyWheel
+                if (float.IsNaN(w.Position) && w.Insertion > 0f) continue; // wheel-less prism/effect set in ApplyWheel
                 w.Slot = 0;
                 w.NextSlot = 0;
                 w.Blend = 0f;
                 continue;
             }
-            var wheel = p.Wheels[w.Wheel];
+            var wheel = p.WheelArray[w.Wheel];
             int n = wheel.SlotCount;
             float q = w.Position - 1f;
             float fl = MathF.Floor(q);
@@ -905,16 +948,16 @@ public static class FixtureEvaluator
             w.Slot = i0 + 1;
             w.NextSlot = i1 + 1;
             w.Blend = blend;
-            bool open0 = wheel.SlotOpen[i0], open1 = wheel.SlotOpen[i1];
+            bool open0 = wheel.SlotOpenArray[i0], open1 = wheel.SlotOpenArray[i1];
             w.IsOpen = open0 && (blend == 0f || open1);
-            int facets = blend > 0.5f ? wheel.SlotFacets[i1] : wheel.SlotFacets[i0];
+            int facets = blend > 0.5f ? wheel.SlotFacetArray[i1] : wheel.SlotFacetArray[i0];
             w.Facets = prisms ? (facets > 0 ? facets : (blend > 0.5f ? open1 : open0) ? 0 : 3) : facets;
             if (w.Insertion == 0f) w.Insertion = w.IsOpen ? 0f : 1f;
             _ = n;
         }
     }
 
-    private static void Finalize(ProfileBeam pb, BeamState bs, ref BeamAcc acc, float[] levels, float[] beamLevels, DimmerCurve curve,
+    private static void Finalize(ProfileBeam pb, BeamState bs, ref BeamAcc acc, float[] levels, DimmerCurve curve,
         in ApplyContext ctx, ref bool animating)
     {
         var p = ctx.Profile;
@@ -951,13 +994,14 @@ public static class FixtureEvaluator
         bool any = false;
         if (pb.Emitters.Length > 0 && acc.Emitters)
         {
-            var map = pb.EmitterSlot;
-            var bl = beamLevels.AsSpan(0, pb.Emitters.Length);
-            bl.Clear();
-            for (int e = 0; e < map.Length; e++)
-                if (map[e] >= 0) bl[map[e]] = levels[e];
-            var mix = ColorMixing.Mix(pb.Emitters, bl);
-            xyz += mix.Tristimulus;
+            // additive mixing by luminous flux in XYZ (as ColorMixing.Mix, without building a colour per emitter)
+            var full = pb.EmitterFullXyz;
+            int n = Math.Min(full.Length, levels.Length);
+            for (int e = 0; e < n; e++)
+            {
+                float level = levels[e];
+                if (level > 0f) xyz += full[e] * MathF.Min(level, 1f);
+            }
             any = true;
         }
         if (acc.Cie && acc.CieY > 1e-4f)
@@ -996,11 +1040,10 @@ public static class FixtureEvaluator
             }
             rgb *= table.RgbTransmission(acc.C, acc.M, acc.Y, target);
         }
-        FinalizeWheels(p, bs.ColorWheels, prisms: false);
         foreach (ref readonly var w in bs.ColorWheels.AsSpan())
         {
             if (w.Wheel < 0 || w.Slot <= 0) continue;
-            var t = p.Wheels[w.Wheel].SlotTransmission;
+            var t = p.WheelArray[w.Wheel].SlotTransmissionArray;
             var tr = t[w.Slot - 1];
             if (w.Blend > 0f) tr = Vector3.Lerp(tr, t[w.NextSlot - 1], w.Blend);
             rgb *= tr;
@@ -1026,11 +1069,6 @@ public static class FixtureEvaluator
         bs.Iris = Math.Clamp(acc.Iris, 0f, 1f);
         bs.Frost = Math.Clamp(1f - acc.FrostKeep, 0f, 1f);
         bs.ShaperRotation = acc.ShaperRotation;
-        FinalizeWheels(p, bs.Gobos, prisms: false);
-        FinalizeWheels(p, bs.Prisms, prisms: true);
-        FinalizeWheels(p, bs.AnimationWheels, prisms: false);
-        FinalizeWheels(p, bs.Effects, prisms: false);
-        FinalizeWheels(p, bs.BeamShapers, prisms: false);
     }
 
     private static float ApplyCurve(float v, DimmerCurve curve) => curve switch
@@ -1092,7 +1130,7 @@ public static class FixtureEvaluator
             ref var r = ref rt[c];
             if (r.Function < 0) continue;
             var f = fns[r.Function];
-            var set = r.SetIndex >= 0 ? f.Sets[r.SetIndex] : null;
+            var set = r.SetIndex >= 0 ? f.SetArray[r.SetIndex] : null;
             bool off = set is not null && (set.Flags & (ChannelSetFlags.Closed | ChannelSetFlags.NoFunction)) != 0;
             float level = off ? 0f : Level(f, MathF.Abs(r.Value)) * r.Relation;
             if (c == p.FlameChannel)

@@ -171,7 +171,41 @@ public sealed class ProfileFunction
     public int Emitter { get; internal set; } = -1;
 
     /// <summary>Channel sets ordered by DMX value.</summary>
-    public IReadOnlyList<ProfileChannelSet> Sets { get; internal set; } = Array.Empty<ProfileChannelSet>();
+    public IReadOnlyList<ProfileChannelSet> Sets => SetArray;
+
+    /// <summary>The channel sets as an array (per-frame path).</summary>
+    internal ProfileChannelSet[] SetArray { get; private set; } = Array.Empty<ProfileChannelSet>();
+
+    /// <summary>First DMX value of every set (same order as <see cref="SetArray"/>), for the binary search on the per-frame path.</summary>
+    internal uint[] SetDmxFrom { get; private set; } = Array.Empty<uint>();
+
+    /// <summary>Installs the channel sets (sorted by DMX value).</summary>
+    internal void SetSets(ProfileChannelSet[] sets)
+    {
+        SetArray = sets;
+        SetDmxFrom = Array.ConvertAll(sets, s => s.DmxFrom);
+    }
+
+    /// <summary>Motion group (MSpeed channels scale it): 0 position, 1 colour, 2 gobo, 3 beam, 4 shaper, 5 other.</summary>
+    internal int MotionGroup { get; set; } = 5;
+
+    /// <summary>True for continuous rotations (endless pan/tilt, wheel spin, slot rotation) whose angle is integrated.</summary>
+    internal bool IsRotation { get; set; }
+
+    /// <summary>
+    /// The physical quantity the function's motor carries: wheel slot selections share one so a wheel moves
+    /// continuously from one selection function to another.
+    /// </summary>
+    internal AttributeKind MotorQuantity { get; set; }
+
+    /// <summary>For MSpeed functions: the motion group they scale (−1 = all groups).</summary>
+    internal int SpeedGroup { get; set; } = -1;
+
+    /// <summary>Angular acceleration of a rotation's speed ramp, deg/s² (∞ = instant).</summary>
+    internal double SpinAcceleration { get; set; } = double.PositiveInfinity;
+
+    /// <summary>Colour code of ColorRgb/ColorSub/BladeSoft functions: 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y, 6 side A, 7 side B; −1 otherwise.</summary>
+    internal int ColorCode { get; set; } = -1;
 
     /// <summary>Time to travel the full physical range at full speed, s (GDTF RealFade; 0 = unknown).</summary>
     public float RealFade => Source.RealFade;
@@ -242,14 +276,22 @@ public sealed class ProfileFunction
     /// <summary>The channel set containing <paramref name="dmx"/>, or null.</summary>
     public ProfileChannelSet? SetAt(uint dmx)
     {
-        var sets = Sets;
-        for (int i = sets.Count - 1; i >= 0; i--)
+        int i = SetIndexAt(dmx);
+        return i >= 0 ? SetArray[i] : null;
+    }
+
+    /// <summary>Index in <see cref="Sets"/> of the set containing <paramref name="dmx"/>, or −1 (binary search).</summary>
+    internal int SetIndexAt(uint dmx)
+    {
+        var from = SetDmxFrom;
+        int lo = 0, hi = from.Length;
+        while (lo < hi)
         {
-            var s = sets[i];
-            if (dmx >= s.DmxFrom)
-                return dmx <= s.DmxTo ? s : null;
+            int mid = (lo + hi) >> 1;
+            if (from[mid] <= dmx) lo = mid + 1; else hi = mid;
         }
-        return null;
+        int i = lo - 1; // last set starting at or below dmx
+        return i >= 0 && dmx <= SetArray[i].DmxTo ? i : -1;
     }
 
     /// <summary>Wheel slot position (1-based, fractional between adjacent slots) at a DMX value, for slot selection functions.</summary>
@@ -356,6 +398,12 @@ public sealed class ProfileChannel
     /// <summary>Index of the axis this channel moves (Pan, Tilt, rotation, translation channels), or −1.</summary>
     public int Axis { get; internal set; } = -1;
 
+    /// <summary>
+    /// Pre-decoded DMX values of an 8-bit channel whose functions do not depend on a mode master (256 entries, shared
+    /// by all instances of the same GDTF channel); null when the channel is decoded on the fly.
+    /// </summary>
+    internal DecodeEntry[]? Decode { get; set; }
+
     /// <inheritdoc />
     public override string ToString() => $"{Name} @ {InstanceName} [{Break}:{string.Join(",", Instance.Offsets)}]";
 }
@@ -367,10 +415,16 @@ public sealed class ProfileWheel
     {
         Index = index;
         Source = source;
-        SlotTransmission = slotTransmission;
-        SlotFacets = facets;
-        SlotOpen = open;
+        SlotTransmissionArray = slotTransmission;
+        SlotFacetArray = facets;
+        SlotOpenArray = open;
     }
+
+    internal Vector3[] SlotTransmissionArray { get; }
+
+    internal int[] SlotFacetArray { get; }
+
+    internal bool[] SlotOpenArray { get; }
 
     /// <summary>Index in <see cref="FixtureProfile.Wheels"/>.</summary>
     public int Index { get; }
@@ -385,13 +439,13 @@ public sealed class ProfileWheel
     public int SlotCount => Math.Max(1, Source.Slots.Count);
 
     /// <summary>Per slot (0-based): linear Rec.2020 transmission of the slot's colour filter for a D65-white source.</summary>
-    public IReadOnlyList<Vector3> SlotTransmission { get; }
+    public IReadOnlyList<Vector3> SlotTransmission => SlotTransmissionArray;
 
     /// <summary>Per slot: number of prism facets (0 = not a prism).</summary>
-    public IReadOnlyList<int> SlotFacets { get; }
+    public IReadOnlyList<int> SlotFacets => SlotFacetArray;
 
     /// <summary>Per slot: true for open/empty slots.</summary>
-    public IReadOnlyList<bool> SlotOpen { get; }
+    public IReadOnlyList<bool> SlotOpen => SlotOpenArray;
 
     /// <summary>Slot by 1-based position (rounded and wrapped onto the wheel).</summary>
     public WheelSlot? SlotAt(float position)
@@ -502,6 +556,15 @@ public sealed class ProfileBeam
     /// <summary>Maps <see cref="FixtureProfile.Emitters"/> index → index in <see cref="Emitters"/> (−1 when absent).</summary>
     internal int[] EmitterSlot { get; set; } = Array.Empty<int>();
 
+    /// <summary>
+    /// Per <see cref="FixtureProfile.Emitters"/> index: CIE XYZ (in lumen) of the emitter at full level in this beam, zero
+    /// for emitters the beam does not have. Mixing is the level-weighted sum (additive in XYZ).
+    /// </summary>
+    internal Vector3[] EmitterFullXyz { get; set; } = Array.Empty<Vector3>();
+
+    /// <summary>True when one of <see cref="OwnChannels"/> drives a wheel, prism, animation, effect, beam shaper or blade.</summary>
+    internal bool OwnMechanics { get; set; }
+
     /// <summary>Channels affecting only this beam (or a subset of beams), evaluated per beam.</summary>
     internal int[] OwnChannels { get; set; } = Array.Empty<int>();
 
@@ -552,4 +615,28 @@ public sealed class ProfileAxis
 
     /// <inheritdoc />
     public override string ToString() => Name;
+}
+
+/// <summary>A pre-decoded DMX value: active function (relative to the channel's first), channel set, physical and control value.</summary>
+internal readonly struct DecodeEntry
+{
+    public DecodeEntry(int function, int set, float physical, float target)
+    {
+        Function = (short)function;
+        Set = (short)set;
+        Physical = physical;
+        Target = target;
+    }
+
+    /// <summary>Function index relative to <see cref="ProfileChannel.FirstFunction"/>.</summary>
+    public readonly short Function;
+
+    /// <summary>Channel set index in the function, −1 when none.</summary>
+    public readonly short Set;
+
+    /// <summary>GDTF physical value.</summary>
+    public readonly float Physical;
+
+    /// <summary>Control value before dynamics (slot position for wheel selection).</summary>
+    public readonly float Target;
 }

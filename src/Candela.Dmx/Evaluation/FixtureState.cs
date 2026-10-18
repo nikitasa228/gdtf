@@ -291,7 +291,6 @@ public sealed class FixtureState
     internal readonly ChannelRuntime[] Runtime;
     internal readonly float[] EmitterLevels;
     internal readonly float[] OwnEmitterLevels;
-    internal readonly float[] BeamLevels;
     internal readonly BeamState SharedScratch;
     internal readonly float[] SpeedFactors = [1f, 1f, 1f, 1f, 1f, 1f];
 
@@ -309,19 +308,17 @@ public sealed class FixtureState
         for (int i = 0; i < Axes.Length; i++) Axes[i].PartIndex = profile.Axes[i].PartIndex;
         EmitterLevels = new float[profile.Emitters.Count];
         OwnEmitterLevels = new float[profile.Emitters.Count];
-        int maxEmitters = 0;
         var counts = new int[7];
         var beams = new BeamState[profile.Beams.Count];
         for (int b = 0; b < beams.Length; b++)
         {
             var pb = profile.Beams[b];
-            maxEmitters = Math.Max(maxEmitters, pb.Emitters.Length);
             var c = FamilyCounts(profile, pb);
             for (int k = 0; k < counts.Length; k++) counts[k] = Math.Max(counts[k], c[k]);
             beams[b] = new BeamState(pb, c[0], c[1], c[2], c[3], c[4], c[5], c[6]);
         }
+        BeamArray = beams;
         Beams = beams;
-        BeamLevels = new float[maxEmitters];
         SharedScratch = new BeamState(profile.Beams.Count > 0 ? profile.Beams[0] : DummyBeam, counts[0], counts[1], counts[2], counts[3],
             counts[4], counts[5], counts[6]);
         Outputs = new DeviceOutputs { FanDirection = 1f, FlameHeight = float.NaN };
@@ -383,6 +380,9 @@ public sealed class FixtureState
 
     /// <summary>Beam states (one per <see cref="FixtureProfile.Beams"/> entry).</summary>
     public IReadOnlyList<BeamState> Beams { get; }
+
+    /// <summary>The beam states as an array (per-frame path).</summary>
+    internal BeamState[] BeamArray { get; }
 
     /// <summary>Outputs of fog/haze/fan/flame devices.</summary>
     public DeviceOutputs Outputs { get; internal set; }

@@ -10,6 +10,8 @@ public sealed class FixtureDmxBuffer
 {
     private readonly byte[][] _breaks;
     private readonly uint[] _virtual;
+    private readonly int[] _channelBreak;    // per channel: break index, −1 for virtual channels
+    private readonly int[][] _channelOffsets; // per channel: 0-based slot indices within the break, coarse first
 
     /// <summary>Creates a buffer for <paramref name="profile"/> holding the profile's default values.</summary>
     public FixtureDmxBuffer(FixtureProfile profile)
@@ -17,7 +19,17 @@ public sealed class FixtureDmxBuffer
         Profile = profile ?? throw new ArgumentNullException(nameof(profile));
         _breaks = new byte[profile.Breaks.Count][];
         for (int i = 0; i < _breaks.Length; i++) _breaks[i] = new byte[profile.Breaks[i].Footprint];
-        _virtual = new uint[profile.Channels.Count];
+        var channels = profile.ChannelArray;
+        _virtual = new uint[channels.Length];
+        _channelBreak = new int[channels.Length];
+        _channelOffsets = new int[channels.Length][];
+        for (int c = 0; c < channels.Length; c++)
+        {
+            var ch = channels[c];
+            bool addressed = !ch.IsVirtual && ch.BreakIndex >= 0;
+            _channelBreak[c] = addressed ? ch.BreakIndex : -1;
+            _channelOffsets[c] = addressed ? Array.ConvertAll(ch.Instance.Offsets, o => o - 1) : Array.Empty<int>();
+        }
         ResetToDefaults();
     }
 
@@ -36,14 +48,29 @@ public sealed class FixtureDmxBuffer
     /// <summary>Raw value of a channel at its resolution (bytes combined coarse first; virtual channels from their store).</summary>
     public uint GetValue(int channel)
     {
-        var ch = Profile.Channels[channel];
-        if (ch.IsVirtual || ch.BreakIndex < 0) return _virtual[channel];
-        var slots = _breaks[ch.BreakIndex];
-        var offsets = ch.Instance.Offsets;
+        int b = _channelBreak[channel];
+        return b < 0 ? _virtual[channel] : Combine(_breaks[b], _channelOffsets[channel]);
+    }
+
+    /// <summary>Reads every channel's raw value into the evaluation state (per-frame path).</summary>
+    internal void ReadAll(ChannelRuntime[] runtime)
+    {
+        var breaks = _channelBreak;
+        var offsets = _channelOffsets;
+        int n = Math.Min(runtime.Length, breaks.Length);
+        for (int c = 0; c < n; c++)
+        {
+            int b = breaks[c];
+            runtime[c].Dmx = b < 0 ? _virtual[c] : Combine(_breaks[b], offsets[c]);
+        }
+    }
+
+    private static uint Combine(byte[] slots, int[] offsets)
+    {
         uint v = 0;
         for (int i = 0; i < offsets.Length; i++)
         {
-            int o = offsets[i] - 1;
+            int o = offsets[i];
             v = (v << 8) | ((uint)o < (uint)slots.Length ? slots[o] : 0u);
         }
         return v;
@@ -52,19 +79,20 @@ public sealed class FixtureDmxBuffer
     /// <summary>Writes a channel value (clamped to the channel's resolution) into its slots, coarse byte first.</summary>
     public void SetValue(int channel, uint value)
     {
-        var ch = Profile.Channels[channel];
+        var ch = Profile.ChannelArray[channel];
         value = Math.Min(value, ch.MaxValue);
         Version++;
-        if (ch.IsVirtual || ch.BreakIndex < 0)
+        int b = _channelBreak[channel];
+        if (b < 0)
         {
             _virtual[channel] = value;
             return;
         }
-        var slots = _breaks[ch.BreakIndex];
-        var offsets = ch.Instance.Offsets;
+        var slots = _breaks[b];
+        var offsets = _channelOffsets[channel];
         for (int i = offsets.Length - 1; i >= 0; i--)
         {
-            int o = offsets[i] - 1;
+            int o = offsets[i];
             if ((uint)o < (uint)slots.Length) slots[o] = (byte)(value & 0xFF);
             value >>= 8;
         }

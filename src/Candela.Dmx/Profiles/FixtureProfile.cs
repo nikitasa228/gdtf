@@ -89,6 +89,24 @@ public sealed partial class FixtureProfile
     /// <summary>The functions as an array (fast indexed access on the per-frame path).</summary>
     internal ProfileFunction[] FunctionArray { get; }
 
+    /// <summary>The channels as an array (per-frame path).</summary>
+    internal ProfileChannel[] ChannelArray { get; }
+
+    /// <summary>The relations as an array (per-frame path).</summary>
+    internal ProfileRelation[] RelationArray { get; }
+
+    /// <summary>The beams as an array (per-frame path).</summary>
+    internal ProfileBeam[] BeamArray { get; }
+
+    /// <summary>The wheels as an array (per-frame path).</summary>
+    internal ProfileWheel[] WheelArray { get; }
+
+    /// <summary>Per axis: the channels moving it (same as <see cref="ProfileAxis.Channels"/>, as arrays).</summary>
+    internal int[][] AxisChannels { get; }
+
+    /// <summary>Channels that follow at least one relation master, ascending.</summary>
+    internal int[] FollowerChannels { get; }
+
     /// <summary>Channels whose functions affect every beam (evaluated once per frame, not per beam).</summary>
     internal int[] SharedBeamChannels { get; }
 
@@ -135,7 +153,7 @@ public sealed partial class FixtureProfile
     /// <summary>The functions of channel <paramref name="channel"/>.</summary>
     public ReadOnlySpan<ProfileFunction> FunctionsOf(int channel)
     {
-        var c = Channels[channel];
+        var c = ChannelArray[channel];
         return FunctionArray.AsSpan(c.FirstFunction, c.FunctionCount);
     }
 
@@ -160,20 +178,26 @@ public sealed partial class FixtureProfile
         Geometry = b.Geometry;
         Breaks = b.Breaks;
         Footprint = b.Breaks.Sum(x => x.Footprint);
-        Channels = b.Channels.ToArray();
+        ChannelArray = b.Channels.ToArray();
+        Channels = ChannelArray;
         FunctionArray = b.Functions.ToArray();
         Functions = FunctionArray;
-        Relations = b.Relations.ToArray();
-        Wheels = b.Wheels.ToArray();
+        RelationArray = b.Relations.ToArray();
+        Relations = RelationArray;
+        WheelArray = b.Wheels.ToArray();
+        Wheels = WheelArray;
         Emitters = b.Emitters.ToArray();
-        Beams = b.Beams.ToArray();
+        BeamArray = b.Beams.ToArray();
+        Beams = BeamArray;
         Axes = b.Axes.ToArray();
+        AxisChannels = Array.ConvertAll(b.Axes.ToArray(), a => a.Channels.ToArray());
         IsAtmospheric = b.IsAtmospheric;
         Warnings = b.Warnings.ToArray();
         SharedBeamChannels = b.SharedBeamChannels;
         OutputChannels = b.OutputChannels;
         ModifierChannels = b.ModifierChannels;
         FollowerRelations = b.FollowerRelations;
+        FollowerChannels = Enumerable.Range(0, b.FollowerRelations.Length).Where(c => b.FollowerRelations[c].Length > 0).ToArray();
         FlameChannel = b.FlameChannel;
         ColorSpacePrimaries = b.ColorSpacePrimaries;
         IsRelationMaster = b.IsRelationMaster;
