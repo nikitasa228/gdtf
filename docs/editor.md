@@ -172,7 +172,9 @@ The camera works in metres with Z up; orthographic views keep the apparent size 
 
 All file dialogs use the editor's **portable file browser** (the same on Windows, Linux and macOS): standard places
 and drives, recent folders, a path bar, sortable name / size / date columns with folders first and natural number
-order, type filters, hidden files toggle, and an overwrite confirmation when saving.
+order, type filters, hidden files toggle, and an overwrite confirmation when saving. When saving, the file name field has
+the keyboard as soon as the dialog opens; the typed name is used by Enter and by the Save button alike (the
+extension of the selected type is added when missing).
 
 ![File browser](images/editor-file-browser.png)
 
@@ -342,7 +344,7 @@ happen on user actions (edits, opening menus and dialogs).
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 330 tests, under a minute) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 340 tests, under a minute) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
 the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
 styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
