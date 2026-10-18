@@ -42,6 +42,7 @@ internal sealed unsafe class ViewportPanel : Panel
     private readonly IViewportHost _host;
     private readonly RenderCamera _renderCamera = new();
     private readonly ViewCubeFace[] _cubeFaces = new ViewCubeFace[ViewCube.FaceCount];
+    private readonly ViewCubeArrow[] _cubeArrows = new ViewCubeArrow[ViewCube.ArrowCount];
     private readonly List<PickRequest> _picks = new();
     private readonly List<Entity> _dragEntities = new();
     private Matrix4x4[] _dragStartWorld = Array.Empty<Matrix4x4>();
@@ -632,9 +633,19 @@ internal sealed unsafe class ViewportPanel : Panel
         bool inArea = Vector2.Distance(mouse, center) < radius;
         _hoveredFace = viewportHovered && inArea ? ViewCube.HitTest(_cubeFaces, mouse) : null;
 
+        // Looking straight at one face, the cube shows only that face: arrows around it lead to the four neighbours.
+        bool axisAligned = ViewCube.IsAxisAligned(Camera.Forward);
+        int hoveredArrow = -1;
+        if (axisAligned)
+        {
+            ViewCube.Arrows(Camera.Right, Camera.Up, center, radius - 2f * scale, 9f * scale, _cubeArrows);
+            if (viewportHovered && inArea && _hoveredFace is null)
+                hoveredArrow = ViewCube.HitTestArrow(_cubeArrows, mouse, 11f * scale);
+        }
+
         drawList.AddCircleFilled(center, radius, Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, inArea ? 0.8f : 0.5f)));
         var font = ImGui.GetFont();
-        float fontSize = ImGui.GetFontSize() * 0.7f;
+        float baseFontSize = ImGui.GetFontSize();
         foreach (var face in _cubeFaces)
         {
             if (face.Facing <= 0.02f)
@@ -646,10 +657,24 @@ internal sealed unsafe class ViewportPanel : Panel
             drawList.AddQuad(face.C0, face.C1, face.C2, face.C3, Theme.U32(Theme.Rgb(0x16171A, 0.95f)), 1.2f * scale);
             if (face.Facing > 0.35f)
             {
+                // The label fills at most 85 % of the face's projected width (long Russian names on oblique faces).
                 string label = FaceLabel(face.View);
-                var textSize = ImGui.CalcTextSize(label) * (fontSize / ImGui.GetFontSize());
+                var fullSize = ImGui.CalcTextSize(label);
+                float faceWidth = MathF.Min(Vector2.Distance(face.C0, face.C1), Vector2.Distance(face.C1, face.C2));
+                float fontSize = MathF.Min(baseFontSize * 0.8f, baseFontSize * faceWidth * 0.85f / MathF.Max(fullSize.X, 1f));
+                var textSize = fullSize * (fontSize / baseFontSize);
                 var alpha = Math.Clamp((face.Facing - 0.35f) / 0.4f, 0f, 1f);
                 drawList.AddText(font, fontSize, face.Center - textSize * 0.5f, Theme.U32(Theme.WithAlpha(Theme.Text, alpha)), label);
+            }
+        }
+
+        if (axisAligned)
+        {
+            for (int i = 0; i < ViewCube.ArrowCount; i++)
+            {
+                var arrow = _cubeArrows[i];
+                var color = i == hoveredArrow ? Theme.Accent : Theme.WithAlpha(Theme.TextMuted, inArea ? 0.95f : 0.6f);
+                drawList.AddTriangleFilled(arrow.Tip, arrow.Left, arrow.Right, Theme.U32(color));
             }
         }
 
@@ -659,13 +684,14 @@ internal sealed unsafe class ViewportPanel : Panel
         var captionSize = ImGui.CalcTextSize(caption);
         drawList.AddText(new Vector2(center.X - captionSize.X * 0.5f, center.Y + radius + 4f * scale), Theme.U32(Theme.TextMuted), caption);
 
-        if (_hoveredFace is { } view && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+        ViewDirection? target = _hoveredFace ?? (hoveredArrow >= 0 ? _cubeArrows[hoveredArrow].View : null);
+        if (target is { } view && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
         {
             Camera.SnapTo(view);
             _host.SetActiveViewport(this);
         }
 
-        if (_hoveredFace is { } tip)
+        if (target is { } tip)
             ImGui.SetTooltip(FaceLabel(tip));
         return inArea;
     }

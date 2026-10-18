@@ -135,6 +135,16 @@ internal static class ViewCube
         }
     }
 
+    /// <summary>
+    /// True when <paramref name="forward"/> (unit view direction) looks straight along a world axis, so the cube shows a
+    /// single face and the neighbour arrows are needed to reach the other views.
+    /// </summary>
+    public static bool IsAxisAligned(Vector3 forward)
+    {
+        var a = Vector3.Abs(forward);
+        return MathF.Max(a.X, MathF.Max(a.Y, a.Z)) > 0.9995f;
+    }
+
     /// <summary>The axis view whose face normal points most along <paramref name="direction"/> (world space).</summary>
     public static ViewDirection NeighbourOf(Vector3 direction)
     {

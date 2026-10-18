@@ -123,6 +123,59 @@ public sealed class ViewCubeTests
         Assert.True(faces.SequenceEqual(expected));
     }
 
+    [Theory]
+    // Arrows in screen order up, right, down, left: each leads to the face lying in that direction.
+    [InlineData(nameof(ViewDirection.Top), nameof(ViewDirection.Back), nameof(ViewDirection.Right), nameof(ViewDirection.Front), nameof(ViewDirection.Left))]
+    [InlineData(nameof(ViewDirection.Front), nameof(ViewDirection.Top), nameof(ViewDirection.Right), nameof(ViewDirection.Bottom), nameof(ViewDirection.Left))]
+    [InlineData(nameof(ViewDirection.Right), nameof(ViewDirection.Top), nameof(ViewDirection.Back), nameof(ViewDirection.Bottom), nameof(ViewDirection.Front))]
+    [InlineData(nameof(ViewDirection.Back), nameof(ViewDirection.Top), nameof(ViewDirection.Left), nameof(ViewDirection.Bottom), nameof(ViewDirection.Right))]
+    [InlineData(nameof(ViewDirection.Bottom), nameof(ViewDirection.Front), nameof(ViewDirection.Right), nameof(ViewDirection.Back), nameof(ViewDirection.Left))]
+    public void Arrows_of_an_axis_view_lead_to_the_neighbouring_faces(string from, string up, string right, string down, string left)
+    {
+        var camera = new ViewportCamera();
+        camera.SnapTo(Enum.Parse<ViewDirection>(from));
+        Assert.True(ViewCube.IsAxisAligned(camera.Forward));
+        Span<ViewCubeArrow> arrows = stackalloc ViewCubeArrow[ViewCube.ArrowCount];
+        ViewCube.Arrows(camera.Right, camera.Up, Center, 50f, 9f, arrows);
+        var expected = new[] { up, right, down, left }.Select(Enum.Parse<ViewDirection>).ToArray();
+        for (int i = 0; i < ViewCube.ArrowCount; i++)
+            Assert.Equal(expected[i], arrows[i].View);
+
+        // Every other axis view is one click away: the four arrows and the face itself cover five of six views.
+        var reachable = new HashSet<ViewDirection>(expected) { camera.SnappedView!.Value };
+        Assert.Equal(5, reachable.Count);
+    }
+
+    [Fact]
+    public void Arrows_sit_outside_the_face_and_are_hit_only_near_their_centre()
+    {
+        var camera = new ViewportCamera();
+        camera.SnapTo(ViewDirection.Top);
+        var faces = Faces(camera);
+        float radius = CubeSize * 0.6f;
+        Span<ViewCubeArrow> arrows = stackalloc ViewCubeArrow[ViewCube.ArrowCount];
+        ViewCube.Arrows(camera.Right, camera.Up, Center, radius, 9f, arrows);
+        foreach (var arrow in arrows)
+        {
+            // Neither the tip nor the base corners cover the face (a click on the face must stay a face click).
+            foreach (var p in new[] { arrow.Tip, arrow.Left, arrow.Right, arrow.Center })
+                Assert.Null(ViewCube.HitTest(faces, p));
+            Assert.True(Vector2.Distance(arrow.Tip, Center) <= radius + 0.01f, "the tip stays inside the cube's disc");
+        }
+
+        Assert.Equal(0, ViewCube.HitTestArrow(arrows, arrows[0].Center + new Vector2(3f, 2f), 11f));
+        Assert.Equal(2, ViewCube.HitTestArrow(arrows, arrows[2].Center, 11f));
+        Assert.Equal(-1, ViewCube.HitTestArrow(arrows, Center, 11f));
+    }
+
+    [Fact]
+    public void Oblique_views_are_not_axis_aligned()
+    {
+        Assert.False(ViewCube.IsAxisAligned(new ViewportCamera { Yaw = 0.6f, Pitch = 0.5f }.Forward));
+        Assert.False(ViewCube.IsAxisAligned(new ViewportCamera().Forward)); // the default view looks slightly down
+        Assert.True(ViewCube.IsAxisAligned(-Vector3.UnitZ));
+    }
+
     [Fact]
     public void Face_contains_handles_both_windings()
     {
