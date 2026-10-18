@@ -36,7 +36,10 @@ metres, degrees in the model (radians only inside maths), seconds, watts, lumen,
   * emitters (Color, DominantWaveLength, DiodePart, spectral measurements);
   * filters with measurements;
   * the colour space (sRGB, ProPhoto, ANSI, Custom), with primary luminances derived so that white has Y = 1;
-  * AdditionalColorSpaces, Gamuts, DMXProfiles (cubic segments, with `Evaluate`) and CRIs;
+  * AdditionalColorSpaces, Gamuts, DMXProfiles and CRIs. `DmxProfile.Evaluate` follows the spec formula
+    `CFC3·(x − P)³ + CFC2·(x − P)² + CFC1·(x − P) + CFC0` with the point at or below x (none: 0), x and P as fractions
+    of the DMX range, so GDTF Builder's "Linear" profile (CFC1 = 1) is the identity. Its closing point at 100 %
+    (CFC0 = 0) starts no segment;
   * legacy Connectors;
   * Properties: OperatingTemperature, Weight, LegHeight and PowerConsumption. PowerConsumption covers Value, PowerFactor,
     the connector link and the voltage and frequency ranges. The connector link resolves to a WiringObject or to a
@@ -139,7 +142,11 @@ template channels, so it does not count those instances.
   is scaled per axis to the declared size, about its origin. Some manufacturers reuse one generic mesh at many sizes.
   The one exception is a declared size of exactly 1 × 1 × 1 m, which is treated as unset.
 * **Primitives (2070 models).** Cube, Cylinder, Sphere, Base, Yoke, Head, Scanner, Conventional, Pigtail and the 1.1
-  variants are generated procedurally and sized by Length, Width and Height.
+  variants are generated procedurally and sized by Length, Width and Height. GDTF 1.1 moved the origin of the Base,
+  Scanner and Conventional meshes to the mounting plate, so `Base1_1`, `Scanner1_1` and `Conventional1_1` hang below
+  their origin (Z from −Height to 0); all other primitives are centred. The files agree: Conventional1_1 bodies carry
+  their Beam at Z ≈ −Height (BOS P-7 HEX, Briteq BT-THEATRE), 1.0 Conventional bodies at −Height/2 (ACME BW-545), and
+  Base1_1 bases end where their centred Yoke begins.
 * **Missing files.** A model whose file is missing falls back to its primitive. With no primitive either, it gets a box
   of the declared size and a warning.
 * **Library-wide load.** All 4982 model definitions of the library load with no failures: 6.3 M triangles in about 26 s
@@ -175,7 +182,10 @@ template channels, so it does not count those instances.
   disk across sessions.
 * **Name lookup.** `Find(manufacturer, model)` and `FindBySpec("Manufacturer@Model[@Revision]")` match names from MVR
   stub GDTFs:
-  * case, spaces vs underscores and punctuation are ignored;
+  * case, spaces vs underscores and punctuation are ignored, except `+`, which is spelled out as "plus" the way file
+    names write it ("Robin Spikie+" = `Robin_SpikiePlus`, "SIX+ BAR L" = `SIX_plus_BAR_L`), so "Spikie+" and
+    "Spikie" stay different models;
+  * a model named by its file name beats one that only has the name as a specs alias, before revisions are compared;
   * manufacturer names reduce to their brand ("Martin" = "Martin_Professional", "Robe" = "Robe_Lighting", "Clay Paky" =
     "Clay_Paky", "Chauvet" = "Chauvet_Professional", "Ayrton " = "Ayrton"), and a brand prefix inside the model name is
     removed;
@@ -217,11 +227,14 @@ template channels, so it does not count those instances.
   three quarters of the limit.
 * **Speed.** Reading all 1091 files: 4.6 s parsing vs 0.5 s from the cache (8–9× faster, Release, one thread); the
   test suite (Debug) measures about 3× for the 60 largest descriptions.
+* **Tests.** The Gdtf, Dmx and Mvr test assemblies point `CANDELA_CACHE_DIR` at a temporary folder of the run (unless
+  it is set), so test runs neither write into the user's cache nor read what earlier runs left there.
 
 ## Robustness and performance
 
 * **Full parse.** All 1091 files parse with no exception in about 8–11 s, in parallel on 4 cores. The test suite
-  reports the time.
+  reports the wall-clock and processor time; it fails only when both say the parse is slow (more than 90 s, and more
+  than 60 s of processor time per core), so a machine busy with other work does not fail it.
 * **Warnings.** 63 files have warnings, and all of them are genuine file defects:
   * channel sets pointing at wheel slots that do not exist (1269 in 34 files, mostly Robe prism macros);
   * channels whose geometry is outside the mode's tree;
@@ -243,6 +256,16 @@ template channels, so it does not count those instances.
   from their header. Geometry matrices whose last row is not `0,0,0,1` are made affine, and a namespaced
   description (not GDTF, but written by generic XML tools) is read by local names, both with a warning. A model file
   that its decoder cannot read only falls back to the primitive or a box, whatever the decoder throws.
+* **Linear resolution.** Every name lookup of the resolver is a dictionary lookup, built once per fixture type or
+  mode: mode masters, relations and macro values (with all their tolerant spellings), features, same-named geometries,
+  RDM personalities, and the attribute/wheel/emitter/… indexes, which used to be rebuilt for every mode. Function and
+  channel-set ranges skip equal starts directly, and a channel with tens of thousands of mutually exclusive functions
+  stops the exclusivity search after 2^20 skips (warning; the rest end at the next start). Descriptions of 2–4 MB
+  built to hit the old scans took 10 s to 3 minutes; they now take well under a second. Model files outside their
+  folder and 3DS texture files are found through an index of the archive's entries.
+* **Part paths.** Besides the per-path limit, all part paths of a build together are limited to 4 Mi characters (the
+  library's largest needs 113 000); a 50 kB description of a deep template instanced 800 times otherwise made the
+  paths alone take 800 MB.
 * **Hot path.** `FixtureGeometry.ComputeWorldTransforms` takes spans and allocates nothing per frame.
 
 ## Known gaps
