@@ -192,7 +192,7 @@ public static class ProjectMerge
 
             var layers = MapLayers(targetScene, source.Scene, options, out var addedLayers);
             var assetIds = MapAssets(target, source, options, out var plannedAssets);
-            var gdtfNames = MapGdtfs(target, source, options, issues, out var plannedGdtfs);
+            var gdtfNames = MapGdtfs(target, source, options, entityIds, issues, out var plannedGdtfs);
             var fixtureIds = options.RenumberFixtureIds ? PlanFixtureIds(targetScene, source.Scene) : null;
 
             // World transform the imported scene's root space ends up in (for world-space points in components).
@@ -306,7 +306,7 @@ public static class ProjectMerge
         }
 
         private static Dictionary<string, string> MapGdtfs(ProjectData target, ProjectData source, ProjectMergeOptions options,
-            List<Issue> issues, out List<(string Name, byte[] Data)> planned)
+            Dictionary<Guid, Guid> entityIds, List<Issue> issues, out List<(string Name, byte[] Data)> planned)
         {
             planned = new List<(string, byte[])>();
             var map = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -337,7 +337,7 @@ public static class ProjectMerge
                 planned.Add((renamed, data));
                 issues.Add(new Issue(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.MergeGdtfRenamed,
                     $"The imported fixture file '{name}' differs from the file of the same name in this project; it was added as '{renamed}'.",
-                    usage.EntitiesOf(name).ToArray()));
+                    usage.EntitiesOf(name).Select(id => entityIds[id]).ToArray()));
             }
             return map;
         }
