@@ -7,7 +7,7 @@ drawings or posters, GDTF files kept with a project — plus the built-in materi
 `IImageSource`. Third-party code: AssimpNet 5.0.0-beta1 (Assimp 5, BSD-3), SharpGLTF.Core (MIT), StbImageSharp and
 StbImageWriteSharp (public domain / MIT).
 
-`tests/Candela.Assets.Tests` (≈ 230 tests, well under a minute) writes every test file itself — OBJ+MTL+PNG, GLB/glTF
+`tests/Candela.Assets.Tests` (≈ 250 tests, about 15 s) writes every test file itself — OBJ+MTL+PNG, GLB/glTF
 built with SharpGLTF, COLLADA text, ASCII/binary STL, ASCII/binary PLY, 3DS, ASCII FBX, PNG/JPEG/TGA/BMP/HDR/GIF/PSD —
 and uses the repository's GDTF fixtures as a real-world corpus: `RealModelTests` imports 60 GLB and 80 3DS models
 written by many manufacturers' exporters and compares them with the sizes their description.xml declares (43 of 60

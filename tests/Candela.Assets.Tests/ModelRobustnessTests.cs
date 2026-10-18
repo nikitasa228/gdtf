@@ -209,6 +209,26 @@ public class ModelRobustnessTests
     }
 
     [Fact]
+    public void TruncatedBinaryStlKeepsTheCompleteTriangles()
+    {
+        var stl = TestFiles.BinaryStl(TestFiles.BoxTriangles(yUp: false));
+        var result = ModelImporter.Import("box.stl", stl[..(84 + 50 * 7 + 20)]);
+        Assert.Equal(7, result.TriangleCount);
+        Assert.Contains(result.Warnings, w => w.Contains("7 of 12 triangles", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData("solid box")]
+    [InlineData("solid box\n")]
+    [InlineData("solid box\nfacet normal 0 0 1\nouter loop\nvertex 0 0 0\nvertex 1 0 0\nvertex 0 1")]
+    public void TruncatedAsciiStlIsRejected(string stl)
+    {
+        // A bare "solid name" line crashed Assimp's STL reader.
+        var e = Assert.Throws<AssetImportException>(() => ModelImporter.Import("cut.stl", Encoding.ASCII.GetBytes(stl)));
+        Assert.Contains("no triangles", e.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void TruncatedAndCorruptedFbx3dsAndStlFilesDoNotCrash()
     {
         var fbx = Encoding.ASCII.GetBytes(TestFiles.AsciiFbx(zUp: false, unitScaleFactorCm: 1));

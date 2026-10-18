@@ -24,7 +24,16 @@ internal static class StlReader
         int invalid;
         if (IsBinary(data, out uint count)) invalid = ReadBinary(data, count, corners);
         else if (LooksLikeAscii(data)) invalid = ReadAscii(data, corners, ctx);
-        else throw new AssetImportException("The STL file is damaged: it is neither a complete binary STL nor ASCII STL text.");
+        else if (data.Length >= BinaryHeaderSize + BinaryTriangleSize && LooksLikeBinaryTriangles(data))
+        {
+            // A binary file whose triangle count does not match its size: truncated (partial download) or a wrong count.
+            uint available = (uint)((data.Length - BinaryHeaderSize) / BinaryTriangleSize);
+            ctx.Warn(count > available
+                ? $"The binary STL file is truncated: {available} of {count} triangles were read."
+                : $"The binary STL file declares {count} triangles but holds {available}; all {available} were read.");
+            invalid = ReadBinary(data, available, corners);
+        }
+        else throw new AssetImportException("The STL file is damaged: it is neither binary STL nor ASCII STL text.");
 
         if (invalid > 0) ctx.Warn($"{invalid} STL triangle(s) with invalid coordinates were skipped.");
         if (corners.Count == 0) throw new AssetImportException("The STL file contains no triangles.");
@@ -65,9 +74,31 @@ internal static class StlReader
         if (data.Length < BinaryHeaderSize) return false;
         count = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(80, 4));
         if ((long)count * BinaryTriangleSize + BinaryHeaderSize == data.Length) return true;
-        // Some exporters pad or append data; accept a binary file that holds at least the declared triangles when the
-        // header is clearly not ASCII.
+        // Some exporters append data after the triangles; accept a binary file that holds at least the declared
+        // triangles when the header is clearly not ASCII.
         return !LooksLikeAscii(data) && count > 0 && (long)count * BinaryTriangleSize + BinaryHeaderSize <= data.Length;
+    }
+
+    /// <summary>
+    /// True when the records after the header look like STL triangles: at least 90 % of the (up to 64) first records
+    /// have finite coordinates below 10⁷ in magnitude. Random or foreign data almost never does (a random float lies in
+    /// that range with a probability of about 18 %, and a record holds twelve).
+    /// </summary>
+    private static bool LooksLikeBinaryTriangles(byte[] data)
+    {
+        int records = System.Math.Min(64, (data.Length - BinaryHeaderSize) / BinaryTriangleSize), plausible = 0;
+        for (int t = 0; t < records; t++)
+        {
+            var s = data.AsSpan(BinaryHeaderSize + t * BinaryTriangleSize, 48);
+            bool ok = true;
+            for (int k = 0; k < 12 && ok; k++)
+            {
+                float v = F(s, 4 * k);
+                ok = float.IsFinite(v) && MathF.Abs(v) < 1e7f && (v == 0 || MathF.Abs(v) > 1e-30f);
+            }
+            if (ok) plausible++;
+        }
+        return records > 0 && plausible >= records * 0.9;
     }
 
     private static bool LooksLikeAscii(byte[] data)
