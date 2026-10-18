@@ -98,7 +98,7 @@ internal sealed class IssuesPanel : Panel
         var (icon, color) = SeverityStyle(issue.Severity);
         ImGui.TextColored(color, icon);
         ImGui.TableNextColumn();
-        ImGui.TextDisabled(issue.Category);
+        ImGui.TextDisabled(CategoryLabel(issue.Category));
         ImGui.TableNextColumn();
         if (ImGui.Selectable(issue.Message, _selected == index, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
         {
@@ -106,10 +106,16 @@ internal sealed class IssuesPanel : Panel
             SelectRelated(issue);
         }
 
-        if (ImGui.IsItemHovered() && issue.Entities.Count > 0)
-            ImGui.SetTooltip(Loc.Format(Str.IssuesRelatedObjects, issue.Code, issue.Entities.Count));
-        else if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(issue.Code);
+        if (ImGui.IsItemHovered())
+        {
+            // The message column cuts long messages: the tooltip shows the whole text and the issue code.
+            ImGui.BeginTooltip();
+            ImGui.PushTextWrapPos(ImGui.GetFontSize() * 36f);
+            ImGui.TextUnformatted(issue.Message);
+            ImGui.PopTextWrapPos();
+            ImGui.TextDisabled(issue.Entities.Count > 0 ? Loc.Format(Str.IssuesRelatedObjects, issue.Code, issue.Entities.Count) : issue.Code);
+            ImGui.EndTooltip();
+        }
         ImGui.PopID();
     }
 
@@ -133,13 +139,13 @@ internal sealed class IssuesPanel : Panel
         ImGui.SameLine();
         float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
         ImGui.SetNextItemWidth(150 * scale);
-        string current = _categoryIndex < 0 || _categoryIndex >= _categories.Count ? Loc.Get(Str.IssuesAllCategories) : _categories[_categoryIndex];
+        string current = _categoryIndex < 0 || _categoryIndex >= _categories.Count ? Loc.Get(Str.IssuesAllCategories) : CategoryLabel(_categories[_categoryIndex]);
         if (ImGui.BeginCombo("##category", current))
         {
             if (ImGui.Selectable(Loc.Get(Str.IssuesAllCategories), _categoryIndex < 0))
                 _categoryIndex = -1;
             for (int i = 0; i < _categories.Count; i++)
-                if (ImGui.Selectable(_categories[i], _categoryIndex == i))
+                if (ImGui.Selectable(CategoryLabel(_categories[i]), _categoryIndex == i))
                     _categoryIndex = i;
             ImGui.EndCombo();
         }
@@ -219,6 +225,19 @@ internal sealed class IssuesPanel : Panel
         IssueSeverity.Error => (mask & 1) != 0,
         IssueSeverity.Warning => (mask & 2) != 0,
         _ => (mask & 4) != 0,
+    };
+
+    /// <summary>Localised name of an issue category (Core <see cref="IssueCategory"/>); unknown categories as they are.</summary>
+    public static string CategoryLabel(string category) => category switch
+    {
+        IssueCategory.Rigging => Loc.Get(Str.IssueCategoryRigging),
+        IssueCategory.Power => Loc.Get(Str.IssueCategoryPower),
+        IssueCategory.Data => Loc.Get(Str.IssueCategoryData),
+        IssueCategory.Patch => Loc.Get(Str.IssueCategoryPatch),
+        IssueCategory.Scene => Loc.Get(Str.IssueCategoryScene),
+        IssueCategory.Fixture => Loc.Get(Str.IssueCategoryFixture),
+        IssueCategory.Program => Loc.Get(Str.IssueCategoryProgram),
+        _ => category,
     };
 
     /// <summary>Icon and colour of a severity.</summary>

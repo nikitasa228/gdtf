@@ -157,6 +157,13 @@ internal enum Str
     // Issues
     IssuesSearch,
     IssuesAllCategories,
+    IssueCategoryRigging,
+    IssueCategoryPower,
+    IssueCategoryData,
+    IssueCategoryPatch,
+    IssueCategoryScene,
+    IssueCategoryFixture,
+    IssueCategoryProgram,
     IssuesNone,
     IssueSeverityError,
     IssueSeverityWarning,

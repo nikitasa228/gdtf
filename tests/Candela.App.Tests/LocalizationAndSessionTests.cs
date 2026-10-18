@@ -123,6 +123,21 @@ public sealed partial class LocalizationTests : IDisposable
     }
 
     [Fact]
+    public void Every_core_issue_category_is_translated()
+    {
+        var categories = typeof(IssueCategory).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Where(f => f.IsLiteral && f.FieldType == typeof(string)).Select(f => (string)f.GetRawConstantValue()!).ToList();
+        Assert.NotEmpty(categories);
+        foreach (var category in categories)
+            Assert.Equal(category, Candela.App.Panels.IssuesPanel.CategoryLabel(category));
+        Loc.SetLanguage("ru");
+        foreach (var category in categories)
+            Assert.NotEqual(category, Candela.App.Panels.IssuesPanel.CategoryLabel(category));
+        Assert.Equal("Программа", Candela.App.Panels.IssuesPanel.CategoryLabel(IssueCategory.Program));
+        Assert.Equal("Custom", Candela.App.Panels.IssuesPanel.CategoryLabel("Custom")); // unknown categories as they are
+    }
+
+    [Fact]
     public void Format_uses_invariant_numbers()
     {
         Assert.Equal("60 fps", Loc.Format(Str.ViewportFps, 59.7));

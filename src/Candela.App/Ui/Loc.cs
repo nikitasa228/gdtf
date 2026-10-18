@@ -209,6 +209,13 @@ internal static class Loc
 
         (Str.IssuesSearch, "Search issues…", "Поиск проблем…"),
         (Str.IssuesAllCategories, "All categories", "Все категории"),
+        (Str.IssueCategoryRigging, "Rigging", "Подвес"),
+        (Str.IssueCategoryPower, "Power", "Питание"),
+        (Str.IssueCategoryData, "Data", "Данные"),
+        (Str.IssueCategoryPatch, "Patch", "Патч"),
+        (Str.IssueCategoryScene, "Scene", "Сцена"),
+        (Str.IssueCategoryFixture, "Fixture", "Прибор"),
+        (Str.IssueCategoryProgram, "Program", "Программа"),
         (Str.IssuesNone, "No issues — everything looks fine.", "Проблем нет — всё в порядке."),
         (Str.IssueSeverityError, "Errors", "Ошибки"),
         (Str.IssueSeverityWarning, "Warnings", "Предупреждения"),
