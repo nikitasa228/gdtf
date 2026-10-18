@@ -11,6 +11,13 @@ the selection and beam outlines, reference drawings and the lux, noise and cable
 tracer (see [Stage 3](#stage-3)). Everything stays in cd/m² (pre-exposed in the HDR image) and agrees with the CPU
 photometry of `Candela.Photometry` (`LightMeter`, `Acoustics`, `BlackbodyRadiator`).
 
+| Full view, haze 0.05 1/m, ray-traced GI | Lux overlay | Noise overlay |
+|---|---|---|
+| ![full](images/render-stage2-haze.png) | ![lux](images/render-stage2-lux.png) | ![noise](images/render-stage2-noise.png) |
+
+`candela render-test --width 960 --height 540 --haze 0.05 --indirect raytraced --overlays` on lavapipe (software
+Vulkan), the built-in procedural test scene.
+
 ```
 src/Candela.Rendering.Vulkan
   Core/         VulkanContext (+ options, device selection, capabilities), VulkanSwapchain, FrameScheduler,
