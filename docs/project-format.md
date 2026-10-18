@@ -214,7 +214,7 @@ codes and the related entity ids, so clicking an issue selects the affected obje
 | an asset file missing | asset not loaded | `project.asset-missing` |
 | an asset file damaged (unreadable entry, wrong size or SHA-256, over the size limit) | asset not loaded | `project.asset-corrupt` |
 | a model companion missing or damaged | model loads without it | `project.asset-companion-missing` |
-| `fixtures/index.json` missing or damaged | GDTFs recovered from `fixtures/*.gdtf` | `project.gdtf-index-invalid` |
+| `fixtures/index.json` missing or damaged, or one record unusable | GDTFs recovered from `fixtures/*.gdtf`, matched to the names the fixtures use (also names that were made safe for storing) | `project.gdtf-index-invalid` |
 | a GDTF file missing / damaged | skipped (the fixture library must supply it) | `project.gdtf-missing` / `project.gdtf-corrupt` |
 | fixtures use a GDTF the project does not hold | note | `project.gdtf-not-embedded` |
 | thumbnail not a PNG | ignored | `project.thumbnail-invalid` |

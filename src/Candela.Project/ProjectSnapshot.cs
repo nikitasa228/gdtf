@@ -29,7 +29,7 @@ public sealed class ProjectSnapshot
         Options = options;
         Settings = project.Settings.Snapshot();
         Assets = project.Assets.Entries;
-        Thumbnail = project.Thumbnail;
+        Thumbnail = project.Thumbnail?.ToArray(); // the app may render the next preview into the same buffer while this is written
 
         var kept = new List<KeptAsset>(project.KeptAssetsMutable.Count);
         foreach (var k in project.KeptAssetsMutable.Values)

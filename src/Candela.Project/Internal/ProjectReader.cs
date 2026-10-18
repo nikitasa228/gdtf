@@ -760,9 +760,11 @@ internal static class ProjectReader
     private static void ReadFixtures(ArchiveAccess access, ProjectData project, ProjectLoadOptions options, IssueCollector issues)
     {
         var usage = ProjectData.CollectGdtfSpecs(project.Scene);
+        var attempted = new Dictionary<string, byte[]?>(StringComparer.Ordinal); // entry → its valid bytes, null when unusable
         foreach (var record in ReadFixtureIndex(access, issues))
         {
             var related = usage.EntitiesOf(record.Name);
+            attempted.TryAdd(record.Entry, null);
             if (project.GdtfFiles.ContainsKey(record.Name))
             {
                 issues.Add(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.GdtfIndexInvalid,
@@ -794,15 +796,46 @@ internal static class ProjectReader
                 continue;
             }
             project.GdtfFiles[record.Name] = data;
+            attempted[record.Entry] = data;
         }
 
         foreach (var name in usage.Keys)
         {
             if (project.FindGdtf(name) is not null) continue;
             var related = usage.EntitiesOf(name);
+            if (RecoverGdtf(access, name, attempted) is { } recovered)
+            {
+                // The record was damaged or the list rebuilt from file names, but the file is where the writer puts it.
+                project.GdtfFiles[name] = recovered.Data;
+                issues.Add(IssueSeverity.Warning, IssueCategory.Fixture, ProjectIssueCodes.GdtfIndexInvalid,
+                    $"'{name}' had no usable record in fixtures/index.json; its file was recovered from {recovered.Entry}.", related);
+                continue;
+            }
             issues.Add(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.GdtfNotEmbedded,
                 $"'{name}' (used by {related.Count} fixture(s)) is not stored in the project; it has to come from the fixture library.", related);
         }
+    }
+
+    /// <summary>
+    /// The GDTF stored for <paramref name="name"/> under the entry name the writer gives it
+    /// (<c>fixtures/{safe name}.gdtf</c>), when that entry is a valid GDTF and not a file whose record failed.
+    /// </summary>
+    private static (string Entry, byte[] Data)? RecoverGdtf(ArchiveAccess access, string name, Dictionary<string, byte[]?> attempted)
+    {
+        var file = ArchivePaths.SafeSegment(name, "fixture");
+        if (!file.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase)) file += ".gdtf";
+        var entry = ArchivePaths.FixturesFolder + file;
+        if (attempted.TryGetValue(entry, out var known)) return known is null ? null : (entry, known);
+        try
+        {
+            var data = access.Read(entry);
+            attempted[entry] = data is not null && GdtfCheck.Validate(data) is null ? data : null;
+        }
+        catch (EntryReadException)
+        {
+            attempted[entry] = null;
+        }
+        return attempted[entry] is { } bytes ? (entry, bytes) : null;
     }
 
     private static List<FixtureRecord> ReadFixtureIndex(ArchiveAccess access, IssueCollector issues)
