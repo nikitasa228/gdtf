@@ -113,7 +113,7 @@ public sealed class PressureSolverTests(ITestOutputHelper output)
         var sim = new SmokeSimulation(new SmokeSimulationSettings
         {
             Bounds = new Aabb(new Vector3(-2f, -2f, 0f), new Vector3(2f, 2f, 4f)),
-            CellSize = 0.125f,
+            CellSize = 4f / 24f,
             OpenFaces = open,
             DissipationPerSecond = 0f,
             TemperatureRelaxationRate = 0f,
