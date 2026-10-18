@@ -237,6 +237,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     }
 
     /// <inheritdoc/>
+    public void ShowViewportSettings() => FocusPanel(_preview);
+
+    /// <inheritdoc/>
     public void SuspendShortcuts(bool suspended) => _dispatcher.Suspended = suspended || _settingsWindow.IsCapturing;
 
     /// <summary>The viewport View-menu commands act on.</summary>

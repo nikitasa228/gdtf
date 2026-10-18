@@ -109,6 +109,7 @@ internal enum Str
     ShadingWireframe,
     ShadingColorless,
     ShadingFull,
+    ViewportSettings,
     ProjectionPerspective,
     ProjectionOrthographic,
     OverlayNone,

@@ -63,6 +63,9 @@ internal interface IViewportHost
 
     /// <summary>Stops shortcuts while flying with W/A/S/D.</summary>
     void SuspendShortcuts(bool suspended);
+
+    /// <summary>Opens and focuses the real-time quality settings of the viewports (the Preview panel).</summary>
+    void ShowViewportSettings();
 }
 
 /// <summary>
@@ -618,6 +621,10 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
             for (int i = 0; i < ShadingModes.Length; i++)
                 if (ImGui.Selectable(_labels.ShadingFull[i], shading == i))
                     View.Shading = ShadingModes[i];
+            // The settings of the Full mode live in their own window (requirement: "параметры вьюпорта").
+            ImGui.Separator();
+            if (ImGui.Selectable(_labels.ViewportSettings))
+                _host.ShowViewportSettings();
             ImGui.EndCombo();
         }
 
@@ -836,6 +843,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         public string OrthographicTooltip { get; private set; } = "";
         public string ShadingTooltip { get; private set; } = "";
         public string OverlayTooltip { get; private set; } = "";
+        public string ViewportSettings { get; private set; } = "";
 
         public void Refresh()
         {
@@ -852,6 +860,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
             OrthographicTooltip = $"{Loc.Get(Str.ViewProjection)}: {Loc.Get(Str.ProjectionOrthographic)}";
             ShadingTooltip = Loc.Get(Str.ViewShading);
             OverlayTooltip = Loc.Get(Str.ViewOverlay);
+            ViewportSettings = $"{Icons.Sliders}  {Loc.Get(Str.ViewportSettings)}";
             _snappedPersp = ViewCube.AllViews.Select(v => $"{FaceLabel(v)} · {PerspectiveShort}").ToArray();
             _snappedOrtho = ViewCube.AllViews.Select(v => $"{FaceLabel(v)} · {OrthographicShort}").ToArray();
         }

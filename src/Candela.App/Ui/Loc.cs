@@ -163,6 +163,7 @@ internal static class Loc
         (Str.ShadingWireframe, "Wireframe", "Каркас"),
         (Str.ShadingColorless, "Colorless", "Без цвета"),
         (Str.ShadingFull, "Full", "Полный"),
+        (Str.ViewportSettings, "Viewport Settings…", "Параметры вьюпорта…"),
         (Str.ProjectionPerspective, "Perspective", "Перспектива"),
         (Str.ProjectionOrthographic, "Orthographic", "Ортография"),
         (Str.OverlayNone, "No Overlay", "Без оверлея"),
