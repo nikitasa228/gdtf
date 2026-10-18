@@ -1,5 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="../../src/Candela.Engine/Candela.Engine.csproj" />
+    <!-- The CLI (render, import worker) and the Vulkan renderer are exercised end to end. -->
+    <ProjectReference Include="../../src/Candela.Cli/Candela.Cli.csproj" />
+    <ProjectReference Include="../../src/Candela.Rendering.Vulkan/Candela.Rendering.Vulkan.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
