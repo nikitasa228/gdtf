@@ -468,6 +468,68 @@ public sealed class ReviewProbeTests
     }
 }
 
+public sealed class ReviewBeamProbes
+{
+    private readonly Xunit.Abstractions.ITestOutputHelper _out;
+
+    public ReviewBeamProbes(Xunit.Abstractions.ITestOutputHelper output) => _out = output;
+
+    [SkippableTheory]
+    [InlineData(true, 16)]
+    [InlineData(true, 0)]
+    [InlineData(false, 16)]
+    public void LookingUpTheBeamMatchesTheIntegral(bool narrow, int maxRaymarched)
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var light = narrow
+                ? StageScene.Spot(new Vector3(0f, 0f, 4f), Vector3.Zero, 40000f, 8f, 12f, shadows: false)
+                : StageScene.Spot(new Vector3(0f, 0f, 4f), Vector3.Zero, 10000f, 40f, 60f, shadows: false);
+            var eye = narrow ? new Vector3(0f, -0.1f, 1f) : new Vector3(0f, -0.5f, 1f);
+            var look = narrow ? new Vector3(0f, 0.3f, 3.5f) : new Vector3(0f, 0.4f, 3.5f);
+            renderer.World.SetLights(new[] { light });
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0.02f, Anisotropy = 0.7f });
+            using var target = renderer.CreateTarget(160, 120);
+            var camera = RenderCamera.LookAt(eye, look, 40f);
+            camera.Ev100 = 6f;
+            var settings = new PreviewSettings { TemporalAccumulation = false, VolumetricSlices = 128, Bloom = false, MaxRaymarchedBeams = maxRaymarched };
+            renderer.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, settings, 1f / 60f);
+            var hdr = renderer.ReadHdr(target);
+            float measured = 0.25f * (hdr.LuminanceAt(79, 59) + hdr.LuminanceAt(80, 59) + hdr.LuminanceAt(79, 60) + hdr.LuminanceAt(80, 60));
+            var direction = Vector3.Normalize(look - eye);
+            var beam = BeamDistribution.Create(light.BeamType, light.BeamAngle, light.FieldAngle);
+            double sum = 0;
+            const int steps = 400000;
+            const double length = 60;
+            double dl = length / steps;
+            for (int i = 0; i < steps; i++)
+            {
+                double l = (i + 0.5) * dl;
+                var x = eye + direction * (float)l;
+                var toPoint = x - light.Position;
+                float r = toPoint.Length();
+                float theta = MathF.Atan2(Vector3.Cross(light.Direction, toPoint).Length(), Vector3.Dot(light.Direction, toPoint));
+                float intensity = light.PeakCandela * beam.Relative(theta);
+                if (intensity <= 0f)
+                    continue;
+                float cos = Vector3.Dot(toPoint / r, -direction);
+                double g = 0.7;
+                double phase = (1 - g * g) / (4 * Math.PI * Math.Pow(1 + g * g - 2 * g * cos, 1.5));
+                sum += 0.02 * phase * intensity * Math.Exp(-0.02 * r) / (r * r) * Math.Exp(-0.02 * l) * dl;
+            }
+
+            _out.WriteLine($"narrow {narrow}, raymarched {renderer.LastStatistics.RaymarchedBeams}: measured {measured:F3}, reference {sum:F3}, ratio {measured / sum:F3}");
+            ImageFiles.WritePng(renderer.ReadPixels(target), Path.Combine(TestRenderers.OutputDirectory, $"up-beam-{narrow}-{maxRaymarched}.png"));
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+}
+
 public sealed class ReviewExperiments
 {
     private readonly Xunit.Abstractions.ITestOutputHelper _out;

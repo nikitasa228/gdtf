@@ -323,6 +323,47 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         PassSetLayout = default;
     }
 
+    /// <summary>Storage images, combined image samplers and storage buffers of set 2 (<see cref="CreatePassSetLayout"/>).</summary>
+    internal const uint PassSetStorageImages = 3;
+
+    /// <inheritdoc cref="PassSetStorageImages"/>
+    internal const uint PassSetSampledImages = 3;
+
+    /// <inheritdoc cref="PassSetStorageImages"/>
+    internal const uint PassSetStorageBuffers = 1;
+
+    /// <summary>Storage buffers of set 0 (materials, instances, material slots, lights; the set has update-after-bind).</summary>
+    internal const uint SceneSetStorageBuffers = 4;
+
+    /// <summary>
+    /// Descriptors of sets 1 and 2 (created without update-after-bind) that one shader stage can access — what the
+    /// shared pipeline layout needs from the device's per-stage and per-set limits besides the bindless textures and
+    /// the storage buffers of set 0 (checked when the device is chosen; the bindless array is sized to leave room for
+    /// them under the update-after-bind limits).
+    /// </summary>
+    internal static void ViewAndPassDescriptors(out uint sampledImages, out uint storageBuffers, out uint storageImages, out uint uniformBuffers)
+    {
+        sampledImages = PassSetSampledImages;
+        storageBuffers = PassSetStorageBuffers;
+        storageImages = PassSetStorageImages;
+        uniformBuffers = 0;
+        for (uint b = 0; b < ShaderConstants.ViewBindingCount; b++)
+        {
+            switch (ViewBindingType(b))
+            {
+                case DescriptorType.CombinedImageSampler:
+                    sampledImages++;
+                    break;
+                case DescriptorType.StorageBuffer:
+                    storageBuffers++;
+                    break;
+                case DescriptorType.UniformBuffer:
+                    uniformBuffers++;
+                    break;
+            }
+        }
+    }
+
     /// <summary>Descriptor type of a set-1 binding.</summary>
     public static DescriptorType ViewBindingType(uint binding) => binding switch
     {
@@ -356,6 +397,7 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         const ShaderStageFlags stages = ShaderStageFlags.ComputeBit | ShaderStageFlags.FragmentBit;
         var bindings = stackalloc DescriptorSetLayoutBinding[8];
         uint n = 0;
+        // Counted by ViewAndPassDescriptors (PassSet* constants).
         bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, 1, stages);
         bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassStorage1, DescriptorType.StorageImage, 1, stages);
         bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassStorage2, DescriptorType.StorageImage, 1, stages);

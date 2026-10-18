@@ -649,6 +649,8 @@ public sealed unsafe class VulkanContext : IDisposable
                 missing.Add("scalarBlockLayout");
         }
 
+        if (api13)
+            CheckLimits(probe);
         if (probe.QueueFamily < 0)
             missing.Add(PresentationSurface != 0 ? "a graphics+compute queue that can present to the surface" : "a graphics+compute queue");
         if (wantSwapchain && !probe.Extensions.Contains(KhrSwapchain.ExtensionName))
@@ -663,6 +665,61 @@ public sealed unsafe class VulkanContext : IDisposable
         }
 
         return probe;
+    }
+
+    /// <summary>
+    /// Adds the limits the renderer exceeds to <see cref="DeviceProbe.Missing"/>: sets 1 and 2 of the pipeline layout
+    /// (no update-after-bind) against the per-stage and per-set descriptor limits, every set against the
+    /// update-after-bind limits with room for at least 64 bindless textures, and the compute work-group size. Desktop
+    /// GPUs have far more; this keeps a device below the requirements from being chosen (invalid pipelines) instead of
+    /// failing later.
+    /// </summary>
+    private static void CheckLimits(DeviceProbe probe)
+    {
+        PipelineLibrary.ViewAndPassDescriptors(out uint sampled, out uint storageBuffers, out uint storageImages, out uint uniforms);
+        var limits = probe.Properties.Limits;
+        var p12 = probe.Properties12;
+        var missing = probe.Missing;
+        void Need(uint limit, uint needed, string name)
+        {
+            if (limit < needed)
+                missing.Add($"{name} >= {needed} (device: {limit})");
+        }
+
+        Need(limits.MaxBoundDescriptorSets, 3, "maxBoundDescriptorSets");
+        Need(limits.MaxPerStageDescriptorSamplers, sampled, "maxPerStageDescriptorSamplers");
+        Need(limits.MaxPerStageDescriptorSampledImages, sampled, "maxPerStageDescriptorSampledImages");
+        Need(limits.MaxPerStageDescriptorStorageBuffers, storageBuffers, "maxPerStageDescriptorStorageBuffers");
+        Need(limits.MaxPerStageDescriptorStorageImages, storageImages, "maxPerStageDescriptorStorageImages");
+        Need(limits.MaxPerStageDescriptorUniformBuffers, uniforms, "maxPerStageDescriptorUniformBuffers");
+        Need(limits.MaxDescriptorSetSamplers, sampled, "maxDescriptorSetSamplers");
+        Need(limits.MaxDescriptorSetSampledImages, sampled, "maxDescriptorSetSampledImages");
+        Need(limits.MaxDescriptorSetStorageBuffers, storageBuffers, "maxDescriptorSetStorageBuffers");
+        Need(limits.MaxDescriptorSetStorageImages, storageImages, "maxDescriptorSetStorageImages");
+        uint scene = PipelineLibrary.SceneSetStorageBuffers;
+        Need(p12.MaxPerStageDescriptorUpdateAfterBindStorageBuffers, scene + storageBuffers, "maxPerStageDescriptorUpdateAfterBindStorageBuffers");
+        Need(p12.MaxDescriptorSetUpdateAfterBindStorageBuffers, scene + storageBuffers, "maxDescriptorSetUpdateAfterBindStorageBuffers");
+        Need(BindlessTextureLimit(p12, sampled), 64, "update-after-bind sampled images for bindless textures");
+
+        // Work groups of 256 invocations (16 x 16 histogram tiles, one virtual-point-light group per light).
+        Need(limits.MaxComputeWorkGroupInvocations, 256, "maxComputeWorkGroupInvocations");
+        Need(limits.MaxComputeWorkGroupSize[0], 256, "maxComputeWorkGroupSize.x");
+    }
+
+    /// <summary>
+    /// Bindless textures the scene set may declare: what the update-after-bind limits (which count the descriptors of
+    /// every set of the pipeline layout) leave after the <paramref name="otherSampled"/> sampled images of sets 1 and
+    /// 2, keeping 64 resources in reserve, at most 16384.
+    /// </summary>
+    private static uint BindlessTextureLimit(in PhysicalDeviceVulkan12Properties p12, uint otherSampled)
+    {
+        static uint Minus(uint limit, uint reserved) => limit > reserved ? limit - reserved : 0u;
+        uint bindless = Math.Min(Minus(p12.MaxPerStageDescriptorUpdateAfterBindSampledImages, otherSampled),
+            Minus(p12.MaxPerStageDescriptorUpdateAfterBindSamplers, otherSampled));
+        bindless = Math.Min(bindless, Minus(p12.MaxDescriptorSetUpdateAfterBindSampledImages, otherSampled));
+        bindless = Math.Min(bindless, Minus(p12.MaxDescriptorSetUpdateAfterBindSamplers, otherSampled));
+        bindless = Math.Min(bindless, Minus(p12.MaxPerStageUpdateAfterBindResources, 64));
+        return Math.Min(bindless, 16384u);
     }
 
     private void CreateDevice(DeviceProbe probe, VulkanContextOptions options, bool wantSwapchain)
@@ -756,9 +813,8 @@ public sealed unsafe class VulkanContext : IDisposable
         var props = probe.Properties;
         var props12 = probe.Properties12;
         var limits = props.Limits;
-        uint bindless = Math.Min(props12.MaxDescriptorSetUpdateAfterBindSampledImages, props12.MaxPerStageDescriptorUpdateAfterBindSampledImages);
-        bindless = Math.Min(bindless, props12.MaxPerStageUpdateAfterBindResources > 64 ? props12.MaxPerStageUpdateAfterBindResources - 64 : 0);
-        bindless = Math.Min(bindless, 16384u);
+        PipelineLibrary.ViewAndPassDescriptors(out uint viewSampled, out _, out _, out _);
+        uint bindless = BindlessTextureLimit(props12, viewSampled);
         var uuidBytes = new byte[16];
         for (int i = 0; i < 16; i++)
             uuidBytes[i] = props.PipelineCacheUuid[i];

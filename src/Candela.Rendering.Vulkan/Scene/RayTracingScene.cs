@@ -81,9 +81,10 @@ internal sealed unsafe class RayTracingScene : IDisposable
 
         if (builtBlas)
         {
-            // Bottom-level builds finish before the top-level build reads them.
+            // Bottom-level builds finish before the top-level build reads them, and their memory is made visible to
+            // the ray queries that traverse them (through the TLAS) in compute shaders of this and later frames.
             barriers.AddGlobal(PipelineStageFlags2.AccelerationStructureBuildBitKhr, AccessFlags2.AccelerationStructureWriteBitKhr,
-                PipelineStageFlags2.AccelerationStructureBuildBitKhr, AccessFlags2.AccelerationStructureReadBitKhr);
+                PipelineStageFlags2.AccelerationStructureBuildBitKhr | PipelineStageFlags2.ComputeShaderBit, AccessFlags2.AccelerationStructureReadBitKhr);
             barriers.Flush();
         }
 
