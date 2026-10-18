@@ -111,7 +111,7 @@ public sealed class ProjectSettings : IReadOnlyDictionary<string, JsonElement>
     }
 
     /// <summary>Raw JSON text of a section (compact), or null when it does not exist.</summary>
-    public string? GetJson(string name) => _sections.TryGetValue(name, out var e) ? e.GetRawText() : null;
+    public string? GetJson(string name) => _sections.TryGetValue(name, out var e) ? JsonSerializer.Serialize(e, CandelaJson.CompactOptions) : null;
 
     /// <summary>A copy of all sections (elements are immutable and shared).</summary>
     public IReadOnlyDictionary<string, JsonElement> Snapshot() => new Dictionary<string, JsonElement>(_sections, StringComparer.Ordinal);
