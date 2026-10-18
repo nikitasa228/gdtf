@@ -12,8 +12,19 @@ public class CatalogTests
         var catalog = CableCatalog.Default;
         string[] ids =
         [
-            "dmx-xlr3", "dmx-xlr5", "ethernet", "powercon", "powercon-true1", "powercon-true1-top", "schuko", "iec", "cee16",
-            "cee32-3p", "cee63-3p", "socapex", "harting16",
+            "dmx-xlr3",
+            "dmx-xlr5",
+            "ethernet",
+            "powercon",
+            "powercon-true1",
+            "powercon-true1-top",
+            "schuko",
+            "iec",
+            "cee16",
+            "cee32-3p",
+            "cee63-3p",
+            "socapex",
+            "harting16",
         ];
         Assert.Equal(ids, catalog.All.Select(t => t.Id));
         foreach (var t in catalog.All)
@@ -139,8 +150,12 @@ public class CatalogTests
         var true1 = CableCatalog.Default.Find("powercon-true1")!;
         var powerIn = new Port
         {
-            Name = "Power In", Direction = PortDirection.Input, Signal = SignalKind.Power, Connector = ConnectorCatalog.Resolve("powerCON TRUE1 TOP"),
-            Role = PortRole.PowerIn, Origin = PortOrigin.Specs,
+            Name = "Power In",
+            Direction = PortDirection.Input,
+            Signal = SignalKind.Power,
+            Connector = ConnectorCatalog.Resolve("powerCON TRUE1 TOP"),
+            Role = PortRole.PowerIn,
+            Origin = PortOrigin.Specs,
         };
         Assert.Equal(ConnectorMatch.Incompatible, ConnectorCompatibility.Check(dmx, powerIn).Match);
         Assert.Equal(ConnectorMatch.Compatible, ConnectorCompatibility.Check(true1, powerIn).Match);

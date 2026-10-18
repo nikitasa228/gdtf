@@ -179,7 +179,9 @@ public class PowerNetworkTests
         var gen = kit.Source("Generator", new Vector3(-10, -10, 0), phases: 3, outlets: SceneKit.Outlet("CEE 63", "CEE 63A 3P", 63f));
         var distro = kit.Source("Distro", new Vector3(0, -5, 0), phases: 3, outlets:
         [
-            SceneKit.Outlet("L1", "powerCON TRUE1", 16f, 1), SceneKit.Outlet("L2", "powerCON TRUE1", 16f, 2), SceneKit.Outlet("L3", "powerCON TRUE1", 16f, 3),
+            SceneKit.Outlet("L1", "powerCON TRUE1", 16f, 1),
+            SceneKit.Outlet("L2", "powerCON TRUE1", 16f, 2),
+            SceneKit.Outlet("L3", "powerCON TRUE1", 16f, 3),
         ]);
         kit.Cable("cee63-3p", "Main", (gen, "CEE 63"), (distro, PortResolver.MainsInPortName));
         var l1 = Aecos(kit, 2);

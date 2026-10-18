@@ -23,9 +23,11 @@ public static class ConnectorCatalog
         Power("powerCON", "Neutrik powerCON", "powerCON", 20f, 3, "connector-powercon",
             "powercon", "power con", "neutrik powercon", "nac3"),
         Power("powerCON blue", "powerCON blue (power in)", "powerCON", 20f, 3, "connector-powercon-blue",
-            "PowerConBlue", "powercon in", "NAC3FCA", "NAC3MPA", "NAC3MPA-1", "NAC3FCA blue") with { Keying = PowerconKeying.Blue },
+            "PowerConBlue", "powercon in", "NAC3FCA", "NAC3MPA", "NAC3MPA-1", "NAC3FCA blue") with
+        { Keying = PowerconKeying.Blue },
         Power("powerCON grey", "powerCON grey (power out)", "powerCON", 20f, 3, "connector-powercon-grey",
-            "PowerConGrey", "powercon gray", "PowerConWhite", "powercon out", "NAC3FCB", "NAC3MPB", "NAC3MPB-1") with { Keying = PowerconKeying.Grey },
+            "PowerConGrey", "powercon gray", "PowerConWhite", "powercon out", "NAC3FCB", "NAC3MPB", "NAC3MPB-1") with
+        { Keying = PowerconKeying.Grey },
 
         // ---- powerCON TRUE1 (16 A, mates under load); TRUE1 TOP is the IP65 version and mates TRUE1
         Power("powerCON TRUE1", "Neutrik powerCON TRUE1", "powerCON TRUE1", 16f, 3, "connector-true1",
@@ -45,23 +47,38 @@ public static class ConnectorCatalog
         Power("CEE 32A", "CEE 32 A 230 V (3-pin)", "CEE 32A", 32f, 3, "connector-cee32",
             "CEE32", "CEE 32 A", "CEE 32A 1P", "CEE 32A 3-pin", "CEE 32A 230V"),
         Power("CEE 16A 3P", "CEE 16 A 400 V (5-pin)", "CEE 16A 3P", 16f, 5, "connector-cee16-3p",
-            "CEE16 3P", "CEE 16A 5P", "CEE 16A 5-pin", "CEE 16A 400V", "cee16-3p") with { Phases = 3 },
+            "CEE16 3P", "CEE 16A 5P", "CEE 16A 5-pin", "CEE 16A 400V", "cee16-3p") with
+        { Phases = 3 },
         Power("CEE 32A 3P", "CEE 32 A 400 V (5-pin)", "CEE 32A 3P", 32f, 5, "connector-cee32-3p",
-            "CEE32 3P", "CEE 32A 5P", "CEE 32A 5-pin", "CEE 32A 400V", "cee32-3p") with { Phases = 3 },
+            "CEE32 3P", "CEE 32A 5P", "CEE 32A 5-pin", "CEE 32A 400V", "cee32-3p") with
+        { Phases = 3 },
         Power("CEE 63A 3P", "CEE 63 A 400 V (5-pin)", "CEE 63A 3P", 63f, 5, "connector-cee63-3p",
-            "CEE63", "CEE 63A", "CEE63 3P", "CEE 63A 5P", "CEE 63A 5-pin", "CEE 63A 400V", "cee63-3p") with { Phases = 3 },
+            "CEE63", "CEE 63A", "CEE63 3P", "CEE 63A 5P", "CEE 63A 5-pin", "CEE 63A 400V", "cee63-3p") with
+        { Phases = 3 },
 
         // ---- multicores (6 circuits)
         new ConnectorInfo
         {
-            Id = "Socapex", DisplayName = "Socapex 19-pin (6 circuits)", Family = "Socapex", Domain = ConnectorDomain.Multicore,
-            RatedCurrentA = 16f, Pins = 19, Circuits = 6, IllustrationKey = "connector-socapex",
+            Id = "Socapex",
+            DisplayName = "Socapex 19-pin (6 circuits)",
+            Family = "Socapex",
+            Domain = ConnectorDomain.Multicore,
+            RatedCurrentA = 16f,
+            Pins = 19,
+            Circuits = 6,
+            IllustrationKey = "connector-socapex",
             Aliases = ["Socapex 19", "Socapex 19-pin", "LSC19", "19-pin", "Socapex 19 pin", "socapex19"],
         },
         new ConnectorInfo
         {
-            Id = "Harting 16", DisplayName = "Harting Han 16E (6 circuits)", Family = "Harting 16", Domain = ConnectorDomain.Multicore,
-            RatedCurrentA = 16f, Pins = 16, Circuits = 6, IllustrationKey = "connector-harting16",
+            Id = "Harting 16",
+            DisplayName = "Harting Han 16E (6 circuits)",
+            Family = "Harting 16",
+            Domain = ConnectorDomain.Multicore,
+            RatedCurrentA = 16f,
+            Pins = 16,
+            Circuits = 6,
+            IllustrationKey = "connector-harting16",
             Aliases = ["Harting16", "Harting 16-pin", "Han 16E", "Han16E", "HAN16", "Harting"],
         },
 
@@ -81,17 +98,25 @@ public static class ConnectorCatalog
         Hybrid("PWB-CAB Connector", "Astera PWB-CAB connector", "connector-pwb-cab", "PWB CAB Connector", "PWB-CAB"),
         Power("DC Jack", "DC jack", "DC Jack", 5f, 2, "connector-dc-jack",
             "DC Power Connector (5,5mm x 2,1mm)", "DC Power Connector (5,5mm x 2,5mm)", "DC Power Connector (3,8mm x 1,35mm)",
-            "DC (external PSU)", "DC jack", "barrel connector", "DC Power Connector") with { IsDc = true },
+            "DC (external PSU)", "DC jack", "barrel connector", "DC Power Connector") with
+        { IsDc = true },
         Power("DIN3 (low-voltage DC)", "DIN 3-pin (low-voltage DC)", "DIN3 (low-voltage DC)", 5f, 3, "connector-din3",
-            "DIN3", "DIN 3", "DIN 3-pin") with { IsDc = true },
+            "DIN3", "DIN 3", "DIN 3-pin") with
+        { IsDc = true },
         Power("XLR4 (DC)", "XLR 4-pin (DC)", "XLR4 (DC)", 10f, 4, "connector-xlr4",
-            "XLR4", "XLR 4", "XLR 4-pin", "4-pin XLR") with { IsDc = true },
+            "XLR4", "XLR 4", "XLR 4-pin", "4-pin XLR") with
+        { IsDc = true },
         Power("E27 lamp socket", "E27 lamp socket", "E27 lamp socket", 4f, 2, "connector-e27", "Edison", "E27", "Edison screw"),
         Power("Track adapter", "Track adapter", "Track adapter", 16f, 0, "connector-track-adapter", "track", "3-circuit track adapter"),
         new ConnectorInfo
         {
-            Id = "Battery (internal)", DisplayName = "Internal battery", Family = "Battery (internal)", Domain = ConnectorDomain.Power,
-            IsInternal = true, IllustrationKey = "connector-battery", Aliases = ["Battery", "internal battery", "From Battery"],
+            Id = "Battery (internal)",
+            DisplayName = "Internal battery",
+            Family = "Battery (internal)",
+            Domain = ConnectorDomain.Power,
+            IsInternal = true,
+            IllustrationKey = "connector-battery",
+            Aliases = ["Battery", "internal battery", "From Battery"],
         },
 
         // ---- data
@@ -181,8 +206,14 @@ public static class ConnectorCatalog
     private static ConnectorInfo Power(string id, string display, string family, float? ratedA, int pins, string illustration, params string[] aliases) =>
         new()
         {
-            Id = id, DisplayName = display, Family = family, Domain = ConnectorDomain.Power, RatedCurrentA = ratedA, Pins = pins,
-            IllustrationKey = illustration, Aliases = aliases,
+            Id = id,
+            DisplayName = display,
+            Family = family,
+            Domain = ConnectorDomain.Power,
+            RatedCurrentA = ratedA,
+            Pins = pins,
+            IllustrationKey = illustration,
+            Aliases = aliases,
         };
 
     private static ConnectorInfo Hybrid(string id, string display, string illustration, params string[] aliases) =>

@@ -125,10 +125,19 @@ public sealed class RiggingAnalyzer
 {
     private static readonly Dictionary<string, float> ProfileKgPerM = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["F22"] = 1.5f, ["F23"] = 2.1f, ["F24"] = 2.8f,
-        ["F31"] = 1.5f, ["F32"] = 2.6f, ["F33"] = 3.5f, ["F34"] = 4.5f,
-        ["F42"] = 3.2f, ["F43"] = 4.6f, ["F44"] = 6.0f,
-        ["F52"] = 4.5f, ["F53"] = 6.0f, ["F54"] = 7.5f,
+        ["F22"] = 1.5f,
+        ["F23"] = 2.1f,
+        ["F24"] = 2.8f,
+        ["F31"] = 1.5f,
+        ["F32"] = 2.6f,
+        ["F33"] = 3.5f,
+        ["F34"] = 4.5f,
+        ["F42"] = 3.2f,
+        ["F43"] = 4.6f,
+        ["F44"] = 6.0f,
+        ["F52"] = 4.5f,
+        ["F53"] = 6.0f,
+        ["F54"] = 7.5f,
     };
 
     private readonly IFixtureProfileProvider? _fixtures;

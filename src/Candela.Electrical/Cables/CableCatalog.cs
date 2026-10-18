@@ -100,71 +100,176 @@ public sealed class CableCatalog
 
         yield return new CableType
         {
-            Id = Ids.DmxXlr3, DisplayName = "DMX cable XLR 3-pin", Signal = SignalKind.Dmx512, ConnectorA = C("XLR3"), ConnectorB = C("XLR3"),
-            ConductorCrossSectionMm2 = 0.22f, WeightKgPerM = 0.045f, MaxRunM = 300f, ColorHex = "#A855F7", IconKey = "cable-dmx-xlr3",
+            Id = Ids.DmxXlr3,
+            DisplayName = "DMX cable XLR 3-pin",
+            Signal = SignalKind.Dmx512,
+            ConnectorA = C("XLR3"),
+            ConnectorB = C("XLR3"),
+            ConductorCrossSectionMm2 = 0.22f,
+            WeightKgPerM = 0.045f,
+            MaxRunM = 300f,
+            ColorHex = "#A855F7",
+            IconKey = "cable-dmx-xlr3",
         };
         yield return new CableType
         {
-            Id = Ids.DmxXlr5, DisplayName = "DMX cable XLR 5-pin", Signal = SignalKind.Dmx512, ConnectorA = C("XLR5"), ConnectorB = C("XLR5"),
-            ConductorCrossSectionMm2 = 0.22f, WeightKgPerM = 0.055f, MaxRunM = 300f, ColorHex = "#7C3AED", IconKey = "cable-dmx-xlr5",
+            Id = Ids.DmxXlr5,
+            DisplayName = "DMX cable XLR 5-pin",
+            Signal = SignalKind.Dmx512,
+            ConnectorA = C("XLR5"),
+            ConnectorB = C("XLR5"),
+            ConductorCrossSectionMm2 = 0.22f,
+            WeightKgPerM = 0.055f,
+            MaxRunM = 300f,
+            ColorHex = "#7C3AED",
+            IconKey = "cable-dmx-xlr5",
         };
         yield return new CableType
         {
-            Id = Ids.Ethernet, DisplayName = "Ethernet etherCON Cat6", Signal = SignalKind.Ethernet, ConnectorA = C("etherCON"), ConnectorB = C("etherCON"),
-            ConductorCrossSectionMm2 = 0.2f, WeightKgPerM = 0.065f, MaxRunM = 100f, ColorHex = "#10B981", IconKey = "cable-ethernet",
+            Id = Ids.Ethernet,
+            DisplayName = "Ethernet etherCON Cat6",
+            Signal = SignalKind.Ethernet,
+            ConnectorA = C("etherCON"),
+            ConnectorB = C("etherCON"),
+            ConductorCrossSectionMm2 = 0.2f,
+            WeightKgPerM = 0.065f,
+            MaxRunM = 100f,
+            ColorHex = "#10B981",
+            IconKey = "cable-ethernet",
         };
         yield return new CableType
         {
-            Id = Ids.Powercon, DisplayName = "powerCON link (grey → blue) 20 A", Signal = SignalKind.Power,
-            ConnectorA = C("powerCON grey"), ConnectorB = C("powerCON blue"),
-            RatedCurrentA = 20f, ConductorCrossSectionMm2 = 2.5f, WeightKgPerM = 0.2f, ColorHex = "#1E3A8A", IconKey = "cable-powercon",
+            Id = Ids.Powercon,
+            DisplayName = "powerCON link (grey → blue) 20 A",
+            Signal = SignalKind.Power,
+            ConnectorA = C("powerCON grey"),
+            ConnectorB = C("powerCON blue"),
+            RatedCurrentA = 20f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.2f,
+            ColorHex = "#1E3A8A",
+            IconKey = "cable-powercon",
         };
         yield return new CableType
         {
-            Id = Ids.PowerconTrue1, DisplayName = "powerCON TRUE1 16 A", Signal = SignalKind.Power,
-            ConnectorA = C("powerCON TRUE1"), ConnectorB = C("powerCON TRUE1"),
-            RatedCurrentA = 16f, ConductorCrossSectionMm2 = 2.5f, WeightKgPerM = 0.2f, ColorHex = "#FACC15", IconKey = "cable-true1",
+            Id = Ids.PowerconTrue1,
+            DisplayName = "powerCON TRUE1 16 A",
+            Signal = SignalKind.Power,
+            ConnectorA = C("powerCON TRUE1"),
+            ConnectorB = C("powerCON TRUE1"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.2f,
+            ColorHex = "#FACC15",
+            IconKey = "cable-true1",
         };
         yield return new CableType
         {
-            Id = Ids.PowerconTrue1Top, DisplayName = "powerCON TRUE1 TOP 16 A", Signal = SignalKind.Power,
-            ConnectorA = C("powerCON TRUE1 TOP"), ConnectorB = C("powerCON TRUE1 TOP"),
-            RatedCurrentA = 16f, ConductorCrossSectionMm2 = 2.5f, WeightKgPerM = 0.21f, ColorHex = "#CA8A04", IconKey = "cable-true1-top",
+            Id = Ids.PowerconTrue1Top,
+            DisplayName = "powerCON TRUE1 TOP 16 A",
+            Signal = SignalKind.Power,
+            ConnectorA = C("powerCON TRUE1 TOP"),
+            ConnectorB = C("powerCON TRUE1 TOP"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.21f,
+            ColorHex = "#CA8A04",
+            IconKey = "cable-true1-top",
         };
         yield return new CableType
         {
-            Id = Ids.Schuko, DisplayName = "Schuko extension 16 A", Signal = SignalKind.Power, ConnectorA = C("Schuko"), ConnectorB = C("Schuko"),
-            RatedCurrentA = 16f, ConductorCrossSectionMm2 = 1.5f, WeightKgPerM = 0.13f, ColorHex = "#14B8A6", IconKey = "cable-schuko",
+            Id = Ids.Schuko,
+            DisplayName = "Schuko extension 16 A",
+            Signal = SignalKind.Power,
+            ConnectorA = C("Schuko"),
+            ConnectorB = C("Schuko"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 1.5f,
+            WeightKgPerM = 0.13f,
+            ColorHex = "#14B8A6",
+            IconKey = "cable-schuko",
         };
         yield return new CableType
         {
-            Id = Ids.Iec, DisplayName = "IEC mains lead (Schuko → C13) 10 A", Signal = SignalKind.Power, ConnectorA = C("Schuko"), ConnectorB = C("IEC C14"),
-            RatedCurrentA = 10f, ConductorCrossSectionMm2 = 1.0f, WeightKgPerM = 0.08f, ColorHex = "#EC4899", IconKey = "cable-iec",
+            Id = Ids.Iec,
+            DisplayName = "IEC mains lead (Schuko → C13) 10 A",
+            Signal = SignalKind.Power,
+            ConnectorA = C("Schuko"),
+            ConnectorB = C("IEC C14"),
+            RatedCurrentA = 10f,
+            ConductorCrossSectionMm2 = 1.0f,
+            WeightKgPerM = 0.08f,
+            ColorHex = "#EC4899",
+            IconKey = "cable-iec",
         };
         yield return new CableType
         {
-            Id = Ids.Cee16, DisplayName = "CEE 16 A single phase", Signal = SignalKind.Power, ConnectorA = C("CEE 16A"), ConnectorB = C("CEE 16A"),
-            RatedCurrentA = 16f, ConductorCrossSectionMm2 = 2.5f, WeightKgPerM = 0.2f, ColorHex = "#3B82F6", IconKey = "cable-cee16",
+            Id = Ids.Cee16,
+            DisplayName = "CEE 16 A single phase",
+            Signal = SignalKind.Power,
+            ConnectorA = C("CEE 16A"),
+            ConnectorB = C("CEE 16A"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.2f,
+            ColorHex = "#3B82F6",
+            IconKey = "cable-cee16",
         };
         yield return new CableType
         {
-            Id = Ids.Cee32ThreePhase, DisplayName = "CEE 32 A three phase", Signal = SignalKind.Power, ConnectorA = C("CEE 32A 3P"), ConnectorB = C("CEE 32A 3P"),
-            RatedCurrentA = 32f, ConductorCrossSectionMm2 = 6f, WeightKgPerM = 0.55f, ColorHex = "#EF4444", IconKey = "cable-cee32-3p", Phases = 3,
+            Id = Ids.Cee32ThreePhase,
+            DisplayName = "CEE 32 A three phase",
+            Signal = SignalKind.Power,
+            ConnectorA = C("CEE 32A 3P"),
+            ConnectorB = C("CEE 32A 3P"),
+            RatedCurrentA = 32f,
+            ConductorCrossSectionMm2 = 6f,
+            WeightKgPerM = 0.55f,
+            ColorHex = "#EF4444",
+            IconKey = "cable-cee32-3p",
+            Phases = 3,
         };
         yield return new CableType
         {
-            Id = Ids.Cee63ThreePhase, DisplayName = "CEE 63 A three phase", Signal = SignalKind.Power, ConnectorA = C("CEE 63A 3P"), ConnectorB = C("CEE 63A 3P"),
-            RatedCurrentA = 63f, ConductorCrossSectionMm2 = 16f, WeightKgPerM = 1.25f, ColorHex = "#991B1B", IconKey = "cable-cee63-3p", Phases = 3,
+            Id = Ids.Cee63ThreePhase,
+            DisplayName = "CEE 63 A three phase",
+            Signal = SignalKind.Power,
+            ConnectorA = C("CEE 63A 3P"),
+            ConnectorB = C("CEE 63A 3P"),
+            RatedCurrentA = 63f,
+            ConductorCrossSectionMm2 = 16f,
+            WeightKgPerM = 1.25f,
+            ColorHex = "#991B1B",
+            IconKey = "cable-cee63-3p",
+            Phases = 3,
         };
         yield return new CableType
         {
-            Id = Ids.Socapex, DisplayName = "Socapex 19-pin multicore (6 × 16 A)", Signal = SignalKind.Multicore, ConnectorA = C("Socapex"), ConnectorB = C("Socapex"),
-            RatedCurrentA = 16f, ConductorCrossSectionMm2 = 2.5f, WeightKgPerM = 0.95f, ColorHex = "#84CC16", IconKey = "cable-socapex", Circuits = 6,
+            Id = Ids.Socapex,
+            DisplayName = "Socapex 19-pin multicore (6 × 16 A)",
+            Signal = SignalKind.Multicore,
+            ConnectorA = C("Socapex"),
+            ConnectorB = C("Socapex"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.95f,
+            ColorHex = "#84CC16",
+            IconKey = "cable-socapex",
+            Circuits = 6,
         };
         yield return new CableType
         {
-            Id = Ids.Harting16, DisplayName = "Harting 16-pin multicore (6 × 16 A)", Signal = SignalKind.Multicore, ConnectorA = C("Harting 16"), ConnectorB = C("Harting 16"),
-            RatedCurrentA = 16f, ConductorCrossSectionMm2 = 2.5f, WeightKgPerM = 0.85f, ColorHex = "#65A30D", IconKey = "cable-harting16", Circuits = 6,
+            Id = Ids.Harting16,
+            DisplayName = "Harting 16-pin multicore (6 × 16 A)",
+            Signal = SignalKind.Multicore,
+            ConnectorA = C("Harting 16"),
+            ConnectorB = C("Harting 16"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.85f,
+            ColorHex = "#65A30D",
+            IconKey = "cable-harting16",
+            Circuits = 6,
         };
     }
 }
