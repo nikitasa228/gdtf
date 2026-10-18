@@ -187,13 +187,15 @@ public sealed class RiggingAnalyzer
         var cables = new List<(Entity Entity, CableComponent Cable)>();
         foreach (var e in scene.All())
         {
+            // One fixture / truss / rigging point per entity (the first component of each kind counts).
+            bool fixtureSeen = false, trussSeen = false, pointSeen = false;
             foreach (var c in e.Components)
             {
                 switch (c)
                 {
-                    case FixtureComponent f: fixtures.Add((e, f)); break;
-                    case TrussComponent t: trusses.Add((e, t)); break;
-                    case RiggingPointComponent p: points.Add((e, p)); break;
+                    case FixtureComponent f when !fixtureSeen: fixtures.Add((e, f)); fixtureSeen = true; break;
+                    case TrussComponent t when !trussSeen: trusses.Add((e, t)); trussSeen = true; break;
+                    case RiggingPointComponent p when !pointSeen: points.Add((e, p)); pointSeen = true; break;
                     case CableComponent cable: cables.Add((e, cable)); break;
                     case WallComponent { Kind: WallKind.Floor } w when Matrix4x4.Invert(e.WorldMatrix, out var inv):
                         floors.Add((inv, e.WorldPosition.Z, MathF.Abs(w.Width) / 2, MathF.Abs(w.Height) / 2));

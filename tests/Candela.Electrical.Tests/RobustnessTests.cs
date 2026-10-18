@@ -55,6 +55,33 @@ public class RobustnessTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Duplicate_components_and_invalid_numbers_do_not_break_the_analyses()
+    {
+        var kit = new SceneKit();
+        var truss = kit.Truss("Double truss", new Vector3(0, 0, 6), float.NaN, maxUniformKg: 50f);
+        truss.Add(new TrussComponent { Length = 3f });
+        var point = new Entity("Point") { Local = new Core.Math.Transform(new Vector3(float.NaN, 0, 7)) };
+        point.Add(new RiggingPointComponent { CapacityKg = float.NaN, Carries = { truss.Id } });
+        point.Add(new RiggingPointComponent { CapacityKg = 1f, Carries = { truss.Id } });
+        kit.Scene.Add(point);
+        var head = kit.Fixture(TestData.Naja, "Head", 1, new Vector3(float.NaN, 0, 6), mountedOn: truss.Id);
+        head.Add(new FixtureComponent { GdtfSpec = TestData.Aeco20, FixtureId = 99 });
+        var desk = kit.Console("Desk", new Vector3(0, -10, 0), SceneKit.DmxOutput("DMX A", 1));
+        var twin = kit.Cable("dmx-xlr5", "Twin", (desk, "DMX A"), (head, "XLR IN"));
+        twin.Add(new CableComponent { CableTypeId = "powercon-true1", Label = "Second" });
+
+        var s = kit.Solve();
+        Assert.True(s.IsConsoleDriven(head.Id));
+        Assert.Equal(2, s.Cables.Count(c => c.EntityId == twin.Id));
+        Assert.Equal("Twin", s.FindCable(twin.Id)!.DisplayLabel);
+        var r = new RiggingAnalyzer(TestData.Profiles).Analyze(kit.Scene);
+        Assert.Single(r.Trusses);
+        Assert.Single(r.Points);
+        Assert.True(double.IsFinite(r.Trusses[0].LoadKg));
+        Assert.NotNull(CableSchedule.Build(s));
+    }
+
+    [Fact]
     public void Issue_log_collects_electrical_and_rigging_issues()
     {
         var kit = new SceneKit();

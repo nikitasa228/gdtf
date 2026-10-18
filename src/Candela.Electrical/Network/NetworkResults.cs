@@ -375,7 +375,8 @@ public sealed class NetworkSolution
         SceneVersion = sceneVersion;
         Devices = devices;
         Cables = cables;
-        _cablesById = cables.ToDictionary(c => c.EntityId);
+        _cablesById = new Dictionary<Guid, CableInfo>(cables.Count);
+        foreach (var c in cables) _cablesById.TryAdd(c.EntityId, c); // an entity with two cable components: the first wins
         _plugged = plugged;
         DataLines = dataLines;
         DataFeedsByDevice = dataFeeds;
