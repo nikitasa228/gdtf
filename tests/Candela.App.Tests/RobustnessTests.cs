@@ -967,3 +967,45 @@ public sealed class FramingBoundsTests
         Assert.True(SelectionController.FramingBounds(scene, new[] { Guid.NewGuid() }, Lookup).IsEmpty);
     }
 }
+
+/// <summary>Folder checks for the settings window never block the UI thread.</summary>
+public sealed class FolderStatusCacheTests
+{
+    [Fact]
+    public void A_folder_that_does_not_answer_does_not_block_and_is_checked_rarely()
+    {
+        using var gate = new ManualResetEventSlim(false);
+        int calls = 0;
+        var cache = new FolderStatusCache(path =>
+        {
+            Interlocked.Increment(ref calls);
+            gate.Wait(TimeSpan.FromSeconds(10)); // an unreachable network share
+            return path == "/share/fixtures";
+        }, maxAgeSeconds: 2.0);
+
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        for (int frame = 0; frame < 100; frame++)
+            Assert.Null(cache.Exists("/share/fixtures", frame / 60.0)); // unknown while the check hangs
+        Assert.True(watch.Elapsed.TotalSeconds < 1, "the UI thread waited for the folder check");
+
+        gate.Set();
+        Assert.True(SpinWait.SpinUntil(() => cache.Exists("/share/fixtures", 1.0) == true, TimeSpan.FromSeconds(10)));
+        Assert.Equal(1, Volatile.Read(ref calls)); // one check for 100 frames within the 2 s window
+
+        // Old answers are refreshed in the background; failures read as "missing".
+        Assert.True(cache.Exists("/share/fixtures", 5.0));
+        Assert.True(SpinWait.SpinUntil(() => Volatile.Read(ref calls) == 2, TimeSpan.FromSeconds(10)));
+        var failing = new FolderStatusCache(_ => throw new IOException("network name no longer available"));
+        Assert.True(SpinWait.SpinUntil(() => failing.Exists("//server/share", 0) == false, TimeSpan.FromSeconds(10)));
+    }
+
+    [Fact]
+    public void Real_folders_are_reported()
+    {
+        using var dir = new TempDir();
+        var cache = new FolderStatusCache();
+        Assert.True(SpinWait.SpinUntil(() => cache.Exists(dir.Path, 0) == true, TimeSpan.FromSeconds(10)));
+        Assert.True(SpinWait.SpinUntil(() => cache.Exists(Path.Combine(dir.Path, "missing"), 0) == false, TimeSpan.FromSeconds(10)));
+        cache.Retain(new[] { dir.Path });
+    }
+}

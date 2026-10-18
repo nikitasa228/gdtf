@@ -49,6 +49,8 @@ internal enum SettingsSection
 internal sealed class SettingsWindow
 {
     private readonly WorkspaceContext _ctx;
+    private readonly FolderStatusCache _folderStatus = new();
+    private readonly Dictionary<string, string> _folderLabels = new(StringComparer.Ordinal);
     private readonly KeyBindingsService _keys;
     private readonly CommandRegistry _commands;
     private readonly KeyBindingDispatcher _dispatcher;
@@ -512,6 +514,7 @@ internal sealed class SettingsWindow
         var s = _ctx.Settings.Settings;
         Heading(Str.SettingsLibraryFolders);
         int remove = -1;
+        double now = _ctx.Timer.Elapsed;
         for (int i = 0; i < s.LibraryFolders.Count; i++)
         {
             ImGui.PushID(i);
@@ -519,8 +522,9 @@ internal sealed class SettingsWindow
                 remove = i;
             ImGui.SameLine();
             ImGui.AlignTextToFramePadding();
-            bool exists = Directory.Exists(s.LibraryFolders[i]);
-            ImGui.TextColored(exists ? Theme.Text : Theme.Error, $"{Icons.Folder}  {s.LibraryFolders[i]}");
+            // Checked in the background (a network share that does not answer must not freeze the window); unknown = muted.
+            bool? exists = _folderStatus.Exists(s.LibraryFolders[i], now);
+            ImGui.TextColored(exists switch { true => Theme.Text, false => Theme.Error, null => Theme.TextMuted }, FolderLabel(s.LibraryFolders[i]));
             ImGui.PopID();
         }
 
@@ -529,6 +533,7 @@ internal sealed class SettingsWindow
         if (remove >= 0)
         {
             s.LibraryFolders.RemoveAt(remove);
+            _folderStatus.Retain(s.LibraryFolders);
             Changed();
         }
 
@@ -601,6 +606,19 @@ internal sealed class SettingsWindow
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
         ImGui.TextWrapped(Loc.Get(Str.SettingsRestartNote));
         ImGui.PopStyleColor();
+    }
+
+    /// <summary>The row text of a library folder (built once per folder, not every frame).</summary>
+    private string FolderLabel(string folder)
+    {
+        if (!_folderLabels.TryGetValue(folder, out var label))
+        {
+            if (_folderLabels.Count > 256)
+                _folderLabels.Clear();
+            _folderLabels[folder] = label = $"{Icons.Folder}  {folder}";
+        }
+
+        return label;
     }
 
     private static List<(string Label, string Value)> ListInterfaces()
