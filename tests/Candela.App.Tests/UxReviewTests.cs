@@ -175,4 +175,19 @@ public sealed class UxReviewTests
         Assert.True(size.X <= 1280 * 0.92f + 0.01f && size.Y <= 776 * 0.92f + 0.01f);
         Assert.Equal(new Vector2(860, 560), PopupPlacement.FitInWindow(new Vector2(860, 560), new Vector2(1600, 876)));
     }
+
+    [Theory]
+    [InlineData(0f, 300f, false)]    // first frame, nothing measured: one row
+    [InlineData(500f, 900f, false)]  // fits
+    [InlineData(520f, 438f, true)]   // four viewports at 150 %: the view options go to a second row
+    public void Viewport_toolbar_wraps_instead_of_running_off_the_view(float singleRowWidth, float available, bool wraps) =>
+        Assert.Equal(wraps, Candela.App.Viewport.ViewportPanel.ToolbarWraps(singleRowWidth, available));
+
+    [Theory]
+    [InlineData(126f, 60f, 400f, 400f, 126f)]  // room enough: the preferred size
+    [InlineData(126f, 60f, 137f, 150f, 114.1667f)] // beside the toolbar of a small view: shrunk to the free width
+    [InlineData(126f, 60f, 182f, 90f, 75f)]    // low view: shrunk to the free height
+    [InlineData(126f, 60f, 182f, 60f, 0f)]     // too low even for the minimum: hidden
+    public void View_cube_shrinks_to_fit_small_viewports(float preferred, float minimum, float width, float height, float expected) =>
+        Assert.Equal(expected, Candela.App.Viewport.ViewportPanel.ViewCubeSize(preferred, minimum, width, height), 3);
 }

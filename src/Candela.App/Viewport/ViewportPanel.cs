@@ -114,6 +114,8 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
     private bool _wasFocused;
     private readonly ToolbarLabels _labels = new();
     private float _toolbarBottom;
+    private float _toolbarSingleRowWidth;
+    private float _toolbarRight;
 
     /// <summary>Creates viewport number <paramref name="number"/> (1 … 16).</summary>
     public ViewportPanel(int number, WorkspaceContext context, IViewportHost host)
@@ -598,6 +600,10 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         ImGui.PushStyleColor(ImGuiCol.Button, Theme.WithAlpha(Theme.OverlayBackground, ToolbarAlpha));
         ImGui.PushStyleColor(ImGuiCol.FrameBg, Theme.WithAlpha(Theme.OverlayBackground, ToolbarAlpha));
         ImGui.BeginGroup();
+        // Tool buttons and view options are two groups: side by side when they fit (measured as one row last frame),
+        // otherwise the view options wrap to a second row instead of running past the viewport's right edge.
+        bool wrap = ToolbarWraps(_toolbarSingleRowWidth, _imageSize.X - 2f * pad.X);
+        ImGui.BeginGroup();
         var tools = _ctx.Tools;
         if (ToolButton(ToolbarLabels.SelectId, Str.ToolSelect, tools.Tool == EditorTool.Select))
             tools.Tool = EditorTool.Select;
@@ -613,7 +619,11 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         ImGui.SameLine();
         if (ToolButton(ToolbarLabels.SnapId, Str.ToolSnapping, tools.Snap))
             tools.Snap = !tools.Snap;
-        ImGui.SameLine(0, 10 * scale);
+        ImGui.EndGroup();
+        float toolsWidth = ImGui.GetItemRectSize().X;
+        if (!wrap)
+            ImGui.SameLine(0, 10 * scale);
+        ImGui.BeginGroup();
 
         int shading = (int)View.Shading;
         if (ImGui.BeginCombo("##shading", compact ? _labels.ShadingIcon[shading] : _labels.ShadingFull[shading], ImGuiComboFlags.WidthFitPreview))
@@ -655,11 +665,29 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         if (ToolButton(ToolbarLabels.StatsId, Str.ViewportStats, ShowStats))
             ShowStats = !ShowStats;
         ImGui.EndGroup();
+        _toolbarSingleRowWidth = toolsWidth + 10 * scale + ImGui.GetItemRectSize().X;
+        ImGui.EndGroup();
         _toolbarBottom = ImGui.GetItemRectMax().Y;
+        _toolbarRight = ImGui.GetItemRectMax().X;
         bool hovered = ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) || ImGui.IsPopupOpen("", ImGuiPopupFlags.AnyPopupId);
         ImGui.PopStyleColor(2);
         ImGui.PopStyleVar(3);
         return hovered;
+    }
+
+    /// <summary>True when a toolbar <paramref name="singleRowWidth"/> pixels wide (0 = not measured yet) does not fit
+    /// <paramref name="available"/> pixels and its view options go to a second row.</summary>
+    internal static bool ToolbarWraps(float singleRowWidth, float available) => singleRowWidth > 0f && singleRowWidth > available;
+
+    /// <summary>
+    /// Side of the view cube's square in pixels: <paramref name="preferred"/>, shrunk so the cube's disc (1.2 × the
+    /// side) fits <paramref name="availableWidth"/> × <paramref name="availableHeight"/> pixels; 0 when even
+    /// <paramref name="minimum"/> does not fit (the cube is hidden).
+    /// </summary>
+    internal static float ViewCubeSize(float preferred, float minimum, float availableWidth, float availableHeight)
+    {
+        float size = MathF.Min(preferred, MathF.Min(availableWidth, availableHeight) / 1.2f);
+        return size >= minimum ? size : 0f;
     }
 
     private static bool ToolButton(string id, Str tooltip, bool active)
@@ -685,11 +713,25 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
             return false;
         var style = ImGui.GetStyle();
         float scale = style.FontScaleMain * style.FontScaleDpi;
-        float size = 84f * scale;
-        float radius = size * 0.6f;
-        var center = new Vector2(_imageMin.X + _imageSize.X - radius - 10f * scale, MathF.Max(_toolbarBottom, _imageMin.Y) + radius + 8f * scale);
-        if (_imageSize.X < size * 2.4f || _imageSize.Y < size * 2.2f)
+        // The cube sits in the top-right corner beside the toolbar when there is room, otherwise below it; in small
+        // viewports (four views at a large UI scale) it shrinks to fit above the statistics line instead of
+        // disappearing, so every view keeps its corner view selector.
+        float lineHeight = ImGui.GetTextLineHeight();
+        float right = _imageMin.X + _imageSize.X - 10f * scale;
+        float bottom = _imageMin.Y + _imageSize.Y - (ShowStats ? lineHeight + 14f * scale : 6f * scale) - lineHeight - 4f * scale;
+        float preferred = 84f * scale, minimum = 40f * scale, maxWidth = _imageSize.X * 0.4f;
+        float besideTop = _imageMin.Y + 8f * scale;
+        float belowTop = MathF.Max(_toolbarBottom, _imageMin.Y) + 8f * scale;
+        float besideSize = ViewCubeSize(preferred, minimum, MathF.Min(maxWidth, right - (_toolbarRight + 8f * scale)), bottom - besideTop);
+        float belowSize = ViewCubeSize(preferred, minimum, maxWidth, bottom - belowTop);
+        bool beside = besideSize >= belowSize;
+        float size = beside ? besideSize : belowSize;
+        float top = beside ? besideTop : belowTop;
+        if (size <= 0f)
             return false;
+        float radius = size * 0.6f;
+        float detail = size / 84f; // arrow and hit sizes follow the cube
+        var center = new Vector2(_imageMin.X + _imageSize.X - radius - 10f * scale, top + radius);
         ViewCube.Project(Camera.Right, Camera.Up, Camera.Forward, center, size, _cubeFaces);
         var mouse = ImGui.GetIO().MousePos;
         bool inArea = Vector2.Distance(mouse, center) < radius;
@@ -700,9 +742,9 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         int hoveredArrow = -1;
         if (axisAligned)
         {
-            ViewCube.Arrows(Camera.Right, Camera.Up, center, radius - 2f * scale, 9f * scale, _cubeArrows);
+            ViewCube.Arrows(Camera.Right, Camera.Up, center, radius - 2f * detail, 9f * detail, _cubeArrows);
             if (viewportHovered && inArea && _hoveredFace is null)
-                hoveredArrow = ViewCube.HitTestArrow(_cubeArrows, mouse, 11f * scale);
+                hoveredArrow = ViewCube.HitTestArrow(_cubeArrows, mouse, 11f * detail);
         }
 
         drawList.AddCircleFilled(center, radius, Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, inArea ? 0.8f : 0.5f)));
@@ -716,7 +758,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
             bool current = Camera.SnappedView == face.View;
             var fill = hot ? Theme.WithAlpha(Theme.Accent, 0.9f) : current ? Theme.Rgb(0x6B4A2A, 0.95f) : Theme.Rgb(0x3A3D44, 0.95f);
             drawList.AddQuadFilled(face.C0, face.C1, face.C2, face.C3, Theme.U32(fill));
-            drawList.AddQuad(face.C0, face.C1, face.C2, face.C3, Theme.U32(Theme.Rgb(0x16171A, 0.95f)), 1.2f * scale);
+            drawList.AddQuad(face.C0, face.C1, face.C2, face.C3, Theme.U32(Theme.Rgb(0x16171A, 0.95f)), MathF.Max(1f, 1.2f * detail));
             if (face.Facing > 0.35f)
             {
                 // The label fills at most 85 % of the face's projected width (long Russian names on oblique faces).
