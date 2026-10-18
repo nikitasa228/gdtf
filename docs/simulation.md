@@ -204,9 +204,10 @@ build/test jobs while measuring:
 
 The 10 steps/s target is met when the four cores are available (11.9 steps/s at load ≈ 6, a 1.6× speed-up over one
 thread); on a saturated machine the wall time is bounded by the single-thread work of ≈ 130 ms. Re-measured after the
-review fixes (Release): at machine load ≈ 4, 88.7 ms per step on 4 threads (11.3 steps/s; stages: velocity advection
-18, projection 42, scalar advection 25, forces 3 ms) and 135.7 ms on one thread (7.4 steps/s); at load 7–31 from other
-jobs the 4-thread run fell to 160–200 ms per step, no better than one thread.
+review fixes (Release): at machine load ≈ 4–5, 74.5–88.7 ms per step on 4 threads (11.3–13.4 steps/s; stages:
+velocity advection 15–18, projection 35–42, scalar advection 22–25, forces 3 ms) and 136–146 ms on one thread
+(6.9–7.4 steps/s); at load 7–31 from other jobs the 4-thread run fell to 160–200 ms per step, no better than one
+thread.
 
 Fans and nozzle jets are imposed over their whole reach (up to the box diagonal), in parallel over slices; eight wind
 machines add ≈ 20 ms per 64³ step on four threads (≈ 30 ms on one).
