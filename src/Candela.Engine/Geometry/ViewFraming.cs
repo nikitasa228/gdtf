@@ -28,13 +28,21 @@ public static class ViewFraming
     /// just far enough that all eight corners of the box are inside the image (with a small margin) for the given vertical
     /// field of view and aspect ratio (width / height).
     /// </summary>
-    public static RenderCamera Frame(Aabb bounds, ViewPreset preset, float fovYDegrees = 45f, float aspect = 16f / 9f, float margin = 1.06f)
+    public static RenderCamera Frame(Aabb bounds, ViewPreset preset, float fovYDegrees = 45f, float aspect = 16f / 9f, float margin = 1.06f) =>
+        Frame(bounds, Direction(preset), fovYDegrees, aspect, margin);
+
+    /// <summary>
+    /// A perspective camera looking at the centre of <paramref name="bounds"/> from <paramref name="towardsCamera"/> (unit
+    /// vector from the target to the eye), just far enough that the whole box is in the image.
+    /// </summary>
+    public static RenderCamera Frame(Aabb bounds, Vector3 towardsCamera, float fovYDegrees, float aspect, float margin = 1.06f)
     {
         if (bounds.IsEmpty || !IsFinite(bounds.Min) || !IsFinite(bounds.Max)) bounds = new Aabb(new Vector3(-5f, -5f, 0f), new Vector3(5f, 5f, 3f));
         float fovY = Math.Clamp(float.IsFinite(fovYDegrees) ? fovYDegrees : 45f, 5f, 120f) * MathF.PI / 180f;
         aspect = float.IsFinite(aspect) && aspect > 0.05f ? aspect : 16f / 9f;
         var centre = bounds.Center;
-        var forward = -Direction(preset); // camera looks along forward
+        float length = towardsCamera.Length();
+        var forward = length > 1e-6f && float.IsFinite(length) ? -towardsCamera / length : -Direction(ViewPreset.Auto); // camera looks along forward
         var worldUp = MathF.Abs(forward.Z) > 0.999f ? Vector3.UnitY : Vector3.UnitZ;
         var right = Vector3.Normalize(Vector3.Cross(forward, worldUp));
         var up = Vector3.Cross(right, forward);
@@ -46,8 +54,10 @@ public static class ViewFraming
             var corner = new Vector3((i & 1) == 0 ? bounds.Min.X : bounds.Max.X, (i & 2) == 0 ? bounds.Min.Y : bounds.Max.Y, (i & 4) == 0 ? bounds.Min.Z : bounds.Max.Z);
             var c = corner - centre;
             float x = Vector3.Dot(c, right), y = Vector3.Dot(c, up), z = Vector3.Dot(c, forward);
-            distance = MathF.Max(distance, z + MathF.Abs(x) / tanX);
-            distance = MathF.Max(distance, z + MathF.Abs(y) / tanY);
+            // the corner is at depth D + z in front of the camera and must satisfy |x| ≤ (D + z)·tan(fov/2)
+            distance = MathF.Max(distance, MathF.Abs(x) / tanX - z);
+            distance = MathF.Max(distance, MathF.Abs(y) / tanY - z);
+            distance = MathF.Max(distance, 0.05f - z);
         }
         distance *= margin;
         var eye = centre - forward * distance;

@@ -57,6 +57,12 @@ public sealed class DmxRecording
     /// <summary>Current file format version.</summary>
     public const int FormatVersion = 1;
 
+    /// <summary>
+    /// Frames up to this much after a requested time count as reached, s (absorbs the rounding of times computed as
+    /// differences of engine clocks).
+    /// </summary>
+    public const double TimeTolerance = 1e-6;
+
     /// <summary>Recording time between kept full states (seek points), s.</summary>
     public const double KeyframeInterval = 2.0;
 
@@ -131,6 +137,7 @@ public sealed class DmxRecording
         ArgumentNullException.ThrowIfNull(state);
         state.Clear();
         int start = 0;
+        time += TimeTolerance;
         foreach (var k in _keyframes)
         {
             if (k.Time > time) break;
@@ -144,6 +151,7 @@ public sealed class DmxRecording
     /// <summary>Index of the first frame after <paramref name="time"/> (binary search).</summary>
     internal int FirstFrameAfter(double time)
     {
+        time += TimeTolerance;
         int lo = 0, hi = Frames.Count;
         while (lo < hi)
         {

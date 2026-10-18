@@ -102,15 +102,10 @@ public sealed class FixtureThumbnailRenderer : IDisposable
         var bounds = _bounds.IsEmpty ? new Aabb(new Vector3(-0.2f), new Vector3(0.2f)) : _bounds;
         var centre = bounds.Center;
         float radius = MathF.Max(0.05f, 0.5f * bounds.Size.Length());
-        float aspect = (float)width / height;
-        float fovY = FovYDegrees * MathF.PI / 180f;
-        float fovX = 2f * MathF.Atan(MathF.Tan(fovY / 2f) * aspect);
-        float distance = radius / MathF.Sin(0.5f * MathF.Min(fovY, fovX)) * 1.02f;
         float az = float.IsFinite(azimuth) ? azimuth : DefaultAzimuth;
-        var direction = new Vector3(MathF.Sin(az) * MathF.Cos(Elevation), -MathF.Cos(az) * MathF.Cos(Elevation), MathF.Sin(Elevation));
-        var camera = RenderCamera.LookAt(centre + direction * distance, centre, FovYDegrees);
-        camera.Near = MathF.Max(0.01f, distance - 2f * radius);
-        camera.Far = distance + 4f * radius;
+        // frame the box (not its bounding sphere) as seen from this direction, with a margin, so the fixture fills the picture
+        var camera = ViewFraming.Frame(bounds, new Vector3(MathF.Sin(az) * MathF.Cos(Elevation), -MathF.Cos(az) * MathF.Cos(Elevation), MathF.Sin(Elevation)),
+            FovYDegrees, (float)width / height, margin: 1.12f);
         // key light 600 lx on a mid-grey body ≈ 75 cd/m²; black fixture bodies (≈ 4 %) need about 6 stops less
         camera.Ev100 = 7.5f;
 

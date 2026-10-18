@@ -198,7 +198,7 @@ public sealed class DmxPlayer : IDisposable
         double t = engineTime - _offset;
         if (t < _position) Rebuild(t);
         var frames = Recording.Frames;
-        while (_next < frames.Count && frames[_next].Time <= t)
+        while (_next < frames.Count && frames[_next].Time <= t + DmxRecording.TimeTolerance)
         {
             DmxRecording.Apply(frames[_next], _state);
             if (frames[_next].Timecode is { } tc) _timecode = tc;
