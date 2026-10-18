@@ -165,3 +165,54 @@ public class CommandTests
         Assert.Throws<ArgumentException>(() => new DuplicateEntitiesCommand(scene, new[] { new Entity("Loose") }));
     }
 }
+
+public class SelectionTests
+{
+    [Fact]
+    public void Contains_follows_every_operation_and_does_not_allocate()
+    {
+        var a = Guid.NewGuid();
+        var b = Guid.NewGuid();
+        var c = Guid.NewGuid();
+        var selection = new Selection();
+        int changes = 0;
+        selection.Changed += () => changes++;
+
+        selection.Set(a);
+        selection.Add(b);
+        selection.Toggle(c);
+        Assert.Equal(new[] { a, b, c }, selection.Ids);
+        Assert.Equal(c, selection.Primary);
+        selection.Add(a); // moves to the end
+        Assert.Equal(new[] { b, c, a }, selection.Ids);
+        selection.Toggle(b);
+        selection.Remove(c);
+        selection.Remove(Guid.NewGuid()); // not selected: no change
+        Assert.Equal(new[] { a }, selection.Ids);
+        Assert.True(selection.Contains(a));
+        Assert.False(selection.Contains(b));
+        Assert.False(selection.Contains(c));
+        Assert.Equal(6, changes);
+
+        selection.Set(new[] { b, c, b, a });
+        Assert.Equal(new[] { b, c, a }, selection.Ids);
+        selection.Prune(id => id != c);
+        Assert.Equal(new[] { b, a }, selection.Ids);
+        Assert.False(selection.Contains(c));
+        Assert.True(selection.Contains(b));
+        selection.Clear();
+        Assert.True(selection.IsEmpty);
+        Assert.False(selection.Contains(a));
+        Assert.Null(selection.Primary);
+
+        var many = Enumerable.Range(0, 10_000).Select(_ => Guid.NewGuid()).ToList();
+        selection.Set(many);
+        _ = selection.Contains(many[0]);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        int found = 0;
+        foreach (var id in many)
+            if (selection.Contains(id)) found++;
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Assert.Equal(many.Count, found);
+    }
+}

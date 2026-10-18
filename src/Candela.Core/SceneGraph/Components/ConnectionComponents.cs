@@ -161,11 +161,13 @@ public sealed class CableEndpoint
 /// </summary>
 public sealed class ConsoleComponent : Component
 {
+    /// <summary>Console model shown in the UI and reports (e.g. "grandMA3 light").</summary>
     public string Model { get; set; } = "Generic console";
 
     /// <summary>Protocol whose input feeds this console ("artnet", "sacn", …); null = none (offline programming).</summary>
     public string? ProtocolId { get; set; } = "artnet";
 
+    /// <summary>Physical outputs (DMX ports, network ports) and the universes they carry.</summary>
     public List<ConsoleOutput> Outputs { get; set; } = new()
     {
         new ConsoleOutput { PortName = "DMX A", FirstUniverse = 1 },
@@ -175,32 +177,45 @@ public sealed class ConsoleComponent : Component
     };
 }
 
+/// <summary>One output port of a <see cref="ConsoleComponent"/>.</summary>
 public sealed class ConsoleOutput
 {
+    /// <summary>Port name cables plug into (<see cref="CableEndpoint.PortName"/>), e.g. "DMX A".</summary>
     public string PortName { get; set; } = "";
 
     /// <summary>"DMX512" for XLR outputs, "Ethernet" for network ports carrying several universes.</summary>
     public string Signal { get; set; } = "DMX512";
 
+    /// <summary>First universe carried by the port (1-based, as shown on consoles).</summary>
     public int FirstUniverse { get; set; } = 1;
+
+    /// <summary>Number of consecutive universes carried (1 for an XLR DMX port).</summary>
     public int UniverseCount { get; set; } = 1;
 }
 
 /// <summary>Where power comes from: a wall outlet, a distro or a generator.</summary>
 public sealed class PowerSourceComponent : Component
 {
+    /// <summary>Nominal phase-to-neutral voltage in volts.</summary>
     public float VoltageV { get; set; } = 230f;
+
+    /// <summary>Mains frequency in hertz.</summary>
     public float FrequencyHz { get; set; } = 50f;
+
+    /// <summary>Number of phases supplied (1 or 3).</summary>
     public int Phases { get; set; } = 1;
 
+    /// <summary>The outlets cables plug into.</summary>
     public List<PowerOutlet> Outlets { get; set; } = new()
     {
         new PowerOutlet { PortName = "Outlet 1", Connector = "Schuko", BreakerA = 16f },
     };
 }
 
+/// <summary>One outlet of a <see cref="PowerSourceComponent"/>.</summary>
 public sealed class PowerOutlet
 {
+    /// <summary>Port name cables plug into (<see cref="CableEndpoint.PortName"/>), e.g. "Outlet 1".</summary>
     public string PortName { get; set; } = "";
 
     /// <summary>Connector name from the cable catalogue / _specs vocabulary ("Schuko", "CEE 16A", "powerCON TRUE1", …).</summary>
@@ -219,6 +234,7 @@ public sealed class PowerOutlet
 /// </summary>
 public sealed class AtmosphereVolumeComponent : Component
 {
+    /// <summary>Extent of the box in metres along the entity's local X, Y and Z, centred on the entity.</summary>
     public Vector3 Size { get; set; } = new(20f, 20f, 10f);
 
     /// <summary>Simulation cell size in metres (smaller = finer and slower).</summary>
@@ -233,5 +249,6 @@ public sealed class AtmosphereVolumeComponent : Component
     /// <summary>Constant airflow in m/s (ventilation drafts).</summary>
     public Vector3 Airflow { get; set; }
 
+    /// <summary>False pauses the simulation of this volume (only the base haze remains).</summary>
     public bool Enabled { get; set; } = true;
 }
