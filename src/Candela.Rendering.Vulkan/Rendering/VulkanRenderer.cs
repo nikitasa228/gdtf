@@ -257,13 +257,18 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _pass.Draws.CulledInstances, draws, _world.LightCount);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Reads the display image of the target's last frame as 8-bit sRGB-encoded RGBA, top row first (blocking). A
+    /// target that has not been rendered since it was created or resized reads as transparent black.
+    /// </summary>
     public ImageData ReadPixels(IRenderTarget target)
     {
         ThrowIfDisposed();
         var t = Validate(target);
         int w = t.Width, h = t.Height;
         ulong size = (ulong)w * (ulong)h * 4;
+        if (!t.Last.Valid)
+            return new ImageData { Width = w, Height = h, Format = PixelFormat.Rgba8, Pixels = new byte[(int)size] };
         var readback = Readback(size);
         var cmd = Context.Immediate.Begin();
         _barriers.CommandBuffer = cmd;

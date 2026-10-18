@@ -100,7 +100,7 @@ internal static class RenderTestCommand
         output.WriteLine($"Software:     {(info.IsSoftwareRenderer ? "yes" : "no")}");
         output.WriteLine($"Ray tracing:  {(info.SupportsRayTracing ? "yes" : "no")}");
         output.WriteLine($"Wireframe:    {(renderer.UsesEdgeShaderWireframe ? "edge shader" : "polygon mode")}");
-        output.WriteLine($"Device memory {info.DeviceMemoryBytes / (1024.0 * 1024.0):F0} MiB");
+        output.WriteLine($"Memory:       {info.DeviceMemoryBytes / (1024.0 * 1024.0):F0} MiB device-local");
         output.WriteLine($"Validation:   {(renderer.Context.ValidationEnabled ? "on" : "off")}");
 
         var scene = ProceduralTestScene.Build(renderer.World);

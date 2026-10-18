@@ -31,6 +31,9 @@ public sealed class LifecycleTests
             Assert.Equal(version + 1, target.DisplayVersion);
             Assert.False(target.HasFrame);
             Assert.Null(renderer.Pick(target, 10, 10)); // contents undefined until the next frame
+            var blank = renderer.ReadPixels(target);
+            Assert.Equal((200, 96), (blank.Width, blank.Height));
+            Assert.All(blank.Pixels, b => Assert.Equal(0, b));
 
             // Several resizes between frames, then frames in every mode (old images retired while frames are in flight).
             foreach (var (w, h) in new[] { (64, 64), (1, 1), (0, -5), (333, 177) })
