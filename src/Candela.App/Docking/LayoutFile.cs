@@ -95,6 +95,9 @@ internal sealed class LayoutFile
         file.TabStyles ??= "";
         file.ImGui ??= "";
         file.Name ??= "";
+        // Dear ImGui aborts the process on an inconsistent dock tree instead of reporting it.
+        if (!DockIniValidator.Validate(file.ImGui, out string reason))
+            throw new LayoutFormatException($"The layout file is damaged: {reason}.");
         return file;
     }
 
