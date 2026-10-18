@@ -147,7 +147,7 @@ be fed from a generator or another distro.
 
 | Check | Code | Severity |
 |---|---|---|
-| Patched fixture with no data path (only fixtures that have a wired data input) | `data.no-signal` | warning |
+| Patched fixture with no data path (only fixtures that have a wired data input, and only once the scene has a data network: a console or a data cable — an MVR import without cabling is not 91 warnings) | `data.no-signal` | warning |
 | Patched universe ≠ universe arriving at the input (DMX: break of the input; Ethernet: every address in range) | `data.universe-mismatch` | error |
 | DMX/Ethernet cable tree with more than two plugged ends; both thru sockets of one fixture in use | `data.y-split` | warning |
 | More than 32 devices on one DMX segment (`NetworkSolverOptions.MaxDmxDevicesPerSegment`) | `data.chain-too-long` | warning |

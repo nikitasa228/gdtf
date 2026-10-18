@@ -117,6 +117,30 @@ public class DataNetworkTests
     }
 
     [Fact]
+    public void Without_consoles_or_data_cables_patched_fixtures_are_not_reported_as_receiving_no_data()
+    {
+        // an imported MVR: 40 patched fixtures, no console, no cables — they follow live universes or their manual values
+        var kit = new SceneKit();
+        var heads = Heads(kit, 40);
+        var s = kit.Solve();
+        Assert.Empty(s.Issues.WithCode(IssueCodes.DataNoSignal));
+        Assert.Empty(s.ConsoleDrivenFixtures);
+        Assert.Equal(40, DataReport.Build(s).PatchedFixturesWithoutData.Count); // the report still lists them
+
+        // a power cable is not a data network either
+        var fresh = new SceneKit();
+        var two = Heads(fresh, 2);
+        fresh.Cable("powercon-true1", "P", (two[0], "Power OUT"), (two[1], "Power IN"));
+        Assert.Empty(fresh.Solve().Issues.WithCode(IssueCodes.DataNoSignal));
+
+        // the first data cable makes it one: the fixtures it does not reach from a console are reported
+        var cabled = new SceneKit();
+        var three = Heads(cabled, 3);
+        cabled.Cable("dmx-xlr5", "Loose", (three[0], "XLR OUT"), (three[1], "XLR IN"));
+        Assert.Equal(3, cabled.Solve().Issues.WithCode(IssueCodes.DataNoSignal).Count);
+    }
+
+    [Fact]
     public void Chains_longer_than_32_devices_and_300_m_are_warnings()
     {
         var kit = new SceneKit();
