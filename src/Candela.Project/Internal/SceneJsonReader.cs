@@ -1,5 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Candela.Core.Diagnostics;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
@@ -188,9 +190,17 @@ internal static class SceneJsonReader
         foreach (var element in array.EnumerateArray())
         {
             string? type = element.ValueKind == JsonValueKind.Object ? ReadString(element, "$type") : null;
+            if (type is not null && !s_knownTypes.Contains(type))
+            {
+                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentUnknown,
+                    $"'{name}' has a component of type '{type}' that this version of Candela does not know (saved by a newer version?); it was dropped.", id);
+                continue;
+            }
             try
             {
-                var component = element.Deserialize<Component>(CandelaJson.Options);
+                var component = type is not null && !TypeIsFirst(element)
+                    ? TypeFirst(element, type).Deserialize<Component>(CandelaJson.Options)
+                    : element.Deserialize<Component>(CandelaJson.Options);
                 if (component is null) continue;
                 if (NullRepair.Repair(component) > 0)
                 {
@@ -199,11 +209,6 @@ internal static class SceneJsonReader
                 }
                 list.Add(component);
             }
-            catch (NotSupportedException) when (type is not null)
-            {
-                issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentUnknown,
-                    $"'{name}' has a component of type '{type}' that this version of Candela does not know (saved by a newer version?); it was dropped.", id);
-            }
             catch (Exception e) when (IsDataError(e))
             {
                 issues.Add(IssueSeverity.Warning, IssueCategory.Scene, ProjectIssueCodes.SceneComponentInvalid,
@@ -211,6 +216,30 @@ internal static class SceneJsonReader
             }
         }
         return list;
+    }
+
+    /// <summary>The component discriminators Core registers ("fixture", "mesh", …).</summary>
+    private static readonly HashSet<string> s_knownTypes = typeof(Component)
+        .GetCustomAttributes(typeof(JsonDerivedTypeAttribute), inherit: false)
+        .Cast<JsonDerivedTypeAttribute>()
+        .Select(a => a.TypeDiscriminator as string)
+        .OfType<string>()
+        .ToHashSet(StringComparer.Ordinal);
+
+    /// <summary>System.Text.Json requires the "$type" discriminator to be the first property.</summary>
+    private static bool TypeIsFirst(JsonElement element)
+    {
+        foreach (var p in element.EnumerateObject()) return p.NameEquals("$type");
+        return false;
+    }
+
+    /// <summary>A copy of a hand-edited component object with "$type" moved to the front.</summary>
+    private static JsonObject TypeFirst(JsonElement element, string type)
+    {
+        var obj = new JsonObject { ["$type"] = type };
+        foreach (var p in element.EnumerateObject())
+            if (!p.NameEquals("$type")) obj[p.Name] = JsonNode.Parse(p.Value.GetRawText());
+        return obj;
     }
 
     private static void CheckLayers(List<EntityRecord> records, List<Layer> layers, IssueCollector issues)

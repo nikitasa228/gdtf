@@ -106,7 +106,18 @@ internal static class ProjectReader
     {
         try
         {
-            return new ZipArchive(source, ZipArchiveMode.Read, leaveOpen: true);
+            var zip = new ZipArchive(source, ZipArchiveMode.Read, leaveOpen: true);
+            try
+            {
+                // The central directory is read lazily; read it now so a damaged directory is reported here.
+                _ = zip.Entries.Count;
+                return zip;
+            }
+            catch
+            {
+                zip.Dispose();
+                throw;
+            }
         }
         catch (Exception e) when (e is InvalidDataException or ArgumentException or NotSupportedException)
         {
