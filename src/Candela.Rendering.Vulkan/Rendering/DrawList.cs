@@ -73,7 +73,7 @@ internal struct Frustum
 /// <summary>
 /// The draws of one view, built from the world's live instances: hidden instances and instances outside the view
 /// frustum are skipped; each sub-mesh is sorted into the opaque, alpha-tested or blended list by its material
-/// (reference drawings are blended); blended draws are sorted back to front. Arrays grow on demand and are reused,
+/// (reference drawings are blended in the Full and Colorless views); blended draws are sorted back to front. Arrays grow on demand and are reused,
 /// so building allocates nothing in steady state.
 /// </summary>
 internal sealed class DrawList
@@ -107,7 +107,8 @@ internal sealed class DrawList
     /// <param name="cameraPosition">Camera position, world space.</param>
     /// <param name="forward">Unit view direction.</param>
     /// <param name="useMaterials">Full view: materials decide the list. Otherwise every draw is opaque.</param>
-    public void Build(VulkanRenderWorld world, in Frustum frustum, Vector3 cameraPosition, Vector3 forward, bool useMaterials)
+    /// <param name="blendReferences">Reference drawings go to the blended list (Full and Colorless: unlit, semi-transparent).</param>
+    public void Build(VulkanRenderWorld world, in Frustum frustum, Vector3 cameraPosition, Vector3 forward, bool useMaterials, bool blendReferences)
     {
         _opaqueCount = _maskedCount = _blendedCount = 0;
         int visible = 0, culled = 0, selected = 0;
@@ -143,8 +144,8 @@ internal sealed class DrawList
                     DoubleSided = material?.DoubleSided ?? false,
                     ViewDepth = depth,
                 };
-                var kind = !useMaterials ? DrawKind.Opaque
-                    : reference ? DrawKind.Blend
+                var kind = reference && blendReferences ? DrawKind.Blend
+                    : !useMaterials ? DrawKind.Opaque
                     : material?.Kind ?? DrawKind.Opaque;
                 switch (kind)
                 {

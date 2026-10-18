@@ -310,7 +310,8 @@ internal sealed class ForwardOpaquePass : RenderPass
 
 /// <summary>
 /// Full view, blended and transmissive surfaces (and reference drawings) back to front with premultiplied alpha,
-/// depth-tested against the opaque scene without writing depth, fogged by the medium in front of them.
+/// depth-tested against the opaque scene without writing depth, fogged by the medium in front of them. The Colorless
+/// view uses it for its reference drawings (unlit, semi-transparent).
 /// </summary>
 internal sealed class ForwardTransparentPass : RenderPass
 {
@@ -319,7 +320,8 @@ internal sealed class ForwardTransparentPass : RenderPass
     {
     }
 
-    public override bool IsActive(PassContext context) => context.Shading == ViewShading.Full && context.Draws.Blended.Length > 0;
+    public override bool IsActive(PassContext context) =>
+        context.Shading is ViewShading.Full or ViewShading.Colorless && context.Draws.Blended.Length > 0;
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {

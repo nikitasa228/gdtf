@@ -530,6 +530,72 @@ public sealed class ReviewBeamProbes
     }
 }
 
+public sealed class ReviewShadowProbes
+{
+    private readonly Xunit.Abstractions.ITestOutputHelper _out;
+
+    public ReviewShadowProbes(Xunit.Abstractions.ITestOutputHelper output) => _out = output;
+
+    [SkippableTheory]
+    [InlineData(0f)]
+    [InlineData(0.15f)]
+    public void LitSphereHasNoShadowAcne(float sourceRadius)
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            var grey = scene.Lambert(new Vector3(0.5f));
+            scene.Floor(20f, grey);
+            var centre = new Vector3(0f, 0f, 1f);
+            const float radius = 1f;
+            scene.Sphere(radius, centre, grey);
+            var light = StageScene.Spot(new Vector3(-3f, -1f, 6f), centre, 50000f, 40f, 60f);
+            light.SourceRadius = sourceRadius;
+            renderer.World.SetLights(new[] { light });
+            var view = new TopDownView(200, 200, 3f);
+            using var target = renderer.CreateTarget(200, 200);
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux }, new PreviewSettings(), 0f);
+            var lux = renderer.ReadAnalysis(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            var reference = new[] { new Photometry.SpotLight(light.Position, light.Direction, light.PeakCandela,
+                BeamDistribution.Create(light.BeamType, light.BeamAngle, light.FieldAngle)) };
+            int n = 0, bad = 0;
+            double worst = 0;
+            for (int y = 0; y < 200; y += 2)
+            {
+                for (int x = 0; x < 200; x += 2)
+                {
+                    var floor = view.FloorPointOf(x, y);
+                    float r2 = (floor.X - centre.X) * (floor.X - centre.X) + (floor.Y - centre.Y) * (floor.Y - centre.Y);
+                    if (r2 > 0.8f * 0.8f)
+                        continue;
+                    var p = new Vector3(floor.X, floor.Y, centre.Z + MathF.Sqrt(radius * radius - r2));
+                    var normal = Vector3.Normalize(p - centre);
+                    var toLight = Vector3.Normalize(light.Position - p);
+                    if (Vector3.Dot(normal, toLight) < 0.35f)
+                        continue;
+                    float expected = LightMeter.IlluminanceAt(reference, p, normal);
+                    float measured = lux[y * 200 + x];
+                    double rel = Math.Abs(measured - expected) / expected;
+                    worst = Math.Max(worst, rel);
+                    n++;
+                    if (rel > 0.04)
+                        bad++;
+                }
+            }
+
+            _out.WriteLine($"source radius {sourceRadius}: {bad} of {n} off by > 4 %, worst {worst:P1}");
+            Assert.True(n > 100);
+            Assert.True(bad == 0, $"{bad} of {n} lit sphere points off by more than 4 % (worst {worst:P1})");
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+}
+
 public sealed class ReviewExperiments
 {
     private readonly Xunit.Abstractions.ITestOutputHelper _out;

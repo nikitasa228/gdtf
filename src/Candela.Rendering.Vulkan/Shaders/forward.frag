@@ -71,13 +71,15 @@ void main()
     }
 
     // Reference drawings and unlit materials show their base colour as a display-referred value, independent of the
-    // exposure and the stage lights; reference drawings are semi-transparent.
+    // exposure and the stage lights; reference drawings are semi-transparent. The Colorless view (reference drawings
+    // only) writes display-linear Rec.709, which its display transform passes through.
     bool reference = (instances[inInstance].flags & INSTANCE_FLAG_REFERENCE) != 0u;
     if ((m.flags & MATERIAL_UNLIT) != 0u || reference)
     {
 #ifdef TRANSPARENT
         float a = alpha * (reference ? REFERENCE_OPACITY : 1.0);
-        outColor = vec4(albedo * a, a);
+        vec3 display = frame.viewMode == VIEW_COLORLESS ? clamp(rec2020ToRec709(albedo), 0.0, 1.0) : albedo;
+        outColor = vec4(display * a, a);
 #else
         outColor = vec4(albedo, 1.0);
 #endif

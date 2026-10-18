@@ -346,6 +346,13 @@ public sealed class OverlayTests
             var expected = ColorSpaces.Rec709ToRec2020(new Vector3(1f, 0f, 0f)) * 0.5f / hdr.Exposure;
             var measured = hdr.At(x, y);
             Assert.InRange(Vector3.Distance(measured, expected) / expected.Length(), 0f, 0.02f);
+
+            // Colorless: also unlit and semi-transparent (display-linear Rec.709 over the dark grey background), not shaded grey.
+            renderer.Render(target, view.Camera, new ViewOptions { Shading = ViewShading.Colorless, ShowGrid = false }, new PreviewSettings(), 0f);
+            var colorless = renderer.ReadHdr(target).At(x, y);
+            const float background = 0.022f;
+            var expectedColorless = new Vector3(0.5f + 0.5f * background, 0.5f * background, 0.5f * background);
+            Assert.InRange(Vector3.Distance(colorless, expectedColorless), 0f, 0.01f);
             TestVulkan.AssertNoValidationErrors(renderer.Context);
         }
         finally

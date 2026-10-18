@@ -279,7 +279,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
             BuildFrameData(t, camera, view, decisions, exposure, ref p.Data, out var frustum);
             var forward = new Vector3(p.Data.CameraForward.X, p.Data.CameraForward.Y, p.Data.CameraForward.Z);
             var eye = new Vector3(p.Data.CameraPosition.X, p.Data.CameraPosition.Y, p.Data.CameraPosition.Z);
-            p.Draws.Build(_world, frustum, eye, forward, useMaterials: decisions.Shading == ViewShading.Full);
+            p.Draws.Build(_world, frustum, eye, forward, useMaterials: decisions.Shading == ViewShading.Full,
+                blendReferences: decisions.Shading != ViewShading.Wireframe);
             p.SelectionActive = view.ShowSelectionOutline && p.Draws.SelectedInstances > 0;
 
             // Shadow atlas, light plan, acceleration structures.

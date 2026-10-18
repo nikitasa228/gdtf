@@ -513,7 +513,8 @@ background is not coloured.
   lens to the field-angle circle where the beam meets the floor (Z = 0; 10 m when it points up; 0.5–30 m) and that
   circle as 24 segments, in the light's colour, 1.5 px, depth-tested.
 * **Reference drawings** (`InstanceFlags.Reference`): unlit, base colour display-referred at 50 % opacity, no shadows,
-  not ray traced.
+  not ray traced — in the Full and the Colorless view (where they are drawn by the transparent pass over the grey
+  shading); the Wireframe view shows their edges. Like other blended surfaces they are not in the pick buffer.
 * **Wireframe** and **Colorless** as in stage 1; lines, grid and outlines are always drawn at display resolution.
 
 ## Accuracy and test coverage
