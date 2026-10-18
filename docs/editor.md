@@ -119,9 +119,11 @@ view shows the snapped face, the arrows to its neighbours and the caption.*
 **Toolbar** (top left; compact icons when the viewport is narrow): select / move / rotate tool, local / world space,
 snapping, shading (Wireframe, Colorless, Full — the menu's last entry, *Viewport Settings…*, opens the Preview panel
 with the real-time quality settings of the Full mode), projection (perspective / orthographic), overlay (None, Lux,
-Noise, Cables), grid, statistics.
+Noise, Cables), grid, statistics. When even the compact toolbar is wider than the view (four views at a large UI
+scale), the view options move to a second row, so every button stays reachable.
 
-**View cube** (top right): the cube turned like the scene; clicking a face snaps the camera to that orthographic view
+**View cube** (top right, beside the toolbar when there is room, otherwise below it; it shrinks in small views
+instead of disappearing): the cube turned like the scene; clicking a face snaps the camera to that orthographic view
 (Top, Bottom, Front = from the audience, Back, Left, Right). Looking straight at a face, the cube shows only that face,
 so four arrows around it lead to the neighbouring views (from Top: up = Back, down = Front, left / right = Left /
 Right) — every view is one or two clicks away without orbiting. The caption under it names the current view.
