@@ -11,10 +11,11 @@ namespace Candela.Rendering.Vulkan;
 /// </summary>
 /// <remarks>
 /// <para><b>Allocation.</b> Tiles are placed on an occupancy grid of the smallest tile size at positions aligned to
-/// their own size (buddy-style, no fragmentation between equal sizes). A request reuses the light's tile when its
-/// size is within one level of the wanted size (hysteresis); otherwise a new tile is placed, evicting the least
-/// recently used tiles of lights that the current frame does not need; when nothing fits even at the smallest size the
-/// light stays unshadowed.</para>
+/// their own size (buddy-style, no fragmentation between equal sizes). The planner sizes the tiles of a view so that
+/// they fit its share of the atlas. A request reuses the light's tile when another view used it in this frame, or when
+/// it is between half the wanted size and the wanted size (hysteresis: tiles shrink at once and grow a level late);
+/// otherwise a new tile is placed, evicting the least recently used tiles of lights that the current frame does not
+/// need; when nothing fits even at the smallest size the light stays unshadowed.</para>
 /// <para><b>Caching.</b> A tile is re-rendered only when its light's shadow frustum changes (position, axis, or the
 /// cone outgrows the frustum, which keeps a 10 % margin for zoom), when a shadow caster inside its frustum is created,
 /// destroyed, moved or changes material (<see cref="ShadowCasterChanges"/>), or when reflective-shadow-map data is
@@ -74,6 +75,22 @@ internal sealed unsafe class ShadowAtlas : IDisposable
 
     /// <summary>Smallest tile size, pixels.</summary>
     public int MinTileSize => _cellSize;
+
+    /// <summary>Level of the smallest tile (size = <see cref="TileResolution"/> / 2^level).</summary>
+    public int SmallestLevel => System.Numerics.BitOperations.Log2((uint)(TileResolution / _cellSize));
+
+    /// <summary>Cells of the smallest tile size in the atlas (its capacity in smallest tiles).</summary>
+    public int CellCount => _cellsPerSide * _cellsPerSide;
+
+    /// <summary>Tile size of a level, pixels (<see cref="TileResolution"/> / 2^level, at least <see cref="MinTileSize"/>).</summary>
+    public int TileSize(int level) => Math.Max(TileResolution >> Math.Clamp(level, 0, 30), _cellSize);
+
+    /// <summary>Atlas area of a tile of a level, in cells of the smallest tile size.</summary>
+    public int TileCells(int level)
+    {
+        int side = TileSize(level) / _cellSize;
+        return side * side;
+    }
 
     /// <summary>Tiles to (re-)render in the current view, in request order.</summary>
     public ReadOnlySpan<int> PendingRenders => _renderList.AsSpan(0, _renderCount);
@@ -160,6 +177,13 @@ internal sealed unsafe class ShadowAtlas : IDisposable
     /// Requests a tile of about <paramref name="wantedSize"/> pixels for a light this frame. Returns the tile index,
     /// or -1 when the atlas is full. Tiles that must be (re-)rendered are added to <see cref="PendingRenders"/>.
     /// </summary>
+    /// <remarks>
+    /// The light keeps its tile when another view already used it in this frame (views must not fight over sizes),
+    /// or when the tile is at most the wanted size and at least half of it (a tile shrinks at once, so the planned
+    /// sizes always fit the atlas, but grows only when it falls a whole level behind). A new tile goes where the
+    /// wanted size fits, after evicting the least recently used tiles that this frame has not used; only when none
+    /// is left is a smaller size tried.
+    /// </remarks>
     public int Request(LightKey key, in GpuLight light, int wantedSize, bool needRsm, ulong frame)
     {
         wantedSize = Math.Clamp(wantedSize, _cellSize, TileResolution);
@@ -167,7 +191,7 @@ internal sealed unsafe class ShadowAtlas : IDisposable
         if (_byKey.TryGetValue(key, out int index))
         {
             ref var tile = ref _tiles[index];
-            if (tile.Size * 2 >= wantedSize && tile.Size <= wantedSize * 2)
+            if (tile.LastUsed == frame || (tile.Size <= wantedSize && tile.Size * 2 >= wantedSize))
             {
                 tile.LastUsed = frame;
                 if (!tile.Matches(position, axis, required))
@@ -190,20 +214,13 @@ internal sealed unsafe class ShadowAtlas : IDisposable
         int slot = FreeSlot();
         if (slot < 0)
             return -1;
-        int x = 0, y = 0, size = wantedSize;
-        bool placed = false;
-        while (!placed)
+        int x, y, size = wantedSize;
+        while (!TryPlace(size, out x, out y))
         {
-            for (size = wantedSize; size >= _cellSize; size >>= 1)
-            {
-                if (TryPlace(size, out x, out y))
-                {
-                    placed = true;
-                    break;
-                }
-            }
-
-            if (!placed && !EvictLeastRecentlyUsed(frame))
+            if (EvictLeastRecentlyUsed(frame))
+                continue;
+            size >>= 1;
+            if (size < _cellSize)
                 return -1;
         }
 

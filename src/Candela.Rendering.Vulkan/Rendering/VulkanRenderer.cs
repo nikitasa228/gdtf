@@ -109,6 +109,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
     private ShadowAtlas? _atlas;
     private RayTracingScene? _rayTracing;
     private GpuBuffer? _readback;
+    private ulong _shadowViewFrame;
+    private int _shadowViewsThisFrame;
+    private int _shadowViewsLastFrame;
     private bool _disposed;
 
     /// <summary>Creates a renderer on a context the caller owns (the editor shares it with its swapchain and UI).</summary>
@@ -284,6 +287,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             {
                 _atlas ??= new ShadowAtlas(Context);
                 _atlas.Configure(settings.ShadowMapResolution, decisions.Indirect == IndirectLighting.ReflectiveShadowMaps);
+                CountShadowedView(frame.Number);
             }
             else if (_atlas is not null && _world.ShadowCastingLights == 0)
             {
@@ -307,6 +311,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 LightRangeScale = p.Data.LightRangeScale,
                 Shadows = decisions.Shadows,
                 MaxShadowedLights = Math.Clamp(settings.MaxShadowedLights, 0, ShadowAtlas.MaxTiles),
+                AtlasShare = Math.Max(_shadowViewsThisFrame, _shadowViewsLastFrame),
                 Rsm = decisions.Indirect == IndirectLighting.ReflectiveShadowMaps,
                 RayTracedGi = decisions.Indirect == IndirectLighting.RayTraced,
                 VplCapacity = decisions.VplCapacity,
@@ -696,9 +701,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         int rw = Math.Max(1, (int)MathF.Round(t.Width * scale)), rh = Math.Max(1, (int)MathF.Round(t.Height * scale));
         d.Scaled = rw != t.Width || rh != t.Height;
         d.Scale = scale;
-        d.VplCapacity = indirect == IndirectLighting.ReflectiveShadowMaps
-            ? LightPlanner.VplCapacity(Math.Clamp(settings.MaxShadowedLights, 1, ShadowAtlas.MaxTiles))
-            : 0;
+        d.VplCapacity = indirect == IndirectLighting.ReflectiveShadowMaps ? LightPlanner.VplBudget : 0;
 
         var r = new ViewRequirements
         {
@@ -729,6 +732,23 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
         d.Requirements = r;
         return d;
+    }
+
+    /// <summary>
+    /// Counts the views that use the shadow atlas in a frame: the editor renders several viewports into one frame, and
+    /// each plans its shadow tiles within an equal share of the atlas (the larger of this frame's and the previous
+    /// frame's view count), so one view cannot take the tiles another view of the same frame needs.
+    /// </summary>
+    private void CountShadowedView(ulong frameNumber)
+    {
+        if (frameNumber != _shadowViewFrame)
+        {
+            _shadowViewsLastFrame = frameNumber == _shadowViewFrame + 1 ? _shadowViewsThisFrame : 0;
+            _shadowViewsThisFrame = 0;
+            _shadowViewFrame = frameNumber;
+        }
+
+        _shadowViewsThisFrame++;
     }
 
     private static int BloomLevelCount(int width, int height)

@@ -11,12 +11,13 @@ namespace Candela.Rendering.Vulkan;
 /// when the sphere (beam cone up to the light's range, at most 60 m) is outside the view frustum;</item>
 /// <item>shadow tiles for the <see cref="PreviewSettings.MaxShadowedLights"/> highest-scoring lights that cast shadows,
 /// the tile size halving for every factor of 4 the score is below the best light's (at least 1/8 of the full
-/// resolution);</item>
+/// resolution), then reduced — the least important of the largest tiles first — until all of them fit the view's
+/// share of the atlas;</item>
 /// <item>the <see cref="PreviewSettings.MaxRaymarchedBeams"/> highest-scoring narrow beams (field angle below
 /// <see cref="NarrowBeamFieldAngle"/>) that are ray marched at full resolution and skipped by the froxel injection;</item>
-/// <item>the lights whose reflective shadow maps feed indirect light, each with a share of the
-/// <see cref="VplBudget"/> virtual point lights proportional to its score (at least <see cref="MinVplsPerLight"/>),
-/// or the lights the ray-traced GI evaluates at its hits;</item>
+/// <item>the lights whose reflective shadow maps feed indirect light — the <see cref="MaxRsmLights"/> highest-scoring
+/// shadowed lights, each with <see cref="MinVplsPerLight"/> plus a share of the rest of the <see cref="VplBudget"/>
+/// virtual point lights proportional to its score —, or the lights the ray-traced GI evaluates at its hits;</item>
 /// <item>the beam outline segments (<see cref="ViewOptions.ShowBeamOutlines"/>).</item>
 /// </list>
 /// </summary>
@@ -31,12 +32,17 @@ internal sealed class LightPlanner
     /// <summary>Fewest VPLs of a light with a reflective shadow map.</summary>
     public const int MinVplsPerLight = 8;
 
+    /// <summary>Most lights whose reflective shadow maps feed the VPLs of a view (each gets at least <see cref="MinVplsPerLight"/>).</summary>
+    public const int MaxRsmLights = VplBudget / MinVplsPerLight;
+
     /// <summary>Most lights evaluated at the hits of the ray-traced GI.</summary>
     public const int MaxGiLights = 64;
 
     private const int OutlineGenerators = 8;
     private const int OutlineRing = 24;
 
+    private readonly int[] _candidates = new int[ShadowAtlas.MaxTiles];
+    private readonly int[] _levels = new int[ShadowAtlas.MaxTiles];
     private float[] _sortKeys = new float[64];
     private int[] _order = new int[64];
     private float[] _scores = new float[64];
@@ -82,17 +88,11 @@ internal sealed class LightPlanner
         ShadowedLights = 0;
         if (atlas is not null && inputs.Shadows)
         {
-            float best = n > 0 ? _scores[_order[0]] : 0f;
-            for (int k = 0; k < n && ShadowedLights < inputs.MaxShadowedLights; k++)
+            int count = PlanShadowTiles(lights, atlas, inputs);
+            for (int c = 0; c < count; c++)
             {
-                int i = _order[k];
-                float score = _scores[i];
-                if (score <= 0f)
-                    break;
-                if ((lights[i].Flags & ShaderConstants.LightCastShadows) == 0)
-                    continue;
-                int level = Math.Clamp((int)MathF.Floor(0.5f * MathF.Log2(MathF.Max(best / score, 1f))), 0, 3);
-                int tile = atlas.Request(keys[i], lights[i], atlas.TileResolution >> level, inputs.Rsm, inputs.FrameNumber);
+                int i = _candidates[c];
+                int tile = atlas.Request(keys[i], lights[i], atlas.TileSize(_levels[c]), inputs.Rsm, inputs.FrameNumber);
                 if (tile < 0)
                     continue;
                 target.LightViews[i].ShadowSlot = (uint)tile;
@@ -123,21 +123,28 @@ internal sealed class LightPlanner
         VplCount = 0;
         if (inputs.Rsm)
         {
+            // The most important shadowed lights (at most MaxRsmLights) share the VPL budget: MinVplsPerLight each
+            // plus the rest in proportion to their scores, so the gather never evaluates more than VplBudget VPLs.
+            int rsmLights = 0;
             float total = 0f;
-            for (int k = 0; k < n; k++)
-            {
-                int i = _order[k];
-                if (target.LightViews[i].ShadowSlot != ShaderConstants.NoShadow)
-                    total += _scores[i];
-            }
-
-            for (int k = 0; k < n && total > 0f; k++)
+            for (int k = 0; k < n && rsmLights < MaxRsmLights; k++)
             {
                 int i = _order[k];
                 if (target.LightViews[i].ShadowSlot == ShaderConstants.NoShadow)
                     continue;
-                int count = Math.Max(MinVplsPerLight, (int)(VplBudget * _scores[i] / total));
-                count = Math.Min(count, inputs.VplCapacity - VplCount);
+                total += _scores[i];
+                rsmLights++;
+            }
+
+            int budget = Math.Min(VplBudget, inputs.VplCapacity);
+            int spare = Math.Max(budget - MinVplsPerLight * rsmLights, 0);
+            for (int k = 0; k < n && IndirectLightCount < rsmLights && total > 0f; k++)
+            {
+                int i = _order[k];
+                if (target.LightViews[i].ShadowSlot == ShaderConstants.NoShadow)
+                    continue;
+                int count = MinVplsPerLight + (int)(spare * (_scores[i] / total));
+                count = Math.Min(count, budget - VplCount);
                 if (count <= 0)
                     break;
                 ref var view = ref target.LightViews[i];
@@ -171,9 +178,6 @@ internal sealed class LightPlanner
             BuildOutlines(lights, target.BeamLines);
     }
 
-    /// <summary>Maximum VPLs the plan can use for <paramref name="lights"/> RSM lights.</summary>
-    public static int VplCapacity(int lights) => Math.Max(VplBudget, MinVplsPerLight * Math.Max(lights, 1)) + MinVplsPerLight;
-
     /// <summary>Estimated contribution of a light to the view (see the class remarks).</summary>
     public static float Score(in GpuLight light, in PlanInputs inputs)
     {
@@ -202,6 +206,59 @@ internal sealed class LightPlanner
             ? sphere.W / MathF.Max(0.5f * inputs.OrthoHeight, 1e-3f)
             : sphere.W / (distance * MathF.Max(inputs.TanHalfFovY, 1e-3f));
         return flux * (0.25f + MathF.Min(screen, 1f)) / (distance * distance);
+    }
+
+    /// <summary>
+    /// The lights that get a shadow tile in this view and their tile levels (size = full resolution / 2^level), in
+    /// <see cref="_candidates"/> / <see cref="_levels"/>: the <see cref="PlanInputs.MaxShadowedLights"/> highest-scoring
+    /// shadow casters, each a level smaller for every factor of 4 its score is below the best one's, then shrunk —
+    /// always the least important of the largest tiles first — until their total area fits the view's share of the
+    /// atlas (<see cref="PlanInputs.AtlasShare"/>); casters that do not fit even at the smallest size are dropped.
+    /// Levels never decrease along the score order, so the atlas can place the tiles without fragmentation.
+    /// </summary>
+    /// <returns>Number of candidates.</returns>
+    private int PlanShadowTiles(ReadOnlySpan<GpuLight> lights, ShadowAtlas atlas, in PlanInputs inputs)
+    {
+        int count = 0;
+        int n = lights.Length;
+        int max = Math.Min(inputs.MaxShadowedLights, _candidates.Length);
+        for (int k = 0; k < n && count < max; k++)
+        {
+            int i = _order[k];
+            if (_scores[i] <= 0f)
+                break;
+            if ((lights[i].Flags & ShaderConstants.LightCastShadows) != 0)
+                _candidates[count++] = i;
+        }
+
+        if (count == 0)
+            return 0;
+        float best = _scores[_candidates[0]];
+        int maxLevel = atlas.SmallestLevel;
+        long area = 0;
+        for (int c = 0; c < count; c++)
+        {
+            float ratio = MathF.Max(best / _scores[_candidates[c]], 1f);
+            int level = Math.Clamp((int)MathF.Floor(0.5f * MathF.Log2(ratio)), 0, maxLevel);
+            _levels[c] = c > 0 ? Math.Max(level, _levels[c - 1]) : level;
+            area += atlas.TileCells(_levels[c]);
+        }
+
+        long capacity = atlas.CellCount / Math.Max(inputs.AtlasShare, 1);
+        while (area > capacity && _levels[0] < maxLevel)
+        {
+            // The last of the largest tiles (levels never decrease along the order) becomes one level smaller.
+            int lowest = _levels[0];
+            int j = 0;
+            while (j + 1 < count && _levels[j + 1] == lowest)
+                j++;
+            area -= atlas.TileCells(lowest) - atlas.TileCells(lowest + 1);
+            _levels[j] = lowest + 1;
+        }
+
+        while (area > capacity && count > 0)
+            area -= atlas.TileCells(_levels[--count]);
+        return count;
     }
 
     private static void Append(VulkanRenderTarget target, uint value)
@@ -271,6 +328,9 @@ internal struct PlanInputs
     public float LightRangeScale;
     public bool Shadows;
     public int MaxShadowedLights;
+
+    /// <summary>Views sharing the shadow atlas in one frame: each plans its tiles within 1/AtlasShare of it.</summary>
+    public int AtlasShare;
     public bool Rsm;
     public bool RayTracedGi;
     public int VplCapacity;
