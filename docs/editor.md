@@ -168,8 +168,10 @@ drawn (its tab covered, the panel closed) — fly mode suspends the shortcuts, a
   angles as entered (a Y of 95° stays 95° instead of flipping to the equivalent −170° / 85° / −160°, and a drag on Y
   continues past ±90°) until the rotation is changed elsewhere.
 * **Undo**: every edit goes through Core's `UndoStack`. A whole gizmo drag, or a whole drag on a numeric field, is
-  *one* undo step (consecutive transform commands merge until the drag ends). Delete, Duplicate, Cut, Copy and Paste
-  work on the top-level selected objects (children follow their parents) and are single steps too.
+  *one* undo step (consecutive transform commands merge until the drag ends); Undo and Redo wait until a drag in a
+  viewport is finished (the drag would re-apply its transform at once and the redo history would be lost). Delete,
+  Duplicate, Cut, Copy and Paste work on the top-level selected objects (children follow their parents) and are single
+  steps too.
 
 ## Menus
 

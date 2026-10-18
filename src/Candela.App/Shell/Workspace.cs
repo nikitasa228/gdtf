@@ -289,6 +289,15 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     /// <inheritdoc/>
     public void SuspendShortcuts(bool suspended) => _dispatcher.Suspended = suspended || _settingsWindow.IsCapturing;
 
+    /// <summary>True while a viewport is in the middle of a drag (gizmo, navigation, box selection).</summary>
+    private bool ViewportBusy()
+    {
+        foreach (var viewport in _viewports)
+            if (viewport.IsInteracting)
+                return true;
+        return false;
+    }
+
     /// <summary>The viewport View-menu commands act on.</summary>
     internal ViewportPanel ActiveViewport => ActiveViewportRule.Choose(_activeViewport, _viewports);
 

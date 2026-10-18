@@ -38,8 +38,10 @@ internal sealed partial class Workspace
         Command(AppActions.Exit, Str.FileExit, Icons.X, () => _ctx.Window.SetShouldClose(true));
 
         // Edit
-        Command(EditorActions.Undo, Str.EditUndo, Icons.Undo, session.Undo.Undo, () => session.Undo.CanUndo);
-        Command(EditorActions.Redo, Str.EditRedo, Icons.Redo, session.Undo.Redo, () => session.Undo.CanRedo);
+        // Not while a gizmo or navigation drag is under way: the drag would re-apply its transform at once and the undone
+        // step (and the redo history) would be lost.
+        Command(EditorActions.Undo, Str.EditUndo, Icons.Undo, session.Undo.Undo, () => session.Undo.CanUndo && !ViewportBusy());
+        Command(EditorActions.Redo, Str.EditRedo, Icons.Redo, session.Undo.Redo, () => session.Undo.CanRedo && !ViewportBusy());
         Command(AppActions.Cut, Str.EditCut, Icons.Scissors, () => Notify(Count(_edit.Cut(session.Scene, session.Selection, session.Undo), Str.EditCut)), HasSelection);
         Command(EditorActions.Copy, Str.EditCopy, Icons.Copy, () => Notify(Count(_edit.Copy(session.Scene, session.Selection), Str.EditCopy)), HasSelection);
         Command(EditorActions.Paste, Str.EditPaste, Icons.Clipboard, () => _edit.Paste(session.Scene, session.Selection, session.Undo), () => _edit.CanPaste);
