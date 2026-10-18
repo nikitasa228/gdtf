@@ -266,15 +266,54 @@ public sealed class ModelFileSet
             var info = new FileInfo(fullPath);
             if (!info.Exists || info.Length > MaxFileSize) return false;
             if (TryKnown(preferredKey, out key, out data)) return true;
+            // Outside the model's folder only images are read (a crafted model must not pull arbitrary local files into a
+            // project that is later shared).
+            bool outside = !IsInsideRoot(info.FullName);
+            if (outside && !AssetFormats.IsImageFile(info.Name)) return false;
             data = File.ReadAllBytes(info.FullName);
+            if (outside && ImageImporter.DetectFormat(data) is null)
+            {
+                data = null;
+                return false;
+            }
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
+            data = null;
             return false;
         }
         key = preferredKey;
         Add(key, data);
         return true;
+    }
+
+    /// <summary>
+    /// Forgets a file that was read but turned out not to be needed (e.g. a "texture" that is no image), so it is not
+    /// stored with the asset. The main file is never removed.
+    /// </summary>
+    internal void Discard(string key)
+    {
+        lock (_gate)
+        {
+            if (string.Equals(key, MainFile, StringComparison.Ordinal) || !_files.Remove(key)) return;
+            _caseInsensitive.Remove(key);
+            foreach (var other in _files.Keys)
+            {
+                if (string.Equals(other, key, StringComparison.OrdinalIgnoreCase))
+                {
+                    _caseInsensitive[key] = other;
+                    break;
+                }
+            }
+        }
+    }
+
+    private bool IsInsideRoot(string fullPath)
+    {
+        if (_rootDirectory is null) return false;
+        var rel = Path.GetRelativePath(_rootDirectory, fullPath);
+        return !Path.IsPathRooted(rel) && rel != ".." && !rel.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal)
+            && !rel.StartsWith("../", StringComparison.Ordinal);
     }
 
     private string KeyForDiskFile(string fullPath)

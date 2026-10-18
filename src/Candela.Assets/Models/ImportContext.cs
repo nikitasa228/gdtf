@@ -46,6 +46,7 @@ internal sealed class ImportContext
         if (ImageImporter.DetectFormat(data) is null)
         {
             Warn($"Texture '{key}' is in a format Candela cannot read; convert it to PNG or JPEG.");
+            if (key != Files.MainFile) Files.Discard(key);
             return null;
         }
         return key;

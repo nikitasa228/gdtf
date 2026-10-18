@@ -103,6 +103,38 @@ public class ModelImporterTests
     }
 
     [Fact]
+    public void CompanionFilesAreLimitedToWhatTheModelNeeds()
+    {
+        // Textures referenced above the model folder and by absolute paths are read when they are images; anything else
+        // (a crafted reference to a private file, a "texture" that is no image) is not stored with the asset.
+        using var dir = new TempDir();
+        dir.Write("shared/stone.png", TestFiles.Png(2, 2, 90, 90, 90));
+        var secret = dir.Write("private/secret.txt", "do not embed");
+        dir.Write("model/notes.txt", "not an image");
+        dir.Write("model/box.mtl",
+            "newmtl A\nmap_Kd ../shared/stone.png\n" +
+            $"newmtl B\nmap_Kd {secret}\n" +
+            "newmtl C\nmap_Kd notes.txt\n");
+        var obj = TestFiles.Obj("box.mtl", "A").Replace("usemtl A\n", "", StringComparison.Ordinal);
+        var faces = obj.Split('\n').Where(l => l.StartsWith("f ", StringComparison.Ordinal)).ToArray();
+        var head = string.Join('\n', obj.Split('\n').Where(l => !l.StartsWith("f ", StringComparison.Ordinal)));
+        var path = dir.Write("model/box.obj", head + "\nusemtl A\n" + faces[0] + "\n" + faces[1] + "\nusemtl B\n" + faces[2] + "\n" + faces[3]
+            + "\nusemtl C\n" + faces[4] + "\n" + faces[5] + "\n");
+
+        var result = ModelImporter.Import(path);
+
+        Assert.Contains("stone.png", result.Files.Keys.Select(k => Path.GetFileName(k)));
+        Assert.DoesNotContain(result.Files.Keys, k => k.EndsWith("secret.txt", StringComparison.Ordinal));
+        Assert.DoesNotContain(result.Files.Keys, k => k.EndsWith("notes.txt", StringComparison.Ordinal));
+        var a = result.Model.Materials.Single(m => m.Name == "A");
+        Assert.NotNull(a.BaseColorTexture);
+        Assert.True(result.Files.ContainsKey(a.BaseColorTexture!));
+        Assert.Null(result.Model.Materials.Single(m => m.Name == "B").BaseColorTexture);
+        Assert.Null(result.Model.Materials.Single(m => m.Name == "C").BaseColorTexture);
+        Assert.Contains(result.Warnings, w => w.Contains("notes.txt", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void ObjWithoutNormalsGetsGeneratedNormalsAndTangents()
     {
         using var dir = new TempDir();
