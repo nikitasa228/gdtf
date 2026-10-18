@@ -71,6 +71,98 @@ public sealed class IndirectTests
         }
     }
 
+    [SkippableTheory]
+    [InlineData(IndirectLighting.ReflectiveShadowMaps, 1, 0.05f)]
+    [InlineData(IndirectLighting.RayTraced, 40, 0.1f)]
+    public void RedFloorBleedsOntoAWhiteWall(IndirectLighting mode, int frames, float tolerance)
+    {
+        // The other way round: a spot lights a red floor in front of a white wall (vertical receiver, horizontal
+        // reflector); the wall's added luminance against a CPU integral of the floor's reflected light.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            Skip.If(mode == IndirectLighting.RayTraced && !renderer.Info.SupportsRayTracing, "the device has no ray query support");
+            var scene = new StageScene(renderer);
+            var red = new Vector3(0.8f, 0.08f, 0.06f);
+            var white = new Vector3(0.8f);
+            scene.Floor(12f, scene.Lambert(red));
+            scene.Box(new Vector3(0.2f, 6f, 4f), new Vector3(WallX + 0.1f, 0f, 2f), scene.Lambert(white, "white wall"));
+            var lights = new[] { StageScene.Spot(new Vector3(0.5f, 0f, 4f), new Vector3(0.5f, 0f, 0f), 60000f, 25f, 35f) };
+            renderer.World.SetLights(lights);
+            const int w = 160, h = 120;
+            using var target = renderer.CreateTarget(w, h);
+            // Orthographic, looking at the wall face along +x.
+            var camera = RenderCamera.LookAt(new Vector3(-6f, 0f, 2f), new Vector3(WallX, 0f, 2f));
+            camera.Projection = ProjectionKind.Orthographic;
+            camera.OrthoHeight = 4f;
+            camera.Near = 0.1f;
+            camera.Far = 50f;
+            camera.Ev100 = 6f;
+            var options = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
+            HdrReadback Render(IndirectLighting m, int n)
+            {
+                var settings = new PreviewSettings { Indirect = m, Bloom = false, Volumetrics = false };
+                for (int i = 0; i < n; i++)
+                    renderer.Render(target, camera, options, settings, 1f / 30f);
+                return renderer.ReadHdr(target);
+            }
+
+            var off = Render(IndirectLighting.Off, 1);
+            var on = Render(mode, frames);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            Matrix4x4.Invert(camera.View * ReverseZ.Orthographic(camera.OrthoHeight, w / (float)h, camera.Near, camera.Far), out var inverse);
+            Vector3 WallPoint(int px, int py)
+            {
+                float nx = (px + 0.5f) / w * 2f - 1f, ny = (py + 0.5f) / h * 2f - 1f;
+                var a = Vector4.Transform(new Vector4(nx, ny, 1f, 1f), inverse);
+                var b = Vector4.Transform(new Vector4(nx, ny, 0.5f, 1f), inverse);
+                var pa = new Vector3(a.X, a.Y, a.Z) / a.W;
+                var pb = new Vector3(b.X, b.Y, b.Z) / b.W;
+                return pa + (pb - pa) * ((WallX - pa.X) / (pb.X - pa.X));
+            }
+
+            var reference = lights.Select(l => new Photometry.SpotLight(l.Position, l.Direction, l.PeakCandela,
+                BeamDistribution.Create(l.BeamType, l.BeamAngle, l.FieldAngle))).ToArray();
+            var floor = new List<(Vector3 Position, float Illuminance)>();
+            for (float x = -6f + WallCell / 2; x < WallX; x += WallCell)
+            {
+                for (float y = -6f + WallCell / 2; y < 6f; y += WallCell)
+                {
+                    var p = new Vector3(x, y, 0f);
+                    float e = LightMeter.IlluminanceAt(reference, p, Vector3.UnitZ);
+                    if (e > 0f)
+                        floor.Add((p, e));
+                }
+            }
+
+            var redAlbedo = ColorSpaces.Rec709ToRec2020(red);
+            var whiteAlbedo = ColorSpaces.Rec709ToRec2020(white);
+            foreach (var (px, py) in new[] { (80, 60), (80, 80), (60, 70), (100, 90), (80, 40) })
+            {
+                var p = WallPoint(px, py);
+                double irradiance = 0;
+                foreach (var (q, e) in floor)
+                {
+                    var d = p - q;
+                    float d2 = d.LengthSquared();
+                    var dir = d / MathF.Sqrt(d2);
+                    if (dir.Z > 0f && dir.X > 0f)
+                        irradiance += e / MathF.PI * dir.Z * dir.X / d2 * WallCell * WallCell;
+                }
+
+                float predicted = ColorSpaces.LuminanceRec2020(whiteAlbedo / MathF.PI * (float)irradiance * redAlbedo);
+                float measured = ColorSpaces.LuminanceRec2020(on.At(px, py) - off.At(px, py));
+                Assert.True(MathF.Abs(measured - predicted) <= tolerance * predicted,
+                    $"{mode}, wall point {p}: indirect {measured:F3} cd/m², CPU integral {predicted:F3} cd/m²");
+                Assert.True(Ratio(on.At(px, py)) > 2f, $"the wall turns red ({Ratio(on.At(px, py)):F2})");
+            }
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     private static void MeasureBleeding(IndirectLighting mode, int warmUp, int samples, float tolerance)
     {
         var renderer = TestRenderers.CreateOrSkip();

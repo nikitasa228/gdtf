@@ -61,6 +61,42 @@ public sealed class VolumetricTests
     }
 
     [SkippableFact]
+    public void UniformSmokeScattersLikeHazeOfTheSameCoefficient()
+    {
+        // Smoke density 0.04 x 0.5 /m at full density = the haze test's 0.02 /m, through the 3D texture over a box.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var light = StageScene.Spot(LightPosition, Vector3.Zero, 10000f, 40f, 60f, shadows: false);
+            renderer.World.SetLights(new[] { light });
+            renderer.World.SetAtmosphere(new AtmosphereState
+            {
+                BaseScattering = 0f,
+                Anisotropy = Anisotropy,
+                SmokeScatteringAtFullDensity = 0.5f,
+                SmokeDensity = new VolumeGrid
+                {
+                    Min = new Vector3(-30f, -30f, -1f), Max = new Vector3(30f, 30f, 8f), SizeX = 8, SizeY = 8, SizeZ = 8,
+                    Values = Enumerable.Repeat(Haze / 0.5f, 8 * 8 * 8).ToArray(),
+                },
+            });
+            using var target = renderer.CreateTarget(Width, Height);
+            var camera = RenderCamera.LookAt(CameraPosition, CameraPosition + Vector3.UnitY, 40f);
+            camera.Ev100 = 2f;
+            renderer.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f },
+                new PreviewSettings { TemporalAccumulation = false, Bloom = false, VolumetricSlices = 128 }, 1f / 60f);
+            float measured = CentreLuminance(renderer.ReadHdr(target));
+            float expected = ReferenceInScattering(light);
+            Assert.InRange(MathF.Abs(measured - expected) / expected, 0f, 0.05f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void BeamInUniformHazeSeenFromTheSide()
     {
         var renderer = TestRenderers.CreateOrSkip();
