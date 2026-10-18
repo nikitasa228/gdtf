@@ -24,19 +24,19 @@ namespace Candela.Engine;
 /// </remarks>
 public sealed class EngineModels
 {
-    private readonly AssetStore _store;
+    private readonly Func<AssetStore> _store;
     private readonly string? _cacheDirectory;
     private readonly Func<string?> _workerPath;
     private readonly ConcurrentDictionary<Guid, Lazy<Decoded>> _models = new();
     private readonly ConcurrentDictionary<string, Issue> _issues = new(StringComparer.Ordinal);
 
     /// <summary>Creates the service over <paramref name="store"/>.</summary>
-    /// <param name="store">The project's assets.</param>
+    /// <param name="store">Returns the open project's assets (the store is replaced with the project).</param>
     /// <param name="cacheDirectory">Folder of the on-disk cache (null: no disk cache); temporary worker files go below it too.</param>
     /// <param name="workerPath">Returns the worker program, or null when none can be found.</param>
     /// <param name="isolateNativeImports">False decodes native formats in-process (trusted files only).</param>
     /// <param name="timeout">Longest time one worker import may take.</param>
-    public EngineModels(AssetStore store, string? cacheDirectory, Func<string?> workerPath, bool isolateNativeImports, TimeSpan timeout)
+    public EngineModels(Func<AssetStore> store, string? cacheDirectory, Func<string?> workerPath, bool isolateNativeImports, TimeSpan timeout)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
         _cacheDirectory = cacheDirectory;
@@ -63,7 +63,7 @@ public sealed class EngineModels
     /// </summary>
     public bool TryGet(Guid assetId, [NotNullWhen(true)] out ImportedModel? model, out string? error)
     {
-        var entry = _store.Find(assetId);
+        var entry = _store().Find(assetId);
         if (entry is null)
         {
             model = null;
@@ -117,14 +117,15 @@ public sealed class EngineModels
     {
         var found = new List<Issue>();
         issues = found;
-        if (!IsolateNativeImports || !ImportWorker.UsesNativeImporter(path)) return _store.ImportModel(path, options);
+        var store = _store();
+        if (!IsolateNativeImports || !ImportWorker.UsesNativeImporter(path)) return store.ImportModel(path, options);
 
         string? worker = _workerPath();
         if (worker is null)
         {
             found.Add(Note(EngineIssueCodes.ImportInProcess,
                 $"'{Path.GetFileName(path)}' was imported inside the application because the import worker (candela) was not found."));
-            return _store.ImportModel(path, options);
+            return store.ImportModel(path, options);
         }
 
         var result = ImportWorker.Run(worker, path, options, Timeout, TempRoot());
@@ -137,7 +138,7 @@ public sealed class EngineModels
             case ImportWorkerStatus.Unavailable:
                 found.Add(Note(EngineIssueCodes.ImportInProcess,
                     $"'{Path.GetFileName(path)}' was imported inside the application: {result.Message}."));
-                return _store.ImportModel(path, options);
+                return store.ImportModel(path, options);
             default:
                 var unsafeIssue = Unsafe(Path.GetFileName(path), result.Message);
                 found.Add(unsafeIssue);
@@ -150,10 +151,10 @@ public sealed class EngineModels
             .ToDictionary(kv => kv.Key, kv => kv.Value, StringComparer.Ordinal);
         var persistent = (options ?? ImportOptions.Default) with { TextureKeyPrefix = "" };
         string hash = AssetEntry.ComputeHash(main, companions);
-        foreach (var existing in _store.Entries)
+        foreach (var existing in store.Entries)
             if (existing.Kind == AssetKind.Model && existing.ContentHash == hash && Equals(existing.ImportOptions, persistent)) return existing;
 
-        var entry = _store.Add(AssetKind.Model, Path.GetFileName(path), main, companions, Path.GetFullPath(path), importOptions: persistent);
+        var entry = store.Add(AssetKind.Model, Path.GetFileName(path), main, companions, Path.GetFullPath(path), importOptions: persistent);
         SaveToDiskCache(entry, imported);
         foreach (var w in imported.Warnings) found.Add(new Issue(IssueSeverity.Note, IssueCategory.Scene, "asset.import-note", $"'{entry.OriginalFileName}': {w}"));
         foreach (var m in imported.MissingFiles)
@@ -209,7 +210,7 @@ public sealed class EngineModels
         bool native = ImportWorker.UsesNativeImporter(entry.OriginalFileName);
         if (!native || !IsolateNativeImports)
         {
-            return _store.TryGetModel(entry.Id, out var m, out var error)
+            return _store().TryGetModel(entry.Id, out var m, out var error)
                 ? new Decoded(entry, m, null)
                 : Failed(entry, error ?? "the model cannot be decoded");
         }
@@ -221,7 +222,7 @@ public sealed class EngineModels
         {
             Record(Note(EngineIssueCodes.ImportInProcess,
                 $"'{entry.OriginalFileName}' was decoded inside the application because the import worker (candela) was not found."));
-            return _store.TryGetModel(entry.Id, out var m, out var error)
+            return _store().TryGetModel(entry.Id, out var m, out var error)
                 ? new Decoded(entry, m, null)
                 : Failed(entry, error ?? "the model cannot be decoded");
         }
@@ -241,7 +242,7 @@ public sealed class EngineModels
                     return Failed(entry, result.Message);
                 case ImportWorkerStatus.Unavailable:
                     Record(Note(EngineIssueCodes.ImportInProcess, $"'{entry.OriginalFileName}' was decoded inside the application: {result.Message}."));
-                    return _store.TryGetModel(entry.Id, out var m, out var error)
+                    return _store().TryGetModel(entry.Id, out var m, out var error)
                         ? new Decoded(entry, m, null)
                         : Failed(entry, error ?? "the model cannot be decoded");
                 default:

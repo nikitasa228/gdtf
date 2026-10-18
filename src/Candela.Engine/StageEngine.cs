@@ -8,6 +8,7 @@ using Candela.Dmx;
 using Candela.Dmx.Input;
 using Candela.Electrical;
 using Candela.Gdtf;
+using Candela.Project;
 using Candela.Protocols;
 using Candela.Rendering;
 
@@ -33,6 +34,7 @@ public sealed partial class StageEngine : IDisposable
     private readonly StageLightCollector _lights = new();
     private readonly List<IIssueProvider> _providers = new();
     private readonly IReadOnlyList<Issue> _libraryIssues = Array.Empty<Issue>();
+    private ProjectData _project;
     private Scene _scene;
     private NetworkSolution? _consoleNetwork;
     private bool _networkDirty = true;
@@ -52,10 +54,11 @@ public sealed partial class StageEngine : IDisposable
         Issues = new IssueLog();
         Library = Options.Library ?? LoadLibrary(Options, out _libraryIssues);
         Profiles = new FixtureProfileCache(Library);
-        Assets = new AssetStore();
-        Models = new EngineModels(Assets, CacheDirectory, () => ImportWorker.FindWorker(Options.ImportWorkerPath),
+        _project = new ProjectData(new Scene());
+        _scene = _project.Scene;
+        Models = new EngineModels(() => _project.Assets, CacheDirectory, () => ImportWorker.FindWorker(Options.ImportWorkerPath),
             Options.IsolateNativeImports, Options.ImportWorkerTimeout);
-        Images = new EngineImageSource(Assets, Models, () => Library);
+        Images = new EngineImageSource(() => _project.Assets, Models, () => Library);
         Input = new DmxInputHub();
         Protocols = new ProtocolManager(Input);
         ElectricalProfiles = new LibraryFixtureProfileProvider(Library);
@@ -74,7 +77,6 @@ public sealed partial class StageEngine : IDisposable
         _providers.Add(new EngineIssueProvider(this));
         foreach (var p in _providers) Issues.Register(p);
 
-        _scene = new Scene();
         Dmx = CreateDmx(_scene);
         _scene.Changed += OnSceneChanged;
         foreach (var issue in _libraryIssues) Issues.Report(issue);
@@ -104,8 +106,14 @@ public sealed partial class StageEngine : IDisposable
     /// <summary>Compiled DMX profiles (GDTF type + mode) shared by every fixture of a type.</summary>
     public FixtureProfileCache Profiles { get; }
 
-    /// <summary>Imported models, images, textures and GDTF copies of the project.</summary>
-    public AssetStore Assets { get; }
+    /// <summary>Imported models, images, textures and GDTF copies of the project (replaced with the project).</summary>
+    public AssetStore Assets => _project.Assets;
+
+    /// <summary>
+    /// The open project: scene, assets, settings sections, GDTF copies and thumbnail, as <c>Candela.Project</c> saves it.
+    /// Replaced by <see cref="New"/> and <see cref="Open"/>.
+    /// </summary>
+    public ProjectData Project => _project;
 
     /// <summary>Decoded models of the model assets (native formats decoded in the isolated import worker).</summary>
     public EngineModels Models { get; }
@@ -209,6 +217,7 @@ public sealed partial class StageEngine : IDisposable
         // recorded DMX enters the hub like any protocol; live input is captured as it was merged
         Player?.PlayTo(Time);
         if (Recorder.IsRecording) Recorder.Capture(Time);
+        _autosave?.Update();
 
         UpdateNetwork();
         Dmx.ApplyDynamics = Settings.MotorDynamics;
@@ -286,17 +295,22 @@ public sealed partial class StageEngine : IDisposable
         _render = null;
         Player?.Dispose();
         Recorder.Stop();
+        _autosave?.Dispose();
+        _autosave = null;
         Protocols.Dispose();
         _scene.Changed -= OnSceneChanged;
         Dmx.Dispose();
         Images.Dispose();
     }
 
-    /// <summary>Makes <paramref name="scene"/> the open scene: DMX, poses, simulations, undo and selection start afresh.</summary>
-    internal void ReplaceScene(Scene scene)
+    /// <summary>Makes <paramref name="project"/> the open project: DMX, poses, simulations, undo and selection start afresh.</summary>
+    internal void ReplaceProject(ProjectData project)
     {
+        CloseAutosaveSession();
         _scene.Changed -= OnSceneChanged;
         Dmx.Dispose();
+        _project = project;
+        var scene = project.Scene;
         _scene = scene;
         Dmx = CreateDmx(scene);
         _scene.Changed += OnSceneChanged;
@@ -312,6 +326,7 @@ public sealed partial class StageEngine : IDisposable
         _consoleNetwork = null;
         IsModified = false;
         SceneReplaced?.Invoke(scene);
+        StartAutosaveSession();
     }
 
     /// <summary>Recompiles every fixture after GDTF files were added to the library.</summary>

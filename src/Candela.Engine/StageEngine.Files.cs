@@ -7,6 +7,7 @@ using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Mvr;
+using Candela.Project;
 
 namespace Candela.Engine;
 
@@ -48,11 +49,10 @@ public sealed partial class StageEngine
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         Issues.ClearProgramMessages();
-        Assets.Clear();
         Settings = new EngineSettings();
         View = new ViewSettings();
-        ReplaceScene(new Scene(string.IsNullOrWhiteSpace(name) ? "Untitled" : name));
         ProjectPath = null;
+        ReplaceProject(new ProjectData(new Scene(string.IsNullOrWhiteSpace(name) ? "Untitled" : name)));
         RefreshIssues();
         return EngineResult.Ok($"New scene '{_scene.Name}'.");
     }
@@ -138,13 +138,12 @@ public sealed partial class StageEngine
         }
 
         Issues.ClearProgramMessages();
-        Assets.Clear();
         Settings = new EngineSettings();
         View = new ViewSettings();
+        ProjectPath = null;
+        ReplaceProject(new ProjectData(result.Scene));
         var extra = new List<Issue>();
         RegisterMvr(result, extra);
-        ReplaceScene(result.Scene);
-        ProjectPath = null;
         IsModified = false;
         var issues = Sorted(result.Issues.Concat(extra));
         Report(issues);

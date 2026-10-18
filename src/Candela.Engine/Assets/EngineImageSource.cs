@@ -15,7 +15,7 @@ namespace Candela.Engine;
 /// <remarks>Thread-safe. Decoded images are cached per key; <see cref="Clear"/> drops the cache and open archives.</remarks>
 public sealed class EngineImageSource : IImageSource, IDisposable
 {
-    private readonly AssetStore _store;
+    private readonly Func<AssetStore> _store;
     private readonly EngineModels _models;
     private readonly Func<FixtureLibrary> _library;
     private readonly ConcurrentDictionary<string, Lazy<ImageData?>> _images = new(StringComparer.Ordinal);
@@ -23,7 +23,7 @@ public sealed class EngineImageSource : IImageSource, IDisposable
     private readonly GdtfImageSource _gdtf;
 
     /// <summary>Creates the source.</summary>
-    public EngineImageSource(AssetStore store, EngineModels models, Func<FixtureLibrary> library)
+    public EngineImageSource(Func<AssetStore> store, EngineModels models, Func<FixtureLibrary> library)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
         _models = models ?? throw new ArgumentNullException(nameof(models));
@@ -39,7 +39,7 @@ public sealed class EngineImageSource : IImageSource, IDisposable
             return _images.GetOrAdd(key, k => new Lazy<ImageData?>(() => _gdtf.Load(k), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
         if (AssetKeys.TryParseAssetKey(key, out var id, out var relative) && relative is not null && _models.TryGetLoaded(id, out var model))
             return _images.GetOrAdd(key, _ => new Lazy<ImageData?>(() => FromModel(model, relative), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
-        return _store.Load(key);
+        return _store().Load(key);
     }
 
     /// <summary>Drops cached images and closes the GDTF archives (library rescanned, project replaced).</summary>

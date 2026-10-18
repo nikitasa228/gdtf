@@ -78,6 +78,7 @@ public sealed class RenderSync : IDisposable
     private VolumeGrid? _smokeGrid;
     private VolumeGrid? _flameGrid;
     private Scene _scene;
+    private AssetStore _assets;
     private bool _disposed;
 
     internal RenderSync(StageEngine engine, IRenderWorld world)
@@ -89,7 +90,8 @@ public sealed class RenderSync : IDisposable
         _scene.Changed += OnSceneChanged;
         engine.SceneReplaced += OnSceneReplaced;
         engine.Selection.Changed += OnSelectionChanged;
-        engine.Assets.AssetChanged += OnAssetChanged;
+        _assets = engine.Assets;
+        _assets.AssetChanged += OnAssetChanged;
         OnSelectionChanged();
     }
 
@@ -191,7 +193,7 @@ public sealed class RenderSync : IDisposable
         _scene.Changed -= OnSceneChanged;
         _engine.SceneReplaced -= OnSceneReplaced;
         _engine.Selection.Changed -= OnSelectionChanged;
-        _engine.Assets.AssetChanged -= OnAssetChanged;
+        _assets.AssetChanged -= OnAssetChanged;
         try
         {
             DestroyAll(destroySharedResources: true);
@@ -213,6 +215,9 @@ public sealed class RenderSync : IDisposable
         _scene.Changed -= OnSceneChanged;
         _scene = scene;
         _scene.Changed += OnSceneChanged;
+        _assets.AssetChanged -= OnAssetChanged;
+        _assets = _engine.Assets;
+        _assets.AssetChanged += OnAssetChanged;
         _all = true;
     }
 
@@ -256,6 +261,9 @@ public sealed class RenderSync : IDisposable
     {
         _all = false;
         DestroyAll(destroySharedResources: false);
+        // models belong to the project's assets; fixture types and built-in materials stay valid across projects
+        foreach (var m in _models.Values) m.Destroy(World);
+        _models.Clear();
         _rebuild.Clear();
         _moved.Clear();
         foreach (var e in _scene.All()) _rebuild.Add(e.Id);
