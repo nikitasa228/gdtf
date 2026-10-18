@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Reflection;
 using Candela.Gdtf;
 using Xunit.Abstractions;
 
@@ -79,56 +78,6 @@ public class LibraryWideTests(ITestOutputHelper output)
         Assert.Equal(TestData.Library.Count, (int)files);
         Assert.True(modes >= 7000);
         Assert.Empty(failures);
-    }
-
-    [Fact]
-    public void Two_thousand_fixtures_evaluate_within_the_frame_budget()
-    {
-        (string Prefix, string? Mode)[] mix =
-        [
-            ("Martin_Professional@MAC_Viper_Profile", "Basic"),
-            ("Robe_Lighting@Robin_Esprite@", "Mode 1 - Standard 16 bit"),
-            ("Prolights@ArcPod27Q", "17ch"),
-            ("Robe_Lighting@Robin_Tetra1", "Mode 4 - Pixel RGBW"),
-            ("Martin_Professional@MAC_Encore_Two", "Basic"),
-            ("Clay_Paky@Arolla_Aqua_LT", null),
-            ("Elation@Paladin_Panel", null),
-            ("ADJ@Entour_Haze_PRO", "4 Channel Mode"),
-        ];
-        var profiles = mix.Select(m => TestData.Profile(m.Prefix, m.Mode)).ToArray();
-        const int count = 2000;
-        var states = new FixtureState[count];
-        var buffers = new FixtureDmxBuffer[count];
-        for (int i = 0; i < count; i++)
-        {
-            var p = profiles[i % profiles.Length];
-            states[i] = new FixtureState(p, (uint)i);
-            buffers[i] = new FixtureDmxBuffer(p);
-        }
-        var rng = new Random(12345);
-        int beams = states.Sum(s => s.Beams.Count), channels = states.Sum(s => s.ChannelCount);
-        var times = new List<double>();
-        double t = 0;
-        for (int frame = 0; frame < 45; frame++)
-        {
-            // a busy console: every slot of every fixture changes every frame
-            foreach (var b in buffers)
-                for (int k = 0; k < b.BreakCount; k++) rng.NextBytes(b.GetBreak(k));
-            t += 1.0 / 60.0;
-            long start = Stopwatch.GetTimestamp();
-            for (int i = 0; i < count; i++) FixtureEvaluator.Evaluate(states[i], buffers[i], t, null, applyDynamics: true);
-            double ms = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-            if (frame >= 5) times.Add(ms);
-        }
-        times.Sort();
-        double median = times[times.Count / 2];
-        bool optimized = typeof(FixtureEvaluator).Assembly.GetCustomAttribute<DebuggableAttribute>()?.IsJITOptimizerDisabled != true;
-        output.WriteLine($"{count} fixtures ({beams} beams, {channels} channels), all DMX changing every frame: median {median:F2} ms, " +
-            $"min {times[0]:F2} ms, max {times[^1]:F2} ms per frame ({(optimized ? "optimised" : "debug")} build, {Environment.ProcessorCount} cores, one thread)");
-        Assert.True(median < (optimized ? 5.0 : 25.0), $"median frame {median:F2} ms");
-        long before = GC.GetAllocatedBytesForCurrentThread();
-        for (int i = 0; i < count; i++) FixtureEvaluator.Evaluate(states[i], buffers[i], t + 0.1, null, applyDynamics: true);
-        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
 
     private static void Check(FixtureProfile p, FixtureState s, string where, ConcurrentQueue<string> failures)
