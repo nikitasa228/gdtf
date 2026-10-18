@@ -90,6 +90,22 @@ public class FileDefectTests
     }
 
     [Fact]
+    public void A_zoom_mode_channel_next_to_the_zoom_channel_does_not_freeze_the_beam_angle()
+    {
+        // Elation Proteus Brutus FS: Zoom 3.5…35° and ZoomModeBeam ("Disabled" / "Long Throw" …, unit Angle)
+        var p = TestData.Profile("Elation@Proteus_Brutus_FS");
+        Assert.NotEmpty(p.FindChannels("ZoomModeBeam"));
+        int zoom = p.FindChannels("Zoom")[0];
+        var buffer = Full(p);
+        foreach (float angle in new[] { 3.5f, 12f, 35f })
+        {
+            DmxEncoder.Encode(buffer, "Zoom", angle);
+            Assert.Equal(angle, FixtureEvaluator.Evaluate(p, buffer).Beams[0].BeamAngle / Deg, 0.05f);
+        }
+        Assert.Equal(AttributeKind.Zoom, p.Functions[p.Channels[zoom].FirstFunction].Class.Kind);
+    }
+
+    [Fact]
     public void Pan_and_tilt_with_the_default_physical_range_move_over_the_fixtures_real_range()
     {
         var p = TestData.Profile("Briteq@BTI-BLIZZARD_WASH2");

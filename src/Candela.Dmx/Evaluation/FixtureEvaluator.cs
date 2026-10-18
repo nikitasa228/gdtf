@@ -754,7 +754,8 @@ public static class FixtureEvaluator
                 }
                 break;
             case AttributeKind.Zoom:
-                if (MathF.Abs(v) > 0.05f) acc.Zoom = MathF.Abs(v);
+                if ((flags & (ChannelSetFlags.NoFunction | ChannelSetFlags.Open | ChannelSetFlags.Closed)) == 0 && MathF.Abs(v) > 0.05f)
+                    acc.Zoom = MathF.Abs(v);
                 break;
             case AttributeKind.Focus:
                 acc.Focus = f.MaxValue > f.MinValue ? Math.Clamp((v - f.MinValue) / (f.MaxValue - f.MinValue), 0f, 1f) : 0.5f;

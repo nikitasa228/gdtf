@@ -238,7 +238,9 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
 
 ### Optics and mechanics
 
-* **Beam/field angle** from `Zoom` (GDTF physical degrees, clamped 0.1 … 179°); without zoom, the Beam geometry's
+* **Beam/field angle** from `Zoom` (GDTF physical degrees, clamped 0.1 … 179°; ranges named "No function" /
+  "Disabled" leave it alone; `ZoomModeSpot`/`ZoomModeBeam` drive it only in modes without a `Zoom` channel — next to
+  one they are presets or mode switches and would otherwise override it); without zoom, the Beam geometry's
   angles (or `_specs` beamAngleDeg when the file carries GDTF's 25°/25° defaults). Field angle = beam angle × the
   beam's field ratio (from the GDTF field angle, or the beam type's typical ratio).
 * **Focus** 0 … 1 within the function's range; `Focus(n)Distance` in metres. **Iris** opening 0 … 1 (1 = open),
@@ -442,7 +444,7 @@ and physical value are in `FixtureState` for the properties panel), they only do
   the real values (ADJ Inno Pocket Z4), a mislabelled "zoom lens rotation" next to a real zoom (BeamZ Nereid 760),
   pan/tilt 0 … 1 (Blizzard Wash2), `Pan` on a control channel (Elation Proteus Rayzor Blade L), strobe, spin and
   shake 0 … 1 (Briteq BTX-Hawk, Vari-Lite VL2600, Elation Fuze Max Spot), a shutter function named "Open" without
-  sets (LIGHT SKY IP2021), an LED engine with GDTF's default lamp type (ARRI Orbiter), a tunable white without emitter
+  sets (LIGHT SKY IP2021), a `ZoomModeBeam` channel next to the zoom (Elation Proteus Brutus FS), an LED engine with GDTF's default lamp type (ARRI Orbiter), a tunable white without emitter
   data (ROXX Neo Mini), datasheet candela shared by GDTF beam flux (Elation Rayzor 760).
 * **Colour engines**: ARRI L5-C white engine follows CCT at the emitters' efficiency and ignores RGBW, the colour
   engine and the cross-fade between them, placeholder emitter outputs, a CTO channel that selects the CCT (PRstage

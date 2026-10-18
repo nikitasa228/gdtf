@@ -32,6 +32,7 @@ public sealed partial class FixtureProfile
         private bool? _emitterYVaries;
         private bool? _cmyAsColorAdd;
         private readonly Dictionary<AttributeKind, bool> _realRange = new();
+        private bool? _plainZoom;
 
         public Builder(FixtureType fixtureType, DmxMode mode, FixtureSpecs? specs)
         {
@@ -229,6 +230,13 @@ public sealed partial class FixtureProfile
                 (s.PhysicalFrom is { } a && float.IsFinite(a) && MathF.Abs(a) > 1.5f) || (s.PhysicalTo is { } b && float.IsFinite(b) && MathF.Abs(b) > 1.5f));
             bool placeholder = defaultRange && !setsReal;
             float offset = 0f, scale = 1f;
+            // ZoomModeSpot/ZoomModeBeam (zoom of a spot or beam mode, often a preset or mode switch) next to a Zoom channel:
+            // the Zoom channel sets the beam angle, otherwise the last of the two channels would always win
+            if (cls.Kind == AttributeKind.Zoom && !string.Equals(attribute, "Zoom", StringComparison.OrdinalIgnoreCase) && ModeHasPlainZoom())
+            {
+                Warnings.Add($"{src.FullName}: {attribute} next to a Zoom channel; the beam angle follows the Zoom channel.");
+                cls = AttributeClass.Ignored;
+            }
             if (placeholder && cls.Kind is AttributeKind.Zoom or AttributeKind.Pan or AttributeKind.Tilt)
                 (cls, offset, scale) = ResolvePlaceholderRange(ch, src, cls);
             var f = new ProfileFunction(Functions.Count, ch.Index, src, attribute, cls)
@@ -380,6 +388,18 @@ public sealed partial class FixtureProfile
                 return (cls, (float)(-r / 2), (float)r);
             }
             return (cls, 0f, 1f);
+        }
+
+        /// <summary>True when a channel function of the mode has the attribute <c>Zoom</c> itself.</summary>
+        private bool ModeHasPlainZoom()
+        {
+            if (_plainZoom is { } known) return known;
+            bool any = false;
+            foreach (var ch in Mode.Channels)
+                foreach (var fn in ch.Functions)
+                    any |= string.Equals(fn.AttributeName, "Zoom", StringComparison.OrdinalIgnoreCase);
+            _plainZoom = any;
+            return any;
         }
 
         /// <summary>True when a function of the mode with attribute kind <paramref name="kind"/> has a physical range other than GDTF's default 0 … 1.</summary>
