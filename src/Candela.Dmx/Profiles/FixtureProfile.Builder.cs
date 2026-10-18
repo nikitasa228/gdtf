@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Candela.Gdtf;
@@ -54,7 +55,8 @@ public sealed partial class FixtureProfile
         private int[] _beamFirst = Array.Empty<int>(); // per channel: first beam index affected
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
         private int[] _subtreeSize = Array.Empty<int>();
-        private float[] _beamShare = Array.Empty<float>(); // per beam: share of the fixture's specs output
+        private float[] _beamShare = Array.Empty<float>(); // per beam: share of the fixture's specs flux and power
+        private float[] _peakShare = Array.Empty<float>(); // per beam: share of the fixture's specs peak candela
         private bool? _emitterYVaries;
         private bool? _cmyAsColorAdd;
         private readonly Dictionary<AttributeKind, bool> _realRange = new();
@@ -1029,6 +1031,28 @@ public sealed partial class FixtureProfile
             }
 
             ComputeBeamShares();
+            int warningsBefore = Warnings.Count;
+            SetupAllBeamPhotometry();
+            // the datasheet peak is the beams' peaks together: shared by each beam's own peak (its flux over its solid
+            // angle), not by flux, once the optics are known — then the beams again (same optics, so the same warnings)
+            if (PeakSharesByOptics() is { } byOptics)
+            {
+                Warnings.RemoveRange(warningsBefore, Warnings.Count - warningsBefore);
+                _peakShare = byOptics;
+                SetupAllBeamPhotometry();
+            }
+            if (DatasheetCandelaPerBeam() is { } perBeam)
+            {
+                Warnings.RemoveRange(warningsBefore, Warnings.Count - warningsBefore);
+                _peakShare = perBeam.Shares;
+                SetupAllBeamPhotometry();
+                Warnings.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"The datasheet peak ({FormatCandela(Specs!.MaxLuminousIntensityCd!.Value)} cd) matches one beam of the file ({FormatCandela(perBeam.FileBeamCd)} cd), not its {Beams.Count} beams together ({FormatCandela(perBeam.FileTotalCd)} cd), and shared between them it would make {perBeam.SharedEfficacy:F1} lm/W: read per beam ({perBeam.Efficacy:F0} lm/W)."));
+            }
+        }
+
+        private void SetupAllBeamPhotometry()
+        {
             foreach (var beam in Beams)
             {
                 try
@@ -1047,6 +1071,94 @@ public sealed partial class FixtureProfile
                     beam.SourceKelvin = 6000f;
                 }
             }
+        }
+
+        /// <summary>
+        /// Shares of the datasheet peak (<c>_specs</c> <c>maxLuminousIntensityCd</c>, the fixture's on-axis intensity at its
+        /// narrowest zoom) once the beams' optics are known: in proportion to each beam's own peak — its flux share
+        /// (<see cref="ComputeBeamShares"/>) over its solid angle at the datasheet's angle — so that the beams' peaks add up
+        /// to the datasheet value with their fluxes in the file's proportions. Shared by flux alone, a diffuse beam (a
+        /// Lambertian glow: aura backlight, liquid-effect ring, pixel dots around the lens) would get a narrow cell's peak
+        /// and emit it over π sr (Ayrton Zonda 3 FX "Basic": 180 000 lm from its liquid effect next to 7 × 170 lm pixels).
+        /// Returns null when the shares do not change (one beam, beams of the same optics, no datasheet peak).
+        /// </summary>
+        private float[]? PeakSharesByOptics()
+        {
+            if (Beams.Count < 2 || Specs?.MaxLuminousIntensityCd is not { } cd || !(cd > 0) || !double.IsFinite(cd)) return null;
+            var weight = new double[Beams.Count];
+            double total = 0;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                var beam = Beams[b];
+                if (beam.PhotometrySource != PhotometrySource.SpecsCandela || !(_peakShare[b] > 0)) return null;
+                double omega = beam.ReferenceFlux / (cd * _peakShare[b]); // reference flux = (cd × share) × Ω
+                if (!(omega > 0) || !double.IsFinite(omega)) return null;
+                weight[b] = _beamShare[b] / omega;
+                total += weight[b];
+            }
+            if (!(total > 0) || !double.IsFinite(total)) return null;
+            var shares = new float[Beams.Count];
+            bool changed = false;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                shares[b] = (float)(weight[b] / total);
+                changed |= MathF.Abs(shares[b] - _peakShare[b]) > 1e-4f * MathF.Max(shares[b], _peakShare[b]);
+            }
+            return changed ? shares : null;
+        }
+
+        /// <summary>A luminous intensity for a message: whole candela, or three significant digits below 100 cd.</summary>
+        private static string FormatCandela(double cd) =>
+            cd >= 100 ? cd.ToString("F0", CultureInfo.InvariantCulture) : cd.ToString("G3", CultureInfo.InvariantCulture);
+
+        /// <summary>Plausible luminous efficacy of a whole fixture (emitted lumens per electrical watt), lm/W.</summary>
+        private const double MinEfficacy = 3, MaxEfficacy = 150;
+
+        /// <summary>
+        /// Datasheet candela of a multi-cell fixture that is the peak of one cell, not of the fixture: <c>_specs</c> gives
+        /// one value per fixture, read as the cells' sum and shared between them (<see cref="ComputeBeamShares"/>), but some
+        /// datasheets (pixel panels and dot matrices: Ayrton MagicPanel 602, 20 000 cd for 36 pixels) give the peak of a
+        /// cell. Recognised when every beam has a real GDTF flux and all of these hold: the datasheet value is within
+        /// a factor of 2 of the brightest beam's own peak (GDTF flux over the beam's solid angle at the datasheet's angle),
+        /// it is less than a tenth of the beams' peaks together, and shared it would make the fixture emit less than
+        /// <see cref="MinEfficacy"/> lm per watt of its power (<c>_specs</c> power, else the beams' GDTF power) while per
+        /// beam it emits a plausible amount (up to <see cref="MaxEfficacy"/> lm/W). Returns the per-beam shares (each beam's
+        /// own peak relative to the brightest), or null.
+        /// </summary>
+        private (float[] Shares, double FileBeamCd, double FileTotalCd, double SharedEfficacy, double Efficacy)? DatasheetCandelaPerBeam()
+        {
+            if (Beams.Count < 2 || Specs?.MaxLuminousIntensityCd is not { } cd || !(cd > 0) || !double.IsFinite(cd)) return null;
+            double power = Specs.PowerConsumptionW is { } w && w > 0 && double.IsFinite(w) ? w : 0;
+            var fileCd = new double[Beams.Count];
+            double fileMax = 0, fileTotal = 0, sharedFlux = 0, gdtfPower = 0;
+            bool allPowered = true;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                var beam = Beams[b];
+                var bg = beam.Geometry;
+                if (beam.PhotometrySource != PhotometrySource.SpecsCandela || !HasRealFlux(bg) || !(_peakShare[b] > 0)) return null;
+                // the beam's solid angle at the datasheet's angle: its reference flux is (cd × share) × Ω
+                double omega = beam.ReferenceFlux / (cd * _peakShare[b]);
+                if (!(omega > 0) || !double.IsFinite(omega)) return null;
+                fileCd[b] = bg.LuminousFlux / omega;
+                fileMax = Math.Max(fileMax, fileCd[b]);
+                fileTotal += fileCd[b];
+                sharedFlux += beam.ReferenceFlux;
+                if (HasRealPower(bg)) gdtfPower += bg.PowerConsumption;
+                else allPowered = false;
+            }
+            if (power <= 0 && allPowered) power = gdtfPower;
+            if (power <= 0 || !(fileMax > 0) || cd > fileTotal / 10 || cd < fileMax / 2 || cd > fileMax * 2) return null;
+            var shares = new float[Beams.Count];
+            double flux = 0;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                shares[b] = (float)(fileCd[b] / fileMax);
+                flux += Beams[b].ReferenceFlux * shares[b] / _peakShare[b];
+            }
+            double sharedEfficacy = sharedFlux / power, efficacy = flux / power;
+            if (sharedEfficacy >= MinEfficacy || efficacy < MinEfficacy || efficacy > MaxEfficacy) return null;
+            return (shares, fileMax, fileTotal, sharedEfficacy, efficacy);
         }
 
         /// <summary>
@@ -1255,7 +1367,7 @@ public sealed partial class FixtureProfile
             // reference output at full white
             if (Specs?.MaxLuminousIntensityCd is { } cd && cd > 0 && double.IsFinite(cd))
             {
-                float perBeam = (float)(cd * _beamShare[beam.Index]);
+                float perBeam = (float)(cd * _peakShare[beam.Index]);
                 float specAngle = hasZoom ? zoomMin : native; // datasheet candela is the narrowest-zoom value
                 beam.ReferenceFlux = perBeam * table.SolidAngle(specAngle * DegToRad);
                 beam.PhotometrySource = PhotometrySource.SpecsCandela;
@@ -1373,10 +1485,11 @@ public sealed partial class FixtureProfile
             or FixtureCategory.Beam or FixtureCategory.WashBeam or FixtureCategory.Bsw or FixtureCategory.FollowSpot;
 
         /// <summary>
-        /// Share of the fixture's researched output (<c>_specs</c> candela or flux) that each beam carries: proportional to
+        /// Share of the fixture's researched flux (<c>_specs</c> flux or power) that each beam carries: proportional to
         /// the beams' GDTF LuminousFlux when the file gives them different values (a main engine and an aura ring, large
         /// and small cells), equal otherwise. A beam whose flux is missing or GDTF's default 10 000 lm counts as the mean
-        /// of the beams with a real value.
+        /// of the beams with a real value. The shares of the datasheet peak start equal to these and follow the beams'
+        /// optics once they are known (<see cref="PeakSharesByOptics"/>).
         /// </summary>
         private void ComputeBeamShares()
         {
@@ -1401,6 +1514,7 @@ public sealed partial class FixtureProfile
                 total += flux[b];
             }
             for (int b = 0; b < n; b++) _beamShare[b] = total > 0 ? (float)(flux[b] / total) : 1f / n;
+            _peakShare = (float[])_beamShare.Clone();
         }
 
         /// <summary>True when the fixture type describes at least two visible emitters of clearly different colour (an RGB… engine).</summary>

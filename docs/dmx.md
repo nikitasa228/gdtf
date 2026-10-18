@@ -187,10 +187,18 @@ GDTF Beam's `LuminousFlux` when the file gives it (`BeamGeometry.IsLuminousFluxS
 default 10 000 lm → `_specs` `luminousFluxLm` → a written default flux (split between the beams of a multi-beam
 fixture) → the beam power the file gives (not GDTF's default 1000 W), else `_specs` `powerConsumptionW`, × a typical
 efficacy of the lamp type (LED 40, discharge 45, halogen 18, tungsten 15 lm/W) → GDTF's default flux split between
-the beams when the file gives neither flux nor power. The `_specs` values are shared between the beams in proportion to their
-GDTF `LuminousFlux` when the file gives the beams different fluxes (a main engine and an aura ring, large and small
-cells: 89 of the library's multi-beam modes), a beam with GDTF's default or no flux counting as the mean of the
-others; equally otherwise. The lamp type is LED for a beam whose mode drives additive emitters, else the `_specs`
+the beams when the file gives neither flux nor power. The `_specs` flux and power are shared between the beams in
+proportion to their GDTF `LuminousFlux` when the file gives the beams different fluxes (a main engine and an aura ring,
+large and small cells: 89 of the library's multi-beam modes), a beam with GDTF's default or no flux counting as the mean
+of the others; equally otherwise. The datasheet peak is the beams' peaks together, so it is shared in proportion to each
+beam's own peak — that flux share over the beam's solid angle at the datasheet's angle: the beams keep the file's
+proportions of flux and their peaks add up to the datasheet value. (Shared by flux alone, a diffuse Glow beam — an aura
+backlight, a liquid-effect ring — took a narrow cell's peak and emitted it over π sr: Ayrton Zonda 3 FX "Basic" gave its
+unaddressed liquid-effect ring 180 000 lm next to seven 170 lm pixels.) A datasheet peak that is one cell's, not the fixture's, is read per beam: when every beam has
+a real GDTF flux, the datasheet value is within a factor of 2 of the brightest beam's own peak (its GDTF flux over its
+solid angle) but below a tenth of the beams' peaks together, and shared it would make the fixture emit under 3 lm per
+watt of its power while per beam it emits 3 … 150 lm/W (Ayrton MagicPanel 602: 20 000 cd is one 7.5° pixel, not the 36
+pixels; 23 files, 64 modes, each with a compile warning). The lamp type is LED for a beam whose mode drives additive emitters, else the `_specs`
 `lightSourceType` (files often keep GDTF's default "Discharge" on LED fixtures), else the GDTF `LampType`. The flux is kept constant when zooming: the peak follows
 `flux / Ω_eff(beam angle)` from `Candela.Photometry.BeamDistribution` (tabulated per beam), so zooming wide lowers
 the peak by the solid-angle ratio. `ColorTransmission` is the luminous share of the current colour relative to full
@@ -467,8 +475,10 @@ and physical value are in `FixtureState` for the properties panel), they only do
   the engine's luminous cost; the firmware's actual emitter levels, and so the spectrum, are not reproduced.
 * The colour of an emitter mix is only as good as the file's emitter data: files whose emitter Y values are not
   photometric (but not obviously placeholders) give a tinted full-on white (e.g. some RGBW washes come out bluish).
-* `_specs` gives one candela value per fixture; multi-beam fixtures share it by the beams' GDTF flux when the file
-  gives different fluxes, equally otherwise (e.g. the decorative RGB rings of a wash whose beams all keep GDTF's
-  default flux get the same share as the main beam).
+* `_specs` gives one candela value per fixture; multi-beam fixtures share it by the beams' own peaks, from the GDTF
+  flux when the file gives different fluxes, from equal fluxes otherwise (e.g. the decorative RGB rings of a wash whose
+  beams all keep GDTF's default flux get as much flux as the main beam). Only a value that clearly is one cell's (see *Photometry*) is
+  read per beam; elsewhere the datasheet and the files' fluxes disagree in both directions (about 40 of the library's
+  fixtures emit less than 3 lm/W of their power at full white, about 60 more than 150 lm/W), and the datasheet wins.
 * Placeholder ranges are recognised only when they are exactly GDTF's default 0 … 1; other implausible ranges in the
   files (e.g. a zoom written as 0.1 … 15°) are taken as written.
