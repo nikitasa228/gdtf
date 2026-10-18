@@ -196,6 +196,22 @@ public static class NetworkInterfaceCatalog
         return null;
     }
 
+    /// <summary>
+    /// The local addresses to join multicast groups on: the selected interface, or (for "all interfaces") every
+    /// operational non-loopback IPv4 address — falling back to the operating system's default when none is listed.
+    /// </summary>
+    internal static IReadOnlyList<IPAddress> MulticastInterfaces(NetworkInterfaceInfo? selected,
+        IReadOnlyList<NetworkInterfaceInfo> interfaces)
+    {
+        ArgumentNullException.ThrowIfNull(interfaces);
+        if (selected is not null) return new[] { selected.Address };
+        var list = new List<IPAddress>();
+        foreach (var i in interfaces)
+            if (i.IsUp && !i.IsLoopback && !list.Contains(i.Address)) list.Add(i.Address);
+        if (list.Count == 0) list.Add(IPAddress.Any);
+        return list;
+    }
+
     private static IPAddress SafeMask(UnicastIPAddressInformation unicast, bool loopback)
     {
         try

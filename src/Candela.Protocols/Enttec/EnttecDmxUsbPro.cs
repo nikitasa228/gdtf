@@ -64,7 +64,8 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
                 transport.Write(_writeBuffer.AsSpan(0, n));
                 return true;
             }
-            catch (IOException e)
+            catch (Exception e) when (e is IOException or InvalidOperationException or UnauthorizedAccessException
+                                           or ObjectDisposedException or TimeoutException)
             {
                 ReportFault($"EntTec widget on {transport.Name}: write failed ({e.Message}).");
                 return false;
@@ -85,7 +86,7 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
         if (options.EnttecUniverse < 1)
             throw new ProtocolStartException($"EntTec universe {options.EnttecUniverse} is invalid; universes start at 1.");
 
-        IEnttecTransport transport;
+        IEnttecTransport? transport = null;
         try
         {
             transport = _transportFactory(portName);
@@ -93,8 +94,14 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
         {
+            transport?.Dispose();
             throw new ProtocolStartException($"Cannot open the EntTec widget on {portName}: {e.Message} " +
                                              "(is it plugged in, and not used by another program?)", e);
+        }
+        catch
+        {
+            transport?.Dispose();
+            throw;
         }
 
         _transport = transport;
@@ -224,12 +231,16 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
             {
                 n = transport.Read(buffer);
             }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidOperationException or ObjectDisposedException)
+            catch (Exception e)
             {
+                // Any failure of the device read ends this loop with an error status. An exception escaping a
+                // background thread would terminate the whole program.
                 if (_running)
                 {
                     _running = false;
-                    ReportFault($"EntTec widget on {transport.Name} disconnected: {e.Message}");
+                    ReportFault(e is IOException or UnauthorizedAccessException or InvalidOperationException or ObjectDisposedException
+                        ? $"EntTec widget on {transport.Name} disconnected: {e.Message}"
+                        : $"EntTec widget on {transport.Name} failed: {e.GetType().Name}: {e.Message}");
                 }
                 break;
             }

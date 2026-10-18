@@ -17,6 +17,7 @@ public sealed class ArtNetTestConsole : IDisposable
     private Thread? _thread;
     private volatile bool _running;
     private long _frames;
+    private string? _lastError;
 
     /// <summary>Creates the console.</summary>
     /// <param name="pattern">The show to play.</param>
@@ -59,6 +60,10 @@ public sealed class ArtNetTestConsole : IDisposable
 
     /// <summary>True while the background loop runs.</summary>
     public bool IsRunning => _running;
+
+    /// <summary>The last error of the background loop (network or pattern failure), or null. The loop keeps sending at
+    /// the frame rate after an error.</summary>
+    public string? LastError => Volatile.Read(ref _lastError);
 
     /// <summary>Renders the show at <paramref name="timeSeconds"/> and sends it (thread-safe).</summary>
     public void SendFrame(double timeSeconds)
@@ -149,13 +154,15 @@ public sealed class ArtNetTestConsole : IDisposable
             {
                 SendFrame(now);
             }
-            catch (System.Net.Sockets.SocketException)
-            {
-                // Network temporarily unavailable (cable unplugged): keep trying at the frame rate.
-            }
             catch (ObjectDisposedException)
             {
                 break;
+            }
+            catch (Exception e)
+            {
+                // Network temporarily unavailable (cable unplugged) or a failing pattern encoder: remember it and keep
+                // trying at the frame rate. An exception escaping this thread would terminate the program.
+                Volatile.Write(ref _lastError, $"{e.GetType().Name}: {e.Message}");
             }
             next = Math.Max(next + period, now - period);
         }

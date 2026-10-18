@@ -133,8 +133,8 @@ public sealed record ArtPollReplyPacket
         d[22] = UbeaVersion;
         d[23] = Status1;
         BinaryPrimitives.WriteUInt16LittleEndian(d[24..], EstaManufacturer);
-        WriteText(d.Slice(26, 18), ShortName);
-        WriteText(d.Slice(44, 64), LongName);
+        WriteText(d.Slice(26, ShortNameField), ShortName);
+        WriteText(d.Slice(44, LongNameField), LongName);
         WriteText(d.Slice(108, 64), NodeReport);
         BinaryPrimitives.WriteUInt16BigEndian(d[172..], (ushort)Math.Clamp(NumPorts, 0, 4));
         for (int i = 0; i < 4 && i < Ports.Count; i++)
@@ -211,6 +211,21 @@ public sealed record ArtPollReplyPacket
         };
         error = null;
         return true;
+    }
+
+    /// <summary>Short-name field size (17 characters and the terminating zero).</summary>
+    internal const int ShortNameField = 18;
+
+    /// <summary>Long-name field size (63 characters and the terminating zero).</summary>
+    internal const int LongNameField = 64;
+
+    /// <summary>The text a receiver reads back from a name field written with <paramref name="text"/> (truncated,
+    /// non-ASCII characters replaced by '?').</summary>
+    internal static string AsWritten(string text, int fieldLength)
+    {
+        Span<byte> field = stackalloc byte[fieldLength];
+        WriteText(field, text);
+        return ReadText(field);
     }
 
     private static void WriteText(Span<byte> field, string text)

@@ -99,7 +99,7 @@ public sealed class PsnReceiver : ExternalProtocolBase
         }
         var channel = UdpChannel.Open("PosiStageNet", UdpChannel.BindAddressFor(selected), options.PsnPort, enableBroadcast: false);
         _channel = channel;
-        bool joined = channel.TryJoinMulticast(group, selected?.Address ?? IPAddress.Any, out var error);
+        bool joined = channel.TryJoinMulticast(group, NetworkInterfaceCatalog.MulticastInterfaces(selected, interfaces), out var error);
         if (!joined)
             AddWarning($"Could not join PosiStageNet multicast {group}: {error}. Unicast PSN to this computer still works.");
         channel.Start("Candela PosiStageNet receiver", ProcessPacket, _ => CountBadPacket("internal error while processing a PSN packet", default),

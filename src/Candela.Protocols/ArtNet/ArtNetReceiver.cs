@@ -30,6 +30,16 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
 
     private static readonly TimeSpan NodeTimeout = TimeSpan.FromSeconds(30);
 
+    /// <summary>Most (sender, physical port, port-address) streams tracked at once; idle ones are forgotten first.</summary>
+    internal const int MaxStreams = 4096;
+
+    /// <summary>A stream without packets for this long may be forgotten when <see cref="MaxStreams"/> is reached.</summary>
+    private static readonly TimeSpan StreamIdleTimeout = TimeSpan.FromSeconds(10);
+
+    /// <summary>GoodOutputB of every port: RDM disabled (bit 7), continuous output (6), RDM discovery not running (5),
+    /// background discovery disabled (4) — Candela has no RDM responder side.</summary>
+    private const byte GoodOutputB = 0xF0;
+
     private readonly DmxInputHub _hub;
     private readonly object _gate = new();
     private readonly Dictionary<ulong, Stream> _streams = new();
@@ -39,6 +49,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
     private readonly Dictionary<(uint Ip, byte Bind), ArtNetNode> _nodes = new();
     private readonly byte[] _replyBuffer = new byte[ArtPollReplyPacket.Length];
     private volatile Runtime? _runtime;
+    private long _nextPruneTicks;
     private int _replyCounter;
 
     /// <summary>Creates the receiver feeding <paramref name="hub"/>.</summary>
@@ -90,6 +101,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             _pending.Clear();
             _syncTicks.Clear();
             _nodes.Clear();
+            _nextPruneTicks = 0;
             _runtime = rt;
         }
         channel.Start("Candela Art-Net receiver", ProcessPacket, OnHandlerError, e => ReportFault($"Art-Net socket failed: {e.Message}"));
@@ -182,11 +194,18 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             ulong key = ((ulong)sender.Address << 24) | ((ulong)dmx.Physical << 16) | (uint)dmx.PortAddress;
             if (!_streams.TryGetValue(key, out var stream))
             {
+                if (_streams.Count >= MaxStreams && !PruneIdleStreams(now))
+                {
+                    // Thousands of live streams: a flood or a misconfigured device. Keep serving the known ones.
+                    CountIgnoredPacket();
+                    return;
+                }
                 var ip = AddressText(sender.Address);
                 stream = new Stream(new DmxSourceId(SourceProtocol, $"{ip}/{dmx.Physical}"), universe, sender.Address, ip, NodeName(sender.Address));
                 _streams[key] = stream;
             }
             label = stream.Label;
+            stream.LastSeenTicks = now.Ticks;
             if (dmx.Sequence != 0 && stream.LastSequence != 0)
             {
                 // Art-Net sequence rule (as in E1.31): a frame up to 19 steps behind the last one is late — drop it.
@@ -345,7 +364,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             }
             if (merging.Contains(universe)) good |= 0x08;
             if (_hub.MergeMode == DmxMergeMode.Ltp) good |= 0x02;
-            ports[i] = new ArtPollReplyPort(ArtPollReplyPort.DmxOutputFromArtNet, 0x00, good, 0xC0, 0, (byte)(pa & 0x0F));
+            ports[i] = new ArtPollReplyPort(ArtPollReplyPort.DmxOutputFromArtNet, 0x00, good, GoodOutputB, 0, (byte)(pa & 0x0F));
         }
         int counter = Interlocked.Increment(ref _replyCounter) % 10000;
         return new ArtPollReplyPacket
@@ -382,6 +401,31 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         foreach (var (u, c) in counts)
             if (c > 1) set.Add(u);
         return set;
+    }
+
+    /// <summary>Forgets streams idle for <see cref="StreamIdleTimeout"/> (called under <c>_gate</c> when the table is
+    /// full; the hub has already expired their sources). Returns true when room was made.</summary>
+    private bool PruneIdleStreams(DateTime now)
+    {
+        // A full table of live streams stays full for a while: scan it at most once a second, not per packet.
+        if (now.Ticks < _nextPruneTicks) return false;
+        long cutoff = now.Ticks - StreamIdleTimeout.Ticks;
+        List<ulong>? idle = null;
+        foreach (var (key, s) in _streams)
+            if (s.LastSeenTicks < cutoff) (idle ??= new()).Add(key);
+        if (idle is null)
+        {
+            _nextPruneTicks = now.Ticks + TimeSpan.TicksPerSecond;
+            AddWarning($"More than {MaxStreams} Art-Net streams (sender, port, universe) are active; new ones are ignored.");
+            return false;
+        }
+        foreach (var key in idle)
+        {
+            var s = _streams[key];
+            if (s.HasPending) DropPending(s);
+            _streams.Remove(key);
+        }
+        return true;
     }
 
     private void DropPending(Stream stream)
@@ -457,6 +501,9 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             Interfaces = interfaces;
             Subscribed = subscribed;
             Binds = binds;
+            // The names as they appear on the wire (a name longer than the field is truncated, non-ASCII becomes '?').
+            ShortNameOnWire = ArtPollReplyPacket.AsWritten(options.NodeShortName, ArtPollReplyPacket.ShortNameField);
+            LongNameOnWire = ArtPollReplyPacket.AsWritten(options.NodeLongName, ArtPollReplyPacket.LongNameField);
         }
 
         public UdpChannel Channel { get; }
@@ -465,11 +512,13 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         public IReadOnlyList<NetworkInterfaceInfo> Interfaces { get; }
         public HashSet<int> Subscribed { get; }
         public List<Bind> Binds { get; }
+        public string ShortNameOnWire { get; }
+        public string LongNameOnWire { get; }
 
         /// <summary>True when a reply came from one of this computer's addresses and carries our node name.</summary>
         public bool IsOwnReply(ArtPollReplyPacket reply, IPv4Endpoint sender)
         {
-            if (reply.ShortName != Options.NodeShortName || reply.LongName != Options.NodeLongName) return false;
+            if (reply.ShortName != ShortNameOnWire || reply.LongName != LongNameOnWire) return false;
             if (sender.IsLoopback) return true;
             foreach (var i in Interfaces)
                 if (i.AddressValue == sender.Address) return true;
@@ -495,6 +544,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         public string Label { get; }
         public string? Name { get; set; }
         public byte LastSequence { get; set; }
+        public long LastSeenTicks { get; set; }
         public byte[] Pending { get; } = new byte[ArtNetProtocol.MaxDmxLength];
         public int PendingLength { get; set; }
         public bool HasPending { get; set; }

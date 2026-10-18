@@ -14,7 +14,8 @@ public sealed record SacnDiscoveredSource(Guid Cid, string Name, string Address,
 
 /// <summary>
 /// ANSI E1.31-2018 (sACN) receiver. Listens on UDP 5568, joins the multicast groups 239.255.{u&gt;&gt;8}.{u&amp;0xff} of the
-/// subscribed universes on the selected interface (join failures are warnings — unicast keeps working), validates
+/// subscribed universes on the selected interface, or on every operational adapter when none is selected (join failures
+/// are warnings — unicast keeps working), validates
 /// root/framing/DMP layers, applies the specification's sequence rule per source and universe, drops preview data
 /// unless enabled, withdraws a source from the hub on Stream_Terminated, holds synchronised data until its
 /// synchronisation packet, and collects universe-discovery announcements. Priority goes to the hub, which merges
@@ -33,6 +34,12 @@ public sealed class SacnReceiver : ExternalProtocolBase
 
     private static readonly TimeSpan DiscoveryTimeout = TimeSpan.FromSeconds(30);
 
+    /// <summary>Most (CID, universe) streams tracked at once; idle ones are forgotten first.</summary>
+    internal const int MaxStreams = 4096;
+
+    /// <summary>A stream without packets for this long may be forgotten when <see cref="MaxStreams"/> is reached.</summary>
+    private static readonly TimeSpan StreamIdleTimeout = TimeSpan.FromSeconds(10);
+
     private readonly DmxInputHub _hub;
     private readonly object _gate = new();
     private readonly Dictionary<(Guid Cid, int Universe), Stream> _streams = new();
@@ -42,6 +49,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
     private readonly Dictionary<uint, string> _addressText = new();
     private readonly Dictionary<Guid, Discovery> _discovered = new();
     private volatile Runtime? _runtime;
+    private long _nextPruneTicks;
 
     /// <summary>Creates the receiver feeding <paramref name="hub"/>.</summary>
     public SacnReceiver(DmxInputHub hub, TimeProvider? timeProvider = null)
@@ -86,7 +94,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
         var selected = NetworkInterfaceCatalog.Resolve(options.NetworkInterface, interfaces);
         var subscribed = new HashSet<int>(options.SubscribedUniverses.Where(u => u is >= SacnProtocol.MinUniverse and <= SacnProtocol.MaxUniverse));
         var channel = UdpChannel.Open("sACN", UdpChannel.BindAddressFor(selected), options.SacnPort, enableBroadcast: false);
-        var rt = new Runtime(channel, options, selected?.Address ?? IPAddress.Any, subscribed);
+        var rt = new Runtime(channel, options, NetworkInterfaceCatalog.MulticastInterfaces(selected, interfaces), subscribed);
         lock (_gate)
         {
             _streams.Clear();
@@ -94,6 +102,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
             _syncSeen.Clear();
             _joined.Clear();
             _discovered.Clear();
+            _nextPruneTicks = 0;
             _runtime = rt;
         }
 
@@ -226,11 +235,18 @@ public sealed class SacnReceiver : ExternalProtocolBase
 
             if (stream is null)
             {
+                if (_streams.Count >= MaxStreams && !PruneIdleStreams(now))
+                {
+                    // Thousands of live sources: a flood or a misconfigured device. Keep serving the known ones.
+                    CountIgnoredPacket();
+                    return;
+                }
                 var ip = AddressText(sender.Address);
                 stream = new Stream(new DmxSourceId(SourceProtocol, ip, data.Cid), universe, ip);
                 _streams[key] = stream;
             }
             stream.LastSequence = data.Sequence;
+            stream.LastSeenTicks = now.Ticks;
             stream.UpdateName(data.SourceNameField);
             label = stream.Label;
 
@@ -320,9 +336,34 @@ public sealed class SacnReceiver : ExternalProtocolBase
         }
     }
 
+    /// <summary>Forgets streams idle for <see cref="StreamIdleTimeout"/> (called under <c>_gate</c> when the table is
+    /// full; the hub has already expired their sources). Returns true when room was made.</summary>
+    private bool PruneIdleStreams(DateTime now)
+    {
+        // A full table of live streams stays full for a while: scan it at most once a second, not per packet.
+        if (now.Ticks < _nextPruneTicks) return false;
+        long cutoff = now.Ticks - StreamIdleTimeout.Ticks;
+        List<(Guid, int)>? idle = null;
+        foreach (var (key, s) in _streams)
+            if (s.LastSeenTicks < cutoff) (idle ??= new()).Add(key);
+        if (idle is null)
+        {
+            _nextPruneTicks = now.Ticks + TimeSpan.TicksPerSecond;
+            AddWarning($"More than {MaxStreams} sACN streams (source, universe) are active; new ones are ignored.");
+            return false;
+        }
+        foreach (var key in idle)
+        {
+            var s = _streams[key];
+            if (s.HasPending) _pending.Remove(s);
+            _streams.Remove(key);
+        }
+        return true;
+    }
+
     private bool Join(Runtime rt, int universe, out string? error)
     {
-        bool ok = rt.Channel.TryJoinMulticast(SacnProtocol.MulticastGroup(universe), rt.InterfaceAddress, out error);
+        bool ok = rt.Channel.TryJoinMulticast(SacnProtocol.MulticastGroup(universe), rt.JoinInterfaces, out error);
         if (ok)
         {
             lock (_gate) _joined.Add(universe);
@@ -336,7 +377,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
         _joined.Add(universe);
         ThreadPool.QueueUserWorkItem(_ =>
         {
-            if (!rt.Channel.TryJoinMulticast(SacnProtocol.MulticastGroup(universe), rt.InterfaceAddress, out var error)
+            if (!rt.Channel.TryJoinMulticast(SacnProtocol.MulticastGroup(universe), rt.JoinInterfaces, out var error)
                 && ReferenceEquals(rt, _runtime))
                 AddWarning($"Could not join the sACN synchronisation universe {universe}: {error}. Synchronised data is output unsynchronised.");
         });
@@ -355,17 +396,19 @@ public sealed class SacnReceiver : ExternalProtocolBase
 
     private sealed class Runtime
     {
-        public Runtime(UdpChannel channel, ProtocolOptions options, IPAddress interfaceAddress, HashSet<int> subscribed)
+        public Runtime(UdpChannel channel, ProtocolOptions options, IReadOnlyList<IPAddress> joinInterfaces, HashSet<int> subscribed)
         {
             Channel = channel;
             Options = options;
-            InterfaceAddress = interfaceAddress;
+            JoinInterfaces = joinInterfaces;
             Subscribed = subscribed;
         }
 
         public UdpChannel Channel { get; }
         public ProtocolOptions Options { get; }
-        public IPAddress InterfaceAddress { get; }
+
+        /// <summary>Local addresses multicast groups are joined on (the selected interface, or every up adapter).</summary>
+        public IReadOnlyList<IPAddress> JoinInterfaces { get; }
         public HashSet<int> Subscribed { get; }
     }
 
@@ -388,6 +431,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
         public string Label { get; private set; }
         public string? Name { get; private set; }
         public byte LastSequence { get; set; }
+        public long LastSeenTicks { get; set; }
         public byte[] Pending { get; } = new byte[512];
         public int PendingLength { get; set; }
         public int PendingPriority { get; set; }

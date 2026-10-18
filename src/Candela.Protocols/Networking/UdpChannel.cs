@@ -24,6 +24,7 @@ internal sealed class UdpChannel : IDisposable
     private readonly byte[] _buffer = new byte[MaxDatagram];
     private readonly SocketAddress _from = new(AddressFamily.InterNetwork);
     private readonly List<Socket> _membershipSockets = new();
+    private readonly object _membershipLock = new();
     private readonly object _sendLock = new();
     private Thread? _thread;
     private volatile bool _closing;
@@ -104,25 +105,57 @@ internal sealed class UdpChannel : IDisposable
     {
         error = null;
         var option = new MulticastOption(group, localInterface);
-        try
+        // Joins can come from the start-up thread and from the thread pool (late sACN synchronisation universes) while
+        // Dispose runs: membership sockets are created and closed under one lock.
+        lock (_membershipLock)
         {
-            _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, option);
-            return true;
+            if (_closing)
+            {
+                error = "socket closed";
+                return false;
+            }
+            try
+            {
+                _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, option);
+                return true;
+            }
+            catch (SocketException e) when (OperatingSystem.IsLinux() && e.SocketErrorCode == SocketError.NoBufferSpaceAvailable)
+            {
+                return TryJoinThroughHelper(option, out error);
+            }
+            catch (SocketException e)
+            {
+                error = $"{e.SocketErrorCode}: {e.Message}";
+                return false;
+            }
+            catch (ObjectDisposedException)
+            {
+                error = "socket closed";
+                return false;
+            }
         }
-        catch (SocketException e) when (OperatingSystem.IsLinux() && e.SocketErrorCode == SocketError.NoBufferSpaceAvailable)
+    }
+
+    /// <summary>
+    /// Joins <paramref name="group"/> on every address of <paramref name="localInterfaces"/> (one membership each), so
+    /// a receiver listening on "all interfaces" gets multicast from the lighting network even when the operating
+    /// system's default multicast route points at another adapter (Wi-Fi, office LAN) or does not exist (an isolated
+    /// 2.x.x.x network without gateway). Returns true when at least one interface joined; <paramref name="error"/> is the
+    /// first failure otherwise.
+    /// </summary>
+    public bool TryJoinMulticast(IPAddress group, IReadOnlyList<IPAddress> localInterfaces, out string? error)
+    {
+        ArgumentNullException.ThrowIfNull(localInterfaces);
+        error = null;
+        bool joined = false;
+        string? firstError = null;
+        foreach (var local in localInterfaces)
         {
-            return TryJoinThroughHelper(option, out error);
+            if (TryJoinMulticast(group, local, out var e)) joined = true;
+            else firstError ??= localInterfaces.Count > 1 ? $"{local}: {e}" : e;
         }
-        catch (SocketException e)
-        {
-            error = $"{e.SocketErrorCode}: {e.Message}";
-            return false;
-        }
-        catch (ObjectDisposedException)
-        {
-            error = "socket closed";
-            return false;
-        }
+        if (!joined) error = firstError ?? "no network interface to join on";
+        return joined;
     }
 
     /// <summary>Sends a datagram; returns false (instead of throwing) when the network refuses it.</summary>
@@ -146,10 +179,13 @@ internal sealed class UdpChannel : IDisposable
     /// <summary>Closes the socket(s) and waits briefly for the receive thread (never from the thread itself).</summary>
     public void Dispose()
     {
-        _closing = true;
-        _socket.Dispose();
-        foreach (var s in _membershipSockets) s.Dispose();
-        _membershipSockets.Clear();
+        lock (_membershipLock)
+        {
+            _closing = true;
+            _socket.Dispose();
+            foreach (var s in _membershipSockets) s.Dispose();
+            _membershipSockets.Clear();
+        }
         var t = _thread;
         if (t is not null && t.ManagedThreadId != Environment.CurrentManagedThreadId) t.Join(TimeSpan.FromSeconds(2));
     }
@@ -170,7 +206,9 @@ internal sealed class UdpChannel : IDisposable
                 break;
             }
             catch (SocketException e) when (e.SocketErrorCode is SocketError.ConnectionReset or SocketError.MessageSize
-                                                 or SocketError.NetworkReset or SocketError.Interrupted)
+                                                 or SocketError.NetworkReset or SocketError.Interrupted
+                                                 or SocketError.ConnectionRefused or SocketError.HostUnreachable
+                                                 or SocketError.NetworkUnreachable)
             {
                 continue;
             }
