@@ -260,7 +260,27 @@ internal sealed class RayTracedGiPass : RenderPass
             Extent = new Extent3D(indirect.Width, indirect.Height, 1),
         };
         vk.CmdCopyImage(context.Cmd, indirect.Handle, ImageLayout.TransferSrcOptimal, t.IndirectHistory!.Handle, ImageLayout.TransferDstOptimal, 1, &copy);
+
+        // Edge-aware a-trous filter of the (temporally accumulated) estimate: steps 1 and 2, ending in Indirect.
+        // The history keeps the unfiltered accumulation, so the filter does not feed back into itself.
+        if (t.IndirectScratch is not { } scratch || t.FilterToScratchSet.Handle == 0)
+            return;
+        barriers.Use(t.Depth, ImageUse.DepthSampledCompute);
+        barriers.Use(t.Normals, ImageUse.SampledCompute);
+        for (int i = 0; i < FilterIterations; i++)
+        {
+            bool toScratch = (i & 1) == 0;
+            barriers.Use(toScratch ? indirect : scratch, ImageUse.SampledCompute);
+            barriers.Use(toScratch ? scratch : indirect, ImageUse.StorageCompute, discard: true);
+            barriers.Flush();
+            PassRecording.BindCompute(context, context.Pipelines.IndirectFilter, toScratch ? t.FilterToScratchSet : t.FilterToIndirectSet);
+            context.Pipelines.Push(context.Cmd, new GpuDrawConstants { Mode = 1u << i });
+            vk.CmdDispatch(context.Cmd, (indirect.Width + 7) / 8, (indirect.Height + 7) / 8, 1);
+        }
     }
+
+    /// <summary>A-trous iterations (even, so the result ends in <see cref="VulkanRenderTarget.Indirect"/>).</summary>
+    private const int FilterIterations = 2;
 }
 
 /// <summary>

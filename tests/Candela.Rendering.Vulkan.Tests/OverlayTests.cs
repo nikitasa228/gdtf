@@ -132,6 +132,59 @@ public sealed class OverlayTests
     }
 
     [SkippableFact]
+    public void NoiseFieldReplacesTheSourcesWhenGiven()
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(20f, scene.Lambert(new Vector3(0.5f)), InstanceFlags.None);
+            renderer.World.SetNoiseSources(new[] { new NoiseSource(new Vector3(0f, 0f, 1f), 90f) }); // ignored with a field
+
+            // A field rising 4 dB per metre along X (linear: trilinear interpolation between voxel centres is exact).
+            const int nx = 16, ny = 8, nz = 4;
+            var min = new Vector3(-4f, -3f, -1f);
+            var max = new Vector3(4f, 3f, 3f);
+            var values = new float[nx * ny * nz];
+            for (int z = 0; z < nz; z++)
+            {
+                for (int y = 0; y < ny; y++)
+                {
+                    for (int x = 0; x < nx; x++)
+                        values[(z * ny + y) * nx + x] = 50f + 4f * (min.X + (x + 0.5f) * (max.X - min.X) / nx);
+                }
+            }
+
+            renderer.World.SetAtmosphere(new AtmosphereState
+            {
+                BaseScattering = 0f,
+                NoiseField = new VolumeGrid { Min = min, Max = max, SizeX = nx, SizeY = ny, SizeZ = nz, Values = values },
+            });
+            var view = new TopDownView(Width, Height, 10f);
+            using var target = renderer.CreateTarget(Width, Height);
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Noise }, new PreviewSettings(), 0f);
+            var spl = renderer.ReadAnalysis(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            for (float x = -3.5f; x <= 3.5f; x += 0.7f)
+            {
+                for (float y = -2.5f; y <= 2.5f; y += 1f)
+                {
+                    var (px, py, centre) = view.NearestPixel(new Vector3(x, y, 0f));
+                    Assert.InRange(spl[py * Width + px], 50f + 4f * centre.X - 0.5f, 50f + 4f * centre.X + 0.5f);
+                }
+            }
+
+            // Outside the field's box there is no level (silence): out of range.
+            var (ox, oy, _) = view.NearestPixel(new Vector3(-6f, 0f, 0f));
+            Assert.True(spl[oy * Width + ox] < -1e6f, $"outside the field: {spl[oy * Width + ox]} dB");
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void NoiseOverlayColoursSurfacesAndFog()
     {
         var renderer = TestRenderers.CreateOrSkip();

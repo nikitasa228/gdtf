@@ -46,6 +46,7 @@ internal static class ShaderPrograms
     public static readonly ShaderVariant VplGenerate = new("vpl.comp");
     public static readonly ShaderVariant IndirectGather = new("gather.comp");
     public static readonly ShaderVariant RayTracedGi = new("rt_gi.comp");
+    public static readonly ShaderVariant IndirectFilter = new("gi_filter.comp");
 
     public static IReadOnlyList<ShaderVariant> All { get; } = new[]
     {
@@ -53,6 +54,6 @@ internal static class ShaderPrograms
         LinesFragment, FullscreenVertex, Tonemap, Grid, ClusterAssign, ShadowVertex, ShadowFragment, ShadowFragmentMask,
         ShadowFragmentRsm, ShadowFragmentRsmMask, Analysis, Selection, Outline, DepthUpsample, FroxelInject, FroxelIntegrate,
         VolumeComposite, BloomDownsampleFirst, BloomDownsample, BloomUpsample, Histogram, ExposureReduce, VplGenerate,
-        IndirectGather, RayTracedGi,
+        IndirectGather, RayTracedGi, IndirectFilter,
     };
 }

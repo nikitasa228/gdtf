@@ -67,7 +67,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     private const int SlotVpls = 9;
     private const int SlotBloom = 10;
     private const int SlotExposure = 11;
-    private readonly int[] _unusedRenders = new int[12];
+    private const int SlotIndirectScratch = 12;
+    private readonly int[] _unusedRenders = new int[13];
     private readonly VulkanRenderer _renderer;
     private readonly VulkanContext _context;
     private readonly DescriptorSignature _signature = new();
@@ -187,6 +188,9 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
     internal GpuImage? IndirectHistory { get; private set; }
 
+    /// <summary>Ping-pong partner of <see cref="Indirect"/> for the ray-traced GI filter.</summary>
+    internal GpuImage? IndirectScratch { get; private set; }
+
     internal GpuBuffer? Vpls { get; private set; }
 
     internal GpuBuffer? Exposure { get; private set; }
@@ -233,6 +237,11 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     internal DescriptorSet GatherSet { get; private set; }
 
     internal DescriptorSet RayTracingSet { get; private set; }
+
+    /// <summary>Filter iteration sets: <see cref="Indirect"/> to <see cref="IndirectScratch"/> and back.</summary>
+    internal DescriptorSet FilterToScratchSet { get; private set; }
+
+    internal DescriptorSet FilterToIndirectSet { get; private set; }
 
     internal LastFrameInfo Last;
 
@@ -304,7 +313,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             Analysis = null;
             RetireImage(Indirect);
             RetireImage(IndirectHistory);
-            Indirect = IndirectHistory = null;
+            RetireImage(IndirectScratch);
+            Indirect = IndirectHistory = IndirectScratch = null;
             for (int i = 0; i < BloomLevels; i++)
                 RetireImage(_bloom[i]);
             BloomLevels = 0;
@@ -354,6 +364,10 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         if (!ReferenceEquals(indirectHistory, IndirectHistory))
             IndirectHistoryValid = false;
         IndirectHistory = indirectHistory;
+        Ensure(SlotIndirectScratch, IndirectScratch, indirect && r.IndirectHistory, (uint)Math.Max(r.IndirectWidth, 1),
+            (uint)Math.Max(r.IndirectHeight, 1), 1, TargetFormats.HdrStorage, ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit,
+            "indirect filter scratch", out var indirectScratch);
+        IndirectScratch = indirectScratch;
 
         ulong vplBytes = (ulong)Math.Max(r.VplCapacity, 0) * (ulong)sizeof(GpuVpl);
         if (r.VplCapacity <= 0)
@@ -400,6 +414,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         sig.Add(Vpls?.Handle.Handle ?? 0);
         sig.Add(Indirect?.View.Handle ?? 0);
         sig.Add(IndirectHistory?.View.Handle ?? 0);
+        sig.Add(IndirectScratch?.View.Handle ?? 0);
         sig.Add(FroxelInjected?.View.Handle ?? 0);
         sig.Add(FroxelHistory?.View.Handle ?? 0);
         sig.Add(FroxelIntegrated?.View.Handle ?? 0);
@@ -466,7 +481,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         w.Image(set, ShaderConstants.BindingSelectionMask, image, shared.NearestClamp, (SelectionMask ?? shared.Dummy2D).View, read);
         w.Buffer(set, ShaderConstants.BindingExposure, storage, (Exposure ?? shared.DummyBuffer).Handle);
 
-        InjectSet = IntegrateSet = GatherSet = RayTracingSet = default;
+        InjectSet = IntegrateSet = GatherSet = RayTracingSet = FilterToScratchSet = FilterToIndirectSet = default;
         if (FroxelInjected is not null)
         {
             InjectSet = Allocate(_renderer.Pipelines.PassSetLayout);
@@ -488,6 +503,17 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
                 w.Image(RayTracingSet, ShaderConstants.BindingPassSampled0, image, shared.LinearClamp, IndirectHistory.View, read);
                 w.Buffer(RayTracingSet, ShaderConstants.BindingPassBuffer, storage, rtData.Handle);
                 w.AccelerationStructure(RayTracingSet, ShaderConstants.BindingPassTlas, tlas);
+                if (IndirectScratch is not null)
+                {
+                    FilterToScratchSet = Allocate(_renderer.Pipelines.PassSetLayout);
+                    w.Image(FilterToScratchSet, ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, default, IndirectScratch.View,
+                        ImageLayout.General);
+                    w.Image(FilterToScratchSet, ShaderConstants.BindingPassSampled0, image, shared.NearestClamp, Indirect.View, read);
+                    FilterToIndirectSet = Allocate(_renderer.Pipelines.PassSetLayout);
+                    w.Image(FilterToIndirectSet, ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, default, Indirect.View,
+                        ImageLayout.General);
+                    w.Image(FilterToIndirectSet, ShaderConstants.BindingPassSampled0, image, shared.NearestClamp, IndirectScratch.View, read);
+                }
             }
         }
 
@@ -529,6 +555,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         RetireImage(FroxelIntegrated);
         RetireImage(Indirect);
         RetireImage(IndirectHistory);
+        RetireImage(IndirectScratch);
         for (int i = 0; i < BloomLevels; i++)
             RetireImage(_bloom[i]);
         BloomLevels = 0;
@@ -759,7 +786,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         var context = _context;
         _context.DeferDestroy(() => context.Vk.DestroyDescriptorPool(context.Device, pool, null));
         _pool = default;
-        ViewSet = InjectSet = IntegrateSet = GatherSet = RayTracingSet = default;
+        ViewSet = InjectSet = IntegrateSet = GatherSet = RayTracingSet = FilterToScratchSet = FilterToIndirectSet = default;
     }
 
     private void DisposeResources()
@@ -779,6 +806,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         FroxelIntegrated?.Dispose();
         Indirect?.Dispose();
         IndirectHistory?.Dispose();
+        IndirectScratch?.Dispose();
         for (int i = 0; i < _bloom.Length; i++)
         {
             _bloom[i]?.Dispose();

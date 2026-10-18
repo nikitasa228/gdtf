@@ -215,7 +215,10 @@ internal sealed unsafe class PipelineLibrary : IDisposable
             VplGenerate = CreateCompute("virtual point lights", ShaderPrograms.VplGenerate);
             IndirectGather = CreateCompute("indirect gather (RSM)", ShaderPrograms.IndirectGather);
             if (RayTracing)
+            {
                 RayTracedGi = CreateCompute("indirect (ray traced)", ShaderPrograms.RayTracedGi);
+                IndirectFilter = CreateCompute("indirect filter", ShaderPrograms.IndirectFilter);
+            }
         }
         catch
         {
@@ -275,6 +278,9 @@ internal sealed unsafe class PipelineLibrary : IDisposable
 
     /// <summary>Ray-query one-bounce GI (default handle without ray tracing).</summary>
     public Pipeline RayTracedGi { get; }
+
+    /// <summary>Edge-aware a-trous filter of the ray-traced GI (default handle without ray tracing).</summary>
+    public Pipeline IndirectFilter { get; }
 
     /// <summary>Binds sets 0 and 1 for <paramref name="bindPoint"/>.</summary>
     public void BindSets(CommandBuffer cmd, PipelineBindPoint bindPoint, DescriptorSet scene, DescriptorSet view)
