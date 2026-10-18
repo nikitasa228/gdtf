@@ -102,6 +102,9 @@ public struct SpotLight
 
     public bool CastShadows;
 
+    /// <summary>GDTF beam type of the emitting geometry; selects the intensity distribution shape (default Wash).</summary>
+    public Candela.Photometry.BeamType BeamType;
+
     /// <summary>Entity id of the fixture (for picking and the light-meter breakdown).</summary>
     public Guid FixtureId;
 }
