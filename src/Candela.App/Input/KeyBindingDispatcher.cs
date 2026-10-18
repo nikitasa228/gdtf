@@ -73,7 +73,8 @@ internal sealed class KeyBindingMap
 
 /// <summary>
 /// Runs editor commands for key presses (polled from Dear ImGui each frame, so scripted input works the same as real
-/// keys). Plain letter keys are ignored while a text field has the keyboard, and everything is ignored while the
+/// keys). Plain letter keys and the text-editing chords (Ctrl+A / C / V / X / Z …) are ignored while a text field has
+/// the keyboard, and everything is ignored while the
 /// shortcut editor records a new chord, a viewport flies with W/A/S/D, or a popup (menu, combo box, context menu,
 /// modal dialog) is open: the popup owns the keyboard, so Escape only closes it and Delete or Ctrl+Z cannot change the
 /// scene behind a dialog. The frame in which a popup closes still belongs to it: Dear ImGui closes a menu on Escape, and
@@ -120,6 +121,20 @@ internal sealed class KeyBindingDispatcher
         _keys = KeyNames.BindableKeys.ToArray();
     }
 
+    /// <summary>
+    /// True for the chords a focused text field handles itself (Ctrl or Super, with or without Shift, and A, C, V, X, Z,
+    /// Y, the arrows, Home, End, Backspace, Delete or Insert): they edit the text, so they must not also run the editor
+    /// commands bound to them (Select All, Copy, Paste, Undo …).
+    /// </summary>
+    internal static bool IsTextEditingChord(ImGuiKey key, KeyModifiers mods)
+    {
+        if ((mods & KeyModifiers.Alt) != 0 || (mods & (KeyModifiers.Ctrl | KeyModifiers.Super)) == 0)
+            return false;
+        return key is ImGuiKey.A or ImGuiKey.C or ImGuiKey.V or ImGuiKey.X or ImGuiKey.Z or ImGuiKey.Y or ImGuiKey.LeftArrow
+            or ImGuiKey.RightArrow or ImGuiKey.UpArrow or ImGuiKey.DownArrow or ImGuiKey.Home or ImGuiKey.End or ImGuiKey.Backspace
+            or ImGuiKey.Delete or ImGuiKey.Insert;
+    }
+
     /// <summary>Checks this frame's key presses and runs the bound commands. Call once per frame inside the ImGui frame.</summary>
     public void Dispatch()
     {
@@ -141,8 +156,10 @@ internal sealed class KeyBindingDispatcher
         {
             if (!ImGui.IsKeyPressed(key, false) || _consumed.Contains(key))
                 continue;
-            // While typing, only chords with Ctrl/Alt/Super are shortcuts (Delete, Escape, letters belong to the text field).
-            if (typing && (mods & (KeyModifiers.Ctrl | KeyModifiers.Alt | KeyModifiers.Super)) == 0)
+            // While typing, only chords with Ctrl/Alt/Super are shortcuts (Delete, Escape, letters belong to the text field),
+            // and not the ones the field itself uses: Ctrl+A / C / V / X / Z select, copy, paste, cut and undo text there,
+            // never all objects or the scene's clipboard.
+            if (typing && ((mods & (KeyModifiers.Ctrl | KeyModifiers.Alt | KeyModifiers.Super)) == 0 || IsTextEditingChord(key, mods)))
                 continue;
             string? name = KeyNames.FromImGui(key);
             if (name is null)

@@ -201,7 +201,9 @@ Shortcuts are commands bound to key chords (Core `KeyBindingSet`); menus show th
 | Wireframe / Colorless / Full | Alt+1 / Alt+2 / Alt+3 | Overlay None / Lux / Noise / Cables | Alt+0 / Alt+L / Alt+N / Alt+C |
 | New viewport | Ctrl+Alt+N | Keyboard shortcuts | F1 |
 
-While a text field has the keyboard, plain keys type into it; chords with Ctrl / Alt / Super still work. **Escape**
+While a text field has the keyboard, plain keys type into it and the text-editing chords (Ctrl+A / C / V / X / Z /
+Y, Ctrl+arrows …) edit the text — they do not select, copy, paste or undo objects; other chords with Ctrl / Alt /
+Super (Ctrl+S, Ctrl+O …) still work. **Escape**
 first closes whatever is open — a menu, a combo box, a dialog, the Settings / Keyboard Shortcuts / About window, a
 shortcut being recorded — and only a press with nothing open clears the selection. Menus and the shortcut editor show
 punctuation and keypad keys as `Ctrl+,` and `Num 7` (stored in the binding files as `Ctrl+Comma`, `Numpad7`).

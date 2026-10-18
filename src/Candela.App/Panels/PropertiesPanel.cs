@@ -132,7 +132,12 @@ internal sealed unsafe class PropertiesPanel : Panel
     {
         PropertyGrid.Row(Str.PropName);
         // A UTF-8 buffer kept between frames: the field is edited in place without building strings every frame.
-        bool editing = _nameFor == entity.Id && ImGuiP.GetActiveID() == ImGui.GetID("##name");
+        // The field still being edited for an object that is no longer the primary selection (the selection changed
+        // under the keyboard): drop that edit, or the half-typed name would be committed to the new object.
+        uint fieldId = ImGui.GetID("##name");
+        if (_nameFor != entity.Id && ImGuiP.GetActiveID() == fieldId)
+            ImGuiP.ClearActiveID();
+        bool editing = _nameFor == entity.Id && ImGuiP.GetActiveID() == fieldId;
         if (!editing && (_nameFor != entity.Id || !ReferenceEquals(_nameShown, entity.Name)))
             SetNameBuffer(entity);
         bool commit;

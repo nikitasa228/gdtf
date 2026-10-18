@@ -287,10 +287,11 @@ public sealed class KeyBindingDispatchTests
     }
 
     [Fact]
-    public void Plain_keys_go_to_a_focused_text_field_but_ctrl_chords_still_work()
+    public void Plain_keys_and_text_editing_chords_go_to_a_focused_text_field_other_ctrl_chords_still_work()
     {
         using var ui = new HeadlessImGui(new Vector2(800, 600));
-        var (commands, ran) = Registry(EditorActions.FrameSelection, EditorActions.Undo);
+        var (commands, ran) = Registry(EditorActions.FrameSelection, EditorActions.Undo, EditorActions.SelectAll, EditorActions.Copy,
+            EditorActions.Paste, AppActions.Cut, EditorActions.FileSave);
         var dispatcher = new KeyBindingDispatcher(commands, KeyBindingsService.CreateDefault());
         string text = "";
         bool focus = true;
@@ -312,8 +313,15 @@ public sealed class KeyBindingDispatchTests
         Assert.True(ImGui.GetIO().WantTextInput);
         Press(ui, dispatcher, ImGuiKey.F, draw: Field);
         Assert.Empty(ran);
-        Press(ui, dispatcher, ImGuiKey.Z, KeyModifiers.Ctrl, Field);
-        Assert.Equal(new[] { EditorActions.Undo }, ran);
+        // The text-editing chords belong to the field: selecting, copying, pasting, cutting or undoing text must not select
+        // all objects, copy or paste the scene, or undo a scene edit.
+        foreach (var key in new[] { ImGuiKey.A, ImGuiKey.C, ImGuiKey.V, ImGuiKey.X, ImGuiKey.Z })
+            Press(ui, dispatcher, key, KeyModifiers.Ctrl, Field);
+        Press(ui, dispatcher, ImGuiKey.Z, KeyModifiers.Ctrl | KeyModifiers.Shift, Field);
+        Assert.Empty(ran);
+        // Other Ctrl chords are still shortcuts while typing.
+        Press(ui, dispatcher, ImGuiKey.S, KeyModifiers.Ctrl, Field);
+        Assert.Equal(new[] { EditorActions.FileSave }, ran);
     }
 
     [Fact]
