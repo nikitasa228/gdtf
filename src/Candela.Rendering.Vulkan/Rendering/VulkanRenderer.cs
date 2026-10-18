@@ -1019,7 +1019,15 @@ public sealed unsafe class VulkanRenderer : IRenderer
         if (value == t.GradientHash)
             return;
         t.GradientHash = value;
-        var colors = gradient.Bake((int)lut.Width);
+        int kind = d.Overlay == OverlayMode.Noise ? 1 : 0;
+        var colors = t.GradientBakes[kind];
+        if (colors is null || colors.Length != lut.Width || t.GradientBakeHashes[kind] != value)
+        {
+            colors = gradient.Bake((int)lut.Width);
+            t.GradientBakes[kind] = colors;
+            t.GradientBakeHashes[kind] = value;
+        }
+
         ulong bytes = lut.Width * 8ul;
         var region = Context.Upload.Allocate(bytes, 16);
         var dst = new Span<Half>(region.Pointer, (int)lut.Width * 4);

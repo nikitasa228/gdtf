@@ -8,7 +8,8 @@ namespace Candela.Rendering.Vulkan;
 /// The procedural scene of <c>candela render-test</c> and the golden-image tests: a stage floor (top at Z = 0), a
 /// back wall, boxes and spheres with typical PBR materials (painted wood, gold, white plastic, brushed steel, black
 /// stage box), an emissive LED panel (150 cd/m²) on the wall, three coloured spot lights with different beam angles
-/// and intensities from 6.5 m, and a cable drawn as a line. Every object has a fixed pick id (<see cref="PickIds"/>).
+/// and intensities from 6.5 m (casting soft shadows), and a cable drawn as a line. Every object has a fixed pick id
+/// (<see cref="PickIds"/>).
 /// </summary>
 public sealed class ProceduralTestScene
 {
@@ -116,6 +117,7 @@ public sealed class ProceduralTestScene
             FieldAngle = fieldDeg * MathF.PI / 180f,
             SourceRadius = 0.08f,
             Iris = 1f,
+            CastShadows = true,
         };
     }
 

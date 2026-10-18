@@ -53,7 +53,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     private const int MaxPassSets = 24;
 
     /// <summary>Renders a feature's resources survive without being used.</summary>
-    private const int KeepUnusedRenders = 60;
+    internal const int KeepUnusedRenders = 60;
 
     private const int SlotDisplayDepth = 0;
     private const int SlotAnalysis = 1;
@@ -168,6 +168,12 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
     /// <summary>Hash of the gradient the table holds.</summary>
     internal int GradientHash { get; set; }
+
+    /// <summary>Baked lux (0) and noise (1) gradients with their hashes, so switching overlays does not re-bake.</summary>
+    internal Vector4[]?[] GradientBakes { get; } = new Vector4[]?[2];
+
+    /// <summary>Hashes of <see cref="GradientBakes"/>.</summary>
+    internal int[] GradientBakeHashes { get; } = new int[2];
 
     internal GpuImage? SelectionMask { get; private set; }
 
