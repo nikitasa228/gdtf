@@ -263,3 +263,63 @@ public sealed class ProbeTests : IDisposable
         Assert.Single(loaded.Scene.All().Single().Components);
     }
 }
+
+public sealed class ProbeFileTests : IDisposable
+{
+    private readonly TempDir _dir = new();
+
+    public void Dispose() => _dir.Dispose();
+
+    [Fact]
+    public void Q1_symlinked_project_is_updated_through_the_link()
+    {
+        var real = Path.Combine(_dir.Path, "real");
+        Directory.CreateDirectory(real);
+        var target = Path.Combine(real, "show.candela");
+        ProjectFile.Save(target, new ProjectData(new Scene("v1")));
+        var link = _dir.File("link.candela");
+        File.CreateSymbolicLink(link, target);
+        ProjectFile.Save(link, new ProjectData(new Scene("v2")));
+        Assert.NotNull(new FileInfo(link).LinkTarget);
+        Assert.Equal("v2", ProjectFile.ReadManifest(target).SceneName);
+    }
+
+    [Fact]
+    public void Q2_file_mode_is_kept()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var path = _dir.File("private.candela");
+        ProjectFile.Save(path, new ProjectData(new Scene("v1")));
+        File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        ProjectFile.Save(path, new ProjectData(new Scene("v2")));
+        Assert.Equal(UnixFileMode.UserRead | UnixFileMode.UserWrite, File.GetUnixFileMode(path));
+    }
+
+    [Fact]
+    public void Q3_read_only_file_is_not_replaced()
+    {
+        var path = _dir.File("ro.candela");
+        ProjectFile.Save(path, new ProjectData(new Scene("v1")));
+        var attrs = File.GetAttributes(path);
+        File.SetAttributes(path, attrs | FileAttributes.ReadOnly);
+        try
+        {
+            Assert.ThrowsAny<Exception>(() => ProjectFile.Save(path, new ProjectData(new Scene("v2"))));
+            Assert.Equal("v1", ProjectFile.ReadManifest(path).SceneName);
+        }
+        finally
+        {
+            File.SetAttributes(path, attrs);
+        }
+    }
+
+    [Fact]
+    public void Q4_long_cyrillic_file_name_saves()
+    {
+        var name = new string('Ф', 120) + ".candela"; // 240 + 8 bytes in UTF-8, within NAME_MAX
+        var path = _dir.File(name);
+        ProjectFile.Save(path, new ProjectData(new Scene("long")));
+        ProjectFile.Save(path, new ProjectData(new Scene("long2")));
+        Assert.Equal("long2", ProjectFile.ReadManifest(path).SceneName);
+    }
+}
