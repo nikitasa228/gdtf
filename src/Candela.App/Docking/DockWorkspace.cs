@@ -163,7 +163,7 @@ internal sealed unsafe class DockWorkspace
                     DrawIconColumn(node, panel, allPanels, scale);
             }
 
-            DrawContentChild(panel, style == TabStyle.LeftIcons, drawContent);
+            DrawContentChild(panel, drawContent);
         }
 
         ImGui.End();
@@ -373,7 +373,7 @@ internal sealed unsafe class DockWorkspace
         ImGui.SetCursorScreenPos(origin + new Vector2(width, 0));
     }
 
-    private static void DrawContentChild(Panel panel, bool besideColumn, Action<Panel> drawContent)
+    private static void DrawContentChild(Panel panel, Action<Panel> drawContent)
     {
         var avail = ImGui.GetContentRegionAvail();
         if (avail.X < 1 || avail.Y < 1)
@@ -388,7 +388,6 @@ internal sealed unsafe class DockWorkspace
         if (open)
             drawContent(panel);
         ImGui.EndChild();
-        _ = besideColumn;
     }
 
     private void RequestMenu(ImGuiDockNodePtr node, Panel panel)

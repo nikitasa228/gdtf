@@ -44,7 +44,6 @@ internal sealed class PreviewStage : IViewportContent
     private readonly List<Guid> _scratch = new();
     private uint _nextPickId = 1;
     private bool _allDirty = true;
-    private bool _selectionDirty = true;
     private bool _disposed;
 
     private PreviewStage(IRenderWorld world, SceneModel scene, Selection selection)
@@ -53,7 +52,6 @@ internal sealed class PreviewStage : IViewportContent
         _scene = scene;
         _selection = selection;
         _scene.Changed += OnSceneChanged;
-        _selection.Changed += OnSelectionChanged;
     }
 
     /// <inheritdoc/>
@@ -116,12 +114,10 @@ internal sealed class PreviewStage : IViewportContent
             _dirty.Clear();
             foreach (var id in _scratch)
                 SyncEntity(id);
-            _selectionDirty = true;
         }
 
         // Visibility and lock are plain properties without change events, and the selection changes often, so the
         // (cheap) instance flags are re-derived every frame; only instances whose flags changed are updated.
-        _selectionDirty = false;
         _scratch.Clear();
         foreach (var (id, bound) in _bound)
             if (FlagsFor(bound.Entity) != bound.Flags)
@@ -134,9 +130,6 @@ internal sealed class PreviewStage : IViewportContent
             _bound[id] = bound with { Flags = flags };
         }
     }
-
-    /// <summary>True when the selection changed since the last <see cref="Sync"/> (diagnostics).</summary>
-    internal bool SelectionDirty => _selectionDirty;
 
     /// <inheritdoc/>
     public Guid? EntityForPick(uint pickId)
@@ -183,7 +176,6 @@ internal sealed class PreviewStage : IViewportContent
             return;
         _disposed = true;
         _scene.Changed -= OnSceneChanged;
-        _selection.Changed -= OnSelectionChanged;
         foreach (var bound in _bound.Values)
             _world.DestroyInstance(bound.Instance);
         _bound.Clear();
@@ -366,8 +358,6 @@ internal sealed class PreviewStage : IViewportContent
 
         _dirty.Add(change.Entity.Id);
     }
-
-    private void OnSelectionChanged() => _selectionDirty = true;
 
     private readonly record struct Bound(Entity Entity, InstanceHandle Instance, Guid Model, string MaterialKey, uint PickId, InstanceFlags Flags);
 }

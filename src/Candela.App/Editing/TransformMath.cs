@@ -103,8 +103,7 @@ internal static class TransformMath
         var qx = Quaternion.CreateFromAxisAngle(Vector3.UnitX, degrees.X * rad);
         var qy = Quaternion.CreateFromAxisAngle(Vector3.UnitY, degrees.Y * rad);
         var qz = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, degrees.Z * rad);
-        // System.Numerics: q1 * q2 applies q2 first? No — Quaternion multiplication composes like matrices in
-        // row-vector order via Concatenate; build the matrix product explicitly to stay unambiguous.
+        // Composed as row-vector matrices (X applied first, then Y, then Z) so the order is unambiguous.
         var m = Matrix4x4.CreateFromQuaternion(qx) * Matrix4x4.CreateFromQuaternion(qy) * Matrix4x4.CreateFromQuaternion(qz);
         return Quaternion.Normalize(Quaternion.CreateFromRotationMatrix(m));
     }
