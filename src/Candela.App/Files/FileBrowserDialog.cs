@@ -86,7 +86,7 @@ internal sealed class FileBrowserDialog
 
         var model = _model;
         DrawPathBar(model, scale);
-        float footer = ImGui.GetFrameHeightWithSpacing() * 2.2f + (model.Error.Length > 0 ? ImGui.GetTextLineHeightWithSpacing() : 0);
+        float footer = FooterHeight(ImGui.GetFrameHeightWithSpacing(), ImGui.GetTextLineHeightWithSpacing(), model.Error.Length > 0);
         float placesWidth = 190f * scale;
         ImGui.BeginChild("##places", new Vector2(placesWidth, -footer), ImGuiChildFlags.Borders);
         DrawPlaces(model);
@@ -112,6 +112,14 @@ internal sealed class FileBrowserDialog
             Close();
     }
 
+    /// <summary>
+    /// Height reserved below the places and entries lists: the file-name row and the file-type row (each a frame plus
+    /// item spacing) and, when the folder could not be read, the error line. Everything the footer draws must fit, or
+    /// the dialog grows a scroll bar and hides its last row.
+    /// </summary>
+    internal static float FooterHeight(float frameHeightWithSpacing, float textLineHeightWithSpacing, bool hasError) =>
+        frameHeightWithSpacing * 2f + (hasError ? textLineHeightWithSpacing : 0f);
+
     /// <summary>Accepts a path programmatically (scripts): as if typed into the name field and confirmed.</summary>
     internal bool AcceptForTesting(string path)
     {
@@ -129,9 +137,20 @@ internal sealed class FileBrowserDialog
         if (IconButton(Icons.Refresh, ""))
             model.Refresh();
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(-1);
+        // Hidden files: a toggle button at the end of the path bar (eye = shown), so the footer keeps two rows.
+        var style = ImGui.GetStyle();
+        float toggleWidth = ImGui.CalcTextSize(Icons.Eye).X + style.FramePadding.X * 2f;
+        ImGui.SetNextItemWidth(-(toggleWidth + style.ItemSpacing.X));
         if (ImGui.InputText("##path", ref _pathText, 1024, ImGuiInputTextFlags.EnterReturnsTrue))
             Navigate(model, _pathText);
+        ImGui.SameLine();
+        bool hidden = model.ShowHidden;
+        if (hidden)
+            ImGui.PushStyleColor(ImGuiCol.Button, Theme.WithAlpha(Theme.Accent, 0.55f));
+        if (IconButton(hidden ? Icons.Eye + "##hidden" : Icons.EyeOff + "##hidden", Loc.Get(Str.BrowserShowHidden)))
+            model.SetShowHidden(!hidden);
+        if (hidden)
+            ImGui.PopStyleColor();
         _ = scale;
     }
 
@@ -276,9 +295,6 @@ internal sealed class FileBrowserDialog
             Close();
         }
 
-        bool hidden = model.ShowHidden;
-        if (ImGui.Checkbox(Loc.Get(Str.BrowserShowHidden), ref hidden))
-            model.SetShowHidden(hidden);
     }
 
     private void DrawOverwriteConfirmation()
