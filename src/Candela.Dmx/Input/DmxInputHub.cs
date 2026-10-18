@@ -1,8 +1,12 @@
 namespace Candela.Dmx.Input;
 
 /// <summary>Who sent a universe: protocol id, sender address and (for sACN) the source CID.</summary>
+/// <param name="Protocol">Protocol name ("Art-Net", "sACN", …).</param>
+/// <param name="Endpoint">Sender address (IP:port, device path …).</param>
+/// <param name="Cid">sACN component identifier; empty for protocols without one.</param>
 public readonly record struct DmxSourceId(string Protocol, string Endpoint, Guid Cid = default)
 {
+    /// <inheritdoc />
     public override string ToString() => Cid == Guid.Empty ? $"{Protocol} {Endpoint}" : $"{Protocol} {Endpoint} ({Cid})";
 }
 
@@ -30,16 +34,23 @@ public sealed record DmxSourceInfo(DmxSourceId Source, int Universe, int Priorit
 /// </summary>
 public sealed class DmxInputHub
 {
+    /// <summary>Priority of sources that have none (Art-Net); sACN's default priority.</summary>
     public const int DefaultPriority = 100;
+
+    /// <summary>Slots per universe.</summary>
     public const int SlotCount = 512;
 
     private readonly object _lock = new();
     private readonly Dictionary<int, UniverseState> _universes = new();
     private readonly Func<DateTime> _clock;
 
+    /// <summary>Creates the hub; <paramref name="clockUtc"/> replaces the system clock (tests, offline playback).</summary>
     public DmxInputHub(Func<DateTime>? clockUtc = null) => _clock = clockUtc ?? (() => DateTime.UtcNow);
 
+    /// <summary>A source without packets for this long is dropped (default 3 s).</summary>
     public TimeSpan SourceTimeout { get; set; } = TimeSpan.FromSeconds(3);
+
+    /// <summary>How sources of equal priority are combined (default HTP).</summary>
     public DmxMergeMode MergeMode { get; set; } = DmxMergeMode.Htp;
 
     /// <summary>Raised on the receiving thread when a timecode message arrives (Art-Net ArtTimeCode, MIDI/LTC bridges…).</summary>
@@ -203,15 +214,28 @@ public sealed class DmxInputHub
 /// <summary>Frame rate / type of a timecode stream (SMPTE types as used by Art-Net ArtTimeCode).</summary>
 public enum TimecodeType
 {
+    /// <summary>24 fps (film).</summary>
     Film24 = 0,
+
+    /// <summary>25 fps (EBU).</summary>
     Ebu25 = 1,
+
+    /// <summary>29.97 fps drop-frame.</summary>
     Df2997 = 2,
+
+    /// <summary>30 fps (SMPTE).</summary>
     Smpte30 = 3,
 }
 
 /// <summary>A SMPTE timecode position.</summary>
+/// <param name="Hours">Hours.</param>
+/// <param name="Minutes">Minutes.</param>
+/// <param name="Seconds">Seconds.</param>
+/// <param name="Frames">Frames within the second.</param>
+/// <param name="Type">Frame rate / type.</param>
 public readonly record struct Timecode(int Hours, int Minutes, int Seconds, int Frames, TimecodeType Type)
 {
+    /// <summary>Actual frame rate, frames per second (29.97 for drop-frame).</summary>
     public double FramesPerSecond => Type switch
     {
         TimecodeType.Film24 => 24,
@@ -236,5 +260,6 @@ public readonly record struct Timecode(int Hours, int Minutes, int Seconds, int 
         }
     }
 
+    /// <inheritdoc />
     public override string ToString() => $"{Hours:D2}:{Minutes:D2}:{Seconds:D2}{(Type == TimecodeType.Df2997 ? ';' : ':')}{Frames:D2}";
 }
