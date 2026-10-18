@@ -210,6 +210,13 @@ public sealed class FixtureGeometryBuilder
     public const int MaxPathLength = 4096;
 
     /// <summary>
+    /// Most characters of all <see cref="FixturePart.Path"/>s of one build together (the library's largest needs 113 000).
+    /// Past it parts get the indexed path <c>…#{index}</c>: a 50 kB description of a 250-level template instanced 800
+    /// times otherwise made the paths alone take 800 MB.
+    /// </summary>
+    public const int MaxTotalPathCharacters = 4 << 20;
+
+    /// <summary>
     /// Most expansion steps (parts, references, refused references) of one build: bounds the work for files whose
     /// references are refused over and over, which <see cref="MaxParts"/> alone does not.
     /// </summary>
@@ -262,7 +269,8 @@ public sealed class FixtureGeometryBuilder
         var stack = new Stack<Work>();
         stack.Push(new Work(root, root.Name, root.Position, root.Model, -1, "", Array.Empty<GeometryReference>(), null, null));
         int refused = 0;
-        long steps = 0;
+        long steps = 0, pathCharacters = 0;
+        bool pathBudgetSpent = false;
         while (stack.Count > 0)
         {
             if (++steps > MaxSteps)
@@ -306,8 +314,15 @@ public sealed class FixtureGeometryBuilder
             int index = parts.Count;
             // Only absurdly long names exceed the limit (real paths stay below 300 characters): an indexed path keeps every
             // part addressable without making the memory for paths grow with depth × name length.
-            string path = w.ParentPath.Length + 1 + w.Name.Length > MaxPathLength ? $"…#{index}"
-                : w.ParentPath.Length == 0 ? w.Name : $"{w.ParentPath}/{w.Name}";
+            int length = w.ParentPath.Length == 0 ? w.Name.Length : w.ParentPath.Length + 1 + w.Name.Length;
+            if (!pathBudgetSpent && pathCharacters + length > MaxTotalPathCharacters)
+            {
+                pathBudgetSpent = true;
+                warnings.Add(new GdtfWarning(root.Name, $"Part paths exceed {MaxTotalPathCharacters} characters in all; further parts are named by index."));
+            }
+            bool indexed = pathBudgetSpent || length > MaxPathLength;
+            string path = indexed ? $"…#{index}" : w.ParentPath.Length == 0 ? w.Name : $"{w.ParentPath}/{w.Name}";
+            if (!indexed) pathCharacters += length;
             parts.Add(new FixturePart(index, w.Name, path, w.Parent, w.Local, g, w.Chain, w.InstancedBy, w.Model,
                 w.Model is null ? null : _models?.Invoke(w.Model)));
             keys.TryAdd(new FixtureGeometry.PartKey(g, w.Chain), index);

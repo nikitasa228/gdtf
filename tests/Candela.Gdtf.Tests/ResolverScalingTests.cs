@@ -192,4 +192,29 @@ public sealed class ResolverScalingTests
         Assert.Equal("textures/Metal.png", archive.FindInAnyFolder("metal.PNG")); // first in archive order
         Assert.Null(archive.FindInAnyFolder("root.png"));                         // root entries are not in a folder
     }
+
+    /// <summary>
+    /// A 50 kB description — a 250-level template instanced 800 times — made the part paths alone take 800 MB (each up
+    /// to <see cref="FixtureGeometryBuilder.MaxPathLength"/> characters, for 200 000 parts). All paths together are now
+    /// bounded; later parts are named by index and stay addressable.
+    /// </summary>
+    [Fact]
+    public void Part_paths_of_a_hostile_instanced_tree_have_a_total_budget()
+    {
+        string pad = new('x', 15);
+        string xml = Fixture(
+            "<DMXMode Name=\"M\" Geometry=\"Root\"/>",
+            geometries: $"<Geometry Name=\"Root\">{Repeat(800, i => $"<GeometryReference Name=\"R{i}\" Geometry=\"T\"/>")}</Geometry>" +
+                        $"<Geometry Name=\"T\">{Repeat(250, i => $"<Geometry Name=\"{pad}{i}\">")}{Repeat(250, _ => "</Geometry>")}</Geometry>");
+        var ft = TestData.ReadXml(xml);
+        var geometry = new FixtureGeometryBuilder(ft).Build();
+
+        Assert.Equal(FixtureGeometryBuilder.MaxParts, geometry.Parts.Count);
+        long total = geometry.Parts.Sum(p => (long)p.Path.Length);
+        Assert.True(total <= FixtureGeometryBuilder.MaxTotalPathCharacters + 16L * geometry.Parts.Count, $"{total} path characters.");
+        Assert.Contains(geometry.Warnings, w => w.Message.Contains("characters in all", StringComparison.Ordinal));
+        Assert.Equal(0, geometry.FindPartByPath("Root"));
+        var last = geometry.Parts[^1];
+        Assert.Equal(last.Index, geometry.FindPartByPath(last.Path));
+    }
 }

@@ -169,7 +169,9 @@ public sealed class HostileInputTests
         Assert.InRange(mode.ChannelInstances.Count, 1, DmxLayout.MaxChains);
         Assert.Single(ft.Warnings, w => w.Message.Contains("geometry reference instances", StringComparison.Ordinal));
         Assert.InRange(parts.Parts.Count, 1, FixtureGeometryBuilder.MaxParts + 1);
-        Assert.Single(parts.Warnings, w => w.Message.Contains("parts", StringComparison.Ordinal));
+        Assert.Single(parts.Warnings, w => w.Message.Contains($"More than {FixtureGeometryBuilder.MaxParts} parts", StringComparison.Ordinal));
+        // 200 000 paths of ~60 characters also exceed the total path budget (once, with one warning).
+        Assert.Single(parts.Warnings, w => w.Message.Contains("characters in all", StringComparison.Ordinal));
     }
 
     [Fact]
