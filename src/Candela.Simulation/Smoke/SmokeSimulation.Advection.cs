@@ -143,8 +143,8 @@ public sealed partial class SmokeSimulation
         if (conserve)
         {
             BoundaryOutflow(dt, out double massOut, out double heatOut);
-            massTarget = Math.Max(0.0, SumField(_density, out _) - massOut);
-            heatTarget = SumField(_temperature, out _) - heatOut;
+            massTarget = Math.Max(0.0, SumField(_density, out _, out _, out _) - massOut);
+            heatTarget = SumField(_temperature, out _, out _, out _) - heatOut;
         }
 
         RunSlices(_nz, _advectScalarsForwardSlice);
@@ -163,8 +163,8 @@ public sealed partial class SmokeSimulation
         // smoke in 60 steps at D = 2 m²/s), while the converged operator would be.
         if (_settings.Diffusivity > 0f)
             DiffuseScalars(dt);
-        _massCorrection = conserve ? FixSum(_density, massTarget) : 0f;
-        _heatCorrection = conserve ? FixSum(_temperature, heatTarget) : 0f;
+        _massCorrection = conserve ? FixSum(_density, massTarget, keepExtremes: false) : 0f;
+        _heatCorrection = conserve ? FixSum(_temperature, heatTarget, keepExtremes: true) : 0f;
     }
 
     /// <summary>
@@ -225,12 +225,17 @@ public sealed partial class SmokeSimulation
     /// the field is corrected to the total it must have — the total before advection minus what left through open faces.
     /// The correction is x += δ·|x| with δ = (target − Σx)/Σ|x|: for a positive field (smoke) a uniform rescaling, for
     /// the signed temperature excess warm and chilled air are corrected in proportion to their magnitude, and no value
-    /// changes sign. δ is limited to ±0.5 so a broken step cannot blow the field up. This is the global "mass fixer" used
-    /// with semi-Lagrangian tracer transport in atmospheric models. Returns δ.
+    /// changes sign. δ is limited to ±0.5 so a broken step cannot blow the field up. With
+    /// <paramref name="keepExtremes"/> (the temperature) the correction creates no new extremes: values stay within the
+    /// field's range before the correction — temperatures come from sources and mixing, and the fixer must not invent air
+    /// hotter or colder than any of them (regression: repeated corrections pushed cells held at the ±1000 K safety limit
+    /// to ±1600–1900 K, and drove a −80 K cold jet's air to −99 K). Smoke density has no such bound and is only kept
+    /// non-negative. This is the global "mass fixer" used with semi-Lagrangian tracer transport in atmospheric models.
+    /// Returns δ.
     /// </summary>
-    private float FixSum(float[] field, double target)
+    private float FixSum(float[] field, double target, bool keepExtremes)
     {
-        double sum = SumField(field, out double magnitude);
+        double sum = SumField(field, out double magnitude, out float low, out float high);
         if (!(magnitude > 1e-12) || !double.IsFinite(sum) || !double.IsFinite(target))
             return 0f;
         float delta = (float)Math.Clamp((target - sum) / magnitude, -0.5, 0.5);
@@ -238,51 +243,71 @@ public sealed partial class SmokeSimulation
             return 0f;
         _fixField = field;
         _fixDelta = delta;
+        (_fixMin, _fixMax) = keepExtremes ? (low, high) : (0f, float.PositiveInfinity);
         RunSlices(_nz, _fixSlice);
         return delta;
     }
 
+    private float _fixMin, _fixMax;
+
     private float[] _fixField = Array.Empty<float>(), _sumField = Array.Empty<float>();
     private float _fixDelta, _massCorrection, _heatCorrection;
 
-    /// <summary>Σx and Σ|x| over all cells (per-slice partial sums added in slice order: deterministic).</summary>
-    private double SumField(float[] field, out double magnitude)
+    /// <summary>
+    /// Σx, Σ|x|, min x and max x over all cells (per-slice partial results combined in slice order: deterministic).
+    /// </summary>
+    private double SumField(float[] field, out double magnitude, out float min, out float max)
     {
         _sumField = field;
         RunSlices(_nz, _sumFieldSlice);
         double sum = 0;
         magnitude = 0;
+        min = float.PositiveInfinity;
+        max = float.NegativeInfinity;
         for (int k = 0; k < _nz; k++)
         {
             sum += _slicePartials[k];
             magnitude += _slicePartials2[k];
+            min = MathF.Min(min, _sliceLow[k]);
+            max = MathF.Max(max, _sliceHigh[k]);
         }
 
         return sum;
     }
+
+    private float[] _sliceLow = Array.Empty<float>(), _sliceHigh = Array.Empty<float>();
 
     private void SumFieldSlice(int k)
     {
         int start = k * _nx * _ny, end = start + _nx * _ny;
         var f = _sumField;
         double sum = 0, magnitude = 0;
+        float low = float.PositiveInfinity, high = float.NegativeInfinity;
         for (int c = start; c < end; c++)
         {
-            sum += f[c];
-            magnitude += MathF.Abs(f[c]);
+            float x = f[c];
+            sum += x;
+            magnitude += MathF.Abs(x);
+            low = MathF.Min(low, x);
+            high = MathF.Max(high, x);
         }
 
         _slicePartials[k] = sum;
         _slicePartials2[k] = magnitude;
+        _sliceLow[k] = low;
+        _sliceHigh[k] = high;
     }
 
     private void FixSlice(int k)
     {
         int start = k * _nx * _ny, end = start + _nx * _ny;
         var f = _fixField;
-        float delta = _fixDelta;
+        float delta = _fixDelta, min = _fixMin, max = _fixMax;
         for (int c = start; c < end; c++)
-            f[c] += delta * MathF.Abs(f[c]);
+        {
+            float x = f[c] + delta * MathF.Abs(f[c]);
+            f[c] = x >= min ? (x <= max ? x : max) : min;
+        }
     }
 
     private void AdvectScalarsForwardSlice(int k)

@@ -272,6 +272,40 @@ public sealed class SmokeStateTests
     }
 
     [Fact]
+    public void Temperatures_StayPhysical_UnderStalledSources()
+    {
+        // Regression: heat and cold are injected at exact rates, so a source whose gas the flow does not carry away (a
+        // CO₂-style cold jet blowing into a corner, a hot plume under a ceiling) drove cells to the ±1000 K safety clamp
+        // — −1000 K is far below absolute zero — and the conservation fixer then pushed them on to ±1600–1900 K.
+        var sim = new SmokeSimulation(new SmokeSimulationSettings
+        {
+            Bounds = new Aabb(new Vector3(-1f, -1f, 0f), new Vector3(1f, 1f, 1.5f)),
+            CellSize = 0.15f,
+            TimeStep = 0.2f,
+            OpenFaces = DomainFaces.None,
+            DissipationPerSecond = 0f,
+            TemperatureRelaxationRate = 0f,
+        });
+        sim.SetObstacles([ObstacleBox.FromAabb(new Aabb(new Vector3(0.2f, -1f, 0.9f), new Vector3(1f, 1f, 1.1f)))]);
+        var emitters = new[]
+        {
+            SmokeEmitter.Plume(new Vector3(-0.8f, -0.8f, 0.4f), new Vector3(-1f, -1f, -1f), 0.5f, 10f, 1e-3f, -80f),
+            SmokeEmitter.Plume(new Vector3(0.6f, 0f, 0.3f), Vector3.UnitZ, 0.3f, 8f, 1e-3f, 900f),
+        };
+        for (int n = 0; n < 40; n++)
+        {
+            sim.StepOnce(emitters);
+            var t = sim.TemperatureExcess.ToArray();
+            Assert.True(t.Min() >= -80.001f, $"step {n}: {t.Min():F1} K below ambient, colder than the cold jet itself");
+            Assert.True(t.Max() <= sim.Settings.MaxTemperatureExcess, $"step {n}: {t.Max():F1} K above ambient");
+        }
+
+        // A source asking for more cold than physics allows is limited to 50 K above absolute zero.
+        sim.StepOnce([SmokeEmitter.Plume(new Vector3(-0.5f, 0.5f, 0.5f), Vector3.UnitZ, 0.3f, 5f, 0f, -1000f)]);
+        Assert.True(sim.TemperatureExcess.ToArray().Min() >= 50f - SimulationConstants.AmbientTemperature - 1e-3f);
+    }
+
+    [Fact]
     public void Stepping_DoesNotAllocate()
     {
         // Single-threaded, so Parallel.For's own bookkeeping does not count; the solver itself must not allocate.

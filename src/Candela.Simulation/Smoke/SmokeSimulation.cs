@@ -44,6 +44,12 @@ public sealed partial class SmokeSimulation
     private readonly Aabb _bounds;
     private readonly double _dt;
     private readonly float _massPerDensity;
+
+    /// <summary>
+    /// Largest temperature deficit, K: <see cref="SmokeSimulationSettings.MaxTemperatureExcess"/>, but never closer than
+    /// 50 K to absolute zero (liquid-nitrogen fog boils at 77 K).
+    /// </summary>
+    private readonly float _coldLimit;
     private readonly ParallelOptions _parallelOptions;
     private readonly bool _parallel;
 
@@ -86,6 +92,7 @@ public sealed partial class SmokeSimulation
         _wCount = _nx * _ny * (_nz + 1);
         _dt = _settings.TimeStep;
         _massPerDensity = _settings.ScatteringAtFullDensity / _settings.MassScatteringCoefficient;
+        _coldLimit = MathF.Max(0f, MathF.Min(_settings.MaxTemperatureExcess, _settings.AmbientTemperature - 50f));
 
         _u = new float[_uCount];
         _v = new float[_vCount];
@@ -112,6 +119,8 @@ public sealed partial class SmokeSimulation
         _slicePartials = new double[_nz + 1];
         _slicePartials2 = new double[_nz + 1];
         _sliceMax = new float[_nz + 1];
+        _sliceLow = new float[_nz + 1];
+        _sliceHigh = new float[_nz + 1];
 
         _parallelOptions = new ParallelOptions
         {
@@ -268,6 +277,7 @@ public sealed partial class SmokeSimulation
         GetCellRange(center - new Vector3(radius), center + new Vector3(radius), out var lo, out var hi);
         float invR2 = 1f / (radius * radius);
         float tMax = _settings.MaxTemperatureExcess;
+        temperatureExcess = Math.Clamp(temperatureExcess, -_coldLimit, tMax);
         for (int k = lo.Z; k <= hi.Z; k++)
         {
             for (int j = lo.Y; j <= hi.Y; j++)
@@ -283,7 +293,7 @@ public sealed partial class SmokeSimulation
                     float w = (1f - q2) * (1f - q2);
                     _density[c] = MathF.Max(0f, _density[c] + densityIncrement * w);
                     if (temperatureExcess != 0f)
-                        _temperature[c] = Math.Clamp(_temperature[c] + (temperatureExcess - _temperature[c]) * w, -tMax, tMax);
+                        _temperature[c] = Math.Clamp(_temperature[c] + (temperatureExcess - _temperature[c]) * w, -_coldLimit, tMax);
                 }
             }
         }

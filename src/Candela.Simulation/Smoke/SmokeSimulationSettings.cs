@@ -120,7 +120,10 @@ public sealed record SmokeSimulationSettings
     /// <summary>Safety limit for any velocity component, m/s.</summary>
     public float MaxSpeed { get; init; } = 60f;
 
-    /// <summary>Safety limit for the temperature excess (positive or negative), K.</summary>
+    /// <summary>
+    /// Safety limit for the temperature excess, K. Chilled air is further limited to 50 K above absolute zero, and a
+    /// chilled source never cools air below its own temperature.
+    /// </summary>
     public float MaxTemperatureExcess { get; init; } = 1000f;
 
     /// <summary>Threads used by the solver (≤ 0 = all cores). Results do not depend on it.</summary>

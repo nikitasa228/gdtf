@@ -38,6 +38,9 @@ public sealed partial class SmokeSimulation
         /// <summary>Heat added per second (negative = cooling), W.</summary>
         public float HeatRate;
 
+        /// <summary>Temperature excess of the emitted gas, K.</summary>
+        public float Temperature;
+
         /// <summary>Density added per second, density·m³/s.</summary>
         public float DensityRate;
 
@@ -83,7 +86,7 @@ public sealed partial class SmokeSimulation
             float diameter = float.IsFinite(e.NozzleDiameter) && e.NozzleDiameter > 0f ? e.NozzleDiameter : 0.05f;
             float speed = float.IsFinite(e.ExitSpeed) ? Math.Clamp(e.ExitSpeed, 0f, _settings.MaxSpeed) : 0f;
             float massRate = float.IsFinite(e.MassRate) ? MathF.Max(e.MassRate, 0f) : 0f;
-            float temperature = float.IsFinite(e.TemperatureExcess) ? Math.Clamp(e.TemperatureExcess, -tMax, tMax) : 0f;
+            float temperature = float.IsFinite(e.TemperatureExcess) ? Math.Clamp(e.TemperatureExcess, -_coldLimit, tMax) : 0f;
             if (e.SpeedFollowsOutput)
                 speed *= output;
 
@@ -112,6 +115,7 @@ public sealed partial class SmokeSimulation
                 Radius = radius,
                 Speed = jet ? 0f : speed * scale,
                 HeatRate = float.IsFinite(heatRate) ? heatRate : 0f,
+                Temperature = temperature,
                 DensityRate = massRate * output / _massPerDensity,
             };
             if (!InjectSource(source, holdVelocity: !jet, dt))
@@ -157,6 +161,10 @@ public sealed partial class SmokeSimulation
         float kelvinPerWeight = (float)(s.HeatRate * dt
             / (SimulationConstants.AirDensity * SimulationConstants.AirSpecificHeat * weightVolume));
         float tMax = _settings.MaxTemperatureExcess;
+        // Chilled gas cannot cool the air below its own temperature (mixing stays within the range of what is mixed;
+        // regression: a stalled cold jet drove cells to −1000 K, far below absolute zero). Hot sources are not bounded
+        // that way: the sections of a flame legitimately heat gas that the sections below have heated already.
+        float coldest = s.Temperature < 0f ? s.Temperature : -_coldLimit;
         for (int k = lo.Z; k <= hi.Z; k++)
         {
             for (int j = lo.Y; j <= hi.Y; j++)
@@ -170,7 +178,11 @@ public sealed partial class SmokeSimulation
                     if (w <= 0f)
                         continue;
                     _density[c] += densityPerWeight * w;
-                    _temperature[c] = Math.Clamp(_temperature[c] + kelvinPerWeight * w, -tMax, tMax);
+                    float t = _temperature[c];
+                    float heated = t + kelvinPerWeight * w;
+                    if (kelvinPerWeight < 0f)
+                        heated = MathF.Max(heated, MathF.Min(t, coldest));
+                    _temperature[c] = Math.Clamp(heated, -_coldLimit, tMax);
                 }
             }
         }

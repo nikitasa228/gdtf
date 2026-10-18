@@ -124,7 +124,8 @@ Semi-Lagrangian advection does not conserve: in recirculating flows the plain sc
 scalar advection the field is therefore corrected to the total it must have — the total before advection minus what
 left through open faces (Σ u_n·q·dt/h over outflow faces, upwind value) — with x += δ·|x|, δ = (target − Σx)/Σ|x|,
 |δ| ≤ 0.5. For smoke this is a uniform rescaling; for the signed temperature excess warm and chilled air are corrected in
-proportion to their magnitude and no value changes sign. This is the global "mass fixer" of semi-Lagrangian tracer
+proportion to their magnitude, no value changes sign, and the correction creates no new extremes (it is clipped to the
+field's range before the correction — the fixer must not invent air hotter or colder than any source made). This is the global "mass fixer" of semi-Lagrangian tracer
 transport in atmospheric models (Priestley 1993); typical corrections are 0.1–2 % per step (`MassCorrection`,
 `HeatCorrection` in the statistics). `ConserveMassAndHeat = false` switches it off.
 
@@ -153,7 +154,12 @@ far smaller than a cell, so the simulation converts them:
   solid (an O(1) summed-volume query, then a 3D DDA walk where needed) — so a fan blowing at or along a wall does not
   move the air behind it (tested);
 * a **plume** (hot gases of a flame) holds its exit velocity U₀·r₀/R in the source sphere only where the air is slower,
-  and is otherwise driven by its own buoyancy.
+  and is otherwise driven by its own buoyancy;
+* **temperature bounds**: heat goes in at the exact rate, but chilled gas never cools air below its own temperature
+  (mixing stays within the range of what is mixed), chilled air stays at least 50 K above absolute zero, and nothing
+  exceeds `MaxTemperatureExcess` (1000 K). A source whose heat the resolved flow cannot carry away saturates there and
+  loses the rest: a 1.1 MW plume from a 0.6 m disc in a closed 4 m box at 0.2 m cells keeps only half its heat, while a
+  5 m flame's sections keep 98.5–99.8 % on 0.2–0.4 m grids.
 
 | Emitter | Defaults (full output) | Source / assumption |
 |---|---|---|
