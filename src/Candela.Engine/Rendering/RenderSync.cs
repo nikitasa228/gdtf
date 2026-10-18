@@ -234,6 +234,10 @@ public sealed class RenderSync : IDisposable
                 if (change.Entity is { } m)
                     foreach (var d in m.SelfAndDescendants()) _moved.Add(d.Id);
                 break;
+            case SceneChangeKind.ComponentChanged when change.Component is FixtureComponent f && change.Entity is { } fe
+                && _entities.TryGetValue(fe.Id, out var drawn) && !drawn.Instances.Exists(r => r.Part >= 0 && r.CastShadow != f.CastShadow):
+                // manual values, patch, mode: the DMX engine re-evaluates and a new profile is caught when the pose arrives
+                break;
             case SceneChangeKind.ComponentAdded or SceneChangeKind.ComponentRemoved or SceneChangeKind.ComponentChanged:
                 if (change.Entity is { } c) _rebuild.Add(c.Id);
                 if (change.Component is CableComponent) _cablesDirty = true;
@@ -302,7 +306,7 @@ public sealed class RenderSync : IDisposable
         if (_moved.Count > 0)
         {
             foreach (var id in _moved)
-                if (_entities.TryGetValue(id, out var v) && v.Kind == VisualKind.Static) PlaceStatic(v);
+                if (_entities.TryGetValue(id, out var v) && v.Kind != VisualKind.Cable) PlaceStatic(v);
             _moved.Clear();
         }
     }

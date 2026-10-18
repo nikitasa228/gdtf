@@ -120,7 +120,7 @@ public sealed partial class StageEngine
 
     private EngineResult UseLoadedProject(ProjectData project, string? path, string what)
     {
-        Issues.ClearProgramMessages();
+        ResetProgramMessages();
         var issues = new List<Issue>(project.LoadIssues);
         Settings = ReadSection(project, EngineSettings.SectionName, new EngineSettings(), issues).Sanitized();
         View = ReadSection(project, ViewSettings.SectionName, new ViewSettings(), issues);

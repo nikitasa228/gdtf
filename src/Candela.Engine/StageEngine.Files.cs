@@ -48,7 +48,7 @@ public sealed partial class StageEngine
     public EngineResult New(string name = "Untitled")
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        Issues.ClearProgramMessages();
+        ResetProgramMessages();
         Settings = new EngineSettings();
         View = new ViewSettings();
         ProjectPath = null;
@@ -137,7 +137,7 @@ public sealed partial class StageEngine
             return Fail(EngineIssueCodes.OpenFailed, $"'{Path.GetFileName(path)}' could not be opened: {e.Message}");
         }
 
-        Issues.ClearProgramMessages();
+        ResetProgramMessages();
         Settings = new EngineSettings();
         View = new ViewSettings();
         ProjectPath = null;

@@ -329,6 +329,13 @@ public sealed partial class StageEngine : IDisposable
         StartAutosaveSession();
     }
 
+    /// <summary>Clears the messages of earlier operations (a new file is opened); library problems stay listed.</summary>
+    private void ResetProgramMessages()
+    {
+        Issues.ClearProgramMessages();
+        foreach (var issue in _libraryIssues) Issues.Report(issue);
+    }
+
     /// <summary>Recompiles every fixture after GDTF files were added to the library.</summary>
     internal void ReloadFixtureTypes()
     {
