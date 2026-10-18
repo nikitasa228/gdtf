@@ -55,7 +55,8 @@ public static class FixtureEvaluator
     /// <summary>
     /// Evaluates <paramref name="state"/> in place for DMX <paramref name="dmx"/> at <paramref name="time"/> seconds.
     /// With <paramref name="applyDynamics"/>, motorised attributes move toward their DMX targets at their physical speed
-    /// since the previous evaluation; otherwise they jump. Allocation-free.
+    /// since the previous evaluation; otherwise they jump. Allocation-free. A caller that skips resting states calls
+    /// <see cref="FixtureState.AdvanceIdleClock"/> with the previous frame's time first (as <see cref="DmxEngine"/> does).
     /// </summary>
     public static void Evaluate(FixtureState state, FixtureDmxBuffer dmx, double time, AttributeOverrides? overrides = null,
         bool applyDynamics = false)

@@ -381,6 +381,18 @@ public sealed class FixtureState
     /// <summary>True when the state changes with time even without new DMX: strobes, rotations, shakes, moving motors.</summary>
     public bool IsAnimating { get; internal set; }
 
+    /// <summary>
+    /// For a caller that skips evaluating a state while it rests (not <see cref="IsAnimating"/>, DMX unchanged): moves
+    /// the state's clock forward to <paramref name="time"/> (s) without evaluating. Nothing of a resting state depends on
+    /// time, so this changes no output; it makes the next evaluation with motor dynamics start the motors from rest at
+    /// <paramref name="time"/> instead of integrating over the whole pause (which would complete any move at once).
+    /// Does nothing for an animating or never-evaluated state, or when <paramref name="time"/> is not later.
+    /// </summary>
+    public void AdvanceIdleClock(double time)
+    {
+        if (!IsAnimating && double.IsFinite(Time) && double.IsFinite(time) && time > Time) Time = time;
+    }
+
     /// <summary>Axis animations (one per <see cref="FixtureProfile.Axes"/> entry).</summary>
     public AxisState[] Axes { get; }
 

@@ -245,7 +245,9 @@ public sealed partial class FixtureProfile
 
             // a shutter function named "Open" / "Closed" means that wherever no named channel set says otherwise
             var nameFlags = cls.Kind == AttributeKind.Shutter ? NameParsing.Flags(src.Name, cls.Kind) & (ChannelSetFlags.Open | ChannelSetFlags.Closed) : 0;
-            if (nameFlags == (ChannelSetFlags.Open | ChannelSetFlags.Closed)) nameFlags = ChannelSetFlags.None;
+            // "Open/Close", "open / closed": a range that does both, not a state
+            if (src.Name.Contains("open", StringComparison.OrdinalIgnoreCase) && src.Name.Contains("clos", StringComparison.OrdinalIgnoreCase))
+                nameFlags = ChannelSetFlags.None;
             f.NameFlags = nameFlags;
 
             // channel sets

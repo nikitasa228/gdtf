@@ -229,6 +229,36 @@ public class DmxEngineTests
     }
 
     [Fact]
+    public void A_fixture_that_was_idle_starts_moving_from_rest_on_its_next_dmx_change()
+    {
+        // idle fixtures are skipped; when DMX changes after a pause, the motors start from rest at that frame, they do not
+        // catch up the pause (which would make every move after an idle period instantaneous)
+        var scene = new Scene();
+        var (e, _) = AddFixture(scene, Viper, "Basic", 1, 1);
+        var hub = new DmxInputHub();
+        hub.Submit(Console1, 1, Universe(ViperBasic, 1, ("Pan", 0f)));
+        using var engine = new DmxEngine(scene, TestData.Profiles, hub);
+        double t = 0;
+        engine.Update(t);
+        var state = engine.GetState(e.Id)!;
+        int axis = ViperBasic.Channels[ViperBasic.FindChannels("Pan")[0]].Axis;
+        for (int frame = 0; frame < 300; frame++)
+        {
+            t += 1.0 / 60;
+            hub.Submit(Console1, 1, Universe(ViperBasic, 1, ("Pan", 0f))); // the console keeps sending the same values
+            engine.Update(t);
+        }
+        Assert.Empty(engine.Changed);
+        hub.Submit(Console1, 1, Universe(ViperBasic, 1, ("Pan", 180f)));
+        t += 1.0 / 60;
+        engine.Update(t);
+        Assert.Contains(e.Id, engine.Changed);
+        float pan = state.Axes[axis].Pan;
+        Assert.InRange(pan, 1e-5f, 0.1f); // one frame of acceleration, as for a fixture that was never idle
+        Assert.True(state.IsAnimating);
+    }
+
+    [Fact]
     public void Parallel_and_sequential_evaluation_give_identical_states()
     {
         var scene = new Scene();

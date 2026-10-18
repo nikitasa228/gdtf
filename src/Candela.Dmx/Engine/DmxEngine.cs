@@ -43,6 +43,7 @@ public sealed class DmxEngine : IDisposable
     private Runtime[] _work = Array.Empty<Runtime>();
     private int _workCount;
     private double _frameTime;
+    private double _previousFrameTime = double.NaN;
     private WorkerPool? _pool;
     private int _maxParallelism = Math.Max(1, Environment.ProcessorCount);
     private bool _universeSetDirty = true;
@@ -189,6 +190,7 @@ public sealed class DmxEngine : IDisposable
             _changed.Add(r.Entity.Id);
         }
 
+        _previousFrameTime = Time;
         _frameTime = timeSeconds;
         if (_workCount >= ParallelThreshold && _maxParallelism > 1)
         {
@@ -207,6 +209,8 @@ public sealed class DmxEngine : IDisposable
     private void EvaluateOne(int index)
     {
         var r = _work[index];
+        // a fixture skipped while it rested starts moving from rest at the previous frame, not at its last evaluation
+        if (_previousFrameTime <= _frameTime) r.State!.AdvanceIdleClock(_previousFrameTime);
         FixtureEvaluator.Evaluate(r.State!, r.Buffer!, _frameTime, r.Driven ? null : r.Manual, ApplyDynamics);
     }
 
