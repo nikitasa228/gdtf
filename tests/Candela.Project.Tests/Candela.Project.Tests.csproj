@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="../../src/Candela.Project/Candela.Project.csproj" />
+    <!-- Real-data tests only: the MVR importer and the fixture library build a scene from stages/Фокина.mvr. -->
+    <ProjectReference Include="../../src/Candela.Mvr/Candela.Mvr.csproj" />
   </ItemGroup>
 </Project>
