@@ -1,4 +1,6 @@
+using System.Numerics;
 using System.Text.Json;
+using Candela.Core.Math;
 
 namespace Candela.Core.SceneGraph;
 
@@ -184,17 +186,43 @@ public sealed class Scene
 
     /// <summary>
     /// Moves an entity under another parent (null = root) at <paramref name="index"/> (-1 = last), optionally keeping its
-    /// world transform. Raises <see cref="SceneChangeKind.Reparented"/>.
+    /// world transform (its local transform is then recomputed under the new parent). Raises
+    /// <see cref="SceneChangeKind.Reparented"/> once, which also covers that local transform change (no separate
+    /// <see cref="SceneChangeKind.TransformChanged"/>); moving an entity to the place it already has changes nothing and
+    /// raises nothing.
     /// </summary>
-    public void Reparent(Entity entity, Entity? newParent, bool keepWorldTransform = true, int index = -1)
+    /// <exception cref="InvalidOperationException">
+    /// The entity or the new parent is not in this scene, or the new parent is the entity or one of its descendants.
+    /// </exception>
+    public void Reparent(Entity entity, Entity? newParent, bool keepWorldTransform = true, int index = -1) =>
+        ReparentCore(entity, newParent, index, keepWorldTransform, null);
+
+    /// <summary>
+    /// Moves an entity under another parent at <paramref name="index"/> with the given local transform, raising one
+    /// <see cref="SceneChangeKind.Reparented"/> (undo of a reparent).
+    /// </summary>
+    internal void Reparent(Entity entity, Entity? newParent, int index, Transform local) =>
+        ReparentCore(entity, newParent, index, false, local);
+
+    private void ReparentCore(Entity entity, Entity? newParent, int index, bool keepWorldTransform, Transform? local)
     {
         ArgumentNullException.ThrowIfNull(entity);
         if (entity.Scene != this) throw new InvalidOperationException($"{entity} is not in this scene.");
         if (newParent is not null && newParent.Scene != this) throw new InvalidOperationException("The new parent is not in this scene.");
         if (newParent == entity || (newParent is not null && entity.IsAncestorOf(newParent)))
             throw new InvalidOperationException("Cannot parent an entity under itself or its descendant.");
-        var world = entity.World;
         var oldParent = entity.Parent;
+        if (ReferenceEquals(oldParent, newParent))
+        {
+            // Same parent: only the sibling position can change (and the local transform, when one is given).
+            IReadOnlyList<Entity> siblings = oldParent is null ? _roots : oldParent.Children;
+            int current = IndexOf(siblings, entity);
+            int last = siblings.Count - 1;
+            int target = index < 0 || index > last ? last : index;
+            if (target == current && (local is null || local.Value == entity.Local)) return;
+        }
+
+        var world = entity.WorldMatrix;
         if (oldParent is null) _roots.Remove(entity); else oldParent.DetachChild(entity);
         if (newParent is null)
         {
@@ -206,8 +234,23 @@ public sealed class Scene
         {
             newParent.AttachChild(entity, index);
         }
-        if (keepWorldTransform) entity.World = world;
+        if (local is { } given)
+        {
+            entity.SetLocalSilently(given);
+        }
+        else if (keepWorldTransform)
+        {
+            if (newParent is not null && Matrix4x4.Invert(newParent.WorldMatrix, out var inverse)) world *= inverse;
+            entity.SetLocalSilently(Transform.FromMatrix(world));
+        }
         Raise(new SceneChange(SceneChangeKind.Reparented, entity) { FormerParent = oldParent });
+    }
+
+    private static int IndexOf(IReadOnlyList<Entity> list, Entity entity)
+    {
+        for (int i = 0; i < list.Count; i++)
+            if (ReferenceEquals(list[i], entity)) return i;
+        return -1;
     }
 
     /// <summary>The entity with <paramref name="id"/>, or null. O(1), allocation-free.</summary>

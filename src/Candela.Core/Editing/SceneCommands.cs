@@ -183,12 +183,8 @@ public sealed class ReparentCommand(SceneModel scene, Entity entity, Entity? new
         scene.Reparent(entity, newParent);
     }
 
-    /// <inheritdoc/>
-    public void Undo()
-    {
-        scene.Reparent(entity, _oldParent, keepWorldTransform: false, index: _oldIndex);
-        entity.Local = _oldLocal;
-    }
+    /// <summary>Puts the entity back under its old parent at its old position with its old local transform (one change).</summary>
+    public void Undo() => scene.Reparent(entity, _oldParent, _oldIndex, _oldLocal);
 
     private static int IndexOf(IReadOnlyList<Entity> list, Entity entity)
     {

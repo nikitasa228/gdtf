@@ -230,7 +230,7 @@ public sealed class Entity
         if (Scene is { } scene) return scene.Add(child, this, index);
         if (child.Scene is not null) throw new InvalidOperationException($"{child} belongs to a scene.");
         if (child.Parent is not null) throw new InvalidOperationException($"{child} already has a parent.");
-        if (child == this || child.IsAncestorOf(this)) throw new InvalidOperationException("Cannot parent an entity under itself or its descendant.");
+        if (IsInSubtree(child, this)) throw new InvalidOperationException("Cannot parent an entity under itself or its descendant.");
         AttachChild(child, index);
         return child;
     }
@@ -293,6 +293,26 @@ public sealed class Entity
         }
     }
 
+    /// <summary>
+    /// True when <paramref name="node"/> is <paramref name="root"/> or one of its descendants. Walks up from the node and
+    /// through the subtree in lockstep and stops at whichever ends first, so the cost is bounded by the smaller of the
+    /// node's depth and the subtree's size: appending to the leaf of a deep detached chain stays O(1).
+    /// </summary>
+    private static bool IsInSubtree(Entity root, Entity node)
+    {
+        if (root._children.Count == 0) return ReferenceEquals(root, node);
+        var up = node;
+        using var down = root.SelfAndDescendants().GetEnumerator();
+        while (true)
+        {
+            if (up is null) return false;
+            if (ReferenceEquals(up, root)) return true;
+            up = up.Parent;
+            if (!down.MoveNext()) return false;
+            if (ReferenceEquals(down.Current, node)) return true;
+        }
+    }
+
     internal void AttachChild(Entity child, int index)
     {
         if (index < 0 || index > _children.Count) index = _children.Count;
@@ -311,6 +331,14 @@ public sealed class Entity
     }
 
     internal void ClearParentForRoot() => Parent = null;
+
+    /// <summary>Sets the local transform without raising a change (the caller raises one that covers it, e.g. Reparented).</summary>
+    internal void SetLocalSilently(Transform value)
+    {
+        if (_local == value) return;
+        _local = value;
+        MarkWorldDirty();
+    }
 
     internal void NotifyComponentChanged(Component c) =>
         Scene?.Raise(new SceneChange(SceneChangeKind.ComponentChanged, this, c));

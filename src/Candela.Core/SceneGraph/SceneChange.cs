@@ -15,7 +15,12 @@ public enum SceneChangeKind
     /// </summary>
     Removed,
 
-    /// <summary>An entity moved under another parent or to another sibling position (<see cref="SceneChange.FormerParent"/>).</summary>
+    /// <summary>
+    /// An entity moved under another parent or to another sibling position (<see cref="SceneChange.FormerParent"/>). Its
+    /// local transform may have changed with it (to keep its world placement, or restored by undo) and the world
+    /// transforms of its subtree may have changed: one Reparented covers all of that, no
+    /// <see cref="TransformChanged"/> is raised besides it.
+    /// </summary>
     Reparented,
 
     /// <summary><see cref="SceneGraph.Entity.Name"/> changed.</summary>
