@@ -39,6 +39,6 @@ void main()
         vec3 integrated = sigmaT > 1e-6 ? inj.rgb * ((1.0 - stepT) / sigmaT) : inj.rgb * dl;
         L += T * integrated;
         T *= stepT;
-        imageStore(outIntegrated, ivec3(id, k), vec4(L, T));
+        imageStore(outIntegrated, ivec3(id, k), vec4(finiteLight(L), T));
     }
 }

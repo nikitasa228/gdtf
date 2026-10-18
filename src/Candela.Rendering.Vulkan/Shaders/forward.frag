@@ -157,9 +157,9 @@ void main()
         color = color * fog.a + fog.rgb * coverage;
     }
 
-    outColor = vec4(color, coverage);
+    outColor = vec4(finiteLight(color), coverage);
 
 #else
-    outColor = vec4((diffuse + specular + emissive) * frame.exposure, 1.0);
+    outColor = vec4(finiteLight((diffuse + specular + emissive) * frame.exposure), 1.0);
 #endif
 }

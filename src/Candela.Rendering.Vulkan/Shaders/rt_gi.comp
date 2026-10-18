@@ -170,5 +170,5 @@ void main()
         }
     }
 
-    imageStore(outIndirect, p, vec4(E, viewDepth));
+    imageStore(outIndirect, p, vec4(finiteLight(E), viewDepth));
 }

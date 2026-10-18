@@ -68,8 +68,9 @@ void main()
 {
     vec2 uv = gl_FragCoord.xy * frame.displaySize.zw;
     vec3 hdr = hasFeature(FEATURE_SCALED) ? textureLod(hdrTexture, uv, 0.0).rgb : texelFetch(hdrTexture, ivec2(gl_FragCoord.xy), 0).rgb;
+    hdr = finiteLight(hdr); // an overflowed blend (+inf) must not reach the tone mapper as NaN
     if (hasFeature(FEATURE_BLOOM))
-        hdr = mix(hdr, textureLod(bloomTexture, uv, 0.0).rgb * draw.width, frame.bloomIntensity);
+        hdr = mix(hdr, finiteLight(textureLod(bloomTexture, uv, 0.0).rgb) * draw.width, frame.bloomIntensity);
 
     vec3 display = displayTransform(hdr);
 

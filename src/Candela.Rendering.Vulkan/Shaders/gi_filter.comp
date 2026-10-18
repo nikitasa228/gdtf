@@ -70,5 +70,5 @@ void main()
         }
     }
 
-    imageStore(outIndirect, p, vec4(sum / max(weightSum, 1e-12), z));
+    imageStore(outIndirect, p, vec4(finiteLight(sum / max(weightSum, 1e-12)), z));
 }

@@ -596,6 +596,59 @@ public sealed class ReviewShadowProbes
     }
 }
 
+public sealed class ReviewOverflowProbes
+{
+    private readonly Xunit.Abstractions.ITestOutputHelper _out;
+
+    public ReviewOverflowProbes(Xunit.Abstractions.ITestOutputHelper output) => _out = output;
+
+    [SkippableTheory]
+    [InlineData(40f, true)]
+    [InlineData(8f, true)]
+    [InlineData(40f, false)]
+    [InlineData(40f, true, 0f, 0.15f)]
+    [InlineData(25f, true, -2f, 0.15f)]
+    [InlineData(40f, true, -2f, 0.15f, 20f)]
+    public void BrightBeamIntoTheCameraStaysFinite(float beam, bool bloom, float ev = 3f, float haze = 0.05f, float distance = 8f)
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(30f, scene.Lambert(new Vector3(0.3f)));
+            // A powerful fixture aimed at the audience (the camera), in haze.
+            var light = StageScene.Spot(new Vector3(0f, distance - 2f, 3f), new Vector3(0f, -2f, 1.6f), 2e6f, beam, beam * 1.5f);
+            renderer.World.SetLights(new[] { light });
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = haze, Anisotropy = 0.7f });
+            using var target = renderer.CreateTarget(160, 120);
+            var camera = RenderCamera.LookAt(new Vector3(0f, -2f, 1.6f), light.Position, 50f);
+            camera.Ev100 = ev;
+            var settings = new PreviewSettings { Bloom = bloom, VolumetricSlices = 64 };
+            for (int i = 0; i < 4; i++)
+                renderer.Render(target, camera, new ViewOptions { ShowGrid = false }, settings, 1f / 60f);
+            var hdr = renderer.ReadHdr(target);
+            int bad = hdr.Rgba.Count(v => !float.IsFinite(v));
+            var image = renderer.ReadPixels(target);
+            ImageFiles.WritePng(image, Path.Combine(TestRenderers.OutputDirectory, $"overflow-{beam}-{bloom}.png"));
+            int black = 0;
+            for (int i = 0; i < image.Pixels.Length; i += 4)
+            {
+                if (image.Pixels[i] < 3 && image.Pixels[i + 1] < 3 && image.Pixels[i + 2] < 3)
+                    black++;
+            }
+
+            float maxExposed = hdr.Rgba.Max() * hdr.Exposure;
+            _out.WriteLine($"beam {beam}, bloom {bloom}, ev {ev}, haze {haze}, distance {distance}: {bad} non-finite HDR values, {black} black display pixels, centre {hdr.LuminanceAt(80, 60)}, max pre-exposed {maxExposed}");
+            Assert.Equal(0, bad);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+}
+
 public sealed class ReviewExperiments
 {
     private readonly Xunit.Abstractions.ITestOutputHelper _out;

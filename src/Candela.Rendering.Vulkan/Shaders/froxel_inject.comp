@@ -94,5 +94,5 @@ void main()
         }
     }
 
-    imageStore(outInjected, ivec3(id), current);
+    imageStore(outInjected, ivec3(id), vec4(finiteLight(current.rgb), current.a));
 }

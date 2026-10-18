@@ -31,7 +31,7 @@ void main()
     ivec2 size = ivec2(frame.renderSize.xy);
     if (all(lessThan(p, size)))
     {
-        vec3 hdr = texelFetch(hdrTexture, p, 0).rgb;
+        vec3 hdr = finiteLight(texelFetch(hdrTexture, p, 0).rgb);
         float luminance = max(luminanceRec2020(hdr), 0.0) / max(frame.exposure, 1e-30);
         float x = (log2(max(luminance, 1e-12)) - HISTOGRAM_MIN_LOG2) / (HISTOGRAM_MAX_LOG2 - HISTOGRAM_MIN_LOG2);
         uint bin = uint(clamp(x * float(HISTOGRAM_BINS), 0.0, float(HISTOGRAM_BINS - 1u)));

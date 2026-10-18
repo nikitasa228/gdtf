@@ -202,6 +202,19 @@ layout(push_constant, scalar) uniform DrawConstants
     vec4 color;              // constant colour (wireframe, edges)
 } draw;
 
+// Largest value written to the half-float light images (HDR, froxel volumes: pre-exposed; indirect irradiance: lx).
+// Half floats overflow at 65504 and the conversion may give +infinity (implementation-defined), which would poison
+// blending, the bloom pyramid and temporal histories with inf/NaN. Pre-exposed 30000 is 15 stops above display
+// white (the tone mapper saturates long before), so the sum of two clamped values in a blend still fits.
+const float HALF_SAFE_MAX = 30000.0;
+
+// NaN -> 0, then clamped to [0, HALF_SAFE_MAX] (+inf -> HALF_SAFE_MAX).
+vec3 finiteLight(vec3 c)
+{
+    c = mix(c, vec3(0.0), isnan(c));
+    return clamp(c, vec3(0.0), vec3(HALF_SAFE_MAX));
+}
+
 bool isOrthographic()
 {
     return (frame.flags & FRAME_ORTHOGRAPHIC) != 0u;

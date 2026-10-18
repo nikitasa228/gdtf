@@ -160,5 +160,5 @@ void main()
         inscatter += sum * dt;
     }
 
-    outColor = vec4(fog.rgb + inscatter * frame.exposure, fog.a);
+    outColor = vec4(finiteLight(fog.rgb + inscatter * frame.exposure), fog.a);
 }
