@@ -12,6 +12,7 @@ public sealed partial class StageEngine
 
     private AutosaveService? _autosave;
     private AutosaveOptions? _autosaveOptions;
+    private RecoverableSession? _recovered;
     private long _autosavedVersion = -1;
     private string? _autosavedSettings;
 
@@ -56,10 +57,24 @@ public sealed partial class StageEngine
         if (_autosave is not null)
         {
             // the saved file now holds everything the autosaves hold: they are discarded and tracking restarts
+            // (a recovered session is continued by this service, so its crash data goes too)
             _autosavedVersion = _scene.Version;
             _autosavedSettings = AutosaveSettingsKey();
             _ = _autosave.MarkSaved();
         }
+        else if (_recovered is not null)
+        {
+            // recovered and saved without autosave: the crash data must not be offered again
+            try
+            {
+                _recovered.Delete();
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // offered again at the next start, where the user can discard it
+            }
+        }
+        _recovered = null;
         var issues = Sorted(saved.Issues);
         Report(issues);
         return new EngineResult(true, $"Saved '{Path.GetFileName(path)}' ({saved.StoredGdtfs.Count} GDTF files, {Assets.Count} assets, " +
@@ -100,13 +115,15 @@ public sealed partial class StageEngine
         ProjectData project;
         try
         {
-            project = session.Load();
+            project = session.Load(new ProjectLoadOptions { Materials = MaterialLibrary.Default });
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ProjectFormatException)
         {
             return Fail(EngineIssueCodes.OpenFailed, $"The autosave of '{session.SceneName}' could not be read: {e.Message}");
         }
-        var result = UseLoadedProject(project, session.OriginalPath, $"Recovered '{session.SceneName ?? "Untitled"}'");
+        // the autosave session of the recovered project continues the crashed session's files (AutosaveOptions.Resume),
+        // so a save or a clean close removes them instead of leaving them to be offered again
+        var result = UseLoadedProject(project, session.OriginalPath, $"Recovered '{session.SceneName ?? "Untitled"}'", session);
         IsModified = true;
         return result;
     }
@@ -125,14 +142,14 @@ public sealed partial class StageEngine
         return UseLoadedProject(project, Path.GetFullPath(path), $"Opened '{Path.GetFileName(path)}'");
     }
 
-    private EngineResult UseLoadedProject(ProjectData project, string? path, string what)
+    private EngineResult UseLoadedProject(ProjectData project, string? path, string what, RecoverableSession? recovered = null)
     {
         ResetProgramMessages();
         var issues = new List<Issue>(project.LoadIssues);
         Settings = ReadSection(project, EngineSettings.SectionName, new EngineSettings(), issues).Sanitized();
         View = ReadSection(project, ViewSettings.SectionName, new ViewSettings(), issues);
         ProjectPath = path;
-        ReplaceProject(project);
+        ReplaceProject(project, recovered);
         RegisterProjectGdtfs(project.GdtfFiles.Keys, issues);
         IsModified = false;
         var sorted = Sorted(issues);
@@ -225,6 +242,16 @@ public sealed partial class StageEngine
         if (_autosaveOptions is not { } options || _disposed) return;
         _autosavedVersion = _scene.Version;
         _autosavedSettings = AutosaveSettingsKey();
+        if (_recovered is { } resume && (resume.ProjectId == Guid.Empty || resume.ProjectId == _project.Id))
+            options = new AutosaveOptions
+            {
+                Directory = options.Directory,
+                Interval = options.Interval,
+                KeepCount = options.KeepCount,
+                CompressionLevel = options.CompressionLevel,
+                TimeProvider = options.TimeProvider,
+                Resume = resume,
+            };
         try
         {
             _autosave = new AutosaveService(_project.Id, CaptureAutosave, options);

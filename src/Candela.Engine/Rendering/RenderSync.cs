@@ -196,8 +196,9 @@ public sealed class RenderSync : IDisposable
         _assets.AssetChanged -= OnAssetChanged;
         try
         {
-            DestroyAll(destroySharedResources: true);
+            // the light list refers to gobo textures: clear it before they are destroyed
             World.SetLights(ReadOnlySpan<SpotLight>.Empty);
+            DestroyAll(destroySharedResources: true);
             World.SetLines(ReadOnlySpan<LineVertex>.Empty);
             World.SetNoiseSources(ReadOnlySpan<NoiseSource>.Empty);
             World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
@@ -673,8 +674,16 @@ public sealed class RenderSync : IDisposable
         var key = (profile, wheelIndex, slot);
         if (_gobos.TryGetValue(key, out var handle)) return handle;
         handle = default;
-        if ((uint)wheelIndex < (uint)profile.Wheels.Count && profile.Wheels[wheelIndex].Source.GetSlot(slot) is { MediaPath: { Length: > 0 } media }
-            && _fixtureTypes.TryGetValue(profile.Key, out var type) && type.FileName is { } file
+        if ((uint)wheelIndex >= (uint)profile.Wheels.Count || profile.Wheels[wheelIndex].Source.GetSlot(slot) is not { MediaPath: { Length: > 0 } media })
+        {
+            _gobos[key] = handle;
+            return handle;
+        }
+        // The light list is collected before this binding's update of the same frame, so a fixture type seen for the
+        // first time (just opened, attached or added) is not registered yet: try again next frame instead of caching
+        // "no gobo" for good.
+        if (!_fixtureTypes.TryGetValue(profile.Key, out var type)) return handle;
+        if (type.FileName is { } file
             && _engine.Images.Load(Candela.Gdtf.GdtfImageSource.MakeKey(file, media)) is { } image && GoboImage.ToTransmission(image) is { } gobo)
         {
             handle = World.CreateTexture(gobo, srgb: true);

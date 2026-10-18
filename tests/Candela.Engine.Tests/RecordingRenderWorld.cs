@@ -51,6 +51,8 @@ internal sealed class RecordingRenderWorld : IRenderWorld
     public void DestroyMesh(MeshHandle mesh)
     {
         if (!Meshes.Remove(mesh.Value)) Violations.Add($"destroyed unknown mesh {mesh.Value}");
+        foreach (var i in Instances.Values)
+            if (i.Mesh == mesh) Violations.Add($"destroyed mesh {mesh.Value} while an instance still draws it");
     }
 
     public TextureHandle CreateTexture(ImageData image, bool srgb)
@@ -64,6 +66,8 @@ internal sealed class RecordingRenderWorld : IRenderWorld
     public void DestroyTexture(TextureHandle texture)
     {
         if (!Textures.Remove(texture.Value)) Violations.Add($"destroyed unknown texture {texture.Value}");
+        foreach (var l in Lights)
+            if (l.Gobo == texture) Violations.Add($"destroyed texture {texture.Value} while a light still projects it");
     }
 
     public MaterialHandle CreateMaterial(MaterialData material, IImageSource? images)
@@ -82,6 +86,8 @@ internal sealed class RecordingRenderWorld : IRenderWorld
     public void DestroyMaterial(MaterialHandle material)
     {
         if (!Materials.Remove(material.Value)) Violations.Add($"destroyed unknown material {material.Value}");
+        foreach (var i in Instances.Values)
+            if (Array.IndexOf(i.Materials, material) >= 0) Violations.Add($"destroyed material {material.Value} while an instance still uses it");
     }
 
     public InstanceHandle CreateInstance(MeshHandle mesh, ReadOnlySpan<MaterialHandle> materials, Matrix4x4 world, InstanceFlags flags, uint pickId)
@@ -122,7 +128,10 @@ internal sealed class RecordingRenderWorld : IRenderWorld
     public void SetLights(ReadOnlySpan<SpotLight> lights)
     {
         foreach (var l in lights)
+        {
             if (!float.IsFinite(l.PeakCandela) || !float.IsFinite(l.Position.X) || !float.IsFinite(l.Direction.Z)) Violations.Add("non-finite light");
+            if (l.Gobo.IsValid && !Textures.ContainsKey(l.Gobo.Value)) Violations.Add($"light projects unknown texture {l.Gobo.Value}");
+        }
         Lights = lights.ToArray();
     }
 
