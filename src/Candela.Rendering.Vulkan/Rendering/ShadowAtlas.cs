@@ -415,7 +415,7 @@ internal sealed unsafe class ShadowAtlas : IDisposable
 
         /// <summary>The cached frustum still serves a light with this position, axis and required half-angle.</summary>
         public readonly bool Matches(Vector3 position, Vector3 axis, float required) =>
-            Vector3.DistanceSquared(position, Position) < 1e-10f && Vector3.Dot(axis, Axis) > 1f - 1e-9f &&
+            Vector3.DistanceSquared(position, Position) < 1e-10f && Vector3.Dot(axis, Axis) >= 1f - 1e-6f &&
             HalfAngle >= required && HalfAngle <= required * 1.25f + 0.01f;
 
         /// <summary>Conservative test of a bounding sphere against the tile's frustum cone (beyond the near plane).</summary>
