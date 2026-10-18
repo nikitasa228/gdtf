@@ -19,6 +19,12 @@ public sealed partial class FixtureProfile
         /// <summary>GDTF's default Beam LuminousFlux (written by editors when the author left the field alone), lm.</summary>
         private const float GdtfDefaultFlux = 10000f;
 
+        /// <summary>
+        /// Largest field-to-beam angle ratio taken from a file: soft-edged washes and PARs reach about 3; larger ratios in
+        /// the library (59 beams, up to 50) are angles that are not a beam/field pair.
+        /// </summary>
+        private const float MaxFieldRatio = 4f;
+
         /// <summary>GDTF's default Beam BeamAngle and FieldAngle, degrees.</summary>
         private const float GdtfDefaultAngle = 25f;
 
@@ -1143,6 +1149,9 @@ public sealed partial class FixtureProfile
             return lo;
         }
 
+        /// <summary>True when two angles in degrees agree within 0.5° or 2 %.</summary>
+        private static bool SameAngle(float a, float b) => MathF.Abs(a - b) <= MathF.Max(0.5f, 0.02f * MathF.Max(a, b));
+
         private IEnumerable<int> ChannelsOfBeam(ProfileBeam beam)
         {
             foreach (int c in SharedBeamChannels) yield return c;
@@ -1168,15 +1177,6 @@ public sealed partial class FixtureProfile
                 field = Specs.FieldAngleDeg is { } sf && sf > native ? (float)sf : float.NaN;
             }
             if (!(native > 0f) || !float.IsFinite(native)) native = 25f;
-            float ratio;
-            if (float.IsFinite(field) && field > native * 1.01f) ratio = field / native;
-            else
-            {
-                var est = BeamDistribution.Create(beam.BeamType, native * DegToRad, float.NaN);
-                ratio = est.BeamAngle > 0f ? est.FieldAngle / est.BeamAngle : 1.3f;
-            }
-            beam.NativeBeamAngle = native * DegToRad;
-            beam.FieldRatio = Math.Clamp(ratio, 1f, 8f);
 
             float zoomMin = float.PositiveInfinity, zoomMax = 0f;
             bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false;
@@ -1217,6 +1217,31 @@ public sealed partial class FixtureProfile
                 }
             }
             bool hasZoom = zoomMax > 0f;
+
+            // field ratio: from the file's field angle unless that is not a field angle — the zoom range written into the
+            // Beam's BeamAngle/FieldAngle (Ayrton Rivale Wash 4°/57°, Clay Paky Aleda B-EYE K10 4°/60° …: 53 beams in the
+            // library) or a ratio no optic has (above MaxFieldRatio) — then the beam type's typical ratio
+            float ratio = float.NaN;
+            if (float.IsFinite(field) && field > native * 1.01f)
+            {
+                bool zoomRange = (hasZoom && SameAngle(native, zoomMin) && SameAngle(field, zoomMax)) ||
+                    (Specs?.BeamAngleDeg is { } range && range.Max > range.Min && SameAngle(native, (float)range.Min) && SameAngle(field, (float)range.Max));
+                float r = field / native;
+                if (zoomRange)
+                    Warnings.Add($"Beam '{beam.Name}': BeamAngle/FieldAngle {native:G4}°/{field:G4}° are the zoom range; the typical field ratio of a {beam.BeamType} beam is used.");
+                else if (r > MaxFieldRatio)
+                    Warnings.Add($"Beam '{beam.Name}': FieldAngle {field:G4}° is {r:G3} × the BeamAngle {native:G4}°; the typical field ratio of a {beam.BeamType} beam is used.");
+                else
+                    ratio = r;
+            }
+            if (float.IsNaN(ratio))
+            {
+                var est = BeamDistribution.Create(beam.BeamType, native * DegToRad, float.NaN);
+                ratio = est.BeamAngle > 0f ? est.FieldAngle / est.BeamAngle : 1.3f;
+            }
+            beam.NativeBeamAngle = native * DegToRad;
+            beam.FieldRatio = Math.Clamp(ratio, 1f, MaxFieldRatio);
+
             float minAngle = hasZoom ? MathF.Min(zoomMin, native) : native;
             float maxAngle = hasZoom ? MathF.Max(zoomMax, native) : native;
             if (!_solidAngleCache.TryGetValue(bg, out var table) || table.MinBeamAngle > minAngle * DegToRad * 1.001f ||

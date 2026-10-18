@@ -237,4 +237,42 @@ public class FileDefectTests
         double pixels = p.Beams.Where(b => b.Geometry.LuminousFlux == 1200f).Sum(b => (double)b.PeakCandelaAt(angle));
         Assert.Equal(7 * 1200.0 / (7 * 1200 + 28 * 15), pixels / total, 1e-3);
     }
+    [Fact]
+    public void A_zoom_range_written_as_beam_and_field_angle_gives_a_real_field_ratio()
+    {
+        // Ayrton Rivale Wash: Beam BeamAngle 4°, FieldAngle 57° — the zoom range (Zoom 4 … 57°), not a beam/field pair.
+        // Taken as a field ratio of 14, the field at mid zoom would be ~430° (it was clamped to 244°).
+        var p = TestData.Profile("Ayrton@Rivale_Wash");
+        Assert.Contains(p.Warnings, w => w.Contains("are the zoom range", StringComparison.Ordinal));
+        var beam = p.Beams[0];
+        Assert.InRange(beam.FieldRatio, 1.2f, 2.5f);
+        foreach (float zoom in new[] { 4f, 30.5f, 57f })
+        {
+            var buffer = new FixtureDmxBuffer(p);
+            DmxLooks.OpenWhite(buffer);
+            DmxEncoder.Encode(buffer, "Zoom", zoom);
+            var b = FixtureEvaluator.Evaluate(p, buffer).Beams[0];
+            Assert.Equal(zoom, b.BeamAngle * 180f / MathF.PI, 0.5f);
+            Assert.InRange(b.FieldAngle / b.BeamAngle, 1.2f, 2.5f);
+            Assert.True(b.FieldAngle * 180f / MathF.PI < 179.01f);
+        }
+        // another file with the same defect, without its zoom on the Beam's channels: the _specs zoom range is matched
+        var aleda = TestData.Profile("Clay_Paky@Aleda_B-EYE_K10");
+        Assert.All(aleda.Beams, x => Assert.InRange(x.FieldRatio, 1f, 4f));
+    }
+
+    [Fact]
+    public void Field_angles_never_exceed_a_hemisphere()
+    {
+        // a ratio no optic has (here 22.5 for a 2° beam) is replaced by the beam type's typical ratio, and a wide zoom
+        // keeps the field at 179° at most
+        var vizi = TestData.Profile("ADJ@Vizi_Beam_RX2");
+        Assert.Contains(vizi.Warnings, w => w.Contains("× the BeamAngle", StringComparison.Ordinal));
+        Assert.All(vizi.Beams, b => Assert.InRange(b.FieldRatio, 1f, 4f));
+        var wash = TestData.Profile("Ayrton@Rivale_Wash");
+        var buffer = new FixtureDmxBuffer(wash);
+        DmxLooks.OpenWhite(buffer);
+        var state = FixtureEvaluator.Evaluate(wash, buffer, 0, new Dictionary<string, float> { ["Zoom"] = 57f });
+        Assert.True(state.Beams[0].FieldAngle <= 179f * MathF.PI / 180f + 1e-5f);
+    }
 }

@@ -72,4 +72,7 @@ public static class EngineIssueCodes
 
     /// <summary>The fixture library has no folders or the folders do not exist.</summary>
     public const string LibraryMissing = "engine.library-missing";
+
+    /// <summary>Fixtures whose field angle is wider than the renderer's spot cone (170°) are drawn with 170°.</summary>
+    public const string FieldClamped = "engine.field-clamped";
 }

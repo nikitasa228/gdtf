@@ -53,6 +53,13 @@ public sealed class EngineIssueProvider : IIssueProvider
         issues.AddRange(_engine.Assets.Issues);
         if (_engine.Render is { } render) issues.AddRange(render.Issues);
         issues.AddRange(_engine.Simulation.Issues);
+        var clamped = _engine.LightCollector.ClampedFieldFixtures;
+        if (clamped.Count > 0)
+        {
+            issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Fixture, EngineIssueCodes.FieldClamped,
+                $"{clamped.Count} fixture(s) have a field angle wider than {StageLightCollector.MaxFieldAngle * 180f / MathF.PI:F0}°; their light is drawn with that angle.",
+                clamped.ToArray()));
+        }
         return issues;
     }
 }

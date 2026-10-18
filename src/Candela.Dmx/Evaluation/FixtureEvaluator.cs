@@ -20,6 +20,9 @@ public static class FixtureEvaluator
 {
     private const float DegToRad = MathF.PI / 180f;
 
+    /// <summary>Widest field angle of a beam (179°, rad): a beam lights at most a hemisphere.</summary>
+    private const float MaxFieldAngle = 179f * DegToRad;
+
     /// <summary>
     /// Evaluates a fixture once (no motor dynamics; continuous rotations are integrated as if their speed had been
     /// constant since time 0) and returns a new state. Convenient for tests and tools; allocates.
@@ -1201,7 +1204,7 @@ public static class FixtureEvaluator
         // optics
         float beamAngle = float.IsFinite(acc.Zoom) ? Math.Clamp(acc.Zoom, 0.1f, 179f) * DegToRad : pb.NativeBeamAngle;
         bs.BeamAngle = beamAngle;
-        bs.FieldAngle = MathF.Min(beamAngle * pb.FieldRatio, 1.5f * MathF.PI);
+        bs.FieldAngle = MathF.Max(beamAngle, MathF.Min(beamAngle * pb.FieldRatio, MaxFieldAngle));
         float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity;
         bs.PeakCandela = float.IsFinite(peak) ? peak : 0f;
         bs.Flux = flux * bs.Intensity;

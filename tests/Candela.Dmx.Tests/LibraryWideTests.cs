@@ -168,7 +168,7 @@ public class LibraryWideTests(ITestOutputHelper output)
                 b.StrobeFrequency];
             if (values.Any(v => !F(v))) Bad($"beam {b.Name}: {string.Join(", ", values)}");
             if (b.Intensity is < 0f or > 1f || b.PeakCandela < 0f || b.ColorTransmission is < 0f or > 1f || b.Color.Rgb.X < 0f || b.Color.Rgb.Y < 0f ||
-                b.Color.Rgb.Z < 0f || b.BeamAngle <= 0f || b.FieldAngle < b.BeamAngle * 0.999f)
+                b.Color.Rgb.Z < 0f || b.BeamAngle <= 0f || b.FieldAngle < b.BeamAngle * 0.999f || (b.FieldAngle > b.BeamAngle * 1.001f && (b.FieldAngle > 179.01f * MathF.PI / 180f || b.FieldAngle > 4.001f * b.BeamAngle)))
                 Bad($"beam {b.Name} out of range: I={b.Intensity} cd={b.PeakCandela} T={b.ColorTransmission} {b.Color} angles {b.BeamAngle}/{b.FieldAngle}");
             foreach (var w in b.ColorWheels.Concat(b.Gobos).Concat(b.Prisms).Concat(b.AnimationWheels).Concat(b.Effects).Concat(b.BeamShapers))
             {

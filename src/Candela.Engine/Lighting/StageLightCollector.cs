@@ -31,14 +31,11 @@ public sealed class StageLightCollector
     public const float FlameHemisphereFieldAngle = 270f * MathF.PI / 180f;
 
     /// <summary>
-    /// Largest field angle (10 %) relative to the beam angle (50 %) passed to the renderer. Real optics stay well below
-    /// it (profiles ≈ 1.2, washes ≈ 1.6–2, PARs ≈ 2.5), but some GDTF files write the zoom range into the Beam geometry
-    /// (Ayrton Rivale Wash: BeamAngle 4°, FieldAngle 57°), and a ratio of 14 applied at a wide zoom would spread the
-    /// light over more than a hemisphere.
+    /// Widest field angle passed to the renderer, rad (170°): its spot cone stops short of a hemisphere. Candela.Dmx
+    /// already keeps field angles at 179° and below and recognises files that write the zoom range into the Beam
+    /// geometry, so only very wide washes reach this sanity clamp; the fixtures it limits are listed in
+    /// <see cref="ClampedFieldFixtures"/> and reported as <c>engine.field-clamped</c>.
     /// </summary>
-    public const float MaxFieldToBeamRatio = 3f;
-
-    /// <summary>Widest field angle passed to the renderer, rad (170°).</summary>
     public const float MaxFieldAngle = 170f * MathF.PI / 180f;
 
     /// <summary>Prism facet offset (fraction of the field radius) assumed when a prism slot gives no facet translation.</summary>
@@ -56,6 +53,11 @@ public sealed class StageLightCollector
     /// <summary>Number of lights from flames in the last collection (two per flame light sample).</summary>
     public int FlameLightCount { get; private set; }
 
+    /// <summary>Fixtures (entity ids) whose field angle was wider than <see cref="MaxFieldAngle"/> in the last collection.</summary>
+    public IReadOnlyCollection<Guid> ClampedFieldFixtures => _clamped;
+
+    private readonly HashSet<Guid> _clamped = new();
+
     /// <summary>
     /// Rebuilds the light list from the fixture poses and the flame light samples. <paramref name="gobos"/> supplies
     /// gobo textures (null: lights without gobo images, e.g. for the light meter).
@@ -64,6 +66,7 @@ public sealed class StageLightCollector
     {
         ArgumentNullException.ThrowIfNull(poses);
         _count = 0;
+        if (_clamped.Count > 0) _clamped.Clear();
         foreach (var pose in poses.All)
         {
             var state = pose.State;
@@ -83,6 +86,7 @@ public sealed class StageLightCollector
                 light.PeakCandela = candela;
                 light.BeamAngle = beam.BeamAngle;
                 light.FieldAngle = PlausibleField(beam.BeamAngle, beam.FieldAngle);
+                if (light.FieldAngle < beam.FieldAngle) _clamped.Add(pose.Entity.Id);
                 light.BeamType = beam.BeamType;
                 light.SourceRadius = SourceRadius(beam.Beam.Geometry.BeamRadius);
                 light.Iris = float.IsFinite(beam.Iris) ? Math.Clamp(beam.Iris, 0f, 1f) : 1f;
@@ -214,11 +218,11 @@ public sealed class StageLightCollector
         light.PrismSpread = float.IsFinite(field) ? offset * 0.5f * field : 0f;
     }
 
-    /// <summary>The field angle limited to <see cref="MaxFieldToBeamRatio"/> × the beam angle and <see cref="MaxFieldAngle"/>.</summary>
+    /// <summary>The field angle kept between the beam angle and <see cref="MaxFieldAngle"/> (sanity clamp), rad.</summary>
     public static float PlausibleField(float beamAngle, float fieldAngle)
     {
         if (!float.IsFinite(fieldAngle) || !(beamAngle > 0f) || !float.IsFinite(beamAngle)) return fieldAngle;
-        return MathF.Max(beamAngle, MathF.Min(fieldAngle, MathF.Min(beamAngle * MaxFieldToBeamRatio, MaxFieldAngle)));
+        return MathF.Max(MathF.Min(beamAngle, MaxFieldAngle), MathF.Min(fieldAngle, MaxFieldAngle));
     }
 
     private static float SourceRadius(float radius) => float.IsFinite(radius) && radius > 0f ? Math.Clamp(radius, 0.001f, 2f) : 0.05f;
