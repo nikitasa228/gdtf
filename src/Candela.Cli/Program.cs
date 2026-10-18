@@ -57,11 +57,15 @@ internal static class Program
         writer.WriteLine();
         writer.WriteLine("Usage:");
         writer.WriteLine("  candela render-test --out <dir> [--width W] [--height H] [--frames N] [--tonemapper agx|aces|neutral]");
-        writer.WriteLine("                      [--device <name>] [--validation]");
+        writer.WriteLine("                      [--device <name>] [--validation] [--haze <1/m>] [--no-shadows] [--shadow-resolution N]");
+        writer.WriteLine("                      [--indirect off|rsm|raytraced] [--no-bloom] [--bloom <k>] [--auto-exposure]");
+        writer.WriteLine("                      [--exposure-compensation <stops>] [--scale <0.5-1>] [--volumetric-slices N] [--overlays]");
         writer.WriteLine();
-        writer.WriteLine("  Renders the built-in procedural test scene (stage floor, wall, boxes, spheres, three coloured spot lights,");
-        writer.WriteLine("  an emissive panel) and writes full.png, colorless.png and wireframe.png to <dir>. Prints the renderer");
-        writer.WriteLine("  information and frame timings. Defaults: 1280 x 720, 5 timed frames per view, AgX.");
+        writer.WriteLine("  Renders the built-in procedural test scene (stage floor, wall, boxes, spheres, three coloured shadow-casting");
+        writer.WriteLine("  spot lights, an emissive panel) and writes full.png, colorless.png and wireframe.png to <dir> (with");
+        writer.WriteLine("  --overlays also lux.png, noise.png and cables.png). Prints the renderer information, frame timings and");
+        writer.WriteLine("  shadow / volumetric / indirect statistics. Defaults: 1280 x 720, 5 timed frames per view, AgX, shadows");
+        writer.WriteLine("  1024, reflective shadow maps, bloom 0.04, camera exposure, no haze.");
     }
 }
 

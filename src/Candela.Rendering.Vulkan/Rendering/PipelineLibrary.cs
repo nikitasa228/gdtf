@@ -6,17 +6,38 @@ namespace Candela.Rendering.Vulkan;
 /// <summary>Formats of a render target's images (dynamic rendering needs them at pipeline creation).</summary>
 internal static class TargetFormats
 {
-    /// <summary>Reverse-Z depth.</summary>
+    /// <summary>Reverse-Z depth (scene and shadow atlas).</summary>
     public const Format Depth = Format.D32Sfloat;
 
     /// <summary>Instance pick ids.</summary>
     public const Format PickId = Format.R32Uint;
+
+    /// <summary>Instance index + 1 of every pixel (overlays).</summary>
+    public const Format InstanceId = Format.R32Uint;
+
+    /// <summary>Octahedral-encoded surface normals (scene and reflective shadow maps).</summary>
+    public const Format Normal = Format.R16G16Sfloat;
 
     /// <summary>Pre-exposed scene-referred linear Rec.2020.</summary>
     public const Format Hdr = Format.R16G16B16A16Sfloat;
 
     /// <summary>Display image: sRGB-encoded values in a UNORM image (what Dear ImGui and PNG files expect).</summary>
     public const Format Display = Format.R8G8B8A8Unorm;
+
+    /// <summary>Per-pixel analysis values (lux, dB) of the overlays.</summary>
+    public const Format Analysis = Format.R32Sfloat;
+
+    /// <summary>Diffuse reflectance of the reflective shadow maps (linear Rec.2020).</summary>
+    public const Format RsmAlbedo = Format.R8G8B8A8Unorm;
+
+    /// <summary>Selection mask (coverage, visible) at display resolution.</summary>
+    public const Format SelectionMask = Format.R8G8B8A8Unorm;
+
+    /// <summary>Froxel volumes, indirect irradiance and bloom levels (storage + sampled).</summary>
+    public const Format HdrStorage = Format.R16G16B16A16Sfloat;
+
+    /// <summary>Scalar volumes of the atmosphere (smoke density, flame temperature, noise level).</summary>
+    public const Format Scalar = Format.R16Sfloat;
 }
 
 /// <summary>Vertex input layouts of the pipelines.</summary>
@@ -45,6 +66,27 @@ internal enum BlendMode
 
     /// <summary>Straight alpha: dst = αsrc·src + (1 − αsrc)·dst.</summary>
     Alpha,
+
+    /// <summary>Participating media over the scene: dst = src (in-scattering) + αsrc (transmittance)·dst.</summary>
+    Transmittance,
+
+    /// <summary>Component-wise maximum (selection mask).</summary>
+    Max,
+}
+
+/// <summary>Up to three colour attachment formats of a pipeline.</summary>
+internal readonly record struct ColorTargets(int Count, Format F0 = Format.Undefined, Format F1 = Format.Undefined, Format F2 = Format.Undefined)
+{
+    public static ColorTargets None => new(0);
+
+    public static ColorTargets One(Format f) => new(1, f);
+
+    public Format this[int i] => i switch
+    {
+        0 => F0,
+        1 => F1,
+        _ => F2,
+    };
 }
 
 /// <summary>Description of a graphics pipeline for <see cref="PipelineLibrary"/>.</summary>
@@ -53,7 +95,7 @@ internal readonly record struct GraphicsPipelineDesc(
     ShaderVariant Vertex,
     ShaderVariant Fragment,
     VertexLayout Layout,
-    Format ColorFormat,
+    ColorTargets Colors,
     BlendMode Blend = BlendMode.None,
     bool DepthAttachment = true,
     bool DepthTest = true,
@@ -61,15 +103,17 @@ internal readonly record struct GraphicsPipelineDesc(
     CompareOp DepthCompare = CompareOp.GreaterOrEqual,
     PolygonMode Polygon = PolygonMode.Fill,
     bool DynamicCull = true,
-    bool DynamicDepthTest = false);
+    bool DynamicDepthTest = false,
+    bool DepthBias = false);
 
 /// <summary>
-/// Descriptor set layouts, the pipeline layout shared by every pipeline (set 0 = scene, set 1 = view, 32 bytes of
-/// push constants) and the graphics/compute pipelines of the real-time renderer. SPIR-V comes from the
-/// <see cref="ShaderCompiler"/> (disk-cached); pipelines go through the context's persisted pipeline cache.
-/// All pipelines use dynamic rendering, a dynamic viewport/scissor and (meshes) a dynamic cull mode, so double-sided
-/// materials need no pipeline of their own. Front faces are counter-clockwise: the projection flips Y for Vulkan,
-/// so a triangle that is counter-clockwise in the world as seen from its front stays counter-clockwise on screen.
+/// Descriptor set layouts, the pipeline layout shared by every pipeline (set 0 = scene, set 1 = view, set 2 = pass
+/// resources of compute passes, 32 bytes of push constants) and the graphics/compute pipelines of the real-time
+/// renderer. SPIR-V comes from the <see cref="ShaderCompiler"/> (disk-cached); pipelines go through the context's
+/// persisted pipeline cache. All pipelines use dynamic rendering, a dynamic viewport/scissor and (meshes) a dynamic
+/// cull mode, so double-sided materials need no pipeline of their own. Front faces are counter-clockwise: the
+/// projection flips Y for Vulkan, so a triangle that is counter-clockwise in the world as seen from its front stays
+/// counter-clockwise on screen (and in the shadow maps).
 /// </summary>
 internal sealed unsafe class PipelineLibrary : IDisposable
 {
@@ -82,18 +126,21 @@ internal sealed unsafe class PipelineLibrary : IDisposable
     {
         _context = context;
         _compiler = compiler;
+        RayTracing = context.Capabilities.RayTracing;
         try
         {
             ViewSetLayout = CreateViewSetLayout();
-            var layouts = stackalloc DescriptorSetLayout[2];
+            PassSetLayout = CreatePassSetLayout();
+            var layouts = stackalloc DescriptorSetLayout[3];
             layouts[ShaderConstants.SetScene] = sceneLayout;
             layouts[ShaderConstants.SetView] = ViewSetLayout;
+            layouts[ShaderConstants.SetPass] = PassSetLayout;
             var range = new PushConstantRange(ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit | ShaderStageFlags.ComputeBit, 0,
                 (uint)sizeof(GpuDrawConstants));
             var info = new PipelineLayoutCreateInfo
             {
                 SType = StructureType.PipelineLayoutCreateInfo,
-                SetLayoutCount = 2,
+                SetLayoutCount = 3,
                 PSetLayouts = layouts,
                 PushConstantRangeCount = 1,
                 PPushConstantRanges = &range,
@@ -102,31 +149,76 @@ internal sealed unsafe class PipelineLibrary : IDisposable
             VkUtil.Check(context.Vk.CreatePipelineLayout(context.Device, &info, null, &layout), "vkCreatePipelineLayout");
             Layout = layout;
 
+            var prepassTargets = new ColorTargets(3, TargetFormats.PickId, TargetFormats.InstanceId, TargetFormats.Normal);
             PrepassOpaque = Create(new GraphicsPipelineDesc("depth pre-pass", ShaderPrograms.MeshVertex, ShaderPrograms.Prepass, VertexLayout.Mesh,
-                TargetFormats.PickId, DepthWrite: true, DepthCompare: CompareOp.Greater));
+                prepassTargets, DepthWrite: true, DepthCompare: CompareOp.Greater));
             PrepassMask = Create(new GraphicsPipelineDesc("depth pre-pass (alpha mask)", ShaderPrograms.MeshVertex, ShaderPrograms.PrepassAlphaMask,
-                VertexLayout.Mesh, TargetFormats.PickId, DepthWrite: true, DepthCompare: CompareOp.Greater));
+                VertexLayout.Mesh, prepassTargets, DepthWrite: true, DepthCompare: CompareOp.Greater));
             ForwardOpaque = Create(new GraphicsPipelineDesc("forward", ShaderPrograms.MeshVertex, ShaderPrograms.Forward, VertexLayout.Mesh,
-                TargetFormats.Hdr, DepthCompare: CompareOp.Equal));
+                ColorTargets.One(TargetFormats.Hdr), DepthCompare: CompareOp.Equal));
             ForwardTransparent = Create(new GraphicsPipelineDesc("forward (transparent)", ShaderPrograms.MeshVertex, ShaderPrograms.ForwardTransparent,
-                VertexLayout.Mesh, TargetFormats.Hdr, BlendMode.Premultiplied, DepthCompare: CompareOp.Greater));
+                VertexLayout.Mesh, ColorTargets.One(TargetFormats.Hdr), BlendMode.Premultiplied, DepthCompare: CompareOp.Greater));
             Colorless = Create(new GraphicsPipelineDesc("colorless", ShaderPrograms.MeshVertex, ShaderPrograms.Colorless, VertexLayout.Mesh,
-                TargetFormats.Hdr, DepthCompare: CompareOp.Equal));
+                ColorTargets.One(TargetFormats.Hdr), DepthCompare: CompareOp.Equal));
             if (polygonWireframe)
             {
                 WireframePolygon = Create(new GraphicsPipelineDesc("wireframe (polygon mode)", ShaderPrograms.MeshVertex, ShaderPrograms.Wire,
-                    VertexLayout.Mesh, TargetFormats.Hdr, DepthAttachment: false, DepthTest: false, Polygon: PolygonMode.Line));
+                    VertexLayout.Mesh, ColorTargets.One(TargetFormats.Hdr), DepthAttachment: false, DepthTest: false, Polygon: PolygonMode.Line));
             }
 
             WireframeEdges = Create(new GraphicsPipelineDesc("wireframe (edge shader)", ShaderPrograms.EdgesVertex, ShaderPrograms.LinesFragment,
-                VertexLayout.Edges, TargetFormats.Hdr, BlendMode.Alpha, DepthAttachment: false, DepthTest: false, DynamicCull: false));
+                VertexLayout.Edges, ColorTargets.One(TargetFormats.Hdr), BlendMode.Alpha, DepthAttachment: false, DepthTest: false, DynamicCull: false));
             Lines = Create(new GraphicsPipelineDesc("lines", ShaderPrograms.LinesVertex, ShaderPrograms.LinesFragment, VertexLayout.Lines,
-                TargetFormats.Display, BlendMode.Alpha, DynamicCull: false));
+                ColorTargets.One(TargetFormats.Display), BlendMode.Alpha, DynamicCull: false, DynamicDepthTest: true));
             Grid = Create(new GraphicsPipelineDesc("grid", ShaderPrograms.FullscreenVertex, ShaderPrograms.Grid, VertexLayout.None,
-                TargetFormats.Display, BlendMode.Alpha, DynamicCull: false, DynamicDepthTest: true));
+                ColorTargets.One(TargetFormats.Display), BlendMode.Alpha, DynamicCull: false, DynamicDepthTest: true));
             Tonemap = Create(new GraphicsPipelineDesc("tone mapping", ShaderPrograms.FullscreenVertex, ShaderPrograms.Tonemap, VertexLayout.None,
-                TargetFormats.Display, DepthAttachment: false, DepthTest: false, DynamicCull: false));
+                ColorTargets.One(TargetFormats.Display), DepthAttachment: false, DepthTest: false, DynamicCull: false));
             ClusterAssign = CreateCompute("cluster light assignment", ShaderPrograms.ClusterAssign);
+
+            // Shadow atlas tiles: casters drawn from both sides with a slope-scaled depth bias (dynamic).
+            ShadowDepth = Create(new GraphicsPipelineDesc("shadow", ShaderPrograms.ShadowVertex, ShaderPrograms.ShadowFragment, VertexLayout.Mesh,
+                ColorTargets.None, DepthWrite: true, DepthCompare: CompareOp.Greater, DepthBias: true));
+            ShadowDepthMask = Create(new GraphicsPipelineDesc("shadow (alpha mask)", ShaderPrograms.ShadowVertex, ShaderPrograms.ShadowFragmentMask,
+                VertexLayout.Mesh, ColorTargets.None, DepthWrite: true, DepthCompare: CompareOp.Greater, DepthBias: true));
+            var rsmTargets = new ColorTargets(2, TargetFormats.RsmAlbedo, TargetFormats.Normal);
+            ShadowRsm = Create(new GraphicsPipelineDesc("shadow + RSM", ShaderPrograms.ShadowVertex, ShaderPrograms.ShadowFragmentRsm, VertexLayout.Mesh,
+                rsmTargets, DepthWrite: true, DepthCompare: CompareOp.Greater, DepthBias: true));
+            ShadowRsmMask = Create(new GraphicsPipelineDesc("shadow + RSM (alpha mask)", ShaderPrograms.ShadowVertex, ShaderPrograms.ShadowFragmentRsmMask,
+                VertexLayout.Mesh, rsmTargets, DepthWrite: true, DepthCompare: CompareOp.Greater, DepthBias: true));
+
+            // Overlays and analysis.
+            Analysis = Create(new GraphicsPipelineDesc("analysis", ShaderPrograms.MeshVertex, ShaderPrograms.Analysis, VertexLayout.Mesh,
+                ColorTargets.One(TargetFormats.Analysis), DepthCompare: CompareOp.Equal));
+            SelectionMask = Create(new GraphicsPipelineDesc("selection mask", ShaderPrograms.MeshVertex, ShaderPrograms.Selection, VertexLayout.Mesh,
+                ColorTargets.One(TargetFormats.SelectionMask), BlendMode.Max, DepthAttachment: false, DepthTest: false));
+            Outline = Create(new GraphicsPipelineDesc("selection outline", ShaderPrograms.FullscreenVertex, ShaderPrograms.Outline, VertexLayout.None,
+                ColorTargets.One(TargetFormats.Display), BlendMode.Alpha, DepthAttachment: false, DepthTest: false, DynamicCull: false));
+            DepthUpsample = Create(new GraphicsPipelineDesc("overlay depth", ShaderPrograms.FullscreenVertex, ShaderPrograms.DepthUpsample,
+                VertexLayout.None, ColorTargets.None, DepthWrite: true, DepthCompare: CompareOp.Always, DynamicCull: false));
+
+            // Volumetrics.
+            FroxelInject = CreateCompute("froxel injection", ShaderPrograms.FroxelInject);
+            FroxelIntegrate = CreateCompute("froxel integration", ShaderPrograms.FroxelIntegrate);
+            VolumeComposite = Create(new GraphicsPipelineDesc("volumetric composite", ShaderPrograms.FullscreenVertex, ShaderPrograms.VolumeComposite,
+                VertexLayout.None, ColorTargets.One(TargetFormats.Hdr), BlendMode.Transmittance, DepthAttachment: false, DepthTest: false,
+                DynamicCull: false));
+
+            // Post.
+            BloomDownsampleFirst = CreateCompute("bloom downsample (first)", ShaderPrograms.BloomDownsampleFirst);
+            BloomDownsample = CreateCompute("bloom downsample", ShaderPrograms.BloomDownsample);
+            BloomUpsample = CreateCompute("bloom upsample", ShaderPrograms.BloomUpsample);
+            Histogram = CreateCompute("luminance histogram", ShaderPrograms.Histogram);
+            ExposureReduce = CreateCompute("exposure", ShaderPrograms.ExposureReduce);
+
+            // Indirect light.
+            VplGenerate = CreateCompute("virtual point lights", ShaderPrograms.VplGenerate);
+            IndirectGather = CreateCompute("indirect gather (RSM)", ShaderPrograms.IndirectGather);
+            if (RayTracing)
+            {
+                RayTracedGi = CreateCompute("indirect (ray traced)", ShaderPrograms.RayTracedGi);
+                IndirectFilter = CreateCompute("indirect filter", ShaderPrograms.IndirectFilter);
+            }
         }
         catch
         {
@@ -139,8 +231,14 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         }
     }
 
+    /// <summary>The ray-query pipelines exist (device supports ray tracing).</summary>
+    public bool RayTracing { get; }
+
     /// <summary>Layout of set 1 (per view).</summary>
     public DescriptorSetLayout ViewSetLayout { get; private set; }
+
+    /// <summary>Layout of set 2 (per-pass compute resources).</summary>
+    public DescriptorSetLayout PassSetLayout { get; private set; }
 
     /// <summary>Layout shared by every pipeline.</summary>
     public PipelineLayout Layout { get; private set; }
@@ -159,6 +257,30 @@ internal sealed unsafe class PipelineLibrary : IDisposable
     public Pipeline Grid { get; }
     public Pipeline Tonemap { get; }
     public Pipeline ClusterAssign { get; }
+    public Pipeline ShadowDepth { get; }
+    public Pipeline ShadowDepthMask { get; }
+    public Pipeline ShadowRsm { get; }
+    public Pipeline ShadowRsmMask { get; }
+    public Pipeline Analysis { get; }
+    public Pipeline SelectionMask { get; }
+    public Pipeline Outline { get; }
+    public Pipeline DepthUpsample { get; }
+    public Pipeline FroxelInject { get; }
+    public Pipeline FroxelIntegrate { get; }
+    public Pipeline VolumeComposite { get; }
+    public Pipeline BloomDownsampleFirst { get; }
+    public Pipeline BloomDownsample { get; }
+    public Pipeline BloomUpsample { get; }
+    public Pipeline Histogram { get; }
+    public Pipeline ExposureReduce { get; }
+    public Pipeline VplGenerate { get; }
+    public Pipeline IndirectGather { get; }
+
+    /// <summary>Ray-query one-bounce GI (default handle without ray tracing).</summary>
+    public Pipeline RayTracedGi { get; }
+
+    /// <summary>Edge-aware a-trous filter of the ray-traced GI (default handle without ray tracing).</summary>
+    public Pipeline IndirectFilter { get; }
 
     /// <summary>Binds sets 0 and 1 for <paramref name="bindPoint"/>.</summary>
     public void BindSets(CommandBuffer cmd, PipelineBindPoint bindPoint, DescriptorSet scene, DescriptorSet view)
@@ -168,6 +290,10 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         sets[ShaderConstants.SetView] = view;
         _context.Vk.CmdBindDescriptorSets(cmd, bindPoint, Layout, 0, 2, sets, 0, null);
     }
+
+    /// <summary>Binds set 2 (pass resources) for <paramref name="bindPoint"/>.</summary>
+    public void BindPassSet(CommandBuffer cmd, PipelineBindPoint bindPoint, DescriptorSet set) =>
+        _context.Vk.CmdBindDescriptorSets(cmd, bindPoint, Layout, (uint)ShaderConstants.SetPass, 1, &set, 0, null);
 
     /// <summary>Pushes the per-draw constants.</summary>
     public void Push(CommandBuffer cmd, in GpuDrawConstants constants)
@@ -192,26 +318,103 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         if (ViewSetLayout.Handle != 0)
             vk.DestroyDescriptorSetLayout(_context.Device, ViewSetLayout, null);
         ViewSetLayout = default;
+        if (PassSetLayout.Handle != 0)
+            vk.DestroyDescriptorSetLayout(_context.Device, PassSetLayout, null);
+        PassSetLayout = default;
     }
+
+    /// <summary>Storage images, combined image samplers and storage buffers of set 2 (<see cref="CreatePassSetLayout"/>).</summary>
+    internal const uint PassSetStorageImages = 3;
+
+    /// <inheritdoc cref="PassSetStorageImages"/>
+    internal const uint PassSetSampledImages = 3;
+
+    /// <inheritdoc cref="PassSetStorageImages"/>
+    internal const uint PassSetStorageBuffers = 1;
+
+    /// <summary>Storage buffers of set 0 (materials, instances, material slots, lights; the set has update-after-bind).</summary>
+    internal const uint SceneSetStorageBuffers = 4;
+
+    /// <summary>
+    /// Descriptors of sets 1 and 2 (created without update-after-bind) that one shader stage can access — what the
+    /// shared pipeline layout needs from the device's per-stage and per-set limits besides the bindless textures and
+    /// the storage buffers of set 0 (checked when the device is chosen; the bindless array is sized to leave room for
+    /// them under the update-after-bind limits).
+    /// </summary>
+    internal static void ViewAndPassDescriptors(out uint sampledImages, out uint storageBuffers, out uint storageImages, out uint uniformBuffers)
+    {
+        sampledImages = PassSetSampledImages;
+        storageBuffers = PassSetStorageBuffers;
+        storageImages = PassSetStorageImages;
+        uniformBuffers = 0;
+        for (uint b = 0; b < ShaderConstants.ViewBindingCount; b++)
+        {
+            switch (ViewBindingType(b))
+            {
+                case DescriptorType.CombinedImageSampler:
+                    sampledImages++;
+                    break;
+                case DescriptorType.StorageBuffer:
+                    storageBuffers++;
+                    break;
+                case DescriptorType.UniformBuffer:
+                    uniformBuffers++;
+                    break;
+            }
+        }
+    }
+
+    /// <summary>Descriptor type of a set-1 binding.</summary>
+    public static DescriptorType ViewBindingType(uint binding) => binding switch
+    {
+        ShaderConstants.BindingFrame => DescriptorType.UniformBuffer,
+        ShaderConstants.BindingClusters or ShaderConstants.BindingClusterLights or ShaderConstants.BindingClusterCounter or
+            ShaderConstants.BindingLightViews or ShaderConstants.BindingShadowSlots or ShaderConstants.BindingVpls or
+            ShaderConstants.BindingFlameLut or ShaderConstants.BindingNoiseSources or ShaderConstants.BindingRaymarchList or
+            ShaderConstants.BindingExposure => DescriptorType.StorageBuffer,
+        _ => DescriptorType.CombinedImageSampler,
+    };
 
     private DescriptorSetLayout CreateViewSetLayout()
     {
         const ShaderStageFlags all = ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit | ShaderStageFlags.ComputeBit;
-        const ShaderStageFlags clusterStages = ShaderStageFlags.FragmentBit | ShaderStageFlags.ComputeBit;
-        var bindings = stackalloc DescriptorSetLayoutBinding[5];
-        bindings[0] = new DescriptorSetLayoutBinding(ShaderConstants.BindingFrame, DescriptorType.UniformBuffer, 1, all);
-        bindings[1] = new DescriptorSetLayoutBinding(ShaderConstants.BindingClusters, DescriptorType.StorageBuffer, 1, clusterStages);
-        bindings[2] = new DescriptorSetLayoutBinding(ShaderConstants.BindingClusterLights, DescriptorType.StorageBuffer, 1, clusterStages);
-        bindings[3] = new DescriptorSetLayoutBinding(ShaderConstants.BindingClusterCounter, DescriptorType.StorageBuffer, 1, ShaderStageFlags.ComputeBit);
-        bindings[4] = new DescriptorSetLayoutBinding(ShaderConstants.BindingHdr, DescriptorType.CombinedImageSampler, 1, ShaderStageFlags.FragmentBit);
+        var bindings = stackalloc DescriptorSetLayoutBinding[(int)ShaderConstants.ViewBindingCount];
+        for (uint b = 0; b < ShaderConstants.ViewBindingCount; b++)
+            bindings[b] = new DescriptorSetLayoutBinding(b, ViewBindingType(b), 1, all);
         var info = new DescriptorSetLayoutCreateInfo
         {
             SType = StructureType.DescriptorSetLayoutCreateInfo,
-            BindingCount = 5,
+            BindingCount = ShaderConstants.ViewBindingCount,
             PBindings = bindings,
         };
         DescriptorSetLayout layout;
         VkUtil.Check(_context.Vk.CreateDescriptorSetLayout(_context.Device, &info, null, &layout), "vkCreateDescriptorSetLayout (view)");
+        return layout;
+    }
+
+    private DescriptorSetLayout CreatePassSetLayout()
+    {
+        const ShaderStageFlags stages = ShaderStageFlags.ComputeBit | ShaderStageFlags.FragmentBit;
+        var bindings = stackalloc DescriptorSetLayoutBinding[8];
+        uint n = 0;
+        // Counted by ViewAndPassDescriptors (PassSet* constants).
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassStorage0, DescriptorType.StorageImage, 1, stages);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassStorage1, DescriptorType.StorageImage, 1, stages);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassStorage2, DescriptorType.StorageImage, 1, stages);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassSampled0, DescriptorType.CombinedImageSampler, 1, stages);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassSampled1, DescriptorType.CombinedImageSampler, 1, stages);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassSampled2, DescriptorType.CombinedImageSampler, 1, stages);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassBuffer, DescriptorType.StorageBuffer, 1, stages);
+        if (RayTracing)
+            bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPassTlas, DescriptorType.AccelerationStructureKhr, 1, ShaderStageFlags.ComputeBit);
+        var info = new DescriptorSetLayoutCreateInfo
+        {
+            SType = StructureType.DescriptorSetLayoutCreateInfo,
+            BindingCount = n,
+            PBindings = bindings,
+        };
+        DescriptorSetLayout layout;
+        VkUtil.Check(_context.Vk.CreateDescriptorSetLayout(_context.Device, &info, null, &layout), "vkCreateDescriptorSetLayout (pass)");
         return layout;
     }
 
@@ -347,6 +550,7 @@ internal sealed unsafe class PipelineLibrary : IDisposable
                 CullMode = CullModeFlags.None,
                 FrontFace = FrontFace.CounterClockwise,
                 LineWidth = 1f,
+                DepthBiasEnable = d.DepthBias,
             };
             var multisample = new PipelineMultisampleStateCreateInfo
             {
@@ -362,28 +566,16 @@ internal sealed unsafe class PipelineLibrary : IDisposable
                 MinDepthBounds = 0f,
                 MaxDepthBounds = 1f,
             };
-            var blendAttachment = new PipelineColorBlendAttachmentState
-            {
-                ColorWriteMask = ColorComponentFlags.RBit | ColorComponentFlags.GBit | ColorComponentFlags.BBit | ColorComponentFlags.ABit,
-            };
-            if (d.Blend != BlendMode.None)
-            {
-                blendAttachment.BlendEnable = true;
-                blendAttachment.SrcColorBlendFactor = d.Blend == BlendMode.Premultiplied ? BlendFactor.One : BlendFactor.SrcAlpha;
-                blendAttachment.DstColorBlendFactor = BlendFactor.OneMinusSrcAlpha;
-                blendAttachment.ColorBlendOp = BlendOp.Add;
-                blendAttachment.SrcAlphaBlendFactor = BlendFactor.One;
-                blendAttachment.DstAlphaBlendFactor = BlendFactor.OneMinusSrcAlpha;
-                blendAttachment.AlphaBlendOp = BlendOp.Add;
-            }
-
+            var blendAttachments = stackalloc PipelineColorBlendAttachmentState[3];
+            for (int i = 0; i < d.Colors.Count; i++)
+                blendAttachments[i] = BlendState(d.Blend);
             var blend = new PipelineColorBlendStateCreateInfo
             {
                 SType = StructureType.PipelineColorBlendStateCreateInfo,
-                AttachmentCount = 1,
-                PAttachments = &blendAttachment,
+                AttachmentCount = (uint)d.Colors.Count,
+                PAttachments = blendAttachments,
             };
-            var dynamicStates = stackalloc DynamicState[4];
+            var dynamicStates = stackalloc DynamicState[5];
             uint dynamicCount = 0;
             dynamicStates[dynamicCount++] = DynamicState.Viewport;
             dynamicStates[dynamicCount++] = DynamicState.Scissor;
@@ -391,18 +583,22 @@ internal sealed unsafe class PipelineLibrary : IDisposable
                 dynamicStates[dynamicCount++] = DynamicState.CullMode;
             if (d.DynamicDepthTest)
                 dynamicStates[dynamicCount++] = DynamicState.DepthTestEnable;
+            if (d.DepthBias)
+                dynamicStates[dynamicCount++] = DynamicState.DepthBias;
             var dynamic = new PipelineDynamicStateCreateInfo
             {
                 SType = StructureType.PipelineDynamicStateCreateInfo,
                 DynamicStateCount = dynamicCount,
                 PDynamicStates = dynamicStates,
             };
-            var colorFormat = d.ColorFormat;
+            var colorFormats = stackalloc Format[3];
+            for (int i = 0; i < d.Colors.Count; i++)
+                colorFormats[i] = d.Colors[i];
             var rendering = new PipelineRenderingCreateInfo
             {
                 SType = StructureType.PipelineRenderingCreateInfo,
-                ColorAttachmentCount = 1,
-                PColorAttachmentFormats = &colorFormat,
+                ColorAttachmentCount = (uint)d.Colors.Count,
+                PColorAttachmentFormats = colorFormats,
                 DepthAttachmentFormat = d.DepthAttachment ? TargetFormats.Depth : Format.Undefined,
             };
             var info = new GraphicsPipelineCreateInfo
@@ -432,5 +628,46 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         {
             Marshal.FreeCoTaskMem(entry);
         }
+    }
+
+    private static PipelineColorBlendAttachmentState BlendState(BlendMode mode)
+    {
+        var state = new PipelineColorBlendAttachmentState
+        {
+            ColorWriteMask = ColorComponentFlags.RBit | ColorComponentFlags.GBit | ColorComponentFlags.BBit | ColorComponentFlags.ABit,
+        };
+        switch (mode)
+        {
+            case BlendMode.Premultiplied:
+            case BlendMode.Alpha:
+                state.BlendEnable = true;
+                state.SrcColorBlendFactor = mode == BlendMode.Premultiplied ? BlendFactor.One : BlendFactor.SrcAlpha;
+                state.DstColorBlendFactor = BlendFactor.OneMinusSrcAlpha;
+                state.ColorBlendOp = BlendOp.Add;
+                state.SrcAlphaBlendFactor = BlendFactor.One;
+                state.DstAlphaBlendFactor = BlendFactor.OneMinusSrcAlpha;
+                state.AlphaBlendOp = BlendOp.Add;
+                break;
+            case BlendMode.Transmittance:
+                state.BlendEnable = true;
+                state.SrcColorBlendFactor = BlendFactor.One;
+                state.DstColorBlendFactor = BlendFactor.SrcAlpha;
+                state.ColorBlendOp = BlendOp.Add;
+                state.SrcAlphaBlendFactor = BlendFactor.Zero;
+                state.DstAlphaBlendFactor = BlendFactor.One;
+                state.AlphaBlendOp = BlendOp.Add;
+                break;
+            case BlendMode.Max:
+                state.BlendEnable = true;
+                state.SrcColorBlendFactor = BlendFactor.One;
+                state.DstColorBlendFactor = BlendFactor.One;
+                state.ColorBlendOp = BlendOp.Max;
+                state.SrcAlphaBlendFactor = BlendFactor.One;
+                state.DstAlphaBlendFactor = BlendFactor.One;
+                state.AlphaBlendOp = BlendOp.Max;
+                break;
+        }
+
+        return state;
     }
 }

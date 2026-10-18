@@ -1,0 +1,55 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Auto exposure, step 2 (one work group): the mean log2 luminance of the pixels between the 50th and 95th percentile
+// of the histogram (the dark venue and the brightest highlights do not drive the exposure). The CPU reads the result
+// back a few frames later and adapts the exposure over time.
+
+#include "common.glsl"
+
+layout(local_size_x = HISTOGRAM_BINS, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = SET_VIEW, binding = BINDING_EXPOSURE, scalar) buffer ExposureBuffer
+{
+    uint histogram[HISTOGRAM_BINS];
+    float averageLog2Luminance;
+    uint pixelCount;
+    uint exposurePad0;
+    uint exposurePad1;
+};
+
+const float LOW_PERCENTILE = 0.5;
+const float HIGH_PERCENTILE = 0.95;
+
+shared uint sCounts[HISTOGRAM_BINS];
+
+void main()
+{
+    uint tid = gl_LocalInvocationIndex;
+    sCounts[tid] = histogram[tid];
+    barrier();
+    if (tid != 0u)
+        return;
+
+    uint total = 0u;
+    for (uint i = 0u; i < HISTOGRAM_BINS; ++i)
+        total += sCounts[i];
+    float lowCount = float(total) * LOW_PERCENTILE;
+    float highCount = float(total) * HIGH_PERCENTILE;
+    float below = 0.0;
+    float weightSum = 0.0;
+    float sum = 0.0;
+    float binWidth = (HISTOGRAM_MAX_LOG2 - HISTOGRAM_MIN_LOG2) / float(HISTOGRAM_BINS);
+    for (uint i = 0u; i < HISTOGRAM_BINS; ++i)
+    {
+        float n = float(sCounts[i]);
+        // part of this bin inside [lowCount, highCount]
+        float inside = max(min(below + n, highCount) - max(below, lowCount), 0.0);
+        below += n;
+        float centre = HISTOGRAM_MIN_LOG2 + (float(i) + 0.5) * binWidth;
+        sum += inside * centre;
+        weightSum += inside;
+    }
+
+    averageLog2Luminance = weightSum > 0.0 ? sum / weightSum : HISTOGRAM_MIN_LOG2;
+    pixelCount = total;
+}

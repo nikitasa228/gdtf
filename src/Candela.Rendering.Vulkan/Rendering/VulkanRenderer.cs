@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using Candela.Core.Geometry;
 using Candela.Core.Math;
 using Candela.Photometry;
@@ -24,7 +23,12 @@ public sealed class VulkanRendererOptions
 /// <param name="CulledInstances">Instances rejected by frustum culling.</param>
 /// <param name="Draws">Indexed draws in the main view pass.</param>
 /// <param name="Lights">Spot lights in the world.</param>
-public readonly record struct RenderStatistics(double CpuMilliseconds, int VisibleInstances, int CulledInstances, int Draws, int Lights);
+/// <param name="ShadowedLights">Lights with a shadow-atlas tile in this view.</param>
+/// <param name="ShadowTilesRendered">Shadow tiles (re-)rendered for this view (0 when every tile was cached).</param>
+/// <param name="RaymarchedBeams">Narrow beams ray marched at full resolution.</param>
+/// <param name="VirtualPointLights">Virtual point lights of the reflective shadow maps.</param>
+public readonly record struct RenderStatistics(double CpuMilliseconds, int VisibleInstances, int CulledInstances, int Draws, int Lights,
+    int ShadowedLights = 0, int ShadowTilesRendered = 0, int RaymarchedBeams = 0, int VirtualPointLights = 0);
 
 /// <summary>Linear HDR read-back of a target (test/diagnostic hook): luminance units, i.e. HDR value / exposure.</summary>
 /// <param name="Width">Width, pixels.</param>
@@ -45,27 +49,50 @@ internal sealed record HdrReadback(int Width, int Height, float[] Rgba, float Ex
 }
 
 /// <summary>
-/// The real-time Vulkan renderer (stage 1): depth + pick pre-pass, clustered light assignment, forward PBR shading
-/// with photometric spot lights into a pre-exposed RGBA16F image, tone mapping into an RGBA8 display image, ground
-/// grid and lines; Colorless and Wireframe views. Any number of <see cref="VulkanRenderTarget"/>s share one
-/// <see cref="VulkanRenderWorld"/>. Main thread only.
+/// The real-time Vulkan renderer: shadow atlas with cached, prioritised spot-light shadow maps (PCSS soft shadows),
+/// light cookies (gobo, iris, framing blades, prism, frost), depth + pick pre-pass, clustered light assignment, indirect
+/// light (reflective shadow maps or ray-traced GI), forward PBR shading with photometric spot lights into a pre-exposed
+/// RGBA16F image, volumetric light in haze and smoke (froxels with temporal reprojection, ray-marched narrow beams,
+/// flame emission), bloom, auto exposure, tone mapping into an RGBA8 display image, the analysis overlays (lux, noise,
+/// cables), grid, lines, beam outlines and the selection outline; Colorless and Wireframe views. Any number of
+/// <see cref="VulkanRenderTarget"/>s share one <see cref="VulkanRenderWorld"/>. Main thread only.
 /// </summary>
 /// <remarks>
 /// <para><b>Frames.</b> When the caller has begun a frame (<see cref="VulkanContext.BeginFrame"/>, the editor),
 /// <see cref="Render"/> records into it; otherwise it begins and submits a frame of its own (CLI, tests, thumbnails).
 /// Nothing waits for the device in steady state. <see cref="ReadPixels"/> and <see cref="Pick"/> are blocking
 /// read-backs of the last submitted frame and must not be called while a frame is being recorded.</para>
-/// <para><b>Exposure.</b> Full view: HDR = luminance (cd/m²) × <c>Units.ExposureFromEv100(camera.Ev100 +
-/// settings.ExposureCompensation)</c> — the compensation is added to the EV (positive values darken, like closing
-/// the aperture). Colorless and Wireframe are display-referred and not exposed.</para>
-/// <para><b>Not yet used (stage 2):</b> <see cref="PreviewSettings"/> shadows, volumetrics, indirect light, bloom,
-/// temporal accumulation, auto exposure and resolution scale; <see cref="ViewOptions"/> overlays, selection outline
-/// and beam outlines. They are accepted and ignored.</para>
+/// <para><b>Exposure.</b> Full view: HDR = luminance (cd/m²) × <c>Units.ExposureFromEv100(EV)</c> with EV = the camera's
+/// EV100 (or, with <see cref="PreviewSettings.AutoExposure"/>, the EV of the adapted scene luminance) +
+/// <see cref="PreviewSettings.ExposureCompensation"/> applied in stops of exposure: EV − compensation, so +1 doubles
+/// the exposure (a brighter image, like photographic exposure compensation). Colorless and Wireframe are
+/// display-referred and not exposed.</para>
 /// </remarks>
 public sealed unsafe class VulkanRenderer : IRenderer
 {
-    private const string StageThreeMessage = "path tracer arrives in stage 3";
+    /// <summary>Weight of the reprojected froxel history (temporal accumulation).</summary>
+    public const float VolumeHistoryWeight = 0.8f;
 
+    /// <summary>Weight of the reprojected ray-traced GI history.</summary>
+    public const float IndirectHistoryWeight = 0.9f;
+
+    /// <summary>Speed of the auto-exposure adaptation (1/s; 1 − e^(−speed·dt) of the remaining difference per frame).</summary>
+    public const float ExposureAdaptationSpeed = 1.5f;
+
+    /// <summary>Absorption coefficient of luminous flames (soot), 1/m.</summary>
+    public const float FlameAbsorption = 2f;
+
+    /// <summary>
+    /// Density (1/m) of the noise overlay's display-referred coloured fog at the top of the gradient range
+    /// (proportional to the level's position in the range below it): 10 m of air at the maximum level shows the
+    /// gradient colour at about 40 %.
+    /// </summary>
+    public const float NoiseFogStrength = 0.05f;
+
+    /// <summary>Froxel tile size, pixels.</summary>
+    public const int FroxelTileSize = 8;
+
+    private const string StageThreeMessage = "path tracer arrives in stage 3";
     private static readonly Vector4 NonFullBackground = new(0.022f, 0.022f, 0.022f, 1f);
     private static readonly Vector4 WireDefaultColor = new(0.55f, 0.57f, 0.6f, 1f);
 
@@ -76,8 +103,15 @@ public sealed unsafe class VulkanRenderer : IRenderer
     private readonly PassContext _pass;
     private readonly PassSequence _passes = new();
     private readonly List<VulkanRenderTarget> _targets = new();
+    private readonly LightPlanner _planner = new();
+    private readonly RendererResources _shared;
     private readonly bool _edgeWireframe;
+    private ShadowAtlas? _atlas;
+    private RayTracingScene? _rayTracing;
     private GpuBuffer? _readback;
+    private ulong _shadowViewFrame;
+    private int _shadowViewsThisFrame;
+    private int _shadowViewsLastFrame;
     private bool _disposed;
 
     /// <summary>Creates a renderer on a context the caller owns (the editor shares it with its swapchain and UI).</summary>
@@ -97,20 +131,32 @@ public sealed unsafe class VulkanRenderer : IRenderer
         try
         {
             _compiler = new ShaderCompiler(ShaderLibrary.Default, context.CacheDirectory, context.Log);
-            DisplaySampler = CreateSampler(Filter.Linear, "display sampler");
-            HdrSampler = CreateSampler(Filter.Nearest, "hdr sampler");
+            _shared = new RendererResources(context, _barriers);
             _world = new VulkanRenderWorld(context, buildEdges: _edgeWireframe);
             Pipelines = new PipelineLibrary(context, _compiler, _world.SceneSetLayout, polygonWireframe: !_edgeWireframe);
-            _pass = new PassContext(context, _world, Pipelines, _barriers) { EdgeWireframe = _edgeWireframe };
+            _pass = new PassContext(context, _world, Pipelines, _barriers, _shared) { EdgeWireframe = _edgeWireframe };
+            _passes.Add(new ShadowPass());
             _passes.Add(new DepthPrepassPass());
             _passes.Add(new ClusterAssignPass());
+            _passes.Add(new VplPass());
+            _passes.Add(new IndirectGatherPass());
+            _passes.Add(new RayTracedGiPass());
             _passes.Add(new ForwardOpaquePass());
             _passes.Add(new ColorlessPass());
             _passes.Add(new WireframePass());
+            _passes.Add(new AnalysisPass());
+            _passes.Add(new FroxelInjectPass());
+            _passes.Add(new FroxelIntegratePass());
+            _passes.Add(new VolumeCompositePass());
             _passes.Add(new ForwardTransparentPass());
+            _passes.Add(new BloomPass());
+            _passes.Add(new ExposurePass());
             _passes.Add(new TonemapPass());
+            _passes.Add(new OverlayDepthPass());
             _passes.Add(new GridPass());
             _passes.Add(new LinesPass());
+            _passes.Add(new SelectionMaskPass());
+            _passes.Add(new OutlinePass());
             context.PipelineCacheStore.Save();
         }
         catch
@@ -139,13 +185,17 @@ public sealed unsafe class VulkanRenderer : IRenderer
     public RenderStatistics LastStatistics { get; private set; }
 
     /// <summary>Linear clamp-to-edge sampler of the display images (for Dear ImGui).</summary>
-    public Sampler DisplaySampler { get; }
-
-    internal Sampler HdrSampler { get; }
+    public Sampler DisplaySampler => _shared.LinearClamp;
 
     internal PipelineLibrary Pipelines { get; } = null!;
 
     internal PassSequence Passes => _passes;
+
+    /// <summary>The shadow atlas (null until a view used shadows).</summary>
+    internal ShadowAtlas? Atlas => _atlas;
+
+    /// <summary>Per-view light decisions of the last <see cref="Render"/>.</summary>
+    internal LightPlanner Planner => _planner;
 
     /// <summary>
     /// Creates a context (options as given; null = defaults with validation from <c>CANDELA_VK_VALIDATION</c>) and a
@@ -189,24 +239,34 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
         bool ownFrame = Context.CurrentFrame is null;
         var frame = ownFrame ? Context.BeginFrame() : Context.CurrentFrame!;
+        int tilesRendered = 0;
         try
         {
             var cmd = frame.CommandBuffer;
-            _barriers.CommandBuffer = cmd;
-            _world.PrepareFrame(frame, _barriers);
-            var shading = Enum.IsDefined(view.Shading) ? view.Shading : ViewShading.Full;
-            if (shading == ViewShading.Full)
-                t.EnsureClusterCapacity(_world.LightCount);
-
+            var barriers = _barriers;
+            barriers.CommandBuffer = cmd;
+            _world.PrepareFrame(frame, barriers);
             var p = _pass;
+            var decisions = Decide(t, view, settings);
+            float dt = float.IsFinite(deltaTime) ? Math.Clamp(deltaTime, 0f, 1f) : 0f;
+            float exposure = ComputeExposure(t, camera, settings, decisions, frame, dt);
+
             p.Frame = frame;
             p.Cmd = cmd;
             p.Target = t;
             p.View = view;
             p.Settings = settings;
-            p.Shading = shading;
-            p.SceneSet = _world.CurrentSceneSet;
-            p.ToneMode = shading != ViewShading.Full ? ShaderConstants.TonePassthrough : settings.ToneMapper switch
+            p.Shading = decisions.Shading;
+            p.Overlay = decisions.Overlay;
+            p.LightsActive = decisions.Lights;
+            p.ShadowsActive = decisions.Shadows;
+            p.RsmActive = decisions.Indirect == IndirectLighting.ReflectiveShadowMaps;
+            p.VolumetricsActive = decisions.Volumetrics;
+            p.Indirect = decisions.Indirect;
+            p.BloomActive = decisions.Bloom;
+            p.AutoExposureActive = decisions.AutoExposure;
+            p.Scaled = decisions.Scaled;
+            p.ToneMode = decisions.Shading != ViewShading.Full ? ShaderConstants.TonePassthrough : settings.ToneMapper switch
             {
                 ToneMapper.Aces => ShaderConstants.ToneAces,
                 ToneMapper.Neutral => ShaderConstants.ToneNeutral,
@@ -215,15 +275,94 @@ public sealed unsafe class VulkanRenderer : IRenderer
             p.WireColor = WireDefaultColor;
             var selection = ColorSpaces.SrgbDecode(new Vector3(view.SelectionColor.X, view.SelectionColor.Y, view.SelectionColor.Z));
             p.WireSelectedColor = new Vector4(selection, 1f);
-            BuildFrameData(t, camera, view, settings, shading, ref p.Data, out var frustum);
+
+            // The cluster list capacity goes into the frame data: grow the buffer first.
+            if (decisions.Lights)
+                t.EnsureClusterCapacity(_world.LightCount);
+            BuildFrameData(t, camera, view, decisions, exposure, ref p.Data, out var frustum);
             var forward = new Vector3(p.Data.CameraForward.X, p.Data.CameraForward.Y, p.Data.CameraForward.Z);
             var eye = new Vector3(p.Data.CameraPosition.X, p.Data.CameraPosition.Y, p.Data.CameraPosition.Z);
-            p.Draws.Build(_world, frustum, eye, forward, useMaterials: shading == ViewShading.Full);
+            p.Draws.Build(_world, frustum, eye, forward, useMaterials: decisions.Shading == ViewShading.Full,
+                blendReferences: decisions.Shading != ViewShading.Wireframe);
+            p.SelectionActive = view.ShowSelectionOutline && p.Draws.SelectedInstances > 0;
+
+            // Shadow atlas, light plan, acceleration structures.
+            if (decisions.Shadows)
+            {
+                _atlas ??= new ShadowAtlas(Context);
+                _atlas.Configure(settings.ShadowMapResolution, decisions.Indirect == IndirectLighting.ReflectiveShadowMaps);
+                CountShadowedView(frame.Number);
+            }
+            else if (_atlas is not null && _world.ShadowCastingLights == 0)
+            {
+                // No light casts shadows any more: give the atlas memory back (destroyed after the frames using it).
+                Context.DeferDispose(_atlas);
+                _atlas = null;
+            }
+
+            if (_atlas is not null)
+                _atlas.ProcessChanges(_world.ShadowChanges);
+            else
+                _world.ShadowChanges.Clear();
+            p.Atlas = _atlas;
+            var plan = new PlanInputs
+            {
+                Frustum = frustum,
+                CameraPosition = eye,
+                Orthographic = (p.Data.Flags & ShaderConstants.FrameOrthographic) != 0,
+                TanHalfFovY = MathF.Abs(p.Data.Projection.M22) > 1e-6f ? 1f / MathF.Abs(p.Data.Projection.M22) : 1f,
+                OrthoHeight = float.IsFinite(camera.OrthoHeight) && camera.OrthoHeight > 0f ? camera.OrthoHeight : 10f,
+                LightRangeScale = p.Data.LightRangeScale,
+                Shadows = decisions.Shadows,
+                MaxShadowedLights = Math.Clamp(settings.MaxShadowedLights, 0, ShadowAtlas.MaxTiles),
+                AtlasShare = Math.Max(_shadowViewsThisFrame, _shadowViewsLastFrame),
+                Rsm = decisions.Indirect == IndirectLighting.ReflectiveShadowMaps,
+                RayTracedGi = decisions.Indirect == IndirectLighting.RayTraced,
+                VplCapacity = decisions.VplCapacity,
+                MaxRaymarchedBeams = decisions.VolumeLights ? Math.Clamp(settings.MaxRaymarchedBeams, 0, 256) : 0,
+                BeamOutlines = view.ShowBeamOutlines && _world.LightCount > 0,
+                FrameNumber = frame.Number,
+            };
+            _planner.Plan(_world, t, decisions.Shadows ? _atlas : null, plan);
+            tilesRendered = decisions.Shadows ? _atlas!.PendingRenders.Length : 0;
+            p.IndirectLightCount = _planner.IndirectLightCount;
+            p.RayTracing = null;
+            if (decisions.Indirect == IndirectLighting.RayTraced)
+            {
+                _rayTracing ??= new RayTracingScene(Context, _world);
+                _rayTracing.Build(frame, barriers);
+                p.RayTracing = _rayTracing;
+            }
+
+            // Per-view resources and descriptors.
+            t.Prepare(decisions.Requirements);
+            UpdateGradient(t, decisions, barriers);
+            bool lightViews = t.LightViews.PrepareUpload(barriers);
+            bool lists = t.Lists.PrepareUpload(barriers);
+            bool beams = t.BeamLines.PrepareUpload(barriers);
+            bool slots = _atlas is not null && _atlas.Slots.PrepareUpload(barriers);
+            barriers.Flush();
+            if (lightViews)
+                t.LightViews.RecordUpload(cmd);
+            if (lists)
+                t.Lists.RecordUpload(cmd);
+            if (beams)
+                t.BeamLines.RecordUpload(cmd);
+            if (slots)
+                _atlas!.Slots.RecordUpload(cmd);
+            t.UpdateDescriptors(_shared, _world, _atlas, _rayTracing?.Tlas ?? default,
+                decisions.Indirect == IndirectLighting.RayTraced ? _rayTracing?.GeometryTable : null);
+            p.SceneSet = _world.CurrentSceneSet;
+
+            FinishFrameData(t, settings, ref decisions, ref p.Data);
+            p.IndirectHistoryWeight = decisions.Indirect == IndirectLighting.RayTraced && settings.TemporalAccumulation && t.IndirectHistoryValid &&
+                                      t.HasPreviousFrame &&
+                                      t.IndirectHistoryMode == IndirectLighting.RayTraced ? IndirectHistoryWeight : 0f;
 
             // Per-view constants and the light-list counter are reset by transfer commands in this command buffer.
-            _barriers.Use(t.FrameUniform, BufferUse.TransferDestination);
-            _barriers.Use(t.ClusterCounter, BufferUse.TransferDestination);
-            _barriers.Flush();
+            barriers.Use(t.FrameUniform, BufferUse.TransferDestination);
+            barriers.Use(t.ClusterCounter, BufferUse.TransferDestination);
+            barriers.Flush();
             fixed (GpuFrameData* data = &p.Data)
                 Context.Vk.CmdUpdateBuffer(cmd, t.FrameUniform.Handle, 0, (ulong)sizeof(GpuFrameData), data);
             Context.Vk.CmdFillBuffer(cmd, t.ClusterCounter.Handle, 0, Vk.WholeSize, 0);
@@ -231,9 +370,18 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _passes.Execute(p);
 
             // Leave the display image readable by fragment shaders (Dear ImGui) of this or later submissions.
-            _barriers.Use(t.Display, ImageUse.Display);
-            _barriers.Flush();
+            barriers.Use(t.Display, ImageUse.Display);
+            barriers.Flush();
 
+            t.IndirectHistoryValid = decisions.Indirect == IndirectLighting.RayTraced && p.RayTracing is { HasTlas: true };
+            t.IndirectHistoryMode = decisions.Indirect;
+            if (!decisions.Volumetrics || !settings.TemporalAccumulation)
+                t.VolumeHistoryValid = false;
+            t.VolumeHistoryKey = decisions.VolumeKey;
+            t.VolumeHistoryExposure = exposure;
+            t.PreviousViewProjection = p.Data.ViewProjection;
+            t.HasPreviousFrame = true;
+            t.FrameIndex++;
             t.Last = new LastFrameInfo
             {
                 Valid = true,
@@ -243,7 +391,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 CameraForward = forward,
                 Orthographic = (p.Data.Flags & ShaderConstants.FrameOrthographic) != 0,
                 Exposure = p.Data.Exposure,
-                Shading = shading,
+                Shading = decisions.Shading,
+                Overlay = decisions.Overlay,
+                Bloom = p.BloomActive && t.BloomLevels > 0,
             };
         }
         finally
@@ -254,7 +404,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
         int draws = _pass.Draws.Opaque.Length + _pass.Draws.Masked.Length + _pass.Draws.Blended.Length;
         LastStatistics = new RenderStatistics(Stopwatch.GetElapsedTime(start).TotalMilliseconds, _pass.Draws.VisibleInstances,
-            _pass.Draws.CulledInstances, draws, _world.LightCount);
+            _pass.Draws.CulledInstances, draws, _world.LightCount, _planner.ShadowedLights, tilesRendered, _planner.RaymarchCount, _planner.VplCount);
     }
 
     /// <summary>
@@ -287,11 +437,12 @@ public sealed unsafe class VulkanRenderer : IRenderer
     }
 
     /// <summary>
-    /// The instance under pixel (<paramref name="x"/>, <paramref name="y"/>) (origin top-left) of the target's last
-    /// frame: its pick id, the world position reconstructed from the depth buffer, the surface normal from the depth
-    /// gradient of the neighbouring pixels on the same object (facing the camera), and the view depth in metres
-    /// (distance along the view direction). Null for the background, non-pickable objects, pixels outside the
-    /// target, or a target without a frame. Blocking.
+    /// The instance under pixel (<paramref name="x"/>, <paramref name="y"/>) (origin top-left, display resolution) of the
+    /// target's last frame: its pick id, the world position reconstructed from the depth buffer, the surface normal
+    /// from the depth gradient of the neighbouring pixels on the same object (facing the camera), and the view depth in
+    /// metres (distance along the view direction). With a resolution scale below 1 the scene images are sampled at the
+    /// corresponding internal pixel. Null for the background, non-pickable objects, pixels outside the target, or a
+    /// target without a frame. Blocking.
     /// </summary>
     public PickResult? Pick(IRenderTarget target, int x, int y)
     {
@@ -299,10 +450,14 @@ public sealed unsafe class VulkanRenderer : IRenderer
         var t = Validate(target);
         if (!t.Last.Valid || x < 0 || y < 0 || x >= t.Width || y >= t.Height)
             return null;
+        int rw = t.RenderWidth, rh = t.RenderHeight;
+        int displayX = x, displayY = y;
+        x = Math.Clamp((int)((x + 0.5f) * rw / t.Width), 0, rw - 1);
+        y = Math.Clamp((int)((y + 0.5f) * rh / t.Height), 0, rh - 1);
         int x0 = Math.Max(x - 1, 0), y0 = Math.Max(y - 1, 0);
-        int x1 = Math.Min(x + 1, t.Width - 1), y1 = Math.Min(y + 1, t.Height - 1);
-        uint rw = (uint)(x1 - x0 + 1), rh = (uint)(y1 - y0 + 1);
-        ulong depthBytes = rw * rh * 4ul;
+        int x1 = Math.Min(x + 1, rw - 1), y1 = Math.Min(y + 1, rh - 1);
+        uint bw = (uint)(x1 - x0 + 1), bh = (uint)(y1 - y0 + 1);
+        ulong depthBytes = bw * bh * 4ul;
         ulong pickOffset = VkUtil.AlignUp(depthBytes, 16);
         ulong size = pickOffset + depthBytes;
         var readback = Readback(size);
@@ -313,29 +468,29 @@ public sealed unsafe class VulkanRenderer : IRenderer
         _barriers.Use(t.PickIds, ImageUse.TransferSource);
         _barriers.Use(readback, BufferUse.TransferDestination);
         _barriers.Flush();
-        CopyToBuffer(cmd, t.Depth, ImageAspectFlags.DepthBit, x0, y0, rw, rh, readback, 0);
-        CopyToBuffer(cmd, t.PickIds, ImageAspectFlags.ColorBit, x0, y0, rw, rh, readback, pickOffset);
+        CopyToBuffer(cmd, t.Depth, ImageAspectFlags.DepthBit, x0, y0, bw, bh, readback, 0);
+        CopyToBuffer(cmd, t.PickIds, ImageAspectFlags.ColorBit, x0, y0, bw, bh, readback, pickOffset);
         _barriers.Use(readback, BufferUse.HostRead);
         _barriers.Flush();
         Context.Immediate.SubmitAndWait();
         Context.Allocator.Invalidate(readback.Allocation, 0, size);
 
-        var depths = new ReadOnlySpan<float>(readback.MappedPointer, (int)(rw * rh)).ToArray();
-        var ids = new ReadOnlySpan<uint>(readback.MappedPointer + pickOffset, (int)(rw * rh)).ToArray();
-        int centre = (int)((y - y0) * rw + (x - x0));
+        var depths = new ReadOnlySpan<float>(readback.MappedPointer, (int)(bw * bh)).ToArray();
+        var ids = new ReadOnlySpan<uint>(readback.MappedPointer + pickOffset, (int)(bw * bh)).ToArray();
+        int centre = (int)((y - y0) * bw + (x - x0));
         uint id = ids[centre];
         float depth = depths[centre];
         if (id == 0 || !(depth > 0f))
             return null;
 
         var last = t.Last;
-        Vector3 Unproject(int px, int py, float d)
+        Vector3 UnprojectNdc(float nx, float ny, float d)
         {
-            float nx = (px + 0.5f) / t.Width * 2f - 1f;
-            float ny = (py + 0.5f) / t.Height * 2f - 1f;
             var h = Vector4.Transform(new Vector4(nx, ny, d, 1f), last.InverseViewProjection);
             return new Vector3(h.X, h.Y, h.Z) / h.W;
         }
+
+        Vector3 Unproject(int px, int py, float d) => UnprojectNdc((px + 0.5f) / rw * 2f - 1f, (py + 0.5f) / rh * 2f - 1f, d);
 
         var position = Unproject(x, y, depth);
         var toCamera = last.Orthographic ? -last.CameraForward : Vector3.Normalize(last.CameraPosition - position);
@@ -350,7 +505,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 int px = x + s * dx, py = y + s * dy;
                 if (px < x0 || px > x1 || py < y0 || py > y1)
                     continue;
-                int i = (int)((py - y0) * rw + (px - x0));
+                int i = (int)((py - y0) * bw + (px - x0));
                 if (ids[i] != id || !(depths[i] > 0f))
                     continue;
                 float step = MathF.Abs(depths[i] - depth);
@@ -374,6 +529,22 @@ public sealed unsafe class VulkanRenderer : IRenderer
             {
                 n = Vector3.Normalize(n);
                 normal = Vector3.Dot(n, toCamera) < 0f ? -n : n;
+
+                // At a reduced resolution scale the internal pixel centre is up to half an internal pixel away from
+                // the display pixel's ray: move the point along the surface's tangent plane onto that ray.
+                if (rw != t.Width || rh != t.Height)
+                {
+                    float nx = (displayX + 0.5f) / t.Width * 2f - 1f, ny = (displayY + 0.5f) / t.Height * 2f - 1f;
+                    var origin = UnprojectNdc(nx, ny, 1f);
+                    var direction = Vector3.Normalize(UnprojectNdc(nx, ny, 0.5f) - origin);
+                    float denominator = Vector3.Dot(direction, normal);
+                    if (MathF.Abs(denominator) > 1e-4f)
+                    {
+                        var hit = origin + direction * (Vector3.Dot(position - origin, normal) / denominator);
+                        if (Vector3.Distance(hit, position) <= MathF.Max(a.Length(), b.Length()))
+                            position = hit;
+                    }
+                }
             }
         }
 
@@ -381,7 +552,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         return new PickResult(id, position, normal, viewDepth);
     }
 
-    /// <summary>Not available in stage 1.</summary>
+    /// <summary>Not available yet.</summary>
     /// <exception cref="NotSupportedException">Always: the path tracer arrives in stage 3.</exception>
     public IFinalRender StartFinalRender(RenderCamera camera, FinalRenderSettings settings) => throw new NotSupportedException(StageThreeMessage);
 
@@ -394,8 +565,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
     }
 
     /// <summary>
-    /// Test/diagnostic hook: the target's pre-tone-mapping HDR image divided by the exposure it was rendered with,
-    /// i.e. scene luminance per Rec.2020 channel in cd/m². Blocking.
+    /// Test/diagnostic hook: the target's pre-tone-mapping HDR image (internal resolution) divided by the exposure it
+    /// was rendered with, i.e. scene luminance per Rec.2020 channel in cd/m². Blocking.
     /// </summary>
     internal HdrReadback ReadHdr(IRenderTarget target)
     {
@@ -403,41 +574,235 @@ public sealed unsafe class VulkanRenderer : IRenderer
         var t = Validate(target);
         if (!t.Last.Valid)
             throw new InvalidOperationException("The target has not been rendered yet.");
-        int w = t.Width, h = t.Height;
+        return ReadRgba16(t.Hdr, t.Last.Exposure, 1f);
+    }
+
+    /// <summary>
+    /// Test/diagnostic hook: the bloom image of the target's last frame — level 0 of the pyramid (half the internal
+    /// resolution) divided by the number of levels, i.e. the image the display transform mixes in, in cd/m² (exposure
+    /// removed like <see cref="ReadHdr"/>). Its mean equals the HDR image's mean when the bloom conserves energy.
+    /// Blocking.
+    /// </summary>
+    internal HdrReadback ReadBloom(IRenderTarget target)
+    {
+        ThrowIfDisposed();
+        var t = Validate(target);
+        if (!t.Last.Valid || !t.Last.Bloom || t.BloomLevels == 0)
+            throw new InvalidOperationException("The target's last frame has no bloom.");
+        return ReadRgba16(t.BloomLevel(0), t.Last.Exposure, 1f / t.BloomLevels);
+    }
+
+    private HdrReadback ReadRgba16(GpuImage image, float exposure, float scale)
+    {
+        int w = (int)image.Width, h = (int)image.Height;
         ulong size = (ulong)w * (ulong)h * 8;
         var readback = Readback(size);
         var cmd = Context.Immediate.Begin();
         _barriers.CommandBuffer = cmd;
-        _barriers.Use(t.Hdr, ImageUse.TransferSource);
+        _barriers.Use(image, ImageUse.TransferSource);
         _barriers.Use(readback, BufferUse.TransferDestination);
         _barriers.Flush();
-        CopyToBuffer(cmd, t.Hdr, ImageAspectFlags.ColorBit, 0, 0, (uint)w, (uint)h, readback, 0);
+        CopyToBuffer(cmd, image, ImageAspectFlags.ColorBit, 0, 0, (uint)w, (uint)h, readback, 0);
         _barriers.Use(readback, BufferUse.HostRead);
         _barriers.Flush();
         Context.Immediate.SubmitAndWait();
         Context.Allocator.Invalidate(readback.Allocation, 0, size);
         var halves = new ReadOnlySpan<Half>(readback.MappedPointer, w * h * 4);
         var result = new float[w * h * 4];
-        float scale = t.Last.Exposure > 0f ? 1f / t.Last.Exposure : 1f;
+        float colorScale = (exposure > 0f ? 1f / exposure : 1f) * scale;
         for (int i = 0; i < result.Length; i++)
-            result[i] = (i & 3) == 3 ? (float)halves[i] : (float)halves[i] * scale;
-        return new HdrReadback(w, h, result, t.Last.Exposure);
+            result[i] = (i & 3) == 3 ? (float)halves[i] : (float)halves[i] * colorScale;
+        return new HdrReadback(w, h, result, exposure);
+    }
+
+    /// <summary>
+    /// Test/diagnostic hook: the analysis image of the target's last frame (internal resolution, top row first) —
+    /// illuminance in lux with <see cref="OverlayMode.Lux"/>, sound level in dB with <see cref="OverlayMode.Noise"/>.
+    /// Blocking.
+    /// </summary>
+    internal float[] ReadAnalysis(IRenderTarget target)
+    {
+        ThrowIfDisposed();
+        var t = Validate(target);
+        if (!t.Last.Valid || t.Analysis is null || t.Last.Overlay is not (OverlayMode.Lux or OverlayMode.Noise))
+            throw new InvalidOperationException("The target's last frame has no lux or noise overlay.");
+        int w = t.RenderWidth, h = t.RenderHeight;
+        ulong size = (ulong)w * (ulong)h * 4;
+        var readback = Readback(size);
+        var cmd = Context.Immediate.Begin();
+        _barriers.CommandBuffer = cmd;
+        _barriers.Use(t.Analysis, ImageUse.TransferSource);
+        _barriers.Use(readback, BufferUse.TransferDestination);
+        _barriers.Flush();
+        CopyToBuffer(cmd, t.Analysis, ImageAspectFlags.ColorBit, 0, 0, (uint)w, (uint)h, readback, 0);
+        _barriers.Use(readback, BufferUse.HostRead);
+        _barriers.Flush();
+        Context.Immediate.SubmitAndWait();
+        Context.Allocator.Invalidate(readback.Allocation, 0, size);
+        return new ReadOnlySpan<float>(readback.MappedPointer, w * h).ToArray();
     }
 
     internal void OnTargetDisposed(VulkanRenderTarget target) => _targets.Remove(target);
 
-    private VulkanRenderTarget Validate(IRenderTarget target)
+    /// <summary>Feature decisions of one view.</summary>
+    private struct Decisions
     {
-        ArgumentNullException.ThrowIfNull(target);
-        if (target is not VulkanRenderTarget t || !ReferenceEquals(t.Owner, this))
-            throw new ArgumentException("The target was not created by this renderer.", nameof(target));
-        ObjectDisposedException.ThrowIf(t.IsDisposed, t);
-        return t;
+        public ViewShading Shading;
+        public OverlayMode Overlay;
+        public bool Lights;
+        public bool Shadows;
+        public bool Haze;
+        public bool Smoke;
+        public bool Flame;
+        public bool NoiseField;
+        public bool VolumeLights;
+        public bool Volumetrics;
+        public IndirectLighting Indirect;
+        public bool Bloom;
+        public bool AutoExposure;
+        public bool Scaled;
+        public float Scale;
+        public int VplCapacity;
+        public Vector4 VolumeKey;
+        public ViewRequirements Requirements;
     }
 
-    private void BuildFrameData(VulkanRenderTarget target, RenderCamera camera, ViewOptions view, PreviewSettings settings, ViewShading shading,
-        ref GpuFrameData d, out Frustum frustum)
+    private Decisions Decide(VulkanRenderTarget t, ViewOptions view, PreviewSettings settings)
     {
+        var d = new Decisions
+        {
+            // Plain range checks: Enum.IsDefined reads the enum's runtime type cache, which the GC may collect under
+            // memory pressure and which is then rebuilt (allocating) on the next call.
+            Shading = view.Shading is ViewShading.Full or ViewShading.Colorless or ViewShading.Wireframe ? view.Shading : ViewShading.Full,
+            Overlay = view.Overlay is OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Cables ? view.Overlay : OverlayMode.None,
+        };
+        bool full = d.Shading == ViewShading.Full;
+        int lights = _world.LightCount;
+        var atmosphere = _world.Atmosphere;
+        var gpu = _world.AtmosphereGpu;
+        d.Haze = atmosphere is not null && float.IsFinite(atmosphere.BaseScattering) && atmosphere.BaseScattering > 0f;
+        d.Smoke = atmosphere is not null && gpu.Smoke.Present && float.IsFinite(atmosphere.SmokeScatteringAtFullDensity) &&
+                  atmosphere.SmokeScatteringAtFullDensity > 0f;
+        d.Flame = gpu.Flame.Present;
+        d.NoiseField = gpu.Noise.Present;
+        d.Lights = lights > 0 && (full || d.Overlay == OverlayMode.Lux);
+        d.Shadows = d.Lights && settings.Shadows && settings.MaxShadowedLights > 0 && _world.ShadowCastingLights > 0;
+        d.VolumeLights = full && settings.Volumetrics && (d.Haze || d.Smoke) && lights > 0;
+        d.Volumetrics = full && settings.Volumetrics && (d.Haze || d.Smoke || d.Flame);
+        var indirect = full && d.Lights ? settings.Indirect : IndirectLighting.Off;
+        if (indirect is not (IndirectLighting.Off or IndirectLighting.ReflectiveShadowMaps or IndirectLighting.RayTraced))
+            indirect = IndirectLighting.Off;
+        if (indirect == IndirectLighting.RayTraced && !Pipelines.RayTracing)
+            indirect = IndirectLighting.ReflectiveShadowMaps;
+        if (indirect == IndirectLighting.ReflectiveShadowMaps && !d.Shadows)
+            indirect = IndirectLighting.Off;
+        d.Indirect = indirect;
+        d.Bloom = full && settings.Bloom && float.IsFinite(settings.BloomIntensity) && settings.BloomIntensity > 0f;
+        d.AutoExposure = full && settings.AutoExposure;
+        float scale = float.IsFinite(settings.ResolutionScale) ? Math.Clamp(settings.ResolutionScale, 0.5f, 1f) : 1f;
+        int rw = Math.Max(1, (int)MathF.Round(t.Width * scale)), rh = Math.Max(1, (int)MathF.Round(t.Height * scale));
+        d.Scaled = rw != t.Width || rh != t.Height;
+        d.Scale = scale;
+        d.VplCapacity = indirect == IndirectLighting.ReflectiveShadowMaps ? LightPlanner.VplBudget : 0;
+
+        var r = new ViewRequirements
+        {
+            RenderWidth = rw,
+            RenderHeight = rh,
+            Scaled = d.Scaled,
+            Analysis = d.Overlay is OverlayMode.Lux or OverlayMode.Noise,
+            Selection = view.ShowSelectionOutline,
+            IndirectHistory = indirect == IndirectLighting.RayTraced,
+            VplCapacity = d.VplCapacity,
+            BloomLevels = d.Bloom ? BloomLevelCount(rw, rh) : 0,
+            AutoExposure = d.AutoExposure,
+        };
+        if (indirect != IndirectLighting.Off)
+        {
+            r.IndirectWidth = Math.Max((rw + 1) / 2, 1);
+            r.IndirectHeight = Math.Max((rh + 1) / 2, 1);
+        }
+
+        if (d.Volumetrics)
+        {
+            // 8 x 8 px froxels; beyond the device's 3D image limit the froxels grow (the shaders map them by uv).
+            int maxDimension = (int)Math.Min(Context.Capabilities.MaxImageDimension3D, 16384u);
+            r.VolumeX = Math.Min((rw + FroxelTileSize - 1) / FroxelTileSize, maxDimension);
+            r.VolumeY = Math.Min((rh + FroxelTileSize - 1) / FroxelTileSize, maxDimension);
+            r.VolumeZ = Math.Clamp(settings.VolumetricSlices, 8, Math.Min(256, maxDimension));
+        }
+
+        d.Requirements = r;
+        return d;
+    }
+
+    /// <summary>
+    /// Counts the views that use the shadow atlas in a frame: the editor renders several viewports into one frame, and
+    /// each plans its shadow tiles within an equal share of the atlas (the larger of this frame's and the previous
+    /// frame's view count), so one view cannot take the tiles another view of the same frame needs.
+    /// </summary>
+    private void CountShadowedView(ulong frameNumber)
+    {
+        if (frameNumber != _shadowViewFrame)
+        {
+            _shadowViewsLastFrame = frameNumber == _shadowViewFrame + 1 ? _shadowViewsThisFrame : 0;
+            _shadowViewsThisFrame = 0;
+            _shadowViewFrame = frameNumber;
+        }
+
+        _shadowViewsThisFrame++;
+    }
+
+    private static int BloomLevelCount(int width, int height)
+    {
+        int levels = 0;
+        int size = Math.Min(width, height) / 2;
+        while (levels < 6 && size >= 4)
+        {
+            levels++;
+            size /= 2;
+        }
+
+        return Math.Max(levels, 1);
+    }
+
+    private float ComputeExposure(VulkanRenderTarget t, RenderCamera camera, PreviewSettings settings, in Decisions d, VulkanFrame frame, float dt)
+    {
+        if (d.Shading != ViewShading.Full)
+            return 1f;
+        float compensation = float.IsFinite(settings.ExposureCompensation) ? settings.ExposureCompensation : 0f;
+        float cameraEv = (float.IsFinite(camera.Ev100) ? camera.Ev100 : 6f) - compensation;
+        if (!d.AutoExposure)
+        {
+            t.AdaptedLog2Luminance = float.NaN;
+            return Units.ExposureFromEv100(cameraEv);
+        }
+
+        int slot = frame.SlotIndex;
+        if (t.ExposureReadback[slot] is { } readback && t.ExposureReadbackFrame[slot] != 0 && t.ExposureReadbackFrame[slot] < frame.Number)
+        {
+            Context.Allocator.Invalidate(readback.Allocation, 0, (ulong)sizeof(GpuExposureResult));
+            var result = *(GpuExposureResult*)readback.MappedPointer;
+            t.ExposureReadbackFrame[slot] = 0;
+            if (result.Count > 0 && float.IsFinite(result.AverageLog2Luminance))
+            {
+                float measured = result.AverageLog2Luminance;
+                t.AdaptedLog2Luminance = float.IsNaN(t.AdaptedLog2Luminance)
+                    ? measured
+                    : t.AdaptedLog2Luminance + (measured - t.AdaptedLog2Luminance) * (1f - MathF.Exp(-dt * ExposureAdaptationSpeed));
+            }
+        }
+
+        if (float.IsNaN(t.AdaptedLog2Luminance))
+            return Units.ExposureFromEv100(cameraEv);
+        float ev = Units.Ev100FromLuminance(MathF.Pow(2f, t.AdaptedLog2Luminance)) - compensation;
+        return Units.ExposureFromEv100(ev);
+    }
+
+    private void BuildFrameData(VulkanRenderTarget target, RenderCamera camera, ViewOptions view, in Decisions dec, float exposure, ref GpuFrameData d,
+        out Frustum frustum)
+    {
+        int rw = dec.Requirements.RenderWidth, rh = dec.Requirements.RenderHeight;
         float aspect = target.Width / (float)target.Height;
         bool ortho = camera.Projection == ProjectionKind.Orthographic;
         float near = float.IsFinite(camera.Near) && camera.Near > 1e-4f ? camera.Near : 1e-4f;
@@ -450,10 +815,10 @@ public sealed unsafe class VulkanRenderer : IRenderer
         }
 
         Matrix4x4 projection;
+        float orthoHeight = float.IsFinite(camera.OrthoHeight) && camera.OrthoHeight > 1e-4f ? camera.OrthoHeight : 10f;
         if (ortho)
         {
-            float height = float.IsFinite(camera.OrthoHeight) && camera.OrthoHeight > 1e-4f ? camera.OrthoHeight : 10f;
-            projection = ReverseZ.Orthographic(height, aspect, near, far);
+            projection = ReverseZ.Orthographic(orthoHeight, aspect, near, far);
         }
         else
         {
@@ -478,13 +843,12 @@ public sealed unsafe class VulkanRenderer : IRenderer
         var flatRight = Vector3.Cross(flatForward, Vector3.UnitZ);
         var keyLight = Vector3.Normalize(Vector3.UnitZ - 0.6f * flatForward - 0.35f * flatRight);
 
-        bool full = shading == ViewShading.Full;
-        float ev = (float.IsFinite(camera.Ev100) ? camera.Ev100 : 6f) + (float.IsFinite(settings.ExposureCompensation) ? settings.ExposureCompensation : 0f);
-        float exposure = full ? Units.ExposureFromEv100(ev) : 1f;
+        bool full = dec.Shading == ViewShading.Full;
         float background = float.IsFinite(view.BackgroundLuminance) ? MathF.Max(view.BackgroundLuminance, 0f) : 0f;
         float spacing = float.IsFinite(view.GridSpacing) && view.GridSpacing > 1e-4f ? view.GridSpacing : 1f;
         float logRange = MathF.Log(far / near);
 
+        d = default;
         d.View = viewMatrix;
         d.Projection = projection;
         d.ViewProjection = viewProjection;
@@ -493,7 +857,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.InverseViewProjection = inverseViewProjection;
         d.CameraPosition = new Vector4(eye, ortho ? 1f : 0f);
         d.CameraForward = new Vector4(forward, 0f);
-        d.RenderSize = new Vector4(target.Width, target.Height, 1f / target.Width, 1f / target.Height);
+        d.RenderSize = new Vector4(rw, rh, 1f / rw, 1f / rh);
+        d.DisplaySize = new Vector4(target.Width, target.Height, 1f / target.Width, 1f / target.Height);
         d.Background = full ? new Vector4(background * exposure, background * exposure, background * exposure, 1f) : NonFullBackground;
         d.GridColorMinor = new Vector4(0.55f, 0.55f, 0.55f, 0.28f);
         d.GridColorMajor = new Vector4(0.72f, 0.72f, 0.72f, 0.5f);
@@ -507,8 +872,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.ClusterCountX = ShaderConstants.ClusterCountX;
         d.ClusterCountY = ShaderConstants.ClusterCountY;
         d.ClusterCountZ = ShaderConstants.ClusterCountZ;
-        d.LightCount = full ? (uint)_world.LightCount : 0u;
-        d.ViewMode = shading switch
+        d.LightCount = dec.Lights ? (uint)_world.LightCount : 0u;
+        d.ViewMode = dec.Shading switch
         {
             ViewShading.Colorless => ShaderConstants.ViewColorless,
             ViewShading.Wireframe => ShaderConstants.ViewWireframe,
@@ -521,6 +886,205 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.RangeEpsilon = ShaderConstants.LightRangeEpsilon;
         d.ClusterIndexCapacity = target.ClusterIndexCapacity;
         d.Headlight = new Vector4(keyLight, 0f);
+        d.PixelFootprint = new Vector4(2f / (MathF.Abs(projection.M22) * rh), orthoHeight / rh, 0f, 0f);
+        d.RenderScale = dec.Scale;
+
+        // Light range: the display threshold of the Full view; for the lux overlay far enough that the range window
+        // is 1 wherever the illuminance is within 10⁻⁴ of the gradient's lower limit.
+        float scale = full ? exposure / (MathF.PI * ShaderConstants.LightRangeEpsilon) : 0f;
+        if (dec.Overlay == OverlayMode.Lux)
+        {
+            float rangeMin = float.IsFinite(view.LuxGradient.RangeMin) ? view.LuxGradient.RangeMin : 0f;
+            float minimumLux = MathF.Max(1e-4f * MathF.Max(rangeMin, 1e-2f), 1e-6f);
+            scale = MathF.Max(scale, 1f / minimumLux);
+        }
+
+        d.LightRangeScale = scale;
+        var gradient = dec.Overlay == OverlayMode.Noise ? view.NoiseGradient : view.LuxGradient;
+        d.OverlayMode = dec.Overlay switch
+        {
+            OverlayMode.Lux => ShaderConstants.OverlayLux,
+            OverlayMode.Noise => ShaderConstants.OverlayNoise,
+            OverlayMode.Cables => ShaderConstants.OverlayCables,
+            _ => ShaderConstants.OverlayNone,
+        };
+        d.OverlayRange = new Vector4(Finite(gradient.RangeMin, 0f), Finite(gradient.RangeMax, 1f), gradient.Logarithmic ? 1f : 0f, NoiseFogStrength);
+        d.OverlayOutOfRange = RenderMath.Sanitize(gradient.OutOfRangeColor);
+        d.SelectionColor = RenderMath.Sanitize(view.SelectionColor);
+    }
+
+    /// <summary>Volumetric, media and feature constants (after the light plan and the per-view resources).</summary>
+    private void FinishFrameData(VulkanRenderTarget t, PreviewSettings settings, ref Decisions dec, ref GpuFrameData d)
+    {
+        uint features = 0;
+        if (dec.Shadows)
+            features |= ShaderConstants.FeatureShadows;
+        if (dec.Volumetrics)
+            features |= ShaderConstants.FeatureVolumetrics;
+        if (dec.Indirect == IndirectLighting.ReflectiveShadowMaps)
+            features |= ShaderConstants.FeatureIndirectRsm;
+        if (dec.Indirect == IndirectLighting.RayTraced)
+            features |= ShaderConstants.FeatureIndirectRayTraced;
+        if (dec.Haze && dec.Shading == ViewShading.Full)
+            features |= ShaderConstants.FeatureHaze;
+        if (dec.Smoke && dec.Shading == ViewShading.Full)
+            features |= ShaderConstants.FeatureSmoke;
+        if (dec.Flame && dec.Shading == ViewShading.Full && settings.Volumetrics)
+            features |= ShaderConstants.FeatureFlame;
+        if (dec.NoiseField)
+            features |= ShaderConstants.FeatureNoiseField;
+        if (dec.Bloom)
+            features |= ShaderConstants.FeatureBloom;
+        if (dec.Scaled)
+            features |= ShaderConstants.FeatureScaled;
+        if (dec.Volumetrics && settings.TemporalAccumulation)
+            features |= ShaderConstants.FeatureTemporal;
+        if (dec.Overlay == OverlayMode.Noise)
+            features |= ShaderConstants.FeatureNoiseFog;
+        if (dec.VolumeLights)
+            features |= ShaderConstants.FeatureVolumeLights;
+        d.Features = features;
+
+        var atmosphere = _world.Atmosphere;
+        var gpu = _world.AtmosphereGpu;
+        float g = atmosphere is not null && float.IsFinite(atmosphere.Anisotropy) ? Math.Clamp(atmosphere.Anisotropy, -0.95f, 0.95f) : 0f;
+        d.Media = new Vector4(dec.Haze ? atmosphere!.BaseScattering : 0f, g, dec.Smoke ? atmosphere!.SmokeScatteringAtFullDensity : 0f, FlameAbsorption);
+        d.SmokeMin = new Vector4(gpu.Smoke.BoxMin, gpu.Smoke.Present ? 1f : 0f);
+        d.SmokeMax = new Vector4(gpu.Smoke.BoxMax, 0f);
+        d.FlameMin = new Vector4(gpu.Flame.BoxMin, gpu.Flame.Present ? 1f : 0f);
+        d.FlameMax = new Vector4(gpu.Flame.BoxMax, 0f);
+        d.NoiseMin = new Vector4(gpu.Noise.BoxMin, gpu.Noise.Present ? 1f : 0f);
+        d.NoiseMax = new Vector4(gpu.Noise.BoxMax, 0f);
+        d.FlameLut = new Vector4(AtmosphereResources.FlameLutMinKelvin, 1f / AtmosphereResources.FlameLutStep, AtmosphereResources.FlameLutEntries,
+            AtmosphereResources.FlameLutMaxKelvin);
+        d.NoiseSourceCount = (uint)gpu.NoiseSources.Count;
+        d.RaymarchCount = (uint)_planner.RaymarchCount;
+        d.VplCount = (uint)_planner.VplCount;
+        d.ShadowTileCount = (uint)(_atlas?.TileCount ?? 0);
+        d.FrameIndex = t.FrameIndex;
+        d.BloomIntensity = dec.Bloom ? Math.Clamp(settings.BloomIntensity, 0f, 1f) : 0f;
+        d.IndirectIntensity = 1f;
+        d.PreviousViewProjection = t.HasPreviousFrame ? t.PreviousViewProjection : d.ViewProjection;
+
+        if (dec.Volumetrics)
+        {
+            var r = dec.Requirements;
+            ComputeVolumeRange(d, out float near, out float far);
+            d.VolumeGrid = new Vector4(r.VolumeX, r.VolumeY, r.VolumeZ, 1f / r.VolumeZ);
+            float logRange = MathF.Log(far / near);
+            d.VolumeDepth = new Vector4(near, far, r.VolumeZ / logRange, MathF.Log(near));
+            int i = (int)(t.FrameIndex % 64) + 1;
+            bool temporal = settings.TemporalAccumulation;
+            var key = new Vector4(r.VolumeX * 4096f + r.VolumeY, r.VolumeZ, near, far);
+            bool orthoMoved = (d.Flags & ShaderConstants.FrameOrthographic) != 0 && t.PreviousViewProjection != d.ViewProjection;
+            bool history = temporal && t.VolumeHistoryValid && t.HasPreviousFrame && key == t.VolumeHistoryKey && !orthoMoved;
+            d.VolumeJitter = temporal
+                ? new Vector4(RenderMath.Halton(i, 2) - 0.5f, RenderMath.Halton(i, 3) - 0.5f, RenderMath.Halton(i, 5) - 0.5f,
+                    t.VolumeHistoryExposure > 0f ? d.Exposure / t.VolumeHistoryExposure : 1f)
+                : new Vector4(0f, 0f, 0f, 1f);
+            d.VolumeHistoryWeight = history ? VolumeHistoryWeight : 0f;
+            dec.VolumeKey = key;
+        }
+    }
+
+    /// <summary>
+    /// Depth range of the froxel volume: from max(camera near, 5 cm) to the far side of the scene (instances and
+    /// lights, each light with up to 30 m of beam), quantised to steps of 25 % so it stays stable while things move,
+    /// limited to 16 × near … min(camera far, 500 m).
+    /// </summary>
+    private void ComputeVolumeRange(in GpuFrameData d, out float near, out float far)
+    {
+        var eye = new Vector3(d.CameraPosition.X, d.CameraPosition.Y, d.CameraPosition.Z);
+        var forward = new Vector3(d.CameraForward.X, d.CameraForward.Y, d.CameraForward.Z);
+        near = MathF.Max(d.NearPlane, 0.05f);
+        float maxDepth = 0f;
+        foreach (int index in _world.LiveInstances)
+        {
+            var s = _world.InstanceAt(index).WorldSphere;
+            if (!float.IsFinite(s.W))
+                continue;
+            float depth = Vector3.Dot(new Vector3(s.X, s.Y, s.Z) - eye, forward) + s.W;
+            maxDepth = MathF.Max(maxDepth, depth);
+        }
+
+        foreach (ref readonly var light in _world.Lights)
+        {
+            float reach = MathF.Min(MathF.Sqrt(light.MaxIntensity * MathF.Max(d.LightRangeScale, 0f)), 30f);
+            float depth = Vector3.Dot(light.Position - eye, forward) + reach;
+            maxDepth = MathF.Max(maxDepth, depth);
+        }
+
+        if (maxDepth <= 0f)
+            maxDepth = 100f;
+        float limit = MathF.Min(d.FarPlane, 500f);
+        float lo = near * 16f;
+        float quantised = lo * MathF.Pow(1.25f, MathF.Ceiling(MathF.Log(MathF.Max(maxDepth, lo) / lo) / MathF.Log(1.25f)));
+        far = Math.Clamp(quantised, lo, MathF.Max(limit, lo * 1.01f));
+    }
+
+    private static float Finite(float value, float fallback) => float.IsFinite(value) ? value : fallback;
+
+    /// <summary>Re-bakes the overlay gradient table of the target when the gradient changed (allocation only then).</summary>
+    private void UpdateGradient(VulkanRenderTarget t, in Decisions d, BarrierBatch barriers)
+    {
+        var lut = t.GradientLut;
+        if (lut is null)
+            return;
+        var gradient = d.Overlay == OverlayMode.Noise ? _pass.View.NoiseGradient : _pass.View.LuxGradient;
+        var hash = new HashCode();
+        hash.Add(gradient.RangeMin);
+        hash.Add(gradient.RangeMax);
+        hash.Add(gradient.Logarithmic);
+        hash.Add(gradient.OutOfRangeColor);
+        foreach (var stop in gradient.Stops)
+        {
+            hash.Add(stop.Value);
+            hash.Add(stop.Color);
+        }
+
+        int value = hash.ToHashCode() | 1;
+        if (value == t.GradientHash)
+            return;
+        t.GradientHash = value;
+        int kind = d.Overlay == OverlayMode.Noise ? 1 : 0;
+        var colors = t.GradientBakes[kind];
+        if (colors is null || colors.Length != lut.Width || t.GradientBakeHashes[kind] != value)
+        {
+            colors = gradient.Bake((int)lut.Width);
+            t.GradientBakes[kind] = colors;
+            t.GradientBakeHashes[kind] = value;
+        }
+
+        ulong bytes = lut.Width * 8ul;
+        var region = Context.Upload.Allocate(bytes, 16);
+        var dst = new Span<Half>(region.Pointer, (int)lut.Width * 4);
+        for (int i = 0; i < colors.Length; i++)
+        {
+            var c = RenderMath.Sanitize(colors[i]);
+            dst[4 * i] = (Half)c.X;
+            dst[4 * i + 1] = (Half)c.Y;
+            dst[4 * i + 2] = (Half)c.Z;
+            dst[4 * i + 3] = (Half)c.W;
+        }
+
+        barriers.Use(lut, ImageUse.TransferDestination, discard: true);
+        barriers.Flush();
+        var copy = new BufferImageCopy
+        {
+            BufferOffset = region.Offset,
+            ImageSubresource = new ImageSubresourceLayers(ImageAspectFlags.ColorBit, 0, 0, 1),
+            ImageExtent = new Extent3D(lut.Width, 1, 1),
+        };
+        Context.Vk.CmdCopyBufferToImage(barriers.CommandBuffer, region.Buffer, lut.Handle, ImageLayout.TransferDstOptimal, 1, &copy);
+    }
+
+    private VulkanRenderTarget Validate(IRenderTarget target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (target is not VulkanRenderTarget t || !ReferenceEquals(t.Owner, this))
+            throw new ArgumentException("The target was not created by this renderer.", nameof(target));
+        ObjectDisposedException.ThrowIf(t.IsDisposed, t);
+        return t;
     }
 
     private void CopyToBuffer(CommandBuffer cmd, GpuImage image, ImageAspectFlags aspect, int x, int y, uint width, uint height, GpuBuffer buffer,
@@ -548,25 +1112,6 @@ public sealed unsafe class VulkanRenderer : IRenderer
         return _readback;
     }
 
-    private Sampler CreateSampler(Filter filter, string name)
-    {
-        var info = new SamplerCreateInfo
-        {
-            SType = StructureType.SamplerCreateInfo,
-            MagFilter = filter,
-            MinFilter = filter,
-            MipmapMode = SamplerMipmapMode.Nearest,
-            AddressModeU = SamplerAddressMode.ClampToEdge,
-            AddressModeV = SamplerAddressMode.ClampToEdge,
-            AddressModeW = SamplerAddressMode.ClampToEdge,
-            MaxLod = 0f,
-        };
-        Sampler sampler;
-        VkUtil.Check(Context.Vk.CreateSampler(Context.Device, &info, null, &sampler), "vkCreateSampler");
-        Context.SetDebugName(ObjectType.Sampler, sampler.Handle, name);
-        return sampler;
-    }
-
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
     private void DisposeCore()
@@ -583,15 +1128,16 @@ public sealed unsafe class VulkanRenderer : IRenderer
         _targets.Clear();
         _passes.Dispose();
         Pipelines?.Dispose();
+        _rayTracing?.Dispose();
+        _rayTracing = null;
+        _atlas?.Dispose();
+        _atlas = null;
         _world?.Dispose();
+        _shared?.Dispose();
         _readback?.Dispose();
         _readback = null;
         if (!Context.IsDisposed)
         {
-            if (DisplaySampler.Handle != 0)
-                Context.Vk.DestroySampler(Context.Device, DisplaySampler, null);
-            if (HdrSampler.Handle != 0)
-                Context.Vk.DestroySampler(Context.Device, HdrSampler, null);
             Context.DrainDeferred();
             Context.PipelineCacheStore.Save();
         }

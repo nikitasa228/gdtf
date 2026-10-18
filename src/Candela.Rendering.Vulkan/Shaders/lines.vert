@@ -67,7 +67,11 @@ void main()
     else if (f1 < 0.0)
         c1 = mix(c1, c0, f1 / (f1 - f0));
 
-    vec2 halfSize = 0.5 * frame.renderSize.xy;
+#ifdef MESH_EDGES
+    vec2 halfSize = 0.5 * frame.renderSize.xy;  // wireframe edges: scene image (internal resolution)
+#else
+    vec2 halfSize = 0.5 * frame.displaySize.xy; // overlay lines: display image
+#endif
     vec2 s0 = c0.xy / c0.w * halfSize;
     vec2 s1 = c1.xy / c1.w * halfSize;
     vec2 dir = s1 - s0;

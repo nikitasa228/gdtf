@@ -38,16 +38,17 @@ public sealed class ManyLightsTests
                     var color = LightColor.FromRec709(new Vector3(0.1f + random.NextSingle(), 0.1f + random.NextSingle(), 0.1f + random.NextSingle()));
                     float beam = 12f + 12f * random.NextSingle();
                     lights[i] = ProceduralTestScene.Spot(position, aim, color, 2000f + 6000f * random.NextSingle(), beam, beam * 1.5f);
-                    profiles[i] = BeamDistribution.Create(LightPacker.DefaultBeamType, lights[i].BeamAngle, lights[i].FieldAngle);
+                    profiles[i] = BeamDistribution.Create(lights[i].BeamType, lights[i].BeamAngle, lights[i].FieldAngle);
                 }
             }
 
-            world.SetLights(lights);
             var view = new TopDownView(Width, Height, 14f, ev100: 10.5f);
             using var target = renderer.CreateTarget(Width, Height);
             var options = new ViewOptions { Shading = ViewShading.Full, ShowGrid = false, BackgroundLuminance = 0f };
-            for (int frame = 0; frame < 3; frame++)
-                renderer.Render(target, view.Camera, options, new PreviewSettings(), 1f / 60f);
+            renderer.Render(target, view.Camera, options, new PreviewSettings(), 1f / 60f); // a frame with no lights
+            world.SetLights(lights);
+            // The first frame with 1000 lights already has room for every cluster's list (checked below).
+            renderer.Render(target, view.Camera, options, new PreviewSettings(), 1f / 60f);
             Assert.Equal(1000, renderer.LastStatistics.Lights);
             var hdr = renderer.ReadHdr(target);
             ImageFiles.WritePng(renderer.ReadPixels(target), Path.Combine(TestRenderers.OutputDirectory, "many-lights.png"));

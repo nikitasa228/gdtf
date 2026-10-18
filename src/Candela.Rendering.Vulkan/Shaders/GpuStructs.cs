@@ -54,7 +54,7 @@ internal struct GpuInstance
     public Vector4 BoundingSphere;
 }
 
-/// <summary>A spot light (96 bytes), see <c>Light</c> in common.glsl and <see cref="LightPacker"/>.</summary>
+/// <summary>A spot light (224 bytes), see <c>Light</c> in common.glsl and <see cref="LightPacker"/>.</summary>
 [StructLayout(LayoutKind.Sequential)]
 internal struct GpuLight
 {
@@ -74,9 +74,88 @@ internal struct GpuLight
     public uint Flags;
     public Vector3 Up;
     public float SourceRadius;
+    public Vector3 Right;
+    public float GateScale;
+    public uint GoboTexture;
+    public float GoboBlur;
+    public float EdgeSoftness;
+    public uint PrismFacets;
+    public Vector2 GoboRotation;
+    public float PrismCosSpread;
+    public float PrismSinSpread;
+    public float PrismRotation;
+    public float BoundingAngle;
+    public float SolidAngle;
+    public float Pad0;
+    public Vector4 BladeA;
+    public Vector4 BladeB;
+    public Vector4 BladeC;
+    public Vector4 BladeD;
 }
 
-/// <summary>Per-view constants (uniform buffer, 592 bytes), see <c>FrameData</c> in common.glsl.</summary>
+/// <summary>Per-view data of a light (16 bytes), see <c>LightView</c> in common.glsl.</summary>
+[StructLayout(LayoutKind.Sequential)]
+internal struct GpuLightView
+{
+    /// <summary>Shadow atlas tile, or <see cref="ShaderConstants.NoShadow"/>.</summary>
+    public uint ShadowSlot;
+
+    /// <summary>LIGHT_VIEW_* bits.</summary>
+    public uint Flags;
+
+    /// <summary>First virtual point light of the light (reflective shadow maps).</summary>
+    public uint VplOffset;
+
+    /// <summary>Number of virtual point lights.</summary>
+    public uint VplCount;
+}
+
+/// <summary>A tile of the shadow atlas (192 bytes), see <c>ShadowSlot</c> in common.glsl.</summary>
+[StructLayout(LayoutKind.Sequential)]
+internal struct GpuShadowSlot
+{
+    /// <summary>World → light clip space (reverse-Z perspective with an infinite far plane).</summary>
+    public Matrix4x4 ViewProjection;
+
+    /// <summary>Light clip space → world.</summary>
+    public Matrix4x4 InverseViewProjection;
+
+    /// <summary>Atlas UV of the tile: offset (xy) and size (zw).</summary>
+    public Vector4 AtlasRect;
+
+    public Vector3 Position;
+    public float Near;
+    public Vector3 Axis;
+    public float TanHalfAngle;
+
+    /// <summary>World size of one shadow texel per metre of depth along the axis (2·tan(half angle)/resolution).</summary>
+    public float TexelScale;
+
+    public float Resolution;
+
+    /// <summary>1 / atlas size (UV of one atlas texel).</summary>
+    public float AtlasTexel;
+
+    /// <summary>Bit 0: the tile holds reflective-shadow-map data.</summary>
+    public uint Flags;
+}
+
+/// <summary>A virtual point light of the reflective shadow maps (48 bytes), see <c>Vpl</c> in common.glsl.</summary>
+[StructLayout(LayoutKind.Sequential)]
+internal struct GpuVpl
+{
+    public Vector3 Position;
+    public float Pad0;
+    public Vector3 Normal;
+    public float Pad1;
+
+    /// <summary>Reflected flux of the surface element (linear Rec.2020, lm): the VPL radiates Φ/π·cos θ cd.</summary>
+    public Vector3 Flux;
+
+    public float Pad2;
+}
+
+/// <summary>Per-view constants (uniform buffer, 960 bytes), see <c>FrameData</c> in common.glsl.</summary>
 [StructLayout(LayoutKind.Sequential)]
 internal struct GpuFrameData
 {
@@ -111,6 +190,35 @@ internal struct GpuFrameData
     public float RangeEpsilon;
     public uint ClusterIndexCapacity;
     public Vector4 Headlight;
+    public Matrix4x4 PreviousViewProjection;
+    public Vector4 DisplaySize;
+    public Vector4 VolumeGrid;
+    public Vector4 VolumeDepth;
+    public Vector4 VolumeJitter;
+    public Vector4 Media;
+    public Vector4 SmokeMin;
+    public Vector4 SmokeMax;
+    public Vector4 FlameMin;
+    public Vector4 FlameMax;
+    public Vector4 NoiseMin;
+    public Vector4 NoiseMax;
+    public Vector4 FlameLut;
+    public Vector4 OverlayRange;
+    public Vector4 OverlayOutOfRange;
+    public Vector4 SelectionColor;
+    public Vector4 PixelFootprint;
+    public float LightRangeScale;
+    public uint RaymarchCount;
+    public uint Features;
+    public uint OverlayMode;
+    public uint VplCount;
+    public uint FrameIndex;
+    public uint NoiseSourceCount;
+    public float BloomIntensity;
+    public float IndirectIntensity;
+    public float RenderScale;
+    public uint ShadowTileCount;
+    public float VolumeHistoryWeight;
 }
 
 /// <summary>Push constants of every draw (32 bytes), see <c>DrawConstants</c> in common.glsl.</summary>
@@ -132,4 +240,18 @@ internal struct GpuClusterCounter
     public uint IndexRequired;
     public uint OverflowedClusters;
     public uint Pad;
+}
+
+/// <summary>Auto-exposure result written by the GPU (16 bytes), see <c>ExposureResult</c> in exposure.comp.</summary>
+[StructLayout(LayoutKind.Sequential)]
+internal struct GpuExposureResult
+{
+    /// <summary>Average log2 luminance (cd/m²) of the frame (percentile-trimmed histogram mean).</summary>
+    public float AverageLog2Luminance;
+
+    /// <summary>Pixels counted.</summary>
+    public uint Count;
+
+    public uint Pad0;
+    public uint Pad1;
 }
