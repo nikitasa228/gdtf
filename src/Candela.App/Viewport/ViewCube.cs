@@ -29,6 +29,19 @@ internal readonly record struct ViewCubeFace(ViewDirection View, Vector2 C0, Vec
 }
 
 /// <summary>
+/// One of the four arrows around the view cube: it points from the cube's centre towards a screen edge and snaps to the
+/// face lying in that direction (from the Front view the up arrow leads to Top, the right arrow to Right). The arrows
+/// make every orthographic view reachable from the corner even when the camera looks straight at one face, where the
+/// cube shows only that face.
+/// </summary>
+/// <param name="View">The axis view a click snaps to.</param>
+/// <param name="Tip">Arrow tip in screen pixels (outer point).</param>
+/// <param name="Left">First base corner.</param>
+/// <param name="Right">Second base corner.</param>
+/// <param name="Center">Centre of the arrow (hit testing).</param>
+internal readonly record struct ViewCubeArrow(ViewDirection View, Vector2 Tip, Vector2 Left, Vector2 Right, Vector2 Center);
+
+/// <summary>
 /// The corner view cube of a viewport (requirement: "in the corner choose which view to fix — orthographic top / right /
 /// front"): the unit cube turned like the scene, drawn orthographically, with one labelled face per axis view. Clicking a
 /// visible face snaps the camera to that view. Face normals: Top +Z, Bottom −Z, Front −Y (the audience side), Back +Y,
@@ -94,6 +107,68 @@ internal static class ViewCube
         }
 
         faces[..FaceCount].Sort(static (a, b) => b.Depth.CompareTo(a.Depth));
+    }
+
+    /// <summary>Number of neighbour arrows (up, right, down, left).</summary>
+    public const int ArrowCount = 4;
+
+    /// <summary>
+    /// The four neighbour arrows of a cube drawn at <paramref name="center"/> inside a disc of <paramref name="radius"/>
+    /// pixels: each points up, right, down or left on screen (an isosceles triangle of <paramref name="arrowSize"/>
+    /// pixels whose tip touches the disc's edge) and snaps to the face whose outward normal is closest to that screen
+    /// direction in the world (screen right <paramref name="right"/>, screen up <paramref name="up"/>).
+    /// </summary>
+    public static void Arrows(Vector3 right, Vector3 up, Vector2 center, float radius, float arrowSize, Span<ViewCubeArrow> arrows)
+    {
+        if (arrows.Length < ArrowCount)
+            throw new ArgumentException("Four arrows are needed.", nameof(arrows));
+        // Screen directions (y down) and the matching world directions.
+        ReadOnlySpan<Vector2> screen = stackalloc Vector2[] { new(0, -1), new(1, 0), new(0, 1), new(-1, 0) };
+        for (int i = 0; i < ArrowCount; i++)
+        {
+            var d = screen[i];
+            var world = right * d.X - up * d.Y;
+            var tip = center + d * radius;
+            var baseCentre = center + d * (radius - arrowSize);
+            var side = new Vector2(-d.Y, d.X) * (arrowSize * 0.75f);
+            arrows[i] = new ViewCubeArrow(NeighbourOf(world), tip, baseCentre + side, baseCentre - side, center + d * (radius - arrowSize * 0.5f));
+        }
+    }
+
+    /// <summary>The axis view whose face normal points most along <paramref name="direction"/> (world space).</summary>
+    public static ViewDirection NeighbourOf(Vector3 direction)
+    {
+        var best = ViewDirection.Top;
+        float bestDot = float.NegativeInfinity;
+        foreach (var view in AllViews)
+        {
+            float dot = Vector3.Dot(NormalOf(view), direction);
+            if (dot > bestDot + 1e-5f)
+            {
+                bestDot = dot;
+                best = view;
+            }
+        }
+
+        return best;
+    }
+
+    /// <summary>The arrow within <paramref name="hitRadius"/> pixels of <paramref name="point"/>, or -1.</summary>
+    public static int HitTestArrow(ReadOnlySpan<ViewCubeArrow> arrows, Vector2 point, float hitRadius)
+    {
+        int found = -1;
+        float best = hitRadius * hitRadius;
+        for (int i = 0; i < arrows.Length; i++)
+        {
+            float d = Vector2.DistanceSquared(arrows[i].Center, point);
+            if (d <= best)
+            {
+                best = d;
+                found = i;
+            }
+        }
+
+        return found;
     }
 
     /// <summary>The view of the front-most visible face under <paramref name="point"/>, or null.</summary>

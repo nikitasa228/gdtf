@@ -39,17 +39,17 @@ public sealed class UxReviewTests
         var viewportSize = new Vector2(1600, 900);
 
         // A button at the right end of a tab bar (the right panel group): the menu's right edge is the button's.
-        var (pos, pivot) = DockWorkspace.MenuPlacement(new Vector2(1640, 60), new Vector2(1660, 80), viewportPos, viewportSize);
+        var (pos, pivot) = PopupPlacement.ForButton(new Vector2(1640, 60), new Vector2(1660, 80), viewportPos, viewportSize);
         Assert.Equal(new Vector2(1660, 80), pos);
         Assert.Equal(new Vector2(1, 0), pivot);
 
         // A button on the left: the menu starts at the button.
-        (pos, pivot) = DockWorkspace.MenuPlacement(new Vector2(400, 60), new Vector2(420, 80), viewportPos, viewportSize);
+        (pos, pivot) = PopupPlacement.ForButton(new Vector2(400, 60), new Vector2(420, 80), viewportPos, viewportSize);
         Assert.Equal(new Vector2(400, 80), pos);
         Assert.Equal(Vector2.Zero, pivot);
 
         // The icon-column button at the bottom of a group: the menu opens upwards.
-        (pos, pivot) = DockWorkspace.MenuPlacement(new Vector2(1500, 900), new Vector2(1540, 940), viewportPos, viewportSize);
+        (pos, pivot) = PopupPlacement.ForButton(new Vector2(1500, 900), new Vector2(1540, 940), viewportPos, viewportSize);
         Assert.Equal(new Vector2(1540, 900), pos);
         Assert.Equal(new Vector2(1, 1), pivot);
     }
