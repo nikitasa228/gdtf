@@ -42,9 +42,36 @@ public sealed class CliTests
     [Fact]
     public void Render_options_parse_every_documented_form()
     {
-        var o = RenderOptions.Parse(["show.candela", "--out", "x.png", "--width", "640", "--height", "360", "--camera", "1,-10,4", "--target", "0,0,1",
-            "--mode", "colorless", "--overlay", "lux", "--haze", "0.05", "--look", "dmx-file", "take.cdmx", "--time", "2.5", "--ev", "8",
-            "--frames", "3", "--floor", "none", "--fov", "40"]);
+        var o = RenderOptions.Parse(["show.candela",
+            "--out",
+            "x.png",
+            "--width",
+            "640",
+            "--height",
+            "360",
+            "--camera",
+            "1,-10,4",
+            "--target",
+            "0,0,1",
+            "--mode",
+            "colorless",
+            "--overlay",
+            "lux",
+            "--haze",
+            "0.05",
+            "--look",
+            "dmx-file",
+            "take.cdmx",
+            "--time",
+            "2.5",
+            "--ev",
+            "8",
+            "--frames",
+            "3",
+            "--floor",
+            "none",
+            "--fov",
+            "40"]);
         Assert.Equal("show.candela", o.Scene);
         Assert.Equal(640, o.Width);
         Assert.Equal(new System.Numerics.Vector3(1, -10, 4), o.Camera);
@@ -107,7 +134,7 @@ public sealed class CliTests
     }
 
     [Fact]
-    public void Artnet_test_sends_dmx_frames_to_the_target()
+    public async Task Artnet_test_sends_dmx_frames_to_the_target()
     {
         using var listener = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
         int port = ((IPEndPoint)listener.Client.LocalEndPoint!).Port;
@@ -135,7 +162,8 @@ public sealed class CliTests
         var result = Run("artnet-test", "--to", $"127.0.0.1:{port}", "--universes", "1-2", "--seconds", "0.5", "--fps", "40");
         Assert.Equal(Program.ExitOk, result.Code);
         Assert.Contains("Sent", result.Output, StringComparison.Ordinal);
-        Assert.True(received.Result >= 5, $"only {received.Result} ArtDmx packets arrived");
+        int packets = await received;
+        Assert.True(packets >= 5, $"only {packets} ArtDmx packets arrived");
     }
 
     [Fact]
