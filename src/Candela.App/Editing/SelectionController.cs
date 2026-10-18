@@ -30,6 +30,46 @@ internal static class SelectionController
     }
 
     /// <summary>
+    /// Whether an entity may be moved or rotated: not locked itself and not on a locked layer (a locked entity can still
+    /// be selected from the issues panel, but the gizmo and the transform fields leave it alone).
+    /// </summary>
+    public static bool IsEditable(SceneModel scene, Entity entity)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(entity);
+        if (entity.Locked)
+            return false;
+        var layer = SceneLookup.LayerOf(scene, entity.LayerId);
+        return layer is null || !layer.Locked;
+    }
+
+    /// <summary>
+    /// The entities a transform of the selection moves, in selection order: every selected editable entity that is still
+    /// in the scene and has no editable selected ancestor (that ancestor already carries it along). A child selected
+    /// together with its parent is therefore moved once, not twice; a selected child of a locked parent moves alone.
+    /// </summary>
+    public static List<Entity> MovableRoots(SceneModel scene, Selection selection)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(selection);
+        var candidates = new List<Entity>();
+        foreach (var id in selection.Ids)
+            if (scene.Find(id) is { } e && IsEditable(scene, e))
+                candidates.Add(e);
+        var result = new List<Entity>(candidates.Count);
+        foreach (var e in candidates)
+        {
+            bool carried = false;
+            for (var p = e.Parent; p is not null && !carried; p = p.Parent)
+                carried = selection.Contains(p.Id) && IsEditable(scene, p);
+            if (!carried)
+                result.Add(e);
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Applies a click on <paramref name="hit"/> (null = background). Without Shift the selection becomes the hit (or
     /// empty); with Shift the hit is toggled and a background click keeps the selection.
     /// </summary>

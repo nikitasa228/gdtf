@@ -98,6 +98,34 @@ internal sealed unsafe class MainWindow : IDisposable
             GLFW.SetWindowShouldClose(_window, close ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
     }
 
+    /// <summary>Resizes the client area (screen coordinates; the size limits of the window apply).</summary>
+    public void SetSize(int width, int height)
+    {
+        if (!IsDisposed && width > 0 && height > 0)
+            GLFW.SetWindowSize(_window, width, height);
+    }
+
+    /// <summary>Minimises the window to the task bar.</summary>
+    public void Minimize()
+    {
+        if (!IsDisposed)
+            GLFW.IconifyWindow(_window);
+    }
+
+    /// <summary>Restores a minimised or maximised window.</summary>
+    public void Restore()
+    {
+        if (!IsDisposed)
+            GLFW.RestoreWindow(_window);
+    }
+
+    /// <summary>Maximises the window.</summary>
+    public void Maximize()
+    {
+        if (!IsDisposed)
+            GLFW.MaximizeWindow(_window);
+    }
+
     /// <summary>Sets the title bar text.</summary>
     public void SetTitle(string title)
     {

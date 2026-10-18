@@ -35,6 +35,9 @@ internal interface IScriptTarget
     /// <summary>Changes a setting by name.</summary>
     void SetSetting(string name, string value);
 
+    /// <summary>Resizes the main window (screen pixels) or sets its state ("minimize", "restore", "maximize").</summary>
+    void SetMainWindow(int width, int height, string state);
+
     /// <summary>The main window (for marking the cursor as inside it).</summary>
     Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr MainWindow { get; }
 }
@@ -167,6 +170,9 @@ internal sealed class ScriptPlayer
                 break;
             case ScriptActionType.Setting:
                 target.SetSetting(a.Text, a.Value);
+                break;
+            case ScriptActionType.Window:
+                target.SetMainWindow((int)a.Width, (int)a.Height, a.Value);
                 break;
         }
     }

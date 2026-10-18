@@ -723,6 +723,27 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         }
     }
 
+    /// <inheritdoc/>
+    public void SetMainWindow(int width, int height, string state)
+    {
+        var window = _ctx.Window;
+        switch (state.Trim().ToLowerInvariant())
+        {
+            case "minimize":
+                window.Minimize();
+                break;
+            case "restore":
+                window.Restore();
+                break;
+            case "maximize":
+                window.Maximize();
+                break;
+            default:
+                window.SetSize(width, height);
+                break;
+        }
+    }
+
     // ---- documentation folder -----------------------------------------------------------------------------------
 
     private void OpenDocsFolder()

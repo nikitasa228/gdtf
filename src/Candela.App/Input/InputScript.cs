@@ -62,6 +62,12 @@ internal enum ScriptActionType
 
     /// <summary>Change a setting ("uiScale", "language", "fontSize").</summary>
     Setting,
+
+    /// <summary>
+    /// Resize the main window to <c>width</c> × <c>height</c> screen pixels, or change its state with <c>value</c>
+    /// ("minimize", "restore", "maximize") — exercises swapchain recreation.
+    /// </summary>
+    Window,
 }
 
 /// <summary>One scripted action. Coordinates are pixels of the main window's client area (top-left origin).</summary>
@@ -251,6 +257,10 @@ internal sealed class InputScript
             _ = Candela.Core.Settings.KeyChord.Parse(a.Text);
         if (a.Type == ScriptActionType.Select && a.Names.Count == 0)
             throw new FormatException("'select' needs \"names\"");
+        if (a.Type == ScriptActionType.Window && a.Value.Length == 0 && (a.Width < 1 || a.Height < 1))
+            throw new FormatException("'window' needs \"width\" and \"height\" or a \"value\" (minimize, restore, maximize)");
+        if (a.Type == ScriptActionType.Window && a.Value.Length > 0 && a.Value.ToLowerInvariant() is not ("minimize" or "restore" or "maximize"))
+            throw new FormatException($"unknown window state '{a.Value}'");
     }
 
     private static int ParseButton(string? s) => s?.ToLowerInvariant() switch

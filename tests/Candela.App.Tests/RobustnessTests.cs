@@ -321,3 +321,125 @@ public sealed class FailureReportingTests : IDisposable
         Assert.EndsWith("app.previous.log", Candela.App.Diagnostics.AppLog.PreviousPathOf(path), StringComparison.Ordinal);
     }
 }
+
+/// <summary>The gizmo drag of a multi-selection around the primary pivot (the logic the viewport runs per drag frame).</summary>
+public sealed class GizmoDragTests
+{
+    private static void Near(Vector3 expected, Vector3 actual, float tolerance = 1e-4f) =>
+        Assert.True(Vector3.Distance(expected, actual) <= tolerance, $"expected {expected}, got {actual}");
+
+    private readonly Candela.Core.SceneGraph.Scene _scene = new("t");
+    private readonly Candela.Core.Editing.Selection _selection = new();
+    private readonly Candela.Core.Editing.UndoStack _undo = new();
+
+    private Candela.Core.SceneGraph.Entity Add(string name, Vector3 position, Candela.Core.SceneGraph.Entity? parent = null) =>
+        _scene.Add(new Candela.Core.SceneGraph.Entity(name) { Local = new Candela.Core.Math.Transform(position) }, parent);
+
+    /// <summary>Drags the gizmo of <paramref name="primary"/> in <paramref name="frames"/> steps to <paramref name="end"/>.</summary>
+    private void Drag(Candela.App.Editing.GizmoDrag drag, Candela.Core.SceneGraph.Entity primary, Matrix4x4 end, int frames = 10)
+    {
+        var start = primary.WorldMatrix;
+        drag.Begin(_scene, _selection, primary, _undo);
+        Assert.True(Matrix4x4.Decompose(start, out _, out var r0, out var t0));
+        Assert.True(Matrix4x4.Decompose(end, out var s1, out var r1, out var t1));
+        for (int f = 1; f <= frames; f++)
+        {
+            float k = f / (float)frames;
+            var m = Matrix4x4.CreateScale(s1) * Matrix4x4.CreateFromQuaternion(Quaternion.Slerp(r0, r1, k)) *
+                    Matrix4x4.CreateTranslation(Vector3.Lerp(t0, t1, k));
+            drag.Update(m, _undo, "Move");
+        }
+
+        drag.End(_undo);
+    }
+
+    [Fact]
+    public void A_child_selected_with_its_parent_moves_once()
+    {
+        var parent = Add("parent", new Vector3(1, 0, 0));
+        var child = Add("child", new Vector3(0, 2, 0), parent);
+        _selection.Set(new[] { parent.Id, child.Id }); // the child is the primary (last selected)
+        var drag = new Candela.App.Editing.GizmoDrag();
+        var end = child.WorldMatrix * Matrix4x4.CreateTranslation(3, 0, 0);
+        Drag(drag, child, end);
+
+        // The gizmo moved the child by +3 in X; the parent carries it, so both moved exactly +3 (not +6 for the child).
+        Near(new Vector3(4, 0, 0), parent.WorldPosition);
+        Near(new Vector3(4, 2, 0), child.WorldPosition);
+        Near(new Vector3(0, 2, 0), child.Local.Position); // still the same offset from its parent
+    }
+
+    [Fact]
+    public void A_selected_child_of_a_locked_parent_moves_alone()
+    {
+        var parent = Add("parent", new Vector3(1, 0, 0));
+        parent.Locked = true;
+        var child = Add("child", new Vector3(0, 2, 0), parent);
+        var other = Add("other", new Vector3(5, 5, 0));
+        _selection.Set(new[] { parent.Id, other.Id, child.Id });
+        var drag = new Candela.App.Editing.GizmoDrag();
+        Drag(drag, child, child.WorldMatrix * Matrix4x4.CreateTranslation(0, 0, 2));
+        Near(new Vector3(1, 0, 0), parent.WorldPosition);
+        Near(new Vector3(1, 2, 2), child.WorldPosition);
+        Near(new Vector3(5, 5, 2), other.WorldPosition);
+    }
+
+    [Fact]
+    public void Entities_on_locked_layers_stay_put()
+    {
+        var layer = new Candela.Core.SceneGraph.Layer { Name = "rig", Locked = true };
+        _scene.Layers.Add(layer);
+        var a = Add("a", Vector3.Zero);
+        var b = Add("b", new Vector3(2, 0, 0));
+        b.LayerId = layer.Id;
+        _selection.Set(new[] { b.Id, a.Id });
+        Assert.False(Candela.App.Editing.SelectionController.IsEditable(_scene, b));
+        Drag(new Candela.App.Editing.GizmoDrag(), a, Matrix4x4.CreateTranslation(0, 1, 0));
+        Near(new Vector3(0, 1, 0), a.WorldPosition);
+        Near(new Vector3(2, 0, 0), b.WorldPosition);
+    }
+
+    [Fact]
+    public void Rotation_turns_the_selection_around_the_primary_pivot_and_is_one_undo_step()
+    {
+        var pivot = Add("pivot", new Vector3(1, 1, 0));
+        var other = Add("other", new Vector3(3, 1, 0));
+        _selection.Set(new[] { other.Id, pivot.Id });
+        var end = Matrix4x4.CreateRotationZ(MathF.PI / 2) * Matrix4x4.CreateTranslation(1, 1, 0);
+        Drag(new Candela.App.Editing.GizmoDrag(), pivot, end, frames: 30);
+
+        Near(new Vector3(1, 1, 0), pivot.WorldPosition);
+        Near(new Vector3(1, 3, 0), other.WorldPosition); // (2, 0) from the pivot turned by 90° about Z
+        Near(Vector3.Transform(Vector3.UnitX, other.Local.Rotation), Vector3.UnitY);
+
+        Assert.Equal("Move", _undo.UndoDescription);
+        _undo.Undo();
+        Near(new Vector3(3, 1, 0), other.WorldPosition);
+        Assert.Equal(Quaternion.Identity, pivot.Local.Rotation);
+        Assert.False(_undo.CanUndo); // thirty drag frames, one step
+        _undo.Redo();
+        Near(new Vector3(1, 3, 0), other.WorldPosition);
+    }
+
+    [Fact]
+    public void Two_drags_are_two_steps_and_bad_matrices_are_ignored()
+    {
+        var a = Add("a", Vector3.Zero);
+        _selection.Set(a.Id);
+        var drag = new Candela.App.Editing.GizmoDrag();
+        Drag(drag, a, Matrix4x4.CreateTranslation(1, 0, 0));
+        Drag(drag, a, Matrix4x4.CreateTranslation(1, 1, 0));
+        drag.Begin(_scene, _selection, a, _undo);
+        var nan = Matrix4x4.CreateTranslation(float.NaN, 0, 0);
+        drag.Update(nan, _undo, "Move");
+        drag.End(_undo);
+        Near(new Vector3(1, 1, 0), a.WorldPosition);
+        _undo.Undo();
+        Near(new Vector3(1, 0, 0), a.WorldPosition);
+        _undo.Undo();
+        Near(Vector3.Zero, a.WorldPosition);
+        Assert.False(_undo.CanUndo);
+        Assert.False(drag.IsActive);
+        Assert.Empty(drag.Entities);
+    }
+}

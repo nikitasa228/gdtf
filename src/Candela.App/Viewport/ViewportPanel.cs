@@ -85,13 +85,9 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
     private readonly ViewCubeFace[] _cubeFaces = new ViewCubeFace[ViewCube.FaceCount];
     private readonly ViewCubeArrow[] _cubeArrows = new ViewCubeArrow[ViewCube.ArrowCount];
     private readonly List<PickRequest> _picks = new();
-    private readonly List<Entity> _dragEntities = new();
+    private readonly GizmoDrag _drag = new();
     private SelectionController.ProjectToScreen? _boxProjector;
-    private Matrix4x4[] _dragStartWorld = Array.Empty<Matrix4x4>();
-    private Transform[] _dragStartLocal = Array.Empty<Transform>();
-    private Matrix4x4 _pivotStart;
     private Matrix4x4 _gizmoMatrix;
-    private bool _gizmoDragging;
     private bool _gizmoVisible;
     private IRenderTarget? _target;
     private ImTextureID _texture;
@@ -517,7 +513,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         var session = _ctx.Session;
         var tools = _ctx.Tools;
         if (tools.Tool == EditorTool.Select || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
-            primary.Locked)
+            !SelectionController.IsEditable(session.Scene, primary))
         {
             _gizmoVisible = false;
             EndGizmoDrag();
@@ -532,7 +528,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         ImGuizmo.SetID(Number);
         var view = Camera.ViewMatrix;
         var projection = Camera.ProjectionMatrix(_imageSize.X / MathF.Max(_imageSize.Y, 1f));
-        if (!_gizmoDragging)
+        if (!_drag.IsActive)
             _gizmoMatrix = primary.WorldMatrix;
         var operation = tools.Tool == EditorTool.Move ? ImGuizmoOperation.Translate : ImGuizmoOperation.Rotate;
         var mode = tools.LocalSpace ? ImGuizmoMode.Local : ImGuizmoMode.World;
@@ -545,14 +541,12 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
 
         if (ImGuizmo.IsUsing())
         {
-            if (!_gizmoDragging)
-                BeginGizmoDrag(primary);
+            if (!_drag.IsActive)
+                _drag.Begin(session.Scene, session.Selection, primary, session.Undo);
             if (changed)
             {
                 _gizmoMatrix = matrix;
-                var delta = TransformMath.Delta(_pivotStart, matrix);
-                var locals = TransformMath.ApplyDelta(_dragEntities, _dragStartWorld, _dragStartLocal, delta);
-                session.Undo.Execute(new SetTransformCommand(_dragEntities, locals, operation == ImGuizmoOperation.Translate ? "Move" : "Rotate"));
+                _drag.Update(matrix, session.Undo, operation == ImGuizmoOperation.Translate ? "Move" : "Rotate");
             }
         }
         else
@@ -561,29 +555,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         }
     }
 
-    private void BeginGizmoDrag(Entity primary)
-    {
-        var session = _ctx.Session;
-        _dragEntities.Clear();
-        _dragEntities.AddRange(SelectionController.TopLevel(session.Scene, session.Selection).Where(e => !e.Locked));
-        if (!_dragEntities.Contains(primary) && !primary.Locked)
-            _dragEntities.Add(primary);
-        _dragStartWorld = _dragEntities.Select(e => e.WorldMatrix).ToArray();
-        _dragStartLocal = _dragEntities.Select(e => e.Local).ToArray();
-        _pivotStart = primary.WorldMatrix;
-        _gizmoDragging = true;
-        // A new drag never merges into the previous one.
-        session.Undo.BreakMerge();
-    }
-
-    private void EndGizmoDrag()
-    {
-        if (!_gizmoDragging)
-            return;
-        _gizmoDragging = false;
-        _dragEntities.Clear();
-        _ctx.Session.Undo.BreakMerge();
-    }
+    private void EndGizmoDrag() => _drag.End(_ctx.Session.Undo);
 
     /// <summary>Draws the toolbar; returns true when the mouse is over it.</summary>
     private bool DrawToolbar()
