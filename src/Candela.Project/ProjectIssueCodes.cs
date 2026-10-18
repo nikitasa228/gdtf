@@ -15,6 +15,12 @@ public static class ProjectIssueCodes
     /// <summary>The project was converted from an older format version (one note per migration step).</summary>
     public const string Migrated = "project.migrated";
 
+    /// <summary>
+    /// A JSON document of the archive contained text that cannot be represented (bytes that are not UTF-8, an escaped
+    /// UTF-16 surrogate without its pair); those characters were replaced by U+FFFD and the document was read.
+    /// </summary>
+    public const string TextRepaired = "project.text-repaired";
+
     /// <summary><c>settings.json</c> is missing, damaged or not an object; the project opens with default settings.</summary>
     public const string SettingsInvalid = "project.settings-invalid";
 

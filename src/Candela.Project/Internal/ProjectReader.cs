@@ -50,7 +50,7 @@ internal static class ProjectReader
         byte[] sceneBytes;
         try
         {
-            sceneBytes = access.Read(ArchivePaths.Scene)
+            sceneBytes = ReadJson(access, ArchivePaths.Scene, issues)
                          ?? throw new ProjectFormatException("The project has no scene (scene.json); the file is incomplete or not a Candela project.");
         }
         catch (EntryReadException e)
@@ -142,7 +142,7 @@ internal static class ProjectReader
         }
         try
         {
-            var bytes = access.Read(ArchivePaths.Manifest);
+            var bytes = ReadJson(access, ArchivePaths.Manifest, issues);
             if (bytes is not null && JsonNode.Parse(bytes, null, ProjectSettings.ReadOptions) is JsonObject obj) return obj;
             issues?.Add(IssueSeverity.Warning, CategoryProgram, ProjectIssueCodes.ManifestInvalid,
                 "The project manifest is not a JSON object; it was ignored and the file was read as the current format.");
@@ -268,6 +268,23 @@ internal static class ProjectReader
         return false;
     }
 
+    /// <summary>
+    /// Reads a JSON entry (null when it does not exist) and repairs text that System.Text.Json parses but cannot turn into
+    /// strings (invalid UTF-8, lone surrogate escapes; see <see cref="JsonText"/>), so no string access can throw later.
+    /// </summary>
+    private static byte[]? ReadJson(ArchiveAccess access, string name, IssueCollector? issues)
+    {
+        var bytes = access.Read(name);
+        if (bytes is null) return null;
+        var repaired = JsonText.Repair(bytes, out int repairs);
+        if (repairs > 0)
+        {
+            issues?.Add(IssueSeverity.Note, CategoryProgram, ProjectIssueCodes.TextRepaired,
+                string.Create(CultureInfo.InvariantCulture, $"{repairs} invalid character(s) in {name} were replaced by U+FFFD."));
+        }
+        return repaired;
+    }
+
     // ----- migrations -----------------------------------------------------------------------------------------------
 
     private static void Migrate(ArchiveAccess access, JsonObject manifest, int version, string writtenBy, ProjectMigrationRegistry registry,
@@ -314,7 +331,7 @@ internal static class ProjectReader
     {
         try
         {
-            var bytes = access.Read(name);
+            var bytes = ReadJson(access, name, null);
             return bytes is null ? null : JsonNode.Parse(bytes, null, ProjectSettings.ReadOptions);
         }
         catch (Exception e) when (e is EntryReadException or JsonException)
@@ -330,7 +347,7 @@ internal static class ProjectReader
         byte[]? bytes;
         try
         {
-            bytes = access.Read(ArchivePaths.Settings);
+            bytes = ReadJson(access, ArchivePaths.Settings, issues);
         }
         catch (EntryReadException e)
         {
@@ -485,7 +502,7 @@ internal static class ProjectReader
         string? damage = null;
         try
         {
-            var bytes = access.Read(ArchivePaths.AssetIndex);
+            var bytes = ReadJson(access, ArchivePaths.AssetIndex, issues);
             if (bytes is null)
             {
                 damage = "missing";
@@ -650,7 +667,7 @@ internal static class ProjectReader
         string? damage;
         try
         {
-            var bytes = access.Read(ArchivePaths.FixtureIndex);
+            var bytes = ReadJson(access, ArchivePaths.FixtureIndex, issues);
             if (bytes is null)
             {
                 damage = "missing";

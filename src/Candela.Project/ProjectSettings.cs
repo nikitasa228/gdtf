@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 using Candela.Core.Serialization;
+using Candela.Project.Internal;
 
 namespace Candela.Project;
 
@@ -45,22 +47,32 @@ public sealed class ProjectSettings : IReadOnlyDictionary<string, JsonElement>
 
     /// <summary>
     /// Stores raw JSON under <paramref name="name"/> (replacing an existing section). The element is cloned, so the
-    /// caller's document may be disposed afterwards.
+    /// caller's document may be disposed afterwards. Escaped UTF-16 surrogates without their pair (<c>"\ud800"</c>), which
+    /// JSON parsers accept but no writer can reproduce, are replaced by U+FFFD so the project can always be saved.
     /// </summary>
+    /// <exception cref="ArgumentException">The element is undefined or contains bytes that are not UTF-8.</exception>
     public void SetRaw(string name, JsonElement value)
     {
         ValidateName(name);
         if (value.ValueKind == JsonValueKind.Undefined) throw new ArgumentException("A settings section cannot be undefined.", nameof(value));
-        _sections[name] = value.Clone();
+        _sections[name] = Normalize(value);
         Changed?.Invoke(name);
     }
 
-    /// <summary>Stores raw JSON text under <paramref name="name"/>. Throws <see cref="JsonException"/> for invalid JSON.</summary>
+    /// <summary>
+    /// Stores raw JSON text under <paramref name="name"/> (see <see cref="SetRaw"/> for the text repairs). Throws
+    /// <see cref="JsonException"/> for invalid JSON.
+    /// </summary>
     public void SetJson(string name, string json)
     {
         ArgumentNullException.ThrowIfNull(json);
-        using var doc = JsonDocument.Parse(json, ReadOptions);
-        SetRaw(name, doc.RootElement);
+        ValidateName(name);
+        // GetBytes writes U+FFFD for unpaired surrogate characters; JsonText repairs unpaired surrogate escapes.
+        var utf8 = JsonText.Repair(Encoding.UTF8.GetBytes(json), out _);
+        using var doc = JsonDocument.Parse(utf8, ReadOptions);
+        if (doc.RootElement.ValueKind == JsonValueKind.Undefined) throw new ArgumentException("A settings section cannot be undefined.", nameof(json));
+        _sections[name] = doc.RootElement.Clone();
+        Changed?.Invoke(name);
     }
 
     /// <summary>Serialises <paramref name="value"/> with <see cref="CandelaJson.Options"/> and stores it as a section.</summary>
@@ -122,6 +134,25 @@ public sealed class ProjectSettings : IReadOnlyDictionary<string, JsonElement>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     internal void SetLoaded(string name, JsonElement clonedValue) => _sections[name] = clonedValue;
+
+    /// <summary>A detached copy of <paramref name="value"/> whose text every JSON writer can reproduce.</summary>
+    private static JsonElement Normalize(JsonElement value)
+    {
+        string raw;
+        try
+        {
+            raw = value.GetRawText();
+        }
+        catch (InvalidOperationException e)
+        {
+            throw new ArgumentException("The settings JSON contains bytes that are not valid UTF-8.", nameof(value), e);
+        }
+        var utf8 = Encoding.UTF8.GetBytes(raw);
+        var repaired = JsonText.Repair(utf8, out int repairs);
+        if (repairs == 0) return value.Clone();
+        using var doc = JsonDocument.Parse(repaired, ReadOptions);
+        return doc.RootElement.Clone();
+    }
 
     internal static JsonDocumentOptions ReadOptions => new()
     {

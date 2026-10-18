@@ -118,7 +118,14 @@ public static class ProjectFile
     {
         ArgumentNullException.ThrowIfNull(source);
         if (!source.CanRead || !source.CanSeek) throw new ArgumentException("The stream must be readable and seekable.", nameof(source));
-        return ProjectReader.Read(source, options ?? ProjectLoadOptions.Default);
+        try
+        {
+            return ProjectReader.Read(source, options ?? ProjectLoadOptions.Default);
+        }
+        catch (Exception e) when (IsUnexpectedReadFailure(e))
+        {
+            throw new ProjectFormatException(UnexpectedReadFailure + e.Message, e);
+        }
     }
 
     /// <summary>
@@ -130,7 +137,14 @@ public static class ProjectFile
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
         using var stream = OpenRead(Path.GetFullPath(path));
-        return ProjectReader.ReadManifestOnly(stream);
+        try
+        {
+            return ProjectReader.ReadManifestOnly(stream);
+        }
+        catch (Exception e) when (IsUnexpectedReadFailure(e))
+        {
+            throw new ProjectFormatException(UnexpectedReadFailure + e.Message, e);
+        }
     }
 
     /// <summary>The <c>thumbnail.png</c> of a project (for Open dialogs), or null when it has none or it is not a PNG.</summary>
@@ -155,6 +169,18 @@ public static class ProjectFile
             return false;
         }
     }
+
+    /// <summary>Start of the message of a <see cref="ProjectFormatException"/> that wraps an unexpected reader failure.</summary>
+    internal const string UnexpectedReadFailure = "The project cannot be read because of an unexpected problem in the file: ";
+
+    /// <summary>
+    /// Failures a framework reader can still raise for damaged data that no check anticipated. Every element is read
+    /// defensively, but should one slip through, the caller still gets the documented <see cref="ProjectFormatException"/>
+    /// (with the cause attached) instead of an exception type it does not expect from opening a file.
+    /// </summary>
+    private static bool IsUnexpectedReadFailure(Exception e) =>
+        e is InvalidOperationException or ArgumentException or FormatException or InvalidDataException or JsonException or NotSupportedException
+            or OverflowException or InvalidCastException or KeyNotFoundException;
 
     private static FileStream OpenRead(string fullPath)
     {
