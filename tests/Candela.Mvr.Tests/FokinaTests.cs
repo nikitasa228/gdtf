@@ -93,6 +93,7 @@ public sealed class FokinaTests
 
         var fixtures = scene.Query<FixtureComponent>().ToList();
         Assert.Equal(91, fixtures.Count);
+        foreach (var i in result.Issues) _out.WriteLine($"{i.Severity} {i.Code}: {i.Message}");
 
         // Resolution per spec name.
         foreach (var g in result.Gdtfs)
@@ -145,6 +146,18 @@ public sealed class FokinaTests
         Assert.Equal(3, atomic.InferredFootprint);
         Assert.Equal(3, atomic.Footprint);
         Assert.Contains(result.Issues, i => i.Code == MvrIssueCodes.ModeUnknown && i.Message.Contains("Mode 1", StringComparison.Ordinal));
+        Assert.Contains(result.Issues, i => i.Code == MvrIssueCodes.ModeUnknown && i.Message.Contains("'Standard'", StringComparison.Ordinal));
+        Assert.Equal(2, result.Issues.Count(i => i.Code == MvrIssueCodes.ModeUnknown));
+
+        // The MagicBlade R substitute keeps its 'Extended' mode name, but that mode is far wider than the 44-channel
+        // spacing of the MagicBlade patch: the overlap is reported (only the substitute causes it).
+        var overlap = Assert.Single(result.Issues, i => i.Code == MvrIssueCodes.ModeFootprint);
+        Assert.Contains("MagicBlade R", overlap.Message, StringComparison.Ordinal);
+        Assert.Equal(28, overlap.Entities.Count);
+        var blade = result.Gdtfs.Single(g => g.SpecName.Contains("MagicBlade", StringComparison.Ordinal)).Modes.Single();
+        Assert.True(blade.Exact);
+        Assert.Equal(44, blade.InferredFootprint);
+        Assert.True(blade.Footprint > blade.InferredFootprint);
     }
 
     [Fact]

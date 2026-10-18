@@ -27,6 +27,7 @@ internal sealed class SceneExporter
     private readonly Dictionary<Guid, string?> _modelFiles = new();
     private readonly Dictionary<string, string?> _wallFiles = new(StringComparer.Ordinal);
     private readonly HashSet<string> _fileNames = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<(string Name, string File), Guid> _symdefs = new();
     private int _objectCount;
     private int _connectionCount;
 
@@ -168,7 +169,7 @@ internal sealed class SceneExporter
                 {
                     if (geometryChildren is not null && geometryChildren.Contains(c.Id))
                     {
-                        AddGeometry(device, c.Get<MeshComponent>()!.ModelAssetId, LocalMatrix(c), c.Id);
+                        AddGeometry(device, c.Get<MeshComponent>()!.ModelAssetId, LocalMatrix(c), c.Id, c);
                         continue;
                     }
                     if (Convert(c, layer) is { } child) device.Children.Add(child);
@@ -410,11 +411,35 @@ internal sealed class SceneExporter
         return name;
     }
 
-    private void AddGeometry(MvrDeviceObject device, Guid assetId, Matrix4x4 local, Guid user)
+    /// <summary>
+    /// Adds a model as geometry of <paramref name="device"/>. A geometry child entity (<paramref name="instance"/>) whose
+    /// name is not the stem of the written file name is written as a <c>Symbol</c> of a one-file <c>Symdef</c> named
+    /// after it (as MVR files from other tools do), so the name survives a round trip; everything else is a plain
+    /// <c>Geometry3D</c>.
+    /// </summary>
+    private void AddGeometry(MvrDeviceObject device, Guid assetId, Matrix4x4 local, Guid user, Entity? instance = null)
     {
         if (assetId == Guid.Empty) return;
         if (EmbedModel(assetId, user) is not { } file) return;
-        device.Geometries.Add(new MvrGeometry3D { FileName = file, Matrix = local, HasMatrix = !MvrMatrix.IsIdentity(local, 0f) });
+        bool hasMatrix = !MvrMatrix.IsIdentity(local, 0f);
+        string? name = instance?.Name.Trim();
+        if (instance is null || string.IsNullOrEmpty(name) || string.Equals(name, Path.GetFileNameWithoutExtension(file), StringComparison.Ordinal))
+        {
+            device.Geometries.Add(new MvrGeometry3D { FileName = file, Matrix = local, HasMatrix = hasMatrix });
+            return;
+        }
+        device.Geometries.Add(new MvrSymbol { Uuid = instance.Id, SymdefId = SymdefFor(name, file), Matrix = local, HasMatrix = hasMatrix });
+    }
+
+    private Guid SymdefFor(string name, string file)
+    {
+        if (_symdefs.TryGetValue((name, file), out var id)) return id;
+        id = DeterministicGuid.Create(DeterministicGuid.MvrNamespace, string.Concat("symdef:", file, "|", name));
+        var def = new MvrSymdef { Uuid = id, Name = name };
+        def.Geometries.Add(new MvrGeometry3D { FileName = file });
+        _doc.AuxData.Symdefs.Add(def);
+        _symdefs[(name, file)] = id;
+        return id;
     }
 
     private string? EmbedModel(Guid assetId, Guid user)

@@ -53,10 +53,10 @@ internal static class MvrXmlWriter
         using var w = XmlWriter.Create(output, Settings);
         w.WriteStartDocument();
         w.WriteStartElement("GeneralSceneDescription");
-        w.WriteAttributeString("verMajor", I(doc.VerMajor));
-        w.WriteAttributeString("verMinor", I(doc.VerMinor));
-        if (!string.IsNullOrEmpty(doc.Provider)) w.WriteAttributeString("provider", doc.Provider);
-        if (!string.IsNullOrEmpty(doc.ProviderVersion)) w.WriteAttributeString("providerVersion", doc.ProviderVersion);
+        Attr(w, "verMajor", I(doc.VerMajor));
+        Attr(w, "verMinor", I(doc.VerMinor));
+        if (!string.IsNullOrEmpty(doc.Provider)) Attr(w, "provider", doc.Provider);
+        if (!string.IsNullOrEmpty(doc.ProviderVersion)) Attr(w, "providerVersion", doc.ProviderVersion);
 
         if (doc.UserData.Count > 0)
         {
@@ -66,15 +66,15 @@ internal static class MvrXmlWriter
                 if (u.Element is not null)
                 {
                     var e = new XElement(u.Element);
-                    e.SetAttributeValue("provider", u.Provider);
-                    e.SetAttributeValue("ver", u.Version);
+                    e.SetAttributeValue("provider", Clean(u.Provider));
+                    e.SetAttributeValue("ver", Clean(u.Version));
                     e.WriteTo(w);
                 }
                 else
                 {
                     w.WriteStartElement("Data");
-                    w.WriteAttributeString("provider", u.Provider);
-                    w.WriteAttributeString("ver", u.Version);
+                    Attr(w, "provider", u.Provider);
+                    Attr(w, "ver", u.Version);
                     w.WriteEndElement();
                 }
             }
@@ -87,9 +87,9 @@ internal static class MvrXmlWriter
         foreach (var layer in doc.Layers)
         {
             w.WriteStartElement("Layer");
-            w.WriteAttributeString("uuid", Id(layer.Uuid));
-            w.WriteAttributeString("name", layer.Name);
-            if (layer.HasMatrix || !MvrMatrix.IsIdentity(layer.Matrix)) w.WriteElementString("Matrix", MvrMatrix.Format(layer.Matrix));
+            Attr(w, "uuid", Id(layer.Uuid));
+            Attr(w, "name", layer.Name);
+            if (layer.HasMatrix || !MvrMatrix.IsIdentity(layer.Matrix)) Elem(w, "Matrix", MvrMatrix.Format(layer.Matrix));
             Unknown(w, layer.UnknownElements);
             WriteChildList(w, layer.Objects, alwaysWrite: true);
             w.WriteEndElement();
@@ -106,15 +106,15 @@ internal static class MvrXmlWriter
         foreach (var c in aux.Classes)
         {
             w.WriteStartElement("Class");
-            w.WriteAttributeString("uuid", Id(c.Uuid));
-            w.WriteAttributeString("name", c.Name);
+            Attr(w, "uuid", Id(c.Uuid));
+            Attr(w, "name", c.Name);
             w.WriteEndElement();
         }
         foreach (var s in aux.Symdefs)
         {
             w.WriteStartElement("Symdef");
-            w.WriteAttributeString("uuid", Id(s.Uuid));
-            w.WriteAttributeString("name", s.Name);
+            Attr(w, "uuid", Id(s.Uuid));
+            Attr(w, "name", s.Name);
             w.WriteStartElement("ChildList");
             foreach (var g in s.Geometries) WriteGeometry(w, g);
             w.WriteEndElement();
@@ -123,19 +123,19 @@ internal static class MvrXmlWriter
         foreach (var p in aux.Positions)
         {
             w.WriteStartElement("Position");
-            w.WriteAttributeString("uuid", Id(p.Uuid));
-            w.WriteAttributeString("name", p.Name);
+            Attr(w, "uuid", Id(p.Uuid));
+            Attr(w, "name", p.Name);
             w.WriteEndElement();
         }
         foreach (var m in aux.MappingDefinitions)
         {
             w.WriteStartElement("MappingDefinition");
-            w.WriteAttributeString("uuid", Id(m.Uuid));
-            w.WriteAttributeString("name", m.Name);
-            w.WriteElementString("SizeX", I(m.SizeX));
-            w.WriteElementString("SizeY", I(m.SizeY));
+            Attr(w, "uuid", Id(m.Uuid));
+            Attr(w, "name", m.Name);
+            Elem(w, "SizeX", I(m.SizeX));
+            Elem(w, "SizeY", I(m.SizeY));
             if (m.Source is not null) WriteSource(w, m.Source);
-            if (m.ScaleHandling is { } sh) w.WriteElementString("ScaleHandeling", sh.ToString());
+            if (m.ScaleHandling is { } sh) Elem(w, "ScaleHandeling", sh.ToString());
             w.WriteEndElement();
         }
         Unknown(w, aux.UnknownElements);
@@ -153,12 +153,12 @@ internal static class MvrXmlWriter
     private static void WriteObject(XmlWriter w, MvrObject o)
     {
         w.WriteStartElement(o.Kind.ToString());
-        w.WriteAttributeString("uuid", Id(o.Uuid));
-        w.WriteAttributeString("name", o.Name);
-        if (o is MvrDeviceObject { Multipatch: { } mp }) w.WriteAttributeString("multipatch", Id(mp));
+        Attr(w, "uuid", Id(o.Uuid));
+        Attr(w, "name", o.Name);
+        if (o is MvrDeviceObject { Multipatch: { } mp }) Attr(w, "multipatch", Id(mp));
 
-        if (o.HasMatrix || !MvrMatrix.IsIdentity(o.Matrix)) w.WriteElementString("Matrix", MvrMatrix.Format(o.Matrix));
-        if (o.Classing is { } cls) w.WriteElementString("Classing", Id(cls));
+        if (o.HasMatrix || !MvrMatrix.IsIdentity(o.Matrix)) Elem(w, "Matrix", MvrMatrix.Format(o.Matrix));
+        if (o.Classing is { } cls) Elem(w, "Classing", Id(cls));
 
         switch (o)
         {
@@ -184,11 +184,11 @@ internal static class MvrXmlWriter
     {
         Opt(w, "GDTFSpec", f.GdtfSpec);
         Opt(w, "GDTFMode", f.GdtfMode);
-        if (f.Focus is { } focus) w.WriteElementString("Focus", Id(focus));
+        if (f.Focus is { } focus) Elem(w, "Focus", Id(focus));
         Opt(w, "CastShadow", f.CastShadow);
         Opt(w, "DMXInvertPan", f.DmxInvertPan);
         Opt(w, "DMXInvertTilt", f.DmxInvertTilt);
-        if (f.Position is { } pos) w.WriteElementString("Position", Id(pos));
+        if (f.Position is { } pos) Elem(w, "Position", Id(pos));
         Opt(w, "Function", f.Function);
         Opt(w, "FixtureID", f.FixtureId);
         Opt(w, "FixtureIDNumeric", f.FixtureIdNumeric);
@@ -200,7 +200,7 @@ internal static class MvrXmlWriter
         WriteCustomCommands(w, f);
         WriteOverwrites(w, f);
         WriteConnections(w, f);
-        if (f.Color is { } c) w.WriteElementString("Color", $"{F(c.X)},{F(c.Y)},{F(c.BigY)}");
+        if (f.Color is { } c) Elem(w, "Color", $"{F(c.X)},{F(c.Y)},{F(c.BigY)}");
         Opt(w, "CustomIdType", f.CustomIdType);
         Opt(w, "CustomId", f.CustomId);
         if (f.Mappings.Count > 0)
@@ -209,12 +209,12 @@ internal static class MvrXmlWriter
             foreach (var m in f.Mappings)
             {
                 w.WriteStartElement("Mapping");
-                w.WriteAttributeString("linkedDef", Id(m.LinkedDefinition));
+                Attr(w, "linkedDef", Id(m.LinkedDefinition));
                 Opt(w, "ux", m.Ux);
                 Opt(w, "uy", m.Uy);
                 Opt(w, "ox", m.Ox);
                 Opt(w, "oy", m.Oy);
-                if (m.Rz is { } rz) w.WriteElementString("rz", F(rz));
+                if (m.Rz is { } rz) Elem(w, "rz", F(rz));
                 w.WriteEndElement();
             }
             w.WriteEndElement();
@@ -222,8 +222,8 @@ internal static class MvrXmlWriter
         if (f.Gobo is { } gobo)
         {
             w.WriteStartElement("Gobo");
-            w.WriteAttributeString("rotation", F(gobo.Rotation));
-            w.WriteString(gobo.FileName);
+            Attr(w, "rotation", F(gobo.Rotation));
+            Text(w, gobo.FileName);
             w.WriteEndElement();
         }
         WriteGeometries(w, f.Geometries, alwaysWrite: false);
@@ -234,7 +234,7 @@ internal static class MvrXmlWriter
     private static void WriteDevice(XmlWriter w, MvrDeviceObject d)
     {
         bool positionFirst = d is MvrTruss or MvrSupport;
-        if (positionFirst && d.Position is { } p0) w.WriteElementString("Position", Id(p0));
+        if (positionFirst && d.Position is { } p0) Elem(w, "Position", Id(p0));
         WriteGeometries(w, d.Geometries, alwaysWrite: true);
         switch (d)
         {
@@ -249,18 +249,18 @@ internal static class MvrXmlWriter
                 {
                     w.WriteStartElement("Projection");
                     if (p.Source is not null) WriteSource(w, p.Source);
-                    if (p.ScaleHandling is { } sh) w.WriteElementString("ScaleHandeling", sh.ToString());
+                    if (p.ScaleHandling is { } sh) Elem(w, "ScaleHandeling", sh.ToString());
                     w.WriteEndElement();
                 }
                 w.WriteEndElement();
                 break;
         }
         Opt(w, "Function", d.Function);
-        if (d is MvrSupport { ChainLength: { } chain }) w.WriteElementString("ChainLength", MvrMatrix.Millimetres(chain));
+        if (d is MvrSupport { ChainLength: { } chain }) Elem(w, "ChainLength", MvrMatrix.Millimetres(chain));
         Opt(w, "GDTFSpec", d.GdtfSpec);
         Opt(w, "GDTFMode", d.GdtfMode);
         Opt(w, "CastShadow", d.CastShadow);
-        if (!positionFirst && d.Position is { } p1) w.WriteElementString("Position", Id(p1));
+        if (!positionFirst && d.Position is { } p1) Elem(w, "Position", Id(p1));
         WriteAddresses(w, d, alwaysWrite: false);
         WriteProtocols(w, d);
         WriteAlignments(w, d);
@@ -291,17 +291,17 @@ internal static class MvrXmlWriter
         {
             case MvrGeometry3D g3:
                 w.WriteStartElement("Geometry3D");
-                w.WriteAttributeString("fileName", g3.FileName);
+                Attr(w, "fileName", g3.FileName);
                 break;
             case MvrSymbol s:
                 w.WriteStartElement("Symbol");
-                w.WriteAttributeString("uuid", Id(s.Uuid));
-                w.WriteAttributeString("symdef", Id(s.SymdefId));
+                Attr(w, "uuid", Id(s.Uuid));
+                Attr(w, "symdef", Id(s.SymdefId));
                 break;
             default:
                 return;
         }
-        if (g.HasMatrix || !MvrMatrix.IsIdentity(g.Matrix)) w.WriteElementString("Matrix", MvrMatrix.Format(g.Matrix));
+        if (g.HasMatrix || !MvrMatrix.IsIdentity(g.Matrix)) Elem(w, "Matrix", MvrMatrix.Format(g.Matrix));
         Unknown(w, g.UnknownElements);
         w.WriteEndElement();
     }
@@ -313,19 +313,19 @@ internal static class MvrXmlWriter
         foreach (var a in d.Addresses)
         {
             w.WriteStartElement("Address");
-            w.WriteAttributeString("break", I(a.Break));
+            Attr(w, "break", I(a.Break));
             bool rawOk = a.RawValue is not null && MvrAddress.TryParse(a.RawValue, a.Break, out var parsed) && parsed!.Absolute == a.Absolute;
-            w.WriteString(rawOk ? a.RawValue!.Trim() : I(a.Absolute));
+            Text(w, rawOk ? a.RawValue!.Trim() : I(a.Absolute));
             w.WriteEndElement();
         }
         foreach (var n in d.Networks)
         {
             w.WriteStartElement("Network");
-            w.WriteAttributeString("geometry", n.Geometry);
+            Attr(w, "geometry", n.Geometry);
             OptAttr(w, "ipv4", n.IPv4);
             OptAttr(w, "subnetmask", n.SubnetMask);
             OptAttr(w, "ipv6", n.IPv6);
-            if (n.Dhcp is { } dhcp) w.WriteAttributeString("dhcp", dhcp ? "on" : "off");
+            if (n.Dhcp is { } dhcp) Attr(w, "dhcp", dhcp ? "on" : "off");
             OptAttr(w, "hostname", n.Hostname);
             w.WriteEndElement();
         }
@@ -357,8 +357,8 @@ internal static class MvrXmlWriter
         {
             w.WriteStartElement("Alignment");
             OptAttr(w, "geometry", a.Geometry);
-            w.WriteAttributeString("up", V(a.Up));
-            w.WriteAttributeString("direction", V(a.Direction));
+            Attr(w, "up", V(a.Up));
+            Attr(w, "direction", V(a.Direction));
             w.WriteEndElement();
         }
         w.WriteEndElement();
@@ -368,7 +368,7 @@ internal static class MvrXmlWriter
     {
         if (d.CustomCommands.Count == 0) return;
         w.WriteStartElement("CustomCommands");
-        foreach (var c in d.CustomCommands) w.WriteElementString("CustomCommand", c);
+        foreach (var c in d.CustomCommands) Elem(w, "CustomCommand", c);
         w.WriteEndElement();
     }
 
@@ -379,8 +379,8 @@ internal static class MvrXmlWriter
         foreach (var o in d.Overwrites)
         {
             w.WriteStartElement("Overwrite");
-            w.WriteAttributeString("universal", o.Universal);
-            if (o.Target.Length > 0) w.WriteAttributeString("target", o.Target);
+            Attr(w, "universal", o.Universal);
+            if (o.Target.Length > 0) Attr(w, "target", o.Target);
             w.WriteEndElement();
         }
         w.WriteEndElement();
@@ -393,9 +393,9 @@ internal static class MvrXmlWriter
         foreach (var c in d.Connections)
         {
             w.WriteStartElement("Connection");
-            w.WriteAttributeString("own", c.Own);
-            w.WriteAttributeString("other", c.Other);
-            w.WriteAttributeString("toObject", Id(c.ToObject));
+            Attr(w, "own", c.Own);
+            Attr(w, "other", c.Other);
+            Attr(w, "toObject", Id(c.ToObject));
             w.WriteEndElement();
         }
         w.WriteEndElement();
@@ -404,9 +404,9 @@ internal static class MvrXmlWriter
     private static void WriteSource(XmlWriter w, MvrSource s)
     {
         w.WriteStartElement("Source");
-        w.WriteAttributeString("linkedGeometry", s.LinkedGeometry);
-        w.WriteAttributeString("type", s.Type);
-        w.WriteString(s.Value);
+        Attr(w, "linkedGeometry", s.LinkedGeometry);
+        Attr(w, "type", s.Type);
+        Text(w, s.Value);
         w.WriteEndElement();
     }
 
@@ -417,22 +417,65 @@ internal static class MvrXmlWriter
 
     private static void Opt(XmlWriter w, string name, string? value)
     {
-        if (value is not null) w.WriteElementString(name, value);
+        if (value is not null) Elem(w, name, value);
     }
 
     private static void Opt(XmlWriter w, string name, int? value)
     {
-        if (value is { } v) w.WriteElementString(name, I(v));
+        if (value is { } v) Elem(w, name, I(v));
     }
 
     private static void Opt(XmlWriter w, string name, bool? value)
     {
-        if (value is { } v) w.WriteElementString(name, v ? "true" : "false");
+        if (value is { } v) Elem(w, name, v ? "true" : "false");
     }
 
     private static void OptAttr(XmlWriter w, string name, string? value)
     {
-        if (value is not null) w.WriteAttributeString(name, value);
+        if (value is not null) Attr(w, name, value);
+    }
+
+    private static void Attr(XmlWriter w, string name, string value) => w.WriteAttributeString(name, Clean(value));
+
+    private static void Elem(XmlWriter w, string name, string value) => w.WriteElementString(name, Clean(value));
+
+    private static void Text(XmlWriter w, string value) => w.WriteString(Clean(value));
+
+    /// <summary>
+    /// Drops characters XML 1.0 cannot carry (control characters, lone surrogates, U+FFFE/U+FFFF) so that a stray
+    /// character in a scene name never makes an export fail. Returns the string itself when it is clean.
+    /// </summary>
+    internal static string Clean(string value)
+    {
+        int i = 0;
+        for (; i < value.Length; i++)
+        {
+            char c = value[i];
+            if (char.IsHighSurrogate(c) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1]))
+            {
+                i++;
+                continue;
+            }
+            if (!XmlConvert.IsXmlChar(c)) break;
+        }
+        if (i == value.Length) return value;
+
+        var sb = new StringBuilder(value.Length);
+        sb.Append(value, 0, i);
+        for (; i < value.Length; i++)
+        {
+            char c = value[i];
+            if (char.IsHighSurrogate(c) && i + 1 < value.Length && char.IsLowSurrogate(value[i + 1]))
+            {
+                sb.Append(c).Append(value[i + 1]);
+                i++;
+            }
+            else if (XmlConvert.IsXmlChar(c))
+            {
+                sb.Append(c);
+            }
+        }
+        return sb.ToString();
     }
 
     internal static string Id(Guid id) => id.ToString("D").ToUpperInvariant();

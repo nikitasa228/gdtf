@@ -94,7 +94,7 @@ public static class MvrWriter
         ArgumentNullException.ThrowIfNull(document);
         ArgumentException.ThrowIfNullOrEmpty(path);
         string full = Path.GetFullPath(path);
-        string temp = full + ".tmp-" + Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string temp = full + ".tmp-" + Guid.NewGuid().ToString("N")[..12];
         try
         {
             using (var fs = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16))

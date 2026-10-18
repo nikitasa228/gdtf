@@ -4,6 +4,7 @@ using Candela.Core.Diagnostics;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
+using Candela.Gdtf;
 
 namespace Candela.Mvr;
 
@@ -240,6 +241,14 @@ public static class MvrImporter
                                 : $"'{r.FileName}' has no DMX mode '{requested}' (asked for by '{key.Spec}'); the closest mode '{mode.Name}' ({resolution.Footprint} channels) is used{inferredText}.",
                             users);
                     }
+                    if (mode is not null && inferred is { } spacing && resolution.Footprint is { } footprint && footprint > spacing &&
+                        (!exact || r.MatchKind == FixtureMatchKind.Substitute))
+                    {
+                        _sink.Add(IssueSeverity.Warning, IssueCategory.Patch, MvrIssueCodes.ModeFootprint,
+                            string.Create(CultureInfo.InvariantCulture,
+                                $"'{key.Spec}' fixtures are patched {spacing} channels apart, but mode '{mode.Name}' of the {(exact ? "substitute" : "closest")} '{r.FileName}' uses {footprint} channels; their DMX ranges overlap until the real GDTF is added or the patch is changed."),
+                            _specUsers[key.Spec].Take(64).ToArray());
+                    }
                 }
                 _modes[key] = resolution;
                 if (!modesBySpec.TryGetValue(key.Spec, out var list)) modesBySpec[key.Spec] = list = new List<MvrModeResolution>();
@@ -351,6 +360,11 @@ public static class MvrImporter
                     break;
                 case MvrFixture f:
                     entity.Add(BuildFixture(f, parentEntity, parentObject));
+                    if (f.Geometries.Count > 0)
+                    {
+                        _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.NotRepresentable, "Fixture/Geometries",
+                            n => $"Geometries of {n} fixture(s) are not imported (a fixture's body comes from its GDTF).", entity.Id);
+                    }
                     break;
                 case MvrDeviceObject d:
                     var (direct, rest) = PlanGeometry(d, entity.Id, isTruss: d is MvrTruss);

@@ -62,6 +62,12 @@ public static class MvrIssueCodes
     /// <summary>The requested DMX mode does not exist in the resolved GDTF; the closest mode was used.</summary>
     public const string ModeUnknown = "mvr.mode-unknown";
 
+    /// <summary>
+    /// The DMX mode chosen for a substitute GDTF (or for a mode name the GDTF lacks) needs more channels than the patch
+    /// of the MVR leaves between consecutive fixtures, so their DMX ranges overlap.
+    /// </summary>
+    public const string ModeFootprint = "mvr.mode-footprint";
+
     /// <summary>A 3D file could not be decoded.</summary>
     public const string GeometryUnreadable = "mvr.geometry-unreadable";
 
