@@ -26,7 +26,7 @@ metres, linear Rec.2020 light colour with luminance 1 plus a photometric magnitu
 using var engine = StageEngine.FromSettings(AppSettings.Load());   // library = settings, else the folder of Candela.sln
 var opened = engine.Open("stages/Фокина.mvr");                     // or a .candela project
 engine.StartProtocols(new[] { ProtocolIds.ArtNet, ProtocolIds.Sacn });
-var sync = engine.AttachRenderWorld(renderer.World);
+var sync = engine.AttachRenderWorld(renderer.World);           // (world, loadFixtureModelsInBackground: false) for CLI/tests
 while (running)
 {
     engine.Tick(frameSeconds);                                     // DMX → poses → simulation → lights → render world
@@ -49,7 +49,7 @@ while (running)
 | `LightMeter`, `Recorder`, `Play`, `Player` | Illuminance and light plot; DMX recording and playback. |
 | `Lights`, `LightCollector`, `Time`, `Frame` | The frame's photometric lights and clock. |
 | `Render`, `AttachRenderWorld`, `DetachRenderWorld` | The renderer binding. |
-| `Autosave`, `EnableAutosave`, `DisableAutosave`, `Recover` | Autosave of the open project (`AutosaveService`, driven by `Tick`; a project is autosaved only when its scene or `engine`/`view` settings changed; a successful save discards the session's autosaves) and recovery of crashed sessions. Opening another project closes the session normally; on a clean exit the application calls `DisableAutosave()` before disposing the engine (disposing alone keeps the recovery files). |
+| `Autosave`, `EnableAutosave`, `DisableAutosave`, `Recover` | Autosave of the open project (`AutosaveService`, driven by `Tick`; a project is autosaved only when its scene, an asset (import options changed, removed) or the `engine`/`view` settings changed; a successful save discards the session's autosaves) and recovery of crashed sessions. `Recover(session)` continues the crashed session's files (`AutosaveOptions.Resume`), so the next successful save removes them — also when autosave is off — and a recovered project is never offered again after it was saved; until then the crash data stays recoverable. Opening another project closes the session normally; on a clean exit the application calls `DisableAutosave()` before disposing the engine (disposing alone keeps the recovery files). |
 
 **Construction.** `new StageEngine(StageEngineOptions)`: `LibraryFolders` (empty → the repository during development:
 the folder containing `Candela.sln`, searched upwards from the program and the current directory), `SpecsIndexPath`
@@ -74,7 +74,10 @@ false only when nothing happened (the open scene is then unchanged).
 **GDTF files that are not in the library.** Complete GDTFs embedded in an MVR, and the GDTF copies of a project, are
 extracted to `{cache}/gdtf/{content hash}/` and added to the library when the library has no file of that name, so a
 project opens and evaluates on a computer without those files (tested with an empty library). Library files win over
-project copies of the same name.
+project copies of the same name. Whenever GDTF files are added to the library (also `Import` of a `.gdtf`), the DMX
+evaluation starts afresh: `DmxEngine` keeps a fixture's profile resolution until its GDTF name or mode changes, so a
+fixture that was unresolved (or stood in by a substitute) only picks up the new file this way; motors travel to their
+positions again, like after opening the scene. Changing an asset's import options marks the project modified.
 
 **MVR models** become model assets with the MVR conventions as import options (3DS millimetres Z-up, glTF metres Y-up);
 the MVR module's managed decode is reused (and cached), so opening an MVR never needs the native importer.
@@ -91,7 +94,9 @@ Assimp is native code: a crafted OBJ, FBX, COLLADA or 3DS file could crash the p
    transforms, materials, the files that were read, embedded and generated images, warnings), or `error.txt` and exit
    code 4 when the file is not importable (a user-facing reason, reported as `engine.import-failed`).
 3. A crash (any other exit, a signal), a timeout (the process tree is killed) or an unreadable package is reported as
-   **`engine.import-unsafe`: "'file' could not be imported safely (…)"**; nothing is added to the project.
+   **`engine.import-unsafe`: "'file' could not be imported safely (…)"**; nothing is added to the project. The timeout
+   bounds the whole import: after the worker ended, its output is read for at most 2 s
+   (`ImportWorker.OutputDrainTimeout`), since a helper process it left behind can hold the pipes open.
 4. The package is checked defensively when read (every count and length against the remaining bytes), the asset is
    stored with its original bytes and companions, and the decoded model is cached in memory and on disk
    (`{cache}/models/{content hash}_{options}.cmodel`), so a model passes the native importer at most once per machine.
@@ -136,13 +141,21 @@ so embedded and generated images never require the native importer again.
 6. **Render sync** (below).
 
 The result depends only on the scene, the DMX received and the sequence of frame times (tested: two engines, same
-input sequence, identical lights; evaluation threads do not change results). Steady-state frames — fixtures moving,
+input sequence, identical lights and smoke; evaluation and simulation threads do not change results). "The scene"
+includes its entity ids: they seed each fixture's random effects (random strobe, random wheel positions), so the same
+show rebuilt with new ids flickers differently. Steady-state frames — fixtures moving,
 nothing edited — allocate nothing on the main thread (tested on `Фокина.mvr` with every motor moving).
 
 ## RenderSync
 
-`engine.AttachRenderWorld(world)` returns a `RenderSync` that keeps an `IRenderWorld` in sync, incrementally from
-`Scene.Changed` plus per-frame dynamic data; `DetachRenderWorld()` destroys everything it created.
+`engine.AttachRenderWorld(world, loadFixtureModelsInBackground = true)` returns a `RenderSync` that keeps an
+`IRenderWorld` in sync, incrementally from `Scene.Changed` plus per-frame dynamic data; `DetachRenderWorld()` destroys
+everything it created. The incremental result equals a binding built from scratch after any sequence of edits, undo
+and redo (tested). What a change replaces — a model whose import options changed, a fixture type recompiled after a
+library change, its gobo textures — is destroyed after every entity drawing it has been rebuilt and the new light list
+was sent, so the renderer never holds an instance or light that refers to a destroyed resource. A gobo of a fixture type
+seen for the first time is resolved from the next frame (the light list of a frame is collected before the binding's
+update).
 
 | Content | How it is drawn |
 |---|---|
@@ -156,7 +169,8 @@ nothing edited — allocate nothing on the main thread (tested on `Фокина.
 | Consoles, power sources, rigging points | Simple primitives (desk, distro box, hoist). |
 | Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, the smoke density grid when the smoke simulation stepped, the flames' temperature grids composited into one grid; noise sources every frame. |
 
-**Flags.** `Selected` (selection), `Hidden` (entity or an ancestor hidden, or its layer hidden), `CableHighlight`
+**Flags.** `Selected` (selection), `Hidden` (entity or an ancestor hidden, or its layer hidden; a hidden fixture still
+emits its light — hiding the rig to look at the stage keeps the stage lit; its dimmer switches it off), `CableHighlight`
 (cables and the devices they plug into), `CastShadow` (`FixtureComponent`/`MeshComponent.CastShadow`; walls, trusses
 and posters cast, reference drawings and cables do not), `Reference`. Every drawn entity has a pick id:
 `TryGetEntity(pickId, out entityId)`, `PickIdOf(entityId)`; `InstancesOf(entityId)` lists what was drawn (part names,
@@ -235,9 +249,15 @@ candela render-test --out <dir> [options]                (renderer self-test, se
 **render** loads the scene through `StageEngine`, applies the look (`open-white` default; `show` = as saved;
 `dmx-file` plays a recording from its start), ticks the simulation for `--time` seconds at 30 frames per second
 (motors travel, haze builds up, flames burn), renders `--frames` frames (temporal accumulation) and writes the PNG,
-printing the scene, camera, exposure, timings and the most severe issues. `--view auto` frames the scene's bounding
-box from the front left, elevated (`ViewFraming`: the distance at which all eight corners fit the field of view);
-`front`, `top`, `side` look along the axes. A scene without a floor (MVR exports often contain only the rig) gets a
+printing the scene, camera, exposure, timings and the most severe issues. `--view auto` frames the scene from the front
+left, elevated; `front`, `top`, `side` look along the axes. The preset views frame the content itself rather than its
+bounding box (`SceneBounds.CollectContentCorners` — the corners of every object's box — plus
+`SceneBounds.CollectFixtureParts` — every fixture part as it hangs and moves — fitted by `ViewFraming.Frame(points, …)`:
+each side of the picture touches its outermost point with a 10 % margin and the content is centred), so the stage fills
+the picture. `--out` must name a file (a folder is a usage error). `--overlay lux` keeps the default gradient
+(1 … 5000 lx) unless the floor is brighter; then the same colours are stretched up to the brightest floor reading
+(a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
+the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
 temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure defaults to an
 incident-light reading of the lit floor (`--ev auto`); `--ev` sets EV100, `--auto-exposure` lets the renderer adapt.
 `render stages/Фокина.mvr --out f.png --width 480 --height 270` takes about 6 s on lavapipe.
@@ -272,7 +292,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (37 tests, ≈ 25 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (73 tests, ≈ 35 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, 4 substitutes and no errors; every fixture has a state and a pose; after
@@ -304,9 +324,22 @@ a device):
   the MVR and a GDTF; `validate` exits with 4 on Фокина's patch overlaps and prints the light plot; `import-worker`
   writes a package with the given units or the reason it cannot; `artnet-test` sends ArtDmx packets to a UDP port;
   engine options from the user settings default to the repository library, and a missing library stays reported.
-* **Rendering** (Vulkan): `candela render` on Фокина.mvr at 480 × 270 gives a lit, not blown-out stage; the
-  thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames differ;
-  `--look dmx-file` plays a recording for `--time` before rendering.
+* **Rendering** (Vulkan): `candela render` on Фокина.mvr at 480 × 270 gives a lit, not blown-out stage that spans most
+  of the picture; the thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames
+  differ; a GDTF deleted since the scan gives a dark thumbnail, not an exception; `--look dmx-file` plays a recording
+  for `--time` before rendering.
+* **Integration review**: lights against independent computations (position = the beam part's pose, unit direction
+  and up, colour of luminance 1 in Rec.2020 for every light of Фокина, the same pan/tilt on a fixture turned 90° gives
+  the beam turned 90°); incremental render sync equals a fresh binding after moves, reparenting, removal, undo/redo, a
+  hidden layer and selection, and detaching leaves the render world empty; gobos projected when the world is attached
+  before the first frame; a fixture whose GDTF is imported later appears; changing a fixture's GDTF or a model's import
+  options redraws it; a library reload rebuilds every fixture without dangling meshes or gobos; opening another scene
+  while attached; Фокина saved as a project reopens with identical fixtures, instances and lights; an MVR merged twice
+  with undo/redo while drawn; noise sources at the specs level scaled by activity; a daisy chain behind a cabled
+  fixture is console-driven; smoke and lights identical for 1 and 4 threads; recovered autosave sessions are gone after
+  saving (with and without autosave); worker crashes with a lingering child, garbage output, and a project whose model
+  crashes the worker; framing fits every point tightly; thousands of damaged recordings and model packages load or are
+  refused with `InvalidDataException`.
 
 ## Known limitations
 

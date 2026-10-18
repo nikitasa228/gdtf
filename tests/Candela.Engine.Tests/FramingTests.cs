@@ -77,3 +77,30 @@ public sealed class FramingTests
         }
     }
 }
+
+/// <summary>The CLI's lux overlay range follows the scene.</summary>
+public sealed class LuxOverlayRangeTests
+{
+    [Fact]
+    public void The_lux_overlay_covers_the_brightest_floor_reading()
+    {
+        using var engine = TestEnvironment.CreateEngine("lux-range");
+        SceneBuilder.Floor(engine.Scene, 10f);
+        var bounds = new Aabb(new Vector3(-5, -5, 0), new Vector3(5, 5, 6));
+        engine.Tick(0);
+        var dark = Cli.RenderCommand.LuxGradientFor(engine, bounds);
+        Assert.Equal(ColorGradient.DefaultLux().RangeMax, dark.RangeMax);
+
+        // a MAC Viper at full, narrow, 2 m above the floor: far brighter than the default 5000 lx
+        SceneBuilder.Fixture(engine.Scene, SceneBuilder.MacViper, "Basic", new Vector3(0, 0, 2));
+        StageLooks.ApplyOpenWhite(engine, new OpenWhiteOptions { Undoable = false, Zoom = 0f, Target = Vector3.Zero, Spread = 0f });
+        engine.Settings.MotorDynamics = false;
+        engine.Tick(1.0 / 30);
+        float peak = engine.LightMeter.HorizontalIlluminanceAt(Vector3.Zero);
+        Assert.True(peak > 10000f, $"{peak} lx");
+        var bright = Cli.RenderCommand.LuxGradientFor(engine, bounds);
+        Assert.True(bright.RangeMax >= peak * 0.9f, $"range {bright.RangeMax} lx for a peak of {peak} lx");
+        Assert.Equal(ColorGradient.DefaultLux().Stops.Count, bright.Stops.Count);
+        Assert.True(bright.Stops.Zip(bright.Stops.Skip(1)).All(p => p.First.Value < p.Second.Value));
+    }
+}

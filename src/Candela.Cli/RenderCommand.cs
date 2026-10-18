@@ -275,6 +275,12 @@ internal static class RenderCommand
             ShowGrid = options.Grid,
             ShowSelectionOutline = false,
         };
+        if (options.Overlay == OverlayMode.Lux)
+        {
+            view.LuxGradient = LuxGradientFor(engine, bounds);
+            output.WriteLine(string.Create(CultureInfo.InvariantCulture,
+                $"Lux:      overlay {view.LuxGradient.RangeMin:0} … {view.LuxGradient.RangeMax:0} lx (grey outside)"));
+        }
         var settings = new PreviewSettings
         {
             AutoExposure = options.AutoExposure,
@@ -353,6 +359,47 @@ internal static class RenderCommand
             camera.Ev100 = engine.LightMeter.IncidentEv100(bounds, bounds.IsEmpty ? 0f : bounds.Min.Z + 0.01f);
         }
         return camera;
+    }
+
+    /// <summary>
+    /// The lux overlay's gradient for this scene: the default (1 … 5000 lx) when the floor stays within it, otherwise the
+    /// same colours stretched up to the brightest floor reading (rounded up), so a bright rig is not drawn grey (out of
+    /// range) everywhere.
+    /// </summary>
+    public static ColorGradient LuxGradientFor(StageEngine engine, Core.Math.Aabb bounds)
+    {
+        var gradient = ColorGradient.DefaultLux();
+        if (bounds.IsEmpty) return gradient;
+        const int n = 32;
+        var size = bounds.Size;
+        var lux = engine.LightMeter.IlluminanceOnGrid(
+            new Vector3(bounds.Min.X + size.X / (2 * n), bounds.Min.Y + size.Y / (2 * n), bounds.Min.Z + 0.01f),
+            new Vector3(size.X / n, 0f, 0f), new Vector3(0f, size.Y / n, 0f), n, n);
+        float max = 0f;
+        foreach (float e in lux)
+            if (float.IsFinite(e)) max = MathF.Max(max, e);
+        // the hot spots of narrow beams fall between grid points: read the floor where every beam axis meets it as well
+        float floor = bounds.Min.Z + 0.01f;
+        foreach (ref readonly var light in engine.Lights)
+        {
+            if (!(light.Direction.Z < -1e-3f)) continue;
+            float t = (floor - light.Position.Z) / light.Direction.Z;
+            if (!(t > 0f) || !float.IsFinite(t)) continue;
+            var hit = light.Position + t * light.Direction;
+            if (hit.X < bounds.Min.X || hit.X > bounds.Max.X || hit.Y < bounds.Min.Y || hit.Y > bounds.Max.Y) continue;
+            float e = engine.LightMeter.HorizontalIlluminanceAt(hit);
+            if (float.IsFinite(e)) max = MathF.Max(max, e);
+        }
+        if (!(max > gradient.RangeMax)) return gradient;
+        float top = MathF.Pow(10f, MathF.Ceiling(MathF.Log10(max) * 4f) / 4f); // 10^(k/4): 5623, 10000, 17783 …
+        float k = top / gradient.RangeMax;
+        var stretched = new ColorGradient { RangeMin = gradient.RangeMin, RangeMax = top, Logarithmic = gradient.Logarithmic, OutOfRangeColor = gradient.OutOfRangeColor };
+        for (int i = 0; i < gradient.Stops.Count; i++)
+        {
+            var stop = gradient.Stops[i];
+            stretched.Stops.Add(i == 0 ? stop : stop with { Value = stop.Value * k });
+        }
+        return stretched;
     }
 
     /// <summary>Prints the most severe issues and a count per severity.</summary>
