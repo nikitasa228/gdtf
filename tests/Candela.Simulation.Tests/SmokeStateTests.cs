@@ -139,7 +139,7 @@ public sealed class SmokeStateTests
         var sim = Scene();
         Assert.Equal(0, sim.Step(0.02, []));        // 20 ms < one 33.3 ms sub-step
         Assert.Equal(1, sim.Step(0.02, []));        // 40 ms accumulated
-        Assert.Equal(1.0 / 30.0, sim.Time, 9);
+        Assert.Equal(sim.TimeStep, sim.Time);
         int total = 0;
         for (int n = 0; n < 30; n++)
             total += sim.Step(1.0 / 30.0, []);

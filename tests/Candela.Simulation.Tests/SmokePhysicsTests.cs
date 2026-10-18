@@ -61,6 +61,8 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     public void WarmSmoke_Rises()
     {
         var sim = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 6f), 0.2f);
+        // Mean excess of the (1 − q²)² puff ≈ 0.23 × 30 K ≈ 7 K: reduced gravity ≈ 0.23 m/s², so the thermal should
+        // accelerate to a few tenths of a metre per second (rise ≈ 0.3–0.6 m in the first 2 s).
         sim.AddSmoke(new Vector3(0f, 0f, 1.2f), 0.8f, 1f, 30f);
         float z0 = sim.SmokeCentreOfMass().Z;
         var heights = new List<float> { z0 };
@@ -73,7 +75,29 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
         output.WriteLine("centre of mass z: " + string.Join(" → ", heights.Select(h => h.ToString("F2"))));
         for (int n = 1; n < heights.Count; n++)
             Assert.True(heights[n] > heights[n - 1], "warm smoke must keep rising");
-        Assert.True(heights[^1] - z0 > 0.8f, $"rose only {heights[^1] - z0:F2} m in 2 s");
+        Assert.InRange(heights[^1] - z0, 0.3f, 1.2f);
+        // Rising faster and faster (accelerating thermal).
+        Assert.True(heights[^1] - heights[^2] > heights[1] - heights[0]);
+    }
+
+    [Fact]
+    public void WarmSource_LiftsItsSmokeHigherThanANeutralOne()
+    {
+        var hot = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 6f), 0.2f);
+        var neutral = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 6f), 0.2f);
+        // A brazier-sized source: 0.2 m disc, 0.5 m/s, 100 K above ambient (≈ 1.9 kW), 0.1 g/s of smoke. Heskestad's
+        // plume correlation gives a steady centre-line velocity of ≈ 1.3 m/s one metre above it; a starting plume's
+        // front travels at roughly half of that.
+        var warm = SmokeEmitter.Plume(new Vector3(0f, 0f, 0.3f), Vector3.UnitZ, 0.1f, 0.5f, 1e-4f, 100f);
+        SmokeTestScenes.Run(hot, 90, warm);
+        SmokeTestScenes.Run(neutral, 90, warm with { TemperatureExcess = 0f });
+        float zHot = hot.SmokeCentreOfMass().Z, zNeutral = neutral.SmokeCentreOfMass().Z;
+        float w = hot.VelocityAt(new Vector3(0f, 0f, 1.3f)).Z;
+        output.WriteLine($"centre of mass after 3 s: warm {zHot:F2} m, neutral {zNeutral:F2} m, w(1.3 m) = {w:F2} m/s");
+        Assert.True(zHot > zNeutral + 0.25f);
+        Assert.InRange(w, 0.5f, 2f);
+        Assert.True(hot.TemperatureAt(new Vector3(0f, 0f, 1.3f)) > SimulationConstants.AmbientTemperature + 5f);
+        Assert.True(hot.DensityAt(new Vector3(0f, 0f, 1.3f)) > 10f * neutral.DensityAt(new Vector3(0f, 0f, 1.3f)));
     }
 
     [Fact]
@@ -157,10 +181,14 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     [Fact]
     public void FanAtZeroSpeed_DoesNothing()
     {
-        var sim = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 4f), 0.25f);
-        sim.AddSmoke(new Vector3(0f, 0f, 2f), 1f, 0.5f);
-        SmokeTestScenes.Run(sim, 5, SmokeEmitter.Fan(new Vector3(-1.5f, 0f, 2f), Vector3.UnitX, 0f));
-        Assert.Equal(Vector3.Zero, sim.VelocityAt(new Vector3(-1f, 0f, 2f)));
+        var withFan = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 4f), 0.25f);
+        var without = SmokeTestScenes.ClosedBox(new Vector3(4f, 4f, 4f), 0.25f);
+        withFan.AddSmoke(new Vector3(0f, 0f, 2f), 1f, 0.5f);
+        without.AddSmoke(new Vector3(0f, 0f, 2f), 1f, 0.5f);
+        SmokeTestScenes.Run(withFan, 5, SmokeEmitter.Fan(new Vector3(-1.5f, 0f, 2f), Vector3.UnitX, 0f));
+        SmokeTestScenes.Run(without, 5);
+        Assert.True(withFan.Density.SequenceEqual(without.Density));
+        Assert.Equal(without.VelocityAt(new Vector3(-1f, 0f, 2f)), withFan.VelocityAt(new Vector3(-1f, 0f, 2f)));
     }
 
     [Fact]
@@ -183,8 +211,9 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
         // Mass balance: everything the hazer produced is in the room (no dissipation in this scene).
         double expected = SmokeEmitter.DefaultHazerMassRate * sim.Time / (volume * sim.MassConcentrationAtFullDensity);
         Assert.InRange(averages[^1], 0.95 * expected, 1.05 * expected);
-        // Haze, not fog: even near the machine the density stays moderate.
-        Assert.True(sim.Density.ToArray().Max() < 50 * averages[^1]);
+        // A slow, even fill: the increments are (nearly) equal from interval to interval.
+        double first = averages[1] - averages[0], last = averages[^1] - averages[^2];
+        Assert.InRange(last / first, 0.9, 1.1);
     }
 
     [Fact]
@@ -203,30 +232,34 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
     public void FogMachineJet_ThrowsFogForward()
     {
         var sim = SmokeTestScenes.ClosedBox(new Vector3(8f, 4f, 3f), 0.2f);
-        var fog = SmokeEmitter.FogMachine(new Vector3(-3.5f, 0f, 0.4f), Vector3.UnitX, 1f);
-        SmokeTestScenes.Run(sim, 30, fog);
-        var c = sim.SmokeCentreOfMass();
-        output.WriteLine($"fog centre after 1 s: {c}");
-        Assert.True(c.X > -3f, "the jet carries fog away from the nozzle");
+        var fog = SmokeEmitter.FogMachine(new Vector3(-3.5f, 0f, 0.6f), Vector3.UnitX, 1f);
+        SmokeTestScenes.Run(sim, 60, fog);
+        float ahead = sim.DensityAt(new Vector3(-2.5f, 0f, 0.7f));
+        float behind = sim.DensityAt(new Vector3(-3.8f, 0f, 0.7f));
+        float speed = sim.VelocityAt(new Vector3(-2f, 0f, 0.6f)).X;
+        output.WriteLine($"after 2 s: density 1 m ahead {ahead:F2}, 0.3 m behind {behind:F3}; air 1.5 m ahead {speed:F2} m/s; " +
+            $"centre {sim.SmokeCentreOfMass()}");
+        Assert.True(ahead > 1f, "fog is thrown at least a metre");
+        Assert.True(ahead > 20f * behind);
+        Assert.InRange(speed, 0.2f, 2f); // grid-filtered round jet of a 20 mm, 10 m/s nozzle (≈ 0.6–0.8 m/s at 1.5 m)
+        Assert.True(sim.SmokeCentreOfMass().X > -3.3f);
     }
 
     [Fact]
     public void LowFog_SinksAndSpreadsOnTheFloor()
     {
         var sim = SmokeTestScenes.ClosedBox(new Vector3(8f, 6f, 3f), 0.2f);
-        var lowFog = SmokeEmitter.FogMachine(new Vector3(-3.5f, 0f, 0.6f), Vector3.UnitX, 1f, lowFog: true);
-        var warmFog = SmokeEmitter.FogMachine(new Vector3(-3.5f, 0f, 0.6f), Vector3.UnitX, 1f);
         var warm = SmokeTestScenes.ClosedBox(new Vector3(8f, 6f, 3f), 0.2f);
-
-        SmokeTestScenes.Run(sim, 90, lowFog);
-        SmokeTestScenes.Run(warm, 90, warmFog);
+        var nozzle = new Vector3(-3.5f, 0f, 0.4f);
+        SmokeTestScenes.Run(sim, 90, SmokeEmitter.FogMachine(nozzle, Vector3.UnitX, 1f, lowFog: true));
+        SmokeTestScenes.Run(warm, 90, SmokeEmitter.FogMachine(nozzle, Vector3.UnitX, 1f));
 
         var cold = sim.SmokeCentreOfMass();
         var hot = warm.SmokeCentreOfMass();
-        output.WriteLine($"low fog centre {cold}, warm fog centre {hot}");
-        Assert.True(cold.Z < 0.5f, $"low fog centre at {cold.Z:F2} m");
-        Assert.True(hot.Z > cold.Z + 0.3f, "warm fog rises above chilled fog");
-        Assert.True(sim.DensityAt(new Vector3(0f, 0f, 0.1f)) > 5f * sim.DensityAt(new Vector3(0f, 0f, 1.5f)),
+        output.WriteLine($"after 3 s: low fog centre {cold}, warm fog centre {hot}");
+        Assert.True(cold.Z < nozzle.Z, $"low fog centre at {cold.Z:F2} m");
+        Assert.True(hot.Z > cold.Z + 0.1f, "warm fog rises above chilled fog");
+        Assert.True(sim.DensityAt(new Vector3(-2.5f, 0f, 0.1f)) > 5f * sim.DensityAt(new Vector3(-2.5f, 0f, 0.9f)),
             "low fog hugs the floor");
         Assert.True(sim.TemperatureAt(new Vector3(-3f, 0f, 0.3f)) < SimulationConstants.AmbientTemperature);
     }

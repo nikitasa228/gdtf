@@ -10,13 +10,18 @@ namespace Candela.Simulation;
 /// <param name="MaxDivergenceAfter">Largest |∇·u| of a fluid cell after the last projection, 1/s.</param>
 /// <param name="IgnoredEmitters">Emitters skipped in the last sub-step (non-finite position, outside the box, inside a solid).</param>
 /// <param name="DroppedTime">Simulation time discarded because the sub-step cap was reached, s.</param>
+/// <param name="MassCorrection">
+/// Relative correction applied by the mass fixer in the last sub-step (scale factor − 1; 0 when
+/// <see cref="SmokeSimulationSettings.ConserveMass"/> is off): a measure of the advection's conservation error.
+/// </param>
 public readonly record struct SmokeStepStatistics(
     int SubSteps,
     int PressureIterations,
     float MaxDivergenceBefore,
     float MaxDivergenceAfter,
     int IgnoredEmitters,
-    double DroppedTime);
+    double DroppedTime,
+    float MassCorrection);
 
 /// <summary>Wall-clock milliseconds spent in each stage of the last fixed sub-step.</summary>
 /// <param name="Sources">Emitter injection.</param>

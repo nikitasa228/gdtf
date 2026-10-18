@@ -3,6 +3,7 @@ namespace Candela.Simulation;
 public sealed partial class SmokeSimulation
 {
     private Action<int> _sumDensitySlice = null!;
+    private Action<int> _scaleDensitySlice = null!;
     private Action<int> _buoyancySlice = null!;
     private Action<int> _dissipateSlice = null!;
     private Action<int> _advectVelocitySlice = null!;
@@ -21,6 +22,7 @@ public sealed partial class SmokeSimulation
     private void InitializeKernels()
     {
         _sumDensitySlice = SumDensitySlice;
+        _scaleDensitySlice = ScaleDensitySlice;
         _buoyancySlice = BuoyancySlice;
         _dissipateSlice = DissipateSlice;
         _advectVelocitySlice = AdvectVelocitySlice;

@@ -79,6 +79,13 @@ public sealed record SmokeSimulationSettings
     /// <summary>How density and temperature are advected.</summary>
     public ScalarAdvectionScheme ScalarAdvection { get; init; } = ScalarAdvectionScheme.MacCormack;
 
+    /// <summary>
+    /// Whether the advected smoke is rescaled so its total mass changes only by what flows out through open faces
+    /// (global mass fixer; see <c>docs/simulation.md</c>). Off = plain semi-Lagrangian/MacCormack, which gains or loses
+    /// mass in recirculating flows.
+    /// </summary>
+    public bool ConserveMass { get; init; } = true;
+
     /// <summary>Molecular/turbulent diffusivity of smoke and heat, m²/s (0 = off; numerical diffusion already acts).</summary>
     public float Diffusivity { get; init; }
 

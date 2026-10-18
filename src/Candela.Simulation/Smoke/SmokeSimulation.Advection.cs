@@ -115,6 +115,11 @@ public sealed partial class SmokeSimulation
     private void AdvectScalars(float dt)
     {
         _dtForKernels = dt;
+        bool conserve = _settings.ConserveMass;
+        double target = 0;
+        if (conserve)
+            target = Math.Max(0.0, SumDensity() - BoundaryOutflow(dt));
+
         RunSlices(_nz, _advectScalarsForwardSlice);
         if (_settings.ScalarAdvection == ScalarAdvectionScheme.MacCormack)
         {
@@ -126,6 +131,87 @@ public sealed partial class SmokeSimulation
             (_density, _density2) = (_density2, _density);
             (_temperature, _temperature2) = (_temperature2, _temperature);
         }
+
+        _massCorrection = 0f;
+        if (conserve)
+            FixMass(target);
+    }
+
+    /// <summary>
+    /// Smoke that leaves through open faces during one step, in density·cells: Σ u_n·d·dt/h over the free boundary
+    /// faces with outward velocity, using the density of the cell inside (first-order upwind). Air entering through an
+    /// open face is ambient and carries no smoke. Sequential, so the sum is deterministic.
+    /// </summary>
+    private double BoundaryOutflow(float dt)
+    {
+        var open = _settings.OpenFaces;
+        if (open == DomainFaces.None)
+            return 0.0;
+        double sum = 0;
+        int nx = _nx, ny = _ny, nz = _nz;
+        for (int k = 0; k < nz; k++)
+        {
+            for (int j = 0; j < ny; j++)
+            {
+                sum += Outflow(_u, _uFlags, UIndex(0, j, k), -1f, CellIndex(0, j, k));
+                sum += Outflow(_u, _uFlags, UIndex(nx, j, k), 1f, CellIndex(nx - 1, j, k));
+            }
+
+            for (int i = 0; i < nx; i++)
+            {
+                sum += Outflow(_v, _vFlags, VIndex(i, 0, k), -1f, CellIndex(i, 0, k));
+                sum += Outflow(_v, _vFlags, VIndex(i, ny, k), 1f, CellIndex(i, ny - 1, k));
+            }
+        }
+
+        for (int j = 0; j < ny; j++)
+        {
+            for (int i = 0; i < nx; i++)
+            {
+                sum += Outflow(_w, _wFlags, WIndex(i, j, 0), -1f, CellIndex(i, j, 0));
+                sum += Outflow(_w, _wFlags, WIndex(i, j, nz), 1f, CellIndex(i, j, nz - 1));
+            }
+        }
+
+        return sum * dt * _invH;
+
+        float Outflow(float[] f, byte[] flags, int face, float outward, int cell)
+        {
+            if (flags[face] != FaceFree)
+                return 0f;
+            float un = f[face] * outward;
+            return un > 0f ? un * _density[cell] : 0f;
+        }
+    }
+
+    /// <summary>
+    /// Global mass fixer: semi-Lagrangian and MacCormack advection do not conserve mass (errors of 10–60 % over a few
+    /// hundred steps in recirculating flows), so the advected density is scaled so that the total equals the total
+    /// before advection minus what left through open faces. Scaling keeps the shape and the sign of the field; the
+    /// factor is limited to [0.5, 2] so a broken step cannot blow the field up. This is the "mass fixer" used with
+    /// semi-Lagrangian tracer transport in atmospheric models.
+    /// </summary>
+    private void FixMass(double target)
+    {
+        double after = SumDensity();
+        if (!(after > 1e-12) || !double.IsFinite(after) || !double.IsFinite(target))
+            return;
+        float factor = (float)Math.Clamp(target / after, 0.5, 2.0);
+        _massCorrection = factor - 1f;
+        if (factor == 1f)
+            return;
+        _massScale = factor;
+        RunSlices(_nz, _scaleDensitySlice);
+    }
+
+    private float _massScale = 1f, _massCorrection;
+
+    private void ScaleDensitySlice(int k)
+    {
+        int start = k * _nx * _ny, end = start + _nx * _ny;
+        float f = _massScale;
+        for (int c = start; c < end; c++)
+            _density[c] *= f;
     }
 
     private Vector3 CellVelocity(int i, int j, int k) => new(

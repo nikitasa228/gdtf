@@ -10,10 +10,10 @@ public sealed partial class SmokeSimulation
     /// <summary>Spreading rate S of a turbulent round jet: velocity half-width grows as S·x (Hussein, Capp &amp; George 1994).</summary>
     public const float JetSpreadingRate = 0.094f;
 
-    /// <summary>Time constant with which an effect fan's jet field is imposed on the air, s.</summary>
+    /// <summary>Time constant with which a fan's or nozzle's jet field is imposed on the air, s.</summary>
     public const float FanResponseTime = 0.25f;
 
-    /// <summary>A fan jet is applied until its centre-line speed falls below this, m/s (and at most 50 outlet diameters).</summary>
+    /// <summary>A jet is applied until its centre-line speed falls below this, m/s (and at most over the box diagonal).</summary>
     private const float FanCutoffSpeed = 0.2f;
 
     private ResolvedSource[] _sources = new ResolvedSource[8];
@@ -32,17 +32,14 @@ public sealed partial class SmokeSimulation
         /// <summary>Injection sphere radius, m (sources).</summary>
         public float Radius;
 
-        /// <summary>Jet speed: grid-scale for sources, outlet speed for fans, m/s.</summary>
+        /// <summary>Speed held in the source sphere (plumes, grid scale) or outlet speed (jets), m/s.</summary>
         public float Speed;
 
-        /// <summary>Grid-scale temperature excess, K.</summary>
-        public float Temperature;
+        /// <summary>Heat added per second (negative = cooling), W.</summary>
+        public float HeatRate;
 
         /// <summary>Density added per second, density·m³/s.</summary>
         public float DensityRate;
-
-        /// <summary>How strongly the source region is held at the jet state each sub-step, 0..1.</summary>
-        public float Strength;
 
         /// <summary>Outlet diameter (fans), m.</summary>
         public float Diameter;
@@ -52,10 +49,11 @@ public sealed partial class SmokeSimulation
     }
 
     /// <summary>
-    /// Converts the emitters to grid-scale sources and applies smoke, heat and jet velocity of hazers, fog machines and
-    /// plumes. Nozzles are much smaller than a cell, so a jet is injected over a sphere of radius R = max(r₀, h) at the
-    /// speed and temperature that carry the nozzle's momentum flux ρU₀²πr₀² and buoyancy flux: U = U₀·r₀/R and
-    /// ΔT = ΔT₀·r₀/R (for a jet entraining ambient air these fluxes are conserved). Returns the number of ignored emitters.
+    /// Converts the emitters to grid-scale sources. Nozzles are much smaller than a cell, so the aerosol mass rate ṁ and
+    /// the heat flux H = ρ·c_p·U₀·πr₀²·ΔT₀ (both × output) are added at exactly their rates to the cells of a sphere of
+    /// radius R = max(r₀, h) in front of the nozzle; the nozzle's momentum is imposed as a grid-filtered round jet
+    /// (<see cref="ApplyJets"/>). A plume holds its exit velocity U₀·r₀/R in the sphere (momentum flux ρU²πR² of the
+    /// nozzle) and is otherwise driven by its own buoyancy. Returns the number of ignored emitters.
     /// </summary>
     private int ApplySources(ReadOnlySpan<SmokeEmitter> emitters, float dt)
     {
@@ -85,7 +83,7 @@ public sealed partial class SmokeSimulation
 
             if (e.Kind == SmokeEmitterKind.Fan)
             {
-                if (!AddFan(e.Position, dir, diameter, speed))
+                if (speed > 0f && !AddJet(e.Position, dir, diameter, speed))
                     ignored++;
                 continue;
             }
@@ -93,25 +91,37 @@ public sealed partial class SmokeSimulation
             float r0 = 0.5f * diameter;
             float radius = MathF.Max(r0, _h);
             float scale = MathF.Min(1f, r0 / radius);
+            float area = MathF.PI * r0 * r0;
+            float heatRate = SimulationConstants.AirDensity * SimulationConstants.AirSpecificHeat * speed * area * temperature
+                * (e.SpeedFollowsOutput ? 1f : output);
+            // Smoke machines blow through a nozzle: their momentum is imposed as a resolved round jet (like a fan), and the
+            // aerosol and heat go into the cells at the nozzle. A plume is driven by its own buoyancy; its exit velocity
+            // is held only in the source sphere.
+            bool jet = e.Kind != SmokeEmitterKind.Plume && speed > 0f;
             var source = new ResolvedSource
             {
                 Kind = e.Kind,
                 Center = e.Position + dir * radius,
                 Direction = dir,
                 Radius = radius,
-                Speed = speed * scale,
-                Temperature = temperature * scale,
+                Speed = jet ? 0f : speed * scale,
+                HeatRate = float.IsFinite(heatRate) ? heatRate : 0f,
                 DensityRate = massRate * output / _massPerDensity,
-                Strength = e.SpeedFollowsOutput ? 1f : output,
             };
-            if (!InjectSource(source, dt))
+            if (!InjectSource(source, holdVelocity: !jet, dt))
+            {
                 ignored++;
+                continue;
+            }
+
+            if (jet)
+                AddJet(e.Position, dir, diameter, speed);
         }
 
         return ignored;
     }
 
-    private bool InjectSource(in ResolvedSource s, float dt)
+    private bool InjectSource(in ResolvedSource s, bool holdVelocity, float dt)
     {
         var extent = new Vector3(s.Radius);
         if (!Overlaps(s.Center - extent, s.Center + extent))
@@ -136,7 +146,10 @@ public sealed partial class SmokeSimulation
         if (!(total > 1e-9))
             return false;
 
-        float densityPerWeight = (float)(s.DensityRate * dt / (total * _h * _h * _h));
+        double weightVolume = total * _h * _h * _h;
+        float densityPerWeight = (float)(s.DensityRate * dt / weightVolume);
+        float kelvinPerWeight = (float)(s.HeatRate * dt
+            / (SimulationConstants.AirDensity * SimulationConstants.AirSpecificHeat * weightVolume));
         float tMax = _settings.MaxTemperatureExcess;
         for (int k = lo.Z; k <= hi.Z; k++)
         {
@@ -151,16 +164,17 @@ public sealed partial class SmokeSimulation
                     if (w <= 0f)
                         continue;
                     _density[c] += densityPerWeight * w;
-                    float blend = w * s.Strength;
-                    _temperature[c] = Math.Clamp(_temperature[c] + (s.Temperature - _temperature[c]) * blend, -tMax, tMax);
+                    _temperature[c] = Math.Clamp(_temperature[c] + kelvinPerWeight * w, -tMax, tMax);
                 }
             }
         }
 
+        if (!holdVelocity)
+            return true;
         var target = s.Direction * s.Speed;
-        BlendFaces(_u, _uFlags, _nx + 1, _ny, _nz, new Vector3(0f, 0.5f, 0.5f), s.Center, s.Radius, target.X, s.Strength);
-        BlendFaces(_v, _vFlags, _nx, _ny + 1, _nz, new Vector3(0.5f, 0f, 0.5f), s.Center, s.Radius, target.Y, s.Strength);
-        BlendFaces(_w, _wFlags, _nx, _ny, _nz + 1, new Vector3(0.5f, 0.5f, 0f), s.Center, s.Radius, target.Z, s.Strength);
+        BlendFaces(_u, _uFlags, _nx + 1, _ny, _nz, new Vector3(0f, 0.5f, 0.5f), s.Center, s.Radius, target.X);
+        BlendFaces(_v, _vFlags, _nx, _ny + 1, _nz, new Vector3(0.5f, 0f, 0.5f), s.Center, s.Radius, target.Y);
+        BlendFaces(_w, _wFlags, _nx, _ny, _nz + 1, new Vector3(0.5f, 0.5f, 0f), s.Center, s.Radius, target.Z);
         return true;
     }
 
@@ -171,10 +185,16 @@ public sealed partial class SmokeSimulation
         max.X >= _bounds.Min.X && max.Y >= _bounds.Min.Y && max.Z >= _bounds.Min.Z
         && min.X <= _bounds.Max.X && min.Y <= _bounds.Max.Y && min.Z <= _bounds.Max.Z;
 
-    /// <summary>Relaxes the free faces of one velocity component inside a sphere toward <paramref name="target"/>.</summary>
+    /// <summary>
+    /// Pushes the free faces of one velocity component inside a sphere toward <paramref name="target"/> (the exit
+    /// velocity's component). Air that already moves faster in that direction — e.g. accelerated by the plume's own
+    /// buoyancy — is left alone, and components perpendicular to the exit direction (target 0) are not touched.
+    /// </summary>
     private void BlendFaces(float[] f, byte[] flags, int sx, int sy, int sz, Vector3 offset, Vector3 center, float radius,
-        float target, float strength)
+        float target)
     {
+        if (target == 0f)
+            return;
         var g = (center - _origin) * _invH - offset;
         float r = radius * _invH;
         int i0 = Math.Max(0, (int)MathF.Floor(g.X - r)), i1 = Math.Min(sx - 1, (int)MathF.Ceiling(g.X + r));
@@ -192,23 +212,31 @@ public sealed partial class SmokeSimulation
                         continue;
                     float dx = i - g.X, dy = j - g.Y, dz = k - g.Z;
                     float w = Kernel((dx * dx + dy * dy + dz * dz) * invR2);
+                    float deficit = target > 0f ? MathF.Max(0f, target - f[n]) : MathF.Min(0f, target - f[n]);
                     if (w > 0f)
-                        f[n] += (target - f[n]) * w * strength;
+                        f[n] += deficit * w;
                 }
             }
         }
     }
 
-    private bool AddFan(Vector3 position, Vector3 direction, float diameter, float speed)
+    /// <summary>
+    /// Registers a round jet (fan outlet or smoke-machine nozzle) of outlet diameter <paramref name="diameter"/> and
+    /// outlet speed <paramref name="speed"/>; it is imposed in <see cref="ApplyJets"/>. The jet is followed until its
+    /// centre-line speed falls below <see cref="FanCutoffSpeed"/> (at most the diagonal of the box). Returns false when it
+    /// misses the box.
+    /// </summary>
+    private bool AddJet(Vector3 position, Vector3 direction, float diameter, float speed)
     {
         if (speed <= 0f)
             return true;
-        float reach = MathF.Min(50f * diameter, JetDecayConstant * diameter * speed / FanCutoffSpeed);
+        float diagonal = _bounds.Size.Length();
+        float reach = MathF.Min(diagonal, JetDecayConstant * diameter * speed / FanCutoffSpeed);
         reach = MathF.Max(reach, diameter);
         var end = position + direction * reach;
-        float endWidth = 2f * HalfWidth(reach, diameter);
-        var min = Vector3.Min(position - new Vector3(diameter), end - new Vector3(endWidth));
-        var max = Vector3.Max(position + new Vector3(diameter), end + new Vector3(endWidth));
+        float endWidth = 2f * HalfWidth(reach, diameter) + _h;
+        var min = Vector3.Min(position - new Vector3(diameter + _h), end - new Vector3(endWidth));
+        var max = Vector3.Max(position + new Vector3(diameter + _h), end + new Vector3(endWidth));
         if (!Overlaps(min, max))
             return false;
         if (_sourceCount == _sources.Length)
@@ -229,34 +257,43 @@ public sealed partial class SmokeSimulation
     private static float HalfWidth(float x, float diameter) => 0.5f * diameter + JetSpreadingRate * x;
 
     /// <summary>
-    /// Imposes the mean velocity field of a turbulent round jet for every active fan: centre-line speed U₀ in the
-    /// potential core (x &lt; B·D), U₀·B·D/x beyond, Gaussian radial profile exp(−ln2·r²/b²) with half-width b = D/2 + S·x.
-    /// The air is relaxed toward it with time constant <see cref="FanResponseTime"/>, weighted by the profile so the
-    /// surrounding air is only entrained, not held.
+    /// Imposes the mean velocity field of a turbulent round jet for every active fan and nozzle: centre-line speed U₀ in
+    /// the potential core (x &lt; B·D), U₀·B·D/x beyond, Gaussian radial profile exp(−ln2·r²/b²) with half-width
+    /// b = D/2 + S·x. Where the jet is narrower than a cell it is widened to b' = h and slowed to u·b/b', which keeps its
+    /// momentum flux (∝ u²b²) — the grid-filtered jet. Only the axial component is imposed: each velocity component is
+    /// relaxed toward its share of the jet with time constant <see cref="FanResponseTime"/>, weighted by the profile and
+    /// by the squared direction cosine, so cross flow and buoyancy can still bend the jet and the surrounding air is
+    /// entrained rather than held.
     /// </summary>
-    private void ApplyFans(float dt)
+    private void ApplyJets(float dt)
     {
         float alpha = 1f - MathF.Exp(-dt / FanResponseTime);
         for (int n = 0; n < _sourceCount; n++)
         {
-            ref readonly var fan = ref _sources[n];
-            ApplyFanComponent(fan, _u, _uFlags, _nx + 1, _ny, _nz, new Vector3(0f, 0.5f, 0.5f), fan.Direction.X, alpha);
-            ApplyFanComponent(fan, _v, _vFlags, _nx, _ny + 1, _nz, new Vector3(0.5f, 0f, 0.5f), fan.Direction.Y, alpha);
-            ApplyFanComponent(fan, _w, _wFlags, _nx, _ny, _nz + 1, new Vector3(0.5f, 0.5f, 0f), fan.Direction.Z, alpha);
+            ref readonly var jet = ref _sources[n];
+            ApplyJetComponent(jet, _u, _uFlags, _nx + 1, _ny, _nz, new Vector3(0f, 0.5f, 0.5f), jet.Direction.X, alpha);
+            ApplyJetComponent(jet, _v, _vFlags, _nx, _ny + 1, _nz, new Vector3(0.5f, 0f, 0.5f), jet.Direction.Y, alpha);
+            ApplyJetComponent(jet, _w, _wFlags, _nx, _ny, _nz + 1, new Vector3(0.5f, 0.5f, 0f), jet.Direction.Z, alpha);
         }
     }
 
-    private void ApplyFanComponent(in ResolvedSource fan, float[] f, byte[] flags, int sx, int sy, int sz, Vector3 offset,
+    private void ApplyJetComponent(in ResolvedSource jet, float[] f, byte[] flags, int sx, int sy, int sz, Vector3 offset,
         float axisComponent, float alpha)
     {
-        var end = fan.Center + fan.Direction * fan.Reach;
-        float endWidth = 2f * HalfWidth(fan.Reach, fan.Diameter);
-        var min = (Vector3.Min(fan.Center - new Vector3(fan.Diameter), end - new Vector3(endWidth)) - _origin) * _invH - offset;
-        var max = (Vector3.Max(fan.Center + new Vector3(fan.Diameter), end + new Vector3(endWidth)) - _origin) * _invH - offset;
+        float weight = axisComponent * axisComponent;
+        if (weight < 1e-6f)
+            return;
+        var end = jet.Center + jet.Direction * jet.Reach;
+        float endWidth = 2f * HalfWidth(jet.Reach, jet.Diameter) + _h;
+        var pad = new Vector3(jet.Diameter + _h);
+        var min = (Vector3.Min(jet.Center - pad, end - new Vector3(endWidth)) - _origin) * _invH - offset;
+        var max = (Vector3.Max(jet.Center + pad, end + new Vector3(endWidth)) - _origin) * _invH - offset;
         int i0 = Math.Max(0, (int)MathF.Floor(min.X)), i1 = Math.Min(sx - 1, (int)MathF.Ceiling(max.X));
         int j0 = Math.Max(0, (int)MathF.Floor(min.Y)), j1 = Math.Min(sy - 1, (int)MathF.Ceiling(max.Y));
         int k0 = Math.Max(0, (int)MathF.Floor(min.Z)), k1 = Math.Min(sz - 1, (int)MathF.Ceiling(max.Z));
-        float core = JetDecayConstant * fan.Diameter;
+        float core = JetDecayConstant * jet.Diameter;
+        float minWidth = _h;
+        float rate = alpha * weight;
         const float ln2 = 0.693147182f;
         for (int k = k0; k <= k1; k++)
         {
@@ -268,18 +305,25 @@ public sealed partial class SmokeSimulation
                     if (flags[idx] != FaceFree)
                         continue;
                     var p = _origin + (new Vector3(i, j, k) + offset) * _h;
-                    var rel = p - fan.Center;
-                    float x = Vector3.Dot(rel, fan.Direction);
-                    if (x < 0f || x > fan.Reach)
+                    var rel = p - jet.Center;
+                    float x = Vector3.Dot(rel, jet.Direction);
+                    if (x < -0.5f * _h || x > jet.Reach)
                         continue;
+                    float xa = MathF.Max(x, 0f);
                     float r2 = MathF.Max(0f, rel.LengthSquared() - x * x);
-                    float b = HalfWidth(x, fan.Diameter);
+                    float b = HalfWidth(xa, jet.Diameter);
+                    float centreline = xa < core ? jet.Speed : jet.Speed * core / xa;
+                    if (b < minWidth)
+                    {
+                        centreline *= b / minWidth;
+                        b = minWidth;
+                    }
+
                     float profile = MathF.Exp(-ln2 * r2 / (b * b));
                     if (profile < 0.02f)
                         continue;
-                    float centreline = x < core ? fan.Speed : fan.Speed * core / x;
                     float target = centreline * profile * axisComponent;
-                    f[idx] += (target - f[idx]) * alpha * profile;
+                    f[idx] += (target - f[idx]) * rate * profile;
                 }
             }
         }
