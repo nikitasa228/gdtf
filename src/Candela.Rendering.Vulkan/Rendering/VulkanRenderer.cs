@@ -280,6 +280,12 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 _atlas ??= new ShadowAtlas(Context);
                 _atlas.Configure(settings.ShadowMapResolution, decisions.Indirect == IndirectLighting.ReflectiveShadowMaps);
             }
+            else if (_atlas is not null && _world.ShadowCastingLights == 0)
+            {
+                // No light casts shadows any more: give the atlas memory back (destroyed after the frames using it).
+                Context.DeferDispose(_atlas);
+                _atlas = null;
+            }
 
             if (_atlas is not null)
                 _atlas.ProcessChanges(_world.ShadowChanges);
@@ -627,7 +633,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.Flame = gpu.Flame.Present;
         d.NoiseField = gpu.Noise.Present;
         d.Lights = lights > 0 && (full || d.Overlay == OverlayMode.Lux);
-        d.Shadows = d.Lights && settings.Shadows && settings.MaxShadowedLights > 0;
+        d.Shadows = d.Lights && settings.Shadows && settings.MaxShadowedLights > 0 && _world.ShadowCastingLights > 0;
         d.VolumeLights = full && settings.Volumetrics && (d.Haze || d.Smoke) && lights > 0;
         d.Volumetrics = (full && settings.Volumetrics && (d.Haze || d.Smoke || d.Flame)) || d.Overlay == OverlayMode.Noise;
         var indirect = full && d.Lights ? settings.Indirect : IndirectLighting.Off;

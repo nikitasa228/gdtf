@@ -48,6 +48,23 @@ internal struct LastFrameInfo
 public sealed unsafe class VulkanRenderTarget : IRenderTarget
 {
     private const int MaxPassSets = 24;
+
+    /// <summary>Renders a feature's resources survive without being used.</summary>
+    private const int KeepUnusedRenders = 60;
+
+    private const int SlotDisplayDepth = 0;
+    private const int SlotAnalysis = 1;
+    private const int SlotGradient = 2;
+    private const int SlotSelection = 3;
+    private const int SlotInjected = 4;
+    private const int SlotHistory = 5;
+    private const int SlotIntegrated = 6;
+    private const int SlotIndirect = 7;
+    private const int SlotIndirectHistory = 8;
+    private const int SlotVpls = 9;
+    private const int SlotBloom = 10;
+    private const int SlotExposure = 11;
+    private readonly int[] _unusedRenders = new int[12];
     private readonly VulkanRenderer _renderer;
     private readonly VulkanContext _context;
     private readonly DescriptorSignature _signature = new();
@@ -285,44 +302,46 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         }
 
         uint dw = (uint)Width, dh = (uint)Height;
-        Ensure(DisplayDepth, r.Scaled, dw, dh, 1, TargetFormats.Depth, ImageUsageFlags.DepthStencilAttachmentBit, "overlay depth", out var displayDepth);
+        Ensure(SlotDisplayDepth, DisplayDepth, r.Scaled, dw, dh, 1, TargetFormats.Depth, ImageUsageFlags.DepthStencilAttachmentBit, "overlay depth",
+            out var displayDepth);
         DisplayDepth = displayDepth;
-        Ensure(Analysis, r.Analysis, (uint)RenderWidth, (uint)RenderHeight, 1, TargetFormats.Analysis,
+        Ensure(SlotAnalysis, Analysis, r.Analysis, (uint)RenderWidth, (uint)RenderHeight, 1, TargetFormats.Analysis,
             ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit, "analysis", out var analysis);
         Analysis = analysis;
-        Ensure(GradientLut, r.Analysis || r.VolumeX > 0, 256, 1, 1, TargetFormats.HdrStorage,
+        Ensure(SlotGradient, GradientLut, r.Analysis || r.VolumeX > 0, 256, 1, 1, TargetFormats.HdrStorage,
             ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit, "overlay gradient", out var lut);
         if (!ReferenceEquals(lut, GradientLut))
             GradientHash = 0;
         GradientLut = lut;
-        Ensure(SelectionMask, r.Selection, dw, dh, 1, TargetFormats.SelectionMask,
+        Ensure(SlotSelection, SelectionMask, r.Selection, dw, dh, 1, TargetFormats.SelectionMask,
             ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit, "selection mask", out var selection);
         SelectionMask = selection;
 
         bool volume = r.VolumeX > 0;
         var volumeUsage = ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit;
-        Ensure(FroxelInjected, volume, (uint)r.VolumeX, (uint)r.VolumeY, (uint)r.VolumeZ, TargetFormats.HdrStorage,
+        Ensure(SlotInjected, FroxelInjected, volume, (uint)r.VolumeX, (uint)r.VolumeY, (uint)r.VolumeZ, TargetFormats.HdrStorage,
             volumeUsage | ImageUsageFlags.TransferSrcBit, "froxels (injected)", out var injected, is3D: true);
         if (!ReferenceEquals(injected, FroxelInjected))
             VolumeHistoryValid = false;
         FroxelInjected = injected;
-        Ensure(FroxelHistory, volume, (uint)r.VolumeX, (uint)r.VolumeY, (uint)r.VolumeZ, TargetFormats.HdrStorage,
+        Ensure(SlotHistory, FroxelHistory, volume, (uint)r.VolumeX, (uint)r.VolumeY, (uint)r.VolumeZ, TargetFormats.HdrStorage,
             ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit, "froxels (history)", out var history, is3D: true);
         FroxelHistory = history;
-        Ensure(FroxelIntegrated, volume, (uint)r.VolumeX, (uint)r.VolumeY, (uint)r.VolumeZ, TargetFormats.HdrStorage, volumeUsage,
+        Ensure(SlotIntegrated, FroxelIntegrated, volume, (uint)r.VolumeX, (uint)r.VolumeY, (uint)r.VolumeZ, TargetFormats.HdrStorage, volumeUsage,
             "froxels (integrated)", out var integrated, is3D: true);
         FroxelIntegrated = integrated;
         if (!volume)
             VolumeHistoryValid = false;
 
         bool indirect = r.IndirectWidth > 0;
-        Ensure(Indirect, indirect, (uint)Math.Max(r.IndirectWidth, 1), (uint)Math.Max(r.IndirectHeight, 1), 1, TargetFormats.HdrStorage,
+        Ensure(SlotIndirect, Indirect, indirect, (uint)Math.Max(r.IndirectWidth, 1), (uint)Math.Max(r.IndirectHeight, 1), 1, TargetFormats.HdrStorage,
             ImageUsageFlags.StorageBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit, "indirect irradiance", out var indirectImage);
         if (!ReferenceEquals(indirectImage, Indirect))
             IndirectHistoryValid = false;
         Indirect = indirectImage;
-        Ensure(IndirectHistory, indirect && r.IndirectHistory, (uint)Math.Max(r.IndirectWidth, 1), (uint)Math.Max(r.IndirectHeight, 1), 1,
-            TargetFormats.HdrStorage, ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit, "indirect history", out var indirectHistory);
+        Ensure(SlotIndirectHistory, IndirectHistory, indirect && r.IndirectHistory, (uint)Math.Max(r.IndirectWidth, 1),
+            (uint)Math.Max(r.IndirectHeight, 1), 1, TargetFormats.HdrStorage, ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit,
+            "indirect history", out var indirectHistory);
         if (!ReferenceEquals(indirectHistory, IndirectHistory))
             IndirectHistoryValid = false;
         IndirectHistory = indirectHistory;
@@ -330,21 +349,23 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         ulong vplBytes = (ulong)Math.Max(r.VplCapacity, 0) * (ulong)sizeof(GpuVpl);
         if (r.VplCapacity <= 0)
         {
-            if (Vpls is not null)
+            if (Vpls is not null && Unused(SlotVpls))
             {
                 _context.DeferDispose(Vpls);
                 Vpls = null;
             }
         }
-        else if (Vpls is null || Vpls.Size < vplBytes)
+        else if (Used(SlotVpls) && (Vpls is null || Vpls.Size < vplBytes))
         {
             if (Vpls is not null)
                 _context.DeferDispose(Vpls);
             Vpls = GpuBuffer.Create(_context, vplBytes, BufferUsageFlags.StorageBufferBit, MemoryUsage.GpuOnly, "virtual point lights");
         }
 
-        EnsureBloom(r.BloomLevels);
-        EnsureExposure(r.AutoExposure);
+        if (r.BloomLevels > 0 ? Used(SlotBloom) : Unused(SlotBloom))
+            EnsureBloom(r.BloomLevels);
+        if (r.AutoExposure ? Used(SlotExposure) : Unused(SlotExposure))
+            EnsureExposure(r.AutoExposure);
     }
 
     /// <summary>
@@ -582,15 +603,37 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             _context.DeferDispose(image);
     }
 
-    private void Ensure(GpuImage? current, bool wanted, uint w, uint h, uint d, Format format, ImageUsageFlags usage, string name, out GpuImage? result,
-        bool is3D = false)
+    /// <summary>Marks a resource slot as used this render.</summary>
+    private bool Used(int slot)
+    {
+        _unusedRenders[slot] = 0;
+        return true;
+    }
+
+    /// <summary>
+    /// Counts a render that did not need a resource slot; true once it was unused for more than
+    /// <see cref="KeepUnusedRenders"/> renders (then it is released, so views that toggle features or alternate view
+    /// modes do not recreate resources every frame).
+    /// </summary>
+    private bool Unused(int slot) => ++_unusedRenders[slot] > KeepUnusedRenders;
+
+    private void Ensure(int slot, GpuImage? current, bool wanted, uint w, uint h, uint d, Format format, ImageUsageFlags usage, string name,
+        out GpuImage? result, bool is3D = false)
     {
         if (!wanted)
         {
+            if (current is not null && !Unused(slot))
+            {
+                result = current;
+                return;
+            }
+
             RetireImage(current);
             result = null;
             return;
         }
+
+        Used(slot);
 
         if (current is not null && current.Width == w && current.Height == h && current.Depth == d && current.Format == format)
         {

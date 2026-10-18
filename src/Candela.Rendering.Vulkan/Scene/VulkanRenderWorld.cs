@@ -216,6 +216,9 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
 
     internal int LightCount { get; private set; }
 
+    /// <summary>Lights of the current frame with <see cref="SpotLight.CastShadows"/>.</summary>
+    internal int ShadowCastingLights { get; private set; }
+
     internal int LineSegmentCount { get; private set; }
 
     internal GpuBuffer LineBuffer => _lineBuffer.Buffer;
@@ -499,9 +502,12 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         if (_lightKeys.Length < lights.Length)
             Array.Resize(ref _lightKeys, Math.Max(lights.Length, _lightKeys.Length * 2));
         _lightOccurrences.Clear();
+        int casters = 0;
         for (int i = 0; i < lights.Length; i++)
         {
             ref readonly var light = ref lights[i];
+            if (light.CastShadows)
+                casters++;
             uint gobo = 0;
             if (light.Gobo.IsValid && _userTextures.TryGet(light.Gobo.Value, out _) is { } texture)
                 gobo = texture.Slot;
@@ -513,6 +519,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
 
         _lightBuffer.MarkDirty(0, lights.Length);
         LightCount = lights.Length;
+        ShadowCastingLights = casters;
     }
 
     /// <inheritdoc/>
