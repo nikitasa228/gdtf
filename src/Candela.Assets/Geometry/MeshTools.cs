@@ -72,6 +72,111 @@ public static class MeshTools
     }
 
     /// <summary>
+    /// Computes vertex normals for a mesh without them, smoothing across edges whose dihedral angle is at most
+    /// <paramref name="smoothingAngleDegrees"/> and splitting vertices at sharper edges (a box keeps flat faces, a
+    /// cylinder's side is smooth). Faces are area-weighted; vertices at the same position (texture seams) smooth
+    /// together. Indices are rewritten when vertices are split; texture coordinates are carried over, tangents dropped
+    /// (regenerate them afterwards) and sub-mesh ranges stay valid. Runs in O(Σ valence²).
+    /// </summary>
+    public static void GenerateNormals(MeshData mesh, float smoothingAngleDegrees)
+    {
+        ArgumentNullException.ThrowIfNull(mesh);
+        var pos = mesh.Positions;
+        var idx = mesh.Indices;
+        int vertexCount = pos.Length;
+        int faceCount = idx.Length / 3;
+        float angle = float.IsFinite(smoothingAngleDegrees) ? System.Math.Clamp(smoothingAngleDegrees, 0f, 180f) : 66f;
+        float cosLimit = MathF.Cos(angle * MathF.PI / 180f) - 1e-4f;
+
+        // Area-weighted (unnormalised) and unit face normals.
+        var weighted = new Vector3[faceCount];
+        var unit = new Vector3[faceCount];
+        for (int f = 0; f < faceCount; f++)
+        {
+            uint a = idx[3 * f], b = idx[3 * f + 1], c = idx[3 * f + 2];
+            if (a >= vertexCount || b >= vertexCount || c >= vertexCount) continue;
+            var n = Vector3.Cross(pos[b] - pos[a], pos[c] - pos[a]);
+            if (!IsFinite(n) || n.LengthSquared() < 1e-30f) continue;
+            weighted[f] = n;
+            unit[f] = Vector3.Normalize(n);
+        }
+
+        // Weld by position so faces on both sides of a texture seam smooth together.
+        var weld = new int[vertexCount];
+        var first = new Dictionary<Vector3, int>(vertexCount);
+        for (int v = 0; v < vertexCount; v++)
+        {
+            if (!first.TryGetValue(pos[v], out int w)) first[pos[v]] = w = v;
+            weld[v] = w;
+        }
+
+        // Faces around each welded position (CSR layout).
+        var start = new int[vertexCount + 1];
+        for (int i = 0; i < faceCount * 3; i++)
+            if (idx[i] < vertexCount) start[weld[idx[i]] + 1]++;
+        for (int v = 0; v < vertexCount; v++) start[v + 1] += start[v];
+        var faces = new int[start[vertexCount]];
+        var fill = (int[])start.Clone();
+        for (int i = 0; i < faceCount * 3; i++)
+            if (idx[i] < vertexCount) faces[fill[weld[idx[i]]]++] = i / 3;
+
+        // One normal per face corner; corners of the same vertex with (nearly) equal normals share an output vertex.
+        var outPos = new List<Vector3>(vertexCount);
+        var outNrm = new List<Vector3>(vertexCount);
+        var srcUv = mesh.TexCoords is { } t && t.Length == vertexCount ? t : null;
+        var outUv = srcUv is null ? null : new List<Vector2>(vertexCount);
+        var variants = new int[vertexCount];
+        Array.Fill(variants, -1);
+        var nextVariant = new List<int>(vertexCount);
+        var newIdx = new uint[idx.Length];
+        for (int i = 0; i < idx.Length; i++)
+        {
+            uint v = idx[i];
+            if (v >= vertexCount || i >= faceCount * 3)
+            {
+                newIdx[i] = 0;
+                continue;
+            }
+            int f = i / 3;
+            var n = Vector3.Zero;
+            var own = unit[f];
+            int p = weld[v];
+            for (int k = start[p]; k < start[p + 1]; k++)
+            {
+                int g = faces[k];
+                if (g == f || Vector3.Dot(own, unit[g]) >= cosLimit) n += weighted[g];
+            }
+            if (n.LengthSquared() < 1e-30f) n = own.LengthSquared() > 0 ? own : Vector3.UnitZ;
+            n = Vector3.Normalize(n);
+
+            int found = -1;
+            for (int o = variants[v]; o >= 0; o = nextVariant[o])
+            {
+                if (Vector3.Dot(outNrm[o], n) > 0.9999f)
+                {
+                    found = o;
+                    break;
+                }
+            }
+            if (found < 0)
+            {
+                found = outPos.Count;
+                outPos.Add(pos[v]);
+                outNrm.Add(n);
+                outUv?.Add(srcUv![v]);
+                nextVariant.Add(variants[v]);
+                variants[v] = found;
+            }
+            newIdx[i] = (uint)found;
+        }
+        mesh.Positions = outPos.ToArray();
+        mesh.Normals = outNrm.ToArray();
+        mesh.TexCoords = outUv?.ToArray();
+        mesh.Tangents = null;
+        mesh.Indices = newIdx;
+    }
+
+    /// <summary>
     /// Replaces the mesh by an unwelded copy with one face normal per triangle (glTF requires flat normals when a file
     /// has none). Texture coordinates are carried over; tangents are dropped (regenerate them afterwards).
     /// </summary>

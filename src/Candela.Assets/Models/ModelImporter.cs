@@ -176,14 +176,14 @@ public static class ModelImporter
         if (parts.Count > System.Math.Max(1, options.MaxParts))
         {
             ctx.Warn($"The model has {parts.Count} objects; they were merged into one to keep it fast to draw.");
-            parts = new List<ModelPart> { Flatten(raw.Name, parts) };
+            parts = new List<ModelPart> { Flatten(raw.Name, parts, options.SmoothingAngleDegrees) };
             transformed.Clear();
             transformed.Add(parts[0].Mesh);
         }
 
         foreach (var mesh in transformed)
         {
-            if (mesh.Normals.Length != mesh.Positions.Length) mesh.ComputeNormals();
+            if (mesh.Normals.Length != mesh.Positions.Length) MeshTools.GenerateNormals(mesh, options.SmoothingAngleDegrees);
             MeshTools.GenerateTangents(mesh);
         }
         var valid = new List<ModelPart>(parts.Count);
@@ -201,7 +201,7 @@ public static class ModelImporter
         }
         if (valid.Count == 0) throw new AssetImportException("The model contains no valid geometry.");
 
-        var model = new ModelData { Name = raw.Name, Parts = valid, Materials = raw.Materials };
+        var model = new ModelData { Name = raw.Name, Parts = valid, Materials = CompactMaterials(valid, raw.Materials) };
         var missing = ctx.Files.MissingFiles
             .Where(m => !m.Contains("__candela_main__", StringComparison.Ordinal) && Path.HasExtension(m))
             .Distinct(StringComparer.Ordinal)
@@ -220,6 +220,43 @@ public static class ModelImporter
             UnitScale = unit,
             UnitsKnown = known,
         };
+    }
+
+    /// <summary>
+    /// Drops materials that no part uses (Assimp adds a default material to every OBJ; files often carry unused library
+    /// materials) and renumbers the sub-mesh slots, keeping the file's material order so slot indices are stable across
+    /// re-imports. A mesh without sub-meshes uses slot 0; slots without a material get the default material.
+    /// </summary>
+    private static List<MaterialData> CompactMaterials(List<ModelPart> parts, List<MaterialData> materials)
+    {
+        var meshes = new List<MeshData>(parts.Count);
+        var seen = new HashSet<MeshData>(ReferenceEqualityComparer.Instance);
+        foreach (var p in parts)
+            if (seen.Add(p.Mesh)) meshes.Add(p.Mesh);
+        var used = new SortedSet<int>();
+        foreach (var m in meshes)
+        {
+            if (m.SubMeshes.Count == 0) used.Add(0);
+            else foreach (var sm in m.SubMeshes) used.Add(System.Math.Max(sm.MaterialSlot, 0));
+        }
+        var remap = new Dictionary<int, int>(used.Count);
+        var result = new List<MaterialData>(used.Count);
+        foreach (int slot in used)
+        {
+            remap[slot] = result.Count;
+            result.Add(slot < materials.Count ? materials[slot] : CreateDefaultMaterial());
+        }
+        foreach (var m in meshes)
+        {
+            if (m.SubMeshes.Count == 0)
+            {
+                if (remap[0] != 0) m.SubMeshes = new List<SubMesh> { new(0, m.Indices.Length, remap[0]) };
+                continue;
+            }
+            for (int i = 0; i < m.SubMeshes.Count; i++)
+                m.SubMeshes[i] = m.SubMeshes[i] with { MaterialSlot = remap[System.Math.Max(m.SubMeshes[i].MaterialSlot, 0)] };
+        }
+        return result;
     }
 
     private static Aabb SourceBounds(RawModel raw)
@@ -251,7 +288,7 @@ public static class ModelImporter
             m.M41, m.M42, m.M43, S(m.M44));
     }
 
-    private static ModelPart Flatten(string name, List<ModelPart> parts)
+    private static ModelPart Flatten(string name, List<ModelPart> parts, float smoothingAngle)
     {
         var sources = new List<(MeshData Mesh, int MaterialSlot)>(parts.Count);
         foreach (var p in parts)
@@ -266,7 +303,7 @@ public static class ModelImporter
                 Indices = src.Indices,
                 SubMeshes = new List<SubMesh>(src.SubMeshes),
             };
-            if (copy.Normals.Length != copy.Positions.Length) copy.ComputeNormals();
+            if (copy.Normals.Length != copy.Positions.Length) MeshTools.GenerateNormals(copy, smoothingAngle);
             if (!p.Transform.IsIdentity)
             {
                 copy.Indices = (uint[])src.Indices.Clone();

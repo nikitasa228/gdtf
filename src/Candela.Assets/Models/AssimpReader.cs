@@ -19,7 +19,6 @@ internal static class AssimpReader
 {
     private const PostProcessSteps Steps =
         PostProcessSteps.Triangulate
-        | PostProcessSteps.GenerateSmoothNormals
         | PostProcessSteps.JoinIdenticalVertices
         | PostProcessSteps.SortByPrimitiveType
         | PostProcessSteps.FindDegenerates
@@ -41,7 +40,6 @@ internal static class AssimpReader
         using (var assimp = new AssimpContext())
         {
             assimp.SetIOSystem(io);
-            assimp.SetConfig(new NormalSmoothingAngleConfig(System.Math.Clamp(ctx.Options.SmoothingAngleDegrees, 0f, 175f)));
             assimp.SetConfig(new SortByPrimitiveTypeConfig(PrimitiveType.Point | PrimitiveType.Line));
             assimp.SetConfig(new RemoveDegeneratePrimitivesConfig(true));
             assimp.SetConfig(new ColladaIgnoreUpDirectionConfig(ctx.Format == ModelFormat.Collada));
@@ -89,7 +87,7 @@ internal static class AssimpReader
         int droppedMeshes = 0;
         for (int i = 0; i < scene.MeshCount; i++)
         {
-            meshes[i] = ConvertMesh(scene.Meshes[i]);
+            meshes[i] = ConvertMesh(scene.Meshes[i], ctx.Options.SmoothingAngleDegrees);
             if (meshes[i] is null) droppedMeshes++;
             meshSlots[i] = SlotOf(scene.Meshes[i].MaterialIndex);
         }
@@ -276,7 +274,12 @@ internal static class AssimpReader
         Indices = m.Indices,
     };
 
-    private static MeshData? ConvertMesh(AiMesh m)
+    /// <summary>
+    /// Converts one Assimp mesh (triangles only). Normals come from the file when it has valid ones; otherwise they are
+    /// generated with <paramref name="smoothingAngle"/> (Assimp's own generator cannot split vertices that a format such
+    /// as PLY or 3MF already shares between faces, which smears normals around hard edges).
+    /// </summary>
+    private static MeshData? ConvertMesh(AiMesh m, float smoothingAngle)
     {
         if (!m.HasVertices || !m.HasFaces || (m.PrimitiveType & PrimitiveType.Triangle) == 0) return null;
         int n = m.VertexCount;
@@ -316,7 +319,6 @@ internal static class AssimpReader
             }
             if (valid) mesh.Normals = nrm;
         }
-        if (mesh.Normals.Length != n) mesh.ComputeNormals();
         if (m.HasTextureCoords(0) && m.TextureCoordinateChannels[0].Count == n)
         {
             var uv = new Vector2[n];
@@ -329,11 +331,18 @@ internal static class AssimpReader
             mesh.TexCoords = uv;
         }
         MeshTools.RemoveInvalidTriangles(mesh);
-        return mesh.Indices.Length == 0 ? null : mesh;
+        if (mesh.Indices.Length == 0) return null;
+        if (mesh.Normals.Length != mesh.Positions.Length) MeshTools.GenerateNormals(mesh, smoothingAngle);
+        return mesh;
     }
+
+    /// <summary>Names Assimp gives the material it invents for geometry without one (OBJ, 3DS, 3MF, FBX readers).</summary>
+    private static bool IsAssimpDefaultMaterial(Material am) =>
+        am.HasName && am.Name is "DefaultMaterial" or "%%%DEFAULT" or "$$$DEFAULT" && am.GetAllMaterialTextures().Length == 0;
 
     private static MaterialData ConvertMaterial(ImportContext ctx, AiScene scene, Material am, int index)
     {
+        if (IsAssimpDefaultMaterial(am)) return ModelImporter.CreateDefaultMaterial();
         string name = am.HasName && !string.IsNullOrWhiteSpace(am.Name) ? am.Name : $"Material {index + 1}";
         Vector3 C(Color4D c) => new(c.R, c.G, c.B);
         var phong = new PhongMaterial

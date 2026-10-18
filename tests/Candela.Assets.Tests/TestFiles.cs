@@ -85,11 +85,15 @@ internal static class TestFiles
         return c;
     }
 
-    /// <summary>Outward counter-clockwise quads over <see cref="BoxCorners"/> (corner indices).</summary>
-    public static int[][] BoxQuads(bool yUp)
+    /// <summary>Outward counter-clockwise quads over <see cref="BoxCorners"/> (corner indices, either convention).</summary>
+    public static int[][] BoxQuads() => s_boxQuads;
+
+    private static readonly int[][] s_boxQuads = CreateBoxQuads();
+
+    private static int[][] CreateBoxQuads()
     {
-        // Corner index bits: 1 = +x, 2 = top, 4 = +depth. In Y-up "depth" is +Z; in Z-up it is −Y, which mirrors the
-        // depth axis, so the winding of the depth-dependent faces is reversed.
+        // Corner index bits: 1 = +x, 2 = top, 4 = +depth. In Y-up "depth" is +Z; in Z-up it is −Y. (x, h, d) → (x, −d, h)
+        // is a proper rotation, so the same corner order is counter-clockwise from outside in both conventions.
         var quads = new[]
         {
             new[] { 4, 5, 7, 6 }, // +depth face
@@ -99,13 +103,13 @@ internal static class TestFiles
             new[] { 6, 7, 3, 2 }, // top
             new[] { 0, 1, 5, 4 }, // bottom
         };
-        return yUp ? quads : quads.Select(q => q.Reverse().ToArray()).ToArray();
+        return quads;
     }
 
     public static IEnumerable<(Vector3 A, Vector3 B, Vector3 C)> BoxTriangles(bool yUp, float scale = 1f)
     {
         var c = BoxCorners(yUp, scale);
-        foreach (var q in BoxQuads(yUp))
+        foreach (var q in BoxQuads())
         {
             yield return (c[q[0]], c[q[1]], c[q[2]]);
             yield return (c[q[0]], c[q[2]], c[q[3]]);
@@ -118,7 +122,7 @@ internal static class TestFiles
         var sb = new StringBuilder("# test box\nmtllib " + mtlFile + "\no Box\n");
         foreach (var v in BoxCorners(yUp: true)) sb.Append($"v {F(v.X)} {F(v.Y)} {F(v.Z)}\n");
         sb.Append("vt 0 0\nvt 1 0\nvt 1 1\nvt 0 1\nusemtl " + material + "\n");
-        foreach (var q in BoxQuads(yUp: true)) sb.Append($"f {q[0] + 1}/1 {q[1] + 1}/2 {q[2] + 1}/3 {q[3] + 1}/4\n");
+        foreach (var q in BoxQuads()) sb.Append($"f {q[0] + 1}/1 {q[1] + 1}/2 {q[2] + 1}/3 {q[3] + 1}/4\n");
         return sb.ToString();
     }
 
@@ -182,7 +186,7 @@ internal static class TestFiles
         bool yUp = upAxis == "Y_UP";
         float scale = 1f / meter;
         var corners = BoxCorners(yUp, scale);
-        var tris = BoxQuads(yUp).SelectMany(q => new[] { q[0], q[1], q[2], q[0], q[2], q[3] }).ToArray();
+        var tris = BoxQuads().SelectMany(q => new[] { q[0], q[1], q[2], q[0], q[2], q[3] }).ToArray();
         string positions = string.Join(" ", corners.SelectMany(c => new[] { F(c.X), F(c.Y), F(c.Z) }));
         return $"""
             <?xml version="1.0" encoding="utf-8"?>
@@ -221,7 +225,7 @@ internal static class TestFiles
         var c = BoxCorners(yUp: false);
         var sb = new StringBuilder("ply\nformat ascii 1.0\nelement vertex 8\nproperty float x\nproperty float y\nproperty float z\nelement face 6\nproperty list uchar int vertex_indices\nend_header\n");
         foreach (var v in c) sb.Append($"{F(v.X)} {F(v.Y)} {F(v.Z)}\n");
-        foreach (var q in BoxQuads(yUp: false)) sb.Append($"4 {q[0]} {q[1]} {q[2]} {q[3]}\n");
+        foreach (var q in BoxQuads()) sb.Append($"4 {q[0]} {q[1]} {q[2]} {q[3]}\n");
         return sb.ToString();
     }
 
@@ -248,7 +252,7 @@ internal static class TestFiles
             vw.Write(v.Y);
             vw.Write(v.Z);
         }
-        var tris = BoxQuads(yUp: false).SelectMany(q => new[] { (q[0], q[1], q[2]), (q[0], q[2], q[3]) }).ToArray();
+        var tris = BoxQuads().SelectMany(q => new[] { (q[0], q[1], q[2]), (q[0], q[2], q[3]) }).ToArray();
         var fms = new MemoryStream();
         var fw = new BinaryWriter(fms);
         fw.Write((ushort)tris.Length);
@@ -273,7 +277,7 @@ internal static class TestFiles
     {
         float toUnits = (float)(100.0 / unitScaleFactorCm);
         var corners = BoxCorners(yUp: !zUp, toUnits);
-        var poly = BoxQuads(yUp: !zUp).SelectMany(q => new[] { q[0], q[1], q[2], -(q[3] + 1) });
+        var poly = BoxQuads().SelectMany(q => new[] { q[0], q[1], q[2], -(q[3] + 1) });
         string axes = zUp
             ? """
                 P: "UpAxis", "int", "Integer", "",2
@@ -313,6 +317,22 @@ internal static class TestFiles
                         a: {{string.Join(",", poly)}}
                     }
                     GeometryVersion: 124
+                    LayerElementMaterial: 0 {
+                        Version: 101
+                        Name: ""
+                        MappingInformationType: "AllSame"
+                        ReferenceInformationType: "IndexToDirect"
+                        Materials: *1 {
+                            a: 0
+                        }
+                    }
+                    Layer: 0 {
+                        Version: 100
+                        LayerElement:  {
+                            Type: "LayerElementMaterial"
+                            TypedIndex: 0
+                        }
+                    }
                 }
                 Model: 2000, "Model::box", "Mesh" {
                     Version: 232
@@ -339,7 +359,10 @@ internal static class TestFiles
     }
 
     /// <summary>A Y-up box GLB built with SharpGLTF (positions, normals, UVs, PBR material with an embedded PNG).</summary>
-    public static byte[] Glb(bool withTexture = true)
+    public static byte[] Glb(bool withTexture = true) => GltfModel(withTexture).WriteGLB().ToArray();
+
+    /// <summary>The model behind <see cref="Glb"/>; save it with <c>SaveGLTF</c> for the .gltf + .bin + .png flavour.</summary>
+    public static ModelRoot GltfModel(bool withTexture = true)
     {
         var model = ModelRoot.CreateModel();
         var corners = BoxCorners(yUp: true);
@@ -347,7 +370,7 @@ internal static class TestFiles
         var nrm = new List<Vector3>();
         var uv = new List<Vector2>();
         var idx = new List<uint>();
-        foreach (var q in BoxQuads(yUp: true))
+        foreach (var q in BoxQuads())
         {
             var n = Vector3.Normalize(Vector3.Cross(corners[q[1]] - corners[q[0]], corners[q[2]] - corners[q[0]]));
             uint b = (uint)pos.Count;
@@ -365,7 +388,7 @@ internal static class TestFiles
             var bytes = System.Runtime.InteropServices.MemoryMarshal.AsBytes(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(data)).ToArray();
             var view = model.UseBufferView(bytes, 0, null, 0, BufferMode.ARRAY_BUFFER);
             var acc = model.CreateAccessor(name);
-            acc.SetVertexData(view, 0, data.Count, dim, EncodingType.FLOAT, false);
+            acc.SetVertexData(view, 0, data.Count, new AttributeFormat(dim, EncodingType.FLOAT, false));
             return acc;
         }
 
@@ -398,14 +421,14 @@ internal static class TestFiles
 
         var scene = model.UseScene("scene");
         scene.CreateNode("box").Mesh = mesh;
-        return model.WriteGLB().ToArray();
+        return model;
     }
 
     /// <summary>A 3MF package with a Z-up box in millimetres.</summary>
     public static byte[] ThreeMf()
     {
         var corners = BoxCorners(yUp: false, 1000f);
-        var tris = BoxQuads(yUp: false).SelectMany(q => new[] { (q[0], q[1], q[2]), (q[0], q[2], q[3]) });
+        var tris = BoxQuads().SelectMany(q => new[] { (q[0], q[1], q[2]), (q[0], q[2], q[3]) });
         var model = new StringBuilder("""<?xml version="1.0" encoding="UTF-8"?>""" + "\n");
         model.Append("""<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><object id="1" type="model"><mesh><vertices>""");
         foreach (var c in corners) model.Append($"<vertex x=\"{F(c.X)}\" y=\"{F(c.Y)}\" z=\"{F(c.Z)}\"/>");

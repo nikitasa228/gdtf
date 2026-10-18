@@ -1,4 +1,6 @@
+using System.Buffers.Binary;
 using System.Numerics;
+using System.Text.Json;
 using Candela.Core.Geometry;
 using SharpGLTF.Schema2;
 using SharpGLTF.Validation;
@@ -45,8 +47,10 @@ internal static class GltfReader
             UnitsKnown = true,
         };
 
+        var uris = ReadImageUris(files.MainData);
         var imageKeys = new string?[model.LogicalImages.Count];
-        for (int i = 0; i < imageKeys.Length; i++) imageKeys[i] = ImageKey(ctx, model.LogicalImages[i], i, missingImages);
+        for (int i = 0; i < imageKeys.Length; i++)
+            imageKeys[i] = ImageKey(ctx, model.LogicalImages[i], i, i < uris.Length ? uris[i] : null, missingImages);
 
         var slots = new int[model.LogicalMaterials.Count];
         for (int i = 0; i < slots.Length; i++)
@@ -108,11 +112,53 @@ internal static class GltfReader
         }
     }
 
-    private static string? ImageKey(ImportContext ctx, Image image, int index, HashSet<string> missing)
+    /// <summary>
+    /// The <c>uri</c> of every entry of the glTF <c>images</c> array (null for buffer-view images and data URIs), read
+    /// from the JSON or the JSON chunk of a GLB. SharpGLTF does not expose the URI of satellite images it read through
+    /// a callback, and the URI is what maps an image to its companion file. Malformed JSON yields an empty array.
+    /// </summary>
+    internal static string?[] ReadImageUris(byte[] data)
+    {
+        ReadOnlySpan<byte> json = data;
+        if (AssetFormats.IsGlb(data))
+        {
+            if (data.Length < 20) return Array.Empty<string?>();
+            uint length = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(12, 4));
+            uint type = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(16, 4));
+            if (type != 0x4E4F534A || length > (uint)(data.Length - 20)) return Array.Empty<string?>();
+            json = data.AsSpan(20, (int)length);
+        }
+        if (json.StartsWith("\uFEFF"u8)) json = json[3..];
+        try
+        {
+            var reader = new Utf8JsonReader(json, new JsonReaderOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
+            using var doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object
+                || !doc.RootElement.TryGetProperty("images", out var images)
+                || images.ValueKind != JsonValueKind.Array)
+                return Array.Empty<string?>();
+            var result = new string?[images.GetArrayLength()];
+            int i = 0;
+            foreach (var image in images.EnumerateArray())
+            {
+                if (image.ValueKind == JsonValueKind.Object && image.TryGetProperty("uri", out var uri) && uri.ValueKind == JsonValueKind.String
+                    && uri.GetString() is { Length: > 0 } text && !text.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+                    result[i] = text;
+                i++;
+            }
+            return result;
+        }
+        catch (JsonException)
+        {
+            return Array.Empty<string?>();
+        }
+    }
+
+    private static string? ImageKey(ImportContext ctx, Image image, int index, string? uri, HashSet<string> missing)
     {
         var content = image.Content;
         if (content.IsEmpty) return null;
-        var source = content.SourcePath;
+        var source = uri ?? content.SourcePath;
         if (!string.IsNullOrEmpty(source) && !source.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
         {
             if (missing.Contains(source)) return null;
