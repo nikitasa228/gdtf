@@ -17,6 +17,16 @@ public enum ScalarAdvectionScheme
     MacCormack,
 }
 
+/// <summary>Preconditioner of the pressure conjugate-gradient solve.</summary>
+public enum PressurePreconditioner
+{
+    /// <summary>Geometric multigrid V-cycle (MGPCG): about 5–10 iterations whatever the grid size.</summary>
+    Multigrid,
+
+    /// <summary>Diagonal (Jacobi): the simplest, iterations grow with the grid size (≈ 40 at 64³ with a warm start).</summary>
+    Jacobi,
+}
+
 /// <summary>
 /// Configuration of a <see cref="SmokeSimulation"/>. All values are SI (m, s, K, kg). Invalid values (NaN, negative
 /// sizes, …) are replaced by the documented defaults when the simulation is created and reported as issues, so a
@@ -100,6 +110,9 @@ public sealed record SmokeSimulationSettings
     /// projection.
     /// </summary>
     public float PressureTolerance { get; init; } = 1e-4f;
+
+    /// <summary>Preconditioner of the pressure solve; results agree to the tolerance, multigrid is faster on large grids.</summary>
+    public PressurePreconditioner PressurePreconditioner { get; init; } = PressurePreconditioner.Multigrid;
 
     /// <summary>Iteration cap of the pressure solver (preconditioned conjugate gradient).</summary>
     public int MaxPressureIterations { get; init; } = 200;

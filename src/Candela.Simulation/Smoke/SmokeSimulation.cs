@@ -56,7 +56,10 @@ public sealed partial class SmokeSimulation
     private float[] _u2, _v2, _w2;
     private float[] _density2, _temperature2;
     private readonly float[] _densityMin, _densityMax, _temperatureMin, _temperatureMax;
-    private readonly float[] _rhs, _residual, _search, _precond, _product;
+    private readonly float[] _rhs, _residual, _search, _product, _zeroRow;
+    private readonly Vector3[] _cellVelocity;
+    private readonly PressureMultigrid? _multigrid;
+    private readonly float[] _z;
     private readonly double[] _slicePartials;
     private readonly double[] _slicePartials2;
     private readonly float[] _sliceMax;
@@ -101,7 +104,8 @@ public sealed partial class SmokeSimulation
         _rhs = new float[_cellCount];
         _residual = new float[_cellCount];
         _search = new float[_cellCount];
-        _precond = new float[_cellCount];
+        _zeroRow = new float[_nx];
+        _cellVelocity = new Vector3[_cellCount];
         _product = new float[_cellCount];
         _solid = new byte[_cellCount];
         _slicePartials = new double[_nz + 1];
@@ -113,6 +117,15 @@ public sealed partial class SmokeSimulation
             MaxDegreeOfParallelism = _settings.MaxDegreeOfParallelism > 0 ? _settings.MaxDegreeOfParallelism : -1,
         };
         _parallel = _cellCount >= ParallelThreshold && _settings.MaxDegreeOfParallelism != 1;
+        if (_settings.PressurePreconditioner == PressurePreconditioner.Multigrid)
+        {
+            _multigrid = new PressureMultigrid(_nx, _ny, _nz, _parallelOptions, _parallel);
+            _z = new float[_cellCount];
+        }
+        else
+        {
+            _z = Array.Empty<float>();
+        }
 
         InitializeBoundaries();
         InitializeKernels();
@@ -570,6 +583,7 @@ public sealed partial class SmokeSimulation
             ? MathF.Min(s.DissipationPerSecond, 1f)
             : NonNegative(nameof(s.DissipationPerSecond), s.DissipationPerSecond, defaults.DissipationPerSecond);
         var advection = Enum.IsDefined(s.ScalarAdvection) ? s.ScalarAdvection : defaults.ScalarAdvection;
+        var preconditioner = Enum.IsDefined(s.PressurePreconditioner) ? s.PressurePreconditioner : defaults.PressurePreconditioner;
 
         return s with
         {
@@ -591,6 +605,7 @@ public sealed partial class SmokeSimulation
             Airflow = airflow,
             AirflowResponseTime = Positive(nameof(s.AirflowResponseTime), s.AirflowResponseTime, defaults.AirflowResponseTime),
             ScalarAdvection = advection,
+            PressurePreconditioner = preconditioner,
             Diffusivity = NonNegative(nameof(s.Diffusivity), s.Diffusivity, 0f),
             Viscosity = NonNegative(nameof(s.Viscosity), s.Viscosity, 0f),
             DiffusionIterations = AtLeast(nameof(s.DiffusionIterations), s.DiffusionIterations, 1, defaults.DiffusionIterations),

@@ -40,6 +40,7 @@ public sealed class SmokePerformanceTests(ITestOutputHelper output)
         const int steps = 30;
         int iterations = 0;
         float sources = 0, forces = 0, velocity = 0, projection = 0, scalars = 0;
+        var cpu0 = Process.GetCurrentProcess().TotalProcessorTime;
         var watch = Stopwatch.StartNew();
         for (int n = 0; n < steps; n++)
         {
@@ -51,10 +52,12 @@ public sealed class SmokePerformanceTests(ITestOutputHelper output)
         }
 
         watch.Stop();
+        double cpuPerStep = (Process.GetCurrentProcess().TotalProcessorTime - cpu0).TotalMilliseconds / steps;
         double msPerStep = watch.Elapsed.TotalMilliseconds / steps;
         output.WriteLine($"64³ ({sim.CellCount} cells), {(threads > 0 ? threads : Environment.ProcessorCount)} threads: {msPerStep:F1} ms/step " +
             $"= {1000 / msPerStep:F1} steps/s, {iterations / (double)steps:F1} CG iterations/step, " +
-            $"divergence {sim.LastStatistics.MaxDivergenceBefore:E2} → {sim.LastStatistics.MaxDivergenceAfter:E2} 1/s");
+            $"divergence {sim.LastStatistics.MaxDivergenceBefore:E2} → {sim.LastStatistics.MaxDivergenceAfter:E2} 1/s, " +
+            $"process CPU {cpuPerStep:F1} ms/step");
         output.WriteLine($"stages (ms/step): sources {sources / steps:F1}, forces {forces / steps:F1}, velocity advection " +
             $"{velocity / steps:F1}, projection {projection / steps:F1}, scalar advection {scalars / steps:F1}");
         Assert.True(msPerStep < 2000, $"{msPerStep:F0} ms per step");

@@ -17,6 +17,7 @@ public sealed partial class SmokeSimulation
     private void AdvectVelocity(float dt)
     {
         _dtForKernels = dt;
+        RunSlices(_nz, _cellVelocitySlice);
         RunSlices(_nz + 1, _advectVelocitySlice);
         (_u, _u2) = (_u2, _u);
         (_v, _v2) = (_v2, _v);
@@ -98,11 +99,31 @@ public sealed partial class SmokeSimulation
         }
     }
 
-    /// <summary>Midpoint (RK2) trace from grid position <paramref name="g"/> along velocity × <paramref name="s"/> (= dt/h; negative traces forward).</summary>
+    /// <summary>
+    /// Midpoint (RK2) trace from grid position <paramref name="g"/>, where the velocity is <paramref name="velocity"/>,
+    /// over <paramref name="s"/> = dt/h (negative traces forward). The midpoint velocity comes from the cell-centred copy
+    /// of the field (<see cref="CellVelocitySlice"/>): one interpolation for all three components.
+    /// </summary>
     private Vector3 Backtrace(Vector3 g, Vector3 velocity, float s)
     {
         var mid = g - velocity * (0.5f * s);
-        return g - SampleVelocity(mid) * s;
+        return g - SampleCellVelocity(mid) * s;
+    }
+
+    /// <summary>Cell-centred velocity (average of the two faces on each axis), m/s, into <c>_cellVelocity</c>.</summary>
+    private void CellVelocitySlice(int k)
+    {
+        for (int j = 0; j < _ny; j++)
+        {
+            int c = CellIndex(0, j, k);
+            for (int i = 0; i < _nx; i++, c++)
+            {
+                _cellVelocity[c] = new Vector3(
+                    0.5f * (_u[UIndex(i, j, k)] + _u[UIndex(i + 1, j, k)]),
+                    0.5f * (_v[VIndex(i, j, k)] + _v[VIndex(i, j + 1, k)]),
+                    0.5f * (_w[WIndex(i, j, k)] + _w[WIndex(i, j, k + 1)]));
+            }
+        }
     }
 
     private static float ClampSpeed(float v, float max) => v >= -max ? (v <= max ? v : max) : (float.IsNaN(v) ? 0f : -max);
@@ -115,6 +136,7 @@ public sealed partial class SmokeSimulation
     private void AdvectScalars(float dt)
     {
         _dtForKernels = dt;
+        RunSlices(_nz, _cellVelocitySlice);
         bool conserve = _settings.ConserveMass;
         double target = 0;
         if (conserve)
@@ -214,11 +236,6 @@ public sealed partial class SmokeSimulation
             _density[c] *= f;
     }
 
-    private Vector3 CellVelocity(int i, int j, int k) => new(
-        0.5f * (_u[UIndex(i, j, k)] + _u[UIndex(i + 1, j, k)]),
-        0.5f * (_v[VIndex(i, j, k)] + _v[VIndex(i, j + 1, k)]),
-        0.5f * (_w[WIndex(i, j, k)] + _w[WIndex(i, j, k + 1)]));
-
     private void AdvectScalarsForwardSlice(int k)
     {
         float s = _dtForKernels * _invH;
@@ -235,7 +252,7 @@ public sealed partial class SmokeSimulation
                 }
 
                 var g = new Vector3(i + 0.5f, j + 0.5f, k + 0.5f);
-                var back = Backtrace(g, CellVelocity(i, j, k), s);
+                var back = Backtrace(g, _cellVelocity[c], s);
                 SampleTwo(_density, _temperature, back, out float d, out float dMin, out float dMax,
                     out float t, out float tMin, out float tMax);
                 _density2[c] = d;
@@ -263,7 +280,7 @@ public sealed partial class SmokeSimulation
                 }
 
                 var g = new Vector3(i + 0.5f, j + 0.5f, k + 0.5f);
-                var forward = Backtrace(g, CellVelocity(i, j, k), -s);
+                var forward = Backtrace(g, _cellVelocity[c], -s);
                 SampleTwo(_density2, _temperature2, forward, out float dRound, out _, out _, out float tRound, out _, out _);
                 float dHat = _density2[c], tHat = _temperature2[c];
                 float d = dHat + 0.5f * (_density[c] - dRound);

@@ -221,6 +221,7 @@ public sealed partial class SmokeSimulation
         }
 
         LabelComponents();
+        _multigrid?.SetTopology(_uFlags, _vFlags, _wFlags, _diag, _invDiag);
         EnforceBoundaryVelocities(_u, _v, _w);
     }
 

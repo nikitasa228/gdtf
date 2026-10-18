@@ -1,9 +1,12 @@
+using System.Runtime.CompilerServices;
+
 namespace Candela.Simulation;
 
 public sealed partial class SmokeSimulation
 {
     private Action<int> _sumDensitySlice = null!;
     private Action<int> _scaleDensitySlice = null!;
+    private Action<int> _cellVelocitySlice = null!;
     private Action<int> _buoyancySlice = null!;
     private Action<int> _dissipateSlice = null!;
     private Action<int> _advectVelocitySlice = null!;
@@ -15,6 +18,8 @@ public sealed partial class SmokeSimulation
     private Action<int> _matVecSlice = null!;
     private Action<int> _updateSlice = null!;
     private Action<int> _searchSlice = null!;
+    private Action<int> _searchMultigridSlice = null!;
+    private Action<int> _dotResidualSlice = null!;
     private Action<int> _applyPressureSlice = null!;
     private float _cgAlpha, _cgBeta;
 
@@ -23,6 +28,7 @@ public sealed partial class SmokeSimulation
     {
         _sumDensitySlice = SumDensitySlice;
         _scaleDensitySlice = ScaleDensitySlice;
+        _cellVelocitySlice = CellVelocitySlice;
         _buoyancySlice = BuoyancySlice;
         _dissipateSlice = DissipateSlice;
         _advectVelocitySlice = AdvectVelocitySlice;
@@ -34,6 +40,8 @@ public sealed partial class SmokeSimulation
         _matVecSlice = MatVecSlice;
         _updateSlice = UpdateSlice;
         _searchSlice = SearchSlice;
+        _searchMultigridSlice = SearchMultigridSlice;
+        _dotResidualSlice = DotResidualSlice;
         _applyPressureSlice = ApplyPressureSlice;
     }
 
@@ -42,8 +50,8 @@ public sealed partial class SmokeSimulation
     /// u −= (φ_b − φ_a)/h; requiring zero divergence gives, for every fluid cell, n·φ_c − Σ φ_nb = −h²·(∇·u)_c, where n
     /// counts the cell's free faces, solid and wall faces drop out (free slip: their normal velocity stays zero) and
     /// open faces see the ambient pressure φ = 0 outside. The symmetric positive (semi-)definite system is solved with
-    /// the Jacobi-preconditioned conjugate gradient, warm-started from the previous step's pressure. Returns the
-    /// iteration count and the largest cell divergence before and after (1/s).
+    /// the preconditioned conjugate gradient (multigrid V-cycle or Jacobi preconditioner), warm-started from the previous
+    /// step's pressure. Returns the iteration count and the largest cell divergence before and after (1/s).
     /// </summary>
     private (int Iterations, float Before, float After) Project()
     {
@@ -56,9 +64,12 @@ public sealed partial class SmokeSimulation
             return (0, maxB / h2, maxB / h2);
 
         // r = b − A·x₀, z = M⁻¹·r, p = z.
+        bool multigrid = _multigrid is not null;
         RunSlices(_nz, _initialResidualSlice);
-        double rz = SumOfSlices();
         float maxR = MaxOfSlices();
+        double rz = multigrid ? Precondition() : SumOfSlices();
+        if (multigrid)
+            _z.AsSpan(0, _cellCount).CopyTo(_search);
         float tolerance = _settings.PressureTolerance * maxB;
         int iterations = 0;
         while (iterations < _settings.MaxPressureIterations && maxR > tolerance)
@@ -72,12 +83,15 @@ public sealed partial class SmokeSimulation
             double rzNext = SumOfSlices();
             maxR = MaxOfSlices();
             iterations++;
+            if (maxR <= tolerance)
+                break;
+            if (multigrid)
+                rzNext = Precondition();
             if (!double.IsFinite(rzNext))
                 break;
             _cgBeta = rz > 0 ? (float)(rzNext / rz) : 0f;
             rz = rzNext;
-            if (maxR > tolerance)
-                RunSlices(_nz, _searchSlice);
+            RunSlices(_nz, multigrid ? _searchMultigridSlice : _searchSlice);
         }
 
         if (!float.IsFinite(maxR))
@@ -89,6 +103,32 @@ public sealed partial class SmokeSimulation
 
         RunSlices(_nz + 1, _applyPressureSlice);
         return (iterations, maxB / h2, maxR / h2);
+    }
+
+    /// <summary>z = V-cycle(r); returns r·z.</summary>
+    private double Precondition()
+    {
+        _multigrid!.Apply(_residual, _z);
+        RunSlices(_nz, _dotResidualSlice);
+        return SumOfSlices();
+    }
+
+    private void DotResidualSlice(int k)
+    {
+        int start = k * _nx * _ny, end = start + _nx * _ny;
+        double dot = 0;
+        for (int c = start; c < end; c++)
+            dot += (double)_residual[c] * _z[c];
+        _slicePartials[k] = dot;
+    }
+
+    /// <summary>p = z + β·p with z from the multigrid preconditioner.</summary>
+    private void SearchMultigridSlice(int k)
+    {
+        float beta = _cgBeta;
+        int start = k * _nx * _ny, end = start + _nx * _ny;
+        for (int c = start; c < end; c++)
+            _search[c] = _z[c] + beta * _search[c];
     }
 
     private double SumOfSlices()
@@ -166,79 +206,73 @@ public sealed partial class SmokeSimulation
         }
     }
 
-    /// <summary>(A·x)_c = n_c·x_c − Σ x_nb; x is zero in solid cells, so they drop out of the sum automatically.</summary>
-    private float Apply(float[] x, int c, int i, int j, int k)
+    /// <summary>
+    /// q = A·x for every cell of slice <paramref name="k"/>: (A·x)_c = n_c·x_c − Σ x_nb for fluid cells and 0 for solid
+    /// ones. x is zero in solid cells, so they drop out of the neighbour sum by themselves. Rows are processed with the
+    /// four neighbouring rows (j ± 1, k ± 1) as flat spans — a zero row stands in beyond the box — so the inner loop has
+    /// no index arithmetic or boundary tests. Returns Σ x·q over the slice.
+    /// </summary>
+    private double MultiplySlice(float[] x, float[] q, int k)
     {
-        int slab = _nx * _ny;
-        float s = 0f;
-        if (i > 0) s += x[c - 1];
-        if (i < _nx - 1) s += x[c + 1];
-        if (j > 0) s += x[c - _nx];
-        if (j < _ny - 1) s += x[c + _nx];
-        if (k > 0) s += x[c - slab];
-        if (k < _nz - 1) s += x[c + slab];
-        return _diag[c] * x[c] - s;
+        int nx = _nx, ny = _ny, slab = nx * ny;
+        double dot = 0;
+        for (int j = 0; j < ny; j++)
+        {
+            int c0 = CellIndex(0, j, k);
+            dot += MultiplyRow(
+                ref x[c0],
+                ref j > 0 ? ref x[c0 - nx] : ref _zeroRow[0],
+                ref j < ny - 1 ? ref x[c0 + nx] : ref _zeroRow[0],
+                ref k > 0 ? ref x[c0 - slab] : ref _zeroRow[0],
+                ref k < _nz - 1 ? ref x[c0 + slab] : ref _zeroRow[0],
+                ref _diag[c0],
+                ref q[c0],
+                nx);
+        }
+
+        return dot;
     }
 
+    private static double MultiplyRow(ref float row, ref float jm, ref float jp, ref float km, ref float kp, ref float diag,
+        ref float q, int n)
+    {
+        double dot = 0;
+        float left = 0f;
+        float centre = row;
+        for (int i = 0; i < n; i++)
+        {
+            float right = i < n - 1 ? Unsafe.Add(ref row, i + 1) : 0f;
+            float d = Unsafe.Add(ref diag, i);
+            float sum = left + right + Unsafe.Add(ref jm, i) + Unsafe.Add(ref jp, i) + Unsafe.Add(ref km, i) + Unsafe.Add(ref kp, i);
+            float value = d > 0f ? d * centre - sum : 0f;
+            Unsafe.Add(ref q, i) = value;
+            dot += centre * value;
+            left = centre;
+            centre = right;
+        }
+
+        return dot;
+    }
+
+    /// <summary>r = b − A·x₀ (warm start from the previous pressure), p = M⁻¹·r; partial r·M⁻¹r and max |r|.</summary>
     private void InitialResidualSlice(int k)
     {
-        double rz = 0;
-        float max = 0f;
-        for (int j = 0; j < _ny; j++)
-        {
-            for (int i = 0; i < _nx; i++)
-            {
-                int c = CellIndex(i, j, k);
-                if (_diag[c] == 0f)
-                {
-                    _pressure[c] = _residual[c] = _precond[c] = _search[c] = 0f;
-                    continue;
-                }
-
-                float r = _rhs[c] - Apply(_pressure, c, i, j, k);
-                float z = r * _invDiag[c];
-                _residual[c] = r;
-                _precond[c] = z;
-                _search[c] = z;
-                rz += (double)r * z;
-                max = MathF.Max(max, MathF.Abs(r));
-            }
-        }
-
-        _slicePartials[k] = rz;
-        _sliceMax[k] = max;
-    }
-
-    private void MatVecSlice(int k)
-    {
-        double pq = 0;
-        for (int j = 0; j < _ny; j++)
-        {
-            for (int i = 0; i < _nx; i++)
-            {
-                int c = CellIndex(i, j, k);
-                float q = _diag[c] == 0f ? 0f : Apply(_search, c, i, j, k);
-                _product[c] = q;
-                pq += (double)_search[c] * q;
-            }
-        }
-
-        _slicePartials[k] = pq;
-    }
-
-    private void UpdateSlice(int k)
-    {
-        float alpha = _cgAlpha;
-        double rz = 0;
-        float max = 0f;
         int start = k * _nx * _ny, end = start + _nx * _ny;
         for (int c = start; c < end; c++)
         {
-            _pressure[c] += alpha * _search[c];
-            float r = _residual[c] - alpha * _product[c];
+            if (_diag[c] == 0f)
+                _pressure[c] = 0f;
+        }
+
+        MultiplySlice(_pressure, _product, k);
+        double rz = 0;
+        float max = 0f;
+        for (int c = start; c < end; c++)
+        {
+            float r = _diag[c] == 0f ? 0f : _rhs[c] - _product[c];
             float z = r * _invDiag[c];
             _residual[c] = r;
-            _precond[c] = z;
+            _search[c] = z;
             rz += (double)r * z;
             max = MathF.Max(max, MathF.Abs(r));
         }
@@ -247,12 +281,44 @@ public sealed partial class SmokeSimulation
         _sliceMax[k] = max;
     }
 
+    private void MatVecSlice(int k) => _slicePartials[k] = MultiplySlice(_search, _product, k);
+
+    /// <summary>x += α·p, r −= α·q; partial r·M⁻¹r (Jacobi preconditioner M = diag A) and max |r|.</summary>
+    private void UpdateSlice(int k)
+    {
+        float alpha = _cgAlpha;
+        double rz = 0;
+        float max = 0f;
+        int start = k * _nx * _ny, count = _nx * _ny;
+        ref float p = ref _search[start];
+        ref float q = ref _product[start];
+        ref float x = ref _pressure[start];
+        ref float res = ref _residual[start];
+        ref float inv = ref _invDiag[start];
+        for (int i = 0; i < count; i++)
+        {
+            Unsafe.Add(ref x, i) += alpha * Unsafe.Add(ref p, i);
+            float r = Unsafe.Add(ref res, i) - alpha * Unsafe.Add(ref q, i);
+            Unsafe.Add(ref res, i) = r;
+            float rr = r * r;
+            rz += rr * Unsafe.Add(ref inv, i);
+            max = MathF.Max(max, rr);
+        }
+
+        _slicePartials[k] = rz;
+        _sliceMax[k] = MathF.Sqrt(max);
+    }
+
+    /// <summary>p = M⁻¹·r + β·p.</summary>
     private void SearchSlice(int k)
     {
         float beta = _cgBeta;
-        int start = k * _nx * _ny, end = start + _nx * _ny;
-        for (int c = start; c < end; c++)
-            _search[c] = _precond[c] + beta * _search[c];
+        int start = k * _nx * _ny, count = _nx * _ny;
+        ref float p = ref _search[start];
+        ref float res = ref _residual[start];
+        ref float inv = ref _invDiag[start];
+        for (int i = 0; i < count; i++)
+            Unsafe.Add(ref p, i) = Unsafe.Add(ref res, i) * Unsafe.Add(ref inv, i) + beta * Unsafe.Add(ref p, i);
     }
 
     /// <summary>Subtracts the pressure gradient from every free face (ambient φ = 0 beyond open faces).</summary>
