@@ -101,12 +101,25 @@ public sealed class FixtureGeometry
     /// <summary>Problems found while building (e.g. reference cycles, part limit).</summary>
     public IReadOnlyList<GdtfWarning> Warnings { get; }
 
-    /// <summary>Part of a geometry inside the instance given by its reference chain, or −1.</summary>
+    /// <summary>
+    /// Part of a geometry inside the instance given by its reference chain, or −1. A <see cref="GeometryReference"/>
+    /// itself (DMX channels may name one, e.g. per-layer controls of a multi-layer fixture) stands for the top part of
+    /// the instance it creates.
+    /// </summary>
     public int FindPart(GdtfGeometry? geometry, IReadOnlyList<GeometryReference> references)
     {
+        ArgumentNullException.ThrowIfNull(references);
         if (geometry is null) return -1;
         var chain = references as GeometryReference[] ?? references.ToArray();
-        return _byGeometry.TryGetValue(new PartKey(geometry, chain), out int index) ? index : -1;
+        if (_byGeometry.TryGetValue(new PartKey(geometry, chain), out int index)) return index;
+        if (geometry is GeometryReference { ReferencedGeometry: { } template } reference)
+        {
+            var extended = new GeometryReference[chain.Length + 1];
+            chain.CopyTo(extended, 0);
+            extended[^1] = reference;
+            if (_byGeometry.TryGetValue(new PartKey(template, extended), out index)) return index;
+        }
+        return -1;
     }
 
     /// <summary>Part a DMX channel instance controls, or −1 (e.g. when the channel's geometry is not in this tree).</summary>

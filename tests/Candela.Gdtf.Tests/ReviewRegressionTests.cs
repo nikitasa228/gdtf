@@ -78,6 +78,82 @@ public sealed class ReviewRegressionTests
         }
     }
 
+    /// <summary>
+    /// Prolights Eclipse XL: the CIE brightness channel of each layer names the layer's GeometryReference. It controls
+    /// that instance (the referenced light engine), so it must map to the instance's top part instead of none, which
+    /// made the DMX layer apply it to every beam of the fixture.
+    /// </summary>
+    [Fact]
+    public void Channels_on_a_geometry_reference_map_to_the_instance_part()
+    {
+        var ft = GdtfReader.ReadFile(TestData.Fixture("Prolights@EclFresnelCTPXLIP@"));
+        var mode = ft.FindMode("M8 - XY 16bit_17ch")!;
+        var geometry = new FixtureGeometryBuilder(ft).Build(mode);
+        var instance = mode.ChannelInstances.Single(i => i.Channel.Name == "Layer_1_CIE_Brightness");
+        Assert.IsType<GeometryReference>(instance.Geometry);
+        int part = geometry.FindPart(instance);
+        Assert.True(part >= 0);
+        Assert.Same(instance.Geometry, geometry.Parts[part].InstancedBy);
+        // every instance of the library maps to a part (checked for this fixture's modes)
+        foreach (var m in ft.DmxModes)
+        {
+            var g = new FixtureGeometryBuilder(ft).Build(m);
+            Assert.All(m.ChannelInstances.Where(i => i.Geometry?.IsSelfOrDescendantOf(m.Geometry!) == true || i.References.Count > 0),
+                i => Assert.True(g.FindPart(i) >= 0, i.ToString()));
+        }
+    }
+
+    /// <summary>
+    /// A wheel image of a few bytes can declare a gigapixel PNG; decoding it would allocate gigabytes. Images beyond
+    /// <see cref="GdtfImageSource.MaxPixels"/> are refused from their header.
+    /// </summary>
+    [Fact]
+    public void Image_bombs_are_refused_from_their_header()
+    {
+        static byte[] Png(uint width, uint height)
+        {
+            var ms = new MemoryStream();
+            ms.Write(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
+            var ihdr = new byte[17];
+            "IHDR"u8.CopyTo(ihdr);
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(ihdr.AsSpan(4), width);
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(ihdr.AsSpan(8), height);
+            ihdr[12] = 8; // bit depth
+            ihdr[13] = 6; // RGBA
+            var len = new byte[4];
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(len, 13);
+            ms.Write(len);
+            ms.Write(ihdr);
+            var crc = new byte[4];
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(crc, Crc32(ihdr));
+            ms.Write(crc);
+            ms.Write(new byte[64]); // no real IDAT
+            return ms.ToArray();
+        }
+
+        Assert.Null(GdtfImageSource.Decode(Png(16000, 16000)));
+        Assert.Null(GdtfImageSource.Decode(Png(1 << 30, 4)));
+        Assert.Null(GdtfImageSource.Decode(Png(4, 4))); // damaged (no image data): null, not an exception
+
+        // Real wheel images still decode.
+        using var archive = GdtfArchive.Open(TestData.Fixture("Robe_Lighting@Robin_MegaPointe@"));
+        var wheelImage = archive.EntryNames.First(n => n.StartsWith("wheels/", StringComparison.OrdinalIgnoreCase) && n.EndsWith(".png", StringComparison.OrdinalIgnoreCase));
+        var image = GdtfImageSource.Decode(archive.ReadBytes(wheelImage));
+        Assert.NotNull(image);
+        Assert.True(image!.Width > 0 && image.Height > 0);
+    }
+
+    private static uint Crc32(ReadOnlySpan<byte> data)
+    {
+        uint crc = 0xFFFFFFFF;
+        foreach (byte b in data)
+        {
+            crc ^= b;
+            for (int k = 0; k < 8; k++) crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320 : crc >> 1;
+        }
+        return ~crc;
+    }
+
     /// <summary>A projective last row would make the geometry tree's composition projective; it is dropped with a warning.</summary>
     [Fact]
     public void Non_affine_geometry_matrices_are_made_affine()
