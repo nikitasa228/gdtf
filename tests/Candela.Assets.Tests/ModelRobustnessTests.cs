@@ -161,6 +161,31 @@ public class ModelRobustnessTests
         RandomCorruptionsImportOrReject("box.glb", glb, 150, 5);
     }
 
+    [Theory]
+    [InlineData("P: \"DiffuseColor\", \"Color\", \"\", \"A\",0.05,0.05,0.05", "P: \"DiffuseColor\", \"Color\", \"\",,0.05,0.05")]
+    [InlineData("P: \"ShininessExponent\", \"double\", \"Number\", \"\",200", "P: \"ShininessExponent\", \"double\", \"Number\", \"\",")]
+    [InlineData("P: \"CoordAxis\", \"int\", \"Integer\", \"\",0", "P: \"CoordAxis\", \"int\", \"Integer\", \"\",")]
+    [InlineData("P: \"ShininessExponent\", \"double\", \"Number\", \"\",200", "P: \"ShininessExponent\", \"double\", \"Number\", \"\",     }")]
+    public void IncompleteAsciiFbxPropertyRecordsAreRejected(string original, string damaged)
+    {
+        // Assimp reads a property's value tokens without checking that they exist.
+        var fbx = TestFiles.AsciiFbx(zUp: false, unitScaleFactorCm: 1);
+        Assert.Contains(original, fbx, StringComparison.Ordinal);
+        var e = Assert.Throws<AssetImportException>(() =>
+            ModelImporter.Import("bad.fbx", Encoding.ASCII.GetBytes(fbx.Replace(original, damaged, StringComparison.Ordinal))));
+        Assert.Contains("FBX", e.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AsciiFbxRecordRunningIntoTheNextKeyIsRejected()
+    {
+        // A lost line break ("…,0P: …") turns the value into the key of the next record.
+        var fbx = TestFiles.AsciiFbx(zUp: false, unitScaleFactorCm: 1);
+        var damaged = System.Text.RegularExpressions.Regex.Replace(fbx, "(P: \"CoordAxis\", \"int\", \"Integer\", \"\",0)\\s+", "$1");
+        Assert.NotEqual(fbx, damaged);
+        Assert.Throws<AssetImportException>(() => ModelImporter.Import("bad.fbx", Encoding.ASCII.GetBytes(damaged)));
+    }
+
     [Fact]
     public void TruncatedAndCorruptedFbx3dsAndStlFilesDoNotCrash()
     {

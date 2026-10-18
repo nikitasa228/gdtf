@@ -31,9 +31,8 @@ or project.
 
 Errors that Assimp *reports* are caught like any other, but a segmentation fault inside the native library cannot be
 caught — it ends the process (the editor, or a project load that decodes a damaged asset). Fuzzing the bundled Assimp
-5.0 build with truncated and byte-corrupted files showed crashes or endless loops in its OBJ, MTL, PLY, COLLADA, glTF,
-3MF, X and X3D readers (and none in FBX, 3DS and STL over several hundred cases each). Damaged input therefore never
-reaches Assimp:
+5.0 build with about 15 000 truncated and byte-corrupted files showed crashes or endless loops in its OBJ, MTL, PLY,
+STL (ASCII), COLLADA, glTF, 3MF, X, X3D and ASCII FBX readers. Damaged input therefore never reaches Assimp:
 
 * **OBJ/MTL** are rewritten by `ObjSanitizer` into a strictly well-formed subset first (numbers validated, face corners
   resolved to absolute indices and written uniformly, faces with invalid references dropped with a warning, points,
@@ -42,6 +41,9 @@ reaches Assimp:
   what the project stores.
 * **COLLADA** is checked by `ModelPreflight`: well-formed XML, numeric arrays and index lists that contain only valid
   numbers and as many as declared, accessors that stay inside their arrays.
+* **ASCII FBX** property records (`P: "name", "type", …`) must carry the value tokens Assimp reads for their type
+  (it indexes them without a bounds check). Binary FBX and 3DS showed no failures under the same fuzzing.
+* **STL** is read by Candela's own `StlReader` (Assimp crashed on a bare `solid name` line).
 * **PLY** is read by Candela's own `PlyReader`; **glTF/GLB** only by SharpGLTF (a file SharpGLTF rejects is not retried
   with Assimp, whose glTF reader crashed on exactly those files).
 * 3MF, X, X3D and the other exotic Assimp formats are not offered (they are rejected with advice on what to export).
@@ -60,10 +62,10 @@ applied.
 |---|---|---|---|
 | glTF 2.0 `.gltf` (external or data-URI buffers), `.glb` | SharpGLTF | Y (specification) | metres (specification) |
 | Wavefront `.obj` + `.mtl` | Assimp (after `ObjSanitizer`) | Y (convention of Blender, Maya, 3ds Max OBJ export) | none → metres / guess |
-| Autodesk `.fbx` (binary and ASCII) | Assimp | from `GlobalSettings` (UpAxis, FrontAxis, CoordAxis and signs) | `UnitScaleFactor` (cm per unit; default 1 cm) |
+| Autodesk `.fbx` (binary and ASCII) | Assimp (ASCII after `ModelPreflight`) | from `GlobalSettings` (UpAxis, FrontAxis, CoordAxis and signs) | `UnitScaleFactor` (cm per unit; default 1 cm) |
 | COLLADA `.dae` | Assimp (after `ModelPreflight`) | `<asset><up_axis>` (Y_UP default, Z_UP, X_UP) | `<asset><unit meter>` (default 1) |
 | 3D Studio `.3ds` | Assimp | Z | none → metres / guess |
-| STL `.stl` (ASCII and binary) | Assimp | Z (CAD) | none → metres / guess |
+| STL `.stl` (ASCII and binary) | Candela (`StlReader`) | Z (CAD) | none → metres / guess |
 | Stanford `.ply` (ASCII, binary little/big endian) | Candela (`PlyReader`) | Z | none → metres / guess |
 
 Rejected with advice instead of a generic error:
@@ -109,7 +111,9 @@ axis, the 3DS Z→Y rotation) are switched off or discarded so every format goes
   non-finite positions); points and lines are skipped with a warning. PLY polygons are fan-triangulated (PLY writers
   emit convex faces); PLY texture coordinates (`s t`, `u v`, `texture_u texture_v`, or MeshLab's per-corner `texcoord`
   lists, which unweld the corners) are flipped from OpenGL's V-up to Candela's V-down.
-* **Normals** are taken from the file when it has valid ones. Otherwise they are generated with the smoothing angle
+* **Normals** are taken from the file when it has valid ones (STL facet normals are always ignored: they are often zero
+  or disagree with the winding, and STL repeats every corner per facet, so its triangles are welded by position first).
+  Otherwise they are generated with the smoothing angle
   `ImportOptions.SmoothingAngleDegrees` (66° by default, the usual DCC default): faces are area-weighted, faces on both
   sides of a texture seam smooth together, and vertices are split where the dihedral angle is sharper — a box keeps
   flat faces, a cylinder's side stays smooth (`MeshTools.GenerateNormals`). Around ordinary vertices (≤ 64 faces) every
@@ -204,7 +208,9 @@ stage light). glTF emissive colour × strength is relative, so 1 is given `Emiss
 
 Decoding is StbImageSharp; output is RGBA, top row first. 8-bit images are returned exactly as stored (sRGB colour or
 linear data such as normal maps — the meaning depends on use). Headers are validated before decoding; images larger
-than 32 768 pixels per side or 256 megapixels are rejected. TIFF, WebP, HEIF/AVIF, DDS and OpenEXR are recognised and
+than 32 768 pixels per side or 256 megapixels are rejected. JPEG marker segments are walked in managed code first:
+StbImageSharp loops forever when a segment's length runs past the end of the data — exactly what a partial download
+looks like — so such files are rejected as damaged (truncated *scan* data still decodes as far as it goes). TIFF, WebP, HEIF/AVIF, DDS and OpenEXR are recognised and
 rejected with a message naming a supported alternative. `EncodePng` / `SavePng` (atomic: temporary file + rename)
 write thumbnails and renders with StbImageWriteSharp; float images are clamped to 0 … 1 and sRGB-encoded (pass
 tone-mapped data for renders).

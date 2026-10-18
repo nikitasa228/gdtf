@@ -371,4 +371,57 @@ public class ImageImporterTests
     {
         Assert.Null(ImageImporter.DetectFormat(Encoding.ASCII.GetBytes("solid box\nfacet normal 0 0 1\n")));
     }
+
+    /// <summary>Decodes on a worker thread so a regression (endless loop) fails the test instead of hanging the run.</summary>
+    private static bool DecodesOrRejectsQuickly(byte[] data)
+    {
+        var task = Task.Run(() => ImageImporter.TryDecode(data, out _, out _));
+        return task.Wait(TimeSpan.FromSeconds(20));
+    }
+
+    [Fact]
+    public void TruncatedJpegsAreRejectedInsteadOfHanging()
+    {
+        // StbImageSharp loops forever when a marker segment runs past the end of the data (a partial download).
+        var source = TestFiles.Image(16, 12, (x, y) => ((byte)(x * 16), (byte)(y * 20), (byte)(x ^ y), 255));
+        var jpg = Write((w, s) => w.WriteJpg(source.Pixels, 16, 12, ColorComponents.RedGreenBlueAlpha, s, 90));
+        for (int length = 0; length < jpg.Length; length++)
+            Assert.True(DecodesOrRejectsQuickly(jpg[..length]), $"decoding the first {length} bytes did not finish");
+
+        // A header segment whose length points past the end: rejected up front.
+        var bad = (byte[])jpg.Clone();
+        bad[4] = 0xF3; // APP0 length high byte
+        Assert.Null(ImageImporter.Identify(bad));
+        var e = Assert.Throws<AssetImportException>(() => ImageImporter.Decode(bad));
+        Assert.Contains("JPEG", e.Message, StringComparison.Ordinal);
+
+        // Truncated entropy-coded data still decodes (as far as it goes), as does a file without its end marker.
+        Assert.NotNull(ImageImporter.Identify(jpg[..(jpg.Length - 40)]));
+        Assert.True(ImageImporter.TryDecode(jpg[..^2], out var image, out _));
+        Assert.Equal(16, image!.Width);
+    }
+
+    [Fact]
+    public void CorruptedImagesOfEveryFormatDecodeOrRejectQuickly()
+    {
+        var source = TestFiles.Image(16, 12, (x, y) => ((byte)(x * 16), (byte)(y * 20), (byte)(x ^ y), 255));
+        var seeds = new[]
+        {
+            ImageImporter.EncodePng(source),
+            Write((w, s) => w.WriteJpg(source.Pixels, 16, 12, ColorComponents.RedGreenBlueAlpha, s, 90)),
+            Write((w, s) => w.WriteTga(source.Pixels, 16, 12, ColorComponents.RedGreenBlueAlpha, s)),
+            Write((w, s) => w.WriteBmp(source.Pixels, 16, 12, ColorComponents.RedGreenBlueAlpha, s)),
+            WriteHdr(Enumerable.Range(0, 16 * 12 * 3).Select(i => i * 0.01f).ToArray(), 16, 12),
+        };
+        var rng = new Random(11);
+        foreach (var seed in seeds)
+        {
+            for (int k = 0; k < 150; k++)
+            {
+                var copy = (byte[])seed.Clone();
+                for (int f = 0; f < 1 + rng.Next(8); f++) copy[rng.Next(copy.Length)] = (byte)rng.Next(256);
+                Assert.True(DecodesOrRejectsQuickly(copy), $"a corrupted {ImageImporter.DetectFormat(seed)} did not finish decoding");
+            }
+        }
+    }
 }

@@ -14,8 +14,9 @@ namespace Candela.Assets;
 /// <item>COLLADA: the XML must be well-formed; numeric arrays (<c>float_array</c>, <c>int_array</c>, <c>p</c>,
 /// <c>vcount</c>, <c>v</c>, <c>h</c>) must contain only numbers and at least as many as their <c>count</c> says; every
 /// <c>accessor</c> must stay inside the array it reads.</item>
+/// <item>ASCII FBX: every property record must have the tokens Assimp reads for its type.</item>
 /// </list>
-/// FBX, 3DS and STL went through the same fuzzing without failures; PLY and glTF never reach Assimp.
+/// Binary FBX and 3DS went through the same fuzzing without failures; PLY, STL and glTF never reach Assimp.
 /// </summary>
 internal static class ModelPreflight
 {
@@ -59,6 +60,9 @@ internal static class ModelPreflight
                 }
             case ModelFormat.Collada:
                 CheckCollada(data);
+                return data;
+            case ModelFormat.Fbx:
+                CheckAsciiFbxProperties(data);
                 return data;
             default:
                 return data;
@@ -152,6 +156,95 @@ internal static class ModelPreflight
             if (stride == 0 || offset + (count - 1) * stride + last > length)
                 throw Inconsistent($"an accessor reads {count} × {stride} values from '{source}', which holds {length}");
         }
+    }
+
+    // FBX property types whose value Assimp reads from the fifth token of a "P:" record, and those it reads as three
+    // values (fifth to seventh token). Assimp does not check the token count first (assert only), so a damaged record
+    // reads past the token list.
+    private static readonly HashSet<string> s_fbxScalarTypes = new(StringComparer.Ordinal)
+    {
+        "KString", "bool", "Bool", "int", "Int", "enum", "Enum", "ULongLong", "KTime", "double", "Number", "Float",
+        "FieldOfView", "UnitScaleFactor",
+    };
+
+    private static readonly HashSet<string> s_fbxVectorTypes = new(StringComparer.Ordinal)
+    {
+        "Vector3D", "ColorRGB", "Vector", "Color", "Lcl Translation", "Lcl Rotation", "Lcl Scaling",
+    };
+
+    /// <summary>
+    /// Checks every property record (<c>P: "name", "type", "label", "flags", values…</c>) of an ASCII FBX file for the
+    /// number of tokens Assimp will read. Binary FBX (typed records) is not affected and passes unchecked.
+    /// </summary>
+    internal static void CheckAsciiFbxProperties(byte[] data)
+    {
+        if (data.AsSpan().StartsWith("Kaydara FBX Binary"u8)) return;
+        ReadOnlySpan<byte> span = data;
+        int lineNumber = 0;
+        var tokens = new List<string>(8);
+        while (!span.IsEmpty)
+        {
+            int nl = span.IndexOf((byte)'\n');
+            var line = nl < 0 ? span : span[..nl];
+            span = nl < 0 ? ReadOnlySpan<byte>.Empty : span[(nl + 1)..];
+            lineNumber++;
+            int i = 0;
+            while (i < line.Length && line[i] is (byte)' ' or (byte)'\t') i++;
+            if (line.Length - i < 2 || line[i] != (byte)'P' || line[i + 1] != (byte)':') continue;
+            SplitFbxTokens(line[(i + 2)..], tokens);
+            int needed = tokens.Count < 2 ? 2 : s_fbxVectorTypes.Contains(tokens[1]) ? 7 : s_fbxScalarTypes.Contains(tokens[1]) ? 5 : 2;
+            if (tokens.Count < needed)
+                throw new AssetImportException($"The FBX file is damaged: the property record on line {lineNumber} is incomplete.");
+        }
+    }
+
+    /// <summary>
+    /// Comma-separated value tokens of an ASCII FBX record as Assimp's tokenizer sees them: quotes removed, empty tokens
+    /// skipped, and the record ending at a bracket, a comment or the key of a following record.
+    /// </summary>
+    private static void SplitFbxTokens(ReadOnlySpan<byte> text, List<string> tokens)
+    {
+        tokens.Clear();
+        var current = new System.Text.StringBuilder();
+        bool quoted = false, any = false;
+        foreach (byte b in text)
+        {
+            if (quoted)
+            {
+                if (b == (byte)'"') quoted = false;
+                else current.Append((char)b);
+                continue;
+            }
+            if (b == (byte)'"')
+            {
+                quoted = true;
+                any = true;
+            }
+            else if (b is (byte)'{' or (byte)'}' or (byte)';')
+            {
+                // A scope bracket or a comment ends the record (Assimp's tokenizer makes the bracket its own token).
+                break;
+            }
+            else if (b == (byte)':')
+            {
+                // "…,0P: …": the word before a colon is the key of the next record, not a value of this one.
+                current.Clear();
+                any = false;
+                break;
+            }
+            else if (b == (byte)',')
+            {
+                if (any) tokens.Add(current.ToString());
+                current.Clear();
+                any = false;
+            }
+            else if (b is not ((byte)' ' or (byte)'\t' or (byte)'\r'))
+            {
+                current.Append((char)b);
+                any = true;
+            }
+        }
+        if (any) tokens.Add(current.ToString());
     }
 
     private static bool IsChecked(string element) => element is "float_array" or "int_array" or "p" or "vcount" or "v" or "h" or "accessor";

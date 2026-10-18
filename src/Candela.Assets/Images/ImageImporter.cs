@@ -34,6 +34,9 @@ public static class ImageImporter
     {
         string? format = DetectFormat(data);
         if (format is null) return null;
+        // StbImageSharp loops forever on a JPEG whose marker segment runs past the end of the data (a truncated
+        // download): check the segment structure first.
+        if (format == "jpeg" && !JpegSegmentsAreComplete(data)) return null;
         try
         {
             fixed (byte* p = data)
@@ -208,6 +211,39 @@ public static class ImageImporter
         if (data.Length >= 2 && data[0] == (byte)'#' && data[1] == (byte)'?') return "hdr";
         if (LooksLikeTga(data)) return "tga";
         return null;
+    }
+
+    /// <summary>
+    /// Walks the JPEG marker segments (APPn, DQT, SOF, DHT, …, and the segments between progressive scans). False when a
+    /// segment's declared length runs past the end of the data, when the first scan has no frame header before it, or
+    /// when no scan starts at all. Truncated entropy-coded data is accepted (it decodes as far as it goes).
+    /// </summary>
+    internal static bool JpegSegmentsAreComplete(ReadOnlySpan<byte> d)
+    {
+        if (d.Length < 4 || d[0] != 0xFF || d[1] != 0xD8) return false;
+        int pos = 2;
+        bool frame = false, scan = false;
+        while (pos < d.Length)
+        {
+            if (d[pos] != 0xFF) return scan; // garbage after the image data: stb stops at the last scan
+            while (pos < d.Length && d[pos] == 0xFF) pos++; // fill bytes
+            if (pos >= d.Length) return scan;
+            byte marker = d[pos++];
+            if (marker == 0xD9) return scan; // EOI
+            if (marker is >= 0xD0 and <= 0xD7 or 0x01) continue; // RSTn, TEM: no length
+            if (pos + 2 > d.Length) return false;
+            int length = d[pos] << 8 | d[pos + 1];
+            if (length < 2 || pos + length > d.Length) return false;
+            if (marker is >= 0xC0 and <= 0xCF and not 0xC4 and not 0xC8 and not 0xCC) frame = true;
+            pos += length;
+            if (marker != 0xDA) continue;
+            if (!frame) return false;
+            scan = true;
+            // Entropy-coded data: skip to the next marker (0xFF followed by neither 0x00 nor a restart marker).
+            while (pos + 1 < d.Length && !(d[pos] == 0xFF && d[pos + 1] != 0x00 && d[pos + 1] is not (>= 0xD0 and <= 0xD7))) pos++;
+            if (pos + 1 >= d.Length) return true; // truncated inside the scan data
+        }
+        return scan;
     }
 
     private static bool LooksLikeTga(ReadOnlySpan<byte> d)
