@@ -12,9 +12,14 @@ public sealed class MeshComponent : Component
     /// <summary>Material slot index of the model → material id (see <see cref="MaterialIds"/>).</summary>
     public Dictionary<int, string> MaterialOverrides { get; set; } = new();
 
+    /// <summary>True when the model casts shadows.</summary>
     public bool CastShadow { get; set; } = true;
+
+    /// <inheritdoc/>
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper) => ModelAssetId = remapper.RemapAsset(ModelAssetId);
 }
 
+/// <summary>Shape and orientation of a <see cref="WallComponent"/>.</summary>
 public enum WallKind
 {
     /// <summary>Vertical: width along local X, height along local Z, thickness along local Y.</summary>
@@ -66,6 +71,9 @@ public sealed class ImageComponent : Component
     public float Height { get; set; } = 1f;
     public float Opacity { get; set; } = 0.6f;
     public bool DoubleSided { get; set; } = true;
+
+    /// <inheritdoc/>
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper) => ImageAssetId = remapper.RemapAsset(ImageAssetId);
 }
 
 public enum TrussKind
@@ -100,6 +108,9 @@ public sealed class TrussComponent : Component
     /// <summary>Optional model asset; when empty the renderer generates the profile procedurally.</summary>
     [AssetReference]
     public Guid? ModelAssetId { get; set; }
+
+    /// <inheritdoc/>
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper) => ModelAssetId = remapper.RemapAsset(ModelAssetId);
 }
 
 /// <summary>A hoist / hanging point that carries a structure (MVR Support).</summary>
@@ -113,7 +124,7 @@ public sealed class RiggingPointComponent : Component
     public List<Guid> Carries { get; set; } = new();
 
     /// <inheritdoc/>
-    protected internal override void RemapEntityReferences(EntityReferenceRemapper remapper) => remapper.RemapAll(Carries);
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper) => remapper.RemapAll(Carries);
 }
 
 /// <summary>Marks an entity that only groups children (MVR GroupObject, editor folders).</summary>
@@ -155,5 +166,10 @@ public sealed class CameraComponent : Component
     /// <summary>Exposure value at ISO 100 (physical camera).</summary>
     public float Ev100 { get; set; } = 6f;
 
+    /// <summary>
+    /// The point the view looks at, in world space (metres, Z up), or null to look along the entity's orientation. The
+    /// camera position is the entity's world position. Copies keep the point unchanged (it does not follow the entity);
+    /// a merge that moves the imported scene moves it with the placement.
+    /// </summary>
     public Vector3? Target { get; set; }
 }

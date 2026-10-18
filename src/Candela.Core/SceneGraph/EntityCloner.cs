@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Candela.Core.Diagnostics;
 
 namespace Candela.Core.SceneGraph;
@@ -39,6 +40,21 @@ public sealed class EntityCloneOptions
 
     /// <summary>Renew ids local to components (cable node ids) so copies never share them (default true).</summary>
     public bool RegenerateLocalIds { get; init; } = true;
+
+    /// <summary>
+    /// Original asset id → asset id where the copies go (merge import of another project's assets). Null (default):
+    /// asset ids are kept, as for copies inside one project. See <see cref="EntityReferenceRemapper.AssetIdMap"/>.
+    /// </summary>
+    public IReadOnlyDictionary<Guid, Guid>? AssetIdMap { get; init; }
+
+    /// <summary>
+    /// Called for every copied component after its references were rewritten, with the original component and its copy
+    /// (attached to the copy entity, which is still detached; <see cref="EntityCloneResult.IdMap"/> is complete by then).
+    /// Use it for what Core does not know about: asset texture keys inside material ids, GDTF file names, console fixture
+    /// ids, world-space points moved by a placement. An exception leaves that component out of the copy and is reported in
+    /// <see cref="EntityCloneResult.Issues"/>; the copy goes on.
+    /// </summary>
+    public Action<Component, Component>? ComponentCopied { get; init; }
 }
 
 /// <summary>The detached copies made by <see cref="EntityCloner"/> and what happened to the references they hold.</summary>
@@ -55,6 +71,7 @@ public sealed class EntityCloneResult
         _copyByOriginalId = copyByOriginalId;
         ReferencesRemapped = remapper.Remapped;
         ReferencesKept = remapper.Kept;
+        AssetReferencesRemapped = remapper.AssetsRemapped;
         ClearedReferences = remapper.Cleared;
         Issues = issues;
     }
@@ -80,6 +97,9 @@ public sealed class EntityCloneResult
     /// <summary>References to entities that were not copied and were kept.</summary>
     public int ReferencesKept { get; }
 
+    /// <summary>Asset references rewritten through <see cref="EntityCloneOptions.AssetIdMap"/>.</summary>
+    public int AssetReferencesRemapped { get; }
+
     /// <summary>References to entities that were not copied and were removed.</summary>
     public IReadOnlyList<ClearedEntityReference> ClearedReferences { get; }
 
@@ -92,7 +112,7 @@ public sealed class EntityCloneResult
 
 /// <summary>
 /// Deep-copies entity subtrees (entities, flags, transforms and components) with new ids and rewrites the entity
-/// references inside the copied components (<see cref="Component.RemapEntityReferences"/>): references among the copied
+/// references inside the copied components (<see cref="Component.RemapReferences"/>): references among the copied
 /// entities point at the copies; references to other entities are kept or removed (<see cref="EntityCloneOptions.ExternalReferences"/>).
 /// The copies are detached: add <see cref="EntityCloneResult.Roots"/> to a scene (e.g. with
 /// <see cref="Editing.AddEntitiesCommand"/>).
@@ -142,6 +162,7 @@ public static class EntityCloner
         var copies = new List<(Entity Original, Entity Copy)>();
         var copyOf = new Dictionary<Entity, Entity>(ReferenceEqualityComparer.Instance);
         var usedIds = new HashSet<Guid>();
+        var sourceOf = new Dictionary<Component, Component>(ReferenceEqualityComparer.Instance);
         var issues = new List<Issue>();
         var rootCopies = new List<Entity>(roots.Count);
 
@@ -157,7 +178,13 @@ public static class EntityCloner
                 if (target is not null && layer != Guid.Empty && target.FindLayer(layer) is null) layer = Guid.Empty;
 
                 bool isRoot = ReferenceEquals(original, root);
-                var copy = new Entity(original.Name, id) { LayerId = layer, Visible = original.Visible, Locked = original.Locked };
+                var copy = new Entity(original.Name, id)
+                {
+                    LayerId = layer,
+                    Visible = original.Visible,
+                    Locked = original.Locked,
+                    UnknownProperties = original.UnknownProperties is { } unknown ? new Dictionary<string, JsonElement>(unknown) : null,
+                };
                 copy.Local = isRoot && options.RootsKeepWorldTransform ? original.World : original.Local;
                 if (isRoot) rootCopies.Add(copy);
                 else copyOf[original.Parent!].AttachChild(copy, -1);
@@ -173,7 +200,9 @@ public static class EntityCloner
                 {
                     try
                     {
-                        copy.Add(component.Clone());
+                        var clone = component.Clone();
+                        copy.Add(clone);
+                        sourceOf[clone] = component;
                     }
                     catch (Exception e)
                     {
@@ -192,13 +221,13 @@ public static class EntityCloner
             IsResolvable = target is null ? null : id => target.Find(id) is not null,
             ResolveOriginal = id => ResolveOriginal(id, originalById, sources, target),
             RegenerateLocalIds = options.RegenerateLocalIds,
+            AssetIdMap = options.AssetIdMap,
         };
         foreach (var (original, copy) in copies)
         {
-            var components = copy.Components;
-            for (int i = components.Count - 1; i >= 0; i--)
+            if (copy.Components.Count == 0) continue;
+            foreach (var component in copy.Components.ToArray()) // components may be left out on failure
             {
-                var component = components[i];
                 try
                 {
                     remapper.Apply(component);
@@ -209,6 +238,19 @@ public static class EntityCloner
                     copy.Remove(component);
                     issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, ComponentNotCopiedCode,
                         $"The references of the {component.GetType().Name} of '{original.Name}' could not be updated; the component was left out of the copy: {e.Message}",
+                        copy.Id));
+                    continue;
+                }
+                if (options.ComponentCopied is not { } copied) continue;
+                try
+                {
+                    copied(sourceOf[component], component);
+                }
+                catch (Exception e)
+                {
+                    copy.Remove(component);
+                    issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, ComponentNotCopiedCode,
+                        $"The {component.GetType().Name} of '{original.Name}' could not be completed and was left out of the copy: {e.Message}",
                         copy.Id));
                 }
             }

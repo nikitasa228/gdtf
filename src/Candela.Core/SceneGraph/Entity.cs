@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 using Candela.Core.Math;
 
 namespace Candela.Core.SceneGraph;
@@ -11,6 +12,14 @@ namespace Candela.Core.SceneGraph;
 /// </summary>
 public sealed class Entity
 {
+    /// <summary>Per-thread scratch list for <see cref="WorldMatrix"/> (no allocation once warmed up, no recursion).</summary>
+    [ThreadStatic]
+    private static List<Entity>? _threadDirtyChain;
+
+    /// <summary>Per-thread scratch stack for <see cref="MarkWorldDirty"/>.</summary>
+    [ThreadStatic]
+    private static Stack<Entity>? _threadDirtyStack;
+
     private readonly List<Entity> _children = new();
     private readonly List<Component> _components = new();
     private Transform _local = Transform.Identity;
@@ -90,6 +99,13 @@ public sealed class Entity
         }
     }
 
+    /// <summary>
+    /// JSON properties of the entity's record that this version does not know (written by a newer version of Candela),
+    /// kept so saving the scene again does not drop them. Opaque: never interpreted, never remapped by copies (which carry
+    /// them unchanged), and changing them raises no scene change. Null when there are none.
+    /// </summary>
+    public Dictionary<string, JsonElement>? UnknownProperties { get; set; }
+
     /// <summary>The scene the entity belongs to, or null while detached.</summary>
     public Scene? Scene { get; internal set; }
 
@@ -115,17 +131,28 @@ public sealed class Entity
         }
     }
 
-    /// <summary>Local-to-world matrix (cached, recomputed lazily after any ancestor moves).</summary>
+    /// <summary>
+    /// Local-to-world matrix (cached, recomputed lazily after any ancestor moves). Iterative, so arbitrarily deep
+    /// hierarchies cannot overflow the call stack, and allocation-free once warmed up.
+    /// </summary>
     public Matrix4x4 WorldMatrix
     {
         get
         {
-            if (_worldDirty)
+            if (!_worldDirty) return _world;
+            if (Parent is not { _worldDirty: true })
             {
-                var local = _local.ToMatrix();
-                _world = Parent is null ? local : local * Parent.WorldMatrix;
-                _worldDirty = false;
+                ComputeWorld();
+                return _world;
             }
+
+            // Invariant: a dirty entity has only dirty descendants (MarkWorldDirty), so the dirty entities above this one
+            // form one unbroken chain up to the first clean ancestor (or the root). Compute it top-down.
+            var chain = _threadDirtyChain ??= new List<Entity>();
+            int start = chain.Count;
+            for (var e = this; e is { _worldDirty: true }; e = e.Parent) chain.Add(e);
+            for (int i = chain.Count - 1; i >= start; i--) chain[i].ComputeWorld();
+            chain.RemoveRange(start, chain.Count - start);
             return _world;
         }
     }
@@ -208,6 +235,18 @@ public sealed class Entity
         return child;
     }
 
+    /// <summary>
+    /// Takes <paramref name="child"/> (with its subtree) out of this entity and returns its former sibling index, or -1
+    /// when it is not a child of this entity. In a scene this is <see cref="SceneGraph.Scene.Remove"/> (the subtree leaves
+    /// the scene, Removed is raised); on a detached entity it edits the detached hierarchy.
+    /// </summary>
+    public int RemoveChild(Entity child)
+    {
+        ArgumentNullException.ThrowIfNull(child);
+        if (!ReferenceEquals(child.Parent, this)) return -1;
+        return Scene is { } scene ? scene.Remove(child).Index : DetachChild(child);
+    }
+
     /// <summary>Depth-first: this entity, then all descendants in tree order. One small enumerator per call, no recursion.</summary>
     public IEnumerable<Entity> SelfAndDescendants() => Traverse(this, _children);
 
@@ -276,11 +315,34 @@ public sealed class Entity
     internal void NotifyComponentChanged(Component c) =>
         Scene?.Raise(new SceneChange(SceneChangeKind.ComponentChanged, this, c));
 
+    /// <summary>
+    /// Marks this entity and its descendants as needing a new world matrix. A descendant that is already dirty has only
+    /// dirty descendants (its world was never computed since its own ancestor last changed), so its subtree is skipped:
+    /// moving a node repeatedly costs O(1) until something reads a world matrix below it. Iterative (deep trees are safe).
+    /// </summary>
     private void MarkWorldDirty()
     {
-        if (_worldDirty && _children.Count == 0) return;
+        if (_worldDirty) return;
         _worldDirty = true;
-        foreach (var c in _children) c.MarkWorldDirty();
+        if (_children.Count == 0) return;
+        var stack = _threadDirtyStack ??= new Stack<Entity>();
+        int floor = stack.Count;
+        foreach (var c in _children) stack.Push(c);
+        while (stack.Count > floor)
+        {
+            var e = stack.Pop();
+            if (e._worldDirty) continue;
+            e._worldDirty = true;
+            foreach (var c in e._children) stack.Push(c);
+        }
+    }
+
+    /// <summary>Computes <see cref="_world"/> from the local transform and the (clean) parent's world matrix.</summary>
+    private void ComputeWorld()
+    {
+        var local = _local.ToMatrix();
+        _world = Parent is null ? local : local * Parent._world;
+        _worldDirty = false;
     }
 
     /// <inheritdoc/>

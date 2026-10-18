@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Candela.Core.SceneGraph;
 
@@ -53,6 +55,13 @@ public sealed class Layer
             Notify();
         }
     }
+
+    /// <summary>
+    /// JSON properties this version does not know (written by a newer version of Candela), kept so that saving again
+    /// does not drop them. Opaque: never interpreted and changing them raises no scene change. Null when there are none.
+    /// </summary>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? UnknownProperties { get; set; }
 
     /// <summary>The scene whose layer list holds this layer (the last one it was added to), or null.</summary>
     internal Scene? Owner { get; set; }

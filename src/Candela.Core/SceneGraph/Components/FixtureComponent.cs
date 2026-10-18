@@ -40,7 +40,7 @@ public sealed class FixtureComponent : Component
     public System.Numerics.Vector3? FocusPoint { get; set; }
 
     /// <inheritdoc/>
-    protected internal override void RemapEntityReferences(EntityReferenceRemapper remapper) => MountedOn = remapper.Remap(MountedOn);
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper) => MountedOn = remapper.Remap(MountedOn);
 }
 
 /// <summary>

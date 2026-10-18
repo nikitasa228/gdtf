@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Candela.Core.SceneGraph;
 
 /// <summary>
@@ -63,6 +65,13 @@ public sealed class Scene
             NotifySettingsChanged();
         }
     }
+
+    /// <summary>
+    /// Top-level JSON properties of the scene file that this version does not know (written by a newer version of
+    /// Candela), kept so saving the scene again does not drop them. Opaque: never interpreted, and changing them raises
+    /// no scene change. Null when there are none.
+    /// </summary>
+    public Dictionary<string, JsonElement>? UnknownProperties { get; set; }
 
     /// <summary>Top-level entities in order.</summary>
     public IReadOnlyList<Entity> Roots => _roots;

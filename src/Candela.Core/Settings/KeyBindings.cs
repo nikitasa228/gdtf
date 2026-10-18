@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Candela.Core.Settings;
 
@@ -195,6 +197,13 @@ public sealed class KeyBindingSet
 
     /// <summary>Action id (<see cref="EditorActions"/>) → chords in text form.</summary>
     public Dictionary<string, List<string>> Bindings { get; set; } = new();
+
+    /// <summary>
+    /// JSON properties this version does not know (written by a newer version of Candela), kept so that saving again
+    /// does not drop them. Opaque: never interpreted. Null when there are none.
+    /// </summary>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? UnknownProperties { get; set; }
 
     /// <summary>The chords bound to <paramref name="action"/> that parse (invalid entries are skipped).</summary>
     public IEnumerable<KeyChord> ChordsFor(string action)

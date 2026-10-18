@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Candela.Core.Serialization;
 
 namespace Candela.Core.Settings;
@@ -51,6 +53,13 @@ public sealed class AppSettings
 
     /// <summary>Preferred GPU name substring (empty = the most capable discrete GPU).</summary>
     public string PreferredGpu { get; set; } = "";
+
+    /// <summary>
+    /// JSON properties this version does not know (written by a newer version of Candela), kept so that saving again
+    /// does not drop them. Opaque: never interpreted. Null when there are none.
+    /// </summary>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? UnknownProperties { get; set; }
 
     public static AppSettings Load(string? path = null)
     {

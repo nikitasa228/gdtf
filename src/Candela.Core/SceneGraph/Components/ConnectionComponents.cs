@@ -37,7 +37,7 @@ public sealed class CableComponent : Component
     /// unplugged. With <see cref="EntityReferenceRemapper.RegenerateLocalIds"/>, node ids are renewed and segments and
     /// endpoints follow them; references to node ids the cable does not have are left as they are.
     /// </summary>
-    protected internal override void RemapEntityReferences(EntityReferenceRemapper remapper)
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper)
     {
         Dictionary<Guid, Guid>? nodeIds = null;
         if (remapper.RegenerateLocalIds && Nodes is { Count: > 0 })

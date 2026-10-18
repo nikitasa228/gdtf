@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 
@@ -9,7 +10,12 @@ namespace Candela.Core.Serialization;
 
 /// <summary>
 /// The one JSON configuration used for project files, presets and settings: camelCase, enums as strings, vectors as
-/// arrays, polymorphic components with a "$type" discriminator, tolerant of unknown properties (forward compatible).
+/// arrays (non-finite numbers as the strings "NaN", "Infinity", "-Infinity"), polymorphic components with a "$type"
+/// discriminator, tolerant of unknown properties (forward compatible; Core's data classes keep them in their
+/// <c>UnknownProperties</c> so a file written by a newer version survives being saved again).
+/// Null values are omitted, except for a property whose default is not null (e.g.
+/// <c>ConsoleComponent.ProtocolId</c>, default "artnet"): such a null is written as <c>null</c>, because an omitted
+/// value reads back as the default. Writing with these options and reading back is therefore exact.
 /// </summary>
 public static class CandelaJson
 {
@@ -20,9 +26,8 @@ public static class CandelaJson
     public static JsonSerializerOptions CompactOptions { get; } = CreateOptions(indented: false);
 
     /// <summary>
-    /// Compact options that write every null. <see cref="CompactOptions"/> omits nulls, which read back as the property's
-    /// default — a value set to null whose default is not null (e.g. <c>ConsoleComponent.ProtocolId</c>) would come back as
-    /// the default. Copies and undo snapshots use these options so they are exact.
+    /// Compact options that write every null (also those whose default is null). Copies and undo snapshots use them, so
+    /// they are exact even for types whose default values cannot be determined (no parameterless constructor).
     /// </summary>
     internal static JsonSerializerOptions CopyOptions { get; } = CreateCopyOptions();
 
@@ -44,6 +49,7 @@ public static class CandelaJson
             NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
             AllowTrailingCommas = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { WriteNullsThatDifferFromDefaults } },
         };
         o.Converters.Add(new JsonStringEnumConverter());
         o.Converters.Add(new Vector2Converter());
@@ -54,6 +60,41 @@ public static class CandelaJson
         o.Converters.Add(new TransformConverter());
         o.MakeReadOnly(populateMissingResolver: true);
         return o;
+    }
+
+    /// <summary>
+    /// Contract modifier: a nullable property whose value on a freshly constructed object is not null is always written,
+    /// so a null stays null through a write and a read (<see cref="JsonIgnoreCondition.WhenWritingNull"/> would omit it and
+    /// the reader would restore the default). Types without a usable parameterless constructor keep the plain behaviour.
+    /// </summary>
+    private static void WriteNullsThatDifferFromDefaults(JsonTypeInfo info)
+    {
+        if (info.Kind != JsonTypeInfoKind.Object || info.CreateObject is null || info.Type.IsAbstract) return;
+        object sample;
+        try
+        {
+            sample = info.CreateObject();
+        }
+        catch (Exception)
+        {
+            return; // a constructor that fails cannot tell the defaults; nulls are omitted as before
+        }
+        foreach (var property in info.Properties)
+        {
+            if (property.Get is null || property.IsExtensionData) continue;
+            var type = property.PropertyType;
+            if (type.IsValueType && Nullable.GetUnderlyingType(type) is null) continue;
+            object? defaultValue;
+            try
+            {
+                defaultValue = property.Get(sample);
+            }
+            catch (Exception)
+            {
+                continue;
+            }
+            if (defaultValue is not null) property.ShouldSerialize = static (_, _) => true;
+        }
     }
 
     /// <summary>Serialises <paramref name="value"/> with <see cref="Options"/> (or <see cref="CompactOptions"/>).</summary>
@@ -79,7 +120,7 @@ public static class CandelaJson
                ?? throw new InvalidOperationException($"A {value.GetType().Name} could not be copied.");
     }
 
-    /// <summary>Component → compact JSON including its "$type" (nulls omitted, as in files).</summary>
+    /// <summary>Component → compact JSON including its "$type" (as in files: nulls omitted unless their default is not null).</summary>
     public static string SerializeComponent(Component component) => JsonSerializer.Serialize(component, CompactOptions);
 
     /// <summary>
