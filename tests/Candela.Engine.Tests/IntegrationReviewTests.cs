@@ -253,3 +253,44 @@ public sealed class IntegrationReviewTests
         engine.DisableAutosave(completeSession: false); // the process "crashes": recovery files stay
     }
 }
+
+public sealed class FokinaRoundTripReviewTests
+{
+    [Fact]
+    public void Fokina_saved_as_a_project_reopens_with_the_same_lights_and_instances()
+    {
+        static (List<string> Lights, int Instances, int Fixtures, List<string> Specs) Evaluate(StageEngine engine)
+        {
+            StageLooks.ApplyOpenWhite(engine, new OpenWhiteOptions { Undoable = false });
+            var world = new RecordingRenderWorld();
+            var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+            engine.Settings.MotorDynamics = false;
+            engine.Tick(0);
+            engine.Tick(1.0 / 30);
+            Assert.Empty(world.Violations);
+            var lights = world.Lights.Select(l => $"{l.FixtureId} {l.Position.X:0.000} {l.Position.Y:0.000} {l.Position.Z:0.000} {l.Direction.X:0.000} {l.Direction.Y:0.000} {l.PeakCandela:0}")
+                .OrderBy(s => s, StringComparer.Ordinal).ToList();
+            var specs = engine.Scene.Query<FixtureComponent>()
+                .Select(f => $"{f.Entity.Id} {engine.Dmx.GetResolution(f.Entity.Id)?.Entry?.FileName} {engine.Dmx.GetState(f.Entity.Id)?.Profile.Mode.Name}")
+                .OrderBy(s => s, StringComparer.Ordinal).ToList();
+            return (lights, sync.InstanceCount, engine.Dmx.FixtureCount, specs);
+        }
+
+        string path = Path.Combine(TestEnvironment.NewTempDirectory("fokina-project"), "fokina.candela");
+        (List<string> Lights, int Instances, int Fixtures, List<string> Specs) before;
+        using (var engine = TestEnvironment.CreateEngine("fokina-save"))
+        {
+            Assert.True(engine.Open(TestEnvironment.Fokina).Success);
+            Assert.True(engine.SaveAs(path).Success);
+            before = Evaluate(engine);
+        }
+        using var reopened = TestEnvironment.CreateEngine("fokina-reopen");
+        var opened = reopened.Open(path);
+        Assert.True(opened.Success, opened.Summary);
+        var after = Evaluate(reopened);
+        Assert.Equal(before.Fixtures, after.Fixtures);
+        Assert.Equal(before.Specs, after.Specs);
+        Assert.Equal(before.Instances, after.Instances);
+        Assert.Equal(before.Lights, after.Lights);
+    }
+}

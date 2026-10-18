@@ -60,6 +60,9 @@ public static class ImportWorker
     /// <summary>Environment variable that names the worker program.</summary>
     public const string EnvironmentVariable = "CANDELA_IMPORT_WORKER";
 
+    /// <summary>How long the worker's output is read after it ended (child processes may hold the pipes open).</summary>
+    public static readonly TimeSpan OutputDrainTimeout = TimeSpan.FromSeconds(2);
+
     /// <summary>
     /// True for formats decoded by the native Assimp library (OBJ, FBX, COLLADA, 3DS), which the engine imports in the
     /// worker; glTF/GLB (SharpGLTF), STL and PLY (Candela's own readers) are managed code and stay in-process.
@@ -203,8 +206,10 @@ public static class ImportWorker
                 return new ImportWorkerResult(ImportWorkerStatus.TimedOut, null,
                     $"importing took longer than {timeout.TotalSeconds:0} s and was stopped");
             }
-            process.WaitForExit();
-            string diagnostics = Tail(stderr.Result) is { Length: > 0 } err ? err : Tail(stdout.Result);
+            // The pipes reach their end only when every process holding them has ended: a helper the importer left
+            // behind (or a crash reporter) can keep them open long after the worker died, so its last words are
+            // waited for only briefly — the timeout bounds the whole import.
+            string diagnostics = Diagnostics(stdout, stderr);
             string package = Path.Combine(output, PackageFileName);
             string error = Path.Combine(output, ErrorFileName);
             if (process.ExitCode == ExitRejected && File.Exists(error))
@@ -303,6 +308,20 @@ public static class ImportWorker
         {
             return "the file cannot be imported";
         }
+    }
+
+    /// <summary>The end of the worker's error output (else its standard output), or "" when it cannot be read in time.</summary>
+    private static string Diagnostics(Task<string> stdout, Task<string> stderr)
+    {
+        try
+        {
+            if (!Task.WhenAll(stdout, stderr).Wait(OutputDrainTimeout)) return "";
+        }
+        catch (AggregateException)
+        {
+            return "";
+        }
+        return Tail(stderr.Result) is { Length: > 0 } err ? err : Tail(stdout.Result);
     }
 
     private static string Tail(string text)
