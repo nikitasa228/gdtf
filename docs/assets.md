@@ -390,6 +390,11 @@ When the native library cannot be loaded, model imports other than glTF fail wit
 * `KHR_texture_transform` offset/rotation and specular-glossiness textures are not represented in Core materials.
 * PSD layers, animated GIF frames after the first and 16-bit PNG precision are not kept.
 * Unit guessing for unit-less formats is a heuristic (metres unless larger than 200 m); the import options override it.
+  OBJ files from Maya are typically in centimetres and are misread by it — set the unit (0.01) in the import options.
+* PLY polygons are fan-triangulated (concave PLY faces would be split wrongly); 3DS shininess percentages arrive from
+  Assimp as Phong exponents of the same number, so 3DS roughness is approximate.
+* OBJ/MTL PBR extensions (`Pr`, `Pm`, `map_Pr`, `map_Pm`) are kept in the file but not used: the bundled Assimp does
+  not read them.
 
 ## References
 
