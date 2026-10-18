@@ -306,12 +306,12 @@ Steady-state frames allocate nothing; idle fixtures cost nothing.
 2000 fixtures of a realistic mix (MAC Viper Profile, Robin Esprite 16-bit, ArcPod 27Q, Robin Tetra1 10-pixel,
 MAC Encore, Arolla Aqua LT, Paladin Panel 10-cell, Entour Haze: 6750 beams, 69 250 channels, 179 universes) with
 **every slot changing every frame** — the worst case: every motor moves, every pixel changes colour — measured on this
-machine (4-core Xeon VM, shared with the builds and tests of other modules, load average 9–16 during the runs):
+machine (4-core Xeon VM, shared with the builds and tests of other modules, load average 9–26 during the runs):
 
 | Build | `DmxEngine.Update` (4 threads) | `FixtureEvaluator` on one thread |
 |---|---|---|
-| Release | **≈ 2.5 ms** per frame (fastest frame ≈ 2.0 ms) | ≈ 3.5–4.8 ms (≈ 1.3 µs per fixture with its data in cache) |
-| Debug (unoptimised JIT) | ≈ 11–22 ms | ≈ 14–20 ms |
+| Release | **≈ 2.2 ms** per frame (fastest frame ≈ 1.9 ms) | ≈ 3.8 ms (≈ 1.3 µs per fixture with its data in cache) |
+| Debug (unoptimised JIT) | ≈ 11–22 ms | ≈ 17–25 ms |
 
 `PerformanceTests` (run `dotnet test -c Release` for the optimised numbers) asserts < 5 ms per frame for optimised
 builds — the median, or the fastest frame when the machine's load average exceeds its core count (then the median
