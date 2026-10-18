@@ -292,7 +292,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (73 tests, ≈ 35 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (66 tests, ≈ 30 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, 4 substitutes and no errors; every fixture has a state and a pose; after

@@ -66,7 +66,7 @@ public sealed class RenderSyncReviewTests
         fixture.NotifyChanged();
         engine.Tick(Frame);
         engine.Tick(Frame);
-        Assert.Equal(engine.Dmx.GetState(head.Id)!.Profile.FixtureType.Name, "Naja");
+        Assert.Equal("Naja", engine.Dmx.GetState(head.Id)!.Profile.FixtureType.Name);
         // the head draws the Naja's meshes now, the other fixture still the MAC Viper's
         Assert.NotEmpty(sync.InstancesOf(head.Id));
         Assert.DoesNotContain(sync.InstancesOf(head.Id), i => viperMeshes.Contains(world.Instances[i.Handle.Value].Mesh));
@@ -128,7 +128,7 @@ public sealed class RenderSyncReviewTests
         Assert.Equal(parts, sync.InstancesOf(a.Id).Count);
         Assert.Equal(parts, sync.InstancesOf(b.Id).Count);
         Assert.Equal(2, world.Lights.Length);
-        Assert.True(world.Lights.Any(l => l.Gobo.IsValid));
+        Assert.Contains(world.Lights, l => l.Gobo.IsValid);
         Assert.Empty(world.Violations);
 
         // the replaced fixture type's meshes and gobos do not pile up in the renderer

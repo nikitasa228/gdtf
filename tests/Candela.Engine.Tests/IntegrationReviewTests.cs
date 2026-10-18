@@ -197,11 +197,11 @@ public sealed class IntegrationReviewTests
         }).OrderBy(s => s, StringComparer.Ordinal).ToList();
 
     [Fact]
-    public void A_recovered_session_is_continued_and_gone_after_saving()
+    public async Task A_recovered_session_is_continued_and_gone_after_saving()
     {
         string dir = TestEnvironment.NewTempDirectory("autosave-resume");
         var options = new AutosaveOptions { Directory = dir, Interval = TimeSpan.FromMilliseconds(10) };
-        CrashWithAutosave(options);
+        await CrashWithAutosave(options);
 
         var session = Assert.Single(AutosaveService.FindRecoverable(dir));
         using var recovered = TestEnvironment.CreateEngine("autosave-resume-2");
@@ -212,17 +212,17 @@ public sealed class IntegrationReviewTests
 
         string path = Path.Combine(TestEnvironment.NewTempDirectory("autosave-resume-file"), "show.candela");
         Assert.True(recovered.SaveAs(path).Success);
-        recovered.Autosave.FlushAsync().Wait();
+        await recovered.Autosave.FlushAsync();
         Assert.Empty(AutosaveService.FindRecoverable(dir)); // the saved file supersedes the crash data
         recovered.DisableAutosave();
         Assert.Empty(Directory.GetFiles(dir));
     }
 
     [Fact]
-    public void A_recovered_session_saved_without_autosave_is_not_offered_again()
+    public async Task A_recovered_session_saved_without_autosave_is_not_offered_again()
     {
         string dir = TestEnvironment.NewTempDirectory("autosave-recover-off");
-        CrashWithAutosave(new AutosaveOptions { Directory = dir, Interval = TimeSpan.FromMilliseconds(10) });
+        await CrashWithAutosave(new AutosaveOptions { Directory = dir, Interval = TimeSpan.FromMilliseconds(10) });
         var session = Assert.Single(AutosaveService.FindRecoverable(dir));
 
         using var recovered = TestEnvironment.CreateEngine("autosave-recover-off-2");
@@ -237,7 +237,7 @@ public sealed class IntegrationReviewTests
         Assert.Empty(AutosaveService.FindRecoverable(dir));
     }
 
-    private static void CrashWithAutosave(AutosaveOptions options)
+    private static async Task CrashWithAutosave(AutosaveOptions options)
     {
         using var engine = TestEnvironment.CreateEngine("autosave-crash");
         engine.EnableAutosave(options);
@@ -246,7 +246,7 @@ public sealed class IntegrationReviewTests
         {
             Thread.Sleep(15);
             engine.Tick(Frame);
-            engine.Autosave.FlushAsync().Wait();
+            await engine.Autosave.FlushAsync();
         }
         engine.Tick(0);
         Assert.NotNull(engine.Autosave!.LastSavedUtc);

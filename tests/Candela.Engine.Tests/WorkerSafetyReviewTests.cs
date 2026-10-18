@@ -10,7 +10,7 @@ public sealed class WorkerSafetyReviewTests
     {
         string script = Path.Combine(folder, name);
         File.WriteAllText(script, "#!/bin/sh\n" + body + "\n");
-        File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         return script;
     }
 
