@@ -44,6 +44,8 @@ internal sealed class EditorApplication : IDisposable
     private int _exitCode = ExitCodes.Ok;
     private bool _quitRequested;
     private float _appliedDpi;
+    private float _frameDelta;
+    private Action? _drawWorkspace;
 
     /// <summary>Creates the application for the given command line.</summary>
     public EditorApplication(AppOptions options, AppLog log)
@@ -256,8 +258,9 @@ internal sealed class EditorApplication : IDisposable
         _script?.Apply(frameIndex, workspace);
 
         imgui.NewFrame();
-        workspace.Draw(dt);
-        ImGui.Render();
+        // The frame is ended even when the UI code throws (Dear ImGui aborts the process on an unended frame).
+        _frameDelta = dt;
+        UiFrame.BuildAndRender(_drawWorkspace ??= () => _workspace!.Draw(_frameDelta));
         _settings!.Update(_timer.Elapsed);
 
         var frame = gpu.Context.BeginFrame();

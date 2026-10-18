@@ -323,7 +323,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         }
         catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
-            ImGuiP.ErrorRecoveryTryToRecoverState(&state);
+            UiFrame.Recover(&state);
             panel.Fault = e;
             _ctx.Log.Error("UI", $"Panel '{panel.Id}' failed", e);
             _ctx.Session.ReportProgramError("app.panel-exception", Loc.Format(Str.MsgUnhandled, panel.Title, e.Message));
