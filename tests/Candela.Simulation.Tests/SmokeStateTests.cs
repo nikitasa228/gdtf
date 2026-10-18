@@ -242,6 +242,19 @@ public sealed class SmokeStateTests
     }
 
     [Fact]
+    public void Stepping_DoesNotAllocate()
+    {
+        // Single-threaded, so Parallel.For's own bookkeeping does not count; the solver itself must not allocate.
+        var sim = Scene(threads: 1);
+        SmokeTestScenes.Run(sim, 3, Emitters);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        SmokeTestScenes.Run(sim, 5, Emitters);
+        sim.Step(0.05, Emitters);
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.True(allocated < 512, $"{allocated} bytes allocated in 6 steps");
+    }
+
+    [Fact]
     public void CopyDensityTo_ExportsTheRawGrid()
     {
         var sim = Scene();

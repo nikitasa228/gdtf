@@ -23,7 +23,7 @@ public sealed class SmokePhysicsTests(ITestOutputHelper output)
 
         double final = sim.TotalSmokeMass();
         double change = (final - initial) / initial;
-        output.WriteLine($"mass {initial:E4} → {final:E4} kg ({change * 100:+0.00;-0.00} %) after {sim.Time:F2} s");
+        output.WriteLine($"mass {initial:E4} → {final:E4} kg ({change * 100:F3} %) after {sim.Time:F2} s");
         Assert.True(Math.Abs(change) < 0.03, $"mass changed by {change * 100:F2} %");
         Assert.All(sim.Density.ToArray(), d => Assert.True(d >= 0f && float.IsFinite(d)));
     }
