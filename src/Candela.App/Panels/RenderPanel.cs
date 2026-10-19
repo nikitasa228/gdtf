@@ -40,12 +40,14 @@ internal sealed unsafe class RenderPanel : Panel
     private readonly byte[] _file = new byte[256];
     private readonly byte[] _start = new byte[32];
     private readonly byte[] _end = new byte[32];
+    private readonly LabelColumn _labels = new(RowLabels);
     private PresetCombo<FinalRenderSettings>? _presets;
     private long _shownVersion = -1;
     private bool _range;
     private string _planText = "";
     private (int W, int H, int Spp, string Lang) _planKey;
     private string? _rangeError;
+    private string? _folderHint;
 
     /// <summary>Creates the panel; <paramref name="report"/> shows results in the status bar.</summary>
     public RenderPanel(WorkspaceContext context, Action<SessionResult> report)
@@ -96,14 +98,14 @@ internal sealed unsafe class RenderPanel : Panel
         bool running = job.State == RenderJobState.Running;
         ImGui.BeginDisabled(running);
         if (ImGui.CollapsingHeader(StageLoc.With(Icons.Image, StageStr.RenderOutput), ImGuiTreeNodeFlags.DefaultOpen) &&
-            PropertyGrid.Begin("##render-output", 120f))
+            PropertyGrid.Begin("##render-output", _labels.Width))
         {
             edited |= OutputRows(s);
             PropertyGrid.End();
         }
 
         if (ImGui.CollapsingHeader(StageLoc.With(Icons.Gauge, StageStr.RenderQuality), ImGuiTreeNodeFlags.DefaultOpen) &&
-            PropertyGrid.Begin("##render-quality", 120f))
+            PropertyGrid.Begin("##render-quality", _labels.Width))
         {
             edited |= QualityRows(s);
             PropertyGrid.End();
@@ -119,7 +121,7 @@ internal sealed unsafe class RenderPanel : Panel
             ImGui.TextUnformatted(StageLoc.Get(StageStr.RenderPathTracerHint));
             ImGui.PopTextWrapPos();
             ImGui.PopStyleColor();
-            if (PropertyGrid.Begin("##render-pt", 120f))
+            if (PropertyGrid.Begin("##render-pt", _labels.Width))
             {
                 PropertyGrid.Row(Loc.Get(Str.RenderBounces));
                 int bounces = s.MaxBounces;
@@ -157,6 +159,51 @@ internal sealed unsafe class RenderPanel : Panel
         RenderButton(s, job);
     }
 
+    /// <summary>Every row label of the panel (one label column for all sections).</summary>
+    private static IEnumerable<string> RowLabels()
+    {
+        foreach (var key in new[]
+                 {
+                     Str.RenderFormat, Str.RenderResolution, Str.RenderSamples, Str.PreviewToneMapper, Str.RenderBounces, Str.RenderRangeStart,
+                     Str.RenderRangeEnd, Str.RenderFrameRate,
+                 })
+            yield return Loc.Get(key);
+        foreach (var key in new[] { StageStr.RenderFolder, StageStr.RenderFileName, StageStr.RenderVolumeBounces, StageStr.RenderDenoise, StageStr.RenderRecording })
+            yield return StageLoc.Get(key);
+    }
+
+    /// <summary>
+    /// The folder renders go to when the output path is relative: the user's Pictures folder (else the home folder),
+    /// subfolder "Candela".
+    /// </summary>
+    internal static string DefaultFolder()
+    {
+        string pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        if (string.IsNullOrEmpty(pictures))
+            pictures = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (string.IsNullOrEmpty(pictures))
+            pictures = Environment.CurrentDirectory;
+        return Path.Combine(pictures, "Candela");
+    }
+
+    /// <summary>The absolute PNG path of an output path (relative paths go to <see cref="DefaultFolder"/>).</summary>
+    internal static string ResolveOutput(string? path)
+    {
+        string p = string.IsNullOrWhiteSpace(path) ? "render.png" : path.Trim();
+        try
+        {
+            if (!Path.IsPathRooted(p))
+                p = Path.Combine(DefaultFolder(), p);
+            if (!p.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                p = Path.ChangeExtension(p, ".png");
+            return Path.GetFullPath(p);
+        }
+        catch (Exception e) when (e is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return Path.Combine(DefaultFolder(), "render.png");
+        }
+    }
+
     private bool OutputRows(FinalRenderSettings s)
     {
         bool edited = false;
@@ -166,7 +213,7 @@ internal sealed unsafe class RenderPanel : Panel
         ImGui.SetNextItemWidth(MathF.Max(40f, ImGui.GetContentRegionAvail().X - browse - style.ItemInnerSpacing.X));
         fixed (byte* folder = _folder)
         {
-            if (ImGui.InputText("##folder", folder, (nuint)_folder.Length))
+            if (ImGui.InputTextWithHint("##folder", _folderHint ??= DefaultFolder(), folder, (nuint)_folder.Length))
                 edited |= ApplyPath(s);
         }
 
@@ -289,7 +336,7 @@ internal sealed unsafe class RenderPanel : Panel
             ImGui.PopStyleColor();
         }
 
-        if (PropertyGrid.Begin("##render-range", 120f))
+        if (PropertyGrid.Begin("##render-range", _labels.Width))
         {
             if (recording is not null)
             {
@@ -409,10 +456,7 @@ internal sealed unsafe class RenderPanel : Panel
         };
         var quality = HighQuality(_stage.Tools.Preview.Live, s);
         var (ss, passes) = RenderJobRunner.Plan(s.Width, s.Height, s.SamplesPerPixel);
-        string path = s.OutputPath;
-        if (!path.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-            path = Path.ChangeExtension(path, ".png");
-        return new RenderRequest(camera, view, quality, s.Width, s.Height, ss, passes, path, range);
+        return new RenderRequest(camera, view, quality, s.Width, s.Height, ss, passes, ResolveOutput(s.OutputPath), range);
     }
 
     /// <summary>The real-time settings used for a final frame: the preview look at the highest quality.</summary>

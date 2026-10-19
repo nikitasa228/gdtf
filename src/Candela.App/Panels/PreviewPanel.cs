@@ -30,6 +30,7 @@ internal sealed class PreviewPanel : Panel
     private readonly StagePanelContext _stage;
     private readonly Func<RendererInfo?> _renderer;
     private PresetCombo<PreviewSettings>? _presets;
+    private readonly LabelColumn _labels = new(RowLabels);
     private float _ev100 = 8f;
     private bool _gridOn = true;
 
@@ -65,7 +66,7 @@ internal sealed class PreviewPanel : Panel
 
         bool edited = false;
         if (ImGui.CollapsingHeader(StageLoc.With(Icons.Gauge, StageStr.PreviewQuality), ImGuiTreeNodeFlags.DefaultOpen) &&
-            PropertyGrid.Begin("##preview-quality", 150f))
+            PropertyGrid.Begin("##preview-quality", _labels.Width))
         {
             PropertyGrid.Row(Loc.Get(Str.PreviewResolutionScale));
             float resolution = p.ResolutionScale;
@@ -141,7 +142,7 @@ internal sealed class PreviewPanel : Panel
         }
 
         if (ImGui.CollapsingHeader(StageLoc.With(Icons.Camera, StageStr.PreviewImage), ImGuiTreeNodeFlags.DefaultOpen) &&
-            PropertyGrid.Begin("##preview-image", 150f))
+            PropertyGrid.Begin("##preview-image", _labels.Width))
         {
             PropertyGrid.Row(Loc.Get(Str.PreviewBloom));
             bool bloom = p.Bloom;
@@ -196,11 +197,29 @@ internal sealed class PreviewPanel : Panel
             binding.MarkEdited();
 
         if (ImGui.CollapsingHeader(StageLoc.With(Icons.CloudFog, StageStr.PreviewStage), ImGuiTreeNodeFlags.DefaultOpen) &&
-            PropertyGrid.Begin("##preview-stage", 150f))
+            PropertyGrid.Begin("##preview-stage", _labels.Width))
         {
             StageSettings(_stage.Scene);
             PropertyGrid.End();
         }
+    }
+
+    /// <summary>Every row label of the panel (one label column for all sections).</summary>
+    private static IEnumerable<string> RowLabels()
+    {
+        foreach (var key in new[]
+                 {
+                     Str.PreviewResolutionScale, Str.PreviewShadows, Str.PreviewVolumetrics, Str.PreviewIndirect, Str.PreviewBloom,
+                     Str.PreviewToneMapper, Str.PreviewAutoExposure, Str.PreviewExposure,
+                 })
+            yield return Loc.Get(key);
+        foreach (var key in new[]
+                 {
+                     StageStr.PreviewShadowResolution, StageStr.PreviewShadowedLights, StageStr.PreviewSlices, StageStr.PreviewRaymarchedBeams,
+                     StageStr.PreviewTemporal, StageStr.PreviewBloomIntensity, StageStr.PreviewCameraEv, StageStr.PreviewHaze,
+                     StageStr.PreviewHazeAnisotropy, StageStr.PreviewAmbient, StageStr.PreviewGrid, StageStr.PreviewGridSpacing,
+                 })
+            yield return StageLoc.Get(key);
     }
 
     private bool IndirectCombo(PreviewSettings p)
