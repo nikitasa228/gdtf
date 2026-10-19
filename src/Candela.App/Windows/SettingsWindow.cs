@@ -215,7 +215,7 @@ internal sealed class SettingsWindow
 
         ImGui.Spacing();
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(CableLoc.Get(CableStr.DuplicatePatchHint));
+        SafeText.Wrapped(CableLoc.Get(CableStr.DuplicatePatchHint));
         ImGui.PopStyleColor();
     }
 

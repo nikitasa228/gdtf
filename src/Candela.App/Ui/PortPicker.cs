@@ -20,7 +20,7 @@ internal static class PortPicker
         ArgumentNullException.ThrowIfNull(pick);
         ArgumentNullException.ThrowIfNull(type);
         string? chosen = null;
-        ImGui.TextColored(Theme.Accent, Icons.Cable + "  " + CableLoc.Format(CableStr.PickerTitle, CableLoc.CableName(type), pick.DeviceName));
+        SafeText.Colored(Theme.Accent, Icons.Cable + "  " + CableLoc.Format(CableStr.PickerTitle, CableLoc.CableName(type), pick.DeviceName));
         ImGui.Separator();
         float icon = MathF.Round(ImGui.GetTextLineHeightWithSpacing() * 2f);
         float width = MathF.Max(340f * scale, ImGui.CalcTextSize(pick.DeviceName).X + icon * 2f);
@@ -62,7 +62,7 @@ internal static class PortPicker
                 float right = start.X + width - size.X - 4f * scale;
                 dl.AddText(new Vector2(MathF.Max(x + 120f * scale, right), start.Y + 1f * scale), Theme.U32(color), status.Text);
                 if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && status.Tooltip is { } tip)
-                    ImGui.SetTooltip(tip);
+                    SafeText.Tooltip(tip);
             }
 
             ImGui.PopID();
@@ -71,11 +71,11 @@ internal static class PortPicker
         if (!any)
         {
             ImGui.Spacing();
-            ImGui.TextColored(Theme.Warning, CableLoc.Get(CableStr.PickerNoFreePort));
+            SafeText.Colored(Theme.Warning, CableLoc.Get(CableStr.PickerNoFreePort));
         }
 
         ImGui.Separator();
-        ImGui.TextDisabled(CableLoc.Get(CableStr.PickerHint));
+        SafeText.Disabled(CableLoc.Get(CableStr.PickerHint));
         return chosen;
     }
 

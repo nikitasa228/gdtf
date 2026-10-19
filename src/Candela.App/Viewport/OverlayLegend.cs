@@ -305,7 +305,7 @@ internal sealed class OverlayLegend
                 ImGui.SetCursorPosX(textX);
             }
 
-            ImGui.TextDisabled(detail);
+            SafeText.Disabled(detail);
         }
     }
 

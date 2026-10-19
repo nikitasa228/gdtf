@@ -142,7 +142,7 @@ internal sealed class CableLinksPanel : Panel
         ImGui.TextUnformatted(_header);
         if (model.Source is { } source)
         {
-            ImGui.TextDisabled(CableLoc.Get(CableStr.LinksSource) + ":");
+            SafeText.Disabled(CableLoc.Get(CableStr.LinksSource) + ":");
             ImGui.SameLine();
             ImGui.TextUnformatted(source);
         }
@@ -155,19 +155,19 @@ internal sealed class CableLinksPanel : Panel
             ImGui.PopStyleColor();
         }
 
-        ImGui.TextDisabled(_counts);
+        SafeText.Disabled(_counts);
         ImGui.SameLine();
         if (ImGui.SmallButton(Icons.Pointer + "##select-cable"))
             _stage.Selection.Set(model.CableId);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(CableLoc.Get(CableStr.PropsCable));
+            SafeText.Tooltip(CableLoc.Get(CableStr.PropsCable));
         if (_showOverlay is not null)
         {
             ImGui.SameLine();
             if (ImGui.SmallButton(Icons.Layers + "##cable-overlay"))
                 _showOverlay();
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(CableLoc.Get(CableStr.LinksOverlay));
+                SafeText.Tooltip(CableLoc.Get(CableStr.LinksOverlay));
         }
     }
 
@@ -248,7 +248,7 @@ internal sealed class CableLinksPanel : Panel
             if (ImGui.InvisibleButton("##link", Vector2.Max(hitMax - hitMin, new Vector2(1f))))
                 FollowLink(i);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip($"{link.Label}\n{link.Ports}\n{link.Length}{(link.Index.Length > 0 ? " · " + link.Index : "")}");
+                SafeText.Tooltip($"{link.Label}\n{link.Ports}\n{link.Length}{(link.Index.Length > 0 ? " · " + link.Index : "")}");
             ImGui.PopID();
         }
 
@@ -267,7 +267,7 @@ internal sealed class CableLinksPanel : Panel
             if (clicked)
                 SelectCard(i);
             if (hovered)
-                ImGui.SetTooltip(string.Join("\n", new[] { card.Name, card.Detail, card.InPort }.Where(s => s.Length > 0)));
+                SafeText.Tooltip(string.Join("\n", new[] { card.Name, card.Detail, card.InPort }.Where(s => s.Length > 0)));
             bool isSelected = selected == card.EntityId;
             dl.AddRectFilled(min, max, Theme.U32(hovered ? Theme.Rgb(0x30333A) : Theme.Rgb(0x24262B)), 6f * scale);
             var border = isSelected ? Theme.Accent : card.OnCable ? model.Color : Theme.Rgb(0x3A3D44);
@@ -282,7 +282,7 @@ internal sealed class CableLinksPanel : Panel
         ImGui.SetCursorScreenPos(origin + new Vector2(0f, cardH + line));
         ImGui.Dummy(new Vector2(contentW, 1f));
         ImGui.EndChild();
-        ImGui.TextDisabled(CableLoc.Get(CableStr.LinksClickHint));
+        SafeText.Disabled(CableLoc.Get(CableStr.LinksClickHint));
     }
 
     /// <summary>Card texts fitted to the card width, rebuilt when the model or the UI scale changes.</summary>

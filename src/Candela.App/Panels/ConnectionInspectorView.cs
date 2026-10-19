@@ -170,7 +170,7 @@ internal sealed class ConnectionInspectorView
 
         if (texts is not null && texts.Ends.Length > 0)
         {
-            ImGui.TextDisabled(CableLoc.Get(CableStr.PropsCableEnds));
+            SafeText.Disabled(CableLoc.Get(CableStr.PropsCableEnds));
             for (int i = 0; i < texts.Ends.Length; i++)
             {
                 ImGui.PushID(i);
@@ -208,7 +208,7 @@ internal sealed class ConnectionInspectorView
             if (plug is not null)
             {
                 PropertyGrid.Row("");
-                ImGui.TextDisabled(CableLoc.Format(CableStr.NodePlugged, scene.Find(plug.EntityId)?.Name ?? "?", plug.PortName));
+                SafeText.Disabled(CableLoc.Format(CableStr.NodePlugged, scene.Find(plug.EntityId)?.Name ?? "?", plug.PortName));
             }
 
             PropertyGrid.End();
@@ -269,7 +269,7 @@ internal sealed class ConnectionInspectorView
             }
         }
 
-        ImGui.TextDisabled(_consoleText);
+        SafeText.Disabled(_consoleText);
         ImGui.SeparatorText(CableLoc.Get(CableStr.PropsConsoleOutputs));
         const ImGuiTableFlags flags = ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings;
         int remove = -1;
@@ -326,7 +326,7 @@ internal sealed class ConnectionInspectorView
                 if (ImGui.IsItemDeactivatedAfterEdit())
                     _stage.Undo.BreakMerge();
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(StageLoc.Get(StageStr.PatchUniverse));
+                    SafeText.Tooltip(StageLoc.Get(StageStr.PatchUniverse));
                 ImGui.TableNextColumn();
                 ImGui.SetNextItemWidth(-1f);
                 ImGui.BeginDisabled(!ethernet);
@@ -340,7 +340,7 @@ internal sealed class ConnectionInspectorView
                 if (ImGui.SmallButton(Icons.Trash + "##remove"))
                     remove = i;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(CableLoc.Get(CableStr.PropsConsoleRemoveOutput));
+                    SafeText.Tooltip(CableLoc.Get(CableStr.PropsConsoleRemoveOutput));
                 ImGui.PopID();
             }
 
@@ -448,6 +448,8 @@ internal sealed class ConnectionInspectorView
         ImGui.SeparatorText(CableLoc.Get(CableStr.PropsPowerOutlets));
         int remove = -1;
         const ImGuiTableFlags flags = ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings;
+        // The right edge of the table, so the load line under an outlet can run across the columns.
+        float tableRight = ImGui.GetCursorScreenPos().X + ImGui.GetContentRegionAvail().X;
         if (ImGui.BeginTable("##outlets", 5, flags))
         {
             float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
@@ -478,7 +480,7 @@ internal sealed class ConnectionInspectorView
                 }
 
                 if (_power?.Loads.TryGetValue(outlet.PortName, out var load) == true && ImGui.IsItemHovered())
-                    ImGui.SetTooltip(load.Text);
+                    SafeText.Tooltip(load.Text);
                 ImGui.TableNextColumn();
                 ImGui.SetNextItemWidth(-1f);
                 if (ImGui.BeginCombo("##connector", outlet.Connector))
@@ -508,7 +510,7 @@ internal sealed class ConnectionInspectorView
                 if (ImGui.SmallButton(Icons.Trash + "##remove"))
                     remove = i;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(CableLoc.Get(CableStr.PropsPowerRemoveOutlet));
+                    SafeText.Tooltip(CableLoc.Get(CableStr.PropsPowerRemoveOutlet));
                 ImGui.PopID();
 
                 // The load on the outlet, under its row (red above the breaker).
@@ -517,7 +519,10 @@ internal sealed class ConnectionInspectorView
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(row.Overloaded ? Theme.Error : Theme.TextMuted, row.Text);
+                    var at = ImGui.GetCursorScreenPos();
+                    ImGui.PushClipRect(at, new Vector2(tableRight, at.Y + ImGui.GetTextLineHeightWithSpacing()), false);
+                    SafeText.Colored(row.Overloaded ? Theme.Error : Theme.TextMuted, row.Text);
+                    ImGui.PopClipRect();
                 }
             }
 

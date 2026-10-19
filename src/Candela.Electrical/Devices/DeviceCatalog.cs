@@ -272,7 +272,7 @@ public static class DeviceCatalog
         SizeM = ConsoleSize,
         Factory = () =>
         {
-            var console = new ConsoleComponent { Model = $"DMX console {outputs}U", ProtocolId = "artnet", Outputs = new List<ConsoleOutput>(outputs) };
+            var console = new ConsoleComponent { Model = $"DMX console, {outputs} universes", ProtocolId = "artnet", Outputs = new List<ConsoleOutput>(outputs) };
             for (int i = 0; i < outputs; i++)
                 console.Outputs.Add(new ConsoleOutput { PortName = $"DMX {(char)('A' + i)}", Signal = "DMX512", FirstUniverse = i + 1, UniverseCount = 1 });
             return console;

@@ -318,7 +318,7 @@ internal sealed class FixtureInspectorView
         bool finished = ImGui.IsItemDeactivatedAfterEdit();
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip(locked ? _lockText : c.Attribute);
+            SafeText.Tooltip(locked ? _lockText : c.Attribute);
         if (!locked && c.Manual is not null && ImGui.BeginPopupContextItem(c.Id + "-menu"))
         {
             if (ImGui.MenuItem(StageLoc.Get(StageStr.PropsClearManual)))
@@ -567,7 +567,7 @@ internal sealed class FixtureInspectorView
     {
         if (cable is not { } id)
         {
-            ImGui.TextDisabled(plain);
+            SafeText.Disabled(plain);
             return;
         }
 

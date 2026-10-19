@@ -73,7 +73,7 @@ internal sealed partial class LibraryPanel
         ImGui.NewLine();
         ImGui.Separator();
         RefreshDevices();
-        ImGui.TextDisabled(CableLoc.Format(CableStr.DevicesCount, _filteredDevices.Count));
+        SafeText.Disabled(CableLoc.Format(CableStr.DevicesCount, _filteredDevices.Count));
         if (_filteredDevices.Count == 0)
         {
             EmptyState(Icons.Search, CableLoc.Get(CableStr.DevicesNoMatches));
@@ -197,14 +197,14 @@ internal sealed partial class LibraryPanel
     {
         ImGui.BeginTooltip();
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + 360f * scale);
-        ImGui.TextColored(Theme.Accent, DeviceIcons.Glyph(device.IconKey) + "  " + texts.FullName);
-        ImGui.TextDisabled(device.FromLibrary ? $"{device.Manufacturer} · {CableLoc.Get(CableStr.DevicesFromLibrary)}" : CableLoc.GroupName(device.Group));
+        SafeText.Colored(Theme.Accent, DeviceIcons.Glyph(device.IconKey) + "  " + texts.FullName);
+        SafeText.Disabled(device.FromLibrary ? $"{device.Manufacturer} · {CableLoc.Get(CableStr.DevicesFromLibrary)}" : CableLoc.GroupName(device.Group));
         ImGui.TextUnformatted(texts.Description);
         ImGui.PopTextWrapPos();
         if (texts.Ports.Length > 0)
         {
             ImGui.Spacing();
-            ImGui.TextDisabled(CableLoc.Get(CableStr.DevicesPorts));
+            SafeText.Disabled(CableLoc.Get(CableStr.DevicesPorts));
             float icon = ImGui.GetTextLineHeight() * 1.3f;
             foreach (var (key, line) in texts.Ports)
             {

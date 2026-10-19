@@ -517,7 +517,7 @@ internal sealed unsafe partial class ViewportPanel
         if (ImGui.Button(label))
             ImGui.OpenPopup(CableTypesPopupId);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(CableLoc.Get(CableStr.ToolCableType));
+            SafeText.Tooltip(CableLoc.Get(CableStr.ToolCableType));
         if (type is not null)
         {
             var (r, g, b) = type.ColorSrgb;

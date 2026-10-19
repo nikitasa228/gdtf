@@ -34,7 +34,7 @@ internal static class CableTypeMenu
                 {
                     if (!first)
                         ImGui.Spacing();
-                    ImGui.TextDisabled(GroupLabel(group));
+                    SafeText.Disabled(GroupLabel(group));
                     header = true;
                     first = false;
                 }
@@ -46,7 +46,7 @@ internal static class CableTypeMenu
                 if (ImGui.Selectable("##type", selected, ImGuiSelectableFlags.None, new Vector2(MathF.Max(300f * scale, ImGui.GetContentRegionAvail().X), height)))
                     chosen = type.Id;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(Tooltip(type));
+                    SafeText.Tooltip(Tooltip(type));
                 var dl = ImGui.GetWindowDrawList();
                 var (r, g, b) = type.ColorSrgb;
                 float swatchH = ImGui.GetTextLineHeight() * 0.42f;
