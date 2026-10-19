@@ -294,7 +294,9 @@ m/s, m/s², radians): how it maps to Candela's Z-up stage frame depends on the t
 * **LastError** / **ErrorText**, **ErrorCode** (`ProtocolErrorCode`: `PortInUse`, `PortConflict`, `InterfaceNotFound`,
   `AddressNotAvailable`, `SocketError`, `SocketFailed`, `InvalidSettings`, `DeviceNotFound`, `DeviceNotResponding`,
   `DeviceDisconnected`, `Unavailable`, `StartFailed`; kept with the error after a stop), and **Warnings** /
-  **WarningTexts** (same order).
+  **WarningTexts** (same order). Every text a protocol reports is keyed, including a stop that failed to release its
+  socket or device (`protocol.stop-failed`, kept as the last error); `protocol.text` (the English text as its only
+  argument) remains only for messages of protocols written outside this module. The last bad packet's reason is English.
 * **Binding** while running: **BoundEndpoint** (`0.0.0.0:6454`, or the serial port of a DMX widget),
   **NetworkInterface** (`eth0 192.168.1.20`, null for all interfaces) and **UniverseCount** (announced for Art-Net,
   subscribed for sACN, mapped by the patterns for OSC, 1 for an EntTec widget, 0 for PosiStageNet).
