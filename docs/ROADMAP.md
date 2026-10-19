@@ -92,9 +92,13 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       the types in the scene, count, length and weight)
 - [x] Duplicated fixtures re-patched to free addresses (setting: ask / next free / keep); Escape cancels wall and
       floor drags
-- [ ] Cables lying on floors drawn without sag (renderer: per-span slack; requested from the engine)
-- [ ] Engine: renew `StageEngine.NetworkSolution` when entities that cable points are fixed to move (the editor's
-      panels re-solve per scene version meanwhile, `CablingNetwork`)
+- [x] Cables lying on floors drawn without sag: per-span slack (straight along an object or on a surface) and the
+      ground/floors as supports a tube never sinks below (`CableSupportSurfaces`, docs/engine.md)
+- [x] Engine: `StageEngine.NetworkSolution` renewed when entities that cable points are fixed to move (only the moved
+      cables, `NetworkSolver.UpdateGeometry`); the editor's `CablingNetwork` workaround can switch to it
+- [x] `PowerSourceComponent.MainsInConnector`: the distro inlet has a real connector (derived for older projects);
+      generic devices marked in Candela's MVR `UserData`; `SpotLight.NoVolumetricScattering` for the work light
+      (the Vulkan renderer honouring it is pending)
 
 ## M5 — Atmosphere, fire, overlays
 - [~] Smoke/haze fluid simulation (GPU, CPU reference): HAZE/FOG emitters from DMX, FAN airflow, obstacles,
