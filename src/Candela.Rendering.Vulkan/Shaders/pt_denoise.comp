@@ -8,7 +8,7 @@
 //    normal:    max(n_p . n_q, 0)^64 (pixels without a surface only mix with each other),
 //    depth:     exp(-|z_p - z_q| / (0.02 z_p step)),
 //    albedo:    exp(-|a_p - a_q|_1 / 0.1),
-//    luminance: exp(-|l_p - l_q| / (4 sqrt(var_p) + eps)),
+//    luminance: exp(-|l_p - l_q| / (4 sqrt(var_p) + eps)), var_p the 3 x 3 Gaussian of the variance around p,
 //  the variance filtered with the squared weights. A converged pixel (variance ~ 0) keeps its value; noise is averaged
 //  only along surfaces of the same material, so edges, gobo patterns and textures stay sharp.
 
@@ -75,11 +75,24 @@ void main()
     vec4 centre = imageLoad(ptInput, p);
     Guide gp = guideAt(p);
     float lumP = luminanceRec2020(centre.rgb);
-    float sigmaL = SIGMA_LUMINANCE * sqrt(max(centre.a, 0.0)) + 1e-6 * max(lumP, 1e-6);
+    // The variance of a few samples is itself noisy: a 3 x 3 Gaussian of it sets the luminance tolerance (SVGF).
+    float variance = 0.0;
+    const float gauss[2] = float[](0.25, 0.125);
+    for (int dy = -1; dy <= 1; ++dy)
+    {
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            ivec2 q = clamp(p + ivec2(dx, dy), ivec2(0), size - 1);
+            float v = imageLoad(ptInput, q).a;
+            variance += (isnan(v) || isinf(v) ? 0.0 : max(v, 0.0)) * gauss[abs(dx)] * gauss[abs(dy)] * 4.0;
+        }
+    }
+
+    float sigmaL = SIGMA_LUMINANCE * sqrt(variance) + 1e-6 * max(lumP, 1e-6);
     bool surfaceP = dot(gp.normal, gp.normal) > 0.0;
     const float kernel[3] = float[](0.375, 0.25, 0.0625);
     vec3 sum = vec3(0.0);
-    float variance = 0.0;
+    float filteredVariance = 0.0;
     float weightSum = 0.0;
     for (int dy = -2; dy <= 2; ++dy)
     {
@@ -110,11 +123,11 @@ void main()
             if (!(w > 0.0) || !isFiniteVec(s.rgb))
                 continue;
             sum += s.rgb * w;
-            variance += max(s.a, 0.0) * w * w;
+            filteredVariance += max(s.a, 0.0) * w * w;
             weightSum += w;
         }
     }
 
-    vec4 result = weightSum > 0.0 ? vec4(sum / weightSum, variance / (weightSum * weightSum)) : centre;
+    vec4 result = weightSum > 0.0 ? vec4(sum / weightSum, filteredVariance / (weightSum * weightSum)) : centre;
     imageStore(ptOutput, p, result);
 }
