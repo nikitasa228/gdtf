@@ -19,6 +19,13 @@ namespace Candela.Core.Serialization;
 /// </summary>
 public static class CandelaJson
 {
+    /// <summary>
+    /// Deepest nesting of JSON objects and arrays the project formats read and write (System.Text.Json's default is 64).
+    /// Scene files are flat (entities are listed, not nested), so the limit only bounds component data and properties of
+    /// newer versions; parsing is iterative, so the limit guards against hostile input, not the stack.
+    /// </summary>
+    public const int MaxDepth = 256;
+
     /// <summary>Indented options for files (project parts, presets, settings).</summary>
     public static JsonSerializerOptions Options { get; } = CreateOptions(indented: true);
 
@@ -49,6 +56,7 @@ public static class CandelaJson
             NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
             AllowTrailingCommas = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
+            MaxDepth = MaxDepth,
             TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { WriteNullsThatDifferFromDefaults } },
         };
         o.Converters.Add(new JsonStringEnumConverter());

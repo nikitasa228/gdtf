@@ -16,6 +16,7 @@ public sealed class AppSettings
     /// <summary>Base font size in pixels at 100 %.</summary>
     public float FontSize { get; set; } = 15f;
 
+    /// <summary>Colour theme of the editor ("Dark", "Light").</summary>
     public string Theme { get; set; } = "Dark";
 
     /// <summary>UI language code ("en", "ru").</summary>
@@ -39,7 +40,10 @@ public sealed class AppSettings
     /// <summary>Autosave interval in minutes (0 = off).</summary>
     public int AutosaveMinutes { get; set; } = 5;
 
+    /// <summary>How many files <see cref="RecentFiles"/> keeps.</summary>
     public int MaxRecentFiles { get; set; } = 12;
+
+    /// <summary>Recently opened or saved files, most recent first (full paths).</summary>
     public List<string> RecentFiles { get; set; } = new();
 
     /// <summary>Viewport navigation style ("Candela", "Blender", "Maya").</summary>
@@ -61,6 +65,10 @@ public sealed class AppSettings
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? UnknownProperties { get; set; }
 
+    /// <summary>
+    /// Reads the settings from <paramref name="path"/> (default <see cref="ConfigPaths.SettingsFile"/>). A missing or
+    /// damaged file gives the defaults: settings must never stop the program from starting.
+    /// </summary>
     public static AppSettings Load(string? path = null)
     {
         path ??= ConfigPaths.SettingsFile;
@@ -75,6 +83,8 @@ public sealed class AppSettings
         return new AppSettings();
     }
 
+    /// <summary>Writes the settings to <paramref name="path"/> (default <see cref="ConfigPaths.SettingsFile"/>) atomically.</summary>
+    /// <exception cref="IOException">The file cannot be written.</exception>
     public void Save(string? path = null)
     {
         path ??= ConfigPaths.SettingsFile;
@@ -84,6 +94,7 @@ public sealed class AppSettings
         File.Move(tmp, path, overwrite: true);
     }
 
+    /// <summary>Moves <paramref name="path"/> to the front of <see cref="RecentFiles"/>, keeping at most <see cref="MaxRecentFiles"/>.</summary>
     public void AddRecentFile(string path)
     {
         RecentFiles.Remove(path);
@@ -95,17 +106,27 @@ public sealed class AppSettings
 /// <summary>Per-user folders (APPDATA on Windows, XDG config/cache on Linux, Library on macOS).</summary>
 public static class ConfigPaths
 {
+    /// <summary>Per-user configuration folder; <c>CANDELA_CONFIG_DIR</c> overrides it (tests, portable installs).</summary>
     public static string ConfigDir =>
         Environment.GetEnvironmentVariable("CANDELA_CONFIG_DIR") is { Length: > 0 } d
             ? d
             : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Candela");
 
+    /// <summary>
+    /// Per-user cache folder (decoded models, extracted GDTF files, thumbnails, autosaves); <c>CANDELA_CACHE_DIR</c>
+    /// overrides it.
+    /// </summary>
     public static string CacheDir =>
         Environment.GetEnvironmentVariable("CANDELA_CACHE_DIR") is { Length: > 0 } d
             ? d
             : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Candela", "cache");
 
+    /// <summary>The user settings file (<see cref="AppSettings"/>).</summary>
     public static string SettingsFile => Path.Combine(ConfigDir, "settings.json");
+
+    /// <summary>Folder of the user's named presets (<see cref="Presets.FilePresetStore"/>).</summary>
     public static string PresetsDir => Path.Combine(ConfigDir, "presets");
+
+    /// <summary>Folder of saved editor panel layouts.</summary>
     public static string LayoutsDir => Path.Combine(ConfigDir, "layouts");
 }
