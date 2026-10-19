@@ -114,6 +114,12 @@ internal sealed class EditorSession : IDisposable
     /// <summary>What the viewports show (null until a renderer is attached).</summary>
     public IViewportContent? Content => _content;
 
+    /// <summary>
+    /// True while something else drives the engine clock (a render job rendering a timecode range ticks the engine at
+    /// the sequence's frame rate): <see cref="Update"/> must then not tick the engine with wall-clock time.
+    /// </summary>
+    public bool EngineClockHeld { get; set; }
+
     /// <summary>True when the scene, its assets or its settings changed since it was opened or saved.</summary>
     public bool IsModified => _options.PreviewStage ? Scene.Version != _previewBaseline : EngineOrThrow.IsModified;
 
@@ -200,7 +206,7 @@ internal sealed class EditorSession : IDisposable
             }
         }
 
-        engine.Tick(dt);
+        if (!EngineClockHeld) engine.Tick(dt);
         (_content as EngineViewportContent)?.MarkTicked();
         RefreshIssuesWhenSettled();
     }

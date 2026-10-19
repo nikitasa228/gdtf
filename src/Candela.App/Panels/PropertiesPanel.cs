@@ -37,12 +37,14 @@ internal sealed unsafe class PropertiesPanel : Panel
     private string _selectionText = "";
     private readonly AxisFormats _formats = new();
     private readonly EulerDisplay _euler = new();
+    private readonly StagePropertiesSection _stage;
 
     /// <summary>Creates the panel.</summary>
     public PropertiesPanel(WorkspaceContext context)
         : base("Properties", Icons.Sliders)
     {
         _ctx = context ?? throw new ArgumentNullException(nameof(context));
+        _stage = new StagePropertiesSection(Session.StagePanelContext.From(context));
     }
 
     /// <inheritdoc/>
@@ -87,6 +89,8 @@ internal sealed unsafe class PropertiesPanel : Panel
             FlagsRows(entity);
             PropertyGrid.End();
         }
+
+        _stage.Draw(entity, LabelWidth);
 
         if (ImGui.CollapsingHeader(Labels.With(Icons.Move3D, Str.PropTransform), ImGuiTreeNodeFlags.DefaultOpen))
         {
@@ -321,36 +325,16 @@ internal sealed unsafe class PropertiesPanel : Panel
             var component = components[i];
             ImGui.PushID(i);
             ImGui.BulletText(_componentNames[i]);
-            if (_componentDetails[i] is not null || component is WallComponent)
+            if (_componentDetails[i] is { } text)
             {
                 ImGui.Indent();
-                if (_componentDetails[i] is { } text)
-                    ImGui.TextDisabled(text);
-                if (component is WallComponent wall)
-                    MaterialCombo(wall);
+                ImGui.TextDisabled(text);
                 ImGui.Unindent();
             }
 
             ImGui.PopID();
         }
     }
-
-    private void MaterialCombo(WallComponent wall)
-    {
-        ImGui.SetNextItemWidth(-1);
-        if (!ImGui.BeginCombo(Labels.With("", Str.PropMaterial, "##material"), MaterialName(wall.MaterialId)))
-            return;
-        foreach (var (id, label) in BuiltInMaterials)
-        {
-            if (ImGui.Selectable(Loc.Get(label), id == wall.MaterialId) && id != wall.MaterialId)
-                _ctx.Session.Undo.Execute(MaterialCommand(wall, id));
-        }
-
-        ImGui.EndCombo();
-    }
-
-    private static IUndoableCommand MaterialCommand(WallComponent wall, string materialId) =>
-        ModifyComponentCommand.Create(wall, w => w.MaterialId = materialId, "Change material");
 
     /// <summary>The localised name of a built-in material, or the id itself for other materials.</summary>
     internal static string MaterialName(string id)

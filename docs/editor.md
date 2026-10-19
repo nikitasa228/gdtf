@@ -399,6 +399,259 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
   switch immediately.
 * DPI: the UI scale is *user scale × monitor content scale*; windows moved between monitors adapt.
 
+## Engine-backed panels
+
+Properties, External Control, Preview, Render and the overlay legends of the viewports work on the open stage: fixture
+state from the DMX engine, manufacturer data from the GDTF file and the curated `_specs` sheets, connectors and cables
+from the electrical model, materials from the material library, protocols, timecode and the DMX recorder from the stage
+engine. Every edit of the stage (manual values, patch, walls, models, scene settings) is one undo step — a slider drag is
+one step, not one per frame. Without an open stage the panels show an empty state. The pictures show
+`stages/Фокина.mvr` with a wooden stage floor added and the *Open white* look applied.
+
+| Panel | Content |
+|---|---|
+| Properties | current state of a fixture, manual controls for every attribute of its mode, DMX patch, manufacturer data, connectors with the cable in each port; size and material of walls, floors and models |
+| External Control | the fifteen show-control protocols with support level, settings and live status; universe activity and 512-slot view; sources; timecode; merge mode; Art-Net test show; DMX recorder |
+| Preview | real-time quality of every viewport, exposure (with a light meter), haze, ambient light and grid of the stage; presets |
+| Render | still frames or image sequences of a timecode range at the highest real-time quality; presets |
+
+### Properties
+
+![Fixture: current state and manual controls](images/editor-properties-fixture.png)
+![Fixture: patch, manufacturer data and connectors](images/editor-properties-type.png)
+
+*Left: a Rivale fixture under manual control. Right (scrolled): its DMX patch — two overlapping fixtures are listed in
+red —, the manufacturer data and the connectors, each drawn as the real connector.*
+
+**Current state** sums up what the fixture emits right now: intensity (%), peak luminous intensity (cd), luminous flux
+(lm), colour as a swatch with CIE 1931 *x y* and the correlated colour temperature (K), pan and tilt (°), beam and field
+angles (°), focus, iris and frost (%), and — when present — strobe frequency (Hz), gobo slot, prism facets and the
+fog / haze / fan output. A line above it says **who drives the fixture**:
+
+* *Manual control* — no live DMX: the controls below set the fixture.
+* *Locked: universe N receives live DMX* — an Art-Net / sACN / EntTec source sends the fixture's universe (see
+  [External Control](#external-control)).
+* *Locked: driven by console …* — a console in the scene feeds the fixture through a DMX cable.
+* *The fixture type could not be resolved* — with the reason (missing or broken GDTF file, unknown mode).
+
+While locked, the controls are disabled and show the values the console or DMX source sets; the tooltip repeats the
+reason.
+
+The **controls** cover every attribute of the fixture's mode, grouped *Intensity, Position, Colour, Beam, Gobos and
+effects, Shapers, Atmosphere* and *Other channels* (collapsed), the main attribute of each group first (dimmer, pan,
+zoom …), framing blades in blade order. Values are physical: degrees for pan, tilt, zoom and rotations, % for levels,
+kelvin for colour-temperature filters, Hz for strobes, the GDTF unit otherwise; wheels are drop-downs of their slots
+with the slot names. A control whose channel currently runs another function shows "—". Setting a control writes a
+*manual value* into the fixture (`FixtureComponent.ManualAttributes`, saved with the project); manual values carry an
+orange bar at the left edge; right-click one to clear it, *Reset manual values* clears them all. A slider drag is one
+undo step; every discrete change — a wheel slot, a cleared value, a mode, a fixture ID, an address, a material, the
+shadow switch — is a step of its own. With several fixtures
+selected, a change applies to every selected fixture that has the attribute and is not driven by a console or live DMX
+(the panel says how many); the panel shows the primary fixture.
+
+**DMX patch**: fixture ID, DMX mode, universe and address of each DMX break (± buttons step by one, typing jumps), the
+resulting slot range, and the patch problems of this fixture from the Issues panel (overlaps, footprints running past
+slot 512). Changing the mode re-reads the fixture; every change is one undo step.
+
+**Fixture type**: manufacturer, model, category, light source, weight, power (with power factor), luminous intensity,
+flux, beam and field angle (zoom range), colour temperature, CRI, colour mixing, noise level, IP rating, supply (voltage,
+frequency, connector), pan / tilt range, operating temperature, features, control protocols and the number of DMX modes
+— taken from the curated specification sheet when there is one, else from the GDTF file and the electrical profile. A
+note says when a fixture was matched to a substitute type (an MVR fixture whose exact GDTF is not in the library).
+Every value says where it comes from (tooltip: the GDTF file, derived from the GDTF data, the manufacturer's datasheet,
+or an estimate); **estimated values** — the `_source` of the `_specs` record is `estimated`, e.g. most noise levels and
+many peak intensities, or lamp power standing in for the mains draw — are shown dimmed with a leading **≈**, and the
+datasheets the researched values come from are listed below the table. When an MVR fixture's GDTF is not in the
+library and a similar type stands in for it, the import warning is repeated at the top of the section (the data below
+is then the stand-in's).
+
+![Fixture type: a stand-in GDTF and estimated values](images/editor-properties-provenance.png)
+
+*A "MagicBlade R" of `stages/Фокина.mvr`: its GDTF is a stub, the MagicPanel 602 stands in for it; the luminous
+intensity, colour temperature, noise level and control protocols of its record are estimates (≈).* The power factor is shown only when the GDTF
+or the specs declare one (the 0.95 the electrical model assumes otherwise is not data). Levels are percentages whatever
+unit the GDTF gives them (a GDTF `Dimmer` declares *LuminousIntensity* with physical values 0 … 1: that is 0 … 100 %,
+not candela).
+
+**Connectors**: every data and power port of the fixture with a vector drawing of its connector (powerCON / TRUE1,
+XLR 3/5-pin, RJ45 / etherCON, Schuko, IEC, CEE, Socapex, Harting … — 38 drawings, a neutral socket for anything else),
+signal and direction, current ratings and breakers, and the cable plugged in (label, type, length, the cable colour).
+Clicking a cable asks the cable editor to open it (`StageToolState.CableLinkRequested`); without a listener the cable
+is selected.
+
+![Floor: size, material and preview](images/editor-properties-floor.png)
+
+![Свойства прибора, русский интерфейс, 150 %](images/editor-properties-ru.png)
+
+*The same panel in Russian at 150 % UI scale (unit symbols follow the language: кд, лм, Вт, дБ(А) …).*
+
+**Walls and floors**: kind, width, height / depth, thickness, area, the material (drop-down grouped by category with
+colour swatches; a lit sphere preview with the material's description, luminous reflectance ρ and roughness) and the
+texture scale. **Models**: size from their bounds, a material override per material slot, shadow casting. Several
+selected walls or models are edited together.
+
+### External Control
+
+![Art-Net test show driving the rig](images/editor-artnet-test.png)
+
+*The Art-Net test show playing to this computer: the External Control panel shows the received timecode, Art-Net
+running at 320 packets/s and the status of the receiver; the selected fixture is locked to the live DMX and its current
+state follows the show.*
+
+The header shows the **last timecode** received with its source (*Art-Net* ArtTimeCode, or the *DMX recording* being
+played), its frame rate and *live* or how long ago, the **merge
+mode** of the DMX input hub (*HTP*: highest level per slot wins; *LTP*: the latest change wins — for two consoles on one
+universe) and **Send Art-Net test** (below). The tabs:
+
+* **Protocols** — all fifteen protocols of `Candela.Protocols` with their support level and live status (packets per
+  second). Selecting one shows its description, why it has that support level, its settings and its status (listening
+  address, errors, packet counters; discovered Art-Net nodes; the Eos connection). The tick box starts or stops it;
+  protocols that are only planned or need a vendor SDK cannot be started.
+
+  | Protocol | Support | Settings |
+  |---|---|---|
+  | Art-Net 4 | implemented | network interface, universe offset, port (6454), ArtSync, broadcast ArtPollReply |
+  | sACN (E1.31) | implemented | port (5568), multicast join, preview data, unpatched universes |
+  | EntTec DMX USB Pro | implemented | serial port, universe (applied when the field is left) |
+  | OSC | implemented | port (8000) |
+  | PosiStageNet | implemented | port (56565) |
+  | ETC Eos | partial | OSC output port (8001) |
+  | BlackTrax, CITP, Compulite VC, Kinesys, LasergraphDSP, PangolinLD | planned | — |
+  | MA-Net2, MA-Net3, NDI | needs the vendor's SDK | — |
+
+* **Universes** — a tile per universe: green while it receives data (brighter = more packets per second), outlined when
+  the patch uses it. Click a tile for its 512 slots with their values; patched slots are highlighted and the tooltip
+  names the fixture and attribute.
+* **Sources** — every sender: protocol, name (Art-Net short name, sACN source name), IP address, universes, priority,
+  packets.
+* **Recorder** — records the merged DMX input with the timecode as it arrives; plays it back (the fixtures follow the
+  recording as they would a console), seeks by position or by timecode, saves and loads `.cdmx` files. A recording is
+  what the Render panel renders a timecode range from.
+
+![Universes and recorder](images/editor-external-universes.png)
+
+![Внешняя связь, русский интерфейс, 150 %](images/editor-external-control-ru.png)
+
+*External Control in Russian at 150 % while the test show runs: universe activity and the slot values of universe 1.*
+
+The protocol settings are stored in `external-control.json` in the config folder (enabled protocols, ports, options,
+merge mode, test target); the network interface and the Art-Net universe offset are the ones of *Settings → Network*.
+
+#### Acceptance path: a console over Art-Net
+
+1. **Open the stage** — *File → Open* `stages/Фокина.mvr` (or a project). The fixtures keep their MVR patch; the
+   Properties panel shows each fixture's universe and address.
+2. **Enable Art-Net** — *External Control → Protocols*, tick **Art-Net**. It listens on UDP 6454 on the interface of
+   *Network interface* (*All interfaces* by default; pick the lighting network's adapter when there are several) and
+   answers ArtPoll, so consoles list the computer as the node **Candela** with the universes the patch uses. *Art-Net
+   universe offset* maps console numbering to Candela's: with offset 1, Art-Net port-address 0:0:0 is universe 1.
+   Allow inbound UDP 6454 in the computer's firewall.
+3. **Point the console at the computer** — on the console, output Art-Net on the universes of the patch, unicast to the
+   computer's address or broadcast on its subnet (2.x.x.x / 10.x.x.x networks work the same). The **Sources** tab lists
+   the console with its IP address and universes, the **Universes** tab turns green.
+4. **Fixtures follow** — the console now drives every fixture on those universes: the viewports show the beams, the
+   Properties panel says *Locked: universe N receives live DMX* and its current state follows the console. With two
+   consoles on one universe the merge mode decides (HTP / LTP).
+5. **Timecode** — when the console (or a show controller) sends ArtTimeCode, the header shows it running. Record the
+   show in the **Recorder**, save it, and render a timecode range of it in the Render panel later — without the console.
+
+Without a console, **Send Art-Net test** does the same over the network: it encodes a moving show for the stage's own
+patch (pan, tilt, dimmer, colour, zoom and focus mapped onto each fixture's channel functions from its GDTF) with a
+running timecode and sends it as a separate Art-Net console to the test target (127.0.0.1 = this computer; Art-Net is
+switched on for it). When *Network interface* names one adapter, "this computer" is reached at that adapter's address
+instead of 127.0.0.1 (a receiver bound to one adapter, as on Windows, does not see loopback datagrams). Sending to
+another address feeds a second Candela or any Art-Net node. An empty stage gets a demo rig's show.
+
+### Preview
+
+![Preview and Render panels](images/editor-preview-render.png)
+
+*Preview (left) and Render (right) with their preset drop-downs.*
+
+**Quality**: resolution scale, shadows (map size, lights with shadows), volumetric light (volume slices, sharp beams),
+temporal accumulation, indirect light (off / reflective shadow maps / ray traced). **Image**: bloom (intensity), tone
+mapper, automatic exposure or exposure compensation (EV) and camera exposure (EV100) with **Meter**, which sets the
+exposure from the engine's light meter (incident light at the stage's centre), applied to every viewport. **Stage**
+(scene settings, undoable, saved with the stage): haze density (scattering coefficient, m⁻¹), haze forward scattering,
+ambient light (cd/m²), grid and grid spacing.
+
+The **preset drop-down** (also in Render and in the legends) lists *Default* (read-only), *Custom* (the edited values,
+shown as soon as anything differs from the chosen preset) and saved presets; the save button stores the current
+values under a name, the bin deletes the chosen preset (the values in use stay; the drop-down then shows *Custom*). Presets are Core `PresetLibrary` files in
+`presets/preview/`, `presets/final-render/`, `presets/lux-gradient/` and `presets/noise-gradient/` of the config folder;
+the current values are saved in the project (`settings.json`, section `view`) and come back when it is opened.
+
+### Render
+
+**Output**: folder (default `Pictures/Candela`), file name and format (PNG; EXR needs the path tracer and is disabled
+with that reason). **Quality**: resolution (with common sizes) and samples per pixel, tone mapper; the panel shows the
+plan, e.g. *2× supersampling, 64 accumulated frames → 1920 × 1080 PNG*. **Frame or timecode range**: a single frame, or
+start and end (timecode `HH:MM:SS:FF` or seconds) and frame rate of the DMX recording. **Path tracer**: bounces, volume
+bounces and denoising, kept for the final renderer.
+
+Final path tracing is not available yet, and the panel says so: **Render uses the real-time renderer at its highest
+quality** — 2048-texel shadow maps for up to 256 lights, 256 volume slices, ray-marched beams, indirect light on — and
+renders at twice the resolution in each direction (when the target stays within 8192 pixels) for `samples ÷ 4` frames
+of temporal accumulation (up to 256), averages the last four frames read back and filters them down to the output
+size. A **timecode range** renders an image sequence
+(`name_0001.png`, …): the job takes over the engine clock (the editor stops ticking the stage with wall-clock time),
+plays the recording from two seconds before the start so moving heads and fades have arrived, and for every frame seeks
+the player, ticks the engine by one frame period and renders. The job runs a slice per editor frame (about 60 ms) with
+a progress bar and *Cancel*, so the editor stays usable; errors (folder not writable, disk full, a GPU error such as a
+lost device or a target too large for the GPU) stop it with the reason, and a cancelled or failed sequence stops the
+recording playback it started.
+
+### Overlay legends
+
+![Illuminance overlay with its legend](images/editor-overlay-lux.png)
+![Cables legend](images/editor-overlay-cables.png)
+
+With the *Illuminance* or *Noise* overlay, the viewport shows a legend in its lower-right corner: the colour gradient
+with its stops and range. Click the bar to add a stop, drag stops to move them, drag the range brackets to set the
+minimum and maximum, right-click a stop to recolour or remove it; the chevron expands numeric fields (from, to,
+logarithmic scale, the value of the selected stop). Values outside the range are drawn grey. Each gradient has presets
+like the Preview panel, applies to every viewport and is saved in the project. The *Cables* overlay shows the colour of
+each cable type (those in the scene, or the whole catalogue while there are none).
+
+### Implementation
+
+```
+src/Candela.App/
+  Session/  StageToolState (StagePanelContext: what the panels see; per-frame update of presets, external control and
+            render job), PresetBinding / SettingsCopy (live settings ↔ preset library ↔ project), FixtureControls
+            (attributes of a mode → controls, live state), ManualAttributeCommand, SetFieldCommand, DeviceFacts
+            (manufacturer rows, ports and cables), ExternalControl (protocol settings, status polling, test show,
+            recorder), RenderJob (RenderJobRunner: plan, supersampling, accumulation, timecode sequences)
+  Panels/   StagePropertiesSection → FixtureInspectorView, DeviceFactsView, SurfaceInspectorView; ExternalControlPanel;
+            PreviewPanel; RenderPanel
+  Viewport/ OverlayLegend (legend window of a viewport)
+  Ui/       StageStrings (StageStr / StageLoc: English and Russian texts of these panels), StageUnits (unit symbols in
+            the UI language), StageIcons, ConnectorIcons (vector connector drawings), GradientEditor, PresetCombo,
+            MaterialSwatch, AttributeLabels, LabelColumn
+```
+
+The shared shell only hosts them: `Workspace` adds the External Control panel and calls `StageToolState.Update` before
+each frame, `EditorSession` exposes the engine and `EngineClockHeld`, `ViewportPanel` draws the legend, the Properties
+panel calls `StagePropertiesSection`. Their steady-state frames do not allocate: texts are rebuilt when the values
+behind them change (current state at most ten times a second, protocol status four times a second), labels once per
+language.
+
+Tests: `FixturePropertiesTests` (controls of a moving head in physical units, ordering, manual values and undo,
+the lock by a console cable and by live DMX, multi-selection, patch changes, manufacturer rows, ports and the cable in
+a port, every connector drawing), `ExternalControlTests` (the acceptance path end to end on the loopback interface — an
+Art-Net console sends DMX and timecode, the source, universe activity and fixture state appear —, the test show,
+recording / playback / seeking / saving, settings files, timecode parsing), `PresetsAndOverlayTests` (presets, Custom,
+project adoption, gradient editing rules, legends, Preview / Render / legend drawing under a window-less ImGui context)
+and `RenderJobTests` (the plan, a frame and a timecode sequence rendered on a headless Vulkan device and checked
+pixel by pixel).
+
+Limitations: final path tracing and EXR output wait for the path tracer; the recorder samples the input once per editor
+frame; status texts of the protocols and the issue messages of the engine (patch, MVR import) come in English; the
+timecode's source names the protocol, not the sender's address (the Art-Net receiver does not report it); changes of
+the preview, render and legend settings are saved with the project but do not count as unsaved changes, and they are
+not undo steps (the engine's modified flag covers the stage only); the cable editor that a cable link opens comes with
+phase B3.
+
 ## Robustness
 
 * No exception escapes the frame loop: a failing frame is logged and reported in the Issues panel and the next frame

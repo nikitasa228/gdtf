@@ -48,6 +48,11 @@ internal sealed class ToolState
 
     /// <summary>Final-render settings (the Render panel).</summary>
     public FinalRenderSettings FinalRender { get; } = new();
+
+    private StageToolState? _stage;
+
+    /// <summary>State of the engine-backed panels: presets, overlay legends, DMX recording, project settings binding.</summary>
+    public StageToolState Stage => _stage ??= new StageToolState(Preview, FinalRender);
 }
 
 /// <summary>Services the workspace and its panels share.</summary>
