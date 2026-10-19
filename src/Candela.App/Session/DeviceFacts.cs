@@ -248,7 +248,9 @@ internal sealed class DeviceFacts
             list.Add(StageLoc.Get(StageStr.FeatureIris));
         if (specs.Frost)
             list.Add(StageLoc.Get(StageStr.FeatureFrost));
-        if (specs.GoboWheels.Count > 0)
+        if (specs.GoboWheels.Count == 1)
+            list.Add(StageLoc.Get(StageStr.FeatureGoboWheel));
+        else if (specs.GoboWheels.Count > 1)
             list.Add(StageLoc.Format(StageStr.FeatureGoboWheels, specs.GoboWheels.Count));
         else if (specs.GoboSlots > 0)
             list.Add(StageLoc.Format(StageStr.FeatureGobos, specs.GoboSlots));

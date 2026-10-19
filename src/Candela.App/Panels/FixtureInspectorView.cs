@@ -290,7 +290,8 @@ internal sealed class FixtureInspectorView
         else
         {
             float shown = value * c.DisplayScale;
-            if (ImGui.SliderFloat(c.Id, ref shown, c.Min * c.DisplayScale, c.Max * c.DisplayScale, c.Format))
+            // A control whose channel currently runs another function shows no number until it is set.
+            if (ImGui.SliderFloat(c.Id, ref shown, c.Min * c.DisplayScale, c.Max * c.DisplayScale, c.IsUnknown ? "—" : c.Format))
             {
                 value = shown / c.DisplayScale;
                 changed = true;

@@ -89,6 +89,9 @@ internal sealed class FixtureControl
     /// <summary>The value the control shows: the manual value, else the live value, else the minimum.</summary>
     public float Shown => Manual ?? (float.IsFinite(Live) ? Live : Min);
 
+    /// <summary>True when the control has neither a manual value nor a live value (its channel runs another function).</summary>
+    public bool IsUnknown => Manual is null && !float.IsFinite(Live);
+
     /// <summary>True when the control's range is a single value (nothing to set).</summary>
     public bool IsConstant => !(Max > Min);
 
@@ -416,8 +419,8 @@ internal sealed class FixtureControls
             built.Add(CreateControl(profile, name, cls, min, max, unit, wheel));
         }
 
-        // Stable order: by group, then by the order of the mode's channels.
-        var indexed = built.Select((c, i) => (c, i)).OrderBy(t => t.c.Group).ThenBy(t => t.i).Select(t => t.c);
+        // Stable order: by group, the main attribute of each group first (dimmer, pan, tilt, zoom …), then the mode's channel order.
+        var indexed = built.Select((c, i) => (c, i)).OrderBy(t => t.c.Group).ThenBy(t => Rank(t.c.Class)).ThenBy(t => t.i).Select(t => t.c);
         foreach (var c in indexed)
         {
             _byAttribute[c.Attribute] = _controls.Count;
@@ -459,7 +462,7 @@ internal sealed class FixtureControls
             PhysicalUnit.Speed => "%.2f m/s",
             PhysicalUnit.WaveLength => "%.0f nm",
             PhysicalUnit.LuminousIntensity => "%.0f cd",
-            _ => wheel >= 0 ? "%.2f" : "%.3g",
+            _ => wheel >= 0 ? "%.2f" : NumberFormat(min, max),
         };
 
         var control = new FixtureControl
@@ -478,6 +481,36 @@ internal sealed class FixtureControls
         };
         control.Label = AttributeLabels.Label(attribute, cls);
         return control;
+    }
+
+    /// <summary>Order of attribute kinds inside their group (lower first); everything else keeps the channel order.</summary>
+    internal static int Rank(AttributeClass cls) => cls.Kind switch
+    {
+        // Framing blades by number, A before B, then rotation and softness.
+        AttributeKind.BladeA => 100 + cls.Number * 4,
+        AttributeKind.BladeB => 101 + cls.Number * 4,
+        AttributeKind.BladeRotation => 102 + cls.Number * 4,
+        AttributeKind.BladeSoft => 103 + cls.Number * 4,
+        AttributeKind.ShaperRotation => 200,
+        AttributeKind.Dimmer => 0,
+        AttributeKind.Shutter => 1,
+        AttributeKind.Pan => 0,
+        AttributeKind.Tilt => 1,
+        AttributeKind.Zoom => 0,
+        AttributeKind.Focus => 1,
+        AttributeKind.Iris => 2,
+        AttributeKind.Frost => 3,
+        AttributeKind.ColorAdd or AttributeKind.ColorSub or AttributeKind.ColorRgb => 0,
+        AttributeKind.WheelSelect => 1,
+        AttributeKind.Ctc or AttributeKind.Cto or AttributeKind.Ctb => 2,
+        _ => 10,
+    };
+
+    /// <summary>A printf format with a sensible number of decimals for the range (no exponent notation).</summary>
+    internal static string NumberFormat(float min, float max)
+    {
+        float span = MathF.Max(MathF.Abs(max - min), MathF.Max(MathF.Abs(min), MathF.Abs(max)) * 0.01f);
+        return span >= 100f ? "%.0f" : span >= 10f ? "%.1f" : span >= 1f ? "%.2f" : "%.3f";
     }
 
     /// <summary>The panel group of an attribute class.</summary>

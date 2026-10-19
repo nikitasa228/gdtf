@@ -46,6 +46,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private string _language = "";
     private string _slotTooltipCache = "";
     private ProtocolStatus? _countersOf;
+    private int _portEdit;
     private string _countersText = "";
     private string _countersLanguage = "";
     private int _slotTooltipKey = -1;
@@ -530,11 +531,18 @@ internal sealed unsafe class ExternalControlPanel : Panel
         return changed;
     }
 
-    private static bool PortRow(StageStr label, int port, out int value)
+    /// <summary>A UDP port field; true once the user finished typing a valid new port (applied on leaving the field).</summary>
+    private bool PortRow(StageStr label, int port, out int value)
     {
         PropertyGrid.Row(StageLoc.Get(label));
-        value = port;
-        return ImGui.InputInt("##port", ref value, 0, 0, ImGuiInputTextFlags.EnterReturnsTrue) && value is > 0 and <= 65535 && value != port;
+        int shown = port;
+        if (ImGui.InputInt("##port", ref shown, 0, 0))
+            _portEdit = shown;
+        if (ImGui.IsItemActivated())
+            _portEdit = port;
+        bool done = ImGui.IsItemDeactivatedAfterEdit();
+        value = _portEdit;
+        return done && value is > 0 and <= 65535 && value != port;
     }
 
     private static bool CheckRow(StageStr label, bool current, out bool value)
@@ -624,11 +632,10 @@ internal sealed unsafe class ExternalControlPanel : Panel
             bool hovered = ImGui.IsItemHovered();
             ImGui.PopID();
             double rate = model.RateOf(u);
-            var fill = active ? Vector4.Lerp(Theme.WithAlpha(Theme.Success, 0.35f), Theme.Success, (float)Math.Clamp(rate / 44.0, 0, 1))
-                : patched ? Theme.Rgb(0x30333A) : Theme.Rgb(0x1E2024);
+            var fill = active ? Vector4.Lerp(Theme.WithAlpha(Theme.Success, 0.45f), Theme.Success, (float)Math.Clamp(rate / 44.0, 0, 1))
+                : patched ? Theme.Rgb(0x33363E) : Theme.Rgb(0x26292F);
             dl.AddRectFilled(p, p + new Vector2(cell, cell * 0.8f), Theme.U32(fill), 3f);
-            if (patched)
-                dl.AddRect(p, p + new Vector2(cell, cell * 0.8f), Theme.U32(active ? Theme.Success : Theme.WithAlpha(Theme.Accent, 0.6f)), 3f);
+            dl.AddRect(p, p + new Vector2(cell, cell * 0.8f), Theme.U32(patched ? Theme.WithAlpha(Theme.Accent, active ? 0.9f : 0.6f) : Theme.Rgb(0x34373F)), 3f);
             if (selected || hovered)
                 dl.AddRect(p - new Vector2(1f), p + new Vector2(cell, cell * 0.8f) + new Vector2(1f), Theme.U32(selected ? Theme.Accent : Theme.Text), 3f, ImDrawFlags.None, 2f);
             string number = Numbers[u];

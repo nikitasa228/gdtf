@@ -114,7 +114,8 @@ internal sealed class DeviceFactsView
     private void Ports(Entity entity, IReadOnlyList<PortRow> ports)
     {
         var style = ImGui.GetStyle();
-        float icon = MathF.Round(ImGui.GetTextLineHeight() * 2.4f);
+        // As tall as the three text lines beside it.
+        float icon = MathF.Round(ImGui.GetTextLineHeightWithSpacing() * 3f - style.ItemSpacing.Y);
         for (int i = 0; i < ports.Count; i++)
         {
             var row = ports[i];
