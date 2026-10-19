@@ -285,6 +285,59 @@ public sealed class PathTracerSessionTests
         }
     }
 
+    /// <summary>
+    /// The editor advances a final render inside each of its frames, next to the real-time view: once warmed up, those
+    /// frames allocate no managed memory (like the real-time renderer's steady state).
+    /// </summary>
+    [SkippableFact]
+    public void AdvancingInsideTheCallersFramesAllocatesNothing()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var camera = BuildRoom(renderer);
+            using var target = renderer.CreateTarget(32, 24);
+            using var render = renderer.StartFinalRender(camera, FinalRenderSupport.Settings(32, 24, VulkanFinalRender.MaxSamples),
+                new FinalRenderOptions { TimeLimit = TimeSpan.FromHours(1) });
+            render.MaxRowsPerDispatch = 8;
+            var view = new ViewOptions { ShowGrid = false };
+            var settings = new PreviewSettings();
+            void Frame()
+            {
+                var open = renderer.Context.BeginFrame();
+                renderer.Render(target, camera, view, settings, 1f / 60f);
+                render.Advance(TimeSpan.FromMilliseconds(5));
+                renderer.Context.SubmitFrame(open);
+            }
+
+            for (int i = 0; i < 40; i++)
+                Frame(); // warm-up: pipelines, descriptor sets, staging, JIT
+            renderer.Context.WaitForSubmittedFrames();
+
+            // one allocation-free window of 30 frames proves the steady state (one-off runtime events do not recur)
+            var windows = new List<long>();
+            for (int window = 0; window < 6; window++)
+            {
+                long before = GC.GetAllocatedBytesForCurrentThread();
+                for (int i = 0; i < 30; i++)
+                    Frame();
+                long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+                if (allocated == 0)
+                    break;
+                windows.Add(allocated);
+            }
+
+            Assert.True(windows.Count < 6, "managed memory allocated in every window of 30 frames: " + string.Join(", ", windows) + " bytes");
+            Assert.False(render.IsComplete);
+            Assert.True(render.SamplesDone > 0);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     [SkippableFact]
     public void DenoiserLowersTheErrorAndKeepsTheRawResult()
     {

@@ -274,7 +274,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         ThrowIfDisposed();
         if (_complete)
             return;
-        var watch = Stopwatch.StartNew();
+        long started = Stopwatch.GetTimestamp(); // (no Stopwatch object: the editor advances in every frame)
         double budgetSeconds = budget > TimeSpan.Zero ? budget.TotalSeconds : 0.0;
         bool inFrame = _context.CurrentFrame is not null;
         if (inFrame)
@@ -298,7 +298,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
                     break;
                 }
 
-                if (_timeLimit is { } limit && _row == 0 && _samplesDone > 0 && _elapsed + watch.Elapsed >= limit)
+                if (_timeLimit is { } limit && _row == 0 && _samplesDone > 0 && _elapsed + Stopwatch.GetElapsedTime(started) >= limit)
                 {
                     _complete = true;
                     break;
@@ -311,7 +311,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
                     break;
                 }
 
-                int dispatches = PlanDispatches(Math.Max(budgetSeconds - watch.Elapsed.TotalSeconds, 0.0));
+                int dispatches = PlanDispatches(Math.Max(budgetSeconds - Stopwatch.GetElapsedTime(started).TotalSeconds, 0.0));
                 var frame = _context.BeginFrame();
                 long start = Stopwatch.GetTimestamp();
                 int rows;
@@ -326,14 +326,14 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
 
                 _context.WaitForSubmittedFrames();
                 Measure(Stopwatch.GetElapsedTime(start).TotalSeconds, rows);
-                if (watch.Elapsed.TotalSeconds >= budgetSeconds)
+                if (Stopwatch.GetElapsedTime(started).TotalSeconds >= budgetSeconds)
                     break;
             }
         }
         finally
         {
             if (!inFrame)
-                _elapsed += watch.Elapsed;
+                _elapsed += Stopwatch.GetElapsedTime(started);
         }
     }
 
