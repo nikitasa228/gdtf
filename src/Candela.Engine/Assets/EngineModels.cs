@@ -83,7 +83,17 @@ public sealed class EngineModels
         if (!NeedsWorker(entry)) return store.TryGetModel(assetId, out model, out error);
 
         var lazy = _inFlight.GetOrAdd(assetId, _ => new Lazy<Decoded>(() => Decode(entry), LazyThreadSafetyMode.ExecutionAndPublication));
-        var decoded = lazy.Value;
+        Decoded decoded;
+        try
+        {
+            decoded = lazy.Value;
+        }
+        catch
+        {
+            // a Lazy keeps its exception: forget the failed decode, so the next request tries again instead of rethrowing
+            _inFlight.TryRemove(new KeyValuePair<Guid, Lazy<Decoded>>(assetId, lazy));
+            throw;
+        }
         bool current = decoded.Model is not null ? store.SetDecodedModel(decoded.Entry, decoded.Model) : store.SetModelDecodeError(decoded.Entry, decoded.Error!);
         _inFlight.TryRemove(new KeyValuePair<Guid, Lazy<Decoded>>(assetId, lazy));
         // the asset was replaced while it decoded (new import options): decode the new one
@@ -117,6 +127,10 @@ public sealed class EngineModels
             {
                 Record(new Issue(IssueSeverity.Error, IssueCategory.Scene, EngineIssueCodes.AssetUnreadable,
                     $"The model {assetId} cannot be loaded: {e.Message}"));
+                // known to fail from now on: a renderer binding that redraws the objects waiting for it must not start
+                // the same failing decode again every frame
+                var store = _store();
+                if (store.Find(assetId) is { } entry) store.SetModelDecodeError(entry, $"the model cannot be loaded: {e.Message}");
                 return false;
             }
         });
