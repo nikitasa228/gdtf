@@ -54,6 +54,42 @@ public sealed class PathTracerPhotometryTests
     }
 
     /// <summary>
+    /// A translucent white surface (a diffusing gel or a frosted screen hung flat: transmission t, no Fresnel) reflects
+    /// the share 1 − t of the direct light like a Lambertian surface, whichever lobe the path continues with — the
+    /// transmitted share goes through (into the black surroundings here).
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(0.5f)]
+    [InlineData(0.9f)]
+    public void TranslucentSurfacesReflectTheirShareOfTheDirectLight(float transmission)
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var view = new TopDownView(40, 30, 8f);
+            var material = TopDownView.WhiteLambertian();
+            material.Transmission = transmission;
+            material.DoubleSided = true;
+            FinalRenderSupport.Floor(renderer.World, material);
+            var light = ProceduralTestScene.Spot(new Vector3(0f, 0f, Height), Vector3.Zero, LightColor.White, PeakCandela, BeamDeg, FieldDeg);
+            renderer.World.SetLights(new[] { light });
+            using var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(view.Width, view.Height, 64),
+                new FinalRenderOptions { BackgroundLuminance = 0f });
+            var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
+            var beam = BeamDistribution.Create(BeamType.Wash, BeamDeg * MathF.PI / 180f, FieldDeg * MathF.PI / 180f);
+            var (cx, cy, centre) = view.NearestPixel(Vector3.Zero);
+            float expected = (1f - transmission) * PhotometricTests.FloorLuminance(light, beam.Relative, centre);
+            float measured = hdr.MeanLuminance(cx, cy, 2);
+            Assert.True(MathF.Abs(measured - expected) / expected < 0.04f, $"translucent floor {measured} cd/m², expected {expected} cd/m²");
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    /// <summary>
     /// A lens far too small for float densities (its area underflows) lights the floor like a point light: no
     /// infinite lens luminance or NaN multiple-importance weight wipes out the samples.
     /// </summary>

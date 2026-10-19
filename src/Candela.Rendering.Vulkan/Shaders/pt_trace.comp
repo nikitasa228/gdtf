@@ -1142,6 +1142,13 @@ void main()
         float pSpecular, pDiffuse, pTransmission;
         vec3 Ft;
         lobeProbabilities(b, NdotV, pSpecular, pDiffuse, pTransmission, Ft);
+
+        // The direct light the surface reflects, whichever lobe the path continues with (the reflection lobes' share
+        // is not 1 - pTransmission of it: next-event estimation is not a sample of the lobe choice).
+        float sumW = 0.0;
+        if (surfaceBounces < params.maxBounces)
+            radiance += clampContribution(beta * surfaceNee(P, Ng, N, V, b, rng, sumW), scattered);
+
         float u = rand(rng);
         if (u < pTransmission)
         {
@@ -1156,9 +1163,6 @@ void main()
 
         if (surfaceBounces >= params.maxBounces)
             break;
-
-        float sumW;
-        radiance += clampContribution(beta * surfaceNee(P, Ng, N, V, b, rng, sumW), scattered);
 
         // continue with a reflection sample
         vec3 L;
