@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Candela.App.Editing;
+using Candela.App.Session;
 using Candela.Core.Math;
 using Candela.Rendering;
 
@@ -82,6 +83,19 @@ internal sealed partial class ViewportPanel
         }
 
         _framedCamera = CameraState();
+    }
+
+    /// <summary>
+    /// Shows a project's stored view instead of framing it (opening a project brings back the camera it was saved with).
+    /// False when the stored camera is unusable; the caller frames the scene instead.
+    /// </summary>
+    public bool ShowSavedCamera(Candela.Engine.SavedCamera saved)
+    {
+        ArgumentNullException.ThrowIfNull(saved);
+        if (!ViewSettingsEdits.Apply(saved, Camera))
+            return false;
+        _framedCamera = CameraState();
+        return true;
     }
 
     /// <summary>True when the camera was moved since <see cref="FrameScene"/> last set it.</summary>

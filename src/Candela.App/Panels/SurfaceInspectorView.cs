@@ -145,7 +145,7 @@ internal sealed class SurfaceInspectorView
         if (ImGui.IsItemDeactivatedAfterEdit())
             _stage.Undo.BreakMerge();
         if (mixed && ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PropsMixed));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PropsMixed));
         ImGui.PopID();
     }
 
@@ -283,7 +283,7 @@ internal sealed class SurfaceInspectorView
             : PropertiesPanel.MaterialName(current);
         var p = ImGui.GetCursorScreenPos();
         float h = ImGui.GetFrameHeight();
-        bool open = ImGui.BeginCombo(id, Padded(preview));
+        bool open = ImGui.BeginCombo(id, Padded(SafeText.Label(preview)));
         // The swatch of the current material inside the combo frame.
         if (!mixed)
         {
@@ -294,7 +294,7 @@ internal sealed class SurfaceInspectorView
         if (!open)
             return false;
         bool picked = false;
-        if (allowOwn && ImGui.Selectable(ownName ?? StageLoc.Get(StageStr.ModelOwnMaterial), current is null))
+        if (allowOwn && ImGui.Selectable(SafeText.Label(ownName ?? StageLoc.Get(StageStr.ModelOwnMaterial)), current is null))
         {
             picked = current is not null;
             chosen = null;
@@ -315,7 +315,7 @@ internal sealed class SurfaceInspectorView
                 }
 
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(m.Description);
+                    SafeText.Tooltip(m.Description);
             }
         }
 

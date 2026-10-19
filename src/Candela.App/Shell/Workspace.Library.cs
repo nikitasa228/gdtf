@@ -198,19 +198,19 @@ internal sealed partial class Workspace : ILibraryHost
             return;
         }
 
-        ImGui.TextColored(Theme.Accent, $"{Icons.Lightbulb}  {entity.Name}");
+        SafeText.Colored(Theme.Accent, $"{Icons.Lightbulb}  {entity.Name}");
         ImGui.Separator();
-        ImGui.TextDisabled(Loc.Get(Str.PlaceMode));
+        SafeText.Disabled(Loc.Get(Str.PlaceMode));
         float scale = _frameScale;
         ImGui.SetNextItemWidth(320f * scale);
         string current = fixture.GdtfMode ?? info.DefaultMode?.Name ?? "";
-        if (ImGui.BeginCombo("##mode", $"{current}  ·  {Loc.Format(Str.PlaceChannels, info.Find(current)?.Footprint ?? 0)}"))
+        if (ImGui.BeginCombo("##mode", $"{SafeText.Label(current)}  ·  {Loc.Format(Str.PlaceChannels, info.Find(current)?.Footprint ?? 0)}"))
         {
             for (int i = 0; i < info.Modes.Count; i++)
             {
                 var mode = info.Modes[i];
                 bool selected = string.Equals(mode.Name, current, StringComparison.Ordinal);
-                if (ImGui.Selectable($"{mode.Name}  ·  {Loc.Format(Str.PlaceChannels, mode.Footprint)}##m{i}", selected))
+                if (ImGui.Selectable($"{SafeText.Label(mode.Name)}  ·  {Loc.Format(Str.PlaceChannels, mode.Footprint)}##m{i}", selected))
                     LibraryPlacement.ChangeMode(session, entity, mode);
                 if (selected)
                     ImGui.SetItemDefaultFocus();
@@ -219,7 +219,7 @@ internal sealed partial class Workspace : ILibraryHost
             ImGui.EndCombo();
         }
 
-        ImGui.TextDisabled(Loc.Get(Str.PlaceAddress));
+        SafeText.Disabled(Loc.Get(Str.PlaceAddress));
         ImGui.TextUnformatted(fixture.Addresses.Count == 0 ? Loc.Get(Str.PlaceUnpatched) : LibraryPlacement.AddressText(fixture));
         ImGui.Spacing();
         if (ImGui.Button(Loc.Get(Str.MsgOk), new Vector2(110f * scale, 0f)) || ImGui.IsKeyPressed(ImGuiKey.Enter, false))
@@ -236,9 +236,9 @@ internal sealed partial class Workspace : ILibraryHost
             return;
         }
 
-        ImGui.TextColored(Theme.Accent, $"{Icons.Image}  {entity.Name}");
+        SafeText.Colored(Theme.Accent, $"{Icons.Image}  {entity.Name}");
         ImGui.Separator();
-        ImGui.TextDisabled(Loc.Get(Str.PlaceImageMode));
+        SafeText.Disabled(Loc.Get(Str.PlaceImageMode));
         if (ImGui.RadioButton(Loc.Get(Str.PlaceReference), image.Mode == ImageMode.Reference) && image.Mode != ImageMode.Reference)
             session.Undo.Execute(ModifyComponentCommand.Create(image, i => i.Mode = ImageMode.Reference, Loc.English_(Str.PlaceReference)));
         if (ImGui.RadioButton(Loc.Get(Str.PlacePoster), image.Mode == ImageMode.Poster) && image.Mode != ImageMode.Poster)

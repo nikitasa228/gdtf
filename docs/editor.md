@@ -131,11 +131,26 @@ hidden behind another tab of its group is never the target — the commands then
 own camera. Fixture models load in the background; meanwhile the bottom-right corner says *Loading fixture models…
 (n)*. Opening a scene frames its content tightly (stage, set and fixtures — not the empty ground around them), and
 frames it again once the models have arrived, unless the camera was moved in between. Clicking any part of a fixture
-(base, yoke, head, lens) selects the fixture itself; the members of a selected group are outlined with it. In *Full*
-shading the stage is lit by its fixtures only, so a scene whose fixtures are all dark looks dark — *Tools → Open
-White* (one undo step) brings every fixture up in open white with the moving heads aimed at the stage. The command
-line option `--preview-stage` shows the renderer's procedural test stage instead of the document (the phase-A
-behaviour, kept for tests that need a fixed picture).
+(base, yoke, head, lens) selects the fixture itself; the members of a selected group are outlined with it
+(`RenderSync.OutlineSelectedDescendants`). Box selection, framing and the surface under a dragged library item use the
+bounds the render binding keeps for every drawn object (`RenderSync.TryGetWorldBounds`, `IncludeWorldBounds`,
+`VisibleWorldBounds`, `CollectVisibleCorners` — fixture models, walls, models, cables and devices alike), so the editor
+keeps no second copy of the render world.
+
+**Work light.** In *Full* shading the stage is lit by its fixtures. While none of them emits — an MVR fresh from the
+designer, an un-programmed rig such as Фокина — the preview adds a dim **work light** (a soft key from above the stage
+and its bounce), so the stage is never just black. *Preview → Stage → Work light* and *View → Work Light* switch it
+between **Off**, **Auto** (default: only while no fixture emits) and **On**; the choice is stored in the project's view
+settings (`ViewSettings.WorkLight`) and applied to the render binding at once. A viewport showing the *Illuminance*
+overlay leaves it out (the lux values are the fixtures' own), and final renders never use it unless the Render panel
+asks for it. *Tools → Open White* (one undo step) brings every fixture up in open white with the moving heads aimed at
+the stage. The command line option `--preview-stage` shows the renderer's procedural test stage instead of the document
+(the phase-A behaviour, kept for tests that need a fixed picture).
+
+![Фокина with the work light](images/editor-work-light.png)
+
+*Фокина opened in Full shading: no fixture is programmed, so the Auto work light shows the rig (with Off the view would be
+black); Preview → Stage → Work light is the switch.*
 
 ![Four viewports, Russian UI](images/editor-four-viewports-ru.png)
 
@@ -215,9 +230,9 @@ New / Open replace the engine's project, so panels keep their references to the 
 |---|---|
 | **New** (Ctrl+N) | An empty stage named *Untitled*: no objects, the floor grid, the camera back over the stage origin. |
 | **Open** (Ctrl+O, Open Recent, `--open`, a dropped file) | `.candela` projects and `.mvr` scenes. An MVR opens as a new, unsaved project (no file yet: Save asks for one). Every open viewport frames the new stage tightly (each side of the picture touches the outermost object), and again once the fixture models have loaded — unless the camera was moved in between. A recent file that no longer exists is removed from the list. |
-| **Save / Save As** (Ctrl+S / Ctrl+Shift+S) | Atomic `.candela` write through the engine (scene, assets, copies of the GDTF files used, `engine`/`view` settings). A scene still called *Untitled* takes the file's name. The file goes to the top of the recent list. |
-| **Import** (Ctrl+I, File → Import) | Another Candela project or an MVR (merged under a new group, one undo step), a 3D model (OBJ, FBX, DAE, 3DS, glTF/GLB, STL, PLY — native formats in the engine's isolated import worker), an image (a reference drawing; the popup that follows makes it a poster), a GDTF file (added to the fixture library). Imported models and images are also added to the Library's Models tab. |
-| **Export** | MVR 1.6 with the fixtures' GDTF files and the models as GLB. |
+| **Save / Save As** (Ctrl+S / Ctrl+Shift+S) | Atomic `.candela` write through the engine (scene, assets, copies of the GDTF files used, `engine`/`view` settings). The active viewport's camera is stored with it and comes back when the project is opened. A scene still called *Untitled* takes the file's name. The file goes to the top of the recent list. |
+| **Import** (Ctrl+I, File → Import) | Another Candela project or an MVR (merged under a new group, one undo step), a 3D model (OBJ, FBX, DAE, 3DS, glTF/GLB, STL, PLY — native formats in the engine's isolated import worker), an image (a reference drawing; the popup that follows makes it a poster), a GDTF file (read completely and added to the fixture library; the Library panel comes forward with its tile selected — see [Library](#library); a file the engine refuses says why). Imported models and images are also added to the Library's Models tab. |
+| **Export** | MVR 1.6 with the fixtures' GDTF files, the models as GLB, and the walls, floors and ceilings: other programs see boxes, Candela gets them back as walls with their kind, size and material (Candela's user-data block of the MVR, see [mvr.md](mvr.md)). |
 | **Open White** (Tools) | Every fixture at full in open white, moving heads aimed at the stage (`StageLooks.ApplyOpenWhite`, one undo step): a quick way to see a rig that was imported dark. |
 | **Pause Simulation** (Tools, Alt+P) | Freezes smoke, fire and sound (`EngineSettings.SimulationPaused`); DMX and moving lights keep running. |
 
@@ -230,20 +245,25 @@ New / Open replace the engine's project, so panels keep their references to the 
   first?"* — **Save** (then continue; a scene without a file asks for one first; a failed save stops there),
   **Don't Save**, **Cancel**. Enter answers Save and Escape Cancel only once the question is on screen: the key press
   that asked it (Enter confirming a file in the file browser) never answers it unseen. Closing the window while another
-  dialog is open (file browser, message, question) waits until that dialog is closed.
+  dialog is open (file browser, message, question) waits until that dialog is closed. Changes of the project's view
+  settings count as unsaved changes and reach the autosave like edits of the stage: a Preview or Render panel value or
+  preset, an overlay legend's gradient, the work light, the camera stored by a save
+  (`StageEngine.MarkViewSettingsChanged`); they are not undo steps.
 * **Title.** The window title is `Candela — <scene name>` with a `•` while there are unsaved changes.
 * **Dropped files.** Files dragged from a file manager onto the window (GLFW drop callback) are opened or imported:
   a single `.candela`/`.mvr` opens directly when the stage is empty and unchanged, otherwise the editor asks **Open**
   (instead of the current scene) or **Import** (into it). Models and images dropped onto a viewport land on the surface
   under the cursor (a model stands on it, an image lies on it — see [Library](#library)); several files are imported
-  side by side; `.gdtf` files go into the fixture library; anything else is reported as not importable.
+  side by side; `.gdtf` files go into the fixture library (the Library selects the last one that came in); anything
+  else is reported as not importable. When some of several dropped files fail, a message lists each of them with the
+  reason (a refused GDTF with the engine's), and the status bar counts the rest.
 * **Engine tick.** Every frame `Update` ticks the engine (DMX input, fixture motors, smoke, fire, sound, lights, render
   binding) — also while the window is minimised (ten times a second, without drawing); the issue analysis (patch, power, rigging, assets) runs again half a second after the last edit, so a
   gizmo drag does not re-check the scene every frame. Clicking an issue selects and frames the objects it names.
 * **Autosave and recovery.** The engine autosaves the open project at the interval of *Settings → Files* (only when
   something changed; a save removes the session's autosaves; a clean exit deletes them). Changing the interval, or
-  turning autosave off and on, adjusts the running autosave session instead of starting another one (which would leave
-  the first session's files behind as a "crashed" session). Only a clean exit — the window closed after the
+  turning autosave off and on, reconfigures the running autosave session (`StageEngine.ConfigureAutosave`) instead of
+  starting another one (which would leave the first session's files behind as a "crashed" session). Only a clean exit — the window closed after the
   unsaved-changes question — deletes the recovery files: when the editor stops abnormally (an exception outside the
   frame loop, 120 failed frames in a row) unsaved changes are autosaved once more and the files stay for the
   recovery prompt. A *Save As* that fails leaves the scene's name as it was. At start-up the editor lists
@@ -263,6 +283,22 @@ projects and MVRs; one tile per model, its newest revision). Category chips filt
 PROFILE, WASH, WASH BEAM, BEAM, SPOT, FOLLOW SPOT, LED BAR, PAR, HAZE, FOG, FAN, SCANER, LASER, STROBE, BLINDER, UV,
 BSW, GENERATOR FIRE (the tooltip of a chip gives its count) — and the search field matches model, manufacturer and
 file name in any case. Each tile shows the fixture's **3D thumbnail** with its name and manufacturer under it.
+
+**Import GDTF** (the button beside the search field, *File → Import → GDTF Fixture*, or a `.gdtf` file dropped onto the
+window) hands the file to the engine, which reads it completely first: a file that is not a GDTF archive, has no
+readable `description.xml` or defines no DMX mode is refused, and the message says why (*"The file was not added to
+the fixture library. 'x.gdtf' is not a readable GDTF file: …"*), so the library never lists a type that cannot be
+placed. An accepted file — or one the library already has, which the status bar then says instead of claiming it was
+added — is **selected**: the Library panel comes forward on the Fixtures tab, a category or search that would hide it is cleared, the grid scrolls its tile into view and frames it
+in orange (an older revision selects its model's tile, the newest). The panel follows the engine's
+`FixtureLibraryChanged` event, so the grid, the category counts, the Devices section and the hover facts are rebuilt
+whenever GDTF files reach the library — imported ones, the GDTFs embedded in an opened or imported MVR, the GDTF copies
+of a project — and the new tiles ask for their thumbnails as they come into view.
+
+![A dropped GDTF selected in the Library](images/editor-library-import.png)
+
+*A GDTF file dropped onto the window: the library grows to 1092 types, the new type is selected and scrolled into view,
+and the status bar names it.*
 
 ![Library: thumbnails and the hover preview](images/editor-library-hover.png)
 
@@ -314,7 +350,9 @@ one. Navigation keeps working with the other mouse buttons, and the tool's one-l
 A selected wall, floor or ceiling shows **handles** (any tool): the ends and the top of a wall, the edges and corners
 of a floor. Dragging one changes the size while the opposite side stays where it is (the size follows the mouse
 along the handle's axis, corners in the floor's plane; snapping rounds the size); the size is shown next to the cursor.
-The whole drag is one undo step. The engine draws walls and floors with `WallMesh` and their material.
+The whole drag is one undo step. The engine draws walls and floors with `WallMesh` and their material. They are saved
+with the project and survive *File → Export → MVR* and opening that MVR again: kind, size, thickness and built-in
+material travel in Candela's user-data block of the MVR, while other programs see a box per wall.
 
 ![Wall and floor tools](images/editor-walls-floors.png)
 
@@ -491,7 +529,7 @@ data or power row of a fixture's patch is clicked (`StageToolState.CableLinkRequ
 |---|---|
 | File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image, GDTF fixture), Export (MVR scene), Render…, Settings…, Exit |
 | Edit | Undo / Redo (with the step name), Cut, Copy, Paste, Duplicate, Delete, Select All, Deselect |
-| View | Shading, Projection, Camera views, Overlay, Grid, Statistics, View cube, Frame selection, New viewport, Reset layout |
+| View | Shading, Projection, Camera views, Overlay, Work Light (Off / Auto / On), Grid, Statistics, View cube, Frame selection, New viewport, Reset layout |
 | Tools | Select, Move, Rotate, Wall, Floor, Cable (the tool, then every cable type with its colour), Snapping, Local/World space, Open White (all fixtures), Pause Simulation |
 | Window | open/close every panel, Layouts (Default, Four Viewports, saved, Save Layout As…, Delete Layout), Reset |
 | Help | Keyboard shortcuts, Documentation, About |
@@ -672,15 +710,28 @@ selected walls or models are edited together.
 running at 320 packets/s and the status of the receiver; the selected fixture is locked to the live DMX and its current
 state follows the show.*
 
-The header shows the **last timecode** received with its source (*Art-Net* ArtTimeCode, or the *DMX recording* being
-played), its frame rate and *live* or how long ago, the **merge
+The header shows the **last timecode** received and **who sent it** — the DMX input hub's
+`LastTimecodeSample` / `LastTimecodeSource`: *Art-Net from 192.168.1.20:6454* (protocol and sender endpoint) or
+*recording 'Show 1'* for a DMX recording being played —, its frame rate and *live* or how long ago, the **merge
 mode** of the DMX input hub (*HTP*: highest level per slot wins; *LTP*: the latest change wins — for two consoles on one
 universe) and **Send Art-Net test** (below). The tabs:
 
 * **Protocols** — all fifteen protocols of `Candela.Protocols` with their support level and live status (packets per
-  second). Selecting one shows its description, why it has that support level, its settings and its status (listening
-  address, errors, packet counters; discovered Art-Net nodes; the Eos connection). The tick box starts or stops it;
-  protocols that are only planned or need a vendor SDK cannot be started.
+  second, universes receiving; the tooltip of the status gives the message). Selecting one shows its description, why
+  it has that support level, its settings and its **status**: the message, where it receives (*Receiving on
+  0.0.0.0:6454*), the selected network interface and the number of universes it serves (announced by Art-Net,
+  subscribed by sACN, mapped by OSC, 1 for a DMX widget), the packet counters, the last error with a hint **what to
+  do** about it (one per `ProtocolErrorCode`: port in use by another program, two protocols on one port, an address or
+  adapter that is missing, a serial port that cannot be opened …), the warnings and the last malformed packet;
+  discovered Art-Net nodes; the Eos connection. A stopped protocol keeps its last error on screen. The tick box starts
+  or stops it; protocols that are only planned or need a vendor SDK cannot be started.
+
+  Status texts are **localised**: every `ProtocolStatus` carries its message, error and warnings as a `ProtocolText`
+  (a stable key of `ProtocolMessages` with language-neutral arguments — ports, addresses, counts, names, system
+  messages — and the English text). In English the text is shown as it is; in Russian the editor fills the key's
+  Russian template (`ProtocolTexts`; every key of `ProtocolMessages.All` has one, with the same placeholders — a test
+  checks it) with the same arguments, and an unknown key falls back to the English text. The panel's own messages
+  (start failures, recorder, test show) are rebuilt when the language changes.
 
   | Protocol | Support | Settings |
   |---|---|---|
@@ -698,11 +749,26 @@ universe) and **Send Art-Net test** (below). The tabs:
   names the fixture and attribute.
 * **Sources** — every sender: protocol, name (Art-Net short name, sACN source name), IP address, universes, priority,
   packets.
-* **Recorder** — records the merged DMX input with the timecode as it arrives; plays it back (the fixtures follow the
-  recording as they would a console), seeks by position or by timecode, saves and loads `.cdmx` files. A recording is
-  what the Render panel renders a timecode range from.
+* **Recorder** — records the merged DMX input with the timecode **at packet rate**: the engine's `DmxRecorder` follows
+  the DMX input hub's receive path and stores every change of a universe and every new timecode the moment it arrives
+  (not once per editor frame), so a 44 Hz console recorded by a slow editor keeps all of its frames. The tab says so,
+  and each recording shows how it was captured (*every change at packet rate · format v2*; a `.cdmx` file of format
+  version 1 was sampled once per engine frame). Plays it back (the fixtures follow the recording as they would a
+  console), seeks by position or by timecode, saves and loads `.cdmx` files. A recording is what the Render panel
+  renders a timecode range from.
 
 ![Universes and recorder](images/editor-external-universes.png)
+
+![Recorder: a recording of the Art-Net test show](images/editor-external-recorder.png)
+
+*The test show recorded for a minute and a half: 3942 frames captured at packet rate; the header names the timecode's
+sender (Art-Net from 127.0.0.1).*
+
+![OSC on the same UDP port as Art-Net](images/editor-external-status.png)
+![Та же ошибка по-русски](images/editor-external-status-ru.png)
+
+*OSC set to Art-Net's UDP port: the status gives the error and what to do about it, in English and in Russian; Art-Net
+itself receives the test show (320 packets/s, 8 universes).*
 
 ![Внешняя связь, русский интерфейс, 150 %](images/editor-external-control-ru.png)
 
@@ -747,7 +813,8 @@ temporal accumulation, indirect light (off / reflective shadow maps / ray traced
 mapper, automatic exposure or exposure compensation (EV) and camera exposure (EV100) with **Meter**, which sets the
 exposure from the engine's light meter (incident light at the stage's centre), applied to every viewport. **Stage**
 (scene settings, undoable, saved with the stage): haze density (scattering coefficient, m⁻¹), haze forward scattering,
-ambient light (cd/m²), grid and grid spacing.
+ambient light (cd/m²), **work light** (Off / Auto / On, see [Viewports](#viewports); stored in the project's view
+settings, not in the preset), grid and grid spacing.
 
 The **preset drop-down** (also in Render and in the legends) lists *Default* (read-only), *Custom* (the edited values,
 shown as soon as anything differs from the chosen preset) and saved presets; the save button stores the current
@@ -760,8 +827,9 @@ the current values are saved in the project (`settings.json`, section `view`) an
 **Output**: folder (default `Pictures/Candela`), file name and format (PNG; EXR needs the path tracer and is disabled
 with that reason). **Quality**: resolution (with common sizes) and samples per pixel, tone mapper; the panel shows the
 plan, e.g. *2× supersampling, 64 accumulated frames → 1920 × 1080 PNG*. **Frame or timecode range**: a single frame, or
-start and end (timecode `HH:MM:SS:FF` or seconds) and frame rate of the DMX recording. **Path tracer**: bounces, volume
-bounces and denoising, kept for the final renderer.
+start and end (timecode `HH:MM:SS:FF` or seconds) and frame rate of the DMX recording. **Work light**: Off by default —
+a final render shows the fixtures' light only, whatever the preview uses —; Auto or On adds it to this render (not saved
+with the preset). **Path tracer**: bounces, volume bounces and denoising, kept for the final renderer.
 
 Final path tracing is not available yet, and the panel says so: **Render uses the real-time renderer at its highest
 quality** — 2048-texel shadow maps for up to 256 lights, 256 volume slices, ray-marched beams, indirect light on — and
@@ -827,11 +895,9 @@ project adoption, gradient editing rules, legends, Preview / Render / legend dra
 and `RenderJobTests` (the plan, a frame and a timecode sequence rendered on a headless Vulkan device and checked
 pixel by pixel).
 
-Limitations: final path tracing and EXR output wait for the path tracer; the recorder samples the input once per editor
-frame; status texts of the protocols and the issue messages of the engine (patch, MVR import) come in English; the
-timecode's source names the protocol, not the sender's address (the Art-Net receiver does not report it); changes of
-the preview, render and legend settings are saved with the project but do not count as unsaved changes, and they are
-not undo steps (the engine's modified flag covers the stage only).
+Limitations: final path tracing and EXR output wait for the path tracer; the issue messages of the engine (patch, MVR
+import) and the operating system's messages quoted in a protocol error stay English (the protocols' own status texts
+are localised); changes of the view settings count as unsaved changes but are not undo steps.
 
 ## Robustness
 
@@ -864,6 +930,24 @@ not undo steps (the engine's modified flag covers the stage only).
   leave it untouched. Key binding files with missing tables, null or empty chords are repaired when read (a custom set
   saved by an older version also gets the newer actions' defaults). Missing library folders are detected in the
   background, so a network share that does not answer never freezes the settings window.
+* **Text from users and files is drawn literally.** Dear ImGui's `Text`, `TextColored`, `TextDisabled`, `TextWrapped`,
+  `BulletText`, `LabelText` and `SetTooltip` read their argument as a printf format, and the binding passes no
+  arguments: a fixture, file or folder name with `%s` or `%n` in it (or a translated "17 %") would print stack garbage
+  or crash the process. Every text the editor shows goes through `SafeText` (`Disabled`, `Colored`, `Wrapped`,
+  `Bullet`, `Tooltip` — all `TextUnformatted`) or `TextUnformatted` itself; a test scans the sources so the format
+  variants stay unused — it reads the list of format functions (every function with a `fmt` parameter, `TextAligned`
+  and the two-argument `TreeNode` included) from the binding itself, so a function added by a binding update is
+  checked too —, and the only format strings left are the editor's own number formats of sliders. Names in
+  widget labels and combo previews (files and folders in the file browser, recent files, issue messages, DMX modes and
+  channel sets, preset, recording, device, connector and network adapter names) go through `SafeText.Label`, which
+  breaks a "##" with a hair space so ImGui does not cut the name off as an ID suffix (and puts one after a final '#',
+  so a folder called `Music C#` does not lose its '#' to the "##id" the row appends).
+
+![File browser with printf conversions in the names](images/editor-safe-text.png)
+
+*A project in the folder `Stage %s %n %%`: names, paths and the file list are shown exactly as they are; `a##b.mvr`
+keeps its name.*
+
 * The Vulkan validation layer (`--validation`) reports no errors for start-up, a session with window resizes, panels
   torn off into OS windows and docked back, new and closed viewports and UI scale changes, and shutdown (also with OS
   windows still open); an integration test runs such a session.
@@ -923,6 +1007,7 @@ in the active viewport when the action runs, so a script does not depend on the 
 | `drop` | `path`, or `names` (several files), `x`, `y` | drop files onto the main window at (x, y), as a file manager does |
 | `save` | `path` | save the document as a `.candela` project, like *Save As* with that file chosen |
 | `screenshot` | `path` | save the current frame (in `--screenshot` runs) |
+| `uiText` | `path` | append every text the windows draw in the next frame to the file (Dear ImGui's text log, as rendered) — tests read back what the user would see |
 
 ## Architecture
 
@@ -944,7 +1029,8 @@ src/Candela.App/
               CableTool (the tool's model: targets, draft, port choice, commits), CablePorts (port candidates and
               positions), CableNodeEdits (moving / deleting nodes), DevicePlacement, DuplicatePatch
   Session/    EditorSession (the single gateway to StageEngine), EngineViewportContent (RenderSync → viewports,
-              picking, bounds, outline), TrackedRenderWorld (mesh bounds for box selection and framing),
+              picking, RenderSync's bounds for box selection and framing, outline of selected descendants, work
+              light), ViewSettingsEdits (work light and stored camera in the project's view settings),
               IViewportContent, PreviewStage (--preview-stage), SessionResult, CableLinkModel (the strip of the
               cable link window)
   Thumbnails/ ThumbnailWorker (background renderer for library stills and orbit frames), UiTextures (ImGui user
@@ -952,13 +1038,15 @@ src/Candela.App/
   Input/      key names, commands, KeyBindingMap / dispatcher, KeyBindingsService, InputScript, ScriptPlayer,
               SessionActions
   Files/      FileFilter, FileBrowserModel (pure logic), FileBrowserDialog (UI)
-  Panels/     Library (+ .Devices), Properties (+ ConnectionInspectorView: cables, consoles, power sources),
-              CableLinks, Issues, Console, Render, Preview
+  Panels/     Library (+ .Devices; FixtureLibraryWatcher follows the engine's FixtureLibraryChanged), Properties
+              (+ ConnectionInspectorView: cables, consoles, power sources), CableLinks, Issues, Console, Render, Preview
   Windows/    SettingsWindow, SessionDialogs (busy, unsaved changes, open-or-import, recovery), message boxes, About,
               Shortcuts
   Settings/   SettingsStore, EditorPreferences (editor-preferences.json)
   Ui/         Theme, FontSet, Icons, Loc / Str, Labels, PropertyGrid, UiScale, CableStrings (CableStr / CableLoc:
-              texts, cable type and device names in both languages), CableTypeMenu, PortPicker, DeviceIcons
+              texts, cable type and device names in both languages), CableTypeMenu, PortPicker, DeviceIcons,
+              SafeText (literal text, tooltips and labels), ProtocolTexts (protocol status in Russian, error hints),
+              WorkLightCombo
   Diagnostics/AppLog
 ```
 
@@ -977,13 +1065,15 @@ program.
 
 **Steady-state frames do not allocate** on the managed heap in the editor's own code: labels are built once per
 language (`Labels`), status texts and statistics only when their values change (statistics at most four times a
-second), commands are cached delegates, the render world wrapper updates instance flags and bounds in place, and the
-Library panel caches its tile keys, labels and filtered lists (rebuilt when the search, category or catalogue
+second), commands are cached delegates, bounds come from the render binding without copying, and the Library panel
+caches its tile keys, labels and filtered lists (rebuilt when the search, category or catalogue
 changes). Allocations happen on user actions (edits, opening menus and dialogs, drags) and when thumbnails arrive.
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 550 tests, under two minutes) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 600 tests, under three minutes; the end-to-end runs whose checks do not depend
+on lit pixels use Colorless shading, since on lavapipe the lit preview of a dark rig — with the Auto work light's
+shadowed key — takes about twice the frame time) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
 the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
 styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
@@ -1046,10 +1136,37 @@ third fixture ended with a right click, a power cable from a distro outlet over 
 Escape, the project saved and read back — cables, anchors, plugs and the fixtures the console drives). The Electrical
 tests cover the catalogue additions (`DeviceCatalogTests`), the Engine tests `GenericDeviceLibrary`.
 
+The engine follow-up tests: `EngineViewportTests` (box selection, framing and drop targets from `RenderSync`'s bounds,
+the outline of a selected group's descendants), `ViewSettingsFollowUpTests` (the work light following the view setting,
+left out under the lux overlay and of final renders unless asked for; autosave reconfigured on the running session;
+Preview / Render / legend changes, the work light and the stored camera counting as unsaved changes and reaching the
+autosave; the camera of a saved project restored), `LibraryImportFollowUpTests` (an imported GDTF — named with printf
+conversions — comes back as the entry to select and is heard once by the Library's watcher; another file of a model
+selects the tile the grid shows; a non-archive and a type without DMX modes are refused with the engine's reason in
+the UI language; the GDTFs of an MVR reach the watcher with their source), `ExternalControlFollowUpTests` (every
+`ProtocolMessages` key has a Russian template with the same placeholders, every error code a hint in both languages,
+fallbacks for literals, unknown keys and mismatched arguments; the status details with endpoint, interface, universes
+served, warnings and the last malformed packet; a real Art-Net / OSC port conflict reported in Russian with its hint and
+re-rendered in English after a language switch; the recorder's capture description), the timecode test in
+`PanelReviewTests` (the sender of an ArtTimeCode — 127.0.0.1 and its port — and of a playing recording by name, in both
+languages), `MvrWallsFollowUpTests` (walls and floors exported to MVR and opened again with kind, size and material, no
+box models), `ViewportBoundsReviewTests` (on Фокина with the heads moved by DMX, every entity's box, the scene box, the
+framing points and the outline of nested groups are exactly what the renderer was sent — the bookkeeping of the former
+`TrackedRenderWorld`, kept as a recording world in the test), `EditorFollowUpReviewTests` (an opened MVR or project shown
+by the Preview and Render panels and the legends in both languages is not an unsaved change), `SafeTextTests` (no
+printf-style ImGui call in the sources; `SafeText.Label` keeps names with "##" whole;
+properties, cable links, the recorder, the file browser and the helpers render names, labels and paths with
+`%s %n %%` literally, read back through Dear ImGui's text log) and `SafeTextEndToEndTests` (the real editor under
+`xvfb-run`: a project in a folder `Stage %s %n %%` with such names opened, a fixture selected, a GDTF of that name
+dropped and selected in the Library, the file browser listing such files and the Russian UI — the `uiText` logs
+contain the names literally and nothing crashes).
+
 ## Limitations
 
 * Walls and floors are rectangular boxes (no polygons, no openings); a floor is drawn aligned to the world axes and
-  turned afterwards with the Rotate gizmo.
+  turned afterwards with the Rotate gizmo. They survive MVR export and import (other programs see boxes); a wall with
+  a material made from the project's own texture comes back from an MVR with the default material, since the texture
+  does not travel.
 * Cables: the engine draws every span with the cable's slack as a catenary, also spans lying on a floor, which then
   sag below it (the length is right, the picture is not); the *Mains In* of consoles' and distros' power sources takes
   any connector (the component has no inlet connector field); a cable's type can be changed to any type and the

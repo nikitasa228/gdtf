@@ -349,6 +349,14 @@ internal sealed class ViewportCamera
         return true;
     }
 
+    /// <summary>Turns the camera to <paramref name="yaw"/> and <paramref name="pitch"/> (radians); it leaves any snapped axis view.</summary>
+    public void Orient(float yaw, float pitch)
+    {
+        Yaw = yaw;
+        Pitch = pitch;
+        SnappedView = null;
+    }
+
     /// <summary>Moves the target to a point (focus on double-click) keeping the direction and distance.</summary>
     public void FocusOn(Vector3 point)
     {

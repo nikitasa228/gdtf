@@ -47,8 +47,11 @@ public sealed class CableEndToEndTests : IDisposable
         }
 
         string picker = _dir.File("picker.png"), drawn = _dir.File("drawn.png");
+        // Colorless shading: nothing here depends on lit pixels, and on a software Vulkan device the lit preview of a dark
+        // rig (the Auto work light with its shadow and haze) costs about twice the frame time.
         string script = _dir.Write("cables.json", $$"""
             { "actions": [
+                { "type": "viewport", "viewport": "Viewport1", "shading": "Colorless" },
                 { "type": "wait", "frames": 6 },
                 { "type": "menu", "path": "Tools/Cable/dmx-xlr5" },
                 { "type": "wait", "frames": 2 },
@@ -153,11 +156,16 @@ public sealed class CableEndToEndTests : IDisposable
             plug = CablePorts.WorldPosition(console, port!, index, count);
         }
 
+        // Colorless shading in all four views (see above: the lit preview is not what this test is about).
         string script = _dir.Write("cables.json", $$"""
             { "actions": [
+                { "type": "viewport", "viewport": "Viewport1", "shading": "Colorless" },
                 { "type": "wait", "frames": 6 },
                 { "type": "layout", "name": "viewports-4" },
                 { "type": "wait", "frames": 6 },
+                { "type": "viewport", "viewport": "Viewport2", "shading": "Colorless" },
+                { "type": "viewport", "viewport": "Viewport3", "shading": "Colorless" },
+                { "type": "viewport", "viewport": "Viewport4", "shading": "Colorless" },
                 { "type": "viewport", "viewport": "Viewport1", "view": "Top", "shading": "Colorless" },
                 { "type": "wait", "frames": 3 },
                 { "type": "menu", "path": "Tools/Cable/dmx-xlr5" },

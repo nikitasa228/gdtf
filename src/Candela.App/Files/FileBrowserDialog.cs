@@ -56,7 +56,7 @@ internal sealed class FileBrowserDialog
         _places = FileBrowserModel.StandardPlaces(Loc.Get(Str.BrowserHome), Loc.Get(Str.BrowserDocuments),
             Loc.Get(Str.BrowserDesktop), Loc.Get(Str.BrowserWorkingFolder));
         _onAccept = onAccept ?? throw new ArgumentNullException(nameof(onAccept));
-        _title = title + PopupId;
+        _title = SafeText.Label(title) + PopupId;
         string start = startFolder is { Length: > 0 } && Directory.Exists(startFolder) ? startFolder
             : _model.RecentPlaces.FirstOrDefault(Directory.Exists) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         if (!_model.Navigate(start) && !_model.Navigate(Environment.CurrentDirectory))
@@ -104,7 +104,7 @@ internal sealed class FileBrowserDialog
         ImGui.EndChild();
 
         if (model.Error.Length > 0)
-            ImGui.TextColored(Theme.Error, $"{Icons.TriangleAlert}  {model.Error}");
+            SafeText.Colored(Theme.Error, $"{Icons.TriangleAlert}  {model.Error}");
         DrawFooter(model, scale);
         DrawOverwriteConfirmation();
 
@@ -164,29 +164,29 @@ internal sealed class FileBrowserDialog
 
     private void DrawPlaces(FileBrowserModel model)
     {
-        ImGui.TextDisabled(Loc.Get(Str.BrowserPlaces));
+        SafeText.Disabled(Loc.Get(Str.BrowserPlaces));
         foreach (var (label, path) in _places)
         {
             string icon = label == Loc.Get(Str.BrowserHome) ? Icons.House : path.Length <= 3 || path == "/" ? Icons.HardDrive : Icons.Folder;
-            if (ImGui.Selectable($"{icon}  {label}##{path}", model.CurrentDirectory == path))
+            if (ImGui.Selectable($"{icon}  {SafeText.Label(label)}##{path}", model.CurrentDirectory == path))
                 Navigate(model, path);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(path);
+                SafeText.Tooltip(path);
         }
 
         if (model.RecentPlaces.Count > 0)
         {
             ImGui.Spacing();
-            ImGui.TextDisabled(Loc.Get(Str.BrowserRecentPlaces));
+            SafeText.Disabled(Loc.Get(Str.BrowserRecentPlaces));
             foreach (var path in model.RecentPlaces)
             {
                 string name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
                 if (name.Length == 0)
                     name = path;
-                if (ImGui.Selectable($"{Icons.History}  {name}##recent{path}", model.CurrentDirectory == path))
+                if (ImGui.Selectable($"{Icons.History}  {SafeText.Label(name)}##recent{path}", model.CurrentDirectory == path))
                     Navigate(model, path);
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(path);
+                    SafeText.Tooltip(path);
             }
         }
     }
@@ -250,10 +250,10 @@ internal sealed class FileBrowserDialog
 
                 ImGui.TableNextColumn();
                 if (!e.IsDirectory)
-                    ImGui.TextDisabled(_rowSizes[i]);
+                    SafeText.Disabled(_rowSizes[i]);
                 ImGui.TableNextColumn();
                 if (e.Modified != DateTime.MinValue)
-                    ImGui.TextDisabled(_rowDates[i]);
+                    SafeText.Disabled(_rowDates[i]);
             }
         }
 
@@ -278,7 +278,7 @@ internal sealed class FileBrowserDialog
         for (int i = 0; i < entries.Count; i++)
         {
             var e = entries[i];
-            _rowLabels[i] = string.Create(CultureInfo.InvariantCulture, $"{(e.IsDirectory ? Icons.Folder : Icons.File)}  {e.Name}##{i}");
+            _rowLabels[i] = string.Create(CultureInfo.InvariantCulture, $"{(e.IsDirectory ? Icons.Folder : Icons.File)}  {SafeText.Label(e.Name)}##{i}");
             _rowSizes[i] = e.IsDirectory ? "" : FileBrowserModel.FormatSize(e.Size);
             _rowDates[i] = e.Modified == DateTime.MinValue ? "" : e.Modified.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
         }
@@ -423,7 +423,7 @@ internal sealed class FileBrowserDialog
     {
         bool clicked = ImGui.Button(icon);
         if (tooltip.Length > 0 && ImGui.IsItemHovered())
-            ImGui.SetTooltip(tooltip);
+            SafeText.Tooltip(tooltip);
         return clicked;
     }
 }

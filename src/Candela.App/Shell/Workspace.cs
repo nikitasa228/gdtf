@@ -253,6 +253,17 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     /// <summary>Renders every visible viewport (inside the GPU frame).</summary>
     public void RenderViewports(float deltaTime)
     {
+        if (_ctx.Session.Content is EngineViewportContent content)
+        {
+            // One light list serves every viewport: a view measuring stage light (lux overlay) keeps the work light out,
+            // and a running final render decides the work light alone.
+            bool lux = false;
+            foreach (var viewport in _viewports)
+                lux |= viewport.IsShown && viewport.View.Overlay == OverlayMode.Lux;
+            content.LuxOverlayShown = lux;
+            content.WorkLightOverride = _ctx.Tools.Stage.Render.WorkLightInUse;
+        }
+
         _ctx.Session.SyncRender();
         foreach (var viewport in _viewports)
             viewport.Render(_ctx.Gpu.Renderer, deltaTime);
@@ -380,7 +391,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     {
         if (panel.Fault is { } fault)
         {
-            ImGui.TextColored(Theme.Error, $"{Icons.OctagonAlert}  {Loc.Format(Str.MsgPanelFailed, fault.Message)}");
+            SafeText.Colored(Theme.Error, $"{Icons.OctagonAlert}  {Loc.Format(Str.MsgPanelFailed, fault.Message)}");
             if (ImGui.Button(Labels.With(Icons.Refresh, Str.MsgPanelRetry)))
                 panel.Fault = null;
             return;
@@ -495,14 +506,14 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 float selectionWidth = session.Selection.IsEmpty ? 0f : ImGui.CalcTextSize(texts.Selection).X + gap;
                 float leftSpace = rightX - gap - selectionWidth - ImGui.GetCursorPosX();
                 string left = _statusFit.Get(texts.Left, MathF.Max(0f, leftSpace));
-                ImGui.TextColored(Theme.TextMuted, left);
+                SafeText.Colored(Theme.TextMuted, left);
                 if (_statusFit.IsShortened && ImGui.IsItemHovered())
-                    ImGui.SetTooltip(texts.Left);
+                    SafeText.Tooltip(texts.Left);
                 ImGui.SameLine(0, gap);
                 if (!session.Selection.IsEmpty)
-                    ImGui.TextColored(Theme.Accent, texts.Selection);
+                    SafeText.Colored(Theme.Accent, texts.Selection);
                 ImGui.SameLine(MathF.Max(ImGui.GetCursorPosX() + 16, rightX));
-                ImGui.TextColored(Theme.TextMuted, right);
+                SafeText.Colored(Theme.TextMuted, right);
                 ImGui.EndMenuBar();
             }
         }

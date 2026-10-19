@@ -38,11 +38,14 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private IReadOnlyList<ProtocolStatus>? _rowsOf;
     private string[] _rowStatus = Array.Empty<string>();
     private string[] _rowRate = Array.Empty<string>();
+    private string[] _rowMessage = Array.Empty<string>();
+    private string _rowsLanguage = "";
+    private StatusView? _statusView;
     private IReadOnlyList<NetworkInterfaceInfo>? _interfaces;
     private IReadOnlyList<string>? _serialPorts;
     private string _timecodeText = "--:--:--:--";
     private string _timecodeDetail = "";
-    private DateTime _timecodeShown;
+    private TimecodeSample? _timecodeShown;
     private double _lastTimecodeRefresh = double.NegativeInfinity;
     private string _language = "";
     private string _slotTooltipCache = "";
@@ -57,6 +60,9 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private string _progressText = "";
     private (object? Recording, string Language) _summaryKey;
     private string _summaryText = "";
+    private string _captureText = "";
+    private string _recorderModeText = "";
+    private string _recorderModeLanguage = "";
 
     /// <summary>Creates the panel for the editor.</summary>
     public ExternalControlPanel(WorkspaceContext context)
@@ -149,13 +155,13 @@ internal sealed unsafe class ExternalControlPanel : Panel
         var style = ImGui.GetStyle();
         float right = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X;
         ImGui.PushFont(ImGui.GetFont(), ImGui.GetStyle().FontSizeBase * 1.35f);
-        ImGui.TextColored(model.LastTimecode is null ? Theme.TextMuted : Theme.Accent, _timecodeText);
+        SafeText.Colored(model.LastTimecode is null ? Theme.TextMuted : Theme.Accent, _timecodeText);
         ImGui.PopFont();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.ExtTimecodeHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.ExtTimecodeHint));
         ImGui.SameLine();
         ImGui.AlignTextToFramePadding();
-        ImGui.TextDisabled(_timecodeDetail);
+        SafeText.Disabled(_timecodeDetail);
 
         // Right side: merge mode and the test pattern.
         float testWidth = ImGui.CalcTextSize(StageLoc.Get(StageStr.ExtTestPatternStop)).X + ImGui.GetFrameHeight() + 2f * style.FramePadding.X;
@@ -176,7 +182,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         }
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.ExtMergeHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.ExtMergeHint));
         ImGui.SameLine();
         bool running = model.TestPatternRunning;
         if (running)
@@ -197,7 +203,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         if (running)
             ImGui.PopStyleColor(2);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Format(StageStr.ExtTestPatternHint, model.Settings.TestTarget, model.TestFramesSent));
+            SafeText.Tooltip(StageLoc.Format(StageStr.ExtTestPatternHint, model.Settings.TestTarget, model.TestFramesSent));
     }
 
     private void RefreshTimecode(ExternalControl model)
@@ -208,33 +214,31 @@ internal sealed unsafe class ExternalControlPanel : Panel
             return;
         _lastTimecodeRefresh = now;
         _language = Loc.Language;
-        if (model.LastTimecode is not { } tc)
+        if (model.LastTimecode is not { } sample)
         {
+            _timecodeShown = null;
             _timecodeText = "--:--:--:--";
             _timecodeDetail = StageLoc.Get(StageStr.ExtNoTimecode);
             return;
         }
 
-        if (tc.ReceivedUtc == _timecodeShown && !languageChanged && (DateTime.UtcNow - tc.ReceivedUtc).TotalSeconds < 1.0)
+        double ago = model.SecondsSince(sample);
+        // A new sample, the language, or a live timecode turning stale (the "s ago" counter) rebuild the texts.
+        if (ReferenceEquals(sample, _timecodeShown) && !languageChanged && ago < 1.0)
             return;
-        _timecodeShown = tc.ReceivedUtc;
-        _timecodeText = tc.Timecode.ToString();
-        double ago = Math.Max(0, (DateTime.UtcNow - tc.ReceivedUtc).TotalSeconds);
+        _timecodeShown = sample;
+        _timecodeText = sample.Timecode.ToString();
         string fps = StageUnits.Current.FramesPerSecond;
-        string rate = tc.Timecode.Type switch
+        string rate = sample.Timecode.Type switch
         {
             TimecodeType.Film24 => "24 " + fps,
             TimecodeType.Ebu25 => "25 " + fps + " EBU",
             TimecodeType.Df2997 => "29.97 " + fps + " DF",
             _ => "30 " + fps + " SMPTE",
         };
-        string source = model.LastTimecodeSource switch
-        {
-            TimecodeSource.ArtNet => StageLoc.Get(StageStr.ExtTimecodeFromArtNet) + " · ",
-            TimecodeSource.Recording => StageLoc.Get(StageStr.ExtTimecodeFromRecording) + " · ",
-            _ => "",
-        };
-        _timecodeDetail = source + (ago < 1.0 ? StageLoc.Format(StageStr.ExtTimecodeLive, rate) : StageLoc.Format(StageStr.ExtTimecodeStale, rate, ago));
+        string source = ExternalControl.DescribeTimecodeSource(sample.Source);
+        string state = ago < 1.0 ? StageLoc.Format(StageStr.ExtTimecodeLive, rate) : StageLoc.Format(StageStr.ExtTimecodeStale, rate, ago);
+        _timecodeDetail = source.Length > 0 ? source + " · " + state : state;
     }
 
     private void Protocols(StageEngine engine, ExternalControl model)
@@ -270,7 +274,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                         model.SetEnabled(engine, _stage.Settings, d.Id, enabled);
                     ImGui.EndDisabled();
                     if (!d.CanStart && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-                        ImGui.SetTooltip(d.SupportReason);
+                        SafeText.Tooltip(d.SupportReason);
                     ImGui.TableNextColumn();
                     StateDot(status?.State ?? ProtocolState.Stopped, d.CanStart);
                     ImGui.SameLine();
@@ -279,15 +283,17 @@ internal sealed unsafe class ExternalControlPanel : Panel
                     ImGui.TableNextColumn();
                     SupportBadge(d.SupportLevel);
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip(d.SupportReason);
+                        SafeText.Tooltip(d.SupportReason);
                     ImGui.TableNextColumn();
                     if (i < _rowStatus.Length)
                     {
                         ImGui.TextUnformatted(_rowStatus[i]);
+                        if (_rowMessage[i].Length > 0 && ImGui.IsItemHovered())
+                            SafeText.Tooltip(_rowMessage[i]);
                         if (_rowRate[i].Length > 0)
                         {
                             ImGui.SameLine();
-                            ImGui.TextDisabled(_rowRate[i]);
+                            SafeText.Disabled(_rowRate[i]);
                         }
                     }
 
@@ -309,18 +315,24 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private void RefreshRows(ExternalControl model)
     {
         var statuses = model.Statuses;
-        if (ReferenceEquals(statuses, _rowsOf) && string.Equals(_language, Loc.Language, StringComparison.Ordinal))
+        if (ReferenceEquals(statuses, _rowsOf) && string.Equals(_rowsLanguage, Loc.Language, StringComparison.Ordinal))
             return;
         _rowsOf = statuses;
+        _rowsLanguage = Loc.Language;
         _rowStatus = new string[statuses.Count];
         _rowRate = new string[statuses.Count];
+        _rowMessage = new string[statuses.Count];
         for (int i = 0; i < statuses.Count; i++)
         {
             var s = statuses[i];
             _rowStatus[i] = StateText(s.State);
+            _rowMessage[i] = s.State == ProtocolState.Stopped && s.ErrorText is null
+                ? ""
+                : ProtocolTexts.Localize(s.ErrorText ?? s.Text, i < ProtocolRegistry.All.Count ? ProtocolRegistry.All[i] : null);
             double rate = 0;
             foreach (var u in s.Universes)
                 rate += u.PacketsPerSecond;
+            // Packets per second and the universes receiving data (those the protocol serves are in its details).
             _rowRate[i] = s.State is ProtocolState.Running or ProtocolState.Warning
                 ? string.Create(CultureInfo.InvariantCulture, $"{rate:0} {StageLoc.Get(StageStr.ExtPacketsPerSecond)} · U{s.Universes.Count}")
                 : "";
@@ -335,7 +347,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         ImGui.SameLine();
         SupportBadge(d.SupportLevel);
         ImGui.PushTextWrapPos(0f);
-        ImGui.TextDisabled(StageLoc.ProtocolDescription(d));
+        SafeText.Disabled(StageLoc.ProtocolDescription(d));
         ImGui.PopTextWrapPos();
         if (d.SupportLevel is not ProtocolSupportLevel.Implemented)
         {
@@ -348,22 +360,9 @@ internal sealed unsafe class ExternalControlPanel : Panel
 
         int index = IndexOf(d.Id);
         var status = index >= 0 && index < model.Statuses.Count ? model.Statuses[index] : null;
-        if (status is not null && status.State != ProtocolState.Stopped)
-        {
-            ImGui.SeparatorText(StageLoc.Get(StageStr.ExtStatus));
-            StateDot(status.State, d.CanStart);
-            ImGui.SameLine();
-            ImGui.PushTextWrapPos(0f);
-            ImGui.TextUnformatted(status.Message);
-            ImGui.PopTextWrapPos();
-            ImGui.TextDisabled(CountersText(status));
-            if (status.LastError is { } error)
-                ImGui.TextColored(Theme.Error, error);
-            foreach (var warning in status.Warnings)
-                ImGui.TextColored(Theme.Warning, warning);
-            if (status.LastBadPacket is { } bad)
-                ImGui.TextDisabled(bad);
-        }
+        // A stopped protocol keeps its last error so the user can read it (and the hint what to do about it).
+        if (status is not null && (status.State != ProtocolState.Stopped || status.LastError is not null))
+            StatusDetails(status, d);
 
         if (!d.CanStart)
             return;
@@ -439,7 +438,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 }
 
                 PropertyGrid.Row(StageLoc.Get(StageStr.ExtOscPatterns));
-                ImGui.TextDisabled(OscPatterns);
+                SafeText.Disabled(OscPatterns);
                 break;
             case ProtocolIds.EtcEos:
                 changed |= InterfaceRow();
@@ -483,6 +482,79 @@ internal sealed unsafe class ExternalControlPanel : Panel
             model.ApplySettings(engine, _stage.Settings);
     }
 
+    /// <summary>
+    /// The selected protocol's status in the UI language: its message, where it receives (bound endpoint, network
+    /// interface, universes served), the packet counters, the error with a hint what to do, the warnings and the last
+    /// malformed packet. The texts are built when the status snapshot or the language changes, not every frame.
+    /// </summary>
+    private void StatusDetails(ProtocolStatus status, ProtocolDescriptor d)
+    {
+        if (_statusView is not { } view || !ReferenceEquals(view.Status, status) || !string.Equals(view.Language, Loc.Language, StringComparison.Ordinal))
+            _statusView = view = StatusView.Build(status, d);
+        ImGui.SeparatorText(StageLoc.Get(StageStr.ExtStatus));
+        StateDot(status.State, d.CanStart);
+        ImGui.SameLine();
+        SafeText.Wrapped(view.Message);
+        if (view.Facts.Length > 0)
+            SafeText.Disabled(view.Facts);
+        SafeText.Disabled(CountersText(status));
+        if (view.Error.Length > 0)
+        {
+            ImGui.PushTextWrapPos(0f);
+            SafeText.Colored(Theme.Error, view.Error);
+            if (view.Hint.Length > 0)
+                SafeText.Colored(Theme.Note, view.Hint);
+            ImGui.PopTextWrapPos();
+        }
+
+        ImGui.PushTextWrapPos(0f);
+        foreach (string warning in view.Warnings)
+            SafeText.Colored(Theme.Warning, warning);
+        ImGui.PopTextWrapPos();
+        if (view.BadPacket.Length > 0)
+            SafeText.Disabled(view.BadPacket);
+    }
+
+    /// <summary>The localised texts of one status snapshot (see <see cref="StatusDetails"/>).</summary>
+    internal sealed record StatusView(ProtocolStatus Status, string Language, string Message, string Facts, string Error, string Hint,
+        string[] Warnings, string BadPacket)
+    {
+        /// <summary>Builds the texts of <paramref name="status"/> in the current UI language.</summary>
+        public static StatusView Build(ProtocolStatus status, ProtocolDescriptor? protocol)
+        {
+            ArgumentNullException.ThrowIfNull(status);
+            string message = ProtocolTexts.Localize(status.Text, protocol);
+            var facts = new List<string>(3);
+            if (!string.IsNullOrEmpty(status.BoundEndpoint))
+                facts.Add($"{StageLoc.Get(StageStr.ExtBoundEndpoint)} {status.BoundEndpoint}");
+            if (!string.IsNullOrEmpty(status.NetworkInterface))
+                facts.Add($"{StageLoc.Get(StageStr.ExtStatusInterface)}: {status.NetworkInterface}");
+            if (status.State is ProtocolState.Running or ProtocolState.Warning && status.UniverseCount > 0)
+                facts.Add(string.Create(CultureInfo.InvariantCulture, $"{StageLoc.Get(StageStr.ExtUniverseCount)}: {status.UniverseCount}"));
+            string error = status.ErrorText is { } errorText ? ProtocolTexts.Localize(errorText, protocol) : status.LastError ?? "";
+            // The message often repeats the error word for word; then the error line would only say it twice.
+            if (string.Equals(error, message, StringComparison.Ordinal) && status.State == ProtocolState.Error)
+                message = StageLoc.Get(StageStr.StateError);
+            string hint = error.Length > 0 ? ProtocolTexts.ErrorHint(status.ErrorCode) : "";
+            if (hint.Length > 0)
+                hint = StageLoc.Get(StageStr.ExtWhatToDo) + ": " + hint;
+            string[] warnings;
+            if (status.WarningTexts.Count == status.Warnings.Count && status.WarningTexts.Count > 0)
+            {
+                warnings = new string[status.WarningTexts.Count];
+                for (int i = 0; i < warnings.Length; i++)
+                    warnings[i] = ProtocolTexts.Localize(status.WarningTexts[i], protocol);
+            }
+            else
+            {
+                warnings = status.Warnings.ToArray();
+            }
+
+            string bad = status.LastBadPacket is { Length: > 0 } packet ? $"{StageLoc.Get(StageStr.ExtLastBadPacket)}: {packet}" : "";
+            return new StatusView(status, Loc.Language, message, string.Join(" · ", facts), error, hint, warnings, bad);
+        }
+    }
+
     private string CountersText(ProtocolStatus status)
     {
         if (ReferenceEquals(status, _countersOf) && string.Equals(_countersLanguage, Loc.Language, StringComparison.Ordinal))
@@ -499,7 +571,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         string current = _stage.Settings.NetworkInterface ?? "";
         string preview = current.Length == 0 ? StageLoc.Get(StageStr.ExtAllInterfaces) : current;
         bool changed = false;
-        if (ImGui.BeginCombo("##interface", preview))
+        if (ImGui.BeginCombo("##interface", SafeText.Label(preview)))
         {
             if (ImGui.IsWindowAppearing())
                 _interfaces = ProtocolManager.GetNetworkInterfaces();
@@ -513,7 +585,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             {
                 string address = nic.Address.ToString();
                 string label = $"{nic.Name} — {address}{(nic.IsUp ? "" : " (down)")}";
-                if (ImGui.Selectable(label, current == address || current == nic.Name) && current != address)
+                if (ImGui.Selectable(SafeText.Label(label), current == address || current == nic.Name) && current != address)
                 {
                     _stage.Settings.NetworkInterface = address;
                     changed = true;
@@ -584,15 +656,15 @@ internal sealed unsafe class ExternalControlPanel : Panel
         PropertyGrid.Row(StageLoc.Get(StageStr.ExtSerialPort));
         bool changed = false;
         string preview = settings.EnttecSerialPort.Length == 0 ? StageLoc.Get(StageStr.ExtNoSerialPort) : settings.EnttecSerialPort;
-        if (ImGui.BeginCombo("##serial", preview))
+        if (ImGui.BeginCombo("##serial", SafeText.Label(preview)))
         {
             if (ImGui.IsWindowAppearing())
                 _serialPorts = ProtocolManager.GetSerialPorts();
             if (_serialPorts is not { Count: > 0 })
-                ImGui.TextDisabled(StageLoc.Get(StageStr.ExtNoSerialPorts));
+                SafeText.Disabled(StageLoc.Get(StageStr.ExtNoSerialPorts));
             foreach (string port in _serialPorts ?? Array.Empty<string>())
             {
-                if (ImGui.Selectable(port, port == settings.EnttecSerialPort) && port != settings.EnttecSerialPort)
+                if (ImGui.Selectable(SafeText.Label(port), port == settings.EnttecSerialPort) && port != settings.EnttecSerialPort)
                 {
                     settings.EnttecSerialPort = port;
                     changed = true;
@@ -614,7 +686,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         PropertyGrid.Row(StageLoc.Get(StageStr.ExtNodes));
         if (nodes.Count == 0)
         {
-            ImGui.TextDisabled("—");
+            SafeText.Disabled("—");
             return;
         }
 
@@ -643,7 +715,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         int columns = Math.Clamp((int)((ImGui.GetContentRegionAvail().X + style.ItemSpacing.X) / (cell + 2f)), 4, 32);
         int count = model.GridUniverses;
         var dl = ImGui.GetWindowDrawList();
-        ImGui.TextDisabled(StageLoc.Get(StageStr.ExtUniversesHint));
+        SafeText.Disabled(StageLoc.Get(StageStr.ExtUniversesHint));
         for (int u = 1; u <= count; u++)
         {
             if ((u - 1) % columns != 0)
@@ -666,7 +738,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             var size = ImGui.CalcTextSize(number);
             dl.AddText(p + (new Vector2(cell, cell * 0.8f) - size) * 0.5f, Theme.U32(active ? new Vector4(0f, 0f, 0f, 0.9f) : Theme.TextMuted), number);
             if (hovered)
-                ImGui.SetTooltip(StageLoc.Format(StageStr.ExtUniverseTooltip, u, rate, active ? StageLoc.Get(StageStr.ExtLive) : "—",
+                SafeText.Tooltip(StageLoc.Format(StageStr.ExtUniverseTooltip, u, rate, active ? StageLoc.Get(StageStr.ExtLive) : "—",
                     patched ? StageLoc.Get(StageStr.ExtPatched) : StageLoc.Get(StageStr.ExtNotPatched)));
         }
 
@@ -681,7 +753,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         ImGui.Spacing();
         ImGui.TextUnformatted(StageLoc.Format(StageStr.ExtSlotsTitle, universe));
         ImGui.SameLine();
-        ImGui.TextDisabled(live ? StageLoc.Get(StageStr.ExtLive) : StageLoc.Get(StageStr.ExtNoData));
+        SafeText.Disabled(live ? StageLoc.Get(StageStr.ExtLive) : StageLoc.Get(StageStr.ExtNoData));
         var style = ImGui.GetStyle();
         float cell = MathF.Max(ImGui.CalcTextSize("255").X + 6f, ImGui.GetTextLineHeight() * 1.6f);
         int columns = Math.Clamp((int)(ImGui.GetContentRegionAvail().X / cell), 8, 32);
@@ -717,7 +789,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
 
         ImGui.Dummy(new Vector2(columns * cell, (511 / columns + 1) * rowHeight));
         if (hoveredSlot >= 0 && ImGui.IsWindowHovered())
-            ImGui.SetTooltip(SlotTooltip(model, universe, hoveredSlot + 1, slots[hoveredSlot]));
+            SafeText.Tooltip(SlotTooltip(model, universe, hoveredSlot + 1, slots[hoveredSlot]));
         ImGui.EndChild();
         _ = style;
     }
@@ -745,7 +817,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         var sources = model.Sources;
         if (sources.Count == 0)
         {
-            ImGui.TextDisabled(StageLoc.Get(StageStr.ExtNoSources));
+            SafeText.Disabled(StageLoc.Get(StageStr.ExtNoSources));
             return;
         }
 
@@ -800,14 +872,14 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 _progressText = StageLoc.Format(StageStr.ExtRecordingProgress, key.Item1 / 10.0, key.Item2);
             }
 
-            ImGui.TextColored(Theme.Error, _progressText);
+            SafeText.Colored(Theme.Error, _progressText);
         }
         else
         {
             if (ImGui.Button(StageLoc.With(StageIcons.Record, StageStr.ExtRecord)))
                 model.StartRecording(engine);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(StageLoc.Get(StageStr.ExtRecordHint));
+                SafeText.Tooltip(StageLoc.Get(StageStr.ExtRecordHint) + "\n" + RecorderModeText());
         }
 
         ImGui.SameLine(0f, style.ItemSpacing.X * 2f);
@@ -829,17 +901,20 @@ internal sealed unsafe class ExternalControlPanel : Panel
         ImGui.EndDisabled();
         ImGui.EndDisabled();
 
+        // How the recorder captures (packet rate, not once per frame) and the file format it writes.
+        ImGui.PushTextWrapPos(0f);
+        SafeText.Disabled(RecorderModeText());
+        ImGui.PopTextWrapPos();
+
         var recording = model.Recording;
         if (recording is null)
         {
             ImGui.Spacing();
-            ImGui.PushTextWrapPos(0f);
-            ImGui.TextDisabled(StageLoc.Get(StageStr.ExtNoRecording));
-            ImGui.PopTextWrapPos();
+            SafeText.Wrapped(StageLoc.Get(StageStr.ExtNoRecording));
             return;
         }
 
-        ImGui.SeparatorText(recording.Name);
+        ImGui.SeparatorText(SafeText.Label(recording.Name));
         var player = engine.Player;
         bool playing = player is not null && ReferenceEquals(player.Recording, recording) && !player.IsAtEnd;
         if (ImGui.Button(playing ? StageLoc.With(StageIcons.Stop, StageStr.ExtStopPlayback) : StageLoc.With(StageIcons.Play, StageStr.ExtPlay)))
@@ -877,11 +952,24 @@ internal sealed unsafe class ExternalControlPanel : Panel
             _summaryKey = (recording, Loc.Language);
             _summaryText = StageLoc.Format(StageStr.ExtRecordingSummary, recording.Frames.Count, recording.Duration,
                 ExternalControl.UniverseRanges(recording.Universes)) + (recording.FirstTimecode is { } first ? " · TC " + first : "");
+            _captureText = ExternalControl.DescribeCapture(recording);
         }
 
-        ImGui.TextDisabled(_summaryText);
+        SafeText.Disabled(_summaryText);
+        SafeText.Disabled(_captureText);
         if (model.RecordingPath is { } file)
-            ImGui.TextDisabled(file);
+            SafeText.Disabled(file);
+    }
+
+    private string RecorderModeText()
+    {
+        if (!string.Equals(_recorderModeLanguage, Loc.Language, StringComparison.Ordinal))
+        {
+            _recorderModeLanguage = Loc.Language;
+            _recorderModeText = StageLoc.Format(StageStr.ExtRecorderMode, Engine.DmxRecording.FormatVersion);
+        }
+
+        return _recorderModeText;
     }
 
     private static IReadOnlyList<FileFilter> RecordingFilters() =>
@@ -912,7 +1000,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             ProtocolSupportLevel.Planned => (StageLoc.Get(StageStr.SupportPlanned), Theme.TextMuted),
             _ => (StageLoc.Get(StageStr.SupportVendorSdk), Theme.Warning),
         };
-        ImGui.TextColored(color, text);
+        SafeText.Colored(color, text);
     }
 
     private static string StateText(ProtocolState state) => StageLoc.Get(state switch

@@ -49,6 +49,7 @@ internal sealed class EditorApplication : IDisposable
     private float _frameDelta;
     private double _minimizedAt = -1;
     private Action? _drawWorkspace;
+    private string? _textLogPath;
 
     /// <summary>Creates the application for the given command line.</summary>
     public EditorApplication(AppOptions options, AppLog log)
@@ -287,6 +288,47 @@ internal sealed class EditorApplication : IDisposable
         }
     }
 
+    /// <summary>
+    /// Draws the workspace; on a frame a script asked for (<c>uiText</c>) every text the windows draw is appended to the
+    /// script's file through Dear ImGui's text log.
+    /// </summary>
+    private void DrawWorkspace()
+    {
+        string? log = _textLogPath;
+        if (log is null)
+        {
+            _workspace!.Draw(_frameDelta);
+            return;
+        }
+
+        try
+        {
+            // Dear ImGui asserts (aborts the process) when it cannot open the log file, so it must open here first.
+            log = Path.GetFullPath(log);
+            if (Path.GetDirectoryName(log) is { Length: > 0 } folder)
+                Directory.CreateDirectory(folder);
+            using (new FileStream(log, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+            {
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            _log.Warn("Script", $"The UI text log '{log}' cannot be written: {e.Message}");
+            _workspace!.Draw(_frameDelta);
+            return;
+        }
+
+        ImGui.LogToFile(-1, log);
+        try
+        {
+            _workspace!.Draw(_frameDelta);
+        }
+        finally
+        {
+            ImGui.LogFinish();
+        }
+    }
+
     private bool RunFrame(int frameIndex, bool capture)
     {
         var gpu = _gpu!;
@@ -305,7 +347,8 @@ internal sealed class EditorApplication : IDisposable
         imgui.NewFrame();
         // The frame is ended even when the UI code throws (Dear ImGui aborts the process on an unended frame).
         _frameDelta = dt;
-        UiFrame.BuildAndRender(_drawWorkspace ??= () => _workspace!.Draw(_frameDelta));
+        _textLogPath = _script?.TextLogPath(frameIndex);
+        UiFrame.BuildAndRender(_drawWorkspace ??= DrawWorkspace);
         _settings!.Update(_timer.Elapsed);
 
         var frame = gpu.Context.BeginFrame();

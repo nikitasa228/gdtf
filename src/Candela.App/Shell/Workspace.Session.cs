@@ -38,6 +38,7 @@ internal sealed partial class Workspace
     private bool _recoveryChecked;
     private bool _frameScenePending;
     private bool _framedOnce;
+    private ViewportPanel? _savedCameraViewport;
     private Vector2 _lastDropPosition;
     private int _frameSceneAttempts;
 
@@ -70,6 +71,20 @@ internal sealed partial class Workspace
             () => session.SimulationPaused);
         Command(SessionActions.ImportGdtf, Str.FileImportGdtf, Icons.Lightbulb, () => ShowImport(ImportKind.Gdtf));
         Command(SessionActions.OpenWhite, Str.LookOpenWhite, Icons.Sun, ApplyOpenWhite, () => session.Engine is not null && session.FixtureCount() > 0);
+        Command(SessionActions.WorkLightOff, Str.CmdWorkLightOff, Icons.Lightbulb, () => SetWorkLight(WorkLightMode.Off),
+            () => session.Engine is not null, () => session.Engine?.View.WorkLight == WorkLightMode.Off);
+        Command(SessionActions.WorkLightAuto, Str.CmdWorkLightAuto, Icons.Lightbulb, () => SetWorkLight(WorkLightMode.Auto),
+            () => session.Engine is not null, () => session.Engine?.View.WorkLight == WorkLightMode.Auto);
+        Command(SessionActions.WorkLightOn, Str.CmdWorkLightOn, Icons.Lightbulb, () => SetWorkLight(WorkLightMode.On),
+            () => session.Engine is not null, () => session.Engine?.View.WorkLight == WorkLightMode.On);
+    }
+
+    /// <summary>View → Work Light: the preview's work light (stored with the project; an unsaved change).</summary>
+    private void SetWorkLight(WorkLightMode mode)
+    {
+        if (_ctx.Session.Engine is not { } engine || !ViewSettingsEdits.SetWorkLight(engine, mode))
+            return;
+        SetStatus(Loc.Format(Str.MsgWorkLight, Loc.Get(WorkLightCombo.Label(mode))));
     }
 
     /// <summary>Releases the drop target and the scene subscription.</summary>
@@ -223,7 +238,11 @@ internal sealed partial class Workspace
             return;
         }
 
-        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), session.Save, result =>
+        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), () =>
+        {
+            StoreCamera();
+            return session.Save();
+        }, result =>
         {
             if (result.Succeeded)
             {
@@ -244,7 +263,11 @@ internal sealed partial class Workspace
     internal void SaveAs(string path, Action? then = null)
     {
         var session = _ctx.Session;
-        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), () => session.SaveAs(path), result =>
+        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), () =>
+        {
+            StoreCamera();
+            return session.SaveAs(path);
+        }, result =>
         {
             if (!result.Succeeded)
                 return;
@@ -270,6 +293,8 @@ internal sealed partial class Workspace
         {
             if (!result.Succeeded)
                 return;
+            if (result.LibraryEntry is { } entry)
+                ShowInLibrary(entry);
             if (kind is ImportKind.Model or ImportKind.Image)
                 _library.RememberModel(path);
             if (kind == ImportKind.Image && result.Entities.Count == 1)
@@ -277,9 +302,28 @@ internal sealed partial class Workspace
         });
     }
 
+    /// <summary>Brings the Library panel forward with a fixture type selected (a GDTF file was just imported).</summary>
+    private void ShowInLibrary(Candela.Gdtf.FixtureLibraryEntry entry)
+    {
+        _library.Select(entry);
+        if (!_library.IsOpen)
+            _library.IsOpen = true;
+        FocusPanel(_library);
+    }
+
     /// <summary>File → Export → MVR.</summary>
     internal void ExportMvr(string path) =>
         RunBusy(Loc.Format(Str.BusyExporting, Path.GetFileName(path)), () => _ctx.Session.Export(path, ExportKind.Mvr));
+
+    /// <summary>
+    /// Stores the active viewport's camera in the project's view settings before a save, so the project opens with the
+    /// view it was saved with (the change is reported to the engine, and the save that follows stores it).
+    /// </summary>
+    private void StoreCamera()
+    {
+        if (_ctx.Session.Engine is { } engine && !_ctx.Session.IsPreviewStage)
+            ViewSettingsEdits.StoreCamera(engine, ActiveViewport.Camera);
+    }
 
     private string SuggestedName()
     {
@@ -390,13 +434,17 @@ internal sealed partial class Workspace
     {
         int imported = 0, failed = 0;
         SessionResult last = default;
+        Candela.Gdtf.FixtureLibraryEntry? libraryEntry = null;
+        var reasons = new List<string>();
         var offset = Vector3.Zero;
         foreach (var file in files)
         {
             if (Directory.Exists(file) || !CanImport(file))
             {
                 failed++;
-                _ctx.Session.ReportProgramNote("app.drop-unsupported", Loc.Format(Str.MsgDropUnsupported, Path.GetFileName(file)));
+                string unsupported = Loc.Format(Str.MsgDropUnsupported, Path.GetFileName(file));
+                reasons.Add(unsupported);
+                _ctx.Session.ReportProgramNote("app.drop-unsupported", unsupported);
                 continue;
             }
 
@@ -409,6 +457,7 @@ internal sealed partial class Workspace
             if (last.Succeeded)
             {
                 imported++;
+                libraryEntry = last.LibraryEntry ?? libraryEntry;
                 // Several models dropped at once are placed side by side instead of inside each other.
                 offset += new Vector3(1.5f, 0f, 0f);
                 if (kind is ImportKind.Model or ImportKind.Image)
@@ -417,13 +466,25 @@ internal sealed partial class Workspace
             else
             {
                 failed++;
+                // The engine's reason (a refused GDTF says why it was refused).
+                reasons.Add($"{Path.GetFileName(file)}: {last.Message}");
             }
         }
 
+        // The last fixture type a dropped GDTF brought in is selected in the Library panel.
+        if (libraryEntry is not null)
+            ShowInLibrary(libraryEntry);
         if (files.Count == 1)
             return failed == 0 ? last : last.Message is { Length: > 0 } ? last : SessionResult.Failed(Loc.Format(Str.MsgDropUnsupported, Path.GetFileName(files[0])));
         string summary = Loc.Format(Str.MsgDropSummary, files.Count, imported, failed);
-        return imported > 0 ? SessionResult.Done(summary) : SessionResult.Failed(summary);
+        if (imported > 0 && failed > 0)
+        {
+            // Some files came in: the status bar says so, and a message lists the files that did not, with the reasons.
+            _messages.Show(MessageKind.Warning, Loc.Get(Str.FileImport), summary + "\n\n" + string.Join("\n", reasons));
+            return SessionResult.Done(summary);
+        }
+
+        return imported > 0 ? SessionResult.Done(summary) : SessionResult.Failed(summary + "\n\n" + string.Join("\n", reasons));
     }
 
     /// <summary>True for files Candela opens as a scene (projects, MVR).</summary>
@@ -476,6 +537,10 @@ internal sealed partial class Workspace
         if (!_framedOnce)
         {
             _framedOnce = true;
+            // A project saved with a camera opens with that view in the active viewport; the others are framed.
+            _savedCameraViewport = _ctx.Session.Engine?.View.Camera is { } saved && ActiveViewport.ShowSavedCamera(saved)
+                ? ActiveViewport
+                : null;
             FrameOpenViewports(onlyUntouched: false);
         }
 
@@ -485,6 +550,7 @@ internal sealed partial class Workspace
             FrameOpenViewports(onlyUntouched: true);
             _frameScenePending = false;
             _framedOnce = false;
+            _savedCameraViewport = null;
         }
     }
 
@@ -492,7 +558,7 @@ internal sealed partial class Workspace
     {
         foreach (var v in _viewports)
         {
-            if (!v.IsOpen || (onlyUntouched && v.CameraMovedSinceFraming))
+            if (!v.IsOpen || ReferenceEquals(v, _savedCameraViewport) || (onlyUntouched && v.CameraMovedSinceFraming))
                 continue;
             v.FrameScene();
         }

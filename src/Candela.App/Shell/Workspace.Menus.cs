@@ -176,7 +176,7 @@ internal sealed partial class Workspace
                 for (int i = 0; i < recent.Count; i++)
                 {
                     string path = recent[i];
-                    if (_menu.Item($"{Icons.File}  {Path.GetFileName(path)}##{i}", "", false, true, path))
+                    if (_menu.Item($"{Icons.File}  {SafeText.Label(Path.GetFileName(path))}##{i}", "", false, true, path))
                         OpenPath(path);
                 }
 
@@ -280,6 +280,14 @@ internal sealed partial class Workspace
                 Item(EditorActions.OverlayLux);
                 Item(EditorActions.OverlayNoise);
                 Item(EditorActions.OverlayCables);
+                _menu.End();
+            }
+
+            if (_menu.Begin(Str.ViewWorkLight, Icons.Lightbulb, _ctx.Session.Engine is not null))
+            {
+                WorkLightItem(SessionActions.WorkLightOff, Str.WorkLightOff, Str.WorkLightOffHint);
+                WorkLightItem(SessionActions.WorkLightAuto, Str.WorkLightAuto, Str.WorkLightAutoHint);
+                WorkLightItem(SessionActions.WorkLightOn, Str.WorkLightOn, Str.WorkLightOnHint);
                 _menu.End();
             }
 
@@ -392,6 +400,18 @@ internal sealed partial class Workspace
         string label = command.Icon.Length > 0 ? $"{command.Icon}  {command.Text}" : command.Text;
         if (_menu.Item(label, ChordText(_keys, commandId), isChecked, command.Enabled, command.Label.ToString(), Loc.English_(command.Label)))
             command.Run();
+    }
+
+    /// <summary>A work light mode in View → Work Light: the short label, the command's shortcut, its check mark and a hint.</summary>
+    private void WorkLightItem(string commandId, Str label, Str hint)
+    {
+        if (_commands.Find(commandId) is not { } command)
+            return;
+        bool isChecked = command.IsChecked?.Invoke() ?? false;
+        if (_menu.Item(label, "", ChordText(_keys, commandId), isChecked, command.Enabled))
+            command.Run();
+        if (_menu.IsRealOpen && ImGui.IsItemHovered(ImGuiHoveredFlags.DelayNormal))
+            SafeText.Tooltip(Loc.Get(hint));
     }
 
     private void UndoItem(string commandId, Str label, string? description)

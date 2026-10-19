@@ -96,11 +96,11 @@ internal sealed class IssuesPanel : Panel
         ImGui.TableNextColumn();
         ImGui.PushID(index);
         var (icon, color) = SeverityStyle(issue.Severity);
-        ImGui.TextColored(color, icon);
+        SafeText.Colored(color, icon);
         ImGui.TableNextColumn();
-        ImGui.TextDisabled(CategoryLabel(issue.Category));
+        SafeText.Disabled(CategoryLabel(issue.Category));
         ImGui.TableNextColumn();
-        if (ImGui.Selectable(issue.Message, _selected == index, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
+        if (ImGui.Selectable(SafeText.Label(issue.Message), _selected == index, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
         {
             _selected = index;
             SelectRelated(issue);
@@ -113,7 +113,7 @@ internal sealed class IssuesPanel : Panel
             ImGui.PushTextWrapPos(ImGui.GetFontSize() * 36f);
             ImGui.TextUnformatted(issue.Message);
             ImGui.PopTextWrapPos();
-            ImGui.TextDisabled(issue.Entities.Count > 0 ? Loc.Format(Str.IssuesRelatedObjects, issue.Code, issue.Entities.Count) : issue.Code);
+            SafeText.Disabled(issue.Entities.Count > 0 ? Loc.Format(Str.IssuesRelatedObjects, issue.Code, issue.Entities.Count) : issue.Code);
             ImGui.EndTooltip();
         }
         ImGui.PopID();
@@ -158,7 +158,7 @@ internal sealed class IssuesPanel : Panel
         if (ImGui.Button(Icons.Trash))
             _ctx.Session.ClearProgramMessages();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.IssuesClearMessages));
+            SafeText.Tooltip(Loc.Get(Str.IssuesClearMessages));
     }
 
     private static void SeverityToggle(string label, Vector4 color, ref bool on, Str tooltip)
@@ -172,7 +172,7 @@ internal sealed class IssuesPanel : Panel
             ImGui.PopStyleColor();
         ImGui.PopStyleColor();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(tooltip));
+            SafeText.Tooltip(Loc.Get(tooltip));
     }
 
     /// <summary>Rebuilds the filtered list only when the log or a filter changed.</summary>

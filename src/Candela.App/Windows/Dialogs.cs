@@ -110,7 +110,7 @@ internal sealed class MessageBoxes
         }
         else
         {
-            ImGui.TextColored(color, icon);
+            SafeText.Colored(color, icon);
             ImGui.SameLine();
             ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + width);
             ImGui.TextUnformatted(m.Text);
@@ -156,7 +156,7 @@ internal sealed class MessageBoxes
     {
         public MessageKind Kind { get; } = kind;
         public string Title { get; } = title;
-        public string WindowTitle { get; } = title + PopupId;
+        public string WindowTitle { get; } = SafeText.Label(title) + PopupId;
         public string Text { get; } = text;
         public Action<bool>? OnAnswer { get; } = onAnswer;
         public Action<string>? OnName { get; } = onName;
@@ -199,9 +199,9 @@ internal sealed class AboutWindow
         if (ImGui.Begin(Labels.With("", Str.HelpAbout, "###About"), &open, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize))
         {
             ImGui.PushFont(_ctx.Fonts.Heading, ImGui.GetStyle().FontSizeBase * 1.6f);
-            ImGui.TextColored(Theme.Accent, $"{Icons.Lightbulb} Candela");
+            SafeText.Colored(Theme.Accent, $"{Icons.Lightbulb} Candela");
             ImGui.PopFont();
-            ImGui.TextDisabled(Loc.Format(Str.MsgAboutVersion, Version));
+            SafeText.Disabled(Loc.Format(Str.MsgAboutVersion, Version));
             ImGui.Spacing();
             // Every line wraps at the same width: the window sizes itself to its content, and a long driver name must
             // not widen it past the main window (it would turn into a separate OS window).
@@ -269,7 +269,7 @@ internal sealed class ShortcutsWindow
                     ImGui.TextUnformatted(command.Icon.Length > 0 ? $"{command.Icon}  {command.Text}" : command.Text);
                     ImGui.TableNextColumn();
                     var chords = _keys.Current.Bindings.TryGetValue(command.Id, out var list) ? list : null;
-                    ImGui.TextColored(Theme.Accent, chords is { Count: > 0 } ? string.Join("   ", chords.Select(KeyNames.DisplayChord)) : "—");
+                    SafeText.Colored(Theme.Accent, chords is { Count: > 0 } ? string.Join("   ", chords.Select(KeyNames.DisplayChord)) : "—");
                 }
 
                 ImGui.EndTable();

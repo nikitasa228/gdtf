@@ -15,24 +15,23 @@ namespace Candela.App.Session;
 /// engine's <see cref="RenderSync"/> (fixtures in their DMX pose, walls, floors, models, images, trusses, cables, lights,
 /// haze). Every viewport renders that world into its own render target. Picks map back to entities through the binding's
 /// pick ids — all parts of a fixture carry the fixture entity's id, so clicking a moving head's lens selects the
-/// fixture. World bounds come from the <see cref="TrackedRenderWorld"/> between the binding and the renderer, so box
-/// selection and framing use what is really drawn; entities whose models are still loading fall back to the extents the
-/// engine knows from the components (<see cref="EngineSceneBounds"/>). Children of a selected group are outlined too.
+/// fixture. World bounds come from the binding (<see cref="RenderSync.TryGetWorldBounds(Guid, out Aabb, bool)"/>,
+/// <see cref="RenderSync.VisibleWorldBounds"/>, <see cref="RenderSync.CollectVisibleCorners"/>), so box selection,
+/// framing and drop targets use what is really drawn; entities whose models are still loading fall back to the extents
+/// the engine knows from the components (<see cref="EngineSceneBounds"/>). The binding outlines the members of a selected
+/// group (<see cref="RenderSync.OutlineSelectedDescendants"/>) and adds the work light of the project's view
+/// (<see cref="ViewSettings.WorkLight"/>) unless a viewport measures stage light with the lux overlay.
 /// </summary>
 internal sealed class EngineViewportContent : IViewportContent
 {
     private readonly StageEngine _engine;
-    private readonly TrackedRenderWorld _world;
     private readonly RenderSync _sync;
-    private readonly HashSet<uint> _inherited = new();
     private readonly Stack<Entity> _stack = new();
     private readonly Action _onSelectionChanged;
     private readonly Action<Scene> _onSceneReplaced;
     private readonly Func<Guid, Aabb?> _modelBounds;
     private bool _selectionDirty = true;
     private bool _tickedSinceReplace;
-    private long _inheritedVersion = -1;
-    private int _inheritedInstances = -1;
     private long _syncedVersion = -1;
     private int _captionPending = -1;
     private string _caption = "";
@@ -48,9 +47,10 @@ internal sealed class EngineViewportContent : IViewportContent
     {
         _engine = engine ?? throw new ArgumentNullException(nameof(engine));
         ArgumentNullException.ThrowIfNull(renderer);
-        _world = new TrackedRenderWorld(renderer.World);
         _modelBounds = id => _engine.Models.GetBounds(id);
-        _sync = engine.AttachRenderWorld(_world, loadFixtureModelsInBackground);
+        _sync = engine.AttachRenderWorld(renderer.World, loadFixtureModelsInBackground);
+        _sync.OutlineSelectedDescendants = true;
+        _sync.WorkLight = EffectiveWorkLight();
         _onSelectionChanged = () => _selectionDirty = true;
         _onSceneReplaced = _ =>
         {
@@ -65,11 +65,24 @@ internal sealed class EngineViewportContent : IViewportContent
     /// <summary>The engine's render binding.</summary>
     public RenderSync Binding => _sync;
 
-    /// <summary>The bounds-tracking world between the binding and the renderer.</summary>
-    public TrackedRenderWorld World => _world;
-
     /// <summary>Fixture types whose 3D models are still loading in the background.</summary>
     public int PendingFixtureTypes => _sync.PendingFixtureTypes;
+
+    /// <summary>
+    /// True while a viewport shows the lux overlay: the work light is left out, since the overlay measures stage light
+    /// and every viewport shares one light list. Set by the workspace before each frame's <see cref="Sync"/>.
+    /// </summary>
+    public bool LuxOverlayShown { get; set; }
+
+    /// <summary>
+    /// The work light a final render asks for while it runs (it decides alone: renders get no work light unless asked),
+    /// or null to follow the project's view (<see cref="ViewSettings.WorkLight"/>).
+    /// </summary>
+    public WorkLightMode? WorkLightOverride { get; set; }
+
+    /// <summary>The work light mode the binding gets now: the render's, or the view's (off under the lux overlay).</summary>
+    public WorkLightMode EffectiveWorkLight() =>
+        WorkLightOverride ?? (LuxOverlayShown ? WorkLightMode.Off : _engine.View.WorkLight);
 
     /// <inheritdoc/>
     public string Caption
@@ -94,22 +107,27 @@ internal sealed class EngineViewportContent : IViewportContent
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (!ReferenceEquals(_engine.Render, _sync))
             return;
+        // The work light follows the view setting (and the lux overlay) at once, not only at the next engine tick.
+        var workLight = EffectiveWorkLight();
+        bool lightsChanged = _sync.WorkLight != workLight;
+        if (lightsChanged)
+            _sync.WorkLight = workLight;
         // Edits made by the UI after this frame's engine tick (gizmo drags, new walls, drops) reach the render world
         // before the viewports render, so a drag never lags a frame behind the mouse.
         long version = _engine.Scene.Version;
-        if (version != _syncedVersion || _selectionDirty)
+        if (version != _syncedVersion || _selectionDirty || lightsChanged)
         {
             _syncedVersion = version;
+            _selectionDirty = false;
             _sync.Update();
         }
-
-        UpdateInheritedSelection();
     }
 
     /// <summary>Marks the render world as up to date after the engine's tick (no second update this frame).</summary>
     public void MarkTicked()
     {
         _syncedVersion = _engine.Scene.Version;
+        _selectionDirty = false;
         _tickedSinceReplace = true;
     }
 
@@ -142,13 +160,16 @@ internal sealed class EngineViewportContent : IViewportContent
             var e = _stack.Pop();
             for (int i = 0; i < e.Children.Count; i++)
                 _stack.Push(e.Children[i]);
-            if (!_world.IncludeBounds(_sync.PickIdOf(e.Id), ref bounds))
+            if (_sync.TryGetWorldBounds(e.Id, out var drawn))
             {
-                // Not drawn (yet): a fixture whose model is loading, an undecodable model — the component extents.
-                var own = EngineSceneBounds.Of(e, _modelBounds);
-                if (!own.IsEmpty && e.Components.Count > 0 && !e.Has<GroupComponent>())
-                    bounds.Include(own);
+                bounds.Include(drawn);
+                continue;
             }
+
+            // Not drawn (yet): a fixture whose model is loading, an undecodable model — the component extents.
+            var own = EngineSceneBounds.Of(e, _modelBounds);
+            if (!own.IsEmpty && e.Components.Count > 0 && !e.Has<GroupComponent>())
+                bounds.Include(own);
         }
 
         return !bounds.IsEmpty;
@@ -159,7 +180,7 @@ internal sealed class EngineViewportContent : IViewportContent
     {
         get
         {
-            var bounds = _world.VisibleBounds();
+            var bounds = _sync.VisibleWorldBounds();
             bounds.Include(EngineSceneBounds.Compute(_engine.Scene, _modelBounds));
             return bounds;
         }
@@ -173,7 +194,7 @@ internal sealed class EngineViewportContent : IViewportContent
         EngineSceneBounds.CollectFixtureParts(_engine.Poses, points);
         // What is really drawn (fixture models in their pose, decoded models) — the component boxes above cover what
         // is still loading.
-        _world.CollectVisibleCorners(points);
+        _sync.CollectVisibleCorners(points);
     }
 
     /// <inheritdoc/>
@@ -186,42 +207,5 @@ internal sealed class EngineViewportContent : IViewportContent
         _engine.SceneReplaced -= _onSceneReplaced;
         if (ReferenceEquals(_engine.Render, _sync))
             _engine.DetachRenderWorld();
-    }
-
-    /// <summary>
-    /// Outlines the descendants of selected entities (a selected group shows its members): recomputed when the selection,
-    /// the scene or the set of drawn instances changed (models finishing their background load get new instances).
-    /// </summary>
-    private void UpdateInheritedSelection()
-    {
-        long version = _engine.Scene.Version;
-        int instances = _world.InstanceCount;
-        if (!_selectionDirty && version == _inheritedVersion && instances == _inheritedInstances)
-            return;
-        _selectionDirty = false;
-        _inheritedVersion = version;
-        _inheritedInstances = instances;
-        _inherited.Clear();
-        var scene = _engine.Scene;
-        var ids = _engine.Selection.Ids;
-        for (int i = 0; i < ids.Count; i++)
-        {
-            if (scene.Find(ids[i]) is not { } selected)
-                continue;
-            _stack.Clear();
-            for (int c = 0; c < selected.Children.Count; c++)
-                _stack.Push(selected.Children[c]);
-            while (_stack.Count > 0)
-            {
-                var e = _stack.Pop();
-                uint pick = _sync.PickIdOf(e.Id);
-                if (pick != 0)
-                    _inherited.Add(pick);
-                for (int c = 0; c < e.Children.Count; c++)
-                    _stack.Push(e.Children[c]);
-            }
-        }
-
-        _world.SetInheritedSelection(_inherited);
     }
 }

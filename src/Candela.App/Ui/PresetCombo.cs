@@ -55,7 +55,7 @@ internal sealed unsafe class PresetCombo<T> where T : class
 
         ImGui.SetNextItemWidth(comboWidth);
         string current = DisplayName(_binding.CurrentName);
-        if (ImGui.BeginCombo(_comboId, current))
+        if (ImGui.BeginCombo(_comboId, SafeText.Label(current)))
         {
             if (ImGui.IsWindowAppearing())
                 _binding.RefreshNames();
@@ -66,12 +66,12 @@ internal sealed unsafe class PresetCombo<T> where T : class
                 {
                     // "Custom" is the edited state; it is shown, not chosen.
                     ImGui.BeginDisabled();
-                    ImGui.Selectable(DisplayName(name), selected);
+                    ImGui.Selectable(SafeText.Label(DisplayName(name)), selected);
                     ImGui.EndDisabled();
                     continue;
                 }
 
-                if (ImGui.Selectable(DisplayName(name), selected) && !selected)
+                if (ImGui.Selectable(SafeText.Label(DisplayName(name)), selected) && !selected)
                     changed |= _binding.Select(name);
             }
 
@@ -79,7 +79,7 @@ internal sealed unsafe class PresetCombo<T> where T : class
         }
 
         if (ImGui.IsItemHovered() && _binding.LastError is { } error)
-            ImGui.SetTooltip(error);
+            SafeText.Tooltip(error);
 
         ImGui.SameLine(0f, style.ItemInnerSpacing.X);
         if (ImGui.Button(Icons.Save + _comboId + "-save", new Vector2(button, 0f)))
@@ -92,7 +92,7 @@ internal sealed unsafe class PresetCombo<T> where T : class
         }
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PresetSaveAs));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PresetSaveAs));
 
         ImGui.SameLine(0f, style.ItemInnerSpacing.X);
         ImGui.BeginDisabled(!canDelete);
@@ -100,7 +100,7 @@ internal sealed unsafe class PresetCombo<T> where T : class
             DeleteCurrent();
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PresetDelete));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PresetDelete));
 
         DrawSavePopup();
         return changed;
@@ -141,7 +141,7 @@ internal sealed unsafe class PresetCombo<T> where T : class
         bool valid = name.Length > 0 && name != PresetLibrary<T>.DefaultName && name != PresetLibrary<T>.CustomName &&
                      name.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
         if (_binding.LastError is { } error)
-            ImGui.TextColored(Theme.Error, error);
+            SafeText.Colored(Theme.Error, error);
         ImGui.BeginDisabled(!valid);
         if (ImGui.Button(StageLoc.Get(StageStr.PresetSave)) || (enter && valid))
         {

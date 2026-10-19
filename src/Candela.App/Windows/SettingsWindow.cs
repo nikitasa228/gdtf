@@ -299,10 +299,10 @@ internal sealed class SettingsWindow
         ImGui.TextUnformatted(Loc.Get(Str.SettingsPreset));
         ImGui.SameLine();
         ImGui.SetNextItemWidth(200 * scale);
-        if (ImGui.BeginCombo("##preset", PresetDisplayName(library.CurrentName)))
+        if (ImGui.BeginCombo("##preset", SafeText.Label(PresetDisplayName(library.CurrentName))))
         {
             foreach (var name in library.Names)
-                if (ImGui.Selectable(PresetDisplayName(name), name == library.CurrentName) && name != PresetLibrary<KeyBindingSet>.CustomName)
+                if (ImGui.Selectable(SafeText.Label(PresetDisplayName(name)), name == library.CurrentName) && name != PresetLibrary<KeyBindingSet>.CustomName)
                 {
                     StopCapture();
                     _keys.Select(name);
@@ -318,7 +318,7 @@ internal sealed class SettingsWindow
             _keys.Delete(library.CurrentName);
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip(Loc.Get(Str.SettingsDeletePreset));
+            SafeText.Tooltip(Loc.Get(Str.SettingsDeletePreset));
         ImGui.SameLine();
         if (ImGui.Button(Labels.With(Icons.RotateCcw, Str.SettingsResetDefaults)))
         {
@@ -371,7 +371,7 @@ internal sealed class SettingsWindow
             ImGui.AlignTextToFramePadding();
             ImGui.TextUnformatted(command.Icon.Length > 0 ? $"{command.Icon}  {label}" : label);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(command.Id);
+                SafeText.Tooltip(command.Id);
             ImGui.TableNextColumn();
             ImGui.PushID(command.Id);
             var chords = _keys.Current.Bindings.TryGetValue(command.Id, out var list) ? list : null;
@@ -400,9 +400,9 @@ internal sealed class SettingsWindow
                     if (others.Count > 0)
                     {
                         ImGui.SameLine(0, 2);
-                        ImGui.TextColored(Theme.Warning, Icons.TriangleAlert);
+                        SafeText.Colored(Theme.Warning, Icons.TriangleAlert);
                         if (ImGui.IsItemHovered())
-                            ImGui.SetTooltip(Loc.Format(Str.SettingsConflict, string.Join(", ", others.Select(LabelOf))));
+                            SafeText.Tooltip(Loc.Format(Str.SettingsConflict, string.Join(", ", others.Select(LabelOf))));
                     }
                 }
 
@@ -418,7 +418,7 @@ internal sealed class SettingsWindow
             if (addCapturing)
                 ImGui.PopStyleColor();
             if (!addCapturing && ImGui.IsItemHovered())
-                ImGui.SetTooltip(Loc.Get(Str.SettingsAddShortcut));
+                SafeText.Tooltip(Loc.Get(Str.SettingsAddShortcut));
             ImGui.PopID();
         }
 
@@ -512,7 +512,7 @@ internal sealed class SettingsWindow
 
         PropertyGrid.Row("");
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(Loc.Get(NavigationHelp(s.NavigationStyle)));
+        SafeText.Wrapped(Loc.Get(NavigationHelp(s.NavigationStyle)));
         ImGui.PopStyleColor();
         PropertyGrid.Row(Str.SettingsZoomSpeed);
         float zoom = s.ZoomSpeed;
@@ -571,12 +571,12 @@ internal sealed class SettingsWindow
             ImGui.AlignTextToFramePadding();
             // Checked in the background (a network share that does not answer must not freeze the window); unknown = muted.
             bool? exists = _folderStatus.Exists(s.LibraryFolders[i], now);
-            ImGui.TextColored(exists switch { true => Theme.Text, false => Theme.Error, null => Theme.TextMuted }, FolderLabel(s.LibraryFolders[i]));
+            SafeText.Colored(exists switch { true => Theme.Text, false => Theme.Error, null => Theme.TextMuted }, FolderLabel(s.LibraryFolders[i]));
             ImGui.PopID();
         }
 
         if (s.LibraryFolders.Count == 0)
-            ImGui.TextDisabled("—");
+            SafeText.Disabled("—");
         if (remove >= 0)
         {
             s.LibraryFolders.RemoveAt(remove);
@@ -597,7 +597,7 @@ internal sealed class SettingsWindow
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(Loc.Get(Str.SettingsRestartNote));
+        SafeText.Wrapped(Loc.Get(Str.SettingsRestartNote));
         ImGui.PopStyleColor();
     }
 
@@ -611,7 +611,7 @@ internal sealed class SettingsWindow
             PropertyGrid.Row(Str.SettingsNetworkInterface);
             string current = s.NetworkInterface.Length == 0 ? Loc.Get(Str.SettingsAllInterfaces)
                 : _interfaces.FirstOrDefault(i => i.Value == s.NetworkInterface).Label ?? s.NetworkInterface;
-            if (ImGui.BeginCombo("##interface", current))
+            if (ImGui.BeginCombo("##interface", SafeText.Label(current)))
             {
                 if (ImGui.Selectable(Loc.Get(Str.SettingsAllInterfaces), s.NetworkInterface.Length == 0))
                 {
@@ -621,7 +621,7 @@ internal sealed class SettingsWindow
 
                 foreach (var (label, value) in _interfaces)
                 {
-                    if (ImGui.Selectable(label, s.NetworkInterface == value))
+                    if (ImGui.Selectable(SafeText.Label(label), s.NetworkInterface == value))
                     {
                         s.NetworkInterface = value;
                         Changed();
@@ -651,7 +651,7 @@ internal sealed class SettingsWindow
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(Loc.Get(Str.SettingsRestartNote));
+        SafeText.Wrapped(Loc.Get(Str.SettingsRestartNote));
         ImGui.PopStyleColor();
     }
 
@@ -723,7 +723,7 @@ internal sealed class SettingsWindow
 
         // Long paths wrap inside the window instead of running off its right edge.
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(Loc.Format(Str.SettingsFileLocation, _ctx.Settings.FilePath));
+        SafeText.Wrapped(Loc.Format(Str.SettingsFileLocation, _ctx.Settings.FilePath));
         ImGui.PopStyleColor();
     }
 
@@ -734,7 +734,7 @@ internal sealed class SettingsWindow
         Heading(Str.SettingsGpu);
         ImGui.TextUnformatted($"{Icons.Cpu}  {Loc.Format(Str.SettingsCurrentDevice, info.DeviceName)}");
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(string.Create(CultureInfo.InvariantCulture,
+        SafeText.Wrapped(string.Create(CultureInfo.InvariantCulture,
             $"{info.DriverName} · Vulkan {info.ApiVersion} · {info.DeviceMemoryBytes / (1024.0 * 1024 * 1024):0.#} GB · {Loc.Format(Str.SettingsRayTracing, Loc.Get(info.SupportsRayTracing ? Str.MsgYes : Str.MsgNo))}"));
         ImGui.PopStyleColor();
         ImGui.Spacing();
@@ -745,7 +745,7 @@ internal sealed class SettingsWindow
             string preferred = s.PreferredGpu.Trim();
             string shown = preferred.Length == 0 ? Loc.Get(Str.SettingsGpuAutomatic)
                 : GpuDevices.Find(_devices, preferred) ?? Loc.Format(Str.SettingsGpuNotListed, preferred);
-            if (ImGui.BeginCombo("##preferred", shown))
+            if (ImGui.BeginCombo("##preferred", SafeText.Label(shown)))
             {
                 if (ImGui.Selectable(Loc.Get(Str.SettingsGpuAutomatic), preferred.Length == 0))
                 {
@@ -755,7 +755,7 @@ internal sealed class SettingsWindow
 
                 foreach (var device in _devices)
                 {
-                    if (ImGui.Selectable(device, string.Equals(device, preferred, StringComparison.OrdinalIgnoreCase)))
+                    if (ImGui.Selectable(SafeText.Label(device), string.Equals(device, preferred, StringComparison.OrdinalIgnoreCase)))
                     {
                         s.PreferredGpu = device;
                         Changed();
@@ -777,7 +777,7 @@ internal sealed class SettingsWindow
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        ImGui.TextWrapped(Loc.Get(Str.SettingsRestartNote));
+        SafeText.Wrapped(Loc.Get(Str.SettingsRestartNote));
         ImGui.PopStyleColor();
     }
 

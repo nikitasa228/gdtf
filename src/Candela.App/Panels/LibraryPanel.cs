@@ -99,6 +99,11 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     private string _pendingText = "";
     private int _pendingValue = -1;
     private string _pendingLanguage = "";
+    private FixtureLibraryEntry? _selected;
+    private bool _revealSelected;
+    private bool _showFixturesTab;
+    private readonly FixtureLibraryWatcher _watcher = new();
+    private int _loggedChanges;
     private bool _disposed;
 
     /// <summary>Creates the panel; <paramref name="models"/> is the user's model library (loaded by the caller).</summary>
@@ -108,6 +113,50 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         _ctx = context ?? throw new ArgumentNullException(nameof(context));
         _host = host ?? throw new ArgumentNullException(nameof(host));
         _models = models ?? throw new ArgumentNullException(nameof(models));
+    }
+
+    /// <summary>
+    /// The fixture tile marked as selected: the type a GDTF import just added (or found), or the tile last clicked. The
+    /// grid shows the newest revision of each model, so an older revision selects its model's tile.
+    /// </summary>
+    public FixtureLibraryEntry? SelectedEntry => _selected;
+
+    /// <summary>Times the engine reported new GDTF files (tests).</summary>
+    internal int LibraryChanges => _watcher.Changes;
+
+    /// <summary>
+    /// Selects <paramref name="entry"/> in the Fixtures tab (after a GDTF import): the tab comes forward, the category and
+    /// search filters let it through, and the grid scrolls to its tile once.
+    /// </summary>
+    public void Select(FixtureLibraryEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        var shown = FixtureLibraryWatcher.TileFor(_ctx.Session.Engine?.Library, entry);
+        _selected = shown;
+        _revealSelected = true;
+        _showFixturesTab = true;
+        if (_category >= 0 && CategoryIndex(shown.Category) != _category)
+            _category = -1;
+        if (_search.Trim() is { Length: > 0 } term && !Matches(shown, term))
+            _search = "";
+    }
+
+    /// <summary>
+    /// GDTF files reached the engine's library (an imported <c>.gdtf</c>, the GDTFs of an MVR or a project) or the
+    /// session has another engine: the grid, the category counts, the Devices section and the hover facts are rebuilt;
+    /// tiles of the new types ask for their pictures as they come into view.
+    /// </summary>
+    private void OnLibraryChanged()
+    {
+        _entries = null;
+        _filteredCategory = int.MinValue;
+        _devicesDirty = true;
+        _facts = null;
+        if (_watcher.Changes != _loggedChanges && _watcher.LastChange is { } change)
+        {
+            _loggedChanges = _watcher.Changes;
+            _ctx.Log.Info("Library", $"{change.Added.Count} fixture type(s) added to the library ({change.Source}).");
+        }
     }
 
     /// <inheritdoc/>
@@ -163,6 +212,10 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         _frame++;
         _textures.Update();
         var engine = _ctx.Session.Engine;
+        _watcher.Follow(engine);
+        if (_watcher.TakeChanged())
+            OnLibraryChanged();
+
         if (engine is not null && !ReferenceEquals(engine.Library, _library))
         {
             _library = engine.Library;
@@ -198,7 +251,9 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         _wanted.Clear();
         if (!ImGui.BeginTabBar("##library-tabs"))
             return;
-        if (ImGui.BeginTabItem(Labels.With(Icons.Lightbulb, Str.LibFixtures)))
+        var fixturesFlags = _showFixturesTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
+        _showFixturesTab = false;
+        if (ImGui.BeginTabItem(Labels.With(Icons.Lightbulb, Str.LibFixtures), fixturesFlags))
         {
             DrawFixtures();
             ImGui.EndTabItem();
@@ -226,6 +281,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         if (_disposed)
             return;
         _disposed = true;
+        _watcher.Dispose();
         _worker?.Dispose();
         _worker = null;
         _textures.Dispose();
@@ -246,7 +302,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         if (ImGui.Button(Icons.FileInput + "##import-gdtf"))
             _host.ShowGdtfImport();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.FileImportGdtf).TrimEnd('…'));
+            SafeText.Tooltip(Loc.Get(Str.FileImportGdtf).TrimEnd('…'));
         ImGui.Spacing();
 
         RefreshFixtureList();
@@ -261,16 +317,16 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
             if (Chip(CategoryNames[i], _category == i, ref x, avail, style))
                 _category = i;
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(Loc.Format(Str.LibCount, _categoryCounts[i]));
+                SafeText.Tooltip(Loc.Format(Str.LibCount, _categoryCounts[i]));
         }
 
         ImGui.NewLine();
         ImGui.Separator();
-        ImGui.TextDisabled(CountText(_filtered.Count));
+        SafeText.Disabled(CountText(_filtered.Count));
         if (_worker is { Pending: > 0 } w)
         {
             ImGui.SameLine();
-            ImGui.TextColored(Theme.TextMuted, PendingText(w.Pending));
+            SafeText.Colored(Theme.TextMuted, PendingText(w.Pending));
         }
 
         if (engine is null || engine.Library.Count == 0)
@@ -321,6 +377,15 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         }
     }
 
+    /// <summary>Index of the selected entry in the grid's list, or −1 (a linear search, done once per import).</summary>
+    private int IndexOfSelected()
+    {
+        for (int i = 0; i < _filtered.Count; i++)
+            if (ReferenceEquals(_filtered[i], _selected))
+                return i;
+        return -1;
+    }
+
     /// <summary>True when <paramref name="term"/> occurs in the entry's manufacturer, model name or file name (any case).</summary>
     internal static bool Matches(FixtureLibraryEntry entry, string term) =>
         entry.ModelName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
@@ -355,6 +420,17 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         object? hovered = null;
         Vector2 hoveredMin = default, hoveredMax = default;
         bool cardOwnsMouse = _hover is not null && _hoverGrow > 0.05f && CardRect(out var cardMin, out var cardMax) && Inside(mouse, cardMin, cardMax);
+        if (_revealSelected && _selected is not null)
+        {
+            // Once, after a GDTF import: the new type's tile is scrolled into the middle of the grid.
+            _revealSelected = false;
+            int selectedIndex = IndexOfSelected();
+            if (selectedIndex >= 0)
+            {
+                float top = selectedIndex / columns * (tileHeight + spacing);
+                ImGui.SetScrollY(MathF.Max(0f, top - (ImGui.GetWindowHeight() - tileHeight) * 0.5f));
+            }
+        }
 
         unsafe
         {
@@ -376,7 +452,8 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
                         ImGui.SetCursorScreenPos(min);
                         ImGui.PushID(index);
                         ImGui.SetNextItemAllowOverlap();
-                        ImGui.InvisibleButton("##tile", new Vector2(tile, tileHeight));
+                        if (ImGui.InvisibleButton("##tile", new Vector2(tile, tileHeight)) && !cardOwnsMouse)
+                            _selected = entry;
                         bool isHovered = ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenBlockedByActiveItem) && (!cardOwnsMouse || ReferenceEquals(entry, _hover));
                         if (isHovered)
                         {
@@ -389,7 +466,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
                         string key = KeysOf(entry, stillSize).Still;
                         var texture = Want(key, ThumbnailKind.FixtureStill, entry, null, stillSize, 0f);
                         DrawTile(drawList, entry, min, tile, tileHeight, texture, isHovered || ReferenceEquals(entry, _hover), scale, CategoryIcon(entry.Category),
-                            entry.ModelName, entry.Manufacturer);
+                            entry.ModelName, entry.Manufacturer, ReferenceEquals(entry, _selected));
                         ImGui.PopID();
                     }
 
@@ -613,7 +690,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         if (ImGui.Button(importLabel))
             _host.ShowModelImport();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.LibImportTooltip));
+            SafeText.Tooltip(Loc.Get(Str.LibImportTooltip));
         ImGui.Separator();
 
         if (_filteredModelVersion != _models.Version || _filteredModelSearch != _modelSearch)
@@ -629,7 +706,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
             }
         }
 
-        ImGui.TextDisabled(Loc.Format(Str.LibModelCount, _filteredModels.Count));
+        SafeText.Disabled(Loc.Format(Str.LibModelCount, _filteredModels.Count));
         if (_models.Items.Count == 0)
         {
             EmptyState(Icons.Package, Loc.Get(Str.LibModelsEmpty));
@@ -680,7 +757,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
                         ImGui.InvisibleButton("##model", new Vector2(tile, tileHeight));
                         bool hovered = ImGui.IsItemHovered();
                         if (hovered)
-                            ImGui.SetTooltip(item.Path);
+                            SafeText.Tooltip(item.Path);
                         if (ImGui.BeginPopupContextItem("##model-menu"))
                         {
                             if (ImGui.MenuItem(Labels.With(Icons.Trash, Str.LibRemove)))
@@ -714,12 +791,14 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     // ---- tiles, drag and drop, textures -------------------------------------------------------------------------
 
     private void DrawTile(ImDrawListPtr drawList, object key, Vector2 min, float tile, float tileHeight, UiTexture? texture, bool highlighted, float scale,
-        string icon, string name, string detail)
+        string icon, string name, string detail, bool selected = false)
     {
         float rounding = 5f * scale;
         var max = min + new Vector2(tile, tileHeight);
-        drawList.AddRectFilled(min, max, Theme.U32(highlighted ? Theme.Rgb(0x2C2F35) : Theme.Rgb(0x222428)), rounding);
-        if (highlighted)
+        drawList.AddRectFilled(min, max, Theme.U32(highlighted || selected ? Theme.Rgb(0x2C2F35) : Theme.Rgb(0x222428)), rounding);
+        if (selected)
+            drawList.AddRect(min, max, Theme.U32(Theme.Accent), rounding, ImDrawFlags.None, 2f * scale);
+        else if (highlighted)
             drawList.AddRect(min, max, Theme.U32(Theme.WithAlpha(Theme.Accent, 0.65f)), rounding);
         float pad = 4f * scale;
         var imageMin = min + new Vector2(pad);
@@ -770,7 +849,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
 
         ImGui.BeginGroup();
         ImGui.TextUnformatted(item.Name);
-        ImGui.TextDisabled(item.Device is null ? Loc.Get(Str.LibDragHint) : CableLoc.Get(CableStr.DevicesDragHint));
+        SafeText.Disabled(item.Device is null ? Loc.Get(Str.LibDragHint) : CableLoc.Get(CableStr.DevicesDragHint));
         ImGui.EndGroup();
         ImGui.EndDragDropSource();
     }
@@ -989,10 +1068,10 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         float total = iconSize.Y * 2 + textSize.Y;
         var start = ImGui.GetCursorPos();
         ImGui.SetCursorPos(new Vector2(start.X + (avail.X - iconSize.X) * 0.5f, start.Y + MathF.Max(8f, (avail.Y - total) * 0.4f)));
-        ImGui.TextDisabled(icon);
+        SafeText.Disabled(icon);
         ImGui.SetCursorPosX(start.X + MathF.Max(0f, (avail.X - wrap) * 0.5f));
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + wrap);
-        ImGui.TextDisabled(text);
+        SafeText.Disabled(text);
         ImGui.PopTextWrapPos();
     }
 

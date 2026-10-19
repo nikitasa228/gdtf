@@ -134,6 +134,7 @@ public sealed class InputScriptTests
     [InlineData("""[ { "type": "select", "names": [] } ]""")]
     [InlineData("""[ { "type": "click", "button": "fourth" } ]""")]
     [InlineData("""[ 5 ]""")]
+    [InlineData("""[ { "type": "uiText" } ]""")]
     public void Invalid_scripts_are_rejected_with_a_format_error(string json) =>
         Assert.Throws<FormatException>(() => InputScript.Parse(json));
 
@@ -165,6 +166,24 @@ public sealed class InputScriptTests
         Assert.False(player.WantsScreenshot(11));
         Assert.Null(player.ScreenshotPath(3));
         Assert.True(player.FrameCount > 15);
+    }
+
+    [Fact]
+    public void Ui_text_logs_are_scheduled_like_screenshots()
+    {
+        var script = InputScript.Parse("""
+            [
+              { "type": "wait", "frames": 3 },
+              { "type": "uiText", "path": "logs/frame %s.txt" },
+              { "type": "screenshot", "path": "a.png" }
+            ]
+            """);
+        Assert.Equal(ScriptActionType.UiText, script.Actions[1].Type);
+        var player = new ScriptPlayer(script, TestLog.Create());
+        // Frame 0 lays the UI out; wait 3 → 4; the text log at 4 (the path as given); the screenshot at 5.
+        Assert.Equal("logs/frame %s.txt", player.TextLogPath(4));
+        Assert.Null(player.TextLogPath(5));
+        Assert.Equal("a.png", player.ScreenshotPath(5));
     }
 
     [Fact]

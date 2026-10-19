@@ -67,7 +67,7 @@ internal sealed unsafe class PropertiesPanel : Panel
         RefreshTexts(entity, selection.Count);
         if (selection.Count > 1)
         {
-            ImGui.TextColored(Theme.Accent, _selectionText);
+            SafeText.Colored(Theme.Accent, _selectionText);
             ImGui.Separator();
         }
 
@@ -78,9 +78,9 @@ internal sealed unsafe class PropertiesPanel : Panel
         ImGui.PopTextWrapPos();
         ImGui.PopFont();
         bool idFits = ImGui.CalcTextSize(_idText).X <= ImGui.GetContentRegionAvail().X;
-        ImGui.TextDisabled(idFits ? _idText : _idShort);
+        SafeText.Disabled(idFits ? _idText : _idShort);
         if (!idFits && ImGui.IsItemHovered())
-            ImGui.SetTooltip(_idText);
+            SafeText.Tooltip(_idText);
         ImGui.Spacing();
 
         if (PropertyGrid.Begin("##props", LabelWidth))
@@ -315,7 +315,7 @@ internal sealed unsafe class PropertiesPanel : Panel
     {
         if (entity.Components.Count == 0)
         {
-            ImGui.TextDisabled(Loc.Get(Str.PropNoComponents));
+            SafeText.Disabled(Loc.Get(Str.PropNoComponents));
             return;
         }
 
@@ -324,11 +324,11 @@ internal sealed unsafe class PropertiesPanel : Panel
         {
             var component = components[i];
             ImGui.PushID(i);
-            ImGui.BulletText(_componentNames[i]);
+            SafeText.Bullet(_componentNames[i]);
             if (_componentDetails[i] is { } text)
             {
                 ImGui.Indent();
-                ImGui.TextDisabled(text);
+                SafeText.Disabled(text);
                 ImGui.Unindent();
             }
 
@@ -389,7 +389,7 @@ internal sealed unsafe class PropertiesPanel : Panel
         ImGui.PopStyleColor();
         ImGui.SetCursorPosX(start.X + MathF.Max(0, (avail.X - MathF.Min(textSize.X, wrap)) * 0.5f));
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + wrap);
-        ImGui.TextDisabled(text);
+        SafeText.Disabled(text);
         ImGui.PopTextWrapPos();
     }
 

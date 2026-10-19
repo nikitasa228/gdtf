@@ -67,6 +67,7 @@ internal sealed class ScriptPlayer
 {
     private readonly List<Step>[] _frames;
     private readonly Dictionary<int, string> _screenshots = new();
+    private readonly Dictionary<int, string> _textLogs = new();
     private readonly AppLog _log;
     private bool _started;
 
@@ -92,6 +93,11 @@ internal sealed class ScriptPlayer
 
     /// <summary>The path of the screenshot taken at <paramref name="frame"/>, or null.</summary>
     public string? ScreenshotPath(int frame) => _screenshots.GetValueOrDefault(frame);
+
+    /// <summary>
+    /// The file the text drawn in <paramref name="frame"/> is appended to (<see cref="ScriptActionType.UiText"/>), or null.
+    /// </summary>
+    public string? TextLogPath(int frame) => _textLogs.GetValueOrDefault(frame);
 
     /// <summary>Queues this frame's events (call before ImGui's NewFrame).</summary>
     public void Apply(int frame, IScriptTarget target)
@@ -282,6 +288,11 @@ internal sealed class ScriptPlayer
             case ScriptActionType.Screenshot:
                 // The frame after the previous action has settled.
                 _screenshots[frame] = a.Text;
+                At(schedule, frame);
+                return frame + 1;
+            case ScriptActionType.UiText:
+                // Used as given (relative to the working folder); a path that cannot be opened is reported then.
+                _textLogs[frame] = a.Text;
                 At(schedule, frame);
                 return frame + 1;
             default:

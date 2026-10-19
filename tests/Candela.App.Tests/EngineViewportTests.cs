@@ -64,7 +64,7 @@ public sealed class EngineViewportTests : IDisposable
         session.Update(1 / 30.0);
         session.SyncRender();
         Assert.True(content.IsSettled);
-        Assert.True(content.World.InstanceCount > 91);
+        Assert.True(content.Binding.InstanceCount > 91);
 
         // Framing: every point of the content is inside the picture.
         var size = new Vector2(640, 360);
@@ -112,20 +112,38 @@ public sealed class EngineViewportTests : IDisposable
 
         // Selection outline: the selected fixture's instances carry the Selected flag; a selected group outlines its members.
         var first = fixtures[0];
-        uint pick = content.Binding.PickIdOf(first.Id);
+        Assert.NotEqual(0u, content.Binding.PickIdOf(first.Id));
         session.Selection.Set(first.Id);
         Render();
-        Assert.True((content.World.EffectiveFlags(pick)!.Value & InstanceFlags.Selected) != 0);
+        Assert.True((FlagsOf(content, first.Id) & InstanceFlags.Selected) != 0);
         session.Selection.Clear();
         Render();
-        Assert.Equal((InstanceFlags)0, content.World.EffectiveFlags(pick)!.Value & InstanceFlags.Selected);
+        Assert.Equal((InstanceFlags)0, FlagsOf(content, first.Id) & InstanceFlags.Selected);
 
         var group = session.Scene.Add(new Entity("group"));
         session.Scene.Reparent(first, group);
         session.Selection.Set(group.Id);
         Render();
-        Assert.True((content.World.EffectiveFlags(content.Binding.PickIdOf(first.Id))!.Value & InstanceFlags.Selected) != 0);
+        Assert.True((FlagsOf(content, first.Id) & InstanceFlags.Selected) != 0);
         Assert.True(content.TryGetBounds(group.Id, out var groupBounds) && !groupBounds.IsEmpty);
+        // The bounds are the binding's: a fixture's box is what RenderSync draws for it, and the scene's box holds them all.
+        Assert.True(content.Binding.TryGetWorldBounds(first.Id, out var drawn));
+        Assert.Equal(drawn.Min, groupBounds.Min);
+        Assert.Equal(drawn.Max, groupBounds.Max);
+        var scene = content.SceneBounds;
+        Assert.True(scene.Contains(drawn.Min) && scene.Contains(drawn.Max));
+        session.Selection.Clear();
+        Render();
+        Assert.Equal((InstanceFlags)0, FlagsOf(content, first.Id) & InstanceFlags.Selected);
+    }
+
+    /// <summary>The flags RenderSync gave the instances of an entity, combined.</summary>
+    private static InstanceFlags FlagsOf(EngineViewportContent content, Guid entityId)
+    {
+        InstanceFlags flags = 0;
+        foreach (var instance in content.Binding.InstancesOf(entityId))
+            flags |= instance.Flags;
+        return flags;
     }
 
     [SkippableFact]

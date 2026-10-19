@@ -114,27 +114,15 @@ internal sealed class ExternalControlSettings
     }
 }
 
-/// <summary>Where the last timecode came from.</summary>
-internal enum TimecodeSource
-{
-    /// <summary>Not known (no timecode, or neither of the sources below sent it).</summary>
-    Unknown,
-
-    /// <summary>ArtTimeCode received by the Art-Net receiver.</summary>
-    ArtNet,
-
-    /// <summary>A DMX recording being played back.</summary>
-    Recording,
-}
-
 /// <summary>One live sender as the external-control panel lists it (grouped over its universes).</summary>
 internal sealed record SourceRow(string Protocol, string Name, string Address, string Universes, int Priority, long Packets, double SecondsAgo);
 
 /// <summary>
 /// The model of the external-control panel: protocol settings and their application to the engine's protocol manager,
 /// status snapshots (polled a few times a second, never per frame), live sources, universe activity, the last
-/// timecode, the merge mode, the Art-Net test console and the DMX recorder. Every operation reports problems as a
-/// message instead of throwing. Main thread, except the timecode handler (receive threads; guarded by a lock).
+/// timecode with its sender (the hub's <see cref="DmxInputHub.LastTimecodeSample"/>), the merge mode, the Art-Net test
+/// console and the DMX recorder. Every operation reports problems as a message in the UI language instead of throwing.
+/// Main thread.
 /// </summary>
 internal sealed class ExternalControl : IDisposable
 {
@@ -144,7 +132,6 @@ internal sealed class ExternalControl : IDisposable
     /// <summary>Universes shown in the activity grid at least (multiples of 16 beyond).</summary>
     public const int MinimumGridUniverses = 16;
 
-    private readonly object _timecodeLock = new();
     private readonly byte[] _slots = new byte[DmxInputHub.SlotCount];
     private ProtocolStatus[] _statuses;
     private IReadOnlyList<SourceRow> _sources = Array.Empty<SourceRow>();
@@ -155,16 +142,14 @@ internal sealed class ExternalControl : IDisposable
     private ArtNetTestConsole? _testConsole;
     private double _lastPoll = double.NegativeInfinity;
     private long _patchVersion = -1;
-    private Timecode? _timecode;
-    private DateTime _timecodeAt;
-    private Timecode? _artNetTimecode;
-    private DateTime _artNetTimecodeAt;
-    private ArtNetReceiver? _artNetReceiver;
     private IReadOnlyList<string> _nodes = Array.Empty<string>();
     private int _trackerCount;
     private readonly bool[] _patchedSlots = new bool[DmxInputHub.SlotCount];
     private (Candela.Dmx.Patch? Patch, int Universe) _patchedSlotsOf;
     private string? _settingsPath;
+    private Func<string>? _messageSource;
+    private string? _message;
+    private string _messageLanguage = "";
     private bool _disposed;
 
     /// <summary>Creates the model with default settings (call <see cref="Load"/> to read the user's file).</summary>
@@ -179,8 +164,25 @@ internal sealed class ExternalControl : IDisposable
     /// <summary>False in headless runs: settings are not written.</summary>
     public bool CanSave { get; set; } = true;
 
-    /// <summary>The last message of an operation (error or confirmation), or null.</summary>
-    public string? Message { get; private set; }
+    /// <summary>
+    /// The last message of an operation (error or confirmation) in the current UI language, or null. The model keeps how
+    /// to build it, so a message reported before the language changed is shown in the new language.
+    /// </summary>
+    public string? Message
+    {
+        get
+        {
+            if (_messageSource is null)
+                return null;
+            if (!string.Equals(_messageLanguage, Loc.Language, StringComparison.Ordinal))
+            {
+                _messageLanguage = Loc.Language;
+                _message = _messageSource();
+            }
+
+            return _message;
+        }
+    }
 
     /// <summary>True when <see cref="Message"/> reports a problem.</summary>
     public bool MessageIsError { get; private set; }
@@ -227,34 +229,48 @@ internal sealed class ExternalControl : IDisposable
     /// <summary>Is the protocol enabled in the settings?</summary>
     public bool IsEnabled(string id) => Settings.Enabled.Contains(id, StringComparer.Ordinal);
 
-    /// <summary>The last received timecode and when it arrived (UTC), or null.</summary>
-    public (Timecode Timecode, DateTime ReceivedUtc)? LastTimecode
+    /// <summary>
+    /// The last timecode the engine's DMX input received, with its sender (<see cref="TimecodeSample.Source"/>: the
+    /// protocol and the sender's endpoint, or <see cref="DmxPlayer.SourceProtocol"/> and the name of a recording being
+    /// played) and its arrival time on the hub's clock; null before the first or without an engine.
+    /// </summary>
+    public TimecodeSample? LastTimecode => _engine?.Input.LastTimecodeSample;
+
+    /// <summary>Seconds since <paramref name="sample"/> arrived, on the hub's clock (0 without an engine).</summary>
+    public double SecondsSince(TimecodeSample sample)
     {
-        get
-        {
-            lock (_timecodeLock)
-                return _timecode is { } tc ? (tc, _timecodeAt) : null;
-        }
+        ArgumentNullException.ThrowIfNull(sample);
+        return _engine is { } engine ? Math.Max(0, (engine.Input.UtcNow - sample.ReceivedUtc).TotalSeconds) : 0;
     }
 
     /// <summary>
-    /// Where the last timecode came from: Art-Net (the receiver reported the same timecode within half a second) or the
-    /// DMX recording that is playing; <see cref="TimecodeSource.Unknown"/> otherwise. Main thread.
+    /// Who sent a timecode, in the UI language: "Art-Net from 192.168.1.20:6454", "recording 'Show 1'", or the protocol id
+    /// and endpoint of a sender the registry does not know; empty when the submitter did not say
+    /// (<see cref="DmxInputHub.UnnamedSource"/>).
     /// </summary>
-    public TimecodeSource LastTimecodeSource
+    public static string DescribeTimecodeSource(DmxSourceId source)
     {
-        get
-        {
-            lock (_timecodeLock)
-            {
-                if (_timecode is not { } tc)
-                    return TimecodeSource.Unknown;
-                if (_artNetTimecode == tc && Math.Abs((_timecodeAt - _artNetTimecodeAt).TotalSeconds) < 0.5)
-                    return TimecodeSource.ArtNet;
-            }
+        string protocol = source.Protocol ?? "";
+        string endpoint = source.Endpoint ?? "";
+        if (protocol.Length == 0)
+            return endpoint;
+        if (string.Equals(protocol, DmxPlayer.SourceProtocol, StringComparison.Ordinal))
+            return StageLoc.Format(StageStr.ExtTimecodeFromRecordingNamed, endpoint);
+        string name = ProtocolRegistry.Find(protocol)?.DisplayName ?? protocol;
+        return endpoint.Length == 0 ? name : StageLoc.Format(StageStr.ExtTimecodeFromSender, name, endpoint);
+    }
 
-            return _engine?.Player is { IsAtEnd: false } ? TimecodeSource.Recording : TimecodeSource.Unknown;
-        }
+    /// <summary>
+    /// How <paramref name="recording"/> was captured, in the UI language: at packet rate (every change as it arrived,
+    /// <see cref="DmxCaptureMode.Packets"/>) or once per engine frame (format version 1 files), with the file format.
+    /// </summary>
+    public static string DescribeCapture(DmxRecording recording)
+    {
+        ArgumentNullException.ThrowIfNull(recording);
+        string mode = recording.Capture == DmxCaptureMode.Packets
+            ? StageLoc.Get(StageStr.ExtCapturePackets)
+            : StageLoc.Get(StageStr.ExtCaptureFrames);
+        return StageLoc.Format(StageStr.ExtCaptureSummary, mode, recording.LoadedFormatVersion);
     }
 
     /// <summary>Art-Net nodes (consoles, gateways) that answered ArtPoll, as of the last poll ("ShortName (address)").</summary>
@@ -367,7 +383,8 @@ internal sealed class ExternalControl : IDisposable
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or NotSupportedException)
         {
             Settings = new ExternalControlSettings();
-            Report(StageLoc.Format(StageStr.ExtSettingsDamaged, _settingsPath, e.Message), error: true);
+            string damaged = _settingsPath;
+            Report(() => StageLoc.Format(StageStr.ExtSettingsDamaged, damaged, e.Message), error: true);
         }
     }
 
@@ -386,28 +403,24 @@ internal sealed class ExternalControl : IDisposable
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            Report(StageLoc.Format(StageStr.ExtSettingsNotSaved, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtSettingsNotSaved, e.Message), error: true);
             return false;
         }
     }
 
     /// <summary>
-    /// Connects the model to <paramref name="engine"/> (or detaches it): subscribes to its timecode, applies the merge
-    /// mode and starts the enabled protocols. Called when the engine changes; cheap when it did not.
+    /// Connects the model to <paramref name="engine"/> (or detaches it): applies the merge mode and starts the enabled
+    /// protocols. Called when the engine changes; cheap when it did not.
     /// </summary>
     public void Bind(StageEngine? engine, AppSettings app)
     {
         if (ReferenceEquals(engine, _engine))
             return;
-        if (_engine is not null)
-            _engine.Input.TimecodeReceived -= OnTimecode;
-        WatchArtNet(null);
         StopTestPattern();
         _engine = engine;
         _patchVersion = -1;
         if (engine is null)
             return;
-        engine.Input.TimecodeReceived += OnTimecode;
         engine.Input.MergeMode = Settings.MergeMode;
         if (Settings.Enabled.Count > 0)
             Apply(engine, app);
@@ -422,7 +435,7 @@ internal sealed class ExternalControl : IDisposable
             return;
         if (enabled && !descriptor.CanStart)
         {
-            Report(StageLoc.Format(StageStr.ExtCannotStart, descriptor.DisplayName, descriptor.SupportReason), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtCannotStart, descriptor.DisplayName, StageLoc.ProtocolSupportReason(descriptor)), error: true);
             return;
         }
 
@@ -452,13 +465,16 @@ internal sealed class ExternalControl : IDisposable
             foreach (var status in statuses)
             {
                 if (status.State == ProtocolState.Error && Settings.Enabled.Contains(status.ProtocolId))
-                    Report(StageLoc.Format(StageStr.ExtStartFailed, ProtocolRegistry.Find(status.ProtocolId)?.DisplayName ?? status.ProtocolId,
-                        status.LastError ?? status.Message), error: true);
+                {
+                    var descriptor = ProtocolRegistry.Find(status.ProtocolId);
+                    Report(() => StageLoc.Format(StageStr.ExtStartFailed, descriptor?.DisplayName ?? status.ProtocolId,
+                        ProtocolTexts.Localize(status.ErrorText ?? status.Text, descriptor)), error: true);
+                }
             }
         }
         catch (Exception e) when (e is ProtocolStartException or ArgumentException or InvalidOperationException)
         {
-            Report(e.Message, error: true);
+            Report(() => e.Message, error: true);
         }
 
         _lastPoll = double.NegativeInfinity;
@@ -492,8 +508,7 @@ internal sealed class ExternalControl : IDisposable
         }
 
         _ = protocols;
-        WatchArtNet(engine.Protocols.Get<ArtNetReceiver>());
-        _nodes = _artNetReceiver is { IsRunning: true } receiver
+        _nodes = engine.Protocols.Get<ArtNetReceiver>() is { IsRunning: true } receiver
             ? receiver.Nodes.Select(n => $"{n.Reply.ShortName} ({n.Sender})").ToArray()
             : Array.Empty<string>();
         _trackerCount = engine.Protocols.Get<Candela.Protocols.Psn.PsnReceiver>() is { IsRunning: true } psn ? psn.Trackers.Count : 0;
@@ -592,7 +607,8 @@ internal sealed class ExternalControl : IDisposable
         StopTestPattern();
         if (EffectiveTestTarget(app) is not { } address)
         {
-            Report(StageLoc.Format(StageStr.ExtTestBadTarget, Settings.TestTarget), error: true);
+            string badTarget = Settings.TestTarget;
+            Report(() => StageLoc.Format(StageStr.ExtTestBadTarget, badTarget), error: true);
             return false;
         }
 
@@ -612,15 +628,17 @@ internal sealed class ExternalControl : IDisposable
 
             _testConsole = new ArtNetTestConsole(pattern, new IPEndPoint(address, Settings.ArtNetPort), app.ArtNetUniverseOffset);
             _testConsole.Start();
-            string target = viaInterface ? StageLoc.Format(StageStr.ExtTestTargetInterface, address) : Settings.TestTarget;
-            Report(StageLoc.Format(StageStr.ExtTestStarted, pattern.FixtureCount, ExternalControl.UniverseRanges(pattern.Universes), target),
-                error: false);
+            string testTarget = Settings.TestTarget;
+            string universes = ExternalControl.UniverseRanges(pattern.Universes);
+            int fixtures = pattern.FixtureCount;
+            Report(() => StageLoc.Format(StageStr.ExtTestStarted, fixtures, universes,
+                viaInterface ? StageLoc.Format(StageStr.ExtTestTargetInterface, address) : testTarget), error: false);
             return true;
         }
         catch (Exception e) when (e is System.Net.Sockets.SocketException or InvalidOperationException or ArgumentException or IOException)
         {
             StopTestPattern();
-            Report(StageLoc.Format(StageStr.ExtTestFailed, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtTestFailed, e.Message), error: true);
             return false;
         }
     }
@@ -640,7 +658,7 @@ internal sealed class ExternalControl : IDisposable
             return;
         string name = StageLoc.Format(StageStr.ExtRecordingName, DateTime.Now);
         engine.Recorder.Start(engine.Time, name);
-        Report(StageLoc.Get(StageStr.ExtRecordingStarted), error: false);
+        Report(() => StageLoc.Get(StageStr.ExtRecordingStarted), error: false);
     }
 
     /// <summary>Stops recording; the recording becomes <see cref="Recording"/>.</summary>
@@ -652,13 +670,13 @@ internal sealed class ExternalControl : IDisposable
         var recording = engine.Recorder.Stop();
         if (recording is null || recording.Frames.Count == 0)
         {
-            Report(StageLoc.Get(StageStr.ExtRecordingEmpty), error: true);
+            Report(() => StageLoc.Get(StageStr.ExtRecordingEmpty), error: true);
             return;
         }
 
         Recording = recording;
         RecordingPath = null;
-        Report(StageLoc.Format(StageStr.ExtRecordingStopped, recording.Frames.Count, recording.Duration), error: false);
+        Report(() => StageLoc.Format(StageStr.ExtRecordingStopped, recording.Frames.Count, recording.Duration), error: false);
     }
 
     /// <summary>Plays <see cref="Recording"/> into the hub from <paramref name="startSeconds"/>.</summary>
@@ -697,7 +715,7 @@ internal sealed class ExternalControl : IDisposable
         ArgumentNullException.ThrowIfNull(engine);
         if (Recording?.FindTimecode(timecode) is not { } seconds)
         {
-            Report(StageLoc.Format(StageStr.ExtTimecodeNotFound, timecode), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtTimecodeNotFound, timecode), error: true);
             return false;
         }
 
@@ -716,12 +734,12 @@ internal sealed class ExternalControl : IDisposable
                 path += DmxRecording.Extension;
             Recording.Save(path);
             RecordingPath = path;
-            Report(StageLoc.Format(StageStr.ExtRecordingSaved, path), error: false);
+            Report(() => StageLoc.Format(StageStr.ExtRecordingSaved, path), error: false);
             return true;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
         {
-            Report(StageLoc.Format(StageStr.ExtRecordingSaveFailed, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtRecordingSaveFailed, e.Message), error: true);
             return false;
         }
     }
@@ -734,14 +752,14 @@ internal sealed class ExternalControl : IDisposable
             var recording = DmxRecording.Load(path);
             Recording = recording;
             RecordingPath = path;
-            Report(recording.Issues.Count > 0
+            Report(() => recording.Issues.Count > 0
                 ? StageLoc.Format(StageStr.ExtRecordingLoadedDamaged, recording.Frames.Count, recording.Issues[0].Message)
                 : StageLoc.Format(StageStr.ExtRecordingLoaded, recording.Frames.Count, recording.Duration), error: recording.Issues.Count > 0);
             return true;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException or ArgumentException)
         {
-            Report(StageLoc.Format(StageStr.ExtRecordingLoadFailed, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtRecordingLoadFailed, e.Message), error: true);
             return false;
         }
     }
@@ -770,43 +788,19 @@ internal sealed class ExternalControl : IDisposable
     }
 
     /// <summary>Clears the last message.</summary>
-    public void ClearMessage() => Message = null;
-
-    private void Report(string message, bool error)
+    public void ClearMessage()
     {
-        Message = message;
+        _messageSource = null;
+        _message = null;
+    }
+
+    /// <summary>Shows a message built by <paramref name="message"/> (built again when the UI language changes).</summary>
+    private void Report(Func<string> message, bool error)
+    {
+        _messageSource = message;
+        _messageLanguage = Loc.Language;
+        _message = message();
         MessageIsError = error;
-    }
-
-    private void OnTimecode(Timecode timecode)
-    {
-        lock (_timecodeLock)
-        {
-            _timecode = timecode;
-            _timecodeAt = DateTime.UtcNow;
-        }
-    }
-
-    /// <summary>Follows the engine's Art-Net receiver (a restart may replace it) to know which timecodes came over Art-Net.</summary>
-    private void WatchArtNet(ArtNetReceiver? receiver)
-    {
-        if (ReferenceEquals(receiver, _artNetReceiver))
-            return;
-        if (_artNetReceiver is not null)
-            _artNetReceiver.TimeCodeReceived -= OnArtNetTimecode;
-        _artNetReceiver = receiver;
-        if (receiver is not null)
-            receiver.TimeCodeReceived += OnArtNetTimecode;
-    }
-
-    /// <summary>Receive thread of the Art-Net receiver.</summary>
-    private void OnArtNetTimecode(ArtTimeCodePacket packet)
-    {
-        lock (_timecodeLock)
-        {
-            _artNetTimecode = packet.ToTimecode();
-            _artNetTimecodeAt = DateTime.UtcNow;
-        }
     }
 
     /// <inheritdoc/>
@@ -816,9 +810,6 @@ internal sealed class ExternalControl : IDisposable
             return;
         _disposed = true;
         StopTestPattern();
-        WatchArtNet(null);
-        if (_engine is not null)
-            _engine.Input.TimecodeReceived -= OnTimecode;
         _engine = null;
     }
 }

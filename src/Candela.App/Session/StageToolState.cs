@@ -90,6 +90,7 @@ internal sealed class StageToolState : IDisposable
     public const string PreviewKind = "preview", FinalRenderKind = "final-render", LuxKind = "lux-gradient", NoiseKind = "noise-gradient";
 
     private ViewSettings? _boundView;
+    private long _viewVersions = -1;
     private bool _externalLoaded;
     private bool _disposed;
 
@@ -147,6 +148,9 @@ internal sealed class StageToolState : IDisposable
     /// <summary>Grid switch to apply to every viewport, or null to leave each viewport's own switch.</summary>
     public bool? ViewportGrid { get; private set; }
 
+    /// <summary>Sum of the live values' change counters (preview, final render, lux and noise gradients).</summary>
+    private long LiveVersions => Preview.Version + FinalRender.Version + Lux.Version + Noise.Version;
+
     /// <summary>Raised when the user asks to see how a cable links its devices (properties panel → connected cable).</summary>
     public event Action<Guid>? CableLinkRequested;
 
@@ -180,7 +184,10 @@ internal sealed class StageToolState : IDisposable
     /// Connects the live settings to the open project's <c>view</c> section: when another project was opened (the
     /// engine's <see cref="ViewSettings"/> object changed), its stored preview, render and overlay settings become the live
     /// values; afterwards the section refers to the live objects, so saving the project stores what the panels show.
-    /// Cheap enough for every frame.
+    /// Every later change of those values — a Preview or Render panel edit, a chosen preset, an overlay gradient edited in
+    /// a legend — is reported to the engine (<see cref="StageEngine.MarkViewSettingsChanged"/>), so it counts as an
+    /// unsaved change and reaches the next autosave; adopting a project's own values does not. Cheap enough for every
+    /// frame (version counters, no comparison of values).
     /// </summary>
     public void BindProject(StageEngine? engine)
     {
@@ -201,6 +208,12 @@ internal sealed class StageToolState : IDisposable
             view.View ??= new ViewOptions();
             Lux.Adopt(view.View.LuxGradient);
             Noise.Adopt(view.View.NoiseGradient);
+            _viewVersions = LiveVersions;
+        }
+        else if (LiveVersions != _viewVersions)
+        {
+            _viewVersions = LiveVersions;
+            engine.MarkViewSettingsChanged();
         }
 
         if (!ReferenceEquals(view.Preview, Preview.Live))
