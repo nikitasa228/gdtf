@@ -247,6 +247,12 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
 
     internal ReadOnlySpan<int> LiveInstances => _live.AsSpan(0, _liveCount);
 
+    /// <summary>
+    /// Incremented whenever the traceable geometry may have changed (instances created, moved, shown/hidden or destroyed,
+    /// meshes destroyed): acceleration structures built for an older version must be rebuilt.
+    /// </summary>
+    internal ulong GeometryVersion { get; private set; } = 1;
+
     internal ReadOnlySpan<GpuLight> Lights => _lightBuffer.Items;
 
     internal InstanceRecord InstanceAt(int index) => _instances.AtIndex(index)!;
@@ -345,6 +351,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         record.Geometry = null;
         record.Edges = null;
         ShadowChanges.InvalidateAll();
+        GeometryVersion++;
     }
 
     // ------------------------------------------------------------------ textures
@@ -447,6 +454,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             Array.Resize(ref _live, _live.Length * 2);
         record.LivePosition = _liveCount;
         _live[_liveCount++] = index;
+        GeometryVersion++;
         return new InstanceHandle(handle);
     }
 
@@ -459,6 +467,8 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         bool castsAfter = CastsShadow(flags);
         if (castsBefore && (moved || !castsAfter))
             ShadowChanges.Add(record.WorldSphere);
+        if (moved || record.Flags != flags)
+            GeometryVersion++;
         record.World = world;
         record.Flags = flags;
         WriteInstance(record);
@@ -527,6 +537,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         _instanceBuffer[index] = new GpuInstance { Flags = (uint)InstanceFlags.Hidden };
         _instanceBuffer.MarkDirty(index);
 
+        GeometryVersion++;
         int last = _live[--_liveCount];
         _live[record.LivePosition] = last;
         var moved = _instances.AtIndex(last);
