@@ -237,4 +237,96 @@ public class FileDefectTests
         double pixels = p.Beams.Where(b => b.Geometry.LuminousFlux == 1200f).Sum(b => (double)b.PeakCandelaAt(angle));
         Assert.Equal(7 * 1200.0 / (7 * 1200 + 28 * 15), pixels / total, 1e-3);
     }
+
+    [Fact]
+    public void The_datasheet_peak_is_shared_by_each_beams_own_peak_so_diffuse_beams_keep_their_flux()
+    {
+        // Ayrton Zonda 3 FX "Basic": seven 3° pixels and the diffuse (Glow) liquid-effect ring, which the mode does not
+        // address and whose flux is GDTF's default. Shared by flux, the ring took a pixel's peak (58 125 cd) and emitted it
+        // over π sr: 180 000 lm from a decorative ring
+        var p = TestData.Profile("Ayrton@Zonda_3_FX", "Basic");
+        var ring = Assert.Single(p.Beams, b => b.BeamType == BeamType.Glow);
+        var pixels = p.Beams.Where(b => b.BeamType != BeamType.Glow).ToList();
+        Assert.Equal(7, pixels.Count);
+        Assert.Equal(pixels[0].ReferenceFlux, ring.ReferenceFlux, pixels[0].ReferenceFlux * 0.01f); // the mean of the pixels' flux
+        float narrow = pixels[0].NativeBeamAngle;
+        double peaks = p.Beams.Sum(b => (double)b.PeakCandelaAt(b.BeamType == BeamType.Glow ? b.NativeBeamAngle : narrow));
+        Assert.Equal(p.Specs!.MaxLuminousIntensityCd!.Value, peaks, p.Specs.MaxLuminousIntensityCd.Value * 0.01);
+        double efficacy = p.Beams.Sum(b => (double)b.ReferenceFlux) / p.Specs.PowerConsumptionW!.Value;
+        Assert.InRange(efficacy, 1, 150);
+
+        // Martin MAC Aura: the file's 270 lm backlight and 202.6 lm pixels keep that ratio of flux
+        var aura = TestData.Profile("Martin_Professional@MAC_Aura@", "Extended");
+        var backlight = Assert.Single(aura.Beams, b => b.BeamType is BeamType.Glow or BeamType.None);
+        var cell = aura.Beams.First(b => b != backlight);
+        Assert.Equal(270.0 / cell.Geometry.LuminousFlux, backlight.ReferenceFlux / cell.ReferenceFlux, 0.01);
+    }
+
+    [Fact]
+    public void A_datasheet_peak_that_matches_one_pixel_is_read_per_pixel()
+    {
+        // Ayrton MagicPanel 602: 36 pixels of 390 lm (GDTF), datasheet 20 000 cd, 600 W. Shared between the pixels the
+        // panel would emit 0.6 lm/W (556 cd a pixel); 20 000 cd is the peak of one 7.5° pixel, as its GDTF flux says
+        var p = TestData.Profile("Ayrton@MagicPanel_602", "Extended");
+        Assert.Equal(36, p.Beams.Count);
+        Assert.Contains(p.Warnings, w => w.Contains("read per beam", StringComparison.Ordinal) && w.Contains("20000 cd", StringComparison.Ordinal));
+        foreach (var beam in p.Beams)
+        {
+            Assert.Equal(PhotometrySource.SpecsCandela, beam.PhotometrySource);
+            Assert.Equal(20000f, beam.PeakCandelaAt(beam.NativeBeamAngle), 20000f * 0.01f);
+        }
+        double efficacy = p.Beams.Sum(b => (double)b.ReferenceFlux) / p.Specs!.PowerConsumptionW!.Value;
+        Assert.InRange(efficacy, 10, 40);
+        var lit = FixtureEvaluator.Evaluate(p, OpenWhite(p)).Beams[0];
+        Assert.InRange(lit.PeakCandela, 15000f, 21000f);
+
+        // a fixture whose datasheet peak is the beams' sum keeps sharing it (Rayzor 760: seven 1200 lm pixels and 28
+        // SparkLEDs; the datasheet's 454 879 cd is far above one pixel's peak)
+        Assert.DoesNotContain(TestData.Profile("Elation@Rayzor_760").Warnings, w => w.Contains("read per beam", StringComparison.Ordinal));
+
+        static FixtureDmxBuffer OpenWhite(FixtureProfile profile)
+        {
+            var buffer = new FixtureDmxBuffer(profile);
+            DmxLooks.OpenWhite(buffer);
+            return buffer;
+        }
+    }
+    [Fact]
+    public void A_zoom_range_written_as_beam_and_field_angle_gives_a_real_field_ratio()
+    {
+        // Ayrton Rivale Wash: Beam BeamAngle 4°, FieldAngle 57° — the zoom range (Zoom 4 … 57°), not a beam/field pair.
+        // Taken as a field ratio of 14, the field at mid zoom would be ~430° (it was clamped to 244°).
+        var p = TestData.Profile("Ayrton@Rivale_Wash");
+        Assert.Contains(p.Warnings, w => w.Contains("are the zoom range", StringComparison.Ordinal));
+        var beam = p.Beams[0];
+        Assert.InRange(beam.FieldRatio, 1.2f, 2.5f);
+        foreach (float zoom in new[] { 4f, 30.5f, 57f })
+        {
+            var buffer = new FixtureDmxBuffer(p);
+            DmxLooks.OpenWhite(buffer);
+            DmxEncoder.Encode(buffer, "Zoom", zoom);
+            var b = FixtureEvaluator.Evaluate(p, buffer).Beams[0];
+            Assert.Equal(zoom, b.BeamAngle * 180f / MathF.PI, 0.5f);
+            Assert.InRange(b.FieldAngle / b.BeamAngle, 1.2f, 2.5f);
+            Assert.True(b.FieldAngle * 180f / MathF.PI < 179.01f);
+        }
+        // another file with the same defect, without its zoom on the Beam's channels: the _specs zoom range is matched
+        var aleda = TestData.Profile("Clay_Paky@Aleda_B-EYE_K10");
+        Assert.All(aleda.Beams, x => Assert.InRange(x.FieldRatio, 1f, 4f));
+    }
+
+    [Fact]
+    public void Field_angles_never_exceed_a_hemisphere()
+    {
+        // a ratio no optic has (here 22.5 for a 2° beam) is replaced by the beam type's typical ratio, and a wide zoom
+        // keeps the field at 179° at most
+        var vizi = TestData.Profile("ADJ@Vizi_Beam_RX2");
+        Assert.Contains(vizi.Warnings, w => w.Contains("× the BeamAngle", StringComparison.Ordinal));
+        Assert.All(vizi.Beams, b => Assert.InRange(b.FieldRatio, 1f, 4f));
+        var wash = TestData.Profile("Ayrton@Rivale_Wash");
+        var buffer = new FixtureDmxBuffer(wash);
+        DmxLooks.OpenWhite(buffer);
+        var state = FixtureEvaluator.Evaluate(wash, buffer, 0, new Dictionary<string, float> { ["Zoom"] = 57f });
+        Assert.True(state.Beams[0].FieldAngle <= 179f * MathF.PI / 180f + 1e-5f);
+    }
 }

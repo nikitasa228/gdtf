@@ -470,6 +470,10 @@ public sealed partial class NetworkSolver
 
         private List<Guid> ReportUnpowered(List<SourceState> sources)
         {
+            // Without a power source and without power cables the scene has no power network yet (an MVR import, a scene
+            // being drawn): every light would be "unpowered", which says nothing. They are still listed in the result.
+            bool powerNetwork = _sources.Count > 0;
+            foreach (var cable in _cables) powerNetwork |= cable.Type is { IsPower: true };
             var unpowered = new List<Guid>();
             foreach (var d in _deviceOrder)
             {
@@ -478,6 +482,7 @@ public sealed partial class NetworkSolver
                 {
                     if (d.Info.Profile is not { NeedsPower: true } profile) continue;
                     unpowered.Add(d.Id);
+                    if (!powerNetwork) continue;
                     var inlets = d.Info.Ports.Where(p => p.Role == PortRole.PowerIn).ToList();
                     var plugged = inlets.FirstOrDefault(p => _plugged.ContainsKey(new PortRef(d.Id, p.Name)));
                     string why = inlets.Count == 0 ? "no power inlet is known for it"

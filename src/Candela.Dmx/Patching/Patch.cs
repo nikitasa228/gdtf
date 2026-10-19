@@ -24,14 +24,21 @@ public readonly record struct PatchRange(int Universe, int Start, int End, int B
 public sealed class PatchEntry
 {
     internal PatchEntry(Entity entity, FixtureComponent fixture, ProfileResolution resolution, IReadOnlyList<PatchRange> ranges,
-        IReadOnlyList<int> missingBreaks)
+        IReadOnlyList<int> missingBreaks, FixtureSubstitution? substitution = null)
     {
         Entity = entity;
         Fixture = fixture;
         Resolution = resolution;
         Ranges = ranges;
         MissingBreaks = missingBreaks;
+        Substitution = substitution ?? resolution.Substitution;
     }
+
+    /// <summary>
+    /// The model the fixture stands in for when its GDTF is a substitute (resolved from an MVR stub name, or known to the
+    /// caller of <see cref="Patch.Build"/>), else null.
+    /// </summary>
+    public FixtureSubstitution? Substitution { get; }
 
     /// <summary>The fixture's entity.</summary>
     public Entity Entity { get; }
@@ -81,14 +88,26 @@ public sealed class Patch
     /// <summary>Universes (≥ 1) that at least one fixture uses, ascending.</summary>
     public IReadOnlyList<int> Universes { get; }
 
-    /// <summary>Builds the patch of <paramref name="scene"/>, resolving profiles through <paramref name="profiles"/>.</summary>
-    public static Patch Build(Scene scene, FixtureProfileCache profiles)
+    /// <summary>
+    /// Builds the patch of <paramref name="scene"/>, resolving profiles through <paramref name="profiles"/> (substitutes
+    /// with the patch spacing of their type, as <see cref="DmxEngine"/> does). <paramref name="substitutions"/> tells about
+    /// fixtures whose GDTF file is itself a stand-in (an MVR import chose it), so that their patch problems are judged
+    /// like a substitute's; it is ignored for a fixture whose GDTF is no longer the stand-in it names.
+    /// </summary>
+    public static Patch Build(Scene scene, FixtureProfileCache profiles, Func<Entity, FixtureComponent, FixtureSubstitution?>? substitutions = null)
     {
         ArgumentNullException.ThrowIfNull(scene);
         ArgumentNullException.ThrowIfNull(profiles);
-        var list = new List<PatchEntry>();
-        foreach (var (entity, fixture) in scene.Query<FixtureComponent>())
-            list.Add(CreateEntry(entity, fixture, profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode)));
+        var fixtures = scene.Query<FixtureComponent>().ToList();
+        var spacing = PatchSpacing.ByType(fixtures.Select(f => f.Component));
+        var list = new List<PatchEntry>(fixtures.Count);
+        foreach (var (entity, fixture) in fixtures)
+        {
+            var resolution = profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode, spacing.GetValueOrDefault(PatchSpacing.Key(fixture.GdtfSpec, fixture.GdtfMode)));
+            var known = substitutions?.Invoke(entity, fixture);
+            if (known is not null && !string.Equals(known.StandIn, fixture.GdtfSpec, StringComparison.OrdinalIgnoreCase)) known = null;
+            list.Add(CreateEntry(entity, fixture, resolution, known));
+        }
         return new Patch(list);
     }
 
@@ -127,7 +146,7 @@ public sealed class Patch
         return slots;
     }
 
-    internal static PatchEntry CreateEntry(Entity entity, FixtureComponent fixture, ProfileResolution resolution)
+    internal static PatchEntry CreateEntry(Entity entity, FixtureComponent fixture, ProfileResolution resolution, FixtureSubstitution? substitution = null)
     {
         var ranges = new List<PatchRange>();
         var missing = new List<int>();
@@ -144,7 +163,7 @@ public sealed class Patch
                 ranges.Add(new PatchRange(a.Universe, a.Address, a.Address + b.Footprint - 1, b.Break));
             }
         }
-        return new PatchEntry(entity, fixture, resolution, ranges, missing);
+        return new PatchEntry(entity, fixture, resolution, ranges, missing, substitution);
     }
 
     /// <summary>

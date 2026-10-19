@@ -20,6 +20,9 @@ internal enum RenderLook
 
     /// <summary>A DMX recording played from its start for --time seconds.</summary>
     DmxFile,
+
+    /// <summary>The demo look (<see cref="StageLooks.ApplyDemo"/>): fans and crossings, saturated colours, gobos, haze.</summary>
+    Demo,
 }
 
 /// <summary>Options of <c>candela render</c>.</summary>
@@ -39,11 +42,20 @@ internal sealed class RenderOptions
     public RenderLook Look { get; private set; } = RenderLook.OpenWhite;
     public string? Recording { get; private set; }
     public double Time { get; private set; }
-    /// <summary>Exposure value at ISO 100, or null for the incident-light reading of the stage floor.</summary>
+    /// <summary>
+    /// Exposure value at ISO 100 (<c>--ev N</c>), or null for the incident-light reading of the stage floor — the fixed
+    /// exposure of <c>--ev floor</c>, and where auto exposure starts adapting from.
+    /// </summary>
     public float? Ev100 { get; private set; }
+
     public bool Floor { get; private set; } = true;
 
-    public bool AutoExposure { get; private set; }
+    /// <summary>
+    /// The renderer adapts the exposure to the picture like an eye or a camera on a stage (default; <c>--ev auto</c>,
+    /// <c>--auto-exposure</c>). A stage picture is mostly dark air and set with bright beams and pools, which a reading
+    /// of the floor alone says little about. False with a fixed exposure: <c>--ev N</c> or <c>--ev floor</c>.
+    /// </summary>
+    public bool AutoExposure { get; private set; } = true;
     public int Frames { get; private set; } = 6;
     public bool Grid { get; private set; }
     public string Device { get; private set; } = "";
@@ -53,6 +65,7 @@ internal sealed class RenderOptions
     public static RenderOptions Parse(string[] args)
     {
         var o = new RenderOptions();
+        bool exposure = true, autoExposure = false; // --ev's choice; --auto-exposure (adapting from --ev N when both are given)
         for (int i = 0; i < args.Length; i++)
         {
             string name = args[i];
@@ -118,12 +131,15 @@ internal sealed class RenderOptions
                         case "show":
                             o.Look = RenderLook.Show;
                             break;
+                        case "demo":
+                            o.Look = RenderLook.Demo;
+                            break;
                         case "dmx-file":
                             o.Look = RenderLook.DmxFile;
                             o.Recording = CliArgs.Value(args, ref i, "--look dmx-file");
                             break;
                         default:
-                            throw new UsageException($"Unknown look '{look}' (open-white, show, dmx-file <recording>).");
+                            throw new UsageException($"Unknown look '{look}' (open-white, demo, show, dmx-file <recording>).");
                     }
                     break;
                 case "--time":
@@ -131,10 +147,24 @@ internal sealed class RenderOptions
                     break;
                 case "--ev":
                     string ev = CliArgs.Value(args, ref i, name);
-                    o.Ev100 = ev.Equals("auto", StringComparison.OrdinalIgnoreCase) ? null : CliArgs.Number(name, ev, -10f, 25f);
+                    switch (ev.ToLowerInvariant())
+                    {
+                        case "auto":
+                            o.Ev100 = null;
+                            exposure = true;
+                            break;
+                        case "floor" or "incident":
+                            o.Ev100 = null;
+                            exposure = false;
+                            break;
+                        default:
+                            o.Ev100 = CliArgs.Number(name, ev, -10f, 25f);
+                            exposure = false;
+                            break;
+                    }
                     break;
                 case "--auto-exposure":
-                    o.AutoExposure = true;
+                    autoExposure = true;
                     break;
                 case "--frames":
                     o.Frames = CliArgs.Integer(name, CliArgs.Value(args, ref i, name), 1, 1000);
@@ -170,6 +200,7 @@ internal sealed class RenderOptions
         if (o.Output.Length == 0) throw new UsageException("render needs --out <file.png>.");
         if (Directory.Exists(o.Output)) throw new UsageException($"--out '{o.Output}' is a folder; give the name of the PNG file to write.");
         if (o.Camera.HasValue != o.Target.HasValue) throw new UsageException("--camera and --target go together.");
+        o.AutoExposure = exposure || autoExposure;
         return o;
     }
 }
@@ -182,6 +213,16 @@ internal static class RenderCommand
 {
     /// <summary>Simulation step used to advance --time (30 frames per second, like a typical preview).</summary>
     public const double TickSeconds = 1.0 / 30.0;
+
+    /// <summary>
+    /// Time each rendered frame stands for while auto exposure adapts, s. The CLI renders a still: the renderer adapts
+    /// with a time constant of about 0.7 s, so at the 1/30 s of a live frame 12 frames would leave the exposure less than
+    /// halfway to the picture's; at half a second per frame it settles within the 12 frames.
+    /// </summary>
+    public const float AdaptationSecondsPerFrame = 0.5f;
+
+    /// <summary>Fewest frames rendered with auto exposure (the measurement is read back a few frames late).</summary>
+    public const int AutoExposureFrames = 12;
 
     /// <summary>Space around the content of the preset views (1 = touching the image edges).</summary>
     public const float FramingMargin = 1.1f;
@@ -207,6 +248,10 @@ internal static class RenderCommand
             case RenderLook.OpenWhite:
                 int changed = StageLooks.ApplyOpenWhite(engine, new OpenWhiteOptions { Undoable = false });
                 output.WriteLine($"Look:     open white on {changed} fixtures");
+                break;
+            case RenderLook.Demo:
+                int lit = StageLooks.ApplyDemo(engine, new DemoLookOptions { Undoable = false });
+                output.WriteLine($"Look:     demo on {lit} fixtures (fans and crossings, saturated colours, gobos, haze)");
                 break;
             case RenderLook.DmxFile:
                 try
@@ -287,16 +332,19 @@ internal static class RenderCommand
             Volumetrics = true,
         };
         using var target = renderer.CreateTarget(options.Width, options.Height);
-        int frames = options.AutoExposure ? Math.Max(options.Frames, 12) : options.Frames;
-        for (int i = 0; i < frames; i++) renderer.Render(target, camera, view, settings, (float)TickSeconds);
+        int frames = options.AutoExposure ? Math.Max(options.Frames, AutoExposureFrames) : options.Frames;
+        float frameSeconds = options.AutoExposure ? AdaptationSecondsPerFrame : (float)TickSeconds;
+        for (int i = 0; i < frames; i++) renderer.Render(target, camera, view, settings, frameSeconds);
         var image = renderer.ReadPixels(target);
         double renderMs = watch.Elapsed.TotalMilliseconds;
         ImageImporter.SavePng(image, options.Output);
 
         engine.RefreshIssues();
         var issues = engine.Issues.Current;
-        output.WriteLine(string.Create(CultureInfo.InvariantCulture,
-            $"Camera:   eye {Format(camera.Position)}, EV100 {camera.Ev100:0.#}{(options.AutoExposure ? " (auto exposure)" : options.Ev100 is null ? " (incident reading of the floor)" : "")}"));
+        string exposure = options.AutoExposure
+            ? string.Create(CultureInfo.InvariantCulture, $"auto exposure (adapting from EV100 {camera.Ev100:0.#})")
+            : string.Create(CultureInfo.InvariantCulture, $"EV100 {camera.Ev100:0.#}{(options.Ev100 is null ? " (incident reading of the floor)" : "")}");
+        output.WriteLine($"Camera:   eye {Format(camera.Position)}, {exposure}");
         output.WriteLine($"Image:    {options.Width} x {options.Height}, {options.Mode}, overlay {options.Overlay}, {renderer.Info.DeviceName}");
         output.WriteLine(string.Create(CultureInfo.InvariantCulture,
             $"Timing:   load {loadMs:0} ms, look + simulation {simulateMs:0} ms, render {renderMs:0} ms ({frames} frames), total {total.Elapsed.TotalMilliseconds:0} ms"));

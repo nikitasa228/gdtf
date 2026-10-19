@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Candela.Gdtf;
@@ -18,6 +19,12 @@ public sealed partial class FixtureProfile
 
         /// <summary>GDTF's default Beam LuminousFlux (written by editors when the author left the field alone), lm.</summary>
         private const float GdtfDefaultFlux = 10000f;
+
+        /// <summary>
+        /// Largest field-to-beam angle ratio taken from a file: soft-edged washes and PARs reach about 3; larger ratios in
+        /// the library (59 beams, up to 50) are angles that are not a beam/field pair.
+        /// </summary>
+        private const float MaxFieldRatio = 4f;
 
         /// <summary>GDTF's default Beam BeamAngle and FieldAngle, degrees.</summary>
         private const float GdtfDefaultAngle = 25f;
@@ -48,7 +55,8 @@ public sealed partial class FixtureProfile
         private int[] _beamFirst = Array.Empty<int>(); // per channel: first beam index affected
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
         private int[] _subtreeSize = Array.Empty<int>();
-        private float[] _beamShare = Array.Empty<float>(); // per beam: share of the fixture's specs output
+        private float[] _beamShare = Array.Empty<float>(); // per beam: share of the fixture's specs flux and power
+        private float[] _peakShare = Array.Empty<float>(); // per beam: share of the fixture's specs peak candela
         private bool? _emitterYVaries;
         private bool? _cmyAsColorAdd;
         private readonly Dictionary<AttributeKind, bool> _realRange = new();
@@ -83,6 +91,7 @@ public sealed partial class FixtureProfile
         public int[] OutputChannels { get; private set; } = Array.Empty<int>();
         public int[] ModifierChannels { get; private set; } = Array.Empty<int>();
         public int[][] FollowerRelations { get; private set; } = Array.Empty<int[]>();
+        public int[] FollowerOrder { get; private set; } = Array.Empty<int>();
         public bool[] IsRelationMaster { get; private set; } = Array.Empty<bool>();
         public Dictionary<string, int[]> ChannelsByAttribute { get; } = new(StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, int> ChannelsByName { get; } = new(StringComparer.Ordinal);
@@ -256,6 +265,17 @@ public sealed partial class FixtureProfile
         {
             string attribute = string.IsNullOrEmpty(src.AttributeName) ? "NoFeature" : src.AttributeName;
             var cls = Classify(attribute);
+            if (cls.Kind == AttributeKind.Dimmer && ch.Class.Kind != AttributeKind.Dimmer && !string.IsNullOrEmpty(ch.Attribute))
+            {
+                // a Dimmer function on a channel of another attribute (control/function channels, background dimmers, a
+                // hue channel whose function carries the wrong attribute) must not dim the beam; a colour-system channel
+                // keeps its own meaning
+                cls = ch.Class.Kind is AttributeKind.HsbHue or AttributeKind.HsbSaturation or AttributeKind.HsbBrightness or AttributeKind.CieX
+                    or AttributeKind.CieY or AttributeKind.CieBrightness
+                    ? ch.Class
+                    : AttributeClass.Ignored;
+                Warnings.Add($"{src.FullName}: Dimmer function on a '{ch.Attribute}' channel read as {(cls.Kind == AttributeKind.Ignored ? "no intensity" : ch.Attribute)}.");
+            }
             float physicalFrom = Finite(src.PhysicalFrom, 0f), physicalTo = Finite(src.PhysicalTo, 1f);
             // GDTF's default physical range 0 … 1 is a placeholder unless channel sets carry the real values
             bool defaultRange = IsDefaultRange(physicalFrom, physicalTo);
@@ -300,6 +320,8 @@ public sealed partial class FixtureProfile
                 float pf = s.PhysicalFrom is { } a && float.IsFinite(a) ? offset + scale * a : float.NaN;
                 float pt = s.PhysicalTo is { } b && float.IsFinite(b) ? offset + scale * b : pf;
                 var setFlags = string.IsNullOrWhiteSpace(s.Name) ? nameFlags : NameParsing.Flags(s.Name, cls.Kind);
+                if (cls.Kind == AttributeKind.Shutter && (setFlags & ChannelSetFlags.Closed) != 0 && IsStrobeOff(src, s.Name))
+                    setFlags = (setFlags & ~ChannelSetFlags.Closed) | ChannelSetFlags.Open;
                 var set = new ProfileChannelSet(s, from, to, pf, pt, setFlags);
                 switch (cls.Kind)
                 {
@@ -320,6 +342,7 @@ public sealed partial class FixtureProfile
                 sets.Add(set);
             }
             sets.Sort((x, y) => x.DmxFrom.CompareTo(y.DmxFrom));
+            if (cls.Kind == AttributeKind.Dimmer) ReconcileDimmerNames(f, sets);
             f.SetSets(sets.ToArray());
 
             float maxAbs = MathF.Max(MathF.Abs(f.PhysicalFrom), MathF.Abs(f.PhysicalTo));
@@ -387,6 +410,60 @@ public sealed partial class FixtureProfile
 
         /// <summary>True for GDTF's default physical range 0 … 1 (either direction).</summary>
         private static bool IsDefaultRange(float from, float to) => (from == 0f && to == 1f) || (from == 1f && to == 0f);
+
+        /// <summary>
+        /// A shutter channel set named just "Off" inside a strobe function ("Strobe Off", "Strobe") or a function whose
+        /// physical value is a constant open shutter: the strobe is off and the shutter open, not "light off" (1060 sets
+        /// of 15 files in the library).
+        /// </summary>
+        private static bool IsStrobeOff(ChannelFunction function, string setName)
+        {
+            if (!string.Equals(setName.Trim(), "off", StringComparison.OrdinalIgnoreCase)) return false;
+            if (function.Name.Contains("strobe", StringComparison.OrdinalIgnoreCase)) return true;
+            float from = Finite(function.PhysicalFrom, 0f), to = Finite(function.PhysicalTo, 1f);
+            return from == to && from >= 0.99f;
+        }
+
+        /// <summary>
+        /// Channel sets named "Open"/"Closed" on a dimmer that contradict its physical range (e.g. "Closed" at DMX 255 of
+        /// a 0 → 1 dimmer, Ayrton MagicPanel 602, ACME AM-WASH300, Prolights PixieWash): the one of the two that follows
+        /// the DMX convention — more DMX is brighter — is believed. An increasing physical range drops the contradicting
+        /// names; a decreasing one whose names all contradict it (closed at DMX 0, open at the top: LIGHT SKY IPL1015) is
+        /// reversed. A decreasing range whose names agree with it is an inverted dimmer and stays.
+        /// </summary>
+        private void ReconcileDimmerNames(ProfileFunction f, List<ProfileChannelSet> sets)
+        {
+            float lo = MathF.Min(f.PhysicalFrom, f.PhysicalTo), span = MathF.Abs(f.PhysicalTo - f.PhysicalFrom);
+            if (!(span > 1e-6f) || f.DmxTo <= f.DmxFrom) return;
+            int flagged = 0, contradicting = 0;
+            var contradicts = new bool[sets.Count];
+            for (int i = 0; i < sets.Count; i++)
+            {
+                var s = sets[i];
+                bool open = (s.Flags & ChannelSetFlags.Open) != 0, closed = (s.Flags & ChannelSetFlags.Closed) != 0;
+                if (open == closed) continue;
+                flagged++;
+                float physical = s.HasPhysical
+                    ? 0.5f * (s.PhysicalFrom + s.PhysicalTo)
+                    : f.PhysicalAt((uint)(((ulong)s.DmxFrom + s.DmxTo) / 2));
+                bool bright = (physical - lo) / span >= 0.5f;
+                if (closed == bright)
+                {
+                    contradicts[i] = true;
+                    contradicting++;
+                }
+            }
+            if (contradicting == 0) return;
+            if (f.PhysicalTo < f.PhysicalFrom && contradicting == flagged)
+            {
+                (f.PhysicalFrom, f.PhysicalTo) = (f.PhysicalTo, f.PhysicalFrom);
+                Warnings.Add($"{f.Source.FullName}: dimmer range runs against its open/closed channel sets; reversed.");
+                return;
+            }
+            for (int i = 0; i < sets.Count; i++)
+                if (contradicts[i]) sets[i].Flags &= ~(ChannelSetFlags.Open | ChannelSetFlags.Closed);
+            Warnings.Add($"{f.Source.FullName}: {contradicting} open/closed channel set name(s) contradict the dimmer's physical range; the range is used.");
+        }
 
         /// <summary>
         /// A Zoom, Pan or Tilt function with GDTF's default physical range 0 … 1 — degrees are meant, the author left the
@@ -555,10 +632,18 @@ public sealed partial class FixtureProfile
             }
         }
 
+        /// <summary>
+        /// Resolves the mode's relations to channel instances (per geometry-reference chain), reads a dimmer's
+        /// <c>Override</c> of a level as <c>Multiply</c> (a virtual dimmer written with the wrong type: replacing a
+        /// colour by the dimmer level would make the colour channels inoperative), drops relations that close a cycle and
+        /// orders the followers so that every master is evaluated before its followers (relation chains such as
+        /// grand master → pixel dimmer → pixel colour).
+        /// </summary>
         private void BuildRelations()
         {
             var follower = new List<int>[Channels.Count];
             IsRelationMaster = new bool[Channels.Count];
+            int reinterpreted = 0;
             foreach (var r in Mode.Relations)
             {
                 if (r.Master is not { } masterChannel || r.Follower?.LogicalChannel?.Channel is not { } followerChannel)
@@ -575,14 +660,151 @@ public sealed partial class FixtureProfile
                         if (ReferenceEquals(Functions[k].Source, r.Follower)) { fn = k; break; }
                     int mi = ResolveInstance(masterChannel, fch.Instance.References);
                     if (fn < 0 || mi < 0 || mi == fi) continue;
+                    var type = r.Type;
+                    if (type == RelationType.Override && IsIntensityMaster(Channels[mi]) && IsLevelKind(Functions[fn].Class.Kind))
+                    {
+                        type = RelationType.Multiply;
+                        reinterpreted++;
+                    }
                     (follower[fi] ??= new List<int>()).Add(Relations.Count);
-                    Relations.Add(new ProfileRelation(mi, fi, fn, r.Type));
-                    if (r.Type == RelationType.Multiply) IsRelationMaster[mi] = true;
+                    Relations.Add(new ProfileRelation(mi, fi, fn, type));
                 }
             }
+            if (reinterpreted > 0)
+                Warnings.Add($"{reinterpreted} Override relation(s) of a dimmer over a level read as Multiply (virtual dimmer).");
+
             FollowerRelations = new int[Channels.Count][];
             for (int i = 0; i < Channels.Count; i++) FollowerRelations[i] = follower[i]?.ToArray() ?? Array.Empty<int>();
+            OrderFollowers();
+            foreach (int c in FollowerOrder)
+                foreach (int ri in FollowerRelations[c])
+                    if (Relations[ri].Type == RelationType.Multiply) IsRelationMaster[Relations[ri].Master] = true;
         }
+
+        /// <summary>
+        /// Followers in evaluation order: every channel after the masters it follows (Kahn's algorithm). When the
+        /// remaining followers all wait for each other, a cycle is found by walking from the first waiting follower to
+        /// a master it waits for until a channel repeats, and only the relations of one edge of that cycle are dropped
+        /// (an Override edge before a Multiply one, then the lowest-index follower's) — followers downstream of a cycle
+        /// keep theirs.
+        /// </summary>
+        private void OrderFollowers()
+        {
+            int n = Channels.Count;
+            var pending = new int[n]; // relations whose master is itself a follower that is not yet ordered
+            var dependents = new List<int>?[n];
+            var isFollower = new bool[n];
+            int followers = 0;
+            for (int c = 0; c < n; c++)
+                if (isFollower[c] = FollowerRelations[c].Length > 0) followers++;
+            for (int c = 0; c < n; c++)
+            {
+                foreach (int ri in FollowerRelations[c])
+                {
+                    int m = Relations[ri].Master;
+                    if (!isFollower[m]) continue;
+                    pending[c]++;
+                    (dependents[m] ??= new List<int>()).Add(c);
+                }
+            }
+            var order = new List<int>(followers);
+            var placed = new bool[n];
+            var queue = new Queue<int>();
+            for (int c = 0; c < n; c++)
+                if (isFollower[c] && pending[c] == 0) queue.Enqueue(c);
+            int dropped = 0, scan = 0;
+            while (order.Count < followers)
+            {
+                if (queue.Count == 0)
+                {
+                    while (!isFollower[scan] || placed[scan]) scan++;
+                    var (c, master) = CycleEdge(scan, placed, isFollower);
+                    var keep = new List<int>(FollowerRelations[c].Length);
+                    foreach (int ri in FollowerRelations[c])
+                    {
+                        if (Relations[ri].Master != master)
+                        {
+                            keep.Add(ri);
+                            continue;
+                        }
+                        dropped++;
+                        pending[c]--;
+                        dependents[master]!.Remove(c);
+                    }
+                    FollowerRelations[c] = keep.ToArray();
+                    if (pending[c] == 0) queue.Enqueue(c);
+                    continue;
+                }
+                int next = queue.Dequeue();
+                placed[next] = true;
+                order.Add(next);
+                if (dependents[next] is not { } deps) continue;
+                foreach (int d in deps)
+                    if (--pending[d] == 0) queue.Enqueue(d);
+            }
+            if (dropped > 0) Warnings.Add($"{dropped} relation(s) closing a cycle of relations ignored.");
+            FollowerOrder = order.Where(c => FollowerRelations[c].Length > 0).ToArray();
+        }
+
+        /// <summary>
+        /// A relation edge on a cycle among the followers not yet ordered, starting the walk at <paramref name="start"/>
+        /// (every such follower waits for at least one master that is itself an unordered follower): the cycle's
+        /// lowest-index channel and its master on the cycle.
+        /// </summary>
+        private (int Follower, int Master) CycleEdge(int start, bool[] placed, bool[] isFollower)
+        {
+            var path = new List<int>();
+            var at = new Dictionary<int, int>();
+            int x = start;
+            while (!at.ContainsKey(x))
+            {
+                at[x] = path.Count;
+                path.Add(x);
+                int waitsFor = -1;
+                foreach (int ri in FollowerRelations[x])
+                {
+                    int m = Relations[ri].Master;
+                    if (isFollower[m] && !placed[m])
+                    {
+                        waitsFor = m;
+                        break;
+                    }
+                }
+                x = waitsFor;
+            }
+            // path[at[x]] … path[^1] is the cycle; path[i] follows path[i + 1], and the last follows x. An Override edge is
+            // dropped in preference to a Multiply one (a pixel dimmer that both scales its colour and is overridden by it
+            // keeps the dimming), then the lowest-index follower's.
+            int first = at[x], best = -1;
+            bool bestOverride = false;
+            for (int i = first; i < path.Count; i++)
+            {
+                int master = i + 1 < path.Count ? path[i + 1] : x;
+                bool isOverride = false;
+                foreach (int ri in FollowerRelations[path[i]])
+                    if (Relations[ri].Master == master && Relations[ri].Type == RelationType.Override) isOverride = true;
+                if (best < 0 || (isOverride && !bestOverride) || (isOverride == bestOverride && path[i] < path[best]))
+                {
+                    best = i;
+                    bestOverride = isOverride;
+                }
+            }
+            return (path[best], best + 1 < path.Count ? path[best + 1] : x);
+        }
+
+        /// <summary>A channel whose attribute is an intensity (Dimmer): its relations scale their followers.</summary>
+        private bool IsIntensityMaster(ProfileChannel ch)
+        {
+            if (ch.Class.Kind == AttributeKind.Dimmer) return true;
+            for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                if (Functions[k].Class.Kind == AttributeKind.Dimmer) return true;
+            return false;
+        }
+
+        /// <summary>Attributes whose value is a level 0 … 1 that an intensity master can scale.</summary>
+        private static bool IsLevelKind(AttributeKind kind) =>
+            kind is AttributeKind.Dimmer or AttributeKind.ColorAdd or AttributeKind.ColorRgb or AttributeKind.HsbBrightness
+                or AttributeKind.CieBrightness;
 
         // ------------------------------------------------------------------ wheels and emitters
 
@@ -832,18 +1054,7 @@ public sealed partial class FixtureProfile
                 }
             }
 
-            // relation masters already applied through their followers are excluded from those beams' dimmer product
-            var excluded = new List<int>?[Beams.Count];
-            foreach (var r in Relations)
-            {
-                if (r.Type != RelationType.Multiply) continue;
-                int f0 = _beamFirst[r.Follower], fc = _beamCount[r.Follower];
-                for (int b = f0; b < f0 + fc; b++)
-                {
-                    var list = excluded[b] ??= new List<int>();
-                    if (!list.Contains(r.Master)) list.Add(r.Master);
-                }
-            }
+            var excluded = ExcludedRelationMasters();
 
             var own = new List<int>?[Beams.Count];
             var shared = new List<int>();
@@ -876,6 +1087,28 @@ public sealed partial class FixtureProfile
             }
 
             ComputeBeamShares();
+            int warningsBefore = Warnings.Count;
+            SetupAllBeamPhotometry();
+            // the datasheet peak is the beams' peaks together: shared by each beam's own peak (its flux over its solid
+            // angle), not by flux, once the optics are known — then the beams again (same optics, so the same warnings)
+            if (PeakSharesByOptics() is { } byOptics)
+            {
+                Warnings.RemoveRange(warningsBefore, Warnings.Count - warningsBefore);
+                _peakShare = byOptics;
+                SetupAllBeamPhotometry();
+            }
+            if (DatasheetCandelaPerBeam() is { } perBeam)
+            {
+                Warnings.RemoveRange(warningsBefore, Warnings.Count - warningsBefore);
+                _peakShare = perBeam.Shares;
+                SetupAllBeamPhotometry();
+                Warnings.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"The datasheet peak ({FormatCandela(Specs!.MaxLuminousIntensityCd!.Value)} cd) matches one beam of the file ({FormatCandela(perBeam.FileBeamCd)} cd), not its {Beams.Count} beams together ({FormatCandela(perBeam.FileTotalCd)} cd), and shared between them it would make {perBeam.SharedEfficacy:F1} lm/W: read per beam ({perBeam.Efficacy:F0} lm/W)."));
+            }
+        }
+
+        private void SetupAllBeamPhotometry()
+        {
             foreach (var beam in Beams)
             {
                 try
@@ -896,6 +1129,187 @@ public sealed partial class FixtureProfile
             }
         }
 
+        /// <summary>
+        /// Shares of the datasheet peak (<c>_specs</c> <c>maxLuminousIntensityCd</c>, the fixture's on-axis intensity at its
+        /// narrowest zoom) once the beams' optics are known: in proportion to each beam's own peak — its flux share
+        /// (<see cref="ComputeBeamShares"/>) over its solid angle at the datasheet's angle — so that the beams' peaks add up
+        /// to the datasheet value with their fluxes in the file's proportions. Shared by flux alone, a diffuse beam (a
+        /// Lambertian glow: aura backlight, liquid-effect ring, pixel dots around the lens) would get a narrow cell's peak
+        /// and emit it over π sr (Ayrton Zonda 3 FX "Basic": 180 000 lm from its liquid effect next to 7 × 170 lm pixels).
+        /// Returns null when the shares do not change (one beam, beams of the same optics, no datasheet peak).
+        /// </summary>
+        private float[]? PeakSharesByOptics()
+        {
+            if (Beams.Count < 2 || Specs?.MaxLuminousIntensityCd is not { } cd || !(cd > 0) || !double.IsFinite(cd)) return null;
+            var weight = new double[Beams.Count];
+            double total = 0;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                var beam = Beams[b];
+                if (beam.PhotometrySource != PhotometrySource.SpecsCandela || !(_peakShare[b] > 0)) return null;
+                double omega = beam.ReferenceFlux / (cd * _peakShare[b]); // reference flux = (cd × share) × Ω
+                if (!(omega > 0) || !double.IsFinite(omega)) return null;
+                weight[b] = _beamShare[b] / omega;
+                total += weight[b];
+            }
+            if (!(total > 0) || !double.IsFinite(total)) return null;
+            var shares = new float[Beams.Count];
+            bool changed = false;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                shares[b] = (float)(weight[b] / total);
+                changed |= MathF.Abs(shares[b] - _peakShare[b]) > 1e-4f * MathF.Max(shares[b], _peakShare[b]);
+            }
+            return changed ? shares : null;
+        }
+
+        /// <summary>A luminous intensity for a message: whole candela, or three significant digits below 100 cd.</summary>
+        private static string FormatCandela(double cd) =>
+            cd >= 100 ? cd.ToString("F0", CultureInfo.InvariantCulture) : cd.ToString("G3", CultureInfo.InvariantCulture);
+
+        /// <summary>Plausible luminous efficacy of a whole fixture (emitted lumens per electrical watt), lm/W.</summary>
+        private const double MinEfficacy = 3, MaxEfficacy = 150;
+
+        /// <summary>
+        /// Datasheet candela of a multi-cell fixture that is the peak of one cell, not of the fixture: <c>_specs</c> gives
+        /// one value per fixture, read as the cells' sum and shared between them (<see cref="ComputeBeamShares"/>), but some
+        /// datasheets (pixel panels and dot matrices: Ayrton MagicPanel 602, 20 000 cd for 36 pixels) give the peak of a
+        /// cell. Recognised when every beam has a real GDTF flux and all of these hold: the datasheet value is within
+        /// a factor of 2 of the brightest beam's own peak (GDTF flux over the beam's solid angle at the datasheet's angle),
+        /// it is less than a tenth of the beams' peaks together, and shared it would make the fixture emit less than
+        /// <see cref="MinEfficacy"/> lm per watt of its power (<c>_specs</c> power, else the beams' GDTF power) while per
+        /// beam it emits a plausible amount (up to <see cref="MaxEfficacy"/> lm/W). Returns the per-beam shares (each beam's
+        /// own peak relative to the brightest), or null.
+        /// </summary>
+        private (float[] Shares, double FileBeamCd, double FileTotalCd, double SharedEfficacy, double Efficacy)? DatasheetCandelaPerBeam()
+        {
+            if (Beams.Count < 2 || Specs?.MaxLuminousIntensityCd is not { } cd || !(cd > 0) || !double.IsFinite(cd)) return null;
+            double power = Specs.PowerConsumptionW is { } w && w > 0 && double.IsFinite(w) ? w : 0;
+            var fileCd = new double[Beams.Count];
+            double fileMax = 0, fileTotal = 0, sharedFlux = 0, gdtfPower = 0;
+            bool allPowered = true;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                var beam = Beams[b];
+                var bg = beam.Geometry;
+                if (beam.PhotometrySource != PhotometrySource.SpecsCandela || !HasRealFlux(bg) || !(_peakShare[b] > 0)) return null;
+                // the beam's solid angle at the datasheet's angle: its reference flux is (cd × share) × Ω
+                double omega = beam.ReferenceFlux / (cd * _peakShare[b]);
+                if (!(omega > 0) || !double.IsFinite(omega)) return null;
+                fileCd[b] = bg.LuminousFlux / omega;
+                fileMax = Math.Max(fileMax, fileCd[b]);
+                fileTotal += fileCd[b];
+                sharedFlux += beam.ReferenceFlux;
+                if (HasRealPower(bg)) gdtfPower += bg.PowerConsumption;
+                else allPowered = false;
+            }
+            if (power <= 0 && allPowered) power = gdtfPower;
+            if (power <= 0 || !(fileMax > 0) || cd > fileTotal / 10 || cd < fileMax / 2 || cd > fileMax * 2) return null;
+            var shares = new float[Beams.Count];
+            double flux = 0;
+            for (int b = 0; b < Beams.Count; b++)
+            {
+                shares[b] = (float)(fileCd[b] / fileMax);
+                flux += Beams[b].ReferenceFlux * shares[b] / _peakShare[b];
+            }
+            double sharedEfficacy = sharedFlux / power, efficacy = flux / power;
+            if (sharedEfficacy >= MinEfficacy || efficacy < MinEfficacy || efficacy > MaxEfficacy) return null;
+            return (shares, fileMax, fileTotal, sharedEfficacy, efficacy);
+        }
+
+        /// <summary>
+        /// Per beam: the Multiply relation masters that reach the beam through their followers and therefore must not
+        /// scale it a second time as a beam dimmer. A colour master (a head colour scaling its pixels' colour) is
+        /// excluded wherever its followers are. A dimmer master is excluded only where it scales all of the beam's light:
+        /// when a dimmer that follows it (directly or along a chain) is applied to the beam, or when every colour channel
+        /// of the beam follows it. Otherwise — e.g. a master dimmer whose relations reach only virtual head colours while
+        /// addressed pixel colours light the beam (Cyclops CPX-412OB II, BeamZ StarColor 540) — it dims the beam directly.
+        /// </summary>
+        private List<int>?[] ExcludedRelationMasters()
+        {
+            var excluded = new List<int>?[Beams.Count];
+            var followersOf = new Dictionary<int, List<int>>();
+            foreach (int c in FollowerOrder)
+            {
+                foreach (int ri in FollowerRelations[c])
+                {
+                    var r = Relations[ri]; // relations dropped from a cycle do not reach the beam
+                    if (r.Type != RelationType.Multiply) continue;
+                    if (!followersOf.TryGetValue(r.Master, out var list)) followersOf[r.Master] = list = new List<int>();
+                    if (!list.Contains(r.Follower)) list.Add(r.Follower);
+                }
+            }
+            if (followersOf.Count == 0) return excluded;
+
+            // the channels covering each beam, and which of them carry colour
+            var beamChannels = new List<int>[Beams.Count];
+            for (int b = 0; b < Beams.Count; b++) beamChannels[b] = new List<int>();
+            var isColor = new bool[Channels.Count];
+            foreach (var ch in Channels)
+            {
+                int first = _beamFirst[ch.Index], count = _beamCount[ch.Index];
+                for (int b = first; b < first + count; b++) beamChannels[b].Add(ch.Index);
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                    if (Functions[k].Class.Kind is AttributeKind.ColorAdd or AttributeKind.ColorRgb or AttributeKind.HsbBrightness or AttributeKind.CieBrightness)
+                        isColor[ch.Index] = true;
+            }
+
+            // masters with their followers first (chains: the pixel dimmer is decided before the grand master above it)
+            var rank = new Dictionary<int, int>();
+            for (int i = 0; i < FollowerOrder.Length; i++) rank[FollowerOrder[i]] = i;
+            var masters = followersOf.Keys.OrderByDescending(m => rank.TryGetValue(m, out int r) ? r : -1).ThenBy(m => m).ToList();
+            var isExcluded = new HashSet<(int Master, int Beam)>();
+            foreach (int m in masters)
+            {
+                var reach = Reach(m, followersOf);
+                var beams = new SortedSet<int>();
+                foreach (int f in followersOf[m])
+                    for (int b = _beamFirst[f]; b < _beamFirst[f] + _beamCount[f]; b++) beams.Add(b);
+                bool dimmer = IsIntensityMaster(Channels[m]);
+                foreach (int b in beams)
+                {
+                    bool exclude = !dimmer || ScalesWholeBeam(m, b, reach, beamChannels[b], isColor, isExcluded);
+                    if (!exclude) continue;
+                    isExcluded.Add((m, b));
+                    var list = excluded[b] ??= new List<int>();
+                    if (!list.Contains(m)) list.Add(m);
+                }
+            }
+            return excluded;
+        }
+
+        /// <summary>True when dimmer master <paramref name="m"/> already scales all of beam <paramref name="b"/>'s light through its followers.</summary>
+        private bool ScalesWholeBeam(int m, int b, HashSet<int> reach, List<int> channels, bool[] isColor, HashSet<(int, int)> isExcluded)
+        {
+            int colors = 0;
+            bool allColorsFollow = true;
+            foreach (int c in channels)
+            {
+                if (c == m) continue;
+                if (reach.Contains(c) && IsIntensityMaster(Channels[c]) && !isExcluded.Contains((c, b))) return true;
+                if (!isColor[c]) continue;
+                colors++;
+                allColorsFollow &= reach.Contains(c);
+            }
+            return colors > 0 && allColorsFollow;
+        }
+
+        /// <summary>Every channel that follows <paramref name="master"/> through Multiply relations, directly or along a chain.</summary>
+        private static HashSet<int> Reach(int master, Dictionary<int, List<int>> followersOf)
+        {
+            var reach = new HashSet<int>();
+            var stack = new Stack<int>();
+            stack.Push(master);
+            while (stack.Count > 0)
+            {
+                int c = stack.Pop();
+                if (!followersOf.TryGetValue(c, out var list)) continue;
+                foreach (int f in list)
+                    if (f != master && reach.Add(f)) stack.Push(f);
+            }
+            return reach;
+        }
+
         private static int LowerBound(int[] sorted, int value)
         {
             int lo = 0, hi = sorted.Length;
@@ -906,6 +1320,9 @@ public sealed partial class FixtureProfile
             }
             return lo;
         }
+
+        /// <summary>True when two angles in degrees agree within 0.5° or 2 %.</summary>
+        private static bool SameAngle(float a, float b) => MathF.Abs(a - b) <= MathF.Max(0.5f, 0.02f * MathF.Max(a, b));
 
         private IEnumerable<int> ChannelsOfBeam(ProfileBeam beam)
         {
@@ -932,15 +1349,6 @@ public sealed partial class FixtureProfile
                 field = Specs.FieldAngleDeg is { } sf && sf > native ? (float)sf : float.NaN;
             }
             if (!(native > 0f) || !float.IsFinite(native)) native = 25f;
-            float ratio;
-            if (float.IsFinite(field) && field > native * 1.01f) ratio = field / native;
-            else
-            {
-                var est = BeamDistribution.Create(beam.BeamType, native * DegToRad, float.NaN);
-                ratio = est.BeamAngle > 0f ? est.FieldAngle / est.BeamAngle : 1.3f;
-            }
-            beam.NativeBeamAngle = native * DegToRad;
-            beam.FieldRatio = Math.Clamp(ratio, 1f, 8f);
 
             float zoomMin = float.PositiveInfinity, zoomMax = 0f;
             bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false;
@@ -981,6 +1389,31 @@ public sealed partial class FixtureProfile
                 }
             }
             bool hasZoom = zoomMax > 0f;
+
+            // field ratio: from the file's field angle unless that is not a field angle — the zoom range written into the
+            // Beam's BeamAngle/FieldAngle (Ayrton Rivale Wash 4°/57°, Clay Paky Aleda B-EYE K10 4°/60° …: 53 beams in the
+            // library) or a ratio no optic has (above MaxFieldRatio) — then the beam type's typical ratio
+            float ratio = float.NaN;
+            if (float.IsFinite(field) && field > native * 1.01f)
+            {
+                bool zoomRange = (hasZoom && SameAngle(native, zoomMin) && SameAngle(field, zoomMax)) ||
+                    (Specs?.BeamAngleDeg is { } range && range.Max > range.Min && SameAngle(native, (float)range.Min) && SameAngle(field, (float)range.Max));
+                float r = field / native;
+                if (zoomRange)
+                    Warnings.Add($"Beam '{beam.Name}': BeamAngle/FieldAngle {native:G4}°/{field:G4}° are the zoom range; the typical field ratio of a {beam.BeamType} beam is used.");
+                else if (r > MaxFieldRatio)
+                    Warnings.Add($"Beam '{beam.Name}': FieldAngle {field:G4}° is {r:G3} × the BeamAngle {native:G4}°; the typical field ratio of a {beam.BeamType} beam is used.");
+                else
+                    ratio = r;
+            }
+            if (float.IsNaN(ratio))
+            {
+                var est = BeamDistribution.Create(beam.BeamType, native * DegToRad, float.NaN);
+                ratio = est.BeamAngle > 0f ? est.FieldAngle / est.BeamAngle : 1.3f;
+            }
+            beam.NativeBeamAngle = native * DegToRad;
+            beam.FieldRatio = Math.Clamp(ratio, 1f, MaxFieldRatio);
+
             float minAngle = hasZoom ? MathF.Min(zoomMin, native) : native;
             float maxAngle = hasZoom ? MathF.Max(zoomMax, native) : native;
             if (!_solidAngleCache.TryGetValue(bg, out var table) || table.MinBeamAngle > minAngle * DegToRad * 1.001f ||
@@ -994,7 +1427,7 @@ public sealed partial class FixtureProfile
             // reference output at full white
             if (Specs?.MaxLuminousIntensityCd is { } cd && cd > 0 && double.IsFinite(cd))
             {
-                float perBeam = (float)(cd * _beamShare[beam.Index]);
+                float perBeam = (float)(cd * _peakShare[beam.Index]);
                 float specAngle = hasZoom ? zoomMin : native; // datasheet candela is the narrowest-zoom value
                 beam.ReferenceFlux = perBeam * table.SolidAngle(specAngle * DegToRad);
                 beam.PhotometrySource = PhotometrySource.SpecsCandela;
@@ -1112,10 +1545,11 @@ public sealed partial class FixtureProfile
             or FixtureCategory.Beam or FixtureCategory.WashBeam or FixtureCategory.Bsw or FixtureCategory.FollowSpot;
 
         /// <summary>
-        /// Share of the fixture's researched output (<c>_specs</c> candela or flux) that each beam carries: proportional to
+        /// Share of the fixture's researched flux (<c>_specs</c> flux or power) that each beam carries: proportional to
         /// the beams' GDTF LuminousFlux when the file gives them different values (a main engine and an aura ring, large
         /// and small cells), equal otherwise. A beam whose flux is missing or GDTF's default 10 000 lm counts as the mean
-        /// of the beams with a real value.
+        /// of the beams with a real value. The shares of the datasheet peak start equal to these and follow the beams'
+        /// optics once they are known (<see cref="PeakSharesByOptics"/>).
         /// </summary>
         private void ComputeBeamShares()
         {
@@ -1140,6 +1574,7 @@ public sealed partial class FixtureProfile
                 total += flux[b];
             }
             for (int b = 0; b < n; b++) _beamShare[b] = total > 0 ? (float)(flux[b] / total) : 1f / n;
+            _peakShare = (float[])_beamShare.Clone();
         }
 
         /// <summary>True when the fixture type describes at least two visible emitters of clearly different colour (an RGB… engine).</summary>

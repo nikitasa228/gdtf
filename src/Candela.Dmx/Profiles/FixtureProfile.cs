@@ -104,7 +104,7 @@ public sealed partial class FixtureProfile
     /// <summary>Per axis: the channels moving it (same as <see cref="ProfileAxis.Channels"/>, as arrays).</summary>
     internal int[][] AxisChannels { get; }
 
-    /// <summary>Channels that follow at least one relation master, ascending.</summary>
+    /// <summary>Channels that follow at least one relation master, each after the masters it follows (relation chains).</summary>
     internal int[] FollowerChannels { get; }
 
     /// <summary>Per channel: where its bytes are in the fixture's DMX (shared by every buffer of the profile).</summary>
@@ -209,7 +209,7 @@ public sealed partial class FixtureProfile
         OutputChannels = b.OutputChannels;
         ModifierChannels = b.ModifierChannels;
         FollowerRelations = b.FollowerRelations;
-        FollowerChannels = Enumerable.Range(0, b.FollowerRelations.Length).Where(c => b.FollowerRelations[c].Length > 0).ToArray();
+        FollowerChannels = b.FollowerOrder;
         SlotLayout = Array.ConvertAll(ChannelArray, ChannelSlots.Of);
         MotorSlot = new int[ChannelArray.Length];
         foreach (var ch in ChannelArray)

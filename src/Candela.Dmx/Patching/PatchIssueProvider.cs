@@ -1,5 +1,6 @@
 using Candela.Core.Diagnostics;
 using Candela.Core.SceneGraph;
+using Candela.Core.SceneGraph.Components;
 using Candela.Gdtf;
 
 namespace Candela.Dmx;
@@ -23,15 +24,22 @@ public sealed class PatchIssueProvider : IIssueProvider
     /// <inheritdoc />
     public string Name => "DMX patch";
 
+    /// <summary>
+    /// Fixtures whose GDTF file is a stand-in chosen by an import (see <see cref="Patch.Build"/>); null when only stand-ins
+    /// resolved from MVR stub names are known.
+    /// </summary>
+    public Func<Entity, FixtureComponent, FixtureSubstitution?>? Substitutions { get; init; }
+
     /// <inheritdoc />
-    public IEnumerable<Issue> Analyze(Scene scene) => Analyze(Patch.Build(scene, _profiles));
+    public IEnumerable<Issue> Analyze(Scene scene) => Analyze(Patch.Build(scene, _profiles, Substitutions));
 
     /// <summary>Issues of an already built patch.</summary>
     public static IReadOnlyList<Issue> Analyze(Patch patch)
     {
         ArgumentNullException.ThrowIfNull(patch);
         var issues = new List<Issue>();
-        var valid = new List<(PatchRange Range, PatchEntry Entry)>();
+        var valid = new List<Slots>();
+        var substitutes = new Dictionary<(string, string, string), (FixtureSubstitution Substitution, FixtureProfile Profile, List<Guid> Entities)>();
         foreach (var e in patch.Entries)
         {
             var id = e.Entity.Id;
@@ -49,10 +57,11 @@ public sealed class PatchIssueProvider : IIssueProvider
                 };
                 issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Patch, code, text, id));
             }
-            else if (res.MatchKind is FixtureMatchKind.Substitute)
+            else if (e.Substitution is { } sub)
             {
-                issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Patch, "patch.substitute-gdtf",
-                    $"{e.Label}: '{e.Fixture.GdtfSpec}' is not in the library; '{res.Entry?.FileName}' is used as a substitute.", id));
+                var key = (sub.RequestedSpec, sub.StandIn, res.Profile.Mode.Name);
+                if (!substitutes.TryGetValue(key, out var group)) substitutes[key] = group = (sub, res.Profile, new List<Guid>());
+                group.Entities.Add(id);
             }
             else if (res.MatchKind is FixtureMatchKind.SameModel or FixtureMatchKind.ModelOnly)
             {
@@ -78,26 +87,51 @@ public sealed class PatchIssueProvider : IIssueProvider
             foreach (var r in e.Ranges)
             {
                 if (r.Universe < 1 || r.Start is < 1 or > 512) continue;
+                // a stand-in wider than its type's patch spacing: the real model fits the spacing, so slots beyond it
+                // are the stand-in's, not the patch's
+                int realEnd = e.Substitution?.PatchSpacing is { } spacing && spacing < r.Length ? r.Start + spacing - 1 : r.End;
                 if (r.End > 512)
                 {
-                    issues.Add(new Issue(IssueSeverity.Error, IssueCategory.Patch, "patch.out-of-range",
-                        $"{e.Label}: {r.Length} channels from {r.Universe}.{r.Start:D3} run past slot 512 of universe {r.Universe} " +
-                        $"(would end at {r.End}).", id));
+                    issues.Add(realEnd <= 512
+                        ? new Issue(IssueSeverity.Warning, IssueCategory.Patch, "patch.out-of-range",
+                            $"{e.Label}: the stand-in '{e.Substitution!.StandIn}' in mode '{res.Profile?.Mode.Name}' uses {r.Length} channels from " +
+                            $"{r.Universe}.{r.Start:D3}, past slot 512; '{e.Substitution.RequestedSpec}' fixtures are patched " +
+                            $"{e.Substitution.PatchSpacing} channels apart, so the real model fits — not a patch error until its GDTF says otherwise.", id)
+                        : new Issue(IssueSeverity.Error, IssueCategory.Patch, "patch.out-of-range",
+                            $"{e.Label}: {r.Length} channels from {r.Universe}.{r.Start:D3} run past slot 512 of universe {r.Universe} " +
+                            $"(would end at {r.End}).", id));
                 }
-                valid.Add((r with { End = Math.Min(r.End, 512) }, e));
+                valid.Add(new Slots(r with { End = Math.Min(r.End, 512) }, Math.Min(realEnd, 512), e));
             }
+        }
+        foreach (var (_, (sub, profile, entities)) in substitutes)
+        {
+            string fit = sub.PatchSpacing is { } spacing
+                ? $" (the mode that best fits their {spacing}-channel patch spacing{(string.Equals(profile.Mode.Name, sub.RequestedMode, StringComparison.OrdinalIgnoreCase) ? "" : $"; the scene asks for '{sub.RequestedMode}'")})"
+                : string.IsNullOrWhiteSpace(sub.RequestedMode) || string.Equals(profile.Mode.Name, sub.RequestedMode, StringComparison.OrdinalIgnoreCase)
+                    ? ""
+                    : $" (the scene asks for '{sub.RequestedMode}')";
+            issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Patch, "patch.substitute-gdtf",
+                $"{entities.Count} fixture(s) of '{sub.RequestedSpec}' use the stand-in '{sub.StandIn}' ({profile.FixtureType.Manufacturer} " +
+                $"{profile.FixtureType.Name}, mode '{profile.Mode.Name}', {profile.Breaks.FirstOrDefault().Footprint} channels{fit}): the library has no GDTF " +
+                "of that model, so its body, beams and DMX layout are the stand-in's until the real GDTF is added.",
+                entities.ToArray()));
         }
         FindOverlaps(valid, issues);
         return issues;
     }
 
-    private static void FindOverlaps(List<(PatchRange Range, PatchEntry Entry)> ranges, List<Issue> issues)
+    /// <summary>A patched range; <see cref="RealEnd"/> is where it ends when a stand-in is limited to its type's patch spacing.</summary>
+    private readonly record struct Slots(PatchRange Range, int RealEnd, PatchEntry Entry);
+
+    private static void FindOverlaps(List<Slots> ranges, List<Issue> issues)
     {
         ranges.Sort((a, b) => a.Range.Universe != b.Range.Universe
             ? a.Range.Universe.CompareTo(b.Range.Universe)
             : a.Range.Start != b.Range.Start ? a.Range.Start.CompareTo(b.Range.Start) : a.Range.End.CompareTo(b.Range.End));
-        var active = new List<(PatchRange Range, PatchEntry Entry)>();
+        var active = new List<Slots>();
         var reported = new HashSet<(Guid, Guid)>();
+        var standInOnly = new Dictionary<string, (FixtureSubstitution Substitution, int Count, HashSet<Guid> Entities)>(StringComparer.OrdinalIgnoreCase);
         int count = 0;
         int universe = int.MinValue;
         foreach (var cur in ranges)
@@ -107,6 +141,7 @@ public sealed class PatchIssueProvider : IIssueProvider
                 active.Clear();
                 universe = cur.Range.Universe;
             }
+            if (count > MaxOverlapIssues) break;
             active.RemoveAll(a => a.Range.End < cur.Range.Start);
             foreach (var other in active)
             {
@@ -122,7 +157,18 @@ public sealed class PatchIssueProvider : IIssueProvider
                 }
                 var key = Order(other.Entry.Entity.Id, cur.Entry.Entity.Id);
                 if (!reported.Add(key)) continue;
-                if (++count > MaxOverlapIssues) return;
+                if ((other.Entry.Substitution is not null || cur.Entry.Substitution is not null) && other.Range.Start != cur.Range.Start &&
+                    !(other.Range.Start <= cur.RealEnd && cur.Range.Start <= other.RealEnd))
+                {
+                    // only the stand-in's footprint overlaps: one warning per stand-in type, below
+                    var sub = (cur.Entry.Substitution ?? other.Entry.Substitution)!;
+                    if (!standInOnly.TryGetValue(sub.RequestedSpec, out var group)) group = (sub, 0, new HashSet<Guid>());
+                    group.Entities.Add(other.Entry.Entity.Id);
+                    group.Entities.Add(cur.Entry.Entity.Id);
+                    standInOnly[sub.RequestedSpec] = (group.Substitution, group.Count + 1, group.Entities);
+                    continue;
+                }
+                if (++count > MaxOverlapIssues) break;
                 int from = Math.Max(other.Range.Start, cur.Range.Start), to = Math.Min(other.Range.End, cur.Range.End);
                 bool identical = other.Range.Start == cur.Range.Start && other.Range.End == cur.Range.End &&
                     ReferenceEquals(other.Entry.Profile, cur.Entry.Profile);
@@ -135,6 +181,13 @@ public sealed class PatchIssueProvider : IIssueProvider
                         $"{universe}.{from:D3}–{universe}.{to:D3}.", other.Entry.Entity.Id, cur.Entry.Entity.Id));
             }
             active.Add(cur);
+        }
+        foreach (var (spec, (sub, n, entities)) in standInOnly)
+        {
+            issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Patch, "patch.overlap",
+                $"{n} overlap(s) between fixtures of '{spec}' come only from the stand-in '{sub.StandIn}' being wider than their " +
+                $"{sub.PatchSpacing}-channel patch spacing: the real model fits the patch — not a patch error until its GDTF says otherwise.",
+                entities.ToArray()));
         }
     }
 

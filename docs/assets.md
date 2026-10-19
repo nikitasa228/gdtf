@@ -244,6 +244,13 @@ kept unchanged so a project can be saved and opened elsewhere.
 * **Decoding**: `GetModel` / `TryGetModel` and `GetImage` / `TryGetImage` decode on first use, exactly once even under
   concurrent requests (`Lazy` with `ExecutionAndPublication`), and cache the result or the error. `ClearDecodedCaches`
   frees memory.
+* **Models decoded elsewhere**: `SetDecodedModel(entry, model)` attaches a model decoded outside the store — by the
+  engine's isolated import worker, from its disk cache, or by the MVR reader — so `GetModel`, `TryGetModel` and the
+  model's texture keys are served from it and the native importer never runs in the application;
+  `SetModelDecodeError(entry, reason)` records a failure (a crashed worker) so the asset is not decoded again until it
+  changes. Both refuse (return false) when the entry was replaced or removed in the meantime, so a late background
+  decode never overwrites a newer one. `TryGetDecodedModel(id, out model, out error)` tells whether the decode result is
+  known without starting a decode (the engine's renderer binding uses it to decode in the background).
 * **`IImageSource`**: `asset:{guid}` is the image of an Image/Texture asset; `asset:{guid}/{relative path}` is a
   texture of a model asset (companion file — exact, then case-insensitive — embedded or generated image);
   `builtin:{material id}/{channel}` is delegated to the `MaterialLibrary`. `Load` never throws: unknown keys return

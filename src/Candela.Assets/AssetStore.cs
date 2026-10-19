@@ -285,6 +285,56 @@ public sealed class AssetStore : IImageSource
     }
 
     /// <summary>
+    /// The decode result of a model asset when it is already known — decoded on use, attached with
+    /// <see cref="SetDecodedModel"/>, or failed — without starting a decode: true with the model, or true with a null
+    /// model and the user-facing reason it failed; false when the asset does not exist, is not a model, or has not been
+    /// decoded yet. Lets a caller that decodes elsewhere (an isolated worker process) find out whether it still has to.
+    /// </summary>
+    public bool TryGetDecodedModel(Guid id, out ImportedModel? model, out string? error)
+    {
+        model = null;
+        error = null;
+        var slot = FindSlot(id);
+        if (slot is null || slot.Entry.Kind != AssetKind.Model || !slot.TryPeekModel(out var result)) return false;
+        model = result.Value;
+        error = result.Error;
+        return true;
+    }
+
+    /// <summary>
+    /// Attaches a model decoded elsewhere — by an isolated import worker, from a disk cache, or by another importer such
+    /// as the MVR reader — to model asset <paramref name="entry"/>, so <see cref="GetModel"/>, <see cref="TryGetModel"/>
+    /// and the model's texture keys are served from it without decoding the file. Its texture keys should already be this
+    /// store's (<c>asset:{id}/…</c>, <see cref="AssetKeys.TexturePrefix"/>). Returns false and changes nothing when the
+    /// asset no longer exists, is not a model, or was replaced since <paramref name="entry"/> was read (its import options
+    /// changed), so a late decode never overwrites a newer one.
+    /// </summary>
+    public bool SetDecodedModel(AssetEntry entry, ImportedModel model)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        ArgumentNullException.ThrowIfNull(model);
+        var slot = FindSlot(entry.Id);
+        if (slot is null || !ReferenceEquals(slot.Entry, entry) || entry.Kind != AssetKind.Model) return false;
+        slot.SetDecodedModel(model);
+        return true;
+    }
+
+    /// <summary>
+    /// Records that model asset <paramref name="entry"/> cannot be decoded, with a user-facing <paramref name="error"/>
+    /// (e.g. the import worker crashed on it), so it is not decoded again until the asset changes;
+    /// <see cref="TryGetModel"/> then returns the error. Same conditions and return value as <see cref="SetDecodedModel"/>.
+    /// </summary>
+    public bool SetModelDecodeError(AssetEntry entry, string error)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        ArgumentException.ThrowIfNullOrEmpty(error);
+        var slot = FindSlot(entry.Id);
+        if (slot is null || !ReferenceEquals(slot.Entry, entry) || entry.Kind != AssetKind.Model) return false;
+        slot.SetModelError(error);
+        return true;
+    }
+
+    /// <summary>
     /// The decoded image of an image or texture asset (decoded once and cached). Throws <see cref="KeyNotFoundException"/>
     /// for an unknown id and <see cref="AssetImportException"/> when the asset is not an image or cannot be decoded.
     /// </summary>
@@ -496,9 +546,26 @@ public sealed class AssetStore : IImageSource
 
         public ConcurrentDictionary<string, Lazy<ImageData?>> Textures { get; } = new(StringComparer.Ordinal);
 
-        /// <summary>Seeds the model cache with a model decoded during import.</summary>
+        /// <summary>Seeds the model cache with a model decoded during import or elsewhere.</summary>
         public void SetDecodedModel(ImportedModel model) =>
-            _model = new Lazy<Result<ImportedModel>>(() => new Result<ImportedModel>(model, null));
+            Volatile.Write(ref _model, new Lazy<Result<ImportedModel>>(new Result<ImportedModel>(model, null)));
+
+        /// <summary>Seeds the model cache with a decode failure.</summary>
+        public void SetModelError(string error) =>
+            Volatile.Write(ref _model, new Lazy<Result<ImportedModel>>(new Result<ImportedModel>(null, error)));
+
+        /// <summary>The model decode result if it is already known (no decoding is started).</summary>
+        public bool TryPeekModel(out Result<ImportedModel> result)
+        {
+            var lazy = Volatile.Read(ref _model);
+            if (lazy is { IsValueCreated: true })
+            {
+                result = lazy.Value;
+                return true;
+            }
+            result = default;
+            return false;
+        }
 
         public Result<ImportedModel> ModelValue(AssetStore store)
         {

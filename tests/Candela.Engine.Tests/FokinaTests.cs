@@ -8,14 +8,16 @@ namespace Candela.Engine.Tests;
 public sealed class FokinaTests
 {
     [Fact]
-    public void Opening_the_mvr_resolves_every_fixture_with_four_substitutes()
+    public void Opening_the_mvr_resolves_every_fixture_with_a_substitute_per_missing_model()
     {
+        // four of the five models are not in the repository's library (FokinaFixtureTypes); each gets a substitute
+        var missing = FokinaFixtureTypes.MissingFrom(TestEnvironment.Library);
         using var engine = TestEnvironment.CreateEngine();
         var result = engine.Open(TestEnvironment.Fokina);
 
         Assert.True(result.Success, result.Summary);
         Assert.Equal(91, engine.Scene.Query<FixtureComponent>().Count());
-        Assert.Equal(4, result.Issues.Count(i => i.Code == MvrIssueCodes.GdtfSubstitute));
+        Assert.Equal(missing.Count, result.Issues.Count(i => i.Code == MvrIssueCodes.GdtfSubstitute));
         Assert.DoesNotContain(result.Issues, i => i.Severity == IssueSeverity.Error);
         Assert.Null(engine.ProjectPath);
         Assert.False(engine.IsModified);
@@ -26,10 +28,33 @@ public sealed class FokinaTests
             Assert.NotNull(engine.Dmx.GetState(entity.Id));
         Assert.Equal(91, engine.Poses.Count);
 
-        // the substitute patch overlaps are real problems of the file and stay visible in the issue list
+        // the stand-ins use the mode that fits their type's patch spacing (the MagicBlade R stand-in, a MagicPanel 602,
+        // would overlap its neighbours in its 160-channel "Extended"): the resolved scene has no patch errors, and each
+        // stand-in type is reported once with all its fixtures
         engine.RefreshIssues();
-        Assert.Contains(engine.Issues.Current, i => i.Code == "patch.overlap");
-        Assert.Contains(engine.Issues.Current, i => i.Code == MvrIssueCodes.GdtfSubstitute);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Category == IssueCategory.Patch && i.Severity == IssueSeverity.Error);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == "patch.overlap" || i.Code == "patch.out-of-range");
+        Assert.Equal(missing.Count > 0, engine.Issues.Current.Any(i => i.Code == MvrIssueCodes.GdtfSubstitute));
+        var substituteIssues = engine.Issues.Current.Where(i => i.Code == "patch.substitute-gdtf").ToList();
+        Assert.Equal(missing.Count, substituteIssues.Count);
+        Assert.Equal(missing.Sum(t => t.Objects), substituteIssues.Sum(i => i.Entities.Count));
+        Assert.Equal(missing.Sum(t => t.Objects), engine.Settings.Substitutes.Count);
+        if (missing.Contains(FokinaFixtureTypes.MagicBladeR))
+        {
+            var blade = engine.Scene.Query<FixtureComponent>().First(x => x.Entity.Name == "MagicBlade R");
+            var state = engine.Dmx.GetState(blade.Entity.Id)!;
+            Assert.True(state.Profile.Footprint <= FokinaFixtureTypes.MagicBladeR.Footprint, $"{state.Profile} on a 44-channel spacing");
+            Assert.Equal(FokinaFixtureTypes.MagicBladeR.Spec, engine.SubstitutionOf(blade.Entity.Id)!.RequestedSpec);
+            Assert.Equal("Extended", engine.SubstitutionOf(blade.Entity.Id)!.RequestedMode);
+            Assert.Equal(44, engine.SubstitutionOf(blade.Entity.Id)!.PatchSpacing);
+            // the importer already chose the fitting mode (a note), so no overlap warning is left
+            Assert.Contains(result.Issues, i => i.Code == MvrIssueCodes.SubstituteMode);
+            Assert.DoesNotContain(result.Issues, i => i.Code == MvrIssueCodes.ModeFootprint);
+        }
+        // the real Zonda 3 FX fixtures are not stand-ins, although the Zonda 3 Wash stand-in is the same file
+        var fx = engine.Scene.Query<FixtureComponent>().Where(x => x.Entity.Name == "Zonda 3 FX").ToList();
+        Assert.NotEmpty(fx);
+        Assert.All(fx, x => Assert.Null(engine.SubstitutionOf(x.Entity.Id)));
     }
 
     [Fact]
@@ -81,7 +106,13 @@ public sealed class FokinaTests
                 litFixtures.Add(entity.Id);
             }
         }
-        Assert.True(litFixtures.Count >= 59, $"only {litFixtures.Count} fixtures lit"); // Zonda (32) and Rivale (27) at least
+        // every fixture lights at open white — the pixel-mapped MagicBlade stand-in included (its pixels' virtual dimmers
+        // and its master dimmer whose channel sets are named the wrong way round, see Candela.Dmx RelationTests) — except
+        // between the flashes of a pure strobe (the Atomic stand-in's 3-channel mode has no steady state)
+        var dark = engine.Scene.Query<FixtureComponent>().Where(x => !litFixtures.Contains(x.Entity.Id)).ToList();
+        Assert.All(dark, x => Assert.True(engine.Dmx.GetState(x.Entity.Id)!.Beams.All(b => b.Strobing && b.Dimmer > 0.99f),
+            $"{x.Component.GdtfSpec} [{engine.Dmx.GetState(x.Entity.Id)!.Profile.Mode.Name}] is dark"));
+        Assert.True(litFixtures.Count >= 87, $"only {litFixtures.Count} fixtures lit");
         Assert.Equal(litBeams, world.Lights.Length);
         foreach (var id in litFixtures)
         {
@@ -89,6 +120,10 @@ public sealed class FokinaTests
             Assert.Equal(beams, world.Lights.Count(l => l.FixtureId == id));
         }
         Assert.All(world.Lights, l => Assert.InRange(l.FieldAngle, l.BeamAngle, StageLightCollector.MaxFieldAngle + 1e-4f));
+        // real optics: no field wider than 4 × the beam (the Rivale Wash stand-in writes its zoom range as beam/field
+        // angle, which used to give a 244° field at mid zoom), and nothing needed the renderer's sanity clamp
+        Assert.All(world.Lights, l => Assert.True(l.FieldAngle <= 4.001f * l.BeamAngle, $"field {l.FieldAngle} for beam {l.BeamAngle}"));
+        Assert.Empty(engine.LightCollector.ClampedFieldFixtures);
     }
 
     [Fact]

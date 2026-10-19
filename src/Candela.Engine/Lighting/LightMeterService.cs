@@ -120,9 +120,10 @@ public sealed class LightMeterService
     {
         var rows = new List<LightPlotRow>();
         var scene = _engine.Scene;
+        var resolve = _engine.FixtureResolver();
         foreach (var (entity, fixture) in scene.Query<FixtureComponent>())
         {
-            var resolution = _engine.Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode);
+            var resolution = resolve(fixture);
             var electrical = _engine.ElectricalProfiles.GetProfile(fixture.GdtfSpec, fixture.GdtfMode);
             var specs = resolution.Profile?.Specs ?? resolution.Entry?.Specs;
             string type = resolution.Profile is { } p

@@ -118,16 +118,24 @@ public sealed class GdtfTestPatternEncoder : ITestPatternEncoder
     /// <summary>
     /// A test show over every patched fixture of the engine's scene (fixtures whose GDTF cannot be resolved are skipped).
     /// </summary>
-    public static ArtNetTestPattern ForScene(StageEngine engine, TestPatternSettings? settings = null)
+    public static ArtNetTestPattern ForScene(StageEngine engine, TestPatternSettings? settings = null) =>
+        new(EncodersForScene(engine), settings);
+
+    /// <summary>
+    /// The encoders of <see cref="ForScene"/>: every patched fixture in the mode the DMX engine evaluates it in (a
+    /// stand-in for a missing model in the mode that fits its patch spacing).
+    /// </summary>
+    internal static List<GdtfTestPatternEncoder> EncodersForScene(StageEngine engine)
     {
         ArgumentNullException.ThrowIfNull(engine);
-        var encoders = new List<ITestPatternEncoder>();
+        var encoders = new List<GdtfTestPatternEncoder>();
+        var resolve = engine.FixtureResolver();
         foreach (var (_, fixture) in engine.Scene.Query<FixtureComponent>())
         {
-            if (engine.Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode).Profile is not { } profile) continue;
+            if (resolve(fixture).Profile is not { } profile) continue;
             encoders.AddRange(Create(profile, fixture));
         }
-        return new ArtNetTestPattern(encoders, settings);
+        return encoders;
     }
 
     /// <inheritdoc />

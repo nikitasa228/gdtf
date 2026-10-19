@@ -184,6 +184,13 @@ public sealed partial class NetworkSolver
                 }
             }
 
+            // Without a console and without data cables the scene has no data network yet (an MVR import, a scene being
+            // drawn): its fixtures follow live universes or their manual values, and "receives no data" would only list
+            // every patched fixture.
+            bool dataNetwork = false;
+            foreach (var device in _deviceOrder) dataNetwork |= device.Console is not null;
+            foreach (var cable in _cables) dataNetwork |= cable.Type is { IsData: true };
+
             var consoleDriven = new HashSet<Guid>();
             foreach (var device in _deviceOrder)
             {
@@ -194,7 +201,7 @@ public sealed partial class NetworkSolver
                     consoleDriven.Add(device.Id);
                     CheckUniverses(device, fixture, list);
                 }
-                else if (fixture.Addresses.Count > 0 && device.Info.Ports.Any(p => p.Signal.CarriesData() && p.Direction != PortDirection.Output))
+                else if (dataNetwork && fixture.Addresses.Count > 0 && device.Info.Ports.Any(p => p.Signal.CarriesData() && p.Direction != PortDirection.Output))
                 {
                     var plugged = device.Info.Ports.FirstOrDefault(p => p.Signal.CarriesData() && p.Direction != PortDirection.Output &&
                                                                          _plugged.ContainsKey(new PortRef(device.Id, p.Name)));

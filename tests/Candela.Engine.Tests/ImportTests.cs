@@ -111,6 +111,70 @@ public sealed class ImportTests
         Assert.Contains("longer than", result.Issues[0].Message, StringComparison.Ordinal);
     }
 
+    [SkippableFact]
+    public void Models_of_an_opened_project_decode_in_the_background_without_stalling_frames()
+    {
+        Skip.If(OperatingSystem.IsWindows(), "uses a POSIX shell script as the worker");
+        // a project with an OBJ model, saved by an engine with the real worker
+        string project = Path.Combine(TestEnvironment.NewTempDirectory("bg-project"), "riser.candela");
+        Guid meshEntity;
+        using (var author = TestEnvironment.CreateEngine("bg-author"))
+        {
+            var imported = author.Import(SceneBuilder.WriteCubeObj(TestEnvironment.NewTempDirectory("bg-model")));
+            Assert.True(imported.Success, imported.Summary);
+            meshEntity = Assert.Single(imported.Entities);
+            Assert.True(author.SaveAs(project).Success);
+        }
+
+        // opened on a machine whose worker hangs (and with an empty model cache): frames keep coming
+        string script = Path.Combine(TestEnvironment.NewTempDirectory("bg-hang"), "hanging-worker.sh");
+        File.WriteAllText(script, "#!/bin/sh\nsleep 30\n");
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        using (var engine = new StageEngine(new StageEngineOptions
+        {
+            Library = TestEnvironment.Library,
+            CacheDirectory = TestEnvironment.NewTempDirectory("bg-hang-cache"),
+            ImportWorkerPath = script,
+            ImportWorkerTimeout = TimeSpan.FromSeconds(2),
+        }))
+        {
+            Assert.True(engine.Open(project).Success);
+            var world = new RecordingRenderWorld();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var sync = engine.AttachRenderWorld(world);
+            for (int i = 0; i < 5; i++) engine.Tick(1.0 / 30);
+            Assert.True(watch.Elapsed < TimeSpan.FromSeconds(1.5), $"frames took {watch.Elapsed.TotalSeconds:F1} s while the worker hangs");
+            Assert.Equal(1, sync.PendingModels);
+            Assert.Empty(sync.InstancesOf(meshEntity));
+
+            // the worker is stopped after its timeout; the failure is reported once and not retried every frame
+            Assert.True(sync.CompletePendingLoads(TimeSpan.FromSeconds(20)));
+            Assert.Equal(0, sync.PendingModels);
+            Assert.Empty(sync.InstancesOf(meshEntity));
+            Assert.Contains(engine.Models.Issues, i => i.Code == EngineIssueCodes.ImportUnsafe);
+            var asset = engine.Scene.Find(meshEntity)!.Get<MeshComponent>()!.ModelAssetId;
+            Assert.True(engine.Assets.TryGetDecodedModel(asset, out var none, out var error) && none is null && error is not null);
+            engine.Tick(1.0 / 30);
+            Assert.Equal(0, sync.PendingModels);
+        }
+
+        // with a working worker the model appears once it has decoded, and stays in the asset store
+        using (var engine = TestEnvironment.CreateEngine("bg-ok"))
+        {
+            Assert.True(engine.Open(project).Success);
+            var world = new RecordingRenderWorld();
+            var sync = engine.AttachRenderWorld(world);
+            engine.Tick(1.0 / 30);
+            Assert.True(sync.CompletePendingLoads(TimeSpan.FromSeconds(60)));
+            engine.Tick(1.0 / 30);
+            Assert.NotEmpty(sync.InstancesOf(meshEntity));
+            var asset = engine.Scene.Find(meshEntity)!.Get<MeshComponent>()!.ModelAssetId;
+            Assert.True(engine.Assets.TryGetDecodedModel(asset, out var model, out _) && model is not null);
+            Assert.True(engine.Models.IsDecoded(asset));
+            Assert.Empty(world.Violations);
+        }
+    }
+
     [Fact]
     public void Without_a_worker_models_are_imported_in_process_with_a_note()
     {

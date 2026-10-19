@@ -147,7 +147,7 @@ be fed from a generator or another distro.
 
 | Check | Code | Severity |
 |---|---|---|
-| Patched fixture with no data path (only fixtures that have a wired data input) | `data.no-signal` | warning |
+| Patched fixture with no data path (only fixtures that have a wired data input, and only once the scene has a data network: a console or a data cable — an MVR import without cabling is not 91 warnings) | `data.no-signal` | warning |
 | Patched universe ≠ universe arriving at the input (DMX: break of the input; Ethernet: every address in range) | `data.universe-mismatch` | error |
 | DMX/Ethernet cable tree with more than two plugged ends; both thru sockets of one fixture in use | `data.y-split` | warning |
 | More than 32 devices on one DMX segment (`NetworkSolverOptions.MaxDmxDevicesPerSegment`) | `data.chain-too-long` | warning |
@@ -208,7 +208,7 @@ ends.
 | Inlet current (own + everything behind) above the inlet connector rating | `power.inlet-overload` | error |
 | Cable current above the cable type rating (the message names what the cable feeds) | `power.cable-overload` | error |
 | Distribution channel above `maxLoadPerChannelA`; total above `maxLoadW` / `maxLoadCurrentA` | `power.channel-overload`, `power.distribution-overload` | error |
-| Fixture needing mains with no supply; fed distro whose feed has no power | `power.unpowered` | warning |
+| Fixture needing mains with no supply (only once the scene has a power network: a power source or a power cable; the fixtures stay listed in `UnpoweredDevices`); fed distro whose feed has no power | `power.unpowered` | warning |
 | Supply not in `supportedPowerNetworks`, outside the voltage/frequency range, or DC on a mains fixture | `power.voltage-mismatch` | error |
 | Three-phase distro fed from a single-phase outlet or lead | `power.phase-mismatch` | error |
 | Three-phase source with (max − min) / max > 20 % and max ≥ 2 A | `power.phase-imbalance` | note |
@@ -312,7 +312,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 85 tests and runs in about 20 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` has 87 tests and runs in about 20 s. It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.

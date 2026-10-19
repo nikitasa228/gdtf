@@ -13,21 +13,22 @@ namespace Candela.Engine;
 /// <summary>
 /// Decoded 3D models of the project's model assets, as the engine uses them (rendering, bounds, MVR export). Models in
 /// formats read by native code (OBJ, FBX, COLLADA, 3DS) are decoded by the isolated <see cref="ImportWorker"/>; the
-/// managed formats (glTF/GLB, STL, PLY) through the <see cref="AssetStore"/>. Every decoded model is cached in memory
-/// per asset and on disk per content (<c>{cache}/models/*.cmodel</c>), so a model passes through the native importer
-/// at most once per machine.
+/// managed formats (glTF/GLB, STL, PLY) through the <see cref="AssetStore"/>. The decoded model lives in the asset
+/// store (<see cref="AssetStore.SetDecodedModel"/>; a worker failure is recorded there too) and on disk per content
+/// (<c>{cache}/models/*.cmodel</c>), so a model passes through the native importer at most once per machine.
 /// </summary>
 /// <remarks>
 /// Texture keys of the returned models are <c>asset:{id}/{relative path}</c>, resolved by <see cref="EngineImageSource"/>
 /// (which reads embedded and generated images from these decoded models, never by decoding the native file again).
-/// Thread-safe; a model is decoded once even under concurrent requests.
+/// Thread-safe; a model is decoded once even under concurrent requests (decodes in flight are shared until their result
+/// is in the store).
 /// </remarks>
 public sealed class EngineModels
 {
     private readonly Func<AssetStore> _store;
     private readonly string? _cacheDirectory;
     private readonly Func<string?> _workerPath;
-    private readonly ConcurrentDictionary<Guid, Lazy<Decoded>> _models = new();
+    private readonly ConcurrentDictionary<Guid, Lazy<Decoded>> _inFlight = new();
     private readonly ConcurrentDictionary<string, Issue> _issues = new(StringComparer.Ordinal);
 
     /// <summary>Creates the service over <paramref name="store"/>.</summary>
@@ -59,11 +60,13 @@ public sealed class EngineModels
 
     /// <summary>
     /// The decoded model of a model asset, or false with a user-facing reason (not a model, missing, could not be
-    /// imported safely, damaged).
+    /// imported safely, damaged). Decodes on the calling thread when the model is not decoded yet — through the worker
+    /// for native formats, which can take up to <see cref="Timeout"/>; <see cref="DecodeAsync"/> does it in the background.
     /// </summary>
     public bool TryGet(Guid assetId, [NotNullWhen(true)] out ImportedModel? model, out string? error)
     {
-        var entry = _store().Find(assetId);
+        var store = _store();
+        var entry = store.Find(assetId);
         if (entry is null)
         {
             model = null;
@@ -76,17 +79,61 @@ public sealed class EngineModels
             error = $"'{entry.OriginalFileName}' is not a 3D model.";
             return false;
         }
-        var lazy = _models.GetOrAdd(assetId, _ => new Lazy<Decoded>(() => Decode(entry), LazyThreadSafetyMode.ExecutionAndPublication));
-        var decoded = lazy.Value;
-        if (!ReferenceEquals(decoded.Entry, entry))
+        if (store.TryGetDecodedModel(assetId, out model, out error)) return model is not null;
+        if (!NeedsWorker(entry)) return store.TryGetModel(assetId, out model, out error);
+
+        var lazy = _inFlight.GetOrAdd(assetId, _ => new Lazy<Decoded>(() => Decode(entry), LazyThreadSafetyMode.ExecutionAndPublication));
+        Decoded decoded;
+        try
         {
-            // The asset was replaced (new import options): decode again.
-            _models.TryRemove(new KeyValuePair<Guid, Lazy<Decoded>>(assetId, lazy));
-            return TryGet(assetId, out model, out error);
+            decoded = lazy.Value;
         }
+        catch
+        {
+            // a Lazy keeps its exception: forget the failed decode, so the next request tries again instead of rethrowing
+            _inFlight.TryRemove(new KeyValuePair<Guid, Lazy<Decoded>>(assetId, lazy));
+            throw;
+        }
+        bool current = decoded.Model is not null ? store.SetDecodedModel(decoded.Entry, decoded.Model) : store.SetModelDecodeError(decoded.Entry, decoded.Error!);
+        _inFlight.TryRemove(new KeyValuePair<Guid, Lazy<Decoded>>(assetId, lazy));
+        // the asset was replaced while it decoded (new import options): decode the new one
+        if (!current || !ReferenceEquals(decoded.Entry, entry)) return TryGet(assetId, out model, out error);
         model = decoded.Model;
         error = decoded.Error;
         return model is not null;
+    }
+
+    /// <summary>
+    /// True when the model of <paramref name="assetId"/> is decoded (or known to fail): <see cref="TryGet"/> returns at
+    /// once, without decoding.
+    /// </summary>
+    public bool IsDecoded(Guid assetId) => _store().TryGetDecodedModel(assetId, out _, out _);
+
+    /// <summary>
+    /// Decodes the model of <paramref name="assetId"/> on a background thread (a no-op task when it is decoded already);
+    /// the task's result is <see cref="TryGet"/>'s. Lets the renderer binding keep drawing frames while the import worker
+    /// runs.
+    /// </summary>
+    public Task<bool> DecodeAsync(Guid assetId)
+    {
+        if (IsDecoded(assetId)) return Task.FromResult(_store().TryGetDecodedModel(assetId, out var m, out _) && m is not null);
+        return Task.Run(() =>
+        {
+            try
+            {
+                return TryGet(assetId, out _, out _);
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                Record(new Issue(IssueSeverity.Error, IssueCategory.Scene, EngineIssueCodes.AssetUnreadable,
+                    $"The model {assetId} cannot be loaded: {e.Message}"));
+                // known to fail from now on: a renderer binding that redraws the objects waiting for it must not start
+                // the same failing decode again every frame
+                var store = _store();
+                if (store.Find(assetId) is { } entry) store.SetModelDecodeError(entry, $"the model cannot be loaded: {e.Message}");
+                return false;
+            }
+        });
     }
 
     /// <summary>The decoded model data, or null (see <see cref="TryGet"/>).</summary>
@@ -101,11 +148,8 @@ public sealed class EngineModels
     }
 
     /// <summary>The decoded model if it is already in memory (no decoding is started).</summary>
-    internal bool TryGetLoaded(Guid assetId, [NotNullWhen(true)] out ImportedModel? model)
-    {
-        model = null;
-        return _models.TryGetValue(assetId, out var lazy) && lazy.IsValueCreated && (model = lazy.Value.Model) is not null;
-    }
+    internal bool TryGetLoaded(Guid assetId, [NotNullWhen(true)] out ImportedModel? model) =>
+        _store().TryGetDecodedModel(assetId, out model, out _) && model is not null;
 
     /// <summary>
     /// Imports a model file into the store: native formats through the worker (falling back to in-process only when no
@@ -160,7 +204,7 @@ public sealed class EngineModels
         foreach (var m in imported.MissingFiles)
             found.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, "asset.file-missing",
                 $"'{entry.OriginalFileName}': '{m}' was not found when the model was imported."));
-        _models[entry.Id] = new Lazy<Decoded>(new Decoded(entry, WithPrefix(imported, entry.Id), null));
+        store.SetDecodedModel(entry, WithPrefix(imported, entry.Id));
         return entry;
     }
 
@@ -192,29 +236,28 @@ public sealed class EngineModels
             UnitsKnown = options.UnitScale is not null,
         };
         SaveToDiskCache(entry, imported);
-        _models[entry.Id] = new Lazy<Decoded>(new Decoded(entry, WithPrefix(imported, entry.Id), null));
+        _store().SetDecodedModel(entry, WithPrefix(imported, entry.Id));
     }
 
-    /// <summary>Forgets every decoded model (scene replaced; they decode again on demand, from the disk cache).</summary>
+    /// <summary>Forgets the decoding problems and decodes in flight (scene replaced; its new asset store holds no decoded models).</summary>
     public void Clear()
     {
-        _models.Clear();
+        _inFlight.Clear();
         _issues.Clear();
     }
 
-    /// <summary>Forgets one asset's decoded model.</summary>
-    public void Invalidate(Guid assetId) => _models.TryRemove(assetId, out _);
+    /// <summary>
+    /// Forgets a decode in flight for one asset (its import options changed; the store dropped its decoded model with the
+    /// old entry, so the next request decodes the new one).
+    /// </summary>
+    public void Invalidate(Guid assetId) => _inFlight.TryRemove(assetId, out _);
 
+    /// <summary>True when the asset's format is read by native code and is therefore decoded in the worker process.</summary>
+    private bool NeedsWorker(AssetEntry entry) => IsolateNativeImports && ImportWorker.UsesNativeImporter(entry.OriginalFileName);
+
+    /// <summary>Decodes a native-format model: the disk cache, else the worker (in-process only when there is no worker).</summary>
     private Decoded Decode(AssetEntry entry)
     {
-        bool native = ImportWorker.UsesNativeImporter(entry.OriginalFileName);
-        if (!native || !IsolateNativeImports)
-        {
-            return _store().TryGetModel(entry.Id, out var m, out var error)
-                ? new Decoded(entry, m, null)
-                : Failed(entry, error ?? "the model cannot be decoded");
-        }
-
         if (LoadFromDiskCache(entry) is { } cached) return new Decoded(entry, WithPrefix(cached, entry.Id), null);
 
         string? worker = _workerPath();

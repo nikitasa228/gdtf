@@ -20,6 +20,9 @@ public static class FixtureEvaluator
 {
     private const float DegToRad = MathF.PI / 180f;
 
+    /// <summary>Widest field angle of a beam (179°, rad): a beam lights at most a hemisphere.</summary>
+    private const float MaxFieldAngle = 179f * DegToRad;
+
     /// <summary>
     /// Evaluates a fixture once (no motor dynamics; continuous rotations are integrated as if their speed had been
     /// constant since time 0) and returns a new state. Convenient for tests and tools; allocates.
@@ -89,20 +92,29 @@ public static class FixtureEvaluator
         // 3: manual overrides take their exact function and control value
         overrides?.Apply(rt);
 
-        // 4: relations (virtual dimmers)
+        // 4: relations (virtual dimmers, group masters, zone overrides); followers come after their masters, so a
+        // master's own relations (grand master → pixel dimmer → pixel colour) are part of its level
         var relations = p.RelationArray;
         foreach (int c in p.FollowerChannels)
         {
             ref var follower = ref rt[c];
             if (follower.Function < 0) continue;
+            float overrideLevel = float.NaN;
             foreach (int ri in p.FollowerRelations[c])
             {
                 var r = relations[ri];
                 if (follower.Function != r.FollowerFunction) continue;
                 ref var m = ref rt[r.Master];
-                float masterLevel = m.Function >= 0 ? Level(fns[m.Function], m.Target) : 1f;
+                float masterLevel = m.Function >= 0 ? Level(fns[m.Function], m.Target) * m.Relation : m.Relation;
                 if (r.Type == Gdtf.RelationType.Multiply) follower.Relation *= masterLevel;
-                else follower.Target = masterLevel * fns[follower.Function].LevelScale;
+                else if (m.Dmx != channels[r.Master].DefaultValue) overrideLevel = masterLevel; // a master in use (away from its default)
+            }
+            if (!float.IsNaN(overrideLevel))
+            {
+                // Override: the master's level (with its own relations) replaces the follower's level and its multipliers,
+                // whatever order the file lists the relations in
+                follower.Target = overrideLevel * fns[follower.Function].LevelScale;
+                follower.Relation = 1f;
             }
         }
 
@@ -1192,7 +1204,7 @@ public static class FixtureEvaluator
         // optics
         float beamAngle = float.IsFinite(acc.Zoom) ? Math.Clamp(acc.Zoom, 0.1f, 179f) * DegToRad : pb.NativeBeamAngle;
         bs.BeamAngle = beamAngle;
-        bs.FieldAngle = MathF.Min(beamAngle * pb.FieldRatio, 1.5f * MathF.PI);
+        bs.FieldAngle = MathF.Max(beamAngle, MathF.Min(beamAngle * pb.FieldRatio, MaxFieldAngle));
         float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity;
         bs.PeakCandela = float.IsFinite(peak) ? peak : 0f;
         bs.Flux = flux * bs.Intensity;

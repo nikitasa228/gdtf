@@ -84,22 +84,47 @@ public sealed class CliTests
         Assert.Equal("take.cdmx", o.Recording);
         Assert.Equal(2.5, o.Time, 6);
         Assert.Equal(8f, o.Ev100);
+        Assert.False(o.AutoExposure); // a fixed EV
         Assert.False(o.Floor);
 
-        var defaults = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--view", "top", "--ev", "auto"]);
+        // stage looks expose automatically by default (starting from the floor reading)
+        var defaults = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--view", "top"]);
         Assert.Equal(ViewPreset.Top, defaults.View);
         Assert.Null(defaults.Ev100);
         Assert.Equal(RenderLook.OpenWhite, defaults.Look);
         Assert.True(defaults.Floor);
+        Assert.True(defaults.AutoExposure);
+        Assert.True(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "auto"]).AutoExposure);
+        var demo = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "demo"]);
+        Assert.Equal(RenderLook.Demo, demo.Look);
+        Assert.True(demo.AutoExposure);
+
+        // fixed exposures: a value, or the incident reading of the floor
+        var fixedEv = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "DEMO", "--ev", "7"]);
+        Assert.Equal(RenderLook.Demo, fixedEv.Look);
+        Assert.False(fixedEv.AutoExposure);
+        Assert.Equal(7f, fixedEv.Ev100);
+        var floor = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "Floor"]);
+        Assert.False(floor.AutoExposure);
+        Assert.Null(floor.Ev100);
+        // --auto-exposure adapts from a given EV, in either order; the last --ev wins
+        var adapt = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--auto-exposure", "--ev", "9"]);
+        Assert.True(adapt.AutoExposure);
+        Assert.Equal(9f, adapt.Ev100);
+        Assert.True(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "floor", "--ev", "auto"]).AutoExposure);
+        Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "bright"]));
+        Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "party"]));
     }
 
     [Fact]
     public void Info_and_validate_describe_the_mvr_and_its_issues()
     {
+        // substitutes and their overlaps only while the library lacks the scene's models (FokinaFixtureTypes)
+        var missing = FokinaFixtureTypes.MissingFrom(TestEnvironment.Library);
         var info = Run("info", TestEnvironment.Fokina, "--library", TestEnvironment.Root);
         Assert.Equal(Program.ExitOk, info.Code);
-        Assert.Contains("91 of 4 type(s)", info.Output, StringComparison.Ordinal);
-        Assert.Contains("library substitute", info.Output, StringComparison.Ordinal);
+        Assert.Contains("91 of ", info.Output, StringComparison.Ordinal);
+        Assert.Equal(missing.Count > 0, info.Output.Contains("library substitute", StringComparison.Ordinal));
 
         var gdtf = Run("info", Path.Combine(TestEnvironment.Root, SceneBuilder.MacViper), "--library", TestEnvironment.Root);
         Assert.Equal(Program.ExitOk, gdtf.Code);
@@ -107,9 +132,13 @@ public sealed class CliTests
         Assert.Contains("Basic", gdtf.Output, StringComparison.Ordinal);
         Assert.Contains("760000 cd", gdtf.Output, StringComparison.Ordinal);
 
+        // the stand-ins take the modes that fit the patch spacing: no patch errors, one warning per stand-in type
         var validate = Run("validate", TestEnvironment.Fokina, "--library", TestEnvironment.Root, "--plot");
-        Assert.Equal(Program.ExitInputErrors, validate.Code); // the substitutes' footprints overlap
-        Assert.Contains("patch.overlap", validate.Output, StringComparison.Ordinal);
+        Assert.Equal(Program.ExitOk, validate.Code);
+        Assert.DoesNotContain("patch.overlap", validate.Output, StringComparison.Ordinal);
+        Assert.Contains(" 0 errors", validate.Output, StringComparison.Ordinal);
+        Assert.Equal(missing.Count > 0, validate.Output.Contains("patch.substitute-gdtf", StringComparison.Ordinal));
+        Assert.DoesNotContain("data.no-signal", validate.Output, StringComparison.Ordinal);
         Assert.Contains("Light plot", validate.Output, StringComparison.Ordinal);
         Assert.Contains("Total:", validate.Output, StringComparison.Ordinal);
     }

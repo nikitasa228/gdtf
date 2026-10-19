@@ -144,6 +144,7 @@ public sealed partial class StageEngine
         ReplaceProject(new ProjectData(result.Scene));
         var extra = new List<Issue>();
         RegisterMvr(result, extra);
+        RecordMvrSubstitutes(result);
         IsModified = false;
         var issues = Sorted(result.Issues.Concat(extra));
         Report(issues);
@@ -171,6 +172,7 @@ public sealed partial class StageEngine
         });
         var extra = new List<Issue>();
         RegisterMvr(result, extra);
+        RecordMvrSubstitutes(result);
         var roots = result.RootEntities.ToList();
         if (roots.Count > 0) Undo.Execute(new ImportedEntitiesCommand(_scene, roots, $"Import {Path.GetFileName(path)}"));
         Selection.Set(roots.Select(r => r.Id));

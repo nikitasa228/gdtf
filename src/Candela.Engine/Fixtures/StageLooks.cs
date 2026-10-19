@@ -30,14 +30,15 @@ public sealed record OpenWhiteOptions
 /// Ready-made looks that set the fixtures' manual values (used when no console drives them), e.g. for a first render
 /// of an imported scene.
 /// </summary>
-public static class StageLooks
+public static partial class StageLooks
 {
     private const int PanSteps = 36;
     private const int TiltSteps = 18;
 
     /// <summary>
-    /// "Open white": every light at full intensity with its shutter open, open white (highlight values of the GDTF,
-    /// additive emitters at full, indirect RGB at full), zoom at <see cref="OpenWhiteOptions.Zoom"/>, and moving heads
+    /// "Open white": every light at full intensity with its shutter open, open white (<see cref="DmxLooks.OpenWhite"/>:
+    /// highlight values of the GDTF, the brightest dimmer range, shutters open without strobe, additive emitters at full,
+    /// indirect RGB white), zoom at <see cref="OpenWhiteOptions.Zoom"/>, and moving heads
     /// (fixtures with pan or tilt) aimed towards the stage centre. Writes <see cref="FixtureComponent.ManualAttributes"/>
     /// (one undo step) and returns the number of fixtures changed; fixtures whose GDTF cannot be resolved are skipped.
     /// </summary>
@@ -51,9 +52,10 @@ public static class StageLooks
         float zoom = float.IsFinite(options.Zoom) ? Math.Clamp(options.Zoom, 0f, 1f) : 0.5f;
 
         var edits = new List<(FixtureComponent Fixture, Dictionary<string, float> Values)>();
+        var resolve = engine.FixtureResolver();
         foreach (var (entity, fixture) in scene.Query<FixtureComponent>().ToList())
         {
-            var profile = engine.Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode).Profile;
+            var profile = resolve(fixture).Profile;
             if (profile is null) continue;
             var aim = target;
             var p = entity.WorldPosition;
@@ -90,48 +92,16 @@ public static class StageLooks
     {
         ArgumentNullException.ThrowIfNull(profile);
         var buffer = new FixtureDmxBuffer(profile);
-        buffer.ResetToDefaults();
-        buffer.ApplyHighlight();
-        var touched = new HashSet<int>();
-        foreach (var ch in profile.Channels)
-            if (ch.HighlightValue is not null) touched.Add(ch.Index);
+        var touched = new HashSet<int>(DmxLooks.OpenWhite(buffer, zoom));
 
         int pan = -1, tilt = -1;
-        foreach (var ch in profile.Channels)
+        foreach (var f in profile.Functions)
         {
-            var functions = profile.FunctionsOf(ch.Index);
-            foreach (var f in functions)
-            {
-                switch (f.Class.Kind)
-                {
-                    case AttributeKind.Dimmer:
-                        DmxEncoder.EncodeFunction(buffer, f.Index, f.MaxValue);
-                        touched.Add(ch.Index);
-                        goto nextChannel;
-                    case AttributeKind.ColorAdd or AttributeKind.ColorRgb:
-                        DmxEncoder.EncodeFunction(buffer, f.Index, f.MaxValue);
-                        touched.Add(ch.Index);
-                        goto nextChannel;
-                    case AttributeKind.Zoom:
-                        DmxEncoder.EncodeFunction(buffer, f.Index, f.MinValue + zoom * (f.MaxValue - f.MinValue));
-                        touched.Add(ch.Index);
-                        goto nextChannel;
-                    case AttributeKind.Shutter when OpenSet(f) is { } open:
-                        buffer.SetValue(ch.Index, open.DmxFrom);
-                        touched.Add(ch.Index);
-                        goto nextChannel;
-                    case AttributeKind.Pan when pan < 0:
-                        pan = f.Index;
-                        touched.Add(ch.Index);
-                        goto nextChannel;
-                    case AttributeKind.Tilt when tilt < 0:
-                        tilt = f.Index;
-                        touched.Add(ch.Index);
-                        goto nextChannel;
-                }
-            }
-        nextChannel:;
+            if (f.Class.Kind == AttributeKind.Pan && pan < 0) pan = f.Index;
+            else if (f.Class.Kind == AttributeKind.Tilt && tilt < 0) tilt = f.Index;
         }
+        if (pan >= 0) touched.Add(profile.Functions[pan].Channel);
+        if (tilt >= 0) touched.Add(profile.Functions[tilt].Channel);
 
         var state = new FixtureState(profile);
         if (pan >= 0 || tilt >= 0) Aim(profile, buffer, state, pan, tilt, fixtureWorld, target);
@@ -157,13 +127,6 @@ public static class StageLooks
         if (bounds.IsEmpty) return Vector3.Zero;
         var c = bounds.Center;
         return new Vector3(c.X, c.Y, Math.Max(0f, Math.Min(bounds.Min.Z, 0.5f)));
-    }
-
-    private static ProfileChannelSet? OpenSet(ProfileFunction f)
-    {
-        foreach (var s in f.Sets)
-            if ((s.Flags & ChannelSetFlags.Open) != 0) return s;
-        return null;
     }
 
     private static float MaxIntensity(FixtureState state)

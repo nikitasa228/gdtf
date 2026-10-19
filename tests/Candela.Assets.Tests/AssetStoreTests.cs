@@ -225,6 +225,46 @@ public class AssetStoreTests
     }
 
     [Fact]
+    public void A_model_decoded_elsewhere_is_attached_and_served_without_decoding()
+    {
+        // e.g. decoded by an isolated import worker: the store must not decode the file itself
+        var store = new AssetStore();
+        var entry = store.Add(AssetKind.Model, "box.stl", TestFiles.BinaryStl(TestFiles.BoxTriangles(yUp: false)));
+        Assert.False(store.TryGetDecodedModel(entry.Id, out _, out _));
+        var external = ModelImporter.Import("box.stl", entry.Data, entry.CompanionFiles,
+            ImportOptions.Default with { TextureKeyPrefix = AssetKeys.TexturePrefix(entry.Id) });
+        Assert.True(store.SetDecodedModel(entry, external));
+        Assert.True(store.TryGetDecodedModel(entry.Id, out var peeked, out var error));
+        Assert.Same(external, peeked);
+        Assert.Null(error);
+        Assert.Same(external, store.GetModel(entry.Id));
+
+        // a late result for an entry that was replaced since (new import options) is refused
+        var replaced = store.SetImportOptions(entry.Id, new ImportOptions { UnitScale = 2f });
+        Assert.False(store.SetDecodedModel(entry, external));
+        Assert.False(store.TryGetDecodedModel(entry.Id, out _, out _));
+        Assert.NotSame(external, store.GetModel(entry.Id));
+        Assert.True(store.TryGetDecodedModel(entry.Id, out var decoded, out _) && decoded is not null);
+
+        // a failure is remembered: no decode is attempted, the reason is returned
+        Assert.True(store.SetModelDecodeError(replaced, "the import worker crashed"));
+        Assert.True(store.TryGetDecodedModel(entry.Id, out var none, out var reason));
+        Assert.Null(none);
+        Assert.Equal("the import worker crashed", reason);
+        Assert.False(store.TryGetModel(entry.Id, out _, out var again));
+        Assert.Equal("the import worker crashed", again);
+
+        // unknown ids, other kinds and removed assets are refused
+        var image = store.Add(AssetKind.Image, "p.png", TestFiles.Png(2, 2, 1, 1, 1));
+        Assert.False(store.SetDecodedModel(image, external));
+        Assert.False(store.TryGetDecodedModel(image.Id, out _, out _));
+        Assert.False(store.TryGetDecodedModel(Guid.NewGuid(), out _, out _));
+        store.Remove(entry.Id);
+        Assert.False(store.SetDecodedModel(replaced, external));
+        Assert.Throws<ArgumentNullException>(() => store.SetDecodedModel(replaced, null!));
+    }
+
+    [Fact]
     public void RemoveAndClear()
     {
         var store = new AssetStore();

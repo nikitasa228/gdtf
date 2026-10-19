@@ -71,7 +71,7 @@ public sealed partial class StageEngine : IDisposable
         LightMeter = new LightMeterService(this);
         Recorder = new DmxRecorder(Input);
 
-        _providers.Add(new PatchIssueProvider(Profiles));
+        _providers.Add(new PatchIssueProvider(Profiles) { Substitutions = SubstitutionOf });
         _providers.Add(new ElectricalIssueProvider(Network));
         _providers.Add(new RiggingIssueProvider(Rigging));
         _providers.Add(new EngineIssueProvider(this));
@@ -240,15 +240,19 @@ public sealed partial class StageEngine : IDisposable
     /// <summary>
     /// Connects a renderer's world: from now on <see cref="Tick"/> keeps it in sync with the scene. Replaces a previous
     /// binding (whose renderer objects are destroyed). <paramref name="loadFixtureModelsInBackground"/> sets
-    /// <see cref="RenderSync.LoadFixtureModelsInBackground"/> before the first update (false for the CLI, tests and
-    /// thumbnails, which need every fixture model at once).
+    /// <see cref="RenderSync.LoadFixtureModelsInBackground"/> and <see cref="RenderSync.LoadModelsInBackground"/> before
+    /// the first update (false for the CLI, tests and thumbnails, which need every fixture and imported model at once).
     /// </summary>
     public RenderSync AttachRenderWorld(IRenderWorld world, bool loadFixtureModelsInBackground = true)
     {
         ArgumentNullException.ThrowIfNull(world);
         ObjectDisposedException.ThrowIf(_disposed, this);
         _render?.Dispose();
-        _render = new RenderSync(this, world) { LoadFixtureModelsInBackground = loadFixtureModelsInBackground };
+        _render = new RenderSync(this, world)
+        {
+            LoadFixtureModelsInBackground = loadFixtureModelsInBackground,
+            LoadModelsInBackground = loadFixtureModelsInBackground,
+        };
         _render.Update();
         return _render;
     }
@@ -348,19 +352,18 @@ public sealed partial class StageEngine : IDisposable
     }
 
     /// <summary>
-    /// Recompiles every fixture after GDTF files were added to the library. The DMX engine keeps each fixture's profile
-    /// resolution until the fixture's GDTF name or mode changes (<see cref="DmxEngine.InvalidateAll"/> only re-reads
-    /// values), so a fixture that was unresolved — or resolved to a substitute — would never see the new file: the DMX
-    /// evaluation starts afresh instead (like opening the scene; motors travel to their positions again), and the poses
-    /// report every fixture that no longer has a state.
+    /// Recompiles every fixture after GDTF files were added to the library: the profile cache is cleared and the DMX
+    /// engine re-resolves every fixture (<see cref="DmxEngine.ReloadProfiles"/>), so a fixture that was unresolved — or
+    /// resolved to a substitute — picks up the new file, and fixtures an MVR import drew with a stand-in switch to the real
+    /// GDTF of their model when the library now has it. Fixtures keep their motor positions (a moving head does not
+    /// travel to its position again); the poses and the renderer binding rebuild the fixtures whose profile changed.
     /// </summary>
     internal void ReloadFixtureTypes()
     {
         Profiles.Clear();
         ElectricalProfiles.Invalidate();
-        Dmx.Dispose();
-        Dmx = CreateDmx(_scene);
-        Poses.ForgetAll();
+        ReplaceStandInsWithRealGdtfs();
+        Dmx.ReloadProfiles();
         _networkDirty = true;
     }
 
