@@ -270,9 +270,10 @@ public sealed partial class StageEngine : IDisposable
         Time += dt;
         Frame++;
 
-        // recorded DMX enters the hub like any protocol; live input is captured as it was merged
-        Player?.PlayTo(Time);
+        // the recorder captures the hub's input at packet rate on the receive threads; the frame time it is given here is
+        // the earliest time of what arrives from now on (playback submitted below included)
         if (Recorder.IsRecording) Recorder.Capture(Time);
+        Player?.PlayTo(Time);
         _autosave?.Update();
 
         UpdateNetwork();
