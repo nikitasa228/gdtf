@@ -27,6 +27,9 @@ internal sealed class DeviceFactsView
     private string[] _iconTooltips = Array.Empty<string>();
     private string _notConnected = "";
     private string _references = "";
+    private IReadOnlyList<Core.Diagnostics.Issue>? _issuesOf;
+    private Guid _issuesFor;
+    private readonly List<Core.Diagnostics.Issue> _typeIssues = new();
 
     /// <summary>Creates the view.</summary>
     public DeviceFactsView(StagePanelContext stage)
@@ -36,6 +39,33 @@ internal sealed class DeviceFactsView
 
     /// <summary>The facts shown (tests).</summary>
     internal DeviceFacts? Facts => _facts;
+
+    /// <summary>
+    /// The fixture-type problems of the device from the engine's issues (an MVR fixture whose GDTF is a stand-in for the
+    /// real type, a DMX mode the GDTF lacks, …), shown in the type section: the data below is then that of the stand-in.
+    /// </summary>
+    internal IReadOnlyList<Core.Diagnostics.Issue> TypeIssues => _typeIssues;
+
+    /// <summary>Collects the fixture-category issues of <paramref name="entity"/> when the issue list or the entity changed.</summary>
+    internal void RefreshTypeIssues(StageEngine engine, Entity entity)
+    {
+        var current = engine.Issues.Current;
+        if (ReferenceEquals(current, _issuesOf) && entity.Id == _issuesFor)
+            return;
+        _issuesOf = current;
+        _issuesFor = entity.Id;
+        _typeIssues.Clear();
+        if (!entity.Has<Core.SceneGraph.Components.FixtureComponent>())
+            return;
+        foreach (var issue in current)
+        {
+            if (issue.Category != Core.Diagnostics.IssueCategory.Fixture || !issue.Entities.Contains(entity.Id))
+                continue;
+            _typeIssues.Add(issue);
+            if (_typeIssues.Count >= 3)
+                break;
+        }
+    }
 
     /// <summary>Rebuilds the facts when the device, its DMX profile, the network or the language changed.</summary>
     internal void Refresh(StageEngine engine, Entity entity)
@@ -69,8 +99,9 @@ internal sealed class DeviceFactsView
     public void Draw(StageEngine engine, Entity entity, float labelWidth)
     {
         Refresh(engine, entity);
+        RefreshTypeIssues(engine, entity);
         var facts = _facts!;
-        if (ShowsTypeSection(facts, entity) && ImGui.CollapsingHeader(StageLoc.With(Icons.BookOpen, StageStr.PropsFixtureType), ImGuiTreeNodeFlags.DefaultOpen))
+        if ((ShowsTypeSection(facts, entity) || _typeIssues.Count > 0) && ImGui.CollapsingHeader(StageLoc.With(Icons.BookOpen, StageStr.PropsFixtureType), ImGuiTreeNodeFlags.DefaultOpen))
         {
             ImGui.PushTextWrapPos(0f);
             ImGui.TextUnformatted(facts.Title);
@@ -81,6 +112,17 @@ internal sealed class DeviceFactsView
                 ImGui.PushStyleColor(ImGuiCol.Text, Theme.Warning);
                 ImGui.PushTextWrapPos(0f);
                 ImGui.TextUnformatted(Icons.TriangleAlert + "  " + note);
+                ImGui.PopTextWrapPos();
+                ImGui.PopStyleColor();
+            }
+
+            // A stand-in type (MVR fixture whose GDTF is not in the library) or a missing mode: the data below is the stand-in's.
+            foreach (var issue in _typeIssues)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, issue.Severity == Core.Diagnostics.IssueSeverity.Error ? Theme.Error
+                    : issue.Severity == Core.Diagnostics.IssueSeverity.Warning ? Theme.Warning : Theme.Note);
+                ImGui.PushTextWrapPos(0f);
+                ImGui.TextUnformatted(issue.Message);
                 ImGui.PopTextWrapPos();
                 ImGui.PopStyleColor();
             }

@@ -48,6 +48,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private string _slotTooltipCache = "";
     private ProtocolStatus? _countersOf;
     private int _portEdit;
+    private int _enttecUniverseEdit;
     private string _countersText = "";
     private string _countersLanguage = "";
     private int _slotTooltipKey = -1;
@@ -463,10 +464,13 @@ internal sealed unsafe class ExternalControlPanel : Panel
             case ProtocolIds.EnttecDmxUsbPro:
                 changed |= SerialPortRow(settings);
                 PropertyGrid.Row(StageLoc.Get(StageStr.ExtUniverse));
-                int universe = settings.EnttecUniverse;
-                if (ImGui.InputInt("##enttec-universe", ref universe) && universe is >= 1 and <= 63999)
+                // Applied when the field is left (or a step button released): every apply restarts the protocols.
+                if (!ImGui.IsAnyItemActive() || _enttecUniverseEdit < 1)
+                    _enttecUniverseEdit = settings.EnttecUniverse;
+                ImGui.InputInt("##enttec-universe", ref _enttecUniverseEdit);
+                if (ImGui.IsItemDeactivatedAfterEdit() && _enttecUniverseEdit is >= 1 and <= 63999 && _enttecUniverseEdit != settings.EnttecUniverse)
                 {
-                    settings.EnttecUniverse = universe;
+                    settings.EnttecUniverse = _enttecUniverseEdit;
                     changed = true;
                 }
 

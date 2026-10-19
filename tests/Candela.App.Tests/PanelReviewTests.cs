@@ -428,6 +428,39 @@ public sealed class PanelReviewTests
     }
 
     [Fact]
+    public void A_stand_in_gdtf_of_an_mvr_fixture_is_explained_above_its_manufacturer_data()
+    {
+        Loc.SetLanguage("en");
+        using var dir = new TempDir();
+        using var engine = StageTestSupport.CreateEngine(dir);
+        var result = engine.Open(StageTestSupport.Fokina);
+        Assert.True(result.Success, result.Summary);
+        engine.Tick(0.02);
+        var blade = engine.Scene.Query<FixtureComponent>().First(t => t.Item1.Name == "MagicBlade R").Item1;
+        // The importer rewrote the spec to the stand-in, so the resolution alone no longer tells it is one.
+        Assert.Equal(FixtureMatchKind.ExactFileName, engine.Dmx.GetResolution(blade.Id)!.MatchKind);
+        var facts = DeviceFacts.Build(engine, blade);
+        Assert.Contains("MagicPanel", facts.Title, StringComparison.Ordinal);
+
+        var view = new DeviceFactsView(StagePanelContext.ForEngine(engine, StageTestSupport.CreateTools()));
+        view.RefreshTypeIssues(engine, blade);
+        Assert.Contains(view.TypeIssues, i => i.Code == "mvr.gdtf-substitute" && i.Message.Contains("MagicBlade R", StringComparison.Ordinal));
+        Assert.True(view.TypeIssues.Count <= 3);
+        // Walls and other non-fixtures have none.
+        var wall = StageTestSupport.AddWall(engine, "Wall", 4, 3);
+        view.RefreshTypeIssues(engine, wall);
+        Assert.Empty(view.TypeIssues);
+        using var ui = new HeadlessImGui(new Vector2(900, 1400));
+        ui.Frame(() =>
+        {
+            ImGui.SetNextWindowSize(new Vector2(420, 1300));
+            ImGui.Begin("facts-host");
+            view.Draw(engine, blade, 92f);
+            ImGui.End();
+        });
+    }
+
+    [Fact]
     public void Unresolved_fixture_without_specs_still_shows_why_in_the_type_section()
     {
         Loc.SetLanguage("en");
