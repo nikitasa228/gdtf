@@ -50,6 +50,10 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private string _countersText = "";
     private string _countersLanguage = "";
     private int _slotTooltipKey = -1;
+    private (long Tenths, int Frames, string Language) _progressKey = (-1, -1, "");
+    private string _progressText = "";
+    private (object? Recording, string Language) _summaryKey;
+    private string _summaryText = "";
 
     /// <summary>Creates the panel for the editor.</summary>
     public ExternalControlPanel(WorkspaceContext context)
@@ -769,8 +773,15 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 model.StopRecording(engine);
             ImGui.PopStyleColor();
             ImGui.SameLine();
-            ImGui.TextColored(Theme.Error, string.Create(CultureInfo.InvariantCulture,
-                $"● {StageLoc.Get(StageStr.ExtRecordingNow)} {recorder.Duration:0.0} s · {recorder.FrameCount}"));
+            // Rebuilt when the shown tenth of a second or the frame count changes, not every frame.
+            var key = ((long)Math.Floor(recorder.Duration * 10.0), recorder.FrameCount, Loc.Language);
+            if (key != _progressKey)
+            {
+                _progressKey = key;
+                _progressText = StageLoc.Format(StageStr.ExtRecordingProgress, key.Item1 / 10.0, key.Item2);
+            }
+
+            ImGui.TextColored(Theme.Error, _progressText);
         }
         else
         {
@@ -842,8 +853,14 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 model.SeekTimecode(engine, tc);
         }
 
-        ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture,
-            $"{recording.Frames.Count} · {recording.Duration:0.0} s · {StageLoc.Get(StageStr.ExtColumnUniverses)} {ExternalControl.UniverseRanges(recording.Universes)}{(recording.FirstTimecode is { } first ? " · TC " + first : "")}"));
+        if (!ReferenceEquals(_summaryKey.Recording, recording) || !string.Equals(_summaryKey.Language, Loc.Language, StringComparison.Ordinal))
+        {
+            _summaryKey = (recording, Loc.Language);
+            _summaryText = StageLoc.Format(StageStr.ExtRecordingSummary, recording.Frames.Count, recording.Duration,
+                ExternalControl.UniverseRanges(recording.Universes)) + (recording.FirstTimecode is { } first ? " · TC " + first : "");
+        }
+
+        ImGui.TextDisabled(_summaryText);
         if (model.RecordingPath is { } file)
             ImGui.TextDisabled(file);
     }
