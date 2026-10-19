@@ -320,7 +320,7 @@ public sealed class DmxEngine : IDisposable
         _runtimes.RemoveAt(last);
     }
 
-    /// <summary>Re-reads a fixture component: profile (when GDTF or mode changed), addresses and manual values.</summary>
+    /// <summary>Re-reads a fixture component: profile (when GDTF or mode changed), addresses, manual values and gel colour.</summary>
     private void Refresh(Runtime r, Entity entity, FixtureComponent fixture)
     {
         r.Entity = entity;
@@ -363,6 +363,7 @@ public sealed class DmxEngine : IDisposable
             }
             r.Addresses = addresses.ToArray();
             r.Manual = fixture.ManualAttributes.Count > 0 ? AttributeOverrides.Compile(profile, fixture.ManualAttributes) : null;
+            state.SetGel(fixture.Color); // the MVR gel colour of a fixture without its own colour system
         }
         else
         {

@@ -255,7 +255,7 @@ public static class FixtureEvaluator
         var acc = BeamAcc.Create();
         ResetWheels(shared);
         Array.Clear(state.EmitterLevels);
-        var ctx = new ApplyContext(p, fns, rt, state.Motors, time, state.Seed, state.Cache);
+        var ctx = new ApplyContext(p, fns, rt, state.Motors, time, state.Seed, state.Cache, state.GelTransmission);
         foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
         if (single)
         {
@@ -512,7 +512,7 @@ public static class FixtureEvaluator
     private readonly struct ApplyContext
     {
         public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, MotorRuntime[] motors, double time, uint seed,
-            EvaluationCache cache)
+            EvaluationCache cache, Vector3 gel)
         {
             Profile = p;
             Functions = fns;
@@ -521,7 +521,11 @@ public static class FixtureEvaluator
             Time = time;
             Seed = seed;
             Cache = cache;
+            Gel = gel;
         }
+
+        /// <summary>Per-channel transmission of the fixture's gel (<see cref="FixtureState.SetGel"/>), (1, 1, 1) without one.</summary>
+        public Vector3 Gel { get; }
 
         public MotorRuntime[] Motors { get; }
 
@@ -1267,6 +1271,8 @@ public static class FixtureEvaluator
             rgb *= gelSaturation < 1f ? Vector3.Lerp(Vector3.One, tr, gelSaturation) : tr;
         }
         if (tint != 0f) rgb = ApplyTint(rgb, tint);
+        // a gel in front of a white fixture (MVR <Color>); fixtures with a colour system of their own make their colour
+        if (!pb.HasColorSystem && ctx.Gel != Vector3.One) rgb *= ctx.Gel;
 
         float flux = MathF.Max(ColorSpaces.LuminanceRec2020(rgb), 0f);
         if (!float.IsFinite(flux) || pb.Unaddressed) flux = 0f; // an unaddressed LED ring has no light of its own

@@ -1323,6 +1323,9 @@ public sealed partial class FixtureProfile
             HashSet<GdtfGeometry>? elsewhere = null;
             foreach (var beam in Beams)
             {
+                // only decorative glow LEDs (aura, background, liquid-effect rings) are off when no channel addresses them; a
+                // cell with channels of its own (a white strobe cell's dimmer) is addressed, whatever its colour
+                if (beam.Geometry.BeamType != GdtfBeamType.Glow || beam.OwnChannels.Length > 0) continue;
                 bool reached = false;
                 foreach (int c in ChannelsOfBeam(beam))
                 {
@@ -1373,6 +1376,7 @@ public sealed partial class FixtureProfile
                     beam.BeamType = PhotometryBeamType.Wash;
                     beam.NativeBeamAngle = 25f * DegToRad;
                     beam.FieldRatio = 1.82f;
+                    beam.FieldRatioEstimated = true;
                     beam.SolidAngles = new BeamSolidAngleTable(PhotometryBeamType.Wash, beam.NativeBeamAngle, beam.NativeBeamAngle, beam.FieldRatio);
                     beam.ReferenceFlux = 1000f;
                     beam.PhotometrySource = PhotometrySource.Estimated;
@@ -1603,7 +1607,7 @@ public sealed partial class FixtureProfile
             if (!(native > 0f) || !float.IsFinite(native)) native = 25f;
 
             float zoomMin = float.PositiveInfinity, zoomMax = 0f;
-            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false;
+            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false, colourSystem = false;
             var emitterSet = new SortedSet<int>();
             foreach (int c in ChannelsOfBeam(beam))
             {
@@ -1638,9 +1642,12 @@ public sealed partial class FixtureProfile
                             emitterSet.Add(f.Emitter);
                             break;
                     }
+                    colourSystem |= IsColourSource(f.Class.Kind) || f.Class.Kind is AttributeKind.ColorSub or AttributeKind.ColorMacro ||
+                        f.Class.Wheel == WheelFamily.Color;
                 }
             }
             bool hasZoom = zoomMax > 0f;
+            beam.HasColorSystem = colourSystem;
 
             // field ratio: from the file's field angle unless that is not a field angle — the zoom range written into the
             // Beam's BeamAngle/FieldAngle (Ayrton Rivale Wash 4°/57°, Clay Paky Aleda B-EYE K10 4°/60° …: 53 beams in the
@@ -1658,6 +1665,7 @@ public sealed partial class FixtureProfile
                 else
                     ratio = r;
             }
+            beam.FieldRatioEstimated = float.IsNaN(ratio);
             if (float.IsNaN(ratio))
             {
                 var est = BeamDistribution.Create(beam.BeamType, native * DegToRad, float.NaN);

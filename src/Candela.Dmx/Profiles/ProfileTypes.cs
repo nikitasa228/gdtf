@@ -655,6 +655,13 @@ public sealed class ProfileBeam
     /// <summary>Field angle / beam angle of the optics.</summary>
     public float FieldRatio { get; internal set; }
 
+    /// <summary>
+    /// True when <see cref="FieldRatio"/> is the beam type's typical ratio, not the file's: the file gives no field angle,
+    /// or its Beam angles are not a beam/field pair (the zoom range written as BeamAngle/FieldAngle, e.g. Ayrton Rivale
+    /// Wash 4°/57°, or a ratio above 4). Field angles derived from it are estimates and may exceed the file's FieldAngle.
+    /// </summary>
+    public bool FieldRatioEstimated { get; internal set; }
+
     /// <summary>Ω_eff as a function of the beam angle.</summary>
     public BeamSolidAngleTable SolidAngles { get; internal set; } = null!;
 
@@ -680,6 +687,13 @@ public sealed class ProfileBeam
     /// of that range on the locus (<see cref="WhitePointKelvin"/>), as a calibrated LED engine does.
     /// </summary>
     public bool WhitePointEstimated { get; internal set; }
+
+    /// <summary>
+    /// True when a channel of the mode colours the beam: additive emitters, CMY or RGB filters, indirect colour (RGB, HSB,
+    /// CIE), colour wheels or colour macros. A beam without (a white source, possibly with CTO/CTB) takes a gel colour set
+    /// on the fixture (<see cref="FixtureState.SetGel"/>, the MVR fixture's &lt;Color&gt;).
+    /// </summary>
+    public bool HasColorSystem { get; internal set; }
 
     /// <summary>Correlated colour temperature of the beam's emitters at full (K), NaN without emitters or when not meaningful.</summary>
     public float WhitePointKelvin { get; internal set; } = float.NaN;
