@@ -51,6 +51,7 @@ public sealed partial class FixtureProfile
         private readonly Dictionary<string, int> _emitterIndex = new(StringComparer.Ordinal);
         private readonly Dictionary<BeamGeometry, BeamSolidAngleTable> _solidAngleCache = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<string, WhiteEfficiencyTable?> _whiteTables = new(StringComparer.Ordinal);
+        private readonly HashSet<string> _whiteWarned = new(StringComparer.Ordinal);
         private bool? _colouredEmitters;
         private int[] _beamFirst = Array.Empty<int>(); // per channel: first beam index affected
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
@@ -979,6 +980,10 @@ public sealed partial class FixtureProfile
             var transmission = new Vector3[n];
             var facets = new int[n];
             var open = new bool[n];
+            var stretch = new float[n];
+            Array.Fill(stretch, 1f);
+            var colourXyz = new Vector3[n];
+            Array.Fill(colourXyz, ColorSpaces.XyToXyz(ColorSpaces.D65WhiteXy));
             bool defaultColourIsOpen = family is not (WheelFamily.BeamShaper or WheelFamily.Animation or WheelFamily.AnimationSystem);
             for (int s = 0; s < n; s++)
             {
@@ -994,6 +999,8 @@ public sealed partial class FixtureProfile
                 transmission[s] = float.IsFinite(c.X) && float.IsFinite(c.Y) && c.Y > 0f
                     ? Filters.PhysicalChannelTransmission(LightColor.FromXy(c.X, c.Y), y)
                     : Vector3.One;
+                if (float.IsFinite(c.X) && float.IsFinite(c.Y) && c.Y > 0f && c.X >= 0f && c.X + c.Y <= 1.0001f)
+                    colourXyz[s] = ColorSpaces.XyToXyz(new Vector2(c.X, c.Y));
                 // a single facet is not a prism: it passes the beam on (BeamZ Ignite's "Wheel Slot 1" under "Prism1 OPEN")
                 facets[s] = slot.Facets.Count > 1 ? slot.Facets.Count : slot.Facets.Count == 1 ? 0 : NameParsing.ParseFacetCount(slot.Name);
                 if (facets[s] == 1) facets[s] = 0;
@@ -1006,9 +1013,11 @@ public sealed partial class FixtureProfile
                             (NameParsing.IsWheelOutName(slot.Name) && !slot.Name.Contains("clos", StringComparison.OrdinalIgnoreCase)));
                 // an open slot is a hole: files often store the lamp's own colour there, which is not a filter
                 if (open[s] && y >= 0.9f) transmission[s] = Vector3.One;
+                // a beam-shaper slot without an image is an anamorphic lens that stretches the beam (Ayrton Rivale)
+                if (family == WheelFamily.BeamShaper && !open[s] && !media && facets[s] == 0) stretch[s] = NameParsing.ParseStretch(slot.Name);
             }
             i = Wheels.Count;
-            Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open));
+            Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open, stretch, colourXyz));
             _wheelIndex[wheel] = i;
             return i;
         }
@@ -1269,6 +1278,7 @@ public sealed partial class FixtureProfile
                             Beams[b].OwnMechanics = true;
             }
 
+            MarkUnaddressedBeams();
             ComputeBeamShares();
             int warningsBefore = Warnings.Count;
             SetupAllBeamPhotometry();
@@ -1290,8 +1300,67 @@ public sealed partial class FixtureProfile
             }
         }
 
+        /// <summary>Attributes that give a beam its colour (additive emitters, indirect colour systems).</summary>
+        private static bool IsColourSource(AttributeKind kind) =>
+            kind is AttributeKind.ColorAdd or AttributeKind.ColorRgb or AttributeKind.HsbHue or AttributeKind.HsbSaturation
+                or AttributeKind.HsbBrightness or AttributeKind.CieX or AttributeKind.CieY or AttributeKind.CieBrightness;
+
+        /// <summary>
+        /// An LED ring or cell that other modes of the fixture colour with additive emitter channels, but that no colour
+        /// channel of this mode reaches while the mode does mix other beams' emitters, has no light of its own here: there
+        /// is no white lamp behind it (Ayrton Zonda 3 FX "Basic": the "Liquid Effect" ring, driven by "Zonda Effect"
+        /// RGB channels only in the "+ Liquid" modes). Such beams are <see cref="ProfileBeam.Unaddressed"/> and stay dark;
+        /// a mode without any emitter channel (a one-channel dimmer mode of an RGBW wash) still lights its beams white.
+        /// </summary>
+        private void MarkUnaddressedBeams()
+        {
+            if (Beams.Count < 2 || FixtureType.DmxModes.Count < 2) return;
+            bool modeMixes = false;
+            foreach (var f in Functions)
+                if (f.Class.Kind == AttributeKind.ColorAdd && f.Emitter >= 0) modeMixes = true;
+            if (!modeMixes) return;
+
+            HashSet<GdtfGeometry>? elsewhere = null;
+            foreach (var beam in Beams)
+            {
+                bool reached = false;
+                foreach (int c in ChannelsOfBeam(beam))
+                {
+                    var ch = Channels[c];
+                    for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount && !reached; k++)
+                        reached = IsColourSource(Functions[k].Class.Kind);
+                    if (reached) break;
+                }
+                if (reached) continue;
+                if (elsewhere is null)
+                {
+                    elsewhere = new HashSet<GdtfGeometry>(ReferenceEqualityComparer.Instance);
+                    foreach (var mode in FixtureType.DmxModes)
+                    {
+                        if (ReferenceEquals(mode, Mode)) continue;
+                        foreach (var channel in mode.Channels)
+                        {
+                            if (channel.Geometry is not { } g) continue;
+                            foreach (var lc in channel.LogicalChannels)
+                                foreach (var fn in lc.Functions)
+                                    if (AttributeClassifier.Classify(fn.AttributeName ?? "").Kind == AttributeKind.ColorAdd) elsewhere.Add(g);
+                        }
+                    }
+                }
+                var parts = Geometry.Parts;
+                for (int part = beam.PartIndex; part >= 0; part = parts[part].ParentIndex)
+                {
+                    if (!elsewhere.Contains(parts[part].Geometry)) continue;
+                    beam.Unaddressed = true;
+                    Warnings.Add($"Beam '{beam.Name}' is coloured by emitter channels in other modes but by no channel of mode '{Mode.Name}': it stays dark.");
+                    break;
+                }
+            }
+        }
+
         private void SetupAllBeamPhotometry()
         {
+            _whiteWarned.Clear();
             foreach (var beam in Beams)
             {
                 try
@@ -1682,7 +1751,9 @@ public sealed partial class FixtureProfile
                     list[i] = new PhotometryEmitter(pe.Name, pe.Chromaticity, beam.ReferenceFlux * MathF.Max(pe.Weight, 1e-6f) / wsum);
                     beam.EmitterSlot[e] = i++;
                 }
+                list = CalibrateWhitePoint(beam, list);
                 beam.Emitters = list;
+                beam.PresetOutput = BuildPresetOutput(beam, list);
                 beam.EmitterFullXyz = new Vector3[Emitters.Count];
                 for (int e = 0; e < Emitters.Count; e++)
                     if (beam.EmitterSlot[e] >= 0)
@@ -1703,6 +1774,117 @@ public sealed partial class FixtureProfile
                 if (!_whiteTables.TryGetValue(key, out var white)) _whiteTables[key] = white = WhiteEfficiencyTable.Create(beam.Emitters);
                 beam.WhiteTable = white;
             }
+        }
+
+        /// <summary>
+        /// Colour wheels on an LED engine that mixes colour are presets, not filters: there is no dichroic in front of the
+        /// emitters, the engine sets them to the preset's colour (Ayrton Zonda 3 FX "Color Preset": "SCARLET" x 0.448,
+        /// y 0.332). Per colour wheel the beam uses, per slot the largest flux the emitters make at the slot's
+        /// chromaticity relative to the beam's reference flux (<see cref="WhiteEfficiencyTable.MaxFlux"/>); NaN for open
+        /// slots and for colours outside the emitters' gamut, which keep the filter model. Null for beams whose emitters
+        /// do not mix colour.
+        /// </summary>
+        private float[]?[]? BuildPresetOutput(ProfileBeam beam, PhotometryEmitter[] list)
+        {
+            bool coloured = false;
+            for (int i = 0; i < list.Length && !coloured; i++)
+                for (int j = i + 1; j < list.Length && !coloured; j++)
+                    coloured = Vector2.Distance(list[i].Chromaticity, list[j].Chromaticity) > 0.1f;
+            if (!coloured || list.Length > 9) return null;
+            float[]?[]? result = null;
+            double[]? a = null, c = null, f = null;
+            double total = 0;
+            foreach (int ch in ChannelsOfBeam(beam))
+            {
+                var channel = Channels[ch];
+                for (int k = channel.FirstFunction; k < channel.FirstFunction + channel.FunctionCount; k++)
+                {
+                    var fn = Functions[k];
+                    if (fn.Class.Wheel != WheelFamily.Color || fn.Wheel < 0) continue;
+                    result ??= new float[]?[Wheels.Count];
+                    if (result[fn.Wheel] is not null) continue;
+                    if (a is null)
+                    {
+                        a = new double[list.Length];
+                        c = new double[list.Length];
+                        f = new double[list.Length];
+                        for (int e = 0; e < list.Length; e++)
+                        {
+                            a[e] = list[e].TristimulusPerLumen.X;
+                            c[e] = list[e].TristimulusPerLumen.Z;
+                            f[e] = list[e].MaxFlux;
+                            total += f[e];
+                        }
+                    }
+                    var wheel = Wheels[fn.Wheel];
+                    var output = new float[wheel.SlotCount];
+                    for (int s = 0; s < output.Length; s++)
+                    {
+                        var xyz = wheel.SlotColorXyzArray[s];
+                        double flux = wheel.SlotOpenArray[s] || !(total > 0) || !(xyz.Y > 0f)
+                            ? 0
+                            : WhiteEfficiencyTable.MaxFlux(a, c!, f!, xyz.X / xyz.Y, xyz.Z / xyz.Y);
+                        output[s] = flux > total * 1e-3 && double.IsFinite(flux) ? (float)(flux / total) : float.NaN;
+                    }
+                    result[fn.Wheel] = output;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>Largest distance of an LED engine's full white from the Planckian locus that is taken as written, Δuv.</summary>
+        private const float MaxWhiteDuv = 0.02f;
+
+        /// <summary>
+        /// Checks the white an LED engine makes with all emitters at full against the fixture's researched colour
+        /// temperature (<c>_specs</c> colorTemperatureK). Emitter outputs taken from a file can be far from photometric
+        /// (Ayrton Zonda 3 FX: RGBW at full mixes to x 0.255, y 0.178, a violet 0.056 below the locus, where the datasheet
+        /// gives 2700–8000 K); a real engine is calibrated to a white. When the full mix is more than
+        /// <see cref="MaxWhiteDuv"/> off the locus or its CCT lies outside the range, the emitter outputs are trimmed as
+        /// little as possible (<see cref="ColorMixing.TryBalance"/>) so that the full mix lands on the locus at the nearest
+        /// CCT of the range, keeping the beam's reference flux and every emitter lit; the beam is marked
+        /// <see cref="ProfileBeam.WhitePointEstimated"/> and a warning names the change. Engines with fewer than two
+        /// differently coloured emitters, or without a researched range, are left alone.
+        /// </summary>
+        private PhotometryEmitter[] CalibrateWhitePoint(ProfileBeam beam, PhotometryEmitter[] list)
+        {
+            beam.WhitePointEstimated = false;
+            beam.WhitePointKelvin = float.NaN;
+            Vector3 sum = default;
+            double total = 0;
+            foreach (var e in list)
+            {
+                sum += e.TristimulusPerLumen * e.MaxFlux;
+                total += e.MaxFlux;
+            }
+            float s = sum.X + sum.Y + sum.Z;
+            if (!(s > 0f) || !(total > 0) || !float.IsFinite(s)) return list;
+            var xy = new Vector2(sum.X / s, sum.Y / s);
+            var cct = Cct.FromXy(xy);
+            if (cct.IsMeaningful) beam.WhitePointKelvin = cct.Kelvin;
+            if (Specs?.ColorTemperatureK is not { } range || !(range.Min >= 1000) || !(range.Max <= 25000) || range.Max < range.Min) return list;
+            bool coloured = false;
+            for (int i = 0; i < list.Length && !coloured; i++)
+                for (int j = i + 1; j < list.Length && !coloured; j++)
+                    coloured = Vector2.Distance(list[i].Chromaticity, list[j].Chromaticity) > 0.1f;
+            if (!coloured) return list;
+            float lo = (float)range.Min, hi = (float)range.Max;
+            bool inRange = cct.IsMeaningful && MathF.Abs(cct.Duv) <= MaxWhiteDuv && cct.Kelvin >= lo / 1.02f && cct.Kelvin <= hi * 1.02f;
+            if (inRange) return list;
+
+            float target = cct.IsMeaningful && float.IsFinite(cct.Kelvin) ? Math.Clamp(cct.Kelvin, lo, hi) : hi;
+            int n = list.Length;
+            var factors = new float[n];
+            if (n > 16 || !ColorMixing.TryBalance(list, Cct.XyFromCct(target), factors)) return list; // outside the emitters' gamut
+            var calibrated = new PhotometryEmitter[n];
+            for (int i = 0; i < n; i++) calibrated[i] = new PhotometryEmitter(list[i].Name, list[i].Chromaticity, list[i].MaxFlux * factors[i]);
+            beam.WhitePointEstimated = true;
+            beam.WhitePointKelvin = target;
+            string key = string.Create(CultureInfo.InvariantCulture, $"{xy.X:F3},{xy.Y:F3}>{target:F0}");
+            if (_whiteWarned.Add(key))
+                Warnings.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"Emitters at full mix to x {xy.X:F3}, y {xy.Y:F3} ({(cct.IsMeaningful ? $"{cct.Kelvin:F0} K, Δuv {cct.Duv:+0.000;-0.000}" : "no CCT")}), outside the datasheet's {lo:F0}–{hi:F0} K; emitter outputs re-balanced to {target:F0} K (estimate)."));
+            return calibrated;
         }
 
         /// <summary>

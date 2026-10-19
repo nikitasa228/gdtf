@@ -311,6 +311,42 @@ public static class NameParsing
         return int.TryParse(s.AsSpan(j + 1, end - j - 1), NumberStyles.None, CultureInfo.InvariantCulture, out int n) && n is > 0 and < 100 ? n : 0;
     }
 
+    /// <summary>Elongation of a beam-shaper lens when its name gives none ("Beam Shaper", "Oval"): a typical 2:1 anamorphic lens.</summary>
+    public const float DefaultShaperStretch = 2f;
+
+    /// <summary>
+    /// Elongation (long axis / short axis, ≥ 1) of an anamorphic beam-shaper lens named <paramref name="name"/>: a ratio
+    /// written in the name ("2:1", "3x1", "x2.5"), else <see cref="DefaultShaperStretch"/>. Values are kept in 1 … 10.
+    /// </summary>
+    public static float ParseStretch(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return DefaultShaperStretch;
+        var s = name.AsSpan();
+        for (int i = 0; i < s.Length; i++)
+        {
+            if (!char.IsAsciiDigit(s[i]) || (i > 0 && (char.IsAsciiDigit(s[i - 1]) || s[i - 1] == '.'))) continue;
+            int j = i;
+            while (j < s.Length && (char.IsAsciiDigit(s[j]) || s[j] == '.')) j++;
+            if (!float.TryParse(s[i..j], NumberStyles.Float, CultureInfo.InvariantCulture, out float a) || !(a > 0f)) continue;
+            int k = j;
+            while (k < s.Length && s[k] == ' ') k++;
+            // "2:1", "2x1", "2 : 1"
+            if (k < s.Length && (s[k] == ':' || s[k] == 'x' || s[k] == 'X'))
+            {
+                int m = k + 1;
+                while (m < s.Length && s[m] == ' ') m++;
+                int e = m;
+                while (e < s.Length && (char.IsAsciiDigit(s[e]) || s[e] == '.')) e++;
+                if (e > m && float.TryParse(s[m..e], NumberStyles.Float, CultureInfo.InvariantCulture, out float b) && b > 0f)
+                    return Math.Clamp(MathF.Max(a, b) / MathF.Min(a, b), 1f, 10f);
+            }
+            // "x2.5"
+            if (i > 0 && (s[i - 1] == 'x' || s[i - 1] == 'X') && a > 1f) return Math.Clamp(a, 1f, 10f);
+            i = j;
+        }
+        return DefaultShaperStretch;
+    }
+
     /// <summary>
     /// True when the name describes an open/empty wheel position ("Open", "Open/Hole", "Open position", "No prism"), also
     /// with "open" as its last word ("Animator OPEN", "Wheel Slot 0: OPEN", "No Prism(Open)") unless it combines it with

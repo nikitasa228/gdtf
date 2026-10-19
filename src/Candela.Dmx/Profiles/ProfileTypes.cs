@@ -518,20 +518,33 @@ public sealed class ProfileChannel
 /// <summary>A wheel used by a profile with per-slot data pre-computed for evaluation.</summary>
 public sealed class ProfileWheel
 {
-    internal ProfileWheel(int index, Wheel source, Vector3[] slotTransmission, int[] facets, bool[] open)
+    internal ProfileWheel(int index, Wheel source, Vector3[] slotTransmission, int[] facets, bool[] open, float[] stretch, Vector3[] colourXyz)
     {
         Index = index;
         Source = source;
         SlotTransmissionArray = slotTransmission;
         SlotFacetArray = facets;
         SlotOpenArray = open;
+        SlotStretchArray = stretch;
+        SlotColorXyzArray = colourXyz;
     }
+
+    /// <summary>Per slot: CIE XYZ (Y = 1) of the slot's colour (D65 for slots without one), for colour presets of LED engines.</summary>
+    internal Vector3[] SlotColorXyzArray { get; }
 
     internal Vector3[] SlotTransmissionArray { get; }
 
     internal int[] SlotFacetArray { get; }
 
     internal bool[] SlotOpenArray { get; }
+
+    internal float[] SlotStretchArray { get; }
+
+    /// <summary>
+    /// Per slot: elongation of the beam (≥ 1, long axis / short axis) by an anamorphic lens — a beam-shaper slot without
+    /// an image ("Beam Shaper", "Oval", "2:1") — 1 for every other slot.
+    /// </summary>
+    public IReadOnlyList<float> SlotStretch => SlotStretchArray;
 
     /// <summary>Index in <see cref="FixtureProfile.Wheels"/>.</summary>
     public int Index { get; }
@@ -660,6 +673,23 @@ public sealed class ProfileBeam
     /// <summary>Emitters of the beam's additive channels with their full-level flux (lm); empty for white-only sources.</summary>
     public PhotometryEmitter[] Emitters { get; internal set; } = Array.Empty<PhotometryEmitter>();
 
+    /// <summary>
+    /// True when the emitters' relative outputs are an estimate: the file's emitter outputs mixed at full to a white far
+    /// from the fixture's researched colour temperature (<c>_specs</c> colorTemperatureK: more than 0.02 Δuv off the
+    /// Planckian locus or a CCT outside the range), so they were trimmed as little as possible to mix to the nearest CCT
+    /// of that range on the locus (<see cref="WhitePointKelvin"/>), as a calibrated LED engine does.
+    /// </summary>
+    public bool WhitePointEstimated { get; internal set; }
+
+    /// <summary>Correlated colour temperature of the beam's emitters at full (K), NaN without emitters or when not meaningful.</summary>
+    public float WhitePointKelvin { get; internal set; } = float.NaN;
+
+    /// <summary>
+    /// True for an LED ring or cell that other modes colour with emitter channels but this mode does not address at all
+    /// (Ayrton Zonda 3 FX "Basic": the liquid-effect ring): it has no light of its own in this mode and stays dark.
+    /// </summary>
+    public bool Unaddressed { get; internal set; }
+
     /// <summary>Maps <see cref="FixtureProfile.Emitters"/> index → index in <see cref="Emitters"/> (−1 when absent).</summary>
     internal int[] EmitterSlot { get; set; } = Array.Empty<int>();
 
@@ -675,6 +705,14 @@ public sealed class ProfileBeam
     /// (<see cref="WhiteEfficiency"/>), not a filter's.
     /// </summary>
     public bool ElectronicColor { get; internal set; }
+
+    /// <summary>
+    /// For a beam whose emitters mix colour (an RGB… LED engine): per profile wheel index, the colour wheel's slots as
+    /// presets the engine renders — per slot the largest flux its emitters make at the slot's chromaticity relative to
+    /// the reference flux, NaN for open slots and slots outside the emitters' gamut (those filter instead); null for
+    /// wheels the beam does not use, and the whole array null for beams without coloured emitters.
+    /// </summary>
+    internal float[]?[]? PresetOutput { get; set; }
 
     /// <summary>Largest white output of the beam's emitters per colour temperature, null when unknown (efficiency 1).</summary>
     internal WhiteEfficiencyTable? WhiteTable { get; set; }

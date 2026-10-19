@@ -1252,9 +1252,15 @@ public static class FixtureEvaluator
             // the engine at the new white point instead of the filter's (re-balancing never adds light)
             rgb *= ctx.Cache.Filter(pb, table, acc.C, acc.M, acc.Y, targetKelvin, electronic: pb.ElectronicColor && temperature);
         }
+        var presets = pb.PresetOutput;
         foreach (ref readonly var w in bs.ColorWheels.AsSpan())
         {
             if (w.Wheel < 0 || w.Slot <= 0 || w.IsOpen) continue;
+            if (presets is not null && presets[w.Wheel] is { } preset && TryPreset(p.WheelArray[w.Wheel], preset, in w, rgb, gelSaturation, out var rendered))
+            {
+                rgb = rendered;
+                continue;
+            }
             var t = p.WheelArray[w.Wheel].SlotTransmissionArray;
             var tr = t[w.Slot - 1];
             if (w.Blend > 0f) tr = Vector3.Lerp(tr, t[w.NextSlot - 1], w.Blend);
@@ -1263,7 +1269,7 @@ public static class FixtureEvaluator
         if (tint != 0f) rgb = ApplyTint(rgb, tint);
 
         float flux = MathF.Max(ColorSpaces.LuminanceRec2020(rgb), 0f);
-        if (!float.IsFinite(flux)) flux = 0f;
+        if (!float.IsFinite(flux) || pb.Unaddressed) flux = 0f; // an unaddressed LED ring has no light of its own
         float transmission = reference > 0f ? Math.Clamp(flux / reference, 0f, 1f) : 0f;
         bs.ColorTransmission = transmission;
         if (flux > 0f) bs.Color = LightColor.FromRec2020(rgb);
@@ -1273,7 +1279,10 @@ public static class FixtureEvaluator
         float beamAngle = float.IsFinite(acc.Zoom) ? Math.Clamp(acc.Zoom, 0.1f, 179f) * DegToRad : pb.NativeBeamAngle;
         bs.BeamAngle = beamAngle;
         bs.FieldAngle = MathF.Max(beamAngle, MathF.Min(beamAngle * pb.FieldRatio, MaxFieldAngle));
-        float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity;
+        float stretch = ShaperStretch(p, bs, out float stretchRotation);
+        bs.ShaperStretch = stretch;
+        bs.ShaperStretchRotation = stretchRotation;
+        float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity / stretch;
         bs.PeakCandela = float.IsFinite(peak) ? peak : 0f;
         bs.Flux = flux * bs.Intensity;
         bs.Focus = float.IsFinite(acc.Focus) ? acc.Focus : 0.5f;
@@ -1281,6 +1290,62 @@ public static class FixtureEvaluator
         bs.Iris = Math.Clamp(acc.Iris, 0f, 1f);
         bs.Frost = Math.Clamp(1f - acc.FrostKeep, 0f, 1f);
         bs.ShaperRotation = acc.ShaperRotation;
+    }
+
+    /// <summary>
+    /// A colour-wheel slot of an LED engine rendered as a preset (see <see cref="ProfileBeam.PresetOutput"/>): the light
+    /// takes the slot's chromaticity, and its luminance is the current mix's times the share of the reference flux the
+    /// emitters make at that colour — dark when the emitters are at 0, the engine's saturated preset at full. A split
+    /// position blends the two slots (an open slot keeps the mix's colour); <paramref name="saturation"/> &lt; 1 (an
+    /// HSB saturation of virtual gels) blends back towards the mix. False when a slot involved is outside the
+    /// emitters' gamut, which leaves the filter model to the caller.
+    /// </summary>
+    private static bool TryPreset(ProfileWheel wheel, float[] output, in WheelState w, Vector3 rgb, float saturation, out Vector3 result)
+    {
+        result = rgb;
+        int i0 = w.Slot - 1, i1 = w.Blend > 0f && w.NextSlot > 0 ? w.NextSlot - 1 : i0;
+        var open = wheel.SlotOpenArray;
+        float o0 = output[i0], o1 = output[i1];
+        if ((!open[i0] && float.IsNaN(o0)) || (!open[i1] && float.IsNaN(o1))) return false;
+        var mix = ColorSpaces.Rec2020ToXyz(rgb);
+        float luminance = mix.Y;
+        if (!(luminance > 0f) || !float.IsFinite(luminance))
+        {
+            result = Vector3.Zero;
+            return true;
+        }
+        var mixUnit = mix / luminance;
+        var xyz = wheel.SlotColorXyzArray;
+        var c0 = open[i0] ? mixUnit : xyz[i0] * o0;
+        var c1 = open[i1] ? mixUnit : xyz[i1] * o1;
+        var preset = (i1 == i0 ? c0 : Vector3.Lerp(c0, c1, w.Blend)) * luminance;
+        if (saturation < 1f) preset = Vector3.Lerp(mix, preset, saturation);
+        result = ColorSpaces.XyzToRec2020(preset);
+        return true;
+    }
+
+    /// <summary>
+    /// Elongation (≥ 1) of the beam by its beam shapers' anamorphic lenses — the slot's stretch scaled by the insertion,
+    /// blended between slots on split positions — and the direction of the long axis (slot indexing/rotation plus the
+    /// wheel angle), rad.
+    /// </summary>
+    private static float ShaperStretch(FixtureProfile p, BeamState bs, out float rotation)
+    {
+        float stretch = 1f;
+        rotation = 0f;
+        foreach (ref readonly var w in bs.BeamShapers.AsSpan())
+        {
+            if (w.Wheel < 0 || w.Slot <= 0 || w.IsOpen || !(w.Insertion > 0f)) continue;
+            var s = p.WheelArray[w.Wheel].SlotStretchArray;
+            float a = s[w.Slot - 1];
+            if (w.Blend > 0f && w.NextSlot > 0) a += (s[w.NextSlot - 1] - a) * w.Blend;
+            a = 1f + (a - 1f) * Math.Clamp(w.Insertion, 0f, 1f);
+            if (!(a > stretch) || !float.IsFinite(a)) continue;
+            stretch = a;
+            float r = (float.IsFinite(w.Rotation) ? w.Rotation : 0f) + (float.IsFinite(w.WheelAngle) ? w.WheelAngle : 0f);
+            rotation = r;
+        }
+        return stretch;
     }
 
     private static float ApplyCurve(float v, DimmerCurve curve) => curve switch

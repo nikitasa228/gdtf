@@ -274,6 +274,17 @@ public sealed class BeamState
     /// <summary>Rotation of the whole framing module, rad.</summary>
     public float ShaperRotation { get; internal set; }
 
+    /// <summary>
+    /// Elongation of the beam by an anamorphic beam shaper (long axis / short axis, ≥ 1; 1 = round): the lens of a beam
+    /// shaper slot without an image, scaled by its insertion. <see cref="BeamAngle"/> and <see cref="FieldAngle"/> are the
+    /// short axis; the long axis is <see cref="ShaperStretch"/> times wider, and <see cref="PeakCandela"/> is lower by the
+    /// same factor (the flux is spread over the wider beam).
+    /// </summary>
+    public float ShaperStretch { get; internal set; } = 1f;
+
+    /// <summary>Direction of the stretched (long) axis about the beam axis, rad (the beam shaper's indexing and rotation).</summary>
+    public float ShaperStretchRotation { get; internal set; }
+
     /// <summary>Number of prism facets currently in the beam (product of all inserted prisms; 0 = none).</summary>
     public int PrismFacets
     {

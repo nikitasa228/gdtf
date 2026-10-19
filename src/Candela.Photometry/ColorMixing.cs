@@ -123,6 +123,81 @@ public static class ColorMixing
     }
 
     /// <summary>
+    /// Re-balances an engine's emitter outputs so that all emitters at full mix to <paramref name="targetXy"/>, changing
+    /// them as little as possible: positive factors kᵢ with the least Σ (ln kᵢ)² (a calibration trims every emitter a
+    /// little rather than switching one off), then scaled together so the total flux stays Σ MaxFlux. Solved by
+    /// minimum-norm Gauss–Newton steps on ln kᵢ against the two chromaticity conditions Σ kᵢ·Fᵢ·(Xᵢ/Yᵢ − X/Y) = 0 and
+    /// Σ kᵢ·Fᵢ·(Zᵢ/Yᵢ − Z/Y) = 0; a handful of iterations for real engines. Allocation-free for up to 16 emitters.
+    /// </summary>
+    /// <param name="emitters">The engine's emitters at their nominal full-level flux.</param>
+    /// <param name="targetXy">The white (or any chromaticity) the full mix should make.</param>
+    /// <param name="factors">Receives kᵢ per emitter (same length as <paramref name="emitters"/>).</param>
+    /// <returns>False when the target lies outside the emitters' gamut, fewer than two emitters have flux, or the input is invalid.</returns>
+    public static bool TryBalance(ReadOnlySpan<Emitter> emitters, Vector2 targetXy, Span<float> factors)
+    {
+        int n = emitters.Length;
+        if (factors.Length < n || n < 2 || n > 16 || !float.IsFinite(targetXy.X) || !float.IsFinite(targetXy.Y) || !(targetXy.Y > 0f))
+            return false;
+        double ta = targetXy.X / (double)targetXy.Y, tc = (1.0 - targetXy.X - targetXy.Y) / targetXy.Y;
+        Span<double> p = stackalloc double[n];
+        Span<double> q = stackalloc double[n];
+        Span<double> x = stackalloc double[n];
+        double total = 0;
+        int lit = 0;
+        for (int i = 0; i < n; i++)
+        {
+            double f = emitters[i].MaxFlux;
+            var t = emitters[i].TristimulusPerLumen;
+            p[i] = f * (t.X - ta);
+            q[i] = f * (t.Z - tc);
+            total += f;
+            if (f > 0) lit++;
+        }
+        if (lit < 2 || !(total > 0)) return false;
+
+        for (int iteration = 0; iteration < 200; iteration++)
+        {
+            // residual and Jacobian rows (∂/∂xᵢ of Σ e^xᵢ pᵢ and Σ e^xᵢ qᵢ)
+            double r1 = 0, r2 = 0, j11 = 0, j12 = 0, j22 = 0, jx1 = 0, jx2 = 0;
+            for (int i = 0; i < n; i++)
+            {
+                double k = Math.Exp(x[i]);
+                double u = k * p[i], v = k * q[i];
+                r1 += u;
+                r2 += v;
+                j11 += u * u;
+                j12 += u * v;
+                j22 += v * v;
+                jx1 += u * x[i];
+                jx2 += v * x[i];
+            }
+            double scale = Math.Max(Math.Abs(r1), Math.Abs(r2));
+            if (scale <= 1e-10 * total) break;
+            if (iteration == 199) return false;
+            // x ← Jᵀ (J Jᵀ)⁻¹ (J x − r): the smallest x that meets the linearised conditions
+            double det = j11 * j22 - j12 * j12;
+            if (!(Math.Abs(det) > 1e-300)) return false;
+            double b1 = jx1 - r1, b2 = jx2 - r2;
+            double l1 = (j22 * b1 - j12 * b2) / det, l2 = (j11 * b2 - j12 * b1) / det;
+            for (int i = 0; i < n; i++)
+            {
+                double k = Math.Exp(x[i]);
+                double next = k * p[i] * l1 + k * q[i] * l2;
+                // damped: a step of more than e² in one factor is taken in part, the gamut edge is approached slowly
+                x[i] += Math.Clamp(next - x[i], -2.0, 2.0);
+                if (!double.IsFinite(x[i]) || Math.Abs(x[i]) > 30) return false;
+            }
+        }
+
+        double mixed = 0;
+        for (int i = 0; i < n; i++) mixed += Math.Exp(x[i]) * emitters[i].MaxFlux;
+        if (!(mixed > 0)) return false;
+        double norm = total / mixed;
+        for (int i = 0; i < n; i++) factors[i] = (float)(Math.Exp(x[i]) * norm);
+        return true;
+    }
+
+    /// <summary>
     /// Spectral power distribution (W/nm) of the mix, for spectral filtering of an LED engine. Each contributing
     /// emitter's relative spectrum is scaled so that its luminous flux equals level × full-level flux.
     /// </summary>
