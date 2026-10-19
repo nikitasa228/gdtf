@@ -63,8 +63,18 @@ internal static class InfoCommand
         }
         var engineOptions = CliArgs.EngineOptions(options.Libraries, null);
         FixtureSpecs? specs = null;
-        foreach (var folder in engineOptions.LibraryFolders)
-            if (FixtureSpecsIndex.TryLoadNear(folder) is { } index && (specs = index.Find(Path.GetFileName(options.File))) is not null) break;
+        // The researched data the engine would use (settings, next to a library folder, installed copy, repository).
+        if (engineOptions.SpecsIndexPath is { } specsPath)
+        {
+            try
+            {
+                specs = FixtureSpecsIndex.Load(specsPath).Find(Path.GetFileName(options.File));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or System.Text.Json.JsonException)
+            {
+                error.WriteLine($"The researched fixture data '{specsPath}' cannot be read: {e.Message}");
+            }
+        }
 
         output.WriteLine($"Fixture:      {type.Manufacturer} {type.LongName.Trim() switch { "" => type.Name, var l => l }}");
         output.WriteLine($"Name:         {type.Name} (short '{type.ShortName}')");

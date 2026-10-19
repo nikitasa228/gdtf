@@ -3,6 +3,11 @@
     <OutputType>Exe</OutputType>
     <!-- The tool is invoked as `candela <command>`. -->
     <AssemblyName>candela</AssemblyName>
+    <!-- Windows file properties, icon and manifest; see packaging/windows. -->
+    <AssemblyTitle>Candela command-line tool</AssemblyTitle>
+    <Description>Candela command-line tool: render, validate and inspect stage lighting scenes; the editor's model import worker.</Description>
+    <ApplicationIcon>../../packaging/windows/icon/candela.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Candela.Engine/Candela.Engine.csproj" />

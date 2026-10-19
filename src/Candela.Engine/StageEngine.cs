@@ -33,7 +33,7 @@ public sealed partial class StageEngine : IDisposable
 {
     private readonly StageLightCollector _lights = new();
     private readonly List<IIssueProvider> _providers = new();
-    private readonly IReadOnlyList<Issue> _libraryIssues = Array.Empty<Issue>();
+    private IReadOnlyList<Issue> _libraryIssues = Array.Empty<Issue>();
     private ProjectData _project;
     private Scene _scene;
     private readonly CableAnchorIndex _cableAnchors = new();
