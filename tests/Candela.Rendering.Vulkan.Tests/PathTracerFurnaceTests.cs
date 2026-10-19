@@ -44,11 +44,13 @@ public sealed class PathTracerFurnaceTests
     }
 
     [SkippableTheory]
-    [InlineData(1f, 0f, 1f, 1f, 0.999f)]     // Lambertian, albedo 1: exactly the background
-    [InlineData(1.5f, 0f, 0.5f, 1f, 0.94f)]  // white plastic: diffuse + GGX specular, a few % lost at grazing angles
-    [InlineData(1.5f, 1f, 0.3f, 1f, 0.94f)]  // white (F0 = 1) rough metal: single-scattering GGX loses a little
-    [InlineData(1.5f, 1f, 0.02f, 1f, 0.97f)] // a mirror
-    public void WhiteSphereConservesEnergy(float ior, float metallic, float roughness, float maximum, float minimum)
+    [InlineData(1f, 0f, 1f, 1f, 0.999f, 0f)]     // Lambertian, albedo 1: exactly the background
+    [InlineData(1.5f, 0f, 0.5f, 1f, 0.94f, 0f)]  // white plastic: diffuse + GGX specular, a few % lost at grazing angles
+    [InlineData(1.5f, 1f, 0.3f, 1f, 0.94f, 0f)]  // white (F0 = 1) rough metal: single-scattering GGX loses a little
+    [InlineData(1.5f, 1f, 0.02f, 1f, 0.97f, 0f)] // a mirror
+    [InlineData(1.5f, 0f, 0.5f, 1f, 0.94f, 0.5f)] // a white translucent screen: reflection + thin-walled transmission
+    [InlineData(1.5f, 0f, 0.05f, 1f, 0.97f, 1f)]  // clear glass: Fresnel reflection + transmission straight through
+    public void WhiteSphereConservesEnergy(float ior, float metallic, float roughness, float maximum, float minimum, float transmission)
     {
         var renderer = FinalRenderSupport.CreateOrSkip();
         try
@@ -62,6 +64,8 @@ public sealed class PathTracerFurnaceTests
                 Metallic = metallic,
                 Roughness = roughness,
                 Ior = ior,
+                Transmission = transmission,
+                DoubleSided = transmission > 0f,
             }, null);
             world.CreateInstance(mesh, new[] { material }, Matrix4x4.Identity, InstanceFlags.None, 1);
             using var render = FinalRenderSupport.RenderToCompletion(renderer, Camera(), FinalRenderSupport.Settings(Size, Size, 32, bounces: 16),
