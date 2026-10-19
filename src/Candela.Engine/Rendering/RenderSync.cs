@@ -79,6 +79,7 @@ public sealed class RenderSync : IDisposable
     private readonly AtmosphereState _atmosphere = new();
     private readonly List<VolumeGrid> _flameGrids = new();
     private readonly List<VolumeGrid> _moreFlames = new();
+    private PartGlow[] _partGlow = new PartGlow[16];
     private readonly List<ModelVisual> _staleModels = new();
     private readonly List<FixtureTypeVisual> _retiredTypes = new();
     private readonly List<TextureHandle> _retiredTextures = new();
@@ -746,25 +747,34 @@ public sealed class RenderSync : IDisposable
         foreach (var v in _entities.Values)
         {
             if (v.Kind != VisualKind.Fixture || !v.HasFixtureInstances || !_engine.Poses.TryGet(v.Entity.Id, out var pose)) continue;
+            // The glow of every part first (one pass over the beams), then the instances: linear in parts + beams +
+            // instances, also for pixel bars with hundreds of beams.
+            var world = pose.PartWorld;
+            int parts = world.Length;
+            if (_partGlow.Length < parts) Array.Resize(ref _partGlow, Math.Max(parts, 2 * _partGlow.Length));
+            var glowOf = _partGlow.AsSpan(0, parts);
+            glowOf.Clear();
             var beams = pose.State.Beams;
+            for (int b = 0; b < beams.Count; b++)
+            {
+                var beam = beams[b];
+                if ((uint)beam.PartIndex >= (uint)parts) continue;
+                var lens = LensLuminance(beam);
+                if (lens == Vector3.Zero) continue;
+                ref var g = ref glowOf[beam.PartIndex];
+                g.Luminance += lens;
+                if (float.IsFinite(beam.BeamAngle)) g.HalfAngle = MathF.Max(g.HalfAngle, 0.5f * beam.BeamAngle);
+            }
+
             var span = CollectionsMarshal.AsSpan(v.Instances);
             for (int i = 0; i < span.Length; i++)
             {
                 ref var r = ref span[i];
                 if (r.Part < 0) continue;
-                var glow = Vector3.Zero;
-                float halfAngle = 0f;
-                for (int b = 0; b < beams.Count; b++)
-                {
-                    var beam = beams[b];
-                    if (beam.PartIndex != r.Part) continue;
-                    var lens = LensLuminance(beam);
-                    if (lens == Vector3.Zero) continue;
-                    glow += lens;
-                    if (float.IsFinite(beam.BeamAngle)) halfAngle = MathF.Max(halfAngle, 0.5f * beam.BeamAngle);
-                }
-                glow = Vector3.Min(glow, new Vector3(MaxLensLuminance));
-                var axis = r.Part < pose.PartWorld.Length ? Vector3.TransformNormal(-Vector3.UnitZ, pose.PartWorld[r.Part]) : Vector3.Zero;
+                var part = r.Part < parts ? glowOf[r.Part] : default;
+                var glow = Vector3.Min(part.Luminance, new Vector3(MaxLensLuminance));
+                float halfAngle = part.HalfAngle;
+                var axis = r.Part < parts ? Vector3.TransformNormal(-Vector3.UnitZ, world[r.Part]) : Vector3.Zero;
                 if (glow == r.Emission && axis == r.EmissionAxis && halfAngle == r.EmissionHalfAngle) continue;
                 r.Emission = glow;
                 r.EmissionAxis = axis;
@@ -772,6 +782,13 @@ public sealed class RenderSync : IDisposable
                 World.SetInstanceEmission(r.Handle, glow, axis, halfAngle);
             }
         }
+    }
+
+    /// <summary>Lens glow of one geometry part (sum of its beams), see <see cref="UpdateLensGlow"/>.</summary>
+    private struct PartGlow
+    {
+        public Vector3 Luminance;
+        public float HalfAngle;
     }
 
     /// <summary>Luminance of a beam's lens, cd/m² per Rec.2020 channel: peak candela / (π r²) in the beam's colour.</summary>

@@ -67,6 +67,9 @@ internal sealed unsafe class AtmosphereResources : IDisposable
     /// <summary>Vector4 entries of one flame grid record after the blackbody table: box min, box max, atlas offset, size.</summary>
     public const int FlameRecordSize = 4;
 
+    /// <summary>Most texels of the flame atlas (all grids together, 2 bytes each): 64 M (128 MiB).</summary>
+    public const long MaxFlameAtlasTexels = 1L << 26;
+
     private static readonly Lazy<Vector4[]> _flameLut = new(BuildFlameLut, LazyThreadSafetyMode.ExecutionAndPublication);
     private readonly VulkanContext _context;
     private readonly HashSet<string> _warned = new(StringComparer.Ordinal);
@@ -257,6 +260,15 @@ internal sealed unsafe class AtmosphereResources : IDisposable
             {
                 if (_warned.Add(Flame.Name + "atlas"))
                     _context.Log(VulkanLogLevel.Warning, "Flame grids beyond the device's 3D image limit are not drawn.");
+                break;
+            }
+
+            // The whole atlas stays within MaxFlameAtlasTexels (memory, and the upload's span length).
+            long atlasTexels = (long)Math.Max(width, column + Math.Max(columnWidth, g.SizeX)) * Math.Max(height, g.SizeY) * Math.Max(depth, z + g.SizeZ);
+            if (atlasTexels > MaxFlameAtlasTexels)
+            {
+                if (_warned.Add(Flame.Name + "texels"))
+                    _context.Log(VulkanLogLevel.Warning, $"Flame grids beyond {MaxFlameAtlasTexels} texels in all are not drawn.");
                 break;
             }
 
