@@ -234,7 +234,20 @@ public static class CableTubeMesh
             float fraction = straight > 0 ? horizontal / straight : 0;
             if (slack <= 1.0001f || fraction < MinHorizontalFraction)
             {
-                result.Add(Rest(c, c.Z, support, lift));
+                var straightEnd = Rest(c, c.Z, support, lift);
+                if (forward is not null && support is not null && horizontal > spacing)
+                {
+                    // a straight span can still cut through a surface on its way (a taut cable leaving a riser): it is
+                    // sampled between its resting ends and draped over what it would pass through; a span that cuts
+                    // through nothing stays one straight piece
+                    var from = result[^1];
+                    int pieces = System.Math.Clamp((int)MathF.Ceiling(straight / spacing), 2, 512);
+                    int start = result.Count;
+                    for (int s = 1; s < pieces; s++) result.Add(Vector3.Lerp(from, straightEnd, s / (float)pieces));
+                    if (!RestSpan(result, start, from, straightEnd, straightEnd.Z, support, lift, forward))
+                        result.RemoveRange(start, result.Count - start);
+                }
+                result.Add(straightEnd);
                 continue;
             }
             float k = CatenaryParameter(slack);
@@ -266,13 +279,13 @@ public static class CableTubeMesh
     /// surface it is lying on or above (so a cable leaving a riser drapes over its edge), but a surface over the cable's
     /// route (a platform it runs under) is left alone. The walk is done from both ends (the start rests on
     /// <c>path[first − 1]</c>, the end at <paramref name="endZ"/>) and each sample keeps the higher result, so the drawing
-    /// does not depend on the direction the span was stored in.
+    /// does not depend on the direction the span was stored in. Returns true when a sample was raised.
     /// </summary>
-    private static void RestSpan(List<Vector3> path, int first, Vector3 a, Vector3 c, float endZ, CableSupportHeight support, float lift,
+    private static bool RestSpan(List<Vector3> path, int first, Vector3 a, Vector3 c, float endZ, CableSupportHeight support, float lift,
         List<float> forward)
     {
         int count = path.Count - first;
-        if (count <= 0) return;
+        if (count <= 0) return false;
         float span = 1f / (count + 1);
         forward.Clear();
         float previous = path[first - 1].Z;
@@ -284,13 +297,17 @@ public static class CableTubeMesh
             forward.Add(previous);
         }
         float next = endZ;
+        bool raised = false;
         for (int s = count - 1; s >= 0; s--)
         {
             var p = path[first + s];
             float chord = a.Z + (c.Z - a.Z) * ((s + 1) * span);
             next = Rest(p, MathF.Max(chord, next), support, lift).Z;
-            path[first + s] = new Vector3(p.X, p.Y, MathF.Max(forward[s], next));
+            float z = MathF.Max(forward[s], next);
+            raised |= z > p.Z + 1e-6f;
+            path[first + s] = new Vector3(p.X, p.Y, z);
         }
+        return raised;
     }
 
     /// <summary>Slack of span <paramref name="i"/>: at least 1, at most 10; missing or invalid values are 1 (straight).</summary>
@@ -299,7 +316,9 @@ public static class CableTubeMesh
 
     /// <summary>
     /// <paramref name="p"/> raised, when needed, to <paramref name="clearance"/> above the surface that supports it (the
-    /// highest one not above <paramref name="maxHeight"/>, the chord of its span there).
+    /// highest one not above <paramref name="maxHeight"/>, the chord of its span there), measured along the surface's
+    /// normal: on a ramp the tube's centre must be <paramref name="clearance"/> / cos(slope) above the surface, or its
+    /// lower side would cut into it.
     /// </summary>
     private static Vector3 Rest(Vector3 p, float maxHeight, CableSupportHeight? support, float clearance)
     {
@@ -307,7 +326,40 @@ public static class CableTubeMesh
         float surface = support(p.X, p.Y, maxHeight);
         if (!float.IsFinite(surface)) return p;
         float min = surface + clearance;
+        // only a point this close to the surface can need more than the level clearance (slopes up to 60°: twice it)
+        if (clearance > 0 && p.Z < surface + MaxSecant * clearance) min = surface + clearance * Secant(support, p.X, p.Y, surface, clearance);
         return p.Z < min ? new Vector3(p.X, p.Y, min) : p;
+    }
+
+    /// <summary>tan²(60°): a steeper change of the supporting height is an edge between two surfaces, not a slope.</summary>
+    private const float MaxSlopeSquared = 3.0003f;
+
+    /// <summary>1 / cos(60°): the largest factor <see cref="Secant"/> returns.</summary>
+    private const float MaxSecant = 2f;
+
+    /// <summary>
+    /// 1 / cos of the slope of the surface at (<paramref name="x"/>, <paramref name="y"/>) — the height of the surface is
+    /// <paramref name="surface"/> there — from its heights a small step away in X and Y (the larger slope of the two
+    /// sides of each axis, so a ridge is not averaged away; a side that is off the surface or across an edge is left
+    /// out). 1 on level ground.
+    /// </summary>
+    private static float Secant(CableSupportHeight support, float x, float y, float surface, float clearance)
+    {
+        float h = MathF.Max(clearance, 1e-3f);
+        float limit = surface + MaxSecant * h; // a slope up to 60° rises at most √3 × h over h
+        float gx = Slope(support(x + h, y, limit), support(x - h, y, limit), surface, h);
+        float gy = Slope(support(x, y + h, limit), support(x, y - h, limit), surface, h);
+        float g2 = gx * gx + gy * gy;
+        return g2 <= MaxSlopeSquared ? MathF.Sqrt(1 + g2) : MaxSecant;
+    }
+
+    /// <summary>The steeper of the slopes towards <paramref name="ahead"/> and from <paramref name="behind"/>, edges left out.</summary>
+    private static float Slope(float ahead, float behind, float surface, float h)
+    {
+        float a = (ahead - surface) / h, b = (surface - behind) / h;
+        bool useA = float.IsFinite(a) && a * a <= MaxSlopeSquared, useB = float.IsFinite(b) && b * b <= MaxSlopeSquared;
+        if (useA && useB) return MathF.Abs(a) >= MathF.Abs(b) ? a : b;
+        return useA ? a : useB ? b : 0f;
     }
 
     /// <summary>

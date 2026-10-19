@@ -83,7 +83,6 @@ public sealed partial class RenderSync : IDisposable
     private readonly Func<CableNode, CableNode, float> _spanSlack;
     private float[] _nodeRest = new float[16];
     private float _cableSlack = 1f;
-    private long _cableSupportsDrawn = -1;
     private readonly List<LineVertex> _lines = new();
     private readonly List<Guid> _scratch = new();
     private readonly List<Issue> _issues = new();
@@ -417,11 +416,12 @@ public sealed partial class RenderSync : IDisposable
     {
         if (_cablesDirty) RebuildCableIndex();
         _cableSupports.EnsureBuilt(_scene);
-        if (_cableSupports.Version != _cableSupportsDrawn)
+        if (_cableSupports.TakeChanges(out bool everywhere, out var changedMin, out var changedMax))
         {
-            // the floors cables lie on changed (rare): every cable is drawn again on the new ones
-            _cableSupportsDrawn = _cableSupports.Version;
-            foreach (var (entity, _) in _scene.Query<CableComponent>()) _rebuild.Add(entity.Id);
+            // the surfaces cables lie on changed (a floor added, moved or resized, the ground): the cables over the
+            // changed area are drawn again on the new ones
+            foreach (var (entity, cable) in _scene.Query<CableComponent>())
+                if (everywhere || CableOverlaps(entity, cable, changedMin, changedMax)) _rebuild.Add(entity.Id);
         }
         if (_moved.Count > 0 || _rebuild.Count > 0)
         {
@@ -696,6 +696,28 @@ public sealed partial class RenderSync : IDisposable
         for (int i = 0; i < n; i++)
             if (cable.Nodes[i] is { } node) _nodeIndex.TryAdd(node.Id, i);
         return n;
+    }
+
+    /// <summary>
+    /// True when the horizontal extent of the cable's nodes (where its tube is drawn: sag and resting are vertical)
+    /// meets the rectangle from <paramref name="min"/> to <paramref name="max"/> (world X/Y, metres).
+    /// </summary>
+    private bool CableOverlaps(Entity entity, CableComponent cable, Vector2 min, Vector2 max)
+    {
+        const float Margin = 0.05f; // the tube's radius and the surface queries around a point
+        if (_nodePositions.Length < cable.Nodes.Count) _nodePositions = new Vector3[Math.Max(cable.Nodes.Count, _nodePositions.Length * 2)];
+        int n = CableGeometry.WriteNodeWorldPositions(_scene, entity, cable, _nodePositions);
+        var lo = new Vector2(float.PositiveInfinity);
+        var hi = new Vector2(float.NegativeInfinity);
+        for (int i = 0; i < n; i++)
+        {
+            var p = _nodePositions[i];
+            if (!IsFinite(p)) continue;
+            lo = Vector2.Min(lo, new Vector2(p.X, p.Y));
+            hi = Vector2.Max(hi, new Vector2(p.X, p.Y));
+        }
+        if (!(lo.X <= hi.X)) return true; // no usable position: draw it again to be safe
+        return lo.X - Margin <= max.X && hi.X + Margin >= min.X && lo.Y - Margin <= max.Y && hi.Y + Margin >= min.Y;
     }
 
     /// <summary>Position of a node of the cable being built (after <see cref="WriteCableNodes"/>).</summary>

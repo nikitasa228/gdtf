@@ -113,7 +113,7 @@ public static class MvrImporter
         private bool _geometryBudgetReported;
         private IReadOnlyDictionary<Guid, CandelaUserData.WallRecord> _walls = new Dictionary<Guid, CandelaUserData.WallRecord>();
         private IReadOnlyDictionary<Guid, CandelaUserData.DeviceRecord> _candelaDevices = new Dictionary<Guid, CandelaUserData.DeviceRecord>();
-        private readonly Dictionary<string, string> _candelaSpecs = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, CandelaUserData.DeviceRecord> _candelaSpecs = new(StringComparer.OrdinalIgnoreCase);
 
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
         {
@@ -213,7 +213,7 @@ public static class MvrImporter
                         users.Add(id);
                         if (d.Addresses.Count > 0) _patchedSpecs.Add(spec);
                         // one of Candela's generic devices: its GDTF is resolved by the device's own file name
-                        if (_candelaDevices.TryGetValue(obj.Uuid, out var device)) _candelaSpecs.TryAdd(spec, device.GdtfFile);
+                        if (_candelaDevices.TryGetValue(obj.Uuid, out var device)) _candelaSpecs.TryAdd(spec, device);
                         var key = (spec, (d.GdtfMode ?? "").Trim());
                         _modeUsers[key] = _modeUsers.GetValueOrDefault(key) + 1;
                         if (!_modeAddresses.TryGetValue(key, out var list)) _modeAddresses[key] = list = new List<int>();

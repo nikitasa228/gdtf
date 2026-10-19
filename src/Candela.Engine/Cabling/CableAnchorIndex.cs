@@ -13,6 +13,7 @@ namespace Candela.Engine;
 public sealed class CableAnchorIndex
 {
     private readonly Dictionary<Guid, List<Guid>> _cablesByEntity = new();
+    private readonly Stack<List<Guid>> _spare = new(); // lists of the previous build, reused (a node drag rebuilds per frame)
     private bool _valid;
 
     /// <summary>Number of entities that move cables (anchors and cable entities), after the last build.</summary>
@@ -30,7 +31,11 @@ public sealed class CableAnchorIndex
         ArgumentNullException.ThrowIfNull(scene);
         if (_valid) return;
         _valid = true;
-        foreach (var list in _cablesByEntity.Values) list.Clear();
+        foreach (var list in _cablesByEntity.Values)
+        {
+            list.Clear();
+            _spare.Push(list);
+        }
         _cablesByEntity.Clear();
         foreach (var (entity, cable) in scene.Query<CableComponent>())
         {
@@ -43,6 +48,7 @@ public sealed class CableAnchorIndex
 
     /// <summary>
     /// The cables whose geometry follows <paramref name="entityId"/> (anchored to it, or carried by it); false when none.
+    /// The list is the index's own and valid until the next build (<see cref="EnsureBuilt"/> after <see cref="Invalidate"/>).
     /// </summary>
     public bool TryGetCables(Guid entityId, out IReadOnlyList<Guid> cables)
     {
@@ -77,7 +83,8 @@ public sealed class CableAnchorIndex
 
     private void Add(Guid entityId, Guid cableId)
     {
-        if (!_cablesByEntity.TryGetValue(entityId, out var list)) _cablesByEntity[entityId] = list = new List<Guid>(1);
+        if (!_cablesByEntity.TryGetValue(entityId, out var list))
+            _cablesByEntity[entityId] = list = _spare.Count > 0 ? _spare.Pop() : new List<Guid>(1);
         if (!list.Contains(cableId)) list.Add(cableId);
     }
 }

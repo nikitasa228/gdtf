@@ -39,6 +39,7 @@ public sealed partial class StageEngine : IDisposable
     private readonly CableAnchorIndex _cableAnchors = new();
     private readonly HashSet<Entity> _movedForNetwork = new(ReferenceEqualityComparer.Instance);
     private readonly HashSet<Guid> _movedCables = new();
+    private readonly NetworkInputs _solvedInputs = new();
     private NetworkSolution? _network;
     private bool _networkDirty = true;
     private bool _hasConsoles;
@@ -254,12 +255,14 @@ public sealed partial class StageEngine : IDisposable
     }
 
     /// <summary>
-    /// The data/power network of the scene as it is now: solved again after structural edits (cables, consoles,
-    /// fixtures, power sources, entities added, removed, renamed or reparented), and renewed when entities that cable
-    /// nodes are anchored to — or cable entities themselves — moved, so cable geometry, lengths, weights, run lengths and
-    /// the length checks always describe the current positions. A move recomputes only the cables that moved with it
-    /// (<see cref="NetworkSolver.UpdateGeometry"/>), when the solution is next read; moving anything else keeps the
-    /// solution as it is.
+    /// The data/power network of the scene as it is now: solved again after structural edits (cables plugged, routed
+    /// or re-anchored, consoles, power sources, a fixture's GDTF, mode, patch or fixture id, entities added, removed,
+    /// renamed or reparented), and renewed when entities that cable nodes are anchored to — or cable entities
+    /// themselves — moved, or cable nodes were dragged to new positions, so cable geometry, lengths, weights, run
+    /// lengths and the length checks always describe the current positions. A move recomputes only the cables that moved
+    /// with it (<see cref="NetworkSolver.UpdateGeometry"/>), when the solution is next read; moving anything else, or
+    /// editing what the cabling does not depend on (a fixture's manual attributes on every frame of a slider drag), keeps
+    /// the solution as it is.
     /// </summary>
     public NetworkSolution NetworkSolution
     {
@@ -270,6 +273,7 @@ public sealed partial class StageEngine : IDisposable
             {
                 _movedForNetwork.Clear();
                 _network = Network.GetOrSolve(_scene);
+                _solvedInputs.Record(_scene);
             }
             else
             {
@@ -416,6 +420,7 @@ public sealed partial class StageEngine : IDisposable
         _network = null;
         _movedForNetwork.Clear();
         _cableAnchors.Invalidate();
+        _solvedInputs.Clear();
         IsModified = false;
         SceneReplaced?.Invoke(scene);
         StartAutosaveSession();
@@ -471,6 +476,8 @@ public sealed partial class StageEngine : IDisposable
             break;
         }
         _network = _hasConsoles ? Network.Solve(_scene) : null;
+        if (_network is null) _solvedInputs.Clear();
+        else _solvedInputs.Record(_scene);
     }
 
     /// <summary>
@@ -489,6 +496,18 @@ public sealed partial class StageEngine : IDisposable
         _network = Network.UpdateGeometry(network, _scene, _movedCables);
         _movedCables.Clear();
     }
+
+    /// <summary>
+    /// True when an in-place edit of <paramref name="component"/> leaves the cabling as it was solved: a fixture whose
+    /// GDTF, mode, patch and fixture id are unchanged, or a cable whose nodes, anchors, segments, plugs, type and label
+    /// are unchanged (its nodes may have moved).
+    /// </summary>
+    private bool IsGeometryOnlyEdit(Component component) => component switch
+    {
+        FixtureComponent fixture => _solvedInputs.IsUnchanged(fixture),
+        CableComponent cable => _solvedInputs.HasSameStructure(cable),
+        _ => false,
+    };
 
     /// <summary>An asset was replaced or removed (import options changed …): the project has unsaved changes.</summary>
     private void OnAssetChanged(Guid assetId)
@@ -525,7 +544,20 @@ public sealed partial class StageEngine : IDisposable
                     foreach (var e in removed.SelfAndDescendants()) Selection.Remove(e.Id);
                 break;
             case SceneChangeKind.ComponentAdded or SceneChangeKind.ComponentRemoved or SceneChangeKind.ComponentChanged:
-                if (change.Component is CableComponent or ConsoleComponent or FixtureComponent or PowerSourceComponent) _networkDirty = true;
+                if (change.Component is CableComponent or ConsoleComponent or FixtureComponent or PowerSourceComponent)
+                {
+                    if (change.Kind == SceneChangeKind.ComponentChanged && !_networkDirty && _network is not null && change.Entity is { } owner &&
+                        IsGeometryOnlyEdit(change.Component))
+                    {
+                        // a cable node dragged along: only that cable's geometry is renewed (a fixture edit the cabling
+                        // does not depend on, such as a manual attribute, needs nothing)
+                        if (change.Component is CableComponent) _movedForNetwork.Add(owner);
+                    }
+                    else
+                    {
+                        _networkDirty = true;
+                    }
+                }
                 break;
         }
         Simulation.OnSceneChanged(change);

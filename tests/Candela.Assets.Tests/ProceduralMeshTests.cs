@@ -358,6 +358,58 @@ public class ProceduralMeshTests
         Assert.Equal(points[1], path[^1]);
     }
 
+    [Theory]
+    [InlineData(0f)]
+    [InlineData(30f)]
+    [InlineData(55f)]
+    public void ATubeOnASlopeKeepsItsRadiusAlongTheSurfaceNormal(float degrees)
+    {
+        // a ramp z = tan(a)·x for x in 0 … 4 m (the floor at 0 before it); a sagging cable laid along and across it
+        float tan = MathF.Tan(degrees * MathF.PI / 180f);
+        CableSupportHeight ramp = (x, y, maxHeight) =>
+        {
+            float z = MathF.Max(0f, MathF.Min(x, 4f)) * tan;
+            return z <= maxHeight + 0.02f ? z : maxHeight >= -0.02f ? 0f : float.NegativeInfinity;
+        };
+        var normal = Vector3.Normalize(new Vector3(-tan, 0, 1));
+        const float radius = 0.006f;
+        foreach (var (from, to) in new[] { (new Vector2(0.5f, 0), new Vector2(3.5f, 0.5f)), (new Vector2(2, -1), new Vector2(2.2f, 1.5f)) })
+        {
+            var points = new[] { new Vector3(from, from.X * tan), new Vector3(to, to.X * tan) };
+            var mesh = CableTubeMesh.Create(points, new CableTubeOptions { Radius = radius, SlackFactor = 1.25f, MaxSampleSpacing = 0.05f, Support = ramp });
+            mesh.Validate();
+            foreach (var v in mesh.Positions.Where(p => p.X is > 0.05f and < 3.95f))
+            {
+                float above = Vector3.Dot(v - new Vector3(0, v.Y, 0), normal); // distance from the ramp's plane along its normal
+                Assert.True(above >= -1e-4f, $"vertex {above * 1000:0.00} mm inside a {degrees}° ramp");
+                Assert.True(above <= 2 * radius + 1e-3f, $"vertex {above * 1000:0.00} mm above a {degrees}° ramp: the cable should lie on it");
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ATautCableLeavingARiserDrapesOverItsEdgeAndAFlatRunStaysOnePiece(bool reversed)
+    {
+        // no slack at all: the span is straight, but it must not cut through the riser (0.6 m high for x < 2)
+        CableSupportHeight surfaces = (x, y, maxHeight) =>
+            x <= 2f && maxHeight >= 0.58f ? 0.6f : maxHeight >= -0.02f ? 0f : float.NegativeInfinity;
+        var points = new[] { new Vector3(1, 0, 0.62f), new Vector3(5, 0, 0.02f) };
+        if (reversed) Array.Reverse(points);
+        var path = CableTubeMesh.SamplePath(points, 1f, 0.05f, surfaces, 0.004f);
+        Assert.All(path, p => Assert.True(p.Z >= (p.X <= 2f ? 0.604f : 0.004f) - 1e-5f, $"({p.X}, {p.Z}) inside a surface"));
+        Assert.Contains(path, p => p.X is > 1.9f and <= 2f); // it follows the riser top to its edge
+        Assert.Equal(points[0], path[0]);
+        Assert.Equal(points[1], path[^1]);
+        var straight = CableTubeMesh.SamplePath(points, 1f, 0.05f);
+        Assert.Equal(2, straight.Length); // without surfaces the same span is one straight piece
+
+        // a taut run lying on the floor, or passing over it, cuts through nothing: still one straight piece
+        Assert.Equal(2, CableTubeMesh.SamplePath(new[] { new Vector3(3, 0, 0.004f), new Vector3(9, 4, 0.004f) }, 1f, 0.05f, surfaces, 0.004f).Length);
+        Assert.Equal(2, CableTubeMesh.SamplePath(new[] { new Vector3(0, 0, 3f), new Vector3(9, 0, 1f) }, 1f, 0.05f, surfaces, 0.004f).Length);
+    }
+
     [Fact]
     public void EachSpanOfACableTreeCanHaveItsOwnSlack()
     {

@@ -12,8 +12,10 @@ namespace Candela.Engine;
 /// <see cref="RestingHeight"/> tells whether a cable node lies on a surface (so a span between two nodes resting on the
 /// same surface runs flat instead of sagging through it).
 /// <para>Built lazily from the scene after <see cref="Invalidate"/> (a floor was added, removed, edited or moved); the
-/// queries do not allocate and cost one rectangle test per floor whose horizontal extent contains the point. Main thread
-/// only, like the scene. Heights are world Z in metres.</para>
+/// queries do not allocate and cost one rectangle test per floor whose horizontal extent contains the point.
+/// <see cref="TakeChanges"/> tells which horizontal area a rebuild changed, so only the cables over it are drawn again
+/// (a floor dragged or resized does not redraw every cable on every frame). Main thread only, like the scene. Heights
+/// are world Z in metres.</para>
 /// </summary>
 public sealed class CableSupportSurfaces
 {
@@ -32,8 +34,13 @@ public sealed class CableSupportSurfaces
 
     private readonly List<Slab> _slabs = new();
     private readonly List<Slab> _previous = new();
+    private readonly HashSet<Slab> _oldSet = new();
+    private readonly HashSet<Slab> _newSet = new();
     private float? _groundHeight = 0f;
     private bool _valid;
+    // what changed since the last TakeChanges: everything (the ground, the start), or the X/Y rectangle of changed floors
+    private bool _changedEverywhere = true;
+    private Vector2 _changedMin = new(float.PositiveInfinity), _changedMax = new(float.NegativeInfinity);
 
     /// <summary>
     /// Height of the ground plane in metres (world Z), or null for no ground (a scene floating in space, or one whose
@@ -47,6 +54,7 @@ public sealed class CableSupportSurfaces
             var v = value is { } h && float.IsFinite(h) ? h : (float?)null;
             if (v == _groundHeight) return;
             _groundHeight = v;
+            _changedEverywhere = true;
             Version++;
         }
     }
@@ -85,9 +93,48 @@ public sealed class CableSupportSurfaces
             if (Slab.TryCreate(entity, wall, out var slab)) _slabs.Add(slab);
         bool changed = _slabs.Count != _previous.Count;
         for (int i = 0; !changed && i < _slabs.Count; i++) changed = !_slabs[i].Equals(_previous[i]);
+        if (changed)
+        {
+            Version++;
+            // the floors that are new, gone or different: only the cables over them can lie differently
+            _oldSet.Clear();
+            _newSet.Clear();
+            foreach (var slab in _previous) _oldSet.Add(slab);
+            foreach (var slab in _slabs) _newSet.Add(slab);
+            foreach (var slab in _previous)
+                if (!_newSet.Contains(slab)) Grow(slab);
+            foreach (var slab in _slabs)
+                if (!_oldSet.Contains(slab)) Grow(slab);
+            _oldSet.Clear();
+            _newSet.Clear();
+        }
         _previous.Clear();
-        if (changed) Version++;
         return changed;
+    }
+
+    /// <summary>
+    /// Takes what changed since the last call (builds by <see cref="EnsureBuilt"/> and <see cref="GroundHeight"/>):
+    /// false when nothing did; otherwise <paramref name="everywhere"/> (the ground changed, or nothing was taken yet), or
+    /// the horizontal rectangle (world X/Y, metres, from <paramref name="min"/> to <paramref name="max"/>) covering every
+    /// floor that was added, removed, moved or resized. A cable is drawn along the vertical through its nodes' horizontal
+    /// extent, so only cables whose nodes' extent meets the rectangle lie differently.
+    /// </summary>
+    public bool TakeChanges(out bool everywhere, out Vector2 min, out Vector2 max)
+    {
+        everywhere = _changedEverywhere;
+        min = _changedMin;
+        max = _changedMax;
+        bool any = everywhere || (min.X <= max.X && min.Y <= max.Y);
+        _changedEverywhere = false;
+        _changedMin = new Vector2(float.PositiveInfinity);
+        _changedMax = new Vector2(float.NegativeInfinity);
+        return any;
+    }
+
+    private void Grow(in Slab slab)
+    {
+        _changedMin = Vector2.Min(_changedMin, new Vector2(slab.MinX, slab.MinY));
+        _changedMax = Vector2.Max(_changedMax, new Vector2(slab.MaxX, slab.MaxY));
     }
 
     /// <summary>

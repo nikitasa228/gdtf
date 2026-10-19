@@ -20,11 +20,15 @@ namespace Candela.Mvr;
 /// back and skips the box (it would otherwise become an imported model); a block it cannot read is reported and the
 /// box is imported as a model instead, so nothing is lost.</para>
 /// <para>It also marks Candela's generic devices (DMX splitters, Art-Net / sACN nodes, dimmer packs, whose GDTF files
-/// Candela generates): one <c>&lt;Device object="{uuid}" gdtf="{file}" mode="{mode}"/&gt;</c> per exported device. The
-/// object itself is an ordinary MVR <c>Fixture</c> with its GDTF embedded, which is what other programs read; the
-/// record tells Candela that <c>gdtf</c> is the file name of one of its own generic devices, so the import resolves it
-/// to that device (the library's generated file, or the embedded copy under that name) without reporting the channel-less
-/// GDTF as a placeholder stub. Readers that do not know the element (older Candela versions) skip it.</para>
+/// Candela generates): one <c>&lt;Device object="{uuid}" gdtf="{file}" mode="{mode}" type="{FixtureTypeID}"/&gt;</c> per
+/// exported device. The object itself is an ordinary MVR <c>Fixture</c> with its GDTF embedded, which is what other
+/// programs read; the record tells Candela that <c>gdtf</c> is the file name of one of its own generic devices, so the
+/// import resolves it to that device (the library's generated file, or the embedded copy under that name) without
+/// reporting the channel-less GDTF as a placeholder stub. <c>type</c> (optional) is the GDTF <c>FixtureTypeID</c> of
+/// the device as exported: a record whose object now carries a GDTF of another fixture type (another program kept the
+/// block but changed the object) — or, without an embedded GDTF, references another file — is stale and ignored, so the
+/// object is imported as the fixture it now is. Readers that do not know the element (older Candela versions) skip
+/// it.</para>
 /// </remarks>
 public static class CandelaUserData
 {
@@ -43,6 +47,7 @@ public static class CandelaUserData
     private const string GeometryAttribute = "geometry";
     private const string GdtfAttribute = "gdtf";
     private const string ModeAttribute = "mode";
+    private const string TypeAttribute = "type";
 
     /// <summary>Longest GDTF file name accepted in a device record (characters).</summary>
     private const int MaxFileNameLength = 255;
@@ -56,11 +61,15 @@ public static class CandelaUserData
     /// <param name="Wall">The wall, floor or ceiling.</param>
     public sealed record WallRecord(Guid ObjectId, string? GeometryFile, WallComponent Wall);
 
-    /// <summary>A generic device of the block: the MVR object and the device's GDTF file name and DMX mode.</summary>
+    /// <summary>A generic device of the block: the MVR object and the device's GDTF file name, DMX mode and fixture type.</summary>
     /// <param name="ObjectId">Uuid of the MVR fixture.</param>
     /// <param name="GdtfFile">File name of the generic device's GDTF (no folder, ending in <c>.gdtf</c>).</param>
     /// <param name="Mode">DMX mode name, or null for the GDTF's first mode.</param>
-    public sealed record DeviceRecord(Guid ObjectId, string GdtfFile, string? Mode);
+    /// <param name="FixtureTypeId">
+    /// GDTF <c>FixtureTypeID</c> of the device's file as exported, or null when it was not known (the file was not
+    /// embedded); the importer uses it to tell the device from a GDTF another program put on the object since.
+    /// </param>
+    public sealed record DeviceRecord(Guid ObjectId, string GdtfFile, string? Mode, Guid? FixtureTypeId = null);
 
     /// <summary>Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/>.</summary>
     public static MvrUserData Create(IEnumerable<WallRecord> walls) => Create(walls, Array.Empty<DeviceRecord>());
@@ -82,6 +91,7 @@ public static class CandelaUserData
         {
             var element = new XElement(DeviceElement, new XAttribute(ObjectAttribute, d.ObjectId.ToString("D")), new XAttribute(GdtfAttribute, d.GdtfFile));
             if (!string.IsNullOrEmpty(d.Mode)) element.Add(new XAttribute(ModeAttribute, d.Mode));
+            if (d.FixtureTypeId is { } type && type != Guid.Empty) element.Add(new XAttribute(TypeAttribute, type.ToString("D")));
             data.Add(element);
         }
         return new MvrUserData { Provider = Provider, Version = Version, Element = data };
@@ -89,9 +99,9 @@ public static class CandelaUserData
 
     /// <summary>
     /// The generic devices of Candela's blocks in <paramref name="document"/> by MVR object uuid. A record without a
-    /// valid object uuid or with a GDTF name that is not a plain <c>.gdtf</c> file name is reported in
-    /// <paramref name="issues"/> (<see cref="MvrIssueCodes.ValueInvalid"/>) and left out (the object is then imported as
-    /// the fixture it is); blocks of other providers are ignored.
+    /// valid object uuid, with a GDTF name that is not a plain <c>.gdtf</c> file name or with a <c>type</c> that is not a
+    /// uuid is reported in <paramref name="issues"/> (<see cref="MvrIssueCodes.ValueInvalid"/>) and left out (the object
+    /// is then imported as the fixture it is); blocks of other providers are ignored.
     /// </summary>
     public static IReadOnlyDictionary<Guid, DeviceRecord> ReadDevices(MvrDocument document, ICollection<Issue>? issues = null)
     {
@@ -107,12 +117,21 @@ public static class CandelaUserData
                 if (devices.Count >= MaxRecords) break;
                 string? file = ((string?)element.Attribute(GdtfAttribute))?.Trim();
                 string? mode = ((string?)element.Attribute(ModeAttribute))?.Trim();
-                if (!Guid.TryParse((string?)element.Attribute(ObjectAttribute), out var objectId) || objectId == Guid.Empty || !IsPlainGdtfName(file))
+                string? typeText = ((string?)element.Attribute(TypeAttribute))?.Trim();
+                Guid? type = null;
+                bool typeValid = true;
+                if (!string.IsNullOrEmpty(typeText))
+                {
+                    typeValid = Guid.TryParse(typeText, out var parsed);
+                    if (typeValid && parsed != Guid.Empty) type = parsed;
+                }
+                if (!Guid.TryParse((string?)element.Attribute(ObjectAttribute), out var objectId) || objectId == Guid.Empty || !IsPlainGdtfName(file) ||
+                    !typeValid)
                 {
                     damaged++;
                     continue;
                 }
-                devices.TryAdd(objectId, new DeviceRecord(objectId, file!, string.IsNullOrEmpty(mode) ? null : mode));
+                devices.TryAdd(objectId, new DeviceRecord(objectId, file!, string.IsNullOrEmpty(mode) ? null : mode, type));
             }
         }
         if (damaged > 0)

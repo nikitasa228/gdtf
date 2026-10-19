@@ -16,14 +16,30 @@ public sealed class CableComponent : Component
     /// <summary>Label printed on the cable / shown in the patch ("U1-03").</summary>
     public string? Label { get; set; }
 
-    /// <summary>Points of the cable (a tree through <see cref="Segments"/>).</summary>
-    public List<CableNode> Nodes { get; set; } = new();
+    /// <summary>Points of the cable (a tree through <see cref="Segments"/>). Never null: null (a damaged file) is read as empty.</summary>
+    public List<CableNode> Nodes
+    {
+        get => _nodes;
+        set => _nodes = value ?? new();
+    }
 
-    /// <summary>Straight runs between nodes of this cable.</summary>
-    public List<CableSegment> Segments { get; set; } = new();
+    /// <summary>Straight runs between nodes of this cable. Never null: null (a damaged file) is read as empty.</summary>
+    public List<CableSegment> Segments
+    {
+        get => _segments;
+        set => _segments = value ?? new();
+    }
 
-    /// <summary>Nodes plugged into device ports.</summary>
-    public List<CableEndpoint> Endpoints { get; set; } = new();
+    /// <summary>Nodes plugged into device ports. Never null: null (a damaged file) is read as empty.</summary>
+    public List<CableEndpoint> Endpoints
+    {
+        get => _endpoints;
+        set => _endpoints = value ?? new();
+    }
+
+    private List<CableNode> _nodes = new();
+    private List<CableSegment> _segments = new();
+    private List<CableEndpoint> _endpoints = new();
 
     /// <summary>Extra length for sag and service loops, as a factor of the routed length (1.05 = +5 %).</summary>
     public float SlackFactor { get; set; } = 1.05f;
@@ -167,8 +183,17 @@ public sealed class ConsoleComponent : Component
     /// <summary>Protocol whose input feeds this console ("artnet", "sacn", …); null = none (offline programming).</summary>
     public string? ProtocolId { get; set; } = "artnet";
 
-    /// <summary>Physical outputs (DMX ports, network ports) and the universes they carry.</summary>
-    public List<ConsoleOutput> Outputs { get; set; } = new()
+    /// <summary>
+    /// Physical outputs (DMX ports, network ports) and the universes they carry. Never null: null (a damaged file) is
+    /// read as no outputs.
+    /// </summary>
+    public List<ConsoleOutput> Outputs
+    {
+        get => _outputs;
+        set => _outputs = value ?? new();
+    }
+
+    private List<ConsoleOutput> _outputs = new()
     {
         new ConsoleOutput { PortName = "DMX A", FirstUniverse = 1 },
         new ConsoleOutput { PortName = "DMX B", FirstUniverse = 2 },
@@ -205,8 +230,14 @@ public sealed class PowerSourceComponent : Component
     /// <summary>Number of phases supplied (1 or 3).</summary>
     public int Phases { get; set; } = 1;
 
-    /// <summary>The outlets cables plug into.</summary>
-    public List<PowerOutlet> Outlets { get; set; } = new()
+    /// <summary>The outlets cables plug into. Never null: null (a damaged file) is read as no outlets.</summary>
+    public List<PowerOutlet> Outlets
+    {
+        get => _outlets;
+        set => _outlets = value ?? new();
+    }
+
+    private List<PowerOutlet> _outlets = new()
     {
         new PowerOutlet { PortName = "Outlet 1", Connector = "Schuko", BreakerA = 16f },
     };

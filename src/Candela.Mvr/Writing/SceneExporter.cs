@@ -26,7 +26,7 @@ internal sealed class SceneExporter
     private readonly List<(MvrLayer Layer, MvrFocusPoint Point)> _focusPoints = new();
     private readonly Dictionary<string, string> _gdtfFiles = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, byte[]> _gdtfBytes = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, string?> _firstModes = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, (string? FirstMode, Guid FixtureTypeId)> _gdtfHeaders = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, string?> _modelFiles = new();
     private readonly Dictionary<string, string?> _wallFiles = new(StringComparer.Ordinal);
     private readonly HashSet<string> _fileNames = new(StringComparer.OrdinalIgnoreCase);
@@ -242,7 +242,9 @@ internal sealed class SceneExporter
         {
             // the device's own file name (the embedded copy may have been renamed to keep archive names unique)
             string file = GdtfResolver.EnsureGdtfExtension(MvrDocument.FileNameOf(MvrDocument.NormalizePath(spec)));
-            _candelaDevices.Add(new CandelaUserData.DeviceRecord(d.Uuid, file, d.GdtfMode));
+            // its fixture type lets the importer notice another program having put another GDTF on the object since
+            var type = HeaderOf(spec).FixtureTypeId;
+            _candelaDevices.Add(new CandelaUserData.DeviceRecord(d.Uuid, file, d.GdtfMode, type == Guid.Empty ? null : type));
         }
         if (d.GdtfMode is null && spec.Length > 0)
         {
@@ -415,25 +417,32 @@ internal sealed class SceneExporter
     // ------------------------------------------------------------------ embedded files
 
     /// <summary>Name of the first DMX mode of the GDTF embedded for <paramref name="spec"/> (parsed once), or null.</summary>
-    private string? FirstModeOf(string spec)
+    private string? FirstModeOf(string spec) => HeaderOf(spec).FirstMode;
+
+    /// <summary>
+    /// First DMX mode and <c>FixtureTypeID</c> of the GDTF embedded for <paramref name="spec"/> (parsed once); null and
+    /// <see cref="Guid.Empty"/> when the file was not embedded or cannot be read.
+    /// </summary>
+    private (string? FirstMode, Guid FixtureTypeId) HeaderOf(string spec)
     {
-        if (_firstModes.TryGetValue(spec, out var cached)) return cached;
-        string? mode = null;
+        if (_gdtfHeaders.TryGetValue(spec, out var cached)) return cached;
+        (string?, Guid) header = (null, Guid.Empty);
         if (_gdtfBytes.TryGetValue(spec, out var bytes))
         {
             try
             {
                 using var archive = GdtfArchive.FromBytes(bytes, spec);
-                mode = GdtfReader.Read(archive).DmxModes.FirstOrDefault(m => !string.IsNullOrWhiteSpace(m.Name))?.Name;
+                var type = GdtfReader.Read(archive);
+                header = (type.DmxModes.FirstOrDefault(m => !string.IsNullOrWhiteSpace(m.Name))?.Name, type.FixtureTypeId);
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {
                 // Supplied bytes that the GDTF reader cannot handle: reported by the caller as a fixture written
-                // without a mode.
+                // without a mode (and a generic device recorded without its fixture type).
             }
         }
-        _firstModes[spec] = mode;
-        return mode;
+        _gdtfHeaders[spec] = header;
+        return header;
     }
 
     private string EmbedGdtf(string spec, Guid user)

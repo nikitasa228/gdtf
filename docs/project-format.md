@@ -81,7 +81,10 @@ changes: `fixture`, `mesh`, `wall`, `image`, `truss`, `riggingPoint`, `cable`, `
 JSON arrays; enums are strings; non-finite numbers are the strings `"NaN"`, `"Infinity"`, `"-Infinity"`; JSON is
 camelCase and tolerant of unknown properties (forward compatible). Properties added later are optional and absent
 from older files, which then load with the documented default — e.g. `powerSource.mainsInConnector` (the connector of
-a distro's inlet; absent or null: derived from the source's outlets and phases by Candela.Electrical).
+a distro's inlet; absent or null: derived from the source's outlets and phases by Candela.Electrical). The lists of
+the cabling components (`cable.nodes`, `segments`, `endpoints`, `console.outputs`, `powerSource.outlets`) are never
+null in memory: a damaged file that writes `null` for one loads it as an empty list, so the cable, power and data
+code that walks them cannot fail on it.
 
 The file is written with Core's `CandelaJson.Options`. Null values are omitted, **except** for a property whose default
 is not null: `"protocolId": null` (a console without protocol input, whose default is Art-Net) is written explicitly,
