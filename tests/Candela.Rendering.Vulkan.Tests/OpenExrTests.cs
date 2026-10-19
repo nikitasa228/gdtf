@@ -1,3 +1,4 @@
+using System.Numerics;
 using Candela.Core.Geometry;
 
 namespace Candela.Rendering.Vulkan.Tests;
@@ -88,6 +89,25 @@ public sealed class OpenExrTests
         Assert.Equal(floats[4 * 5 + 1], image.Channel("G")!.Values[5]);
         Assert.Equal(floats[4 * 7 + 2], image.Channel("raw.B")!.Values[7]);
         Assert.Equal(floats[4 * 11 + 3], image.Channel("A")!.Values[11]);
+    }
+
+    [Fact]
+    public void ChromaticitiesAndWhiteLuminanceRoundTrip()
+    {
+        var colorimetry = ExrColorimetry.Rec2020 with { WhiteLuminance = 312.5f };
+        string path = Path.Combine(TestRenderers.OutputDirectory, "exr-colorimetry.exr");
+        OpenExr.Write(path, 3, 2, new[] { new ExrChannel("Y", Pattern(3, 2, 11), ExrPixelType.Float) }, ExrCompression.None, colorimetry);
+        var image = OpenExr.Read(path);
+        Assert.Equal(colorimetry, image.Colorimetry);
+        Assert.Equal(new Vector2(0.708f, 0.292f), image.Colorimetry!.Red);
+
+        // Without the attributes nothing is stated (readers assume Rec.709).
+        using var plain = new MemoryStream();
+        OpenExr.Write(plain, 3, 2, new[] { new ExrChannel("Y", Pattern(3, 2, 12)) });
+        plain.Position = 0;
+        Assert.Null(OpenExr.Read(plain).Colorimetry);
+        Assert.Throws<ArgumentException>(() => OpenExr.Write(new MemoryStream(), 2, 2, new[] { new ExrChannel("Y", new float[4]) }, ExrCompression.Zip,
+            ExrColorimetry.Rec709 with { WhiteLuminance = -1f }));
     }
 
     [Fact]

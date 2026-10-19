@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
+using System.Numerics;
 using System.Text;
 using Candela.Core.Geometry;
 
@@ -37,12 +38,37 @@ public enum ExrPixelType
 /// <param name="Type">Sample type in the file.</param>
 public sealed record ExrChannel(string Name, float[] Values, ExrPixelType Type = ExrPixelType.Half);
 
+/// <summary>
+/// The colour attributes of an OpenEXR header: the CIE 1931 xy chromaticities of the RGB primaries and the white point
+/// (<c>chromaticities</c>; without it readers assume Rec.709), and optionally the luminance of RGB (1, 1, 1) in cd/m²
+/// (<c>whiteLuminance</c>), which makes the pixel values absolute photometric quantities.
+/// </summary>
+/// <param name="Red">xy of the red primary.</param>
+/// <param name="Green">xy of the green primary.</param>
+/// <param name="Blue">xy of the blue primary.</param>
+/// <param name="White">xy of the white point.</param>
+/// <param name="WhiteLuminance">Luminance of RGB (1, 1, 1), cd/m², or null when not stated.</param>
+public sealed record ExrColorimetry(Vector2 Red, Vector2 Green, Vector2 Blue, Vector2 White, float? WhiteLuminance = null)
+{
+    /// <summary>ITU-R BT.2020 primaries with the D65 white point (the renderer's working space).</summary>
+    public static ExrColorimetry Rec2020 { get; } = new(new Vector2(0.708f, 0.292f), new Vector2(0.170f, 0.797f), new Vector2(0.131f, 0.046f),
+        new Vector2(0.3127f, 0.3290f));
+
+    /// <summary>ITU-R BT.709 / sRGB primaries with the D65 white point (what readers assume without the attribute).</summary>
+    public static ExrColorimetry Rec709 { get; } = new(new Vector2(0.64f, 0.33f), new Vector2(0.30f, 0.60f), new Vector2(0.15f, 0.06f),
+        new Vector2(0.3127f, 0.3290f));
+}
+
 /// <summary>An OpenEXR image read by <see cref="OpenExr.Read(Stream)"/>.</summary>
 /// <param name="Width">Width of the data window, px.</param>
 /// <param name="Height">Height of the data window, px.</param>
 /// <param name="Compression">Compression of the file.</param>
 /// <param name="Channels">The channels in file order (sorted by name).</param>
-public sealed record ExrImage(int Width, int Height, ExrCompression Compression, IReadOnlyList<ExrChannel> Channels)
+/// <param name="Colorimetry">
+/// The file's <c>chromaticities</c> and <c>whiteLuminance</c> attributes, or null when it has no chromaticities
+/// (Rec.709 is implied then).
+/// </param>
+public sealed record ExrImage(int Width, int Height, ExrCompression Compression, IReadOnlyList<ExrChannel> Channels, ExrColorimetry? Colorimetry = null)
 {
     /// <summary>The channel with this name, or null.</summary>
     public ExrChannel? Channel(string name) => Channels.FirstOrDefault(c => c.Name == name);
@@ -64,16 +90,17 @@ public static class OpenExr
     /// <summary>
     /// Writes the RGBA float image <paramref name="hdr"/> (linear, e.g. <see cref="IFinalRender.ResultHdr"/>) as channels
     /// R, G, B, A (plus <paramref name="extraChannels"/>, e.g. layers "raw.R" or "albedo.R") to <paramref name="path"/>
-    /// (written to a temporary file next to it and moved into place).
+    /// (written to a temporary file next to it and moved into place), with the colour attributes
+    /// <paramref name="colorimetry"/> (none: Rec.709 is implied).
     /// </summary>
     public static void WriteRgba(string path, ImageData hdr, ExrPixelType type = ExrPixelType.Half, ExrCompression compression = ExrCompression.Zip,
-        IEnumerable<ExrChannel>? extraChannels = null)
+        IEnumerable<ExrChannel>? extraChannels = null, ExrColorimetry? colorimetry = null)
     {
         ArgumentNullException.ThrowIfNull(hdr);
         var channels = new List<ExrChannel>(SplitRgba(hdr, "", type, includeAlpha: true));
         if (extraChannels is not null)
             channels.AddRange(extraChannels);
-        Write(path, hdr.Width, hdr.Height, channels, compression);
+        Write(path, hdr.Width, hdr.Height, channels, compression, colorimetry);
     }
 
     /// <summary>
@@ -103,7 +130,8 @@ public static class OpenExr
     }
 
     /// <summary>Writes an image to <paramref name="path"/> through a temporary file (atomic replace).</summary>
-    public static void Write(string path, int width, int height, IReadOnlyList<ExrChannel> channels, ExrCompression compression = ExrCompression.Zip)
+    public static void Write(string path, int width, int height, IReadOnlyList<ExrChannel> channels, ExrCompression compression = ExrCompression.Zip,
+        ExrColorimetry? colorimetry = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
         string full = Path.GetFullPath(path);
@@ -114,7 +142,7 @@ public static class OpenExr
         try
         {
             using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                Write(stream, width, height, channels, compression);
+                Write(stream, width, height, channels, compression, colorimetry);
             File.Move(temporary, full, overwrite: true);
         }
         finally
@@ -124,11 +152,23 @@ public static class OpenExr
         }
     }
 
-    /// <summary>Writes a single-part scanline OpenEXR image (channels are sorted by name, as the format requires).</summary>
-    public static void Write(Stream stream, int width, int height, IReadOnlyList<ExrChannel> channels, ExrCompression compression = ExrCompression.Zip)
+    /// <summary>
+    /// Writes a single-part scanline OpenEXR image (channels are sorted by name, as the format requires), with the colour
+    /// attributes <paramref name="colorimetry"/> when given.
+    /// </summary>
+    public static void Write(Stream stream, int width, int height, IReadOnlyList<ExrChannel> channels, ExrCompression compression = ExrCompression.Zip,
+        ExrColorimetry? colorimetry = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(channels);
+        if (colorimetry is not null)
+        {
+            var points = new[] { colorimetry.Red, colorimetry.Green, colorimetry.Blue, colorimetry.White };
+            if (points.Any(v => !float.IsFinite(v.X) || !float.IsFinite(v.Y)) ||
+                colorimetry.WhiteLuminance is { } white && !(float.IsFinite(white) && white > 0f))
+                throw new ArgumentException("The chromaticities must be finite and the white luminance finite and positive.", nameof(colorimetry));
+        }
+
         if (width <= 0 || height <= 0 || width > MaxDimension || height > MaxDimension)
             throw new ArgumentOutOfRangeException(nameof(width), "The image size must be between 1 and 2^20 pixels per side.");
         if (channels.Count == 0)
@@ -156,6 +196,18 @@ public static class OpenExr
         var w = new BinaryWriter(header, Encoding.ASCII, leaveOpen: true);
         w.Write(Magic);
         w.Write(2 | (longNames ? LongNamesFlag : 0));
+        if (colorimetry is not null)
+        {
+            Attribute(w, "chromaticities", "chromaticities", writer =>
+            {
+                foreach (var v in new[] { colorimetry.Red, colorimetry.Green, colorimetry.Blue, colorimetry.White })
+                {
+                    writer.Write(v.X);
+                    writer.Write(v.Y);
+                }
+            });
+        }
+
         Attribute(w, "channels", "chlist", writer =>
         {
             foreach (var c in sorted)
@@ -183,6 +235,8 @@ public static class OpenExr
             writer.Write(0f);
         });
         Attribute(w, "screenWindowWidth", "float", writer => writer.Write(1f));
+        if (colorimetry?.WhiteLuminance is { } luminance)
+            Attribute(w, "whiteLuminance", "float", writer => writer.Write(luminance));
         w.Write((byte)0); // end of header
         w.Flush();
 
@@ -271,6 +325,8 @@ public static class OpenExr
         int compressionCode = -1;
         int xMin = 0, yMin = 0, xMax = -1, yMax = -1;
         bool dataWindow = false;
+        Vector2[]? chromaticities = null;
+        float? whiteLuminance = null;
         while (true)
         {
             string name = ReadCString(span, ref at);
@@ -311,6 +367,16 @@ public static class OpenExr
                     xMax = BinaryPrimitives.ReadInt32LittleEndian(value[8..]);
                     yMax = BinaryPrimitives.ReadInt32LittleEndian(value[12..]);
                     dataWindow = true;
+                    break;
+                case "chromaticities" when type == "chromaticities" && value.Length >= 32:
+                    chromaticities = new Vector2[4];
+                    for (int k = 0; k < 4; k++)
+                        chromaticities[k] = new Vector2(BinaryPrimitives.ReadSingleLittleEndian(value[(8 * k)..]),
+                            BinaryPrimitives.ReadSingleLittleEndian(value[(8 * k + 4)..]));
+                    break;
+                case "whiteLuminance" when type == "float" && value.Length >= 4:
+                    float luminance = BinaryPrimitives.ReadSingleLittleEndian(value);
+                    whiteLuminance = float.IsFinite(luminance) && luminance > 0f ? luminance : null;
                     break;
                 case "type" when !Encoding.ASCII.GetString(value).TrimEnd('\0').Equals("scanlineimage", StringComparison.Ordinal):
                     throw new InvalidDataException("Only scanline OpenEXR images are supported.");
@@ -364,7 +430,8 @@ public static class OpenExr
         }
 
         var result = channels.Select((c, i) => new ExrChannel(c.Name, planes[i], c.Type)).ToArray();
-        return new ExrImage(width, height, compression, result);
+        var colorimetry = chromaticities is { } xy ? new ExrColorimetry(xy[0], xy[1], xy[2], xy[3], whiteLuminance) : null;
+        return new ExrImage(width, height, compression, result, colorimetry);
     }
 
     private static int LinesPerChunk(ExrCompression compression) => compression == ExrCompression.Zip ? 16 : 1;
