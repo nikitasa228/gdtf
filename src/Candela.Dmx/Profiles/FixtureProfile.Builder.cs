@@ -684,8 +684,9 @@ public sealed partial class FixtureProfile
         /// <summary>
         /// Followers in evaluation order: every channel after the masters it follows (Kahn's algorithm). When the
         /// remaining followers all wait for each other, a cycle is found by walking from the first waiting follower to
-        /// a master it waits for until a channel repeats, and only the relations closing that cycle (those of its
-        /// lowest-index channel to its master on the cycle) are dropped — followers downstream of a cycle keep theirs.
+        /// a master it waits for until a channel repeats, and only the relations of one edge of that cycle are dropped
+        /// (an Override edge before a Multiply one, then the lowest-index follower's) — followers downstream of a cycle
+        /// keep theirs.
         /// </summary>
         private void OrderFollowers()
         {
@@ -771,10 +772,23 @@ public sealed partial class FixtureProfile
                 }
                 x = waitsFor;
             }
-            // path[at[x]] … path[^1] is the cycle; path[i] follows path[i + 1], and the last follows x
-            int first = at[x], best = first;
-            for (int i = first + 1; i < path.Count; i++)
-                if (path[i] < path[best]) best = i;
+            // path[at[x]] … path[^1] is the cycle; path[i] follows path[i + 1], and the last follows x. An Override edge is
+            // dropped in preference to a Multiply one (a pixel dimmer that both scales its colour and is overridden by it
+            // keeps the dimming), then the lowest-index follower's.
+            int first = at[x], best = -1;
+            bool bestOverride = false;
+            for (int i = first; i < path.Count; i++)
+            {
+                int master = i + 1 < path.Count ? path[i + 1] : x;
+                bool isOverride = false;
+                foreach (int ri in FollowerRelations[path[i]])
+                    if (Relations[ri].Master == master && Relations[ri].Type == RelationType.Override) isOverride = true;
+                if (best < 0 || (isOverride && !bestOverride) || (isOverride == bestOverride && path[i] < path[best]))
+                {
+                    best = i;
+                    bestOverride = isOverride;
+                }
+            }
             return (path[best], best + 1 < path.Count ? path[best + 1] : x);
         }
 

@@ -397,8 +397,10 @@ public sealed class FixtureState
     /// Continues the mechanics of <paramref name="previous"/>, a state of the same fixture under an earlier profile (the
     /// GDTF was re-resolved after a library change, a substitute was replaced by the real file, the mode changed): the
     /// clock and the motor and rotation state of every motorised channel found in both profiles — by channel name and
-    /// geometry instance, else by attribute and instance — so the next evaluation moves the heads, zooms and wheels on
-    /// from where they physically are instead of jumping. Channels without a counterpart start where their DMX puts them.
+    /// geometry instance, else by attribute and instance, else (modes and files that name their geometry differently,
+    /// e.g. "YOKE Std" / "YOKE Ext", or a stand-in replaced by the real GDTF) by attribute and its rank among the
+    /// motorised channels of that attribute — so the next evaluation moves the heads, zooms and wheels on from where
+    /// they physically are instead of jumping. Channels without a counterpart start where their DMX puts them.
     /// Call it before the first evaluation of this state.
     /// </summary>
     public void ContinueFrom(FixtureState previous)
@@ -408,18 +410,27 @@ public sealed class FixtureState
         var old = previous.Profile;
         var byName = new Dictionary<(string, string), int>();
         var byAttribute = new Dictionary<(string, string), int>();
+        var byRank = new Dictionary<(string, int), int>();
+        var rankOf = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         foreach (var ch in old.Channels)
         {
             if (old.MotorSlot[ch.Index] < 0) continue;
             byName.TryAdd((ch.Name, ch.InstanceName), ch.Index);
             byAttribute.TryAdd((ch.Attribute, ch.InstanceName), ch.Index);
+            int rank = rankOf.GetValueOrDefault(ch.Attribute);
+            rankOf[ch.Attribute] = rank + 1;
+            byRank[(ch.Attribute.ToUpperInvariant(), rank)] = ch.Index;
         }
+        rankOf.Clear();
         foreach (var ch in Profile.Channels)
         {
             int slot = Profile.MotorSlot[ch.Index];
             if (slot < 0) continue;
+            int rank = rankOf.GetValueOrDefault(ch.Attribute);
+            rankOf[ch.Attribute] = rank + 1;
             if (!byName.TryGetValue((ch.Name, ch.InstanceName), out int match) &&
-                !byAttribute.TryGetValue((ch.Attribute, ch.InstanceName), out match)) continue;
+                !byAttribute.TryGetValue((ch.Attribute, ch.InstanceName), out match) &&
+                !byRank.TryGetValue((ch.Attribute.ToUpperInvariant(), rank), out match)) continue;
             Motors[slot] = previous.Motors[old.MotorSlot[match]];
         }
         Time = previous.Time;
