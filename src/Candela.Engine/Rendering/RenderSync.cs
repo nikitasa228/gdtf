@@ -65,9 +65,6 @@ public sealed partial class RenderSync : IDisposable
     /// </summary>
     public const float MaxLensLuminance = 1e9f;
 
-    private static readonly Vector3 ConsoleSize = new(1.2f, 0.7f, 0.25f);
-    private static readonly Vector3 PowerSourceSize = new(0.45f, 0.3f, 0.6f);
-
     private readonly StageEngine _engine;
     private readonly Dictionary<Guid, EntityVisual> _entities = new();
     private readonly Dictionary<uint, Guid> _byPickId = new();
@@ -79,7 +76,7 @@ public sealed partial class RenderSync : IDisposable
     private readonly HashSet<Guid> _moved = new();
     private readonly HashSet<Guid> _selected = new();
     private readonly HashSet<Guid> _cableEnds = new();
-    private readonly Dictionary<Guid, List<Guid>> _cablesByAnchor = new();
+    private readonly CableAnchorIndex _cableAnchors = new();
     private readonly List<LineVertex> _lines = new();
     private readonly List<Guid> _scratch = new();
     private readonly List<Issue> _issues = new();
@@ -94,6 +91,7 @@ public sealed partial class RenderSync : IDisposable
     private readonly List<TextureHandle> _retiredTextures = new();
     private readonly List<(FixtureProfile Profile, int Wheel, int Slot)> _scratchGobos = new();
     private Vector3[] _nodePositions = new Vector3[16];
+    private readonly Dictionary<Guid, int> _nodeIndex = new();
     private MeshHandle _consoleMesh, _powerMesh, _hoistMesh;
     private Aabb _consoleBounds = Aabb.Empty, _powerBounds = Aabb.Empty, _hoistBounds = Aabb.Empty;
     private MaterialHandle _defaultMaterial, _steelMaterial, _hoistMaterial, _greyMaterial;
@@ -397,7 +395,7 @@ public sealed partial class RenderSync : IDisposable
             _scratch.AddRange(_rebuild);
             foreach (var id in _scratch)
             {
-                if (!_cablesByAnchor.TryGetValue(id, out var cables)) continue;
+                if (!_cableAnchors.TryGetCables(id, out var cables)) continue;
                 foreach (var cable in cables) _rebuild.Add(cable);
                 _linesDirty = true;
             }
@@ -533,11 +531,11 @@ public sealed partial class RenderSync : IDisposable
                     break;
                 case ConsoleComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _consoleMesh, _consoleBounds, _steelMaterial, Matrix4x4.CreateTranslation(0f, 0f, ConsoleSize.Z / 2f), "Console", castShadow: true);
+                    AddStatic(v, _consoleMesh, _consoleBounds, _steelMaterial, Matrix4x4.CreateTranslation(0f, 0f, DeviceCatalog.ConsoleSize.Z / 2f), "Console", castShadow: true);
                     break;
                 case PowerSourceComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _powerMesh, _powerBounds, _greyMaterial, Matrix4x4.CreateTranslation(0f, 0f, PowerSourceSize.Z / 2f), "Power source", castShadow: true);
+                    AddStatic(v, _powerMesh, _powerBounds, _greyMaterial, Matrix4x4.CreateTranslation(0f, 0f, DeviceCatalog.PowerSourceSize.Z / 2f), "Power source", castShadow: true);
                     break;
                 case CableComponent cable:
                     BuildCable(v, cable);
@@ -649,24 +647,16 @@ public sealed partial class RenderSync : IDisposable
     {
         _cablesDirty = false;
         _linesDirty = true;
-        _cablesByAnchor.Clear();
+        _cableAnchors.Invalidate();
+        _cableAnchors.EnsureBuilt(_scene);
         // the devices that lose or gain the cable highlight get new flags
         foreach (var id in _cableEnds) _flagsDirty.Add(id);
         _cableEnds.Clear();
         foreach (var (entity, cable) in _scene.Query<CableComponent>())
         {
             _cableEnds.Add(entity.Id);
-            foreach (var node in cable.Nodes)
-            {
-                if (node?.Anchor is not { } anchor) continue;
-                if (!_cablesByAnchor.TryGetValue(anchor.EntityId, out var list)) _cablesByAnchor[anchor.EntityId] = list = new List<Guid>();
-                if (!list.Contains(entity.Id)) list.Add(entity.Id);
-            }
             foreach (var end in cable.Endpoints)
                 if (end is not null && end.EntityId != Guid.Empty) _cableEnds.Add(end.EntityId);
-            // a cable entity moved as a whole moves its free nodes
-            if (!_cablesByAnchor.TryGetValue(entity.Id, out var own)) _cablesByAnchor[entity.Id] = own = new List<Guid>();
-            if (!own.Contains(entity.Id)) own.Add(entity.Id);
         }
         foreach (var id in _cableEnds) _flagsDirty.Add(id);
     }
@@ -682,11 +672,14 @@ public sealed partial class RenderSync : IDisposable
             int n = CableGeometry.WriteNodeWorldPositions(_scene, entity, cable, _nodePositions);
             var (r, g, b) = _engine.Network.Catalog.Find(cable.CableTypeId)?.ColorSrgb ?? (0.8f, 0.8f, 0.8f);
             var color = new Vector4(r, g, b, 1f);
+            // node id → position index (the first node of a repeated id, as CableGeometry does), so a long cable costs
+            // nodes + segments, not nodes × segments
+            _nodeIndex.Clear();
+            for (int i = 0; i < n; i++)
+                if (cable.Nodes[i] is { } node) _nodeIndex.TryAdd(node.Id, i);
             foreach (var segment in cable.Segments)
             {
-                int a = cable.Nodes.FindIndex(x => x?.Id == segment.FromNode);
-                int c = cable.Nodes.FindIndex(x => x?.Id == segment.ToNode);
-                if (a < 0 || c < 0 || a >= n || c >= n) continue;
+                if (!_nodeIndex.TryGetValue(segment.FromNode, out int a) || !_nodeIndex.TryGetValue(segment.ToNode, out int c)) continue;
                 var p0 = _nodePositions[a];
                 var p1 = _nodePositions[c];
                 if (!IsFinite(p0) || !IsFinite(p1)) continue;
@@ -1115,8 +1108,9 @@ public sealed partial class RenderSync : IDisposable
     private void EnsurePrimitives()
     {
         if (_consoleMesh.IsValid) return;
-        var console = Primitives.Box(ConsoleSize);
-        var power = Primitives.Box(PowerSourceSize);
+        // the boxes the editor places and the cable tool puts the ports on (Candela.Electrical's device catalogue)
+        var console = Primitives.Box(DeviceCatalog.ConsoleSize);
+        var power = Primitives.Box(DeviceCatalog.PowerSourceSize);
         var hoist = Primitives.Cylinder(0.12f, 0.45f);
         _consoleMesh = World.CreateMesh(console);
         _powerMesh = World.CreateMesh(power);
