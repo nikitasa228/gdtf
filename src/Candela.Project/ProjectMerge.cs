@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.Editing;
@@ -286,7 +287,15 @@ public static class ProjectMerge
                     map[layer.Id] = existing;
                     continue;
                 }
-                var copy = new Layer { Id = Guid.NewGuid(), Name = layer.Name, Visible = layer.Visible, Locked = layer.Locked };
+                var copy = new Layer
+                {
+                    Id = Guid.NewGuid(),
+                    Name = layer.Name,
+                    Visible = layer.Visible,
+                    Locked = layer.Locked,
+                    // properties of a newer version travel with the layer, as they do with the entities (Core's copy)
+                    UnknownProperties = layer.UnknownProperties is { } unknown ? new Dictionary<string, JsonElement>(unknown) : null,
+                };
                 added.Add(copy);
                 byName.TryAdd(copy.Name, copy.Id);
                 map[layer.Id] = copy.Id;

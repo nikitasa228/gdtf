@@ -137,7 +137,7 @@ internal static class ProjectWriter
                 used.Add(entry);
                 WriteEntry(zip, entry, data, LevelFor(entry, level), stamp);
             }
-            records.Add(JsonNode.Parse(kept.Record.GetRawText()));
+            records.Add(JsonNode.Parse(kept.Record.GetRawText(), null, ProjectSettings.ReadOptions));
         }
         WriteEntry(zip, ArchivePaths.AssetIndex, JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options), level, stamp);
     }

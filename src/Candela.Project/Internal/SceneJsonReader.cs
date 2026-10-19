@@ -300,7 +300,7 @@ internal static class SceneJsonReader
     {
         var obj = new JsonObject { ["$type"] = type };
         foreach (var p in element.EnumerateObject())
-            if (!p.NameEquals("$type")) obj[p.Name] = JsonNode.Parse(p.Value.GetRawText());
+            if (!p.NameEquals("$type")) obj[p.Name] = JsonNode.Parse(p.Value.GetRawText(), null, ProjectSettings.ReadOptions);
         return obj;
     }
 

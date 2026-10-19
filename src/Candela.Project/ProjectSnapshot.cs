@@ -153,7 +153,7 @@ public sealed class ProjectSnapshot
                     continue;
                 }
                 if (entity["components"] is not JsonArray components) entity["components"] = components = new JsonArray();
-                foreach (var component in kept) components.Add(JsonNode.Parse(component.GetRawText()));
+                foreach (var component in kept) components.Add(JsonNode.Parse(component.GetRawText(), null, ProjectSettings.ReadOptions));
             }
         }
         return JsonSerializer.SerializeToUtf8Bytes(root, CandelaJson.Options);
