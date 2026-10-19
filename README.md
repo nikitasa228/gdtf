@@ -87,6 +87,8 @@ library, the firewall, where files are kept, uninstalling, and what to do when s
 * Live control from a console over Art-Net, sACN, OSC and PSN; DMX recording.
 * English and Russian interface, freely dockable panels.
 
+![Final render of Фокина.mvr](docs/images/render-final-fokina.png)
+
 ### Documentation
 
 [Editor](docs/editor.md) · [Engine](docs/engine.md) · [Rendering](docs/rendering.md) · [GDTF](docs/gdtf.md) ·

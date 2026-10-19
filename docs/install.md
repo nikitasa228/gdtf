@@ -68,7 +68,8 @@ DMX-режимами, лучом, цветами и гобо. Полная би�
 
 ![Окно «Библиотека приборов» при первом запуске](images/install-first-run-ru.png)
 
-*Первый запуск: окно «Библиотека приборов» поверх редактора. Слева — четыре прибора примера сцены.*
+*Первый запуск: в окне «Библиотека приборов» выбрана папка `Документы\Candela\Fixture Library` с шестью файлами
+GDTF — они сразу появились в панели «Библиотека» рядом с четырьмя приборами примера сцены (всего 10).*
 
 При первом запуске (пока в библиотеке нет ваших приборов) Candela показывает окно **«Библиотека приборов»**:
 
@@ -385,7 +386,7 @@ powershell -ExecutionPolicy Bypass -File packaging\windows\build-installer.ps1
 ```
 
 **On GitHub** the workflow [`.github/workflows/windows-installer.yml`](../.github/workflows/windows-installer.yml)
-runs on `windows-latest` for pushes to `main`, for `v*` tags and on demand: restore, build, the tests that need no
+runs on `windows-latest` for pushes to `main`, pull requests, `v*` tags and on demand: restore, build, the tests that need no
 GPU, the installer, and an artifact `Candela-Setup-<version>-win-x64`; on a `v*` tag (which must match the version of
 `Directory.Build.props`) the installer is attached to the GitHub release.
 
