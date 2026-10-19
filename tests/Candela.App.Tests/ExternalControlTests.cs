@@ -83,7 +83,7 @@ public sealed class ExternalControlTests
 
         // Stopping withdraws the universes.
         model.SetEnabled(engine, app, ProtocolIds.ArtNet, false);
-        Assert.False(engine.Input.ActiveUniverses().Contains(2));
+        Assert.DoesNotContain(2, engine.Input.ActiveUniverses());
     }
 
     [Fact]

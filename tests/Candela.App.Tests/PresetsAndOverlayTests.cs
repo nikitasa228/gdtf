@@ -51,7 +51,10 @@ public sealed partial class PresetsAndOverlayTests
         // A hand-edited preset file with nonsense is made safe when selected.
         store.Save("preview", "Broken", CandelaJson.Serialize(new PreviewSettings
         {
-            ResolutionScale = 99f, VolumetricSlices = -3, ExposureCompensation = 1e30f, Indirect = (IndirectLighting)77,
+            ResolutionScale = 99f,
+            VolumetricSlices = -3,
+            ExposureCompensation = 1e30f,
+            Indirect = (IndirectLighting)77,
         }));
         binding.RefreshNames();
         Assert.True(binding.Select("Broken"));
@@ -70,24 +73,43 @@ public sealed partial class PresetsAndOverlayTests
     {
         var preview = new PreviewSettings
         {
-            ResolutionScale = 0.5f, Shadows = false, ShadowMapResolution = 4096, MaxShadowedLights = 3, Volumetrics = false, VolumetricSlices = 64,
-            MaxRaymarchedBeams = 2, TemporalAccumulation = false, Indirect = IndirectLighting.RayTraced, Bloom = false, BloomIntensity = 0.2f,
-            ToneMapper = ToneMapper.Aces, AutoExposure = true, ExposureCompensation = -2f,
+            ResolutionScale = 0.5f,
+            Shadows = false,
+            ShadowMapResolution = 4096,
+            MaxShadowedLights = 3,
+            Volumetrics = false,
+            VolumetricSlices = 64,
+            MaxRaymarchedBeams = 2,
+            TemporalAccumulation = false,
+            Indirect = IndirectLighting.RayTraced,
+            Bloom = false,
+            BloomIntensity = 0.2f,
+            ToneMapper = ToneMapper.Aces,
+            AutoExposure = true,
+            ExposureCompensation = -2f,
         };
         var copy = new PreviewSettings();
         SettingsCopy.Copy(preview, copy);
         Assert.Equal(CandelaJson.Serialize(preview), CandelaJson.Serialize(copy));
-        Assert.Equal(typeof(PreviewSettings).GetProperties().Length, 14);
+        Assert.Equal(14, typeof(PreviewSettings).GetProperties().Length);
 
         var final = new FinalRenderSettings
         {
-            Width = 640, Height = 360, SamplesPerPixel = 8, MaxBounces = 2, MaxVolumeBounces = 1, Denoise = false, ToneMapper = ToneMapper.Neutral,
-            Format = ImageFileFormat.Exr, OutputPath = "/x/y.png", FrameRate = 30,
+            Width = 640,
+            Height = 360,
+            SamplesPerPixel = 8,
+            MaxBounces = 2,
+            MaxVolumeBounces = 1,
+            Denoise = false,
+            ToneMapper = ToneMapper.Neutral,
+            Format = ImageFileFormat.Exr,
+            OutputPath = "/x/y.png",
+            FrameRate = 30,
         };
         var finalCopy = new FinalRenderSettings();
         SettingsCopy.Copy(final, finalCopy);
         Assert.Equal(CandelaJson.Serialize(final), CandelaJson.Serialize(finalCopy));
-        Assert.Equal(typeof(FinalRenderSettings).GetProperties().Length, 10);
+        Assert.Equal(10, typeof(FinalRenderSettings).GetProperties().Length);
 
         var gradient = ColorGradient.DefaultNoise();
         gradient.Logarithmic = true;

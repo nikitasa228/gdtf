@@ -13,11 +13,26 @@ internal static class AttributeLabels
 {
     private static readonly Dictionary<string, StageStr> EmitterCodes = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["R"] = StageStr.EmitterRed, ["G"] = StageStr.EmitterGreen, ["B"] = StageStr.EmitterBlue, ["W"] = StageStr.EmitterWhite,
-        ["WW"] = StageStr.EmitterWarmWhite, ["CW"] = StageStr.EmitterCoolWhite, ["A"] = StageStr.EmitterAmber, ["RY"] = StageStr.EmitterAmber,
-        ["L"] = StageStr.EmitterLime, ["GY"] = StageStr.EmitterLime, ["UV"] = StageStr.EmitterUv, ["C"] = StageStr.EmitterCyan,
-        ["M"] = StageStr.EmitterMagenta, ["Y"] = StageStr.EmitterYellow, ["IR"] = StageStr.EmitterInfrared, ["P"] = StageStr.EmitterPurple,
-        ["O"] = StageStr.EmitterOrange, ["I"] = StageStr.EmitterIndigo, ["BC"] = StageStr.EmitterCyan, ["GC"] = StageStr.EmitterCyan,
+        ["R"] = StageStr.EmitterRed,
+        ["G"] = StageStr.EmitterGreen,
+        ["B"] = StageStr.EmitterBlue,
+        ["W"] = StageStr.EmitterWhite,
+        ["WW"] = StageStr.EmitterWarmWhite,
+        ["CW"] = StageStr.EmitterCoolWhite,
+        ["A"] = StageStr.EmitterAmber,
+        ["RY"] = StageStr.EmitterAmber,
+        ["L"] = StageStr.EmitterLime,
+        ["GY"] = StageStr.EmitterLime,
+        ["UV"] = StageStr.EmitterUv,
+        ["C"] = StageStr.EmitterCyan,
+        ["M"] = StageStr.EmitterMagenta,
+        ["Y"] = StageStr.EmitterYellow,
+        ["IR"] = StageStr.EmitterInfrared,
+        ["P"] = StageStr.EmitterPurple,
+        ["O"] = StageStr.EmitterOrange,
+        ["I"] = StageStr.EmitterIndigo,
+        ["BC"] = StageStr.EmitterCyan,
+        ["GC"] = StageStr.EmitterCyan,
     };
 
     /// <summary>The label of <paramref name="attribute"/> (classified as <paramref name="cls"/>) in the current language.</summary>
