@@ -158,3 +158,100 @@ public sealed class BeamTwinProbe2
         _output.WriteLine($"exact ratio {BeamScatteringTable.Integral(0, l.Exponent, 0, 0.2) / BeamScatteringTable.Integral(0, l.Exponent, 0, 1.0):0.0000}");
     }
 }
+
+public sealed class BeamTwinIris
+{
+    private readonly ITestOutputHelper _output;
+
+    public BeamTwinIris(ITestOutputHelper output) => _output = output;
+
+    private static double Shape(in GpuLight l, double theta)
+    {
+        if (theta >= l.Cutoff)
+            return 0;
+        double r = theta * l.InvHalfBeam;
+        double g = r > 0 ? Math.Exp(-Math.Log(2) * Math.Pow(r, l.Exponent)) : 1;
+        if (theta > l.HalfField)
+        {
+            double s = (theta - l.HalfField) * l.InvWindow;
+            g *= 1 - s * s * (3 - 2 * s);
+        }
+
+        return g;
+    }
+
+    private static double Iris(in GpuLight l, double theta)
+    {
+        if (theta <= l.IrisSoftStart)
+            return 1;
+        double x = Math.Clamp((theta - l.IrisSoftStart) / (l.IrisAngle - l.IrisSoftStart), 0, 1);
+        return 1 - x * x * (3 - 2 * x);
+    }
+
+    [Fact]
+    public void Band()
+    {
+        var light = StageScene.Spot(new Vector3(0, 0, 4), Vector3.Zero, 30000f, 20f, 30f, shadows: false, type: BeamType.Spot);
+        light.Iris = 0.5f;
+        LightPacker.Pack(light, 0, out var l);
+        _output.WriteLine($"iris {l.IrisAngle} soft {l.IrisSoftStart} cutoff {l.Cutoff} bounding {l.BoundingAngle}");
+        double thetaB = 1.0 / l.InvHalfBeam, W = l.Cutoff * l.InvHalfBeam;
+        double scale = 2 * Math.Sin(0.5 * thetaB) * W, profileScale = thetaB * W;
+        foreach (double x in new[] { 0.0, 0.2, 0.235, 0.25, 0.26 })
+        {
+            double thetaM = Math.Atan2(x, 2);
+            // Ray perpendicular to the axis at distance 2, offset x: R = cos(thetaM), chord of the closest point.
+            double R = Math.Cos(thetaM);
+            double v = 2 * Math.Sin(0.5 * thetaM) / scale;
+            double yScale = Math.Sqrt(R) / scale;
+            double outer = Math.Min(1, 2 * Math.Sin(0.5 * l.IrisAngle) / scale);
+            double inner = Math.Min(outer, 2 * Math.Sin(0.5 * l.IrisSoftStart) / scale);
+            if (v >= outer)
+            {
+                _output.WriteLine($"x {x}: outside");
+                continue;
+            }
+
+            double yOuter = Math.Sqrt(outer * outer - v * v);
+            double yInner = v < inner ? Math.Sqrt(inner * inner - v * v) : 0;
+            double Angle(double y) => 2 * Math.Asin(Math.Min(0.5 * scale * Math.Sqrt(v * v + y * y), 1));
+            double M(double y) => 1 / Math.Cos(Math.Asin(Math.Clamp(y / (2 * yScale), -1, 1)));
+            double F(double y) => Shape(l, profileScale * Math.Sqrt(v * v + y * y));
+            double truth = 0;
+            int n = 100000;
+            for (int i = 0; i < n; i++)
+            {
+                double y = -yOuter + (i + 0.5) * 2 * yOuter / n;
+                double u = 2 * Math.Asin(Math.Clamp(y / (2 * yScale), -1, 1));
+                double theta = Math.Acos(Math.Cos(thetaM) * Math.Cos(u));
+                truth += Shape(l, theta) * Iris(l, theta) * M(y) * 2 * yOuter / n;
+            }
+
+            double est = 0;
+            int K = 4;
+            for (int part = 0; part < 3; part++)
+            {
+                double lo = part == 0 ? -yOuter : Math.Max(-yOuter, part == 1 ? -yInner : yInner);
+                double hi = part == 0 ? Math.Min(yOuter, -yInner) : part == 1 ? Math.Min(yOuter, yInner) : yOuter;
+                if (!(hi > lo))
+                    continue;
+                bool band = part != 1;
+                int segs = band ? 2 : K;
+                double dy = (hi - lo) / segs;
+                for (int i = 0; i < segs; i++)
+                {
+                    double y0 = lo + i * dy, y1 = y0 + dy, ym = y0 + 0.5 * dy;
+                    double dH = BeamScatteringTable.Lookup(l.BeamLayer, v, y1) - BeamScatteringTable.Lookup(l.BeamLayer, v, y0);
+                    double f0 = F(y0), fm = F(ym), f1 = F(y1);
+                    double i0 = band ? Iris(l, Angle(y0)) : 1, im = band ? Iris(l, Angle(ym)) : 1, i1 = band ? Iris(l, Angle(y1)) : 1;
+                    double m0 = M(y0), m1 = M(y1);
+                    double simpson = f0 + 4 * fm + f1;
+                    double average = simpson > 1e-6 ? (f0 * i0 * m0 + 2 * fm * im * (m0 + m1) + f1 * i1 * m1) / simpson : 0.25 * (i0 * m0 + i1 * m1) + 0.25 * im * (m0 + m1);
+                    est += dH * average;
+                }
+            }
+
+            _output.WriteLine($"x {x}: v {v:0.0000} inner {inner:0.000} outer {outer:0.000} truth {truth:0.00000} est {est:0.00000} error {(est - truth) / truth:P2}");
+        }
+    }
+}

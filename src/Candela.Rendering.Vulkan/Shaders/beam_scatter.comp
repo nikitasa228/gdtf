@@ -49,6 +49,14 @@ const int MAX_COOKIE_SAMPLES = 24;
 // Near field length in units of the apex offset R / tan(half-angle): (1 + 3^-4)^(-1/4) = 0.997 of the point source.
 const float NEAR_FIELD_SPAN = 3.0;
 
+// Thin-beam anti-aliasing: a beam whose cut-off radius at the crossing is below this many half-resolution sample
+// spacings is widened to it (flux conserved). beam_cull.comp grows the tiles by BEAM_CULL_MARGIN internal pixels,
+// which covers the widened cone (one sample = 2 internal pixels).
+const float MIN_BEAM_SAMPLES = 1.5;
+
+// Largest widening (beyond it the beam is far below a pixel and contributes almost nothing visible on its own).
+const float MAX_WIDENING = 64.0;
+
 struct BeamRay
 {
     vec3 origin;
@@ -60,6 +68,7 @@ struct BeamRay
     float noise;       // blue-noise value of the pixel, [0, 1)
     float pixelSize;   // world size of a pixel per metre of view depth (perspective) or constant (orthographic)
     bool mediaVolume;  // smoke or flames: view transmittance from the froxel volume
+    float widening;    // angular widening of the current facet (thin-beam anti-aliasing, see widenBeam), 1 = none
 };
 
 // Position of a chord line in the table: the two v rows around it and the weight of the second.
@@ -432,7 +441,7 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
                 float approx = shapeProfile(light, profileScale * sqrt(v * v + yj * yj));
                 float ratio = approx > 1e-4 ? clamp(exact / approx, 0.0, 4.0) : 1.0;
                 float shadow = shadowHard(slot, X, vec3(0.0));
-                float pixelGate = ray.pixelSize * max(ray.originDepth + tj / ray.stretch, 0.0) / max(rj, 1e-3) * light.gateScale;
+                float pixelGate = ray.pixelSize * max(ray.originDepth + tj / ray.stretch, 0.0) / max(rj, 1e-3) * light.gateScale * ray.widening;
                 vec3 c = facetCookie(light, k, facets, omega, max(footprint, pixelGate));
                 // The smooth factor at the sample (linear in the segment) over its profile-weighted mean.
                 float mj = mix(m0, m1, clamp((yj - y0) / dy, 0.0, 1.0));
@@ -561,13 +570,52 @@ void nearField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, f
             continue;
         float smokeLight = hasFeature(FEATURE_SMOKE) ? smokeLightTransmittance(light.position, X, smokeAtLight, smoke) : 1.0;
         float shadow = shadowHard(slot, X, vec3(0.0));
-        float pixelGate = ray.pixelSize * max(ray.originDepth + t / ray.stretch, 0.0) / max(d, 1e-3) * light.gateScale;
+        float pixelGate = ray.pixelSize * max(ray.originDepth + t / ray.stretch, 0.0) / max(d, 1e-3) * light.gateScale * ray.widening;
         num += weight * sigma * shadow * smokeLight * facetCookie(light, k, facets, omega, max(footprint, pixelGate));
     }
 
     // Ratio estimator: the deterministic envelope times the weighted mean modulation (exact when the modulation is
     // uniform, e.g. haze with an unobstructed shadow map); no sample in the lit part: the haze alone.
     sumL += light.intensity * (den > 0.0 ? accB * num / den : vec3(accB * sigmaH));
+}
+
+// Thin-beam anti-aliasing. The half-resolution rays are two internal pixels apart, so a beam narrower than that (a
+// narrow beam seen from afar, near its lens, pixel beams of LED bars) would be hit by some rays and missed by the
+// next: broken, stair-stepped shafts that vanish towards the source. Where the facet's cut-off radius at the ray's
+// closest approach to the axis is below MIN_BEAM_SAMPLES sample spacings, the facet is widened for this ray by the
+// factor k that brings it there: every angle (beam, field, cut-off, iris, the near-field lens radius, the gate
+// coordinates of gobos and blades) times k and the intensity over k^2, which keeps the beam's flux and therefore its
+// light integrated across the screen; a resolved beam (k = 1) is untouched. Returns k and updates light and halfAngle.
+float widenBeam(inout Light light, vec3 a, inout float halfAngle, BeamRay ray)
+{
+    vec3 w0 = ray.origin - light.position;
+    float b = dot(ray.dir, a);
+    float denom = 1.0 - b * b;
+    float t = denom > 1e-6 ? (b * dot(a, w0) - dot(ray.dir, w0)) / denom : 0.0;
+    t = clamp(t, 0.0, ray.tMax);
+    float z = max(dot(w0 + ray.dir * t, a), 0.0);
+    float zeta = z * tan(halfAngle);
+    float lens = light.sourceRadius;
+    float radius = lens > 0.0 ? sqrt(sqrt(lens * lens * lens * lens + zeta * zeta * zeta * zeta)) : zeta;
+    float depth = isOrthographic() ? 1.0 : max(ray.originDepth + t / ray.stretch, 0.0);
+    float spacing = 2.0 * ray.pixelSize * depth;
+    float k = clamp(MIN_BEAM_SAMPLES * spacing / max(radius, 1e-9), 1.0, min(MAX_WIDENING, 1.3 / max(halfAngle, 1e-4)));
+    if (!(k > 1.0))
+        return 1.0;
+    light.invHalfBeam /= k;
+    light.halfField *= k;
+    light.cutoff *= k;
+    light.invWindow /= k;
+    if (light.irisAngle < 3.9)
+    {
+        light.irisAngle *= k;
+        light.irisSoftStart *= k;
+    }
+
+    light.gateScale /= k;
+    light.sourceRadius *= k;
+    halfAngle *= k;
+    return k;
 }
 
 void main()
@@ -615,6 +663,7 @@ void main()
     ray.noise = fract(interleavedGradientNoise(vec2(id)) + float(frame.frameIndex % 64u) * 0.6180339887);
     ray.pixelSize = isOrthographic() ? frame.pixelFootprint.y : frame.pixelFootprint.x;
     ray.mediaVolume = hasFeature(FEATURE_SMOKE) || hasFeature(FEATURE_FLAME);
+    ray.widening = 1.0;
     // Without a history the frame stands alone: twice the modulation samples.
     int samples = (frame.beamFlags & BEAM_FLAG_HISTORY) != 0u ? 1 : 2;
 
@@ -640,17 +689,25 @@ void main()
             bool shadowed = slot != NO_SHADOW && hasFeature(FEATURE_SHADOWS);
             bool modulate = shadowed || smoke || (light.flags & (LIGHT_GOBO | LIGHT_BLADES)) != 0u;
             uint facets = beamFacetCount(light);
-            float halfAngle = beamFacetHalfAngle(light);
-            float zNear = light.sourceRadius > 0.0 ? NEAR_FIELD_SPAN * beamApexOffset(light.sourceRadius, halfAngle) : 0.0;
+            float facetHalfAngle = beamFacetHalfAngle(light);
             vec3 sumL = vec3(0.0);
             float sumB = 0.0;
             float smokeAtLight = smoke ? smokeAt(light.position) : 0.0;
             for (uint k = 0u; k < facets; ++k)
             {
                 vec3 a = beamFacetAxis(light, k, facets);
-                farField(light, slot, entry, k, facets, a, halfAngle, zNear, ray, modulate, samples, smokeAtLight, sumL, sumB, tEnd);
+                Light facet = light;
+                float halfAngle = facetHalfAngle;
+                ray.widening = widenBeam(facet, a, halfAngle, ray);
+                float zNear = facet.sourceRadius > 0.0 ? NEAR_FIELD_SPAN * beamApexOffset(facet.sourceRadius, halfAngle) : 0.0;
+                vec3 facetL = vec3(0.0);
+                float facetB = 0.0;
+                farField(facet, slot, entry, k, facets, a, halfAngle, zNear, ray, modulate, samples, smokeAtLight, facetL, facetB, tEnd);
                 if (zNear > 0.0)
-                    nearField(light, slot, entry, k, facets, a, halfAngle, zNear, ray, modulate, samples, smokeAtLight, sumL, sumB, tEnd);
+                    nearField(facet, slot, entry, k, facets, a, halfAngle, zNear, ray, modulate, samples, smokeAtLight, facetL, facetB, tEnd);
+                float flux = 1.0 / (ray.widening * ray.widening);
+                sumL += facetL * flux;
+                sumB += facetB * flux;
             }
 
             L += sumL;
@@ -660,8 +717,11 @@ void main()
 
     // Validity depth for the upsampling: when every beam ended in front of the surface (or no beam was hit), the
     // value holds for any surface behind that point, stored negated; otherwise only for this sample's surface depth.
+    // Both depths are stored in half floats: limited to HALF_SAFE_MAX (the background's BEAM_BACKGROUND_DEPTH would
+    // overflow to infinity, and the temporal pass could not reproject the sky).
     bool clipped = tEnd >= ray.tMax * 0.9999 && tEnd > 0.0;
-    float validity = clipped ? viewDepth : -max(ray.originDepth + tEnd / ray.stretch, 1e-4);
+    float storedDepth = min(viewDepth, HALF_SAFE_MAX);
+    float validity = clipped ? storedDepth : -clamp(ray.originDepth + tEnd / ray.stretch, 1e-4, HALF_SAFE_MAX);
     imageStore(outScatter, id, vec4(finiteLight(L * frame.exposure), validity));
-    imageStore(outBase, id, vec4(finiteLight(B * (frame.beamSigmaRef * frame.exposure)), viewDepth));
+    imageStore(outBase, id, vec4(finiteLight(B * (frame.beamSigmaRef * frame.exposure)), storedDepth));
 }

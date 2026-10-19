@@ -12,6 +12,10 @@
 
 layout(local_size_x = 256) in;
 
+// Growth of every tile on each side (internal pixels) for the thin-beam widening of beam_scatter.comp (MIN_BEAM_SAMPLES
+// = 1.5 samples of 2 internal pixels, plus a pixel of margin).
+const float BEAM_CULL_MARGIN = 4.0;
+
 shared float groupDepth[256];
 shared uint groupMask[MAX_BEAM_WORDS];
 
@@ -75,6 +79,12 @@ void main()
         // The farthest point of the tile: any corner ray at that depth gives the view depth.
         maxViewDepth = viewDepthOf(worldFromDepth(0.5 * (uv0 + uv1), farDepth));
     }
+
+    // The side planes enclose the tile grown by BEAM_CULL_MARGIN internal pixels: beams thinner than the sample
+    // spacing are widened by the scatter pass to 1.5 samples (3 internal pixels) around their axis, so a tile next
+    // to such a beam still lists it.
+    uv0 -= BEAM_CULL_MARGIN * frame.renderSize.zw;
+    uv1 += BEAM_CULL_MARGIN * frame.renderSize.zw;
 
     vec3 oc, dc;
     viewRay(0.5 * (uv0 + uv1), oc, dc);

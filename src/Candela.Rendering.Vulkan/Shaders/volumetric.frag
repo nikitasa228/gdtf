@@ -24,7 +24,7 @@ float viewDepthAt(ivec2 p)
 {
     p = clamp(p, ivec2(0), ivec2(frame.renderSize.xy) - 1);
     float depth = texelFetch(sceneDepth, p, 0).r;
-    return depth > 0.0 ? viewDepthOf(worldFromDepth((vec2(p) + 0.5) * frame.renderSize.zw, depth)) : BEAM_BACKGROUND_DEPTH;
+    return min(depth > 0.0 ? viewDepthOf(worldFromDepth((vec2(p) + 0.5) * frame.renderSize.zw, depth)) : BEAM_BACKGROUND_DEPTH, HALF_SAFE_MAX);
 }
 
 // Smaller of the two one-sided view-depth differences along one axis: the slope of the surface, not of an edge.
@@ -38,6 +38,8 @@ vec3 beamLight(float viewDepth)
     // A half-resolution sample lies up to 1.5 pixels away and represents the nearest or farthest depth of its
     // 2 x 2 block: on a sloped surface it differs from this pixel's depth by up to about 2.5 slopes per axis.
     ivec2 pixel = ivec2(gl_FragCoord.xy);
+    // The samples store their depths in half floats, limited to HALF_SAFE_MAX (beam_scatter.comp).
+    viewDepth = min(viewDepth, HALF_SAFE_MAX);
     float slope = depthSlope(pixel, ivec2(1, 0), viewDepth) + depthSlope(pixel, ivec2(0, 1), viewDepth);
     float tolerance = max(0.02 * viewDepth + 2.5 * slope, 1e-3);
     vec2 size = vec2(textureSize(beamTexture, 0));
