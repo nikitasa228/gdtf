@@ -159,7 +159,7 @@ update).
 
 | Content | How it is drawn |
 |---|---|
-| Fixtures | The models of each fixture type + mode are loaded once (`FixtureGeometryBuilder` + `GdtfModelLoader`, textures through `gdtf:` keys) — on a background task by default (`LoadFixtureModelsInBackground`; `CompletePendingLoads` waits) — and uploaded once; every fixture gets one instance per model part of every geometry part, whose world matrix follows the part's pose. **Lens glow**: the instances of a beam's geometry part emit peak candela / lens area (π·r², r = the beam's `BeamRadius`, 5 cm when unset; summed over the beams of the part, at most 10⁹ cd/m²) in the beam's colour through `IRenderWorld.SetInstanceEmission(instance, luminance, axis, halfAngle)`, seen along the part's −Z axis and falling off like the beam (half at half the widest beam angle), so a lens glares only for eyes in its beam; the renderer's bloom adds the glare. Sent only when it changes. |
+| Fixtures | The models of each fixture type + mode are loaded once (`FixtureGeometryBuilder` + `GdtfModelLoader`, textures through `gdtf:` keys) — on a background task by default (`LoadFixtureModelsInBackground`; `CompletePendingLoads` waits) — and uploaded once; every fixture gets one instance per model part of every geometry part, whose world matrix follows the part's pose. **Lens glow**: the instances of a beam's geometry part emit peak candela / lens area (π·r², r = the beam's `BeamRadius`, 5 cm when unset; summed over the beams of the part, at most 10⁹ cd/m²) in the beam's colour through `IRenderWorld.SetInstanceEmission(instance, luminance, axis, halfAngle)`, seen along the part's −Z axis and falling off like the beam (half at half the widest beam angle), so a lens glares only for eyes in its beam; the renderer's bloom adds the glare. Computed per fixture in one pass over its beams (a reused per-part buffer, linear in parts + beams + instances also for pixel bars with hundreds of beams) and sent only when it changes. |
 | Lights | `SetLights` every frame; gobo textures are created once per wheel slot from the GDTF media (alpha = transmission = linear luminance × alpha of the picture, RGB = tint of coloured glass). |
 | Walls, floors, ceilings | `WallMesh` + the built-in material (`MaterialLibrary`) with its UV scale. |
 | Images | `ImagePlaneMesh` + `ImagePlaneMesh.CreateMaterial`; reference drawings unlit (`InstanceFlags.Reference`), posters lit. |
@@ -355,4 +355,5 @@ a device):
   fixture's 465 000 cd (Candela.Dmx), so each is a Lambertian emitter of about 183 klm; in haze they light the air
   evenly and mask the beams of the other fixtures (docs/rendering.md shows the stage with and without them).
 * The DMX recorder samples the input once per engine frame (not every received packet).
-* The renderer keeps at most 64 flame grids (the hottest wins where they overlap).
+* The renderer keeps at most 64 flame grids and 64 M texels in all (the hottest wins where they overlap; grids beyond
+  the budget are skipped with a warning).
