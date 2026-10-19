@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Numerics;
 using Candela.Core.Geometry;
 using Candela.Core.Math;
@@ -119,12 +120,21 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         _world = renderer.VulkanWorld;
         _tracer = tracer;
         _scene = scene;
-        _barriers = new BarrierBatch(_context.Vk);
-        _tlas = new TopLevelStructure(scene.Device, "path tracer TLAS");
 
         int maxSide = (int)Math.Min(_context.Capabilities.MaxImageDimension2D, 16384u);
         _width = Math.Clamp(settings.Width, 1, maxSide);
         _height = Math.Clamp(settings.Height, 1, maxSide);
+        ulong imageBytes = ImageBytes(_width, _height);
+        ulong deviceBytes = _context.Capabilities.DeviceLocalMemoryBytes;
+        if (deviceBytes > 0 && imageBytes > deviceBytes / 2)
+        {
+            throw new NotSupportedException(string.Create(CultureInfo.InvariantCulture,
+                $"a {_width} × {_height} final render needs {imageBytes >> 20} MiB of images, more than half of the {deviceBytes >> 20} MiB of " +
+                $"'{_context.Capabilities.DeviceName}': not supported on this GPU at this size (render a smaller image)"));
+        }
+
+        _barriers = new BarrierBatch(_context.Vk);
+        _tlas = new TopLevelStructure(scene.Device, "path tracer TLAS");
         _samplesTotal = Math.Clamp(settings.SamplesPerPixel, 1, MaxSamples);
         _denoise = settings.Denoise;
         _denoiseIterations = Math.Clamp(options.DenoiseIterations, 1, 8);
@@ -251,6 +261,12 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
 
     /// <inheritdoc/>
     public float Exposure => _exposure;
+
+    /// <summary>
+    /// GPU memory of the images of a <paramref name="width"/> × <paramref name="height"/> render, bytes: five RGBA32F
+    /// images (accumulation, albedo, normal + depth, two denoiser buffers), the RGBA8 display and the RGBA32F read-back.
+    /// </summary>
+    public static ulong ImageBytes(int width, int height) => (ulong)Math.Max(width, 0) * (ulong)Math.Max(height, 0) * (5 * 16 + 4 + 16);
 
     /// <summary>Output width, px.</summary>
     public int Width => _width;

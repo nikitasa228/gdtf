@@ -730,7 +730,9 @@ internal static class RenderCommand
             catch (NotSupportedException e)
             {
                 error.WriteLine(e.Message);
-                error.WriteLine("Pick a GPU with ray queries with --device <name>, or render without --final (the real-time view).");
+                error.WriteLine(renderer.Info.SupportsRayTracing
+                    ? "Render a smaller image (--width, --height), or pick a GPU with more memory with --device <name>."
+                    : "Pick a GPU with ray queries with --device <name>, or render without --final (the real-time view).");
                 return new RenderResult(Program.ExitNoVulkan, written, false, "", detail, "");
             }
 

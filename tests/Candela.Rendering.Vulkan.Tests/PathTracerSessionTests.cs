@@ -508,6 +508,34 @@ public sealed class PathTracerSessionTests
         }
     }
 
+    /// <summary>
+    /// An image whose accumulation buffers would take more than half of the GPU's memory is refused with "not
+    /// supported on this GPU" before anything is allocated (16 384² needs 25 GiB; on a CPU device the images would
+    /// otherwise be committed from system memory), and the renderer goes on working.
+    /// </summary>
+    [SkippableFact]
+    public void ImagesTooLargeForTheGpuAreRefusedBeforeAllocating()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var caps = renderer.Context.Capabilities;
+            int side = (int)Math.Min(caps.MaxImageDimension2D, 16384u);
+            Skip.If(VulkanFinalRender.ImageBytes(side, side) <= caps.DeviceLocalMemoryBytes / 2, "The device has room for the largest final render.");
+            var camera = BuildRoom(renderer);
+            var e = Assert.Throws<NotSupportedException>(() => renderer.StartFinalRender(camera, FinalRenderSupport.Settings(side, side, 1), new FinalRenderOptions()));
+            Assert.Contains("not supported on this GPU", e.Message);
+            Assert.Contains($"{side} × {side}", e.Message);
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(16, 12, 1)))
+                Assert.Equal(1, render.SamplesDone);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     [SkippableFact]
     public void BadInputStaysFiniteAndValidationClean()
     {

@@ -937,7 +937,10 @@ off the pools, it lights the room. (`PathTracerSceneTests` renders the scene at 
   denoiser buffers, display: 84 bytes per pixel, 174 MB at 1920 × 1080), the light snapshot (one `GpuLight`, a box
   and a 16-gon per light, two small acceleration structures over them) and a TLAS; the BLAS per mesh, the geometry
   table, materials and textures are the real-time view's. Nothing is stored per path or per bounce, so the memory does
-  not grow with samples, bounces or the 1291 beams of `Фокина.mvr`.
+  not grow with samples, bounces or the 1291 beams of `Фокина.mvr`. A size whose images (`ImageBytes`: 100 bytes per
+  pixel with the read-back) would take more than half of the GPU's memory is refused before anything is allocated —
+  "not supported on this GPU at this size" (16 384² needs 25 GiB; on lavapipe the images would otherwise be committed
+  from system memory).
 
 ### Lights
 
