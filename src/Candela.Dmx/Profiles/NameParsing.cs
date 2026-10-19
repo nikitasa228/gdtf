@@ -406,8 +406,7 @@ public static class NameParsing
         if (IsTransition(s)) return false;
         if (IsOpenSlotName(s)) return true;
         if (s is "off" or "out" or "removed" or "remove" or "idle" or "neutral" or "disable" or "disabled" or "close" or "closed") return true;
-        foreach (string prefix in (ReadOnlySpan<string>)["off ", "off(", "off-", "removed", "out ", "closed", "close ", "no function", "nofunction",
-            "no feature", "nofeature", "no animation", "no effect", "no gobo", "no shaper", "no beam shaper", "empty"])
+        foreach (string prefix in OutPrefixes)
         {
             if (s.StartsWith(prefix, StringComparison.Ordinal)) return true;
         }
@@ -418,6 +417,28 @@ public static class NameParsing
         // "Animation Rotation OFF", "Wheel Slot 0 OFF": the mechanism is switched off (but "Shake off" only stops a shake)
         return LastWordIs(s, "off") && !ContainsAny(s, "/", "+", "&", "shake", "strobe", " on");
     }
+
+    /// <summary>Lower-case beginnings of range names that take a mechanism out of the beam ("Off (no rotation)", "No function").</summary>
+    private static readonly string[] OutPrefixes =
+    [
+        "off ",
+        "off(",
+        "off-",
+        "removed",
+        "out ",
+        "closed",
+        "close ",
+        "no function",
+        "nofunction",
+        "no feature",
+        "nofeature",
+        "no animation",
+        "no effect",
+        "no gobo",
+        "no shaper",
+        "no beam shaper",
+        "empty",
+    ];
 
     /// <summary>True when the last word of a lower-case name, ignoring punctuation, is <paramref name="word"/>.</summary>
     private static bool LastWordIs(string s, string word)

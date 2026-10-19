@@ -62,6 +62,16 @@ Emitters are mixed in CIE XYZ (Grassmann's law): each emitter contributes level 
 the total Y is the flux in lumens and the chromaticity of the sum is the colour. Mixing never happens in clipped RGB.
 `TrySolveLevels` finds the RGB levels for a target chromaticity (white balance, virtual CCT).
 
+`TryBalance(emitters, targetXy, factors)` re-balances a whole engine so that all its emitters at full mix to a target
+(a datasheet white when a file's emitter outputs are placeholders, e.g. every emitter written with Y 100). It looks for
+positive factors kᵢ on the emitters' full-level fluxes with the least Σ (ln kᵢ)², so a calibration trims every emitter
+a little rather than switching one off. The two chromaticity conditions Σ kᵢ·Fᵢ·(Xᵢ/Yᵢ − X/Y) = 0 and
+Σ kᵢ·Fᵢ·(Zᵢ/Yᵢ − Z/Y) = 0 are solved by minimum-norm Gauss–Newton steps on ln kᵢ, damped to ±2 per step. Convergence
+is judged against the current mix's flux, because the conditions are homogeneous in k and shrinking every factor
+together would also shrink the residual. The factors are then scaled together so the total flux stays Σ Fᵢ. A target
+outside the emitters' gamut, or off the line between two emitters, is refused (false). It works for 2–16 emitters and
+does not allocate.
+
 When a GDTF file has no emitter data, `StandardEmitters.FromColorMixing` builds emitters from the `_specs`
 `colorMixing` code (all codes in `_specs/fixtures_index.json` are understood). Typical stage-LED chromaticities:
 R (0.700, 0.299), G (0.170, 0.700), B (0.150, 0.030), A (0.575, 0.424), L (0.405, 0.545), C (0.060, 0.520),
@@ -129,6 +139,7 @@ L = 10·log₁₀ Σ 10^(Lᵢ/10) (two 60 dB sources → 63.01 dB).
 | CCT of D65 xy | 6504 K, Δuv +0.0032 | 6504.2 K, +0.0032 |
 | CCT of Planck 2700 K | 2700 K | ±0.02 K |
 | RGB LEDs mixed to D65 | Δxy < 0.003 | < 10⁻⁴ |
+| Placeholder RGBW (all Y 100) balanced to 2700 / 5600 / 8000 K | Δxy < 10⁻⁴, flux kept | < 10⁻⁴, ±0.01 lm |
 | full CMY | < 2 % | 0.8 % |
 | beam 50 % / 10 % points | at beam/2, field/2 | exact (10⁻⁵) |
 
