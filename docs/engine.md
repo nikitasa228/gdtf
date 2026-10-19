@@ -336,7 +336,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (75 tests, ≈ 50 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (80 tests, ≈ 40 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
@@ -397,6 +397,10 @@ a device):
   saving (with and without autosave); worker crashes with a lingering child, garbage output, and a project whose model
   crashes the worker; framing fits every point tightly; thousands of damaged recordings and model packages load or are
   refused with `InvalidDataException`.
+* **Follow-up review**: a background model decode that throws is recorded as failed in the asset store and not started
+  again; fixtures named by an MVR stub spec get the same stand-in mode in the looks and the Art-Net test pattern as in
+  the DMX engine; an ARRI SkyPanel's 179° field is trimmed to the renderer's 170° cone silently, while an Astera
+  LunaBulb, whose beam cone itself is wider, is reported (`engine.field-clamped`).
 
 ## Known limitations
 

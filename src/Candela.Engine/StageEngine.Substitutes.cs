@@ -1,4 +1,3 @@
-using System.Globalization;
 using Candela.Core.Diagnostics;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
@@ -100,6 +99,7 @@ public sealed partial class StageEngine
                 }
             }
         }
+        _substitutes = null; // entries may have been replaced without changing the count
     }
 
     /// <summary>

@@ -402,6 +402,12 @@ Writing the result again gives the same bytes.
   so its GDTF beam, along local −Z, points up). Every entity transform must
   reproduce its MVR matrix. The scene is exported and re-imported (same entities, positions within 1e-4 m, same
   patch, specs and modes, byte-identical repeated export), and merged twice into a venue scene.
+* **`SubstituteModeTests`.** Fixtures of a model the library lacks (MagicBlade R → MagicPanel 602 stand-in) patched
+  at various spacings: the stand-in's mode of the requested name is replaced when it overlaps (`mvr.substitute-mode`)
+  and kept when it fits; an unknown mode name gets the widest fitting mode with a `mvr.mode-unknown` warning; when
+  nothing fits, the smallest mode and `mvr.mode-footprint`; one fixture (no spacing) keeps the mode by name; universes
+  do not make a spacing; and the importer's rule picks the same mode as `Candela.Dmx.SubstituteModes.Choose` for every
+  library fixture type, mode name and a range of spacings (the test project references Candela.Dmx for this only).
 * **`SyntheticTests`.** A hand-written MVR 1.6 archive with every object type and nearly every attribute: nested
   groups, nested symdefs, a GLB and a 3DS model, a mirror matrix, a layer matrix, connections, and complete, stub and
   library-only GDTFs. The tests cover the reader, the importer mapping, the lossless and idempotent document round
