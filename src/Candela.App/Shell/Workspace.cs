@@ -123,8 +123,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _render = Add(new RenderPanel(_ctx, Report));
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
-        _external = Add(new ExternalControlPanel(_ctx));
         _cableLinks = Add(new CableLinksPanel(StagePanelContext.From(_ctx), ShowCableOverlay));
+        _external = Add(new ExternalControlPanel(_ctx));
         _ctx.Tools.Stage.Browser = _browser;
         RegisterCommands();
         InitializeSession();
@@ -522,8 +522,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         plan.Right.Add(_render.DockName);
         plan.Bottom.Add(_issues.DockName);
         plan.Bottom.Add(_console.DockName);
-        plan.Bottom.Add(_external.DockName);
         plan.Bottom.Add(_cableLinks.DockName);
+        plan.Bottom.Add(_external.DockName);
         int count = fourViewports ? 4 : 1;
         for (int i = 0; i < count; i++)
             plan.Center.Add(_viewports[i].DockName);
