@@ -16,8 +16,10 @@
 // from its centre c, exactly as in the real-time renderer; the lens (SourceRadius) is an area-preserving polygon in
 // front of it that casts soft shadows and is what rays see:  L(y -> x) = I(theta_c(x)) |x - y|^2 / (A cos theta_y |x - c|^2),
 // so next-event estimation through a random lens point gives I(theta_c)/|x - c|^2 times the visibility of that point.
+// Lenses emit but do not occlude (overlapping lenses of a fixture's beams add up), and rays see a lens through the
+// surfaces within its clearance in front of it, which shadow rays leave out (the fixture's own lens and housing).
 // As in the real-time view, only instances with CastShadow block light, and lights without LIGHT_CAST_SHADOWS (flame
-// light samples) are not shadowed at all.
+// light samples) are not shadowed at all. Next-event estimation runs at every surface vertex, whichever lobe follows.
 //
 // Media: uniform haze (inside the media box), the smoke density grid (scattering, albedo 1) and the flame grids
 // (absorption kappa, blackbody emission kappa x L_bb(T)) with the Henyey-Greenstein phase function. Single scattering
