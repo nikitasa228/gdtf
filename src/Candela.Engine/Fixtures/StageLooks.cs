@@ -52,9 +52,10 @@ public static partial class StageLooks
         float zoom = float.IsFinite(options.Zoom) ? Math.Clamp(options.Zoom, 0f, 1f) : 0.5f;
 
         var edits = new List<(FixtureComponent Fixture, Dictionary<string, float> Values)>();
+        var resolve = engine.FixtureResolver();
         foreach (var (entity, fixture) in scene.Query<FixtureComponent>().ToList())
         {
-            var profile = engine.Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode).Profile;
+            var profile = resolve(fixture).Profile;
             if (profile is null) continue;
             var aim = target;
             var p = entity.WorldPosition;

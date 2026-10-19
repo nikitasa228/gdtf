@@ -96,11 +96,12 @@ public static partial class StageLooks
         float front = bounds.IsEmpty ? centre.Y - 5f : bounds.Min.Y;
 
         var members = new List<DemoMember>();
+        var resolve = engine.FixtureResolver();
         foreach (var (entity, fixture) in scene.Query<FixtureComponent>())
         {
             var position = entity.WorldPosition;
             if (!float.IsFinite(position.X) || !float.IsFinite(position.Y) || !float.IsFinite(position.Z)) continue;
-            if (engine.Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode).Profile is { } profile)
+            if (resolve(fixture).Profile is { } profile)
                 members.Add(new DemoMember(entity, fixture, profile, position));
         }
 

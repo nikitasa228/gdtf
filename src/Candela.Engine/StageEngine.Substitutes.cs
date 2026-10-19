@@ -38,6 +38,25 @@ public sealed partial class StageEngine
         return new FixtureSubstitution(sub.RequestedSpec, sub.RequestedMode, sub.StandIn, sub.PatchSpacing);
     }
 
+    /// <summary>
+    /// Resolves fixtures' profiles the way <see cref="DmxEngine"/> does, for code that works on the scene's fixtures
+    /// outside the DMX engine (looks, the Art-Net test pattern, the light plot): a fixture whose <c>GdtfSpec</c> names a
+    /// model the library lacks (an MVR stub name) gets the stand-in's mode that fits its type's patch spacing, not the
+    /// mode of the requested name, so its manual values and DMX layout match the state the engine evaluates. The patch
+    /// spacing of the scene is computed once per resolver, on its first stand-in.
+    /// </summary>
+    internal Func<FixtureComponent, ProfileResolution> FixtureResolver()
+    {
+        Dictionary<(string Spec, string Mode), int?>? spacing = null;
+        return fixture =>
+        {
+            var resolution = Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode);
+            if (resolution.MatchKind != FixtureMatchKind.Substitute) return resolution;
+            spacing ??= PatchSpacing.ByType(_scene.Query<FixtureComponent>().Select(x => x.Component));
+            return Profiles.Resolve(fixture.GdtfSpec, fixture.GdtfMode, spacing.GetValueOrDefault(PatchSpacing.Key(fixture.GdtfSpec, fixture.GdtfMode)));
+        };
+    }
+
     /// <summary>For the patch: the stand-in an import chose for a fixture (see <see cref="SubstitutionOf(Guid)"/>).</summary>
     private FixtureSubstitution? SubstitutionOf(Entity entity, FixtureComponent fixture) => SubstitutionOf(entity.Id);
 
