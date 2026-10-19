@@ -320,7 +320,14 @@ note says when a fixture was matched to a substitute type (an MVR fixture whose 
 Every value says where it comes from (tooltip: the GDTF file, derived from the GDTF data, the manufacturer's datasheet,
 or an estimate); **estimated values** — the `_source` of the `_specs` record is `estimated`, e.g. most noise levels and
 many peak intensities, or lamp power standing in for the mains draw — are shown dimmed with a leading **≈**, and the
-datasheets the researched values come from are listed below the table. The power factor is shown only when the GDTF
+datasheets the researched values come from are listed below the table. When an MVR fixture's GDTF is not in the
+library and a similar type stands in for it, the import warning is repeated at the top of the section (the data below
+is then the stand-in's).
+
+![Fixture type: a stand-in GDTF and estimated values](images/editor-properties-provenance.png)
+
+*A "MagicBlade R" of `stages/Фокина.mvr`: its GDTF is a stub, the MagicPanel 602 stands in for it; the luminous
+intensity, colour temperature, noise level and control protocols of its record are estimates (≈).* The power factor is shown only when the GDTF
 or the specs declare one (the 0.95 the electrical model assumes otherwise is not data). Levels are percentages whatever
 unit the GDTF gives them (a GDTF `Dimmer` declares *LuminousIntensity* with physical values 0 … 1: that is 0 … 100 %,
 not candela).
@@ -364,7 +371,7 @@ universe) and **Send Art-Net test** (below). The tabs:
   |---|---|---|
   | Art-Net 4 | implemented | network interface, universe offset, port (6454), ArtSync, broadcast ArtPollReply |
   | sACN (E1.31) | implemented | port (5568), multicast join, preview data, unpatched universes |
-  | EntTec DMX USB Pro | implemented | serial port, universe |
+  | EntTec DMX USB Pro | implemented | serial port, universe (applied when the field is left) |
   | OSC | implemented | port (8000) |
   | PosiStageNet | implemented | port (56565) |
   | ETC Eos | partial | OSC output port (8001) |
