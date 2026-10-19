@@ -1,5 +1,6 @@
 using Candela.App.Editing;
 using Candela.App.Panels;
+using Candela.App.Settings;
 using Candela.App.Session;
 using Candela.App.Ui;
 using Candela.Core.Settings;
@@ -24,6 +25,7 @@ internal sealed partial class Workspace
     private string[] _cableMenuLabels = Array.Empty<string>();
     private string _cableMenuLanguage = "";
     private CableCatalog? _cableMenuCatalog;
+    private EditorPreferences _preferences = new();
 
     /// <summary>The cable link window.</summary>
     internal CableLinksPanel CableLinks => _cableLinks;
@@ -46,6 +48,54 @@ internal sealed partial class Workspace
         };
         _ctx.Session.SceneReplaced += _onCablesSceneReplaced;
         _handleEditingKeys = HandleEditingKeys;
+        _preferences = EditorPreferences.Load(ConfigPaths.ConfigDir, _ctx.Log);
+        _settingsWindow.Preferences = _preferences;
+        _settingsWindow.PreferencesChanged = () =>
+        {
+            if (!_ctx.Settings.ReadOnly)
+                _preferences.Save(ConfigPaths.ConfigDir, _ctx.Log);
+        };
+    }
+
+    /// <summary>The editing preferences (tests).</summary>
+    internal EditorPreferences Preferences => _preferences;
+
+    /// <summary>
+    /// After Duplicate or Paste: copied fixtures that overlap other fixtures' channels are patched to the next free
+    /// addresses, or the user is asked first, as <see cref="EditorPreferences.DuplicatePatch"/> says.
+    /// </summary>
+    private void AfterCopy(IReadOnlyList<Guid> created)
+    {
+        var session = _ctx.Session;
+        if (session.Engine is not { } engine || created.Count == 0 || _preferences.DuplicatePatch == DuplicatePatchMode.Keep)
+            return;
+        var overlapping = DuplicatePatch.Overlapping(session.Scene, engine.Profiles, created);
+        if (overlapping.Count == 0)
+            return;
+        if (_preferences.DuplicatePatch == DuplicatePatchMode.NextFree)
+        {
+            RepatchCopies(overlapping.Select(e => e.Id).ToList());
+            return;
+        }
+
+        var ids = overlapping.Select(e => e.Id).ToList();
+        _messages.Ask(CableLoc.Get(CableStr.DuplicateQuestionTitle), CableLoc.Format(CableStr.DuplicateQuestion, ids.Count),
+            CableLoc.Get(CableStr.DuplicateRepatch), CableLoc.Get(CableStr.DuplicateKeep), yes =>
+            {
+                if (yes)
+                    RepatchCopies(ids);
+            });
+    }
+
+    private void RepatchCopies(IReadOnlyList<Guid> ids)
+    {
+        var session = _ctx.Session;
+        if (session.Engine is not { } engine)
+            return;
+        var fixtures = ids.Select(session.Scene.Find).Where(e => e is not null).Select(e => e!).ToList();
+        int n = DuplicatePatch.Repatch(session.Scene, engine.Profiles, session.Undo, fixtures);
+        if (n > 0)
+            SetStatus(CableLoc.Format(CableStr.DuplicateRepatched, n));
     }
 
     private void DisposeCabling()
