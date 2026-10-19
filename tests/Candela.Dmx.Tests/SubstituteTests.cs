@@ -46,14 +46,14 @@ public class SubstituteTests
         var match = TestData.Library.FindBySpec(MagicBladeStub);
         Assert.Equal(FixtureMatchKind.Substitute, match!.Kind);
         var panel = TestData.Library.GetFixtureType(match.Entry);
-        Assert.Equal("Standard", SubstituteModes.Choose(panel, "Extended", 44)!.Name); // 20 of the 44 channels
-        Assert.Equal("Basic", SubstituteModes.Choose(panel, "Extended", 19)!.Name);
-        Assert.Equal("Basic", SubstituteModes.Choose(panel, "Extended", 5)!.Name); // nothing fits: the smallest
-        Assert.Equal("Extended", SubstituteModes.Choose(panel, "Extended", 160)!.Name); // the requested one fits
-        Assert.Equal("Basic", SubstituteModes.Choose(panel, "Basic", 44)!.Name); // a requested mode that fits is kept
-        Assert.Equal("Extended", SubstituteModes.Choose(panel, "Extended", null)!.Name); // no spacing: by name
-        Assert.Equal(panel.DmxModes[0].Name, SubstituteModes.Choose(panel, "No such mode", null)!.Name);
-        Assert.Equal(160, SubstituteModes.Footprint(panel.FindMode("Extended")!));
+        Assert.Equal("Standard", panel.FitModeToSpacing("Extended", 44)!.Name); // 20 of the 44 channels
+        Assert.Equal("Basic", panel.FitModeToSpacing("Extended", 19)!.Name);
+        Assert.Equal("Basic", panel.FitModeToSpacing("Extended", 5)!.Name); // nothing fits: the smallest
+        Assert.Equal("Extended", panel.FitModeToSpacing("Extended", 160)!.Name); // the requested one fits
+        Assert.Equal("Basic", panel.FitModeToSpacing("Basic", 44)!.Name); // a requested mode that fits is kept
+        Assert.Equal("Extended", panel.FitModeToSpacing("Extended", null)!.Name); // no spacing: by name
+        Assert.Equal(panel.DmxModes[0].Name, panel.FitModeToSpacing("No such mode", null)!.Name);
+        Assert.Equal(160, panel.FindMode("Extended")!.FirstBreakFootprint);
     }
 
     [Fact]

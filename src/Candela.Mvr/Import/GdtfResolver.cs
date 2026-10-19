@@ -237,7 +237,7 @@ internal static class ModeMatcher
             double score = NameSimilarity(requested, m.Name);
             if (inferredFootprint is { } inferred)
             {
-                int fp = FirstBreakFootprint(m);
+                int fp = m.FirstBreakFootprint;
                 score = 0.4 * score + 0.6 / (1.0 + System.Math.Abs(fp - inferred));
             }
             if (score > bestScore + 1e-12)
@@ -259,63 +259,6 @@ internal static class ModeMatcher
         foreach (var m in type.DmxModes)
             if (FixtureNames.Key(m.Name) == key) return m;
         return null;
-    }
-
-    /// <summary>
-    /// The mode of a substitute GDTF for fixtures patched <paramref name="spacing"/> channels apart: <paramref name="named"/>
-    /// (the stand-in's mode of the requested name) when it fits; else the mode with the largest first-break footprint that
-    /// fits — the most complete one that does not overlap the neighbours; GDTF order breaks ties; else, when none fits,
-    /// the smallest. The same rule as <c>Candela.Dmx.SubstituteModes.Choose</c>, so the engine and the importer agree.
-    /// Null only when the GDTF has no modes.
-    /// </summary>
-    public static DmxMode? FitToSpacing(FixtureType type, DmxMode? named, int spacing)
-    {
-        if (type.DmxModes.Count == 0) return null;
-        if (named is not null && FirstBreakFootprint(named) <= spacing) return named;
-        DmxMode? best = null, smallest = null;
-        int bestFootprint = 0, smallestFootprint = int.MaxValue;
-        foreach (var m in type.DmxModes)
-        {
-            int f = FirstBreakFootprint(m);
-            if (f <= spacing && (best is null || f > bestFootprint))
-            {
-                best = m;
-                bestFootprint = f;
-            }
-            if (f < smallestFootprint)
-            {
-                smallest = m;
-                smallestFootprint = f;
-            }
-        }
-        return best ?? smallest;
-    }
-
-    /// <summary>
-    /// The patch spacing of fixtures of one type and mode: the smallest gap between two different start addresses
-    /// (absolute) within one universe — the most channels their real mode can use without overlapping. Null with fewer
-    /// than two fixtures in one universe. The same rule as <c>Candela.Dmx.PatchSpacing.Infer</c>.
-    /// </summary>
-    public static int? PatchSpacing(IEnumerable<int> absoluteAddresses)
-    {
-        var sorted = absoluteAddresses.Where(a => a > 0).Distinct().Order().ToArray();
-        int? best = null;
-        for (int i = 1; i < sorted.Length; i++)
-        {
-            int a = sorted[i - 1], b = sorted[i];
-            if ((a - 1) / 512 != (b - 1) / 512) continue;
-            int gap = b - a;
-            if (best is null || gap < best) best = gap;
-        }
-        return best;
-    }
-
-    /// <summary>Slots of the mode's first DMX break (the break MVR's <c>break="0"</c> address patches).</summary>
-    public static int FirstBreakFootprint(DmxMode mode)
-    {
-        if (mode.BreakFootprints.TryGetValue(1, out int f)) return f;
-        if (mode.BreakFootprints.Count > 0) return mode.BreakFootprints.OrderBy(kv => kv.Key).First().Value;
-        return mode.DeclaredChannelCount;
     }
 
     /// <summary>Similarity of two mode names in 0 … 1: equal keys 1, containment 0.8, else shared words (prefixes of ≥ 3 letters count).</summary>

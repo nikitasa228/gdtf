@@ -239,7 +239,7 @@ public static class MvrImporter
                     resolution = new MvrModeResolution(requested, requested, null, inferred, false, count);
                 }
                 else if (r.MatchKind == FixtureMatchKind.Substitute &&
-                         ModeMatcher.PatchSpacing(_modeAddresses.GetValueOrDefault(key) ?? new List<int>()) is { } substituteSpacing)
+                         DmxPatchSpacing.Infer(_modeAddresses.GetValueOrDefault(key) ?? new List<int>()) is { } substituteSpacing)
                 {
                     resolution = ResolveSubstituteMode(key.Spec, r, requested, substituteSpacing, inferred, count);
                 }
@@ -247,7 +247,7 @@ public static class MvrImporter
                 {
                     var (mode, exact) = ModeMatcher.Match(r.FixtureType, requested, inferred);
                     resolution = new MvrModeResolution(requested, mode?.Name ?? requested,
-                        mode is null ? null : ModeMatcher.FirstBreakFootprint(mode), inferred, exact, count);
+                        mode?.FirstBreakFootprint, inferred, exact, count);
                     if (!exact && mode is not null)
                     {
                         var users = _specUsers[key.Spec].Take(64).ToArray();
@@ -278,15 +278,15 @@ public static class MvrImporter
         /// The mode of a substitute GDTF (a similar model standing in for one the library lacks) for fixtures patched
         /// <paramref name="spacing"/> channels apart: the requested mode name belongs to the missing model, so the
         /// stand-in's mode of that name is kept only when it fits the spacing; otherwise its most complete mode that fits
-        /// (<see cref="ModeMatcher.FitToSpacing"/>), so that the stand-in does not overlap its neighbours in the patch.
+        /// (<see cref="FixtureType.FitModeToSpacing(DmxMode?, int?)"/>, the rule the DMX engine uses too), so that the stand-in does not overlap its neighbours in the patch.
         /// </summary>
         private MvrModeResolution ResolveSubstituteMode(string spec, MvrGdtfReference r, string? requested, int spacing, int? inferred, int count)
         {
             var type = r.FixtureType!;
             var named = ModeMatcher.MatchName(type, requested);
-            var mode = ModeMatcher.FitToSpacing(type, named, spacing);
+            var mode = type.FitModeToSpacing(named, spacing);
             if (mode is null) return new MvrModeResolution(requested, requested, null, inferred, false, count);
-            int footprint = ModeMatcher.FirstBreakFootprint(mode);
+            int footprint = mode.FirstBreakFootprint;
             bool exact = named is not null && ReferenceEquals(mode, named);
             var users = _specUsers[spec].Take(64).ToArray();
             string fit = footprint <= spacing
@@ -296,7 +296,7 @@ public static class MvrImporter
             {
                 _sink.Add(IssueSeverity.Note, IssueCategory.Patch, MvrIssueCodes.SubstituteMode,
                     string.Create(CultureInfo.InvariantCulture,
-                        $"'{spec}' fixtures are patched {spacing} channels apart; the stand-in '{r.FileName}' uses its mode '{mode.Name}' ({footprint} channels, {fit}) instead of its mode of the requested name, '{named.Name}' ({ModeMatcher.FirstBreakFootprint(named)} channels)."),
+                        $"'{spec}' fixtures are patched {spacing} channels apart; the stand-in '{r.FileName}' uses its mode '{mode.Name}' ({footprint} channels, {fit}) instead of its mode of the requested name, '{named.Name}' ({named.FirstBreakFootprint} channels)."),
                     users);
             }
             else if (named is null)

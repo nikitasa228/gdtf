@@ -17,27 +17,22 @@ namespace Candela.Dmx;
 /// </param>
 public sealed record FixtureSubstitution(string RequestedSpec, string? RequestedMode, string StandIn, int? PatchSpacing);
 
-/// <summary>The channel spacing of fixtures patched one after another, which tells how many channels their real mode uses.</summary>
+/// <summary>
+/// The channel spacing of fixtures patched one after another, which tells how many channels their real mode uses. The
+/// stand-in's mode for a spacing is chosen by <see cref="FixtureType.FitModeToSpacing(DmxMode?, int?)"/>.
+/// </summary>
 public static class PatchSpacing
 {
     /// <summary>
     /// The smallest distance (channels) between two different start addresses of the same universe, or null when fewer
-    /// than two fixtures are patched in one universe. Fixtures patched back to back in their real mode are this far apart,
-    /// so it is the largest footprint the real mode can have.
+    /// than two fixtures are patched in one universe (<see cref="DmxPatchSpacing.Infer"/>, the rule the MVR importer uses
+    /// too). Fixtures patched back to back in their real mode are this far apart, so it is the largest footprint the real
+    /// mode can have.
     /// </summary>
     public static int? Infer(IEnumerable<DmxAddress> starts)
     {
         ArgumentNullException.ThrowIfNull(starts);
-        var sorted = starts.Where(a => a.Universe >= 1 && a.Address is >= 1 and <= 512).Select(a => a.Absolute).Distinct().Order().ToArray();
-        int? best = null;
-        for (int i = 1; i < sorted.Length; i++)
-        {
-            int a = sorted[i - 1], b = sorted[i];
-            if ((a - 1) / 512 != (b - 1) / 512) continue; // different universes
-            int gap = b - a;
-            if (best is null || gap < best) best = gap;
-        }
-        return best;
+        return DmxPatchSpacing.Infer(starts.Where(a => a.Universe >= 1 && a.Address is >= 1 and <= 512).Select(a => a.Absolute));
     }
 
     /// <summary>
@@ -68,47 +63,5 @@ public static class PatchSpacing
         foreach (var a in f.Addresses)
             if (first is null || a.Break < first.Value.Break) first = a;
         return first;
-    }
-}
-
-/// <summary>Chooses the DMX mode of a stand-in GDTF so that it fits the patch of the fixtures it stands in for.</summary>
-public static class SubstituteModes
-{
-    /// <summary>
-    /// The mode of <paramref name="type"/> to use for fixtures patched <paramref name="spacing"/> channels apart: the
-    /// requested mode when the stand-in has it and it fits; else the mode with the largest first-break footprint that
-    /// fits (the most complete one that does not overlap the neighbours; GDTF order breaks ties); else, when none fits,
-    /// the smallest one. Without a spacing, the requested mode (by name), else the first mode. Null when the type has no
-    /// modes.
-    /// </summary>
-    public static DmxMode? Choose(FixtureType type, string? requestedMode, int? spacing)
-    {
-        ArgumentNullException.ThrowIfNull(type);
-        if (type.DmxModes.Count == 0) return null;
-        var requested = string.IsNullOrWhiteSpace(requestedMode) ? null : type.FindMode(requestedMode);
-        if (spacing is not { } s || s < 1) return requested ?? type.DmxModes[0];
-        if (requested is not null && Footprint(requested) <= s) return requested;
-        DmxMode? best = null, smallest = null;
-        foreach (var m in type.DmxModes)
-        {
-            int f = Footprint(m);
-            if (f <= s && (best is null || f > Footprint(best))) best = m;
-            if (smallest is null || f < Footprint(smallest)) smallest = m;
-        }
-        return best ?? smallest;
-    }
-
-    /// <summary>Channels of a mode's first DMX break (what one patch address covers).</summary>
-    public static int Footprint(DmxMode mode)
-    {
-        ArgumentNullException.ThrowIfNull(mode);
-        int first = int.MaxValue, footprint = 0;
-        foreach (var (brk, slots) in mode.BreakFootprints)
-        {
-            if (slots <= 0 || brk >= first) continue;
-            first = brk;
-            footprint = slots;
-        }
-        return footprint;
     }
 }

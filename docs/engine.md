@@ -85,8 +85,8 @@ with a similar model of the same manufacturer (`mvr.gdtf-substitute`; Фокин
 602). The importer gives each stand-in type the mode that best fits its patch spacing — the requested mode when it
 fits, else the largest that fits, else the smallest (`mvr.substitute-mode`, docs/mvr.md; the MagicBlade's 44-channel
 "Extended" would otherwise have become the panel's 160-channel "Extended": 73 overlap errors on Фокина) — with the
-same rule as `SubstituteModes.Choose`, which the DMX engine and the patch use for fixtures whose `GdtfSpec` is still a
-stub name. After the import the engine records every stand-in in `EngineSettings.Substitutes` (requested GDTF and
+same rule (`FixtureType.FitModeToSpacing`, Candela.Gdtf) that the DMX engine and the patch use for fixtures whose
+`GdtfSpec` is still a stub name. After the import the engine records every stand-in in `EngineSettings.Substitutes` (requested GDTF and
 mode, stand-in file, spacing; saved with the project). The patch judges stand-ins by that record (`PatchIssueProvider.Substitutions`): one `patch.substitute-gdtf`
 warning per type with all its fixtures, and overlaps or slots past 512 that only the stand-in's larger footprint causes
 are one warning per type, not errors. When the real GDTF arrives (library reload, `.gdtf` import), the stand-ins switch

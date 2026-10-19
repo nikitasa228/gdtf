@@ -54,11 +54,12 @@ name or — for MVR stub names such as `Manufacturer@Model` — by manufacturer 
 caches failures too (`ProfileResolution.ErrorKind`: unknown file, unreadable file, unknown mode). When the stub resolves
 to a *similar* model (a substitute), `Resolve(spec, mode, patchSpacing)` gives the stand-in's mode that fits the
 fixtures' patch spacing rather than the mode of the requested name, which belongs to the missing model
-(`SubstituteModes.Choose`: the requested mode when the stand-in has it and its first-break footprint fits the spacing,
-else the largest mode that fits, else the smallest; without a spacing the requested mode, else the first), and says so
+(`FixtureType.FitModeToSpacing` in Candela.Gdtf, the one rule the MVR importer uses too: the requested mode when the
+stand-in has it and its first-break footprint (`DmxMode.FirstBreakFootprint`) fits the spacing, else the largest mode
+that fits, else the smallest; without a spacing the requested mode, else the first), and says so
 in `ProfileResolution.Substitution` (`FixtureSubstitution`: requested GDTF and mode, stand-in file, spacing).
-`PatchSpacing.Infer` is the smallest distance between start addresses of one universe — fixtures patched back to
-back in their real mode are that far apart. A mode that the stand-in lacks no longer leaves the fixture unresolved.
+`PatchSpacing.Infer` (over `DmxPatchSpacing.Infer` of Candela.Gdtf) is the smallest distance between start addresses
+of one universe — fixtures patched back to back in their real mode are that far apart. A mode that the stand-in lacks no longer leaves the fixture unresolved.
 
 Compilation (`FixtureProfile.Builder`):
 
