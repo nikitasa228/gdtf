@@ -114,6 +114,19 @@ internal sealed class ExternalControlSettings
     }
 }
 
+/// <summary>Where the last timecode came from.</summary>
+internal enum TimecodeSource
+{
+    /// <summary>Not known (no timecode, or neither of the sources below sent it).</summary>
+    Unknown,
+
+    /// <summary>ArtTimeCode received by the Art-Net receiver.</summary>
+    ArtNet,
+
+    /// <summary>A DMX recording being played back.</summary>
+    Recording,
+}
+
 /// <summary>One live sender as the external-control panel lists it (grouped over its universes).</summary>
 internal sealed record SourceRow(string Protocol, string Name, string Address, string Universes, int Priority, long Packets, double SecondsAgo);
 
@@ -144,6 +157,13 @@ internal sealed class ExternalControl : IDisposable
     private long _patchVersion = -1;
     private Timecode? _timecode;
     private DateTime _timecodeAt;
+    private Timecode? _artNetTimecode;
+    private DateTime _artNetTimecodeAt;
+    private ArtNetReceiver? _artNetReceiver;
+    private IReadOnlyList<string> _nodes = Array.Empty<string>();
+    private int _trackerCount;
+    private readonly bool[] _patchedSlots = new bool[DmxInputHub.SlotCount];
+    private (Candela.Dmx.Patch? Patch, int Universe) _patchedSlotsOf;
     private string? _settingsPath;
     private bool _disposed;
 
@@ -217,6 +237,124 @@ internal sealed class ExternalControl : IDisposable
         }
     }
 
+    /// <summary>
+    /// Where the last timecode came from: Art-Net (the receiver reported the same timecode within half a second) or the
+    /// DMX recording that is playing; <see cref="TimecodeSource.Unknown"/> otherwise. Main thread.
+    /// </summary>
+    public TimecodeSource LastTimecodeSource
+    {
+        get
+        {
+            lock (_timecodeLock)
+            {
+                if (_timecode is not { } tc)
+                    return TimecodeSource.Unknown;
+                if (_artNetTimecode == tc && Math.Abs((_timecodeAt - _artNetTimecodeAt).TotalSeconds) < 0.5)
+                    return TimecodeSource.ArtNet;
+            }
+
+            return _engine?.Player is { IsAtEnd: false } ? TimecodeSource.Recording : TimecodeSource.Unknown;
+        }
+    }
+
+    /// <summary>Art-Net nodes (consoles, gateways) that answered ArtPoll, as of the last poll ("ShortName (address)").</summary>
+    public IReadOnlyList<string> ArtNetNodes => _nodes;
+
+    /// <summary>PosiStageNet trackers seen, as of the last poll.</summary>
+    public int TrackerCount => _trackerCount;
+
+    /// <summary>
+    /// For each of the 512 slots of <paramref name="universe"/>, whether a fixture of the patch uses it (the slot view
+    /// highlights them). Rebuilt when the patch or the universe changes; allocation-free otherwise.
+    /// </summary>
+    public ReadOnlySpan<bool> PatchedSlots(int universe)
+    {
+        var patch = Patch;
+        if (!ReferenceEquals(_patchedSlotsOf.Patch, patch) || _patchedSlotsOf.Universe != universe)
+        {
+            _patchedSlotsOf = (patch, universe);
+            Array.Clear(_patchedSlots);
+            if (patch is not null && universe > 0)
+            {
+                foreach (var entry in patch.Entries)
+                {
+                    foreach (var range in entry.Ranges)
+                    {
+                        if (range.Universe != universe)
+                            continue;
+                        for (int a = Math.Max(range.Start, 1); a <= Math.Min(range.End, DmxInputHub.SlotCount); a++)
+                            _patchedSlots[a - 1] = true;
+                    }
+                }
+            }
+        }
+
+        return _patchedSlots;
+    }
+
+    /// <summary>
+    /// Who uses slot <paramref name="slot"/> of <paramref name="universe"/>: one line per fixture with the GDTF channel
+    /// at that slot ("Fixture 101 'Spot 1' · Pan (coarse)"). Empty when nobody does.
+    /// </summary>
+    public static IEnumerable<string> SlotUsers(Candela.Dmx.Patch patch, int universe, int slot)
+    {
+        ArgumentNullException.ThrowIfNull(patch);
+        foreach (var entry in patch.At(universe, slot))
+        {
+            string? channel = null;
+            if (entry.Profile is { } profile)
+            {
+                foreach (var range in entry.Ranges)
+                {
+                    if (range.Universe != universe || slot < range.Start || slot > range.End)
+                        continue;
+                    int offset = slot - range.Start + 1;
+                    foreach (var ch in profile.Channels)
+                    {
+                        if (ch.Break != range.Break)
+                            continue;
+                        int byteIndex = Array.IndexOf(ch.Instance.Offsets, offset);
+                        if (byteIndex < 0)
+                            continue;
+                        string attribute = string.IsNullOrEmpty(ch.Attribute) ? ch.Name : ch.Attribute;
+                        string instance = ch.InstanceName is { Length: > 0 } inst && !string.Equals(inst, ch.Source.GeometryName, StringComparison.Ordinal)
+                            ? " @ " + inst
+                            : "";
+                        channel = ch.Instance.Offsets.Length > 1
+                            ? $"{attribute}{instance} ({(byteIndex == 0 ? "coarse" : byteIndex == 1 ? "fine" : "ultra")})"
+                            : attribute + instance;
+                        break;
+                    }
+
+                    if (channel is not null)
+                        break;
+                }
+            }
+
+            yield return channel is null ? entry.Label : entry.Label + " · " + channel;
+        }
+    }
+
+    /// <summary>
+    /// The address the Art-Net test show is sent to. A loopback target (this computer) is sent to the address of the
+    /// selected network interface instead when one is selected: a receiver bound to that interface (Windows) does not
+    /// see loopback datagrams, and every receiver on the wildcard address sees datagrams to the interface's own address.
+    /// Null when the target is not an IPv4 address.
+    /// </summary>
+    public IPAddress? EffectiveTestTarget(AppSettings app, IReadOnlyList<Protocols.Networking.NetworkInterfaceInfo>? interfaces = null)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+        if (!IPAddress.TryParse(Settings.TestTarget, out var address) || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+            return null;
+        if (!IPAddress.IsLoopback(address) || string.IsNullOrWhiteSpace(app.NetworkInterface))
+            return address;
+        interfaces ??= ProtocolManager.GetNetworkInterfaces();
+        return Protocols.Networking.NetworkInterfaceCatalog.TryResolve(app.NetworkInterface, interfaces, out var nic) &&
+               nic is { IsLoopback: false } && nic.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
+            ? nic.Address
+            : address;
+    }
+
     /// <summary>Reads the settings file of <paramref name="configDir"/> (missing or damaged files give the defaults and a message).</summary>
     public void Load(string configDir)
     {
@@ -263,6 +401,7 @@ internal sealed class ExternalControl : IDisposable
             return;
         if (_engine is not null)
             _engine.Input.TimecodeReceived -= OnTimecode;
+        WatchArtNet(null);
         StopTestPattern();
         _engine = engine;
         _patchVersion = -1;
@@ -353,6 +492,11 @@ internal sealed class ExternalControl : IDisposable
         }
 
         _ = protocols;
+        WatchArtNet(engine.Protocols.Get<ArtNetReceiver>());
+        _nodes = _artNetReceiver is { IsRunning: true } receiver
+            ? receiver.Nodes.Select(n => $"{n.Reply.ShortName} ({n.Sender})").ToArray()
+            : Array.Empty<string>();
+        _trackerCount = engine.Protocols.Get<Candela.Protocols.Psn.PsnReceiver>() is { IsRunning: true } psn ? psn.Trackers.Count : 0;
         _statuses = statuses;
         _rates = rates;
         _activeUniverses = new HashSet<int>(engine.Input.ActiveUniverses());
@@ -446,18 +590,20 @@ internal sealed class ExternalControl : IDisposable
         ArgumentNullException.ThrowIfNull(engine);
         ArgumentNullException.ThrowIfNull(app);
         StopTestPattern();
-        if (!IPAddress.TryParse(Settings.TestTarget, out var address) || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+        if (EffectiveTestTarget(app) is not { } address)
         {
             Report(StageLoc.Format(StageStr.ExtTestBadTarget, Settings.TestTarget), error: true);
             return false;
         }
+
+        bool viaInterface = IPAddress.TryParse(Settings.TestTarget, out var configured) && IPAddress.IsLoopback(configured) && !IPAddress.IsLoopback(address);
 
         try
         {
             var pattern = GdtfTestPatternEncoder.ForScene(engine);
             if (pattern.FixtureCount == 0)
                 pattern = ArtNetTestPattern.DemoRig();
-            if (IPAddress.IsLoopback(address) && !IsEnabled(ProtocolIds.ArtNet))
+            if ((IPAddress.IsLoopback(address) || viaInterface) && !IsEnabled(ProtocolIds.ArtNet))
             {
                 Settings.Enabled.Add(ProtocolIds.ArtNet);
                 Save();
@@ -466,8 +612,9 @@ internal sealed class ExternalControl : IDisposable
 
             _testConsole = new ArtNetTestConsole(pattern, new IPEndPoint(address, Settings.ArtNetPort), app.ArtNetUniverseOffset);
             _testConsole.Start();
-            Report(StageLoc.Format(StageStr.ExtTestStarted, pattern.FixtureCount, ExternalControl.UniverseRanges(pattern.Universes),
-                Settings.TestTarget), error: false);
+            string target = viaInterface ? StageLoc.Format(StageStr.ExtTestTargetInterface, address) : Settings.TestTarget;
+            Report(StageLoc.Format(StageStr.ExtTestStarted, pattern.FixtureCount, ExternalControl.UniverseRanges(pattern.Universes), target),
+                error: false);
             return true;
         }
         catch (Exception e) when (e is System.Net.Sockets.SocketException or InvalidOperationException or ArgumentException or IOException)
@@ -640,6 +787,28 @@ internal sealed class ExternalControl : IDisposable
         }
     }
 
+    /// <summary>Follows the engine's Art-Net receiver (a restart may replace it) to know which timecodes came over Art-Net.</summary>
+    private void WatchArtNet(ArtNetReceiver? receiver)
+    {
+        if (ReferenceEquals(receiver, _artNetReceiver))
+            return;
+        if (_artNetReceiver is not null)
+            _artNetReceiver.TimeCodeReceived -= OnArtNetTimecode;
+        _artNetReceiver = receiver;
+        if (receiver is not null)
+            receiver.TimeCodeReceived += OnArtNetTimecode;
+    }
+
+    /// <summary>Receive thread of the Art-Net receiver.</summary>
+    private void OnArtNetTimecode(ArtTimeCodePacket packet)
+    {
+        lock (_timecodeLock)
+        {
+            _artNetTimecode = packet.ToTimecode();
+            _artNetTimecodeAt = DateTime.UtcNow;
+        }
+    }
+
     /// <inheritdoc/>
     public void Dispose()
     {
@@ -647,6 +816,7 @@ internal sealed class ExternalControl : IDisposable
             return;
         _disposed = true;
         StopTestPattern();
+        WatchArtNet(null);
         if (_engine is not null)
             _engine.Input.TimecodeReceived -= OnTimecode;
         _engine = null;

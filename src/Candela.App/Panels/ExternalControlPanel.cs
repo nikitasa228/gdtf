@@ -29,6 +29,7 @@ namespace Candela.App.Panels;
 internal sealed unsafe class ExternalControlPanel : Panel
 {
     private static readonly string[] Numbers = BuildNumbers(513);
+    private static readonly string OscPatterns = string.Join("  ", ProtocolOptions.DefaultOscPatterns);
     private readonly StagePanelContext _stage;
     private readonly byte[] _target = new byte[64];
     private readonly byte[] _seek = new byte[32];
@@ -50,6 +51,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private string _countersText = "";
     private string _countersLanguage = "";
     private int _slotTooltipKey = -1;
+    private object? _slotTooltipPatch;
     private (long Tenths, int Frames, string Language) _progressKey = (-1, -1, "");
     private string _progressText = "";
     private (object? Recording, string Language) _summaryKey;
@@ -224,7 +226,13 @@ internal sealed unsafe class ExternalControlPanel : Panel
             TimecodeType.Df2997 => "29.97 fps DF",
             _ => "30 fps SMPTE",
         };
-        _timecodeDetail = ago < 1.0 ? StageLoc.Format(StageStr.ExtTimecodeLive, rate) : StageLoc.Format(StageStr.ExtTimecodeStale, rate, ago);
+        string source = model.LastTimecodeSource switch
+        {
+            TimecodeSource.ArtNet => StageLoc.Get(StageStr.ExtTimecodeFromArtNet) + " · ",
+            TimecodeSource.Recording => StageLoc.Get(StageStr.ExtTimecodeFromRecording) + " · ",
+            _ => "",
+        };
+        _timecodeDetail = source + (ago < 1.0 ? StageLoc.Format(StageStr.ExtTimecodeLive, rate) : StageLoc.Format(StageStr.ExtTimecodeStale, rate, ago));
     }
 
     private void Protocols(StageEngine engine, ExternalControl model)
@@ -391,7 +399,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                     changed = true;
                 }
 
-                ArtNetNodes(engine);
+                ArtNetNodes(model);
                 break;
             case ProtocolIds.Sacn:
                 changed |= InterfaceRow();
@@ -429,7 +437,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 }
 
                 PropertyGrid.Row(StageLoc.Get(StageStr.ExtOscPatterns));
-                ImGui.TextDisabled(string.Join("  ", ProtocolOptions.DefaultOscPatterns));
+                ImGui.TextDisabled(OscPatterns);
                 break;
             case ProtocolIds.EtcEos:
                 changed |= InterfaceRow();
@@ -450,7 +458,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 }
 
                 PropertyGrid.Row(StageLoc.Get(StageStr.ExtTrackers));
-                ImGui.TextUnformatted((engine.Protocols.Get<PsnReceiver>()?.Trackers.Count ?? 0).ToString(CultureInfo.InvariantCulture));
+                ImGui.TextUnformatted(Numbers[Math.Clamp(model.TrackerCount, 0, Numbers.Length - 1)]);
                 break;
             case ProtocolIds.EnttecDmxUsbPro:
                 changed |= SerialPortRow(settings);
@@ -592,12 +600,12 @@ internal sealed unsafe class ExternalControlPanel : Panel
         return changed;
     }
 
-    private static void ArtNetNodes(StageEngine engine)
+    /// <summary>The Art-Net nodes of the last status poll (read a few times a second, not every frame).</summary>
+    private static void ArtNetNodes(ExternalControl model)
     {
-        var receiver = engine.Protocols.Get<ArtNetReceiver>();
-        if (receiver is null || !receiver.IsRunning)
+        if (!model.IsEnabled(ProtocolIds.ArtNet))
             return;
-        var nodes = receiver.Nodes;
+        var nodes = model.ArtNetNodes;
         PropertyGrid.Row(StageLoc.Get(StageStr.ExtNodes));
         if (nodes.Count == 0)
         {
@@ -605,8 +613,8 @@ internal sealed unsafe class ExternalControlPanel : Panel
             return;
         }
 
-        foreach (var node in nodes)
-            ImGui.TextUnformatted($"{node.Reply.ShortName} ({node.Sender})");
+        foreach (string node in nodes)
+            ImGui.TextUnformatted(node);
     }
 
     private static void EosState(StageEngine engine)
@@ -683,6 +691,8 @@ internal sealed unsafe class ExternalControlPanel : Panel
         var dl = ImGui.GetWindowDrawList();
         var origin = ImGui.GetCursorScreenPos();
         var mouse = ImGui.GetIO().MousePos;
+        var patched = model.PatchedSlots(universe);
+        uint patchedOutline = Theme.U32(Theme.WithAlpha(Theme.Accent, 0.55f));
         int hoveredSlot = -1;
         for (int i = 0; i < 512; i++)
         {
@@ -690,6 +700,9 @@ internal sealed unsafe class ExternalControlPanel : Panel
             var p = origin + new Vector2(col * cell, row * rowHeight);
             float v = slots[i] / 255f;
             dl.AddRectFilled(p, p + new Vector2(cell - 2f, rowHeight - 2f), Theme.U32(new Vector4(0.9f * v + 0.08f, 0.55f * v + 0.08f, 0.1f * v + 0.09f, 1f)), 2f);
+            // Slots a fixture of the patch uses are outlined.
+            if (patched[i])
+                dl.AddRect(p, p + new Vector2(cell - 2f, rowHeight - 2f), patchedOutline, 2f);
             string text = Numbers[slots[i]];
             var size = ImGui.CalcTextSize(text);
             dl.AddText(p + new Vector2((cell - 2f - size.X) * 0.5f, 1f), Theme.U32(v > 0.55f ? new Vector4(0f, 0f, 0f, 1f) : Theme.Text), text);
@@ -707,15 +720,16 @@ internal sealed unsafe class ExternalControlPanel : Panel
     private string SlotTooltip(ExternalControl model, int universe, int slot, byte value)
     {
         int key = (universe << 20) | (slot << 8) | value;
-        if (key == _slotTooltipKey)
+        if (key == _slotTooltipKey && ReferenceEquals(model.Patch, _slotTooltipPatch))
             return _slotTooltipCache;
         _slotTooltipKey = key;
+        _slotTooltipPatch = model.Patch;
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture, $"{universe}.{slot:D3} = {value} ({value * 100 / 255}%)");
         if (model.Patch is { } patch)
         {
-            foreach (var entry in patch.At(universe, slot))
-                sb.Append('\n').Append(entry.Label);
+            foreach (string user in ExternalControl.SlotUsers(patch, universe, slot))
+                sb.Append('\n').Append(user);
         }
 
         return _slotTooltipCache = sb.ToString();

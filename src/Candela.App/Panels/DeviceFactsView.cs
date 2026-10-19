@@ -70,9 +70,7 @@ internal sealed class DeviceFactsView
     {
         Refresh(engine, entity);
         var facts = _facts!;
-        // An unresolved fixture without a specs record still gets the section: its note says why nothing is known.
-        bool typeSection = facts.Rows.Count > 0 || facts.Note is not null && entity.Has<Core.SceneGraph.Components.FixtureComponent>();
-        if (typeSection && ImGui.CollapsingHeader(StageLoc.With(Icons.BookOpen, StageStr.PropsFixtureType), ImGuiTreeNodeFlags.DefaultOpen))
+        if (ShowsTypeSection(facts, entity) && ImGui.CollapsingHeader(StageLoc.With(Icons.BookOpen, StageStr.PropsFixtureType), ImGuiTreeNodeFlags.DefaultOpen))
         {
             ImGui.PushTextWrapPos(0f);
             ImGui.TextUnformatted(facts.Title);
@@ -210,6 +208,13 @@ internal sealed class DeviceFactsView
         Refresh(engine, entity);
         return _facts!.Ports;
     }
+
+    /// <summary>
+    /// True when the fixture-type section is drawn: when there are rows, and for a fixture without any (an unresolved
+    /// GDTF without a specs record) so that its note says why nothing is known.
+    /// </summary>
+    internal static bool ShowsTypeSection(DeviceFacts facts, Entity entity) =>
+        facts.Rows.Count > 0 || facts.Note is not null && entity.Has<Core.SceneGraph.Components.FixtureComponent>();
 
     /// <summary>Kinds of devices that have ports in the properties panel.</summary>
     internal static bool HasPorts(Entity entity) =>
