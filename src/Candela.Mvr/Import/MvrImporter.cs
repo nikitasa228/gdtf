@@ -337,7 +337,7 @@ public static class MvrImporter
                 return;
             }
 
-            bool added = false;
+            // adding to the layer collection raises LayersChanged by itself
             foreach (var l in _doc.Layers)
             {
                 if (_layerMap.ContainsKey(l.Uuid)) continue;
@@ -347,12 +347,10 @@ public static class MvrImporter
                 {
                     layer = new Layer { Id = l.Uuid == Guid.Empty ? Guid.NewGuid() : l.Uuid, Name = l.Name.Length > 0 ? l.Name : "Layer" };
                     _scene.Layers.Add(layer);
-                    added = true;
                 }
                 _layerMap[l.Uuid] = layer;
                 if (!_layers.Contains(layer)) _layers.Add(layer);
             }
-            if (added) _scene.NotifySettingsChanged();
         }
 
         // ------------------------------------------------------------ pass 2: entities

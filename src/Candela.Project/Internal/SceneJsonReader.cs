@@ -53,6 +53,7 @@ internal static class SceneJsonReader
                 Name = ReadString(root, "name") ?? "Untitled",
                 Layers = ReadLayers(root, issues),
                 Settings = ReadSceneSettings(root, issues),
+                UnknownProperties = UnknownProperties(root, s_sceneProperties),
             };
             var records = ReadEntities(root, issues, unknownComponents);
             CheckLayers(records, file.Layers, issues);
@@ -146,6 +147,7 @@ internal static class SceneJsonReader
                 Locked = ReadBool(element, "locked") ?? false,
                 Transform = ReadTransform(element, name, id, issues),
                 Components = ReadComponents(element, name, id, issues, unknown),
+                UnknownProperties = UnknownProperties(element, s_entityProperties),
             };
             records.Add(record);
         }
@@ -252,6 +254,30 @@ internal static class SceneJsonReader
             list.Add(component);
         }
         return list;
+    }
+
+    /// <summary>JSON names of the scene file's known top-level properties.</summary>
+    private static readonly HashSet<string> s_sceneProperties = JsonNames(typeof(SceneFile));
+
+    /// <summary>JSON names of an entity record's known properties.</summary>
+    private static readonly HashSet<string> s_entityProperties = JsonNames(typeof(EntityRecord));
+
+    private static HashSet<string> JsonNames(Type type) =>
+        CandelaJson.Options.GetTypeInfo(type).Properties.Where(p => !p.IsExtensionData).Select(p => p.Name).ToHashSet(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Properties of <paramref name="element"/> this version does not know (written by a newer version), kept so saving
+    /// writes them back (Core's <c>UnknownProperties</c>); null when there are none.
+    /// </summary>
+    private static Dictionary<string, JsonElement>? UnknownProperties(JsonElement element, HashSet<string> known)
+    {
+        Dictionary<string, JsonElement>? unknown = null;
+        foreach (var p in element.EnumerateObject())
+        {
+            if (known.Contains(p.Name)) continue;
+            (unknown ??= new Dictionary<string, JsonElement>(StringComparer.Ordinal)).TryAdd(p.Name, p.Value.Clone());
+        }
+        return unknown;
     }
 
     /// <summary>The component discriminators Core registers ("fixture", "mesh", …).</summary>
