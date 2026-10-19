@@ -324,7 +324,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         var cmd = _context.Immediate.Begin();
         var b = _barriers;
         b.CommandBuffer = cmd;
-        b.Use(source, ImageUse.StorageComputeRead);
+        DeclareDisplayReads(b, source);
         b.Use(_display, ImageUse.StorageCompute, discard: true);
         b.Flush();
         var vk = _context.Vk;
@@ -567,6 +567,11 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             _context.Vk.CmdClearColorImage(cmd, image.Handle, ImageLayout.TransferDstOptimal, &clear, 1, &range);
         }
 
+        // Every image of the path tracer's sets lives in GENERAL from now on (shaders may statically use any of them).
+        foreach (var image in new[] { _accum, _aux, _guide, _ping, _pong })
+            b.Use(image, ImageUse.StorageCompute);
+        b.Use(_display, ImageUse.StorageCompute, discard: true);
+        b.Flush();
         _setUp = true;
     }
 
@@ -900,7 +905,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         b.Flush();
         _context.Vk.CmdFillBuffer(cmd, _histogram.Handle, 0, Vk.WholeSize, 0);
         b.Use(_histogram, BufferUse.ComputeWrite);
-        b.Use(source, ImageUse.StorageComputeRead);
+        DeclareDisplayReads(b, source);
         b.Use(_display, ImageUse.StorageCompute);
         b.Flush();
         _context.Vk.CmdBindPipeline(cmd, PipelineBindPoint.Compute, _tracer.Display);
@@ -919,6 +924,13 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         var bins = new ReadOnlySpan<uint>(_histogram.MappedPointer, (int)ShaderConstants.HistogramBins);
         if (ExposureMeter.AverageLog2Luminance(bins, _metering) is { } log2)
             _exposure = ExposureMeter.ExposureFor(log2, _metering, _compensation);
+    }
+
+    /// <summary>The images a display set reads: the accumulation and the set's input (the source or a placeholder).</summary>
+    private void DeclareDisplayReads(BarrierBatch b, GpuImage source)
+    {
+        b.Use(_accum, ImageUse.StorageComputeRead);
+        b.Use(ReferenceEquals(source, _pong) ? _pong : _ping, ImageUse.StorageComputeRead);
     }
 
     private ImageData ReadHdr(GpuImage source, bool mean, float exposure)
