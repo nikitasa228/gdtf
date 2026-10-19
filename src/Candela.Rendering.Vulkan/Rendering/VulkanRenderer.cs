@@ -113,7 +113,6 @@ public sealed unsafe class VulkanRenderer : IRenderer
     /// <summary>Froxel tile size, pixels.</summary>
     public const int FroxelTileSize = 8;
 
-    private const string StageThreeMessage = "path tracer arrives in stage 3";
     private static readonly Vector4 NonFullBackground = new(0.022f, 0.022f, 0.022f, 1f);
     private static readonly Vector4 WireDefaultColor = new(0.55f, 0.57f, 0.6f, 1f);
 
@@ -129,6 +128,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
     private readonly bool _edgeWireframe;
     private ShadowAtlas? _atlas;
     private RayTracingScene? _rayTracing;
+    private PathTracer? _pathTracer;
+    private readonly List<VulkanFinalRender> _finalRenders = new();
     private GpuBuffer? _readback;
     private ulong _shadowViewFrame;
     private int _shadowViewsThisFrame;
@@ -212,6 +213,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
     public Sampler DisplaySampler => _shared.LinearClamp;
 
     internal PipelineLibrary Pipelines { get; } = null!;
+
+    /// <summary>Samplers and placeholder resources shared by the views and the path tracer.</summary>
+    internal RendererResources SharedResources => _shared;
 
     internal PassSequence Passes => _passes;
 
@@ -604,9 +608,43 @@ public sealed unsafe class VulkanRenderer : IRenderer
         return new PickResult(id, position, normal, viewDepth);
     }
 
-    /// <summary>Not available yet.</summary>
-    /// <exception cref="NotSupportedException">Always: the path tracer arrives in stage 3.</exception>
-    public IFinalRender StartFinalRender(RenderCamera camera, FinalRenderSettings settings) => throw new NotSupportedException(StageThreeMessage);
+    /// <summary>
+    /// Starts a progressive path-traced render of the current world with default <see cref="FinalRenderOptions"/>
+    /// (camera exposure, no firefly clamp, seed 0); see
+    /// <see cref="StartFinalRender(RenderCamera, FinalRenderSettings, FinalRenderOptions)"/>.
+    /// </summary>
+    /// <exception cref="NotSupportedException">The device has no ray query support (or too few descriptors).</exception>
+    public IFinalRender StartFinalRender(RenderCamera camera, FinalRenderSettings settings) =>
+        StartFinalRender(camera, settings, new FinalRenderOptions());
+
+    /// <summary>
+    /// Starts a progressive path-traced render (<see cref="VulkanFinalRender"/>) of the current world: the camera,
+    /// <paramref name="settings"/>, <paramref name="options"/> and the lights are taken now; call
+    /// <see cref="IFinalRender.Advance(TimeSpan)"/> until <see cref="IFinalRender.IsComplete"/>, then read the results.
+    /// Renders on the device's single queue between (or inside) the caller's frames.
+    /// </summary>
+    /// <exception cref="NotSupportedException">
+    /// The device cannot run the path tracer (no ray query, or descriptor limits below its layout): the message says
+    /// "not supported on this GPU" and names the device.
+    /// </exception>
+    IFinalRender IRenderer.StartFinalRender(RenderCamera camera, FinalRenderSettings settings, FinalRenderOptions options) =>
+        StartFinalRender(camera, settings, options);
+
+    /// <inheritdoc cref="IRenderer.StartFinalRender(RenderCamera, FinalRenderSettings, FinalRenderOptions)"/>
+    public VulkanFinalRender StartFinalRender(RenderCamera camera, FinalRenderSettings settings, FinalRenderOptions options)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(camera);
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(options);
+        if (PathTracer.Unsupported(Context) is { } reason)
+            throw new NotSupportedException(reason);
+        _pathTracer ??= new PathTracer(Context, _compiler, _world.SceneSetLayout, Pipelines.ViewSetLayout);
+        _rayTracing ??= new RayTracingScene(Context, _world);
+        var render = new VulkanFinalRender(this, _pathTracer, _rayTracing, camera, settings, options);
+        _finalRenders.Add(render);
+        return render;
+    }
 
     /// <summary>Waits for the GPU, destroys the world, the targets and the pipelines, and the context when owned.</summary>
     public void Dispose()
@@ -698,6 +736,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
     }
 
     internal void OnTargetDisposed(VulkanRenderTarget target) => _targets.Remove(target);
+
+    internal void OnFinalRenderDisposed(VulkanFinalRender render) => _finalRenders.Remove(render);
 
     /// <summary>Feature decisions of one view.</summary>
     private struct Decisions
@@ -859,37 +899,21 @@ public sealed unsafe class VulkanRenderer : IRenderer
         out Frustum frustum)
     {
         int rw = dec.Requirements.RenderWidth, rh = dec.Requirements.RenderHeight;
-        float aspect = target.Width / (float)target.Height;
-        bool ortho = camera.Projection == ProjectionKind.Orthographic;
-        float near = float.IsFinite(camera.Near) && camera.Near > 1e-4f ? camera.Near : 1e-4f;
-        float far = float.IsFinite(camera.Far) && camera.Far > near * 1.001f ? camera.Far : near * 1000f;
-        var viewMatrix = camera.View;
-        if (!Matrix4x4.Invert(viewMatrix, out var inverseView))
-        {
-            viewMatrix = Matrix4x4.Identity;
-            inverseView = Matrix4x4.Identity;
-        }
-
-        Matrix4x4 projection;
-        float orthoHeight = float.IsFinite(camera.OrthoHeight) && camera.OrthoHeight > 1e-4f ? camera.OrthoHeight : 10f;
-        if (ortho)
-        {
-            projection = ReverseZ.Orthographic(orthoHeight, aspect, near, far);
-        }
-        else
-        {
-            float fov = float.IsFinite(camera.FovY) ? Math.Clamp(camera.FovY, 0.01f, 3.1f) : 50f * MathF.PI / 180f;
-            projection = ReverseZ.Perspective(fov, aspect, near);
-        }
-
-        var viewProjection = viewMatrix * projection;
-        Matrix4x4.Invert(projection, out var inverseProjection);
-        Matrix4x4.Invert(viewProjection, out var inverseViewProjection);
+        var cam = CameraFrame.Compute(camera, target.Width / (float)target.Height);
+        bool ortho = cam.Orthographic;
+        float near = cam.Near, far = cam.Far;
+        var viewMatrix = cam.View;
+        var inverseView = cam.InverseView;
+        var projection = cam.Projection;
+        var viewProjection = cam.ViewProjection;
+        var inverseProjection = cam.InverseProjection;
+        var inverseViewProjection = cam.InverseViewProjection;
+        float orthoHeight = cam.OrthoHeight;
         frustum = Frustum.FromViewProjection(viewProjection, finiteFar: ortho);
 
-        var eye = inverseView.Translation;
-        var up = Vector3.Normalize(new Vector3(inverseView.M21, inverseView.M22, inverseView.M23));
-        var forward = -Vector3.Normalize(new Vector3(inverseView.M31, inverseView.M32, inverseView.M33));
+        var eye = cam.Eye;
+        var up = cam.Up;
+        var forward = cam.Forward;
         // Colorless key light: from above, behind the camera and over its left shoulder (camera yaw only, so it does
         // not swing with tilting); a top view uses the camera's up vector as "forward" on the floor.
         var flatForward = new Vector3(forward.X, forward.Y, 0f);
@@ -1213,6 +1237,11 @@ public sealed unsafe class VulkanRenderer : IRenderer
         foreach (var target in _targets.ToArray())
             target.DisposeNow();
         _targets.Clear();
+        foreach (var render in _finalRenders.ToArray())
+            render.DisposeNow();
+        _finalRenders.Clear();
+        _pathTracer?.Dispose();
+        _pathTracer = null;
         _passes.Dispose();
         Pipelines?.Dispose();
         _rayTracing?.Dispose();
