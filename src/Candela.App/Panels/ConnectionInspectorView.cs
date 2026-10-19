@@ -62,7 +62,7 @@ internal sealed class ConnectionInspectorView
         if (entity.Get<ConsoleComponent>() is { } console)
             DrawConsole(engine, entity, console, labelWidth);
         if (entity.Get<PowerSourceComponent>() is { } source)
-            DrawPowerSource(entity, source, labelWidth);
+            DrawPowerSource(source, labelWidth);
     }
 
     /// <summary>Rebuilds the texts when the entity, the network solution or the language changed.</summary>
@@ -276,11 +276,12 @@ internal sealed class ConnectionInspectorView
         if (ImGui.BeginTable("##outputs", 5, flags))
         {
             float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
-            ImGui.TableSetupColumn("name", ImGuiTableColumnFlags.WidthStretch, 1.4f);
-            ImGui.TableSetupColumn("signal", ImGuiTableColumnFlags.WidthStretch, 1.2f);
-            ImGui.TableSetupColumn("universe", ImGuiTableColumnFlags.WidthStretch, 1f);
-            ImGui.TableSetupColumn("count", ImGuiTableColumnFlags.WidthStretch, 0.8f);
-            ImGui.TableSetupColumn("remove", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFrameHeight() + 2f * scale);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsConsoleOutputName), ImGuiTableColumnFlags.WidthStretch, 1.4f);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsConsoleSignal), ImGuiTableColumnFlags.WidthStretch, 1.2f);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsConsoleFirstUniverse), ImGuiTableColumnFlags.WidthStretch, 1f);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsConsoleUniverseCount), ImGuiTableColumnFlags.WidthStretch, 0.8f);
+            ImGui.TableSetupColumn("##remove", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFrameHeight() + 2f * scale);
+            ImGui.TableHeadersRow();
             for (int i = 0; i < console.Outputs.Count; i++)
             {
                 if (console.Outputs[i] is not { } output)
@@ -401,7 +402,7 @@ internal sealed class ConnectionInspectorView
 
     // ---- power source -----------------------------------------------------------------------------------------------
 
-    private void DrawPowerSource(Entity entity, PowerSourceComponent source, float labelWidth)
+    private void DrawPowerSource(PowerSourceComponent source, float labelWidth)
     {
         if (!ImGui.CollapsingHeader(CableLoc.With(DeviceIcons.Glyph(DeviceGroup.Distro), CableStr.PropsPowerSource), ImGuiTreeNodeFlags.DefaultOpen))
             return;
@@ -450,11 +451,12 @@ internal sealed class ConnectionInspectorView
         if (ImGui.BeginTable("##outlets", 5, flags))
         {
             float scale = ImGui.GetStyle().FontScaleMain * ImGui.GetStyle().FontScaleDpi;
-            ImGui.TableSetupColumn("name", ImGuiTableColumnFlags.WidthStretch, 1.2f);
-            ImGui.TableSetupColumn("connector", ImGuiTableColumnFlags.WidthStretch, 1.4f);
-            ImGui.TableSetupColumn("breaker", ImGuiTableColumnFlags.WidthStretch, 0.8f);
-            ImGui.TableSetupColumn("phase", ImGuiTableColumnFlags.WidthStretch, 0.6f);
-            ImGui.TableSetupColumn("remove", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFrameHeight() + 2f * scale);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsPowerOutletName), ImGuiTableColumnFlags.WidthStretch, 1.2f);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsPowerConnector), ImGuiTableColumnFlags.WidthStretch, 1.4f);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsPowerBreaker), ImGuiTableColumnFlags.WidthStretch, 0.8f);
+            ImGui.TableSetupColumn(CableLoc.Get(CableStr.PropsPowerPhase), ImGuiTableColumnFlags.WidthStretch, 0.6f);
+            ImGui.TableSetupColumn("##remove", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFrameHeight() + 2f * scale);
+            ImGui.TableHeadersRow();
             for (int i = 0; i < source.Outlets.Count; i++)
             {
                 if (source.Outlets[i] is not { } outlet)
@@ -531,7 +533,6 @@ internal sealed class ConnectionInspectorView
 
         if (ImGui.Button(CableLoc.With(Icons.Plus, CableStr.PropsPowerAddOutlet)))
             AddOutlet(source);
-        _ = entity;
     }
 
     /// <summary>Adds an outlet like the last one ("Schuko 7" on the next phase) as one undo step.</summary>

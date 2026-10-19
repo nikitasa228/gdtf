@@ -57,6 +57,13 @@ the folder containing `Candela.sln`, searched upwards from the program and the c
 `CacheDirectory` (default `ConfigPaths.CacheDir`), the import worker (below), and thread counts. A missing library or
 unreadable specs file becomes an issue (`engine.library-missing`), never an exception.
 
+**Generic cabling devices.** `GenericDeviceLibrary.Register(engine)` (in `Cabling/`) writes the GDTF files of the
+generic DMX splitters, Art-Net / sACN nodes and dimmer pack (`Candela.Electrical.GenericDevices`, byte-identical on
+every run) into `{CacheDirectory}/generic-devices/` — only when missing or different, written aside and renamed — and
+adds those the library does not know yet, so they are placed, patched, solved, rendered and saved in projects like any
+GDTF. The editor calls it right after creating its engine. A folder that cannot be written is reported
+(`engine.generic-devices`, warning) and the library stays as it was.
+
 ### Operations
 
 Every operation returns an `EngineResult` (`Success`, a one-line `Summary` for the status bar or the CLI, `Issues` most
@@ -332,13 +339,14 @@ adds the light plot).
 | `engine.library-missing` | warning/error | no library folder, or it cannot be scanned |
 | `engine.field-clamped` | warning | a fixture's beam angle (50 % cone) is wider than the renderer's 170° cone; its light is drawn as that cone (a wide wash whose field alone is trimmed to 170° is not reported) |
 | `engine.substitute-replaced` | note | fixtures that stood in for a missing model now use its GDTF, which the library has |
+| `engine.generic-devices` | warning | the generic cabling devices could not be written to the cache (`GenericDeviceLibrary`) |
 
 Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (electrical), `asset.*` (asset store),
 `mvr.*`, `project.*`, and the simulations' issues.
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (80 tests, ≈ 40 s; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (82 tests, ≈ 40 s; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
@@ -370,6 +378,9 @@ a device):
   from the package, disk cache written, undo/redo); a worker that crashes (SIGSEGV) or hangs (timeout 1 s) gives
   `engine.import-unsafe` and adds nothing; no worker → in-process with a note; unreadable and SketchUp files rejected
   with reasons; model packages round-trip and every truncation is rejected; images become posters/reference drawings.
+* **Generic devices**: `GenericDeviceLibrary` writes the splitters, nodes and dimmer once (identical bytes, no temporary
+  files left), adds them to a private library, adds nothing the second time, rewrites a damaged file, resolves a
+  placed node's Ethernet input and DMX outputs, and reports a cache folder that cannot be written instead of throwing.
 * **Recordings**: 120 frames of two universes with timecode round-trip through a file (< 8 KiB) and play back
   byte-exact, including a lost universe and seeking backwards; seek by timecode; truncated and damaged files; the
   engine records its own input and plays it back to its fixtures.

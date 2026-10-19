@@ -127,12 +127,12 @@ internal sealed class CableLinksPanel : Panel
 
         var style = ImGui.GetStyle();
         float scale = style.FontScaleMain * style.FontScaleDpi;
-        Header(model, scale);
+        Header(model);
         ImGui.Separator();
         Strip(model, scale);
     }
 
-    private void Header(CableLinkModel model, float scale)
+    private void Header(CableLinkModel model)
     {
         var p = ImGui.GetCursorScreenPos();
         float h = ImGui.GetTextLineHeight();
@@ -169,8 +169,6 @@ internal sealed class CableLinksPanel : Panel
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip(CableLoc.Get(CableStr.LinksOverlay));
         }
-
-        _ = scale;
     }
 
     private void Strip(CableLinkModel model, float scale)

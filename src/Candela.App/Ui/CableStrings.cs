@@ -46,7 +46,6 @@ internal enum CableStr
     ToolCableHint,
     ToolCableDrawingHint,
     ToolCableLength,
-    ToolCableTarget,
     ToolCableBranchHere,
     ToolCableContinueHere,
     ToolCableJoinHere,
@@ -112,6 +111,10 @@ internal enum CableStr
     PropsConsoleOutputs,
     PropsConsoleAddOutput,
     PropsConsoleRemoveOutput,
+    PropsConsoleOutputName,
+    PropsConsoleSignal,
+    PropsConsoleFirstUniverse,
+    PropsConsoleUniverseCount,
     PropsConsoleInputOn,
     PropsConsoleInputOff,
     PropsConsoleEnableInput,
@@ -126,6 +129,7 @@ internal enum CableStr
     PropsPowerBreaker,
     PropsPowerPhase,
     PropsPowerConnector,
+    PropsPowerOutletName,
     PropsPowerLoad,
     PropsPowerTotal,
     PropsPowerUnfed,
@@ -153,7 +157,6 @@ internal enum CableStr
     DuplicateRepatch,
     DuplicateKeep,
     DuplicateRepatched,
-    DuplicateRemember,
 }
 
 /// <summary>English and Russian texts of <see cref="CableStr"/>, of the cable types and of the device presets.</summary>
@@ -269,7 +272,6 @@ internal static class CableLoc
             "Click to add a point, a device to connect, a cable to join it. Backspace removes the last point; right-click or Esc finishes.",
             "Щелчок — точка, по устройству — подключение, по кабелю — соединение. Backspace убирает последнюю точку; правая кнопка или Esc — закончить."),
         (CableStr.ToolCableLength, "{0} m · {1} kg", "{0} м · {1} кг"),
-        (CableStr.ToolCableTarget, "{0}: {1} free", "{0}: свободно {1}"),
         (CableStr.ToolCableBranchHere, "Branch from here", "Ответвление отсюда"),
         (CableStr.ToolCableContinueHere, "Continue this cable", "Продолжить этот кабель"),
         (CableStr.ToolCableJoinHere, "Join this cable here", "Присоединить к этому кабелю"),
@@ -336,6 +338,10 @@ internal static class CableLoc
         (CableStr.PropsConsoleOutputs, "Outputs", "Выходы"),
         (CableStr.PropsConsoleAddOutput, "Add output", "Добавить выход"),
         (CableStr.PropsConsoleRemoveOutput, "Remove this output", "Удалить этот выход"),
+        (CableStr.PropsConsoleOutputName, "Output", "Выход"),
+        (CableStr.PropsConsoleSignal, "Signal", "Сигнал"),
+        (CableStr.PropsConsoleFirstUniverse, "Universe", "Юниверс"),
+        (CableStr.PropsConsoleUniverseCount, "Count", "Кол-во"),
         (CableStr.PropsConsoleInputOn, "{0} input is on: the fixtures cabled to this console follow it.",
             "Вход {0} включён: приборы, подключённые к пульту кабелями, следуют ему."),
         (CableStr.PropsConsoleInputOff, "{0} input is off: the fixtures cabled to this console keep their last DMX.",
@@ -352,6 +358,7 @@ internal static class CableLoc
         (CableStr.PropsPowerBreaker, "Breaker, A", "Автомат, А"),
         (CableStr.PropsPowerPhase, "Phase", "Фаза"),
         (CableStr.PropsPowerConnector, "Connector", "Разъём"),
+        (CableStr.PropsPowerOutletName, "Outlet", "Розетка"),
         (CableStr.PropsPowerLoad, "{0} W · {1} A ({2}% of {3} A)", "{0} Вт · {1} А ({2}% от {3} А)"),
         (CableStr.PropsPowerTotal, "Total {0} W · L1 {1} A · L2 {2} A · L3 {3} A", "Всего {0} Вт · L1 {1} А · L2 {2} А · L3 {3} А"),
         (CableStr.PropsPowerUnfed, "Its mains input has no power.", "На вводе нет питания."),
@@ -381,7 +388,6 @@ internal static class CableLoc
         (CableStr.DuplicateRepatch, "Patch to free addresses", "Перепатчить"),
         (CableStr.DuplicateKeep, "Keep addresses", "Оставить адреса"),
         (CableStr.DuplicateRepatched, "{0} copied fixtures patched to the next free addresses.", "Скопированные приборы перепатчены на свободные адреса: {0}."),
-        (CableStr.DuplicateRemember, "Remember my choice", "Запомнить выбор"),
     };
 
     static CableLoc()

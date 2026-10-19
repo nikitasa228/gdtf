@@ -254,7 +254,7 @@ internal sealed class CableTool
             return false;
         if (draft.Points.Count < 2)
             return false;
-        return draft.ExistingCable is { } existing ? CommitBranch(draft, existing, null) : CommitNew(draft, null) is not null;
+        return draft.ExistingCable is { } existing ? CommitBranch(draft, existing) : CommitNew(draft) is not null;
     }
 
     /// <summary>Drops the cable being drawn without committing it (scene replaced, tool switched off mid-way by code).</summary>
@@ -430,7 +430,7 @@ internal sealed class CableTool
         var done = Draft;
         Draft = null;
         done.Points.Add(point);
-        bool committed = done.ExistingCable is { } existing ? CommitBranch(done, existing, device) : CommitNew(done, device) is not null;
+        bool committed = done.ExistingCable is { } existing ? CommitBranch(done, existing) : CommitNew(done) is not null;
         if (!committed)
             return CableClickOutcome.Rejected;
         Notify(CableLoc.Format(CableStr.ToolCableConnected, device.Name, port.Name));
@@ -452,9 +452,8 @@ internal sealed class CableTool
     // ---- commits ----------------------------------------------------------------------------------------------------
 
     /// <summary>Adds the draft as a new cable entity (one undo step); returns it.</summary>
-    private Entity? CommitNew(CableDraft draft, Entity? endDevice)
+    private Entity? CommitNew(CableDraft draft)
     {
-        _ = endDevice;
         if (draft.Points.Count < 2)
         {
             Notify(CableLoc.Get(CableStr.ToolCableTooShort));
@@ -485,9 +484,8 @@ internal sealed class CableTool
     }
 
     /// <summary>Adds the draft as a branch of the cable it started from (one undo step).</summary>
-    private bool CommitBranch(CableDraft draft, Guid cableId, Entity? endDevice)
+    private bool CommitBranch(CableDraft draft, Guid cableId)
     {
-        _ = endDevice;
         if (_stage.Scene.Find(cableId) is not { } cableEntity || cableEntity.Get<CableComponent>() is not { } cable)
             return false;
         if (draft.Points.Count < 2)

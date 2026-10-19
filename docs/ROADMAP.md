@@ -71,21 +71,28 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [ ] External control panel: protocol selection (all protocols listed below), status, universes, timecode
 
 ## M4 — Cabling, power, consoles
-- [ ] Cable tool: pick cable type from the tool menu, icon on cursor, click walls/mounts/ports to route, right-click
-      or Esc to finish, click on a segment to branch, cable nodes movable with gizmo/drag
-- [ ] Port picker popup when a device has several matching inputs/outputs
-- [ ] Ports from GDTF wiring objects + specs; connector illustrations in the properties panel with the connected cable
-- [ ] Cable link window: strip of all devices on a cable, click → select device
-- [~] Console model: outputs → universes; fixtures cabled to a console are console-driven (locked controls);
-      cable indices shown in the patch (engine: console-driven status from the data network locks manual values,
-      docs/engine.md; locked controls and the patch view in the editor)
-- [x] Power network: sources, links (TRUE1 through), distros, dimmers (own draw vs `maxLoadW`), breaker checks
-      (engine side done in Candela.Electrical; editor tools in this milestone)
+- [x] Devices section of the Library: consoles (DMX 2/4/8 outputs, Art-Net / sACN network consoles), nodes, splitters,
+      mains supplies (Schuko 16 A, CEE 16/32 A, CEE 32/63/125 A three phase, Powerlock), distros, dimmers and the power
+      devices of the fixture library; dragged into the scene with their ports (docs/editor.md#devices-in-the-library)
+- [x] Cable tool: pick cable type from the tool menu, icon on cursor, click walls/mounts/ports to route, right-click
+      or Esc to finish, click on a segment to branch, cable nodes movable with gizmo/drag, length and weight shown
+      (docs/editor.md#the-cable-tool)
+- [x] Port picker popup when a device has several matching inputs/outputs (connector drawings, what is plugged in,
+      why a port does not fit)
+- [x] Ports from GDTF wiring objects + specs; connector illustrations in the properties panel with the connected cable
+- [x] Cable link window: strip of all devices on a cable in signal order with cable indices, click → select device
+- [x] Console model: outputs → universes; fixtures cabled to a console are console-driven (locked controls, following
+      the cables); cable indices shown in the patch ("DMX A · cable 3"), universe mismatch in the Issues panel
+- [x] Power network: sources, links (TRUE1 through), distros, dimmers (own draw vs `maxLoadW`), breaker checks; power
+      issues after cabling in the Issues panel, outlet loads in the Properties panel
 - [x] Data network: DMX chains, splitters, Y-split warning, address overlap, chain length (Candela.Electrical)
 - [x] Rigging: fixtures mounted on trusses/pipes, truss/point load incl. cable weight, overload warnings
       (Candela.Electrical RiggingAnalyzer) — docs/electrical.md
-- [~] Cable overlay with legend (cables drawn as tubes + coloured lines, connected devices highlighted; legend in the
-      editor)
+- [x] Cable overlay with legend (cables drawn as tubes + coloured lines, connected devices highlighted; legend with
+      the types in the scene, count, length and weight)
+- [x] Duplicated fixtures re-patched to free addresses (setting: ask / next free / keep); Escape cancels wall and
+      floor drags
+- [ ] Cables lying on floors drawn without sag (renderer: per-span slack; requested from the engine)
 
 ## M5 — Atmosphere, fire, overlays
 - [~] Smoke/haze fluid simulation (GPU, CPU reference): HAZE/FOG emitters from DMX, FAN airflow, obstacles,
