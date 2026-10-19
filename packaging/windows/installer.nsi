@@ -385,7 +385,12 @@ FunctionEnd
 ; ---------------------------------------------------------------------------------------------------- start / finish
 
 Function .onInit
+  ; /D=<folder> on the command line sets $INSTDIR before .onInit; the install-mode initialisation would replace it.
+  StrCpy $0 $INSTDIR
   !insertmacro MULTIUSER_INIT
+  ${If} $0 != ""
+    StrCpy $INSTDIR $0
+  ${EndIf}
   ${IfNot} ${RunningX64}
     MessageBox MB_OK|MB_ICONSTOP "$(MsgNeeds64Bit)" /SD IDOK
     Abort

@@ -18,7 +18,29 @@ internal static class Program
     internal const int ExitInputErrors = 4;
     internal const int ExitCancelled = 130;
 
-    private static int Main(string[] args) => Run(args, Console.Out, Console.Error);
+    private static int Main(string[] args)
+    {
+        UseUtf8Console();
+        return Run(args, Console.Out, Console.Error);
+    }
+
+    /// <summary>
+    /// On Windows the console's code page (437, 866, …) cannot show every character the tool prints (file names in any
+    /// script, ×, →, m²); UTF-8 output shows them in the console and keeps them intact in redirected output.
+    /// </summary>
+    private static void UseUtf8Console()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+        try
+        {
+            Console.OutputEncoding = new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+        }
+        catch (Exception e) when (e is IOException or PlatformNotSupportedException or System.Security.SecurityException)
+        {
+            // No console or not allowed: the default encoding stays.
+        }
+    }
 
     /// <summary>Runs a command line (also used by tests in-process).</summary>
     internal static int Run(string[] args, TextWriter output, TextWriter error)
