@@ -94,6 +94,79 @@ public sealed class PathTracerPhotometryTests
     }
 
     /// <summary>
+    /// Beams of one fixture share its front: a weak glow beam (a GDTF Glow geometry around the cells, as on Фокина's
+    /// panels) whose lens lies a millimetre in front of a strong beam's lens must not hide it. Lenses are emitters, not
+    /// occluders: looking into both beams the camera sees the sum of their luminances, and the floor under them gets
+    /// both lights (next-event estimation and BSDF samples that pass one lens to reach the other agree).
+    /// </summary>
+    [SkippableFact]
+    public void OverlappingLensesAddUp()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+            const float radius = 0.1f;
+            var strong = ProceduralTestScene.Spot(new Vector3(0f, 0f, Height), Vector3.Zero, LightColor.White, PeakCandela, BeamDeg, FieldDeg);
+            strong.SourceRadius = radius;
+            var glow = ProceduralTestScene.Spot(new Vector3(0.02f, 0f, Height - 0.001f), new Vector3(0.02f, 0f, 0f), LightColor.White, 50f, 100f, 160f);
+            glow.SourceRadius = radius;
+            float LensLuminance(SpotLight light, Vector3 eye)
+            {
+                var beam = BeamDistribution.Create(light.BeamType, light.BeamAngle, light.FieldAngle);
+                var toEye = eye - light.Position;
+                float angle = MathF.Acos(Math.Clamp(Vector3.Dot(Vector3.Normalize(toEye), light.Direction), -1f, 1f));
+                var lens = light.Position + light.Direction * PathTracerScene.LensOffset;
+                float dy = Vector3.Distance(eye, lens), dc = toEye.Length();
+                return light.PeakCandela * beam.Relative(angle) * dy * dy / (MathF.PI * radius * radius * MathF.Cos(angle) * dc * dc);
+            }
+
+            var eye = new Vector3(0f, 0f, 0.5f);
+            var camera = RenderCamera.LookAt(eye, strong.Position, 0.5f);
+            camera.Ev100 = 18f;
+            renderer.World.SetLights(new[] { strong, glow });
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(8, 8, 4),
+                       new FinalRenderOptions { BackgroundLuminance = 0f }))
+            {
+                float measured = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure).MeanLuminance(4, 4, 2);
+                float expected = LensLuminance(strong, eye) + LensLuminance(glow, eye);
+                Assert.True(MathF.Abs(measured - expected) / expected < 0.01f, $"lenses {measured} cd/m², expected {expected} cd/m²");
+            }
+
+            // a glossy floor under both: the lens integral of the two lights
+            FinalRenderSupport.Floor(renderer.World, new MaterialData
+            {
+                Name = "glossy",
+                BaseColorFactor = new Vector4(0.9f, 0.9f, 0.9f, 1f),
+                Metallic = 1f,
+                Roughness = 0.2f,
+            });
+            var view = new TopDownView(16, 16, 0.4f);
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(16, 16, 256, bounces: 1),
+                       new FinalRenderOptions { BackgroundLuminance = 0f, Seed = 2 }))
+            {
+                var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
+                renderer.World.SetLights(new[] { strong });
+                using var strongOnly = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(16, 16, 256, bounces: 1),
+                    new FinalRenderOptions { BackgroundLuminance = 0f, Seed = 2 });
+                renderer.World.SetLights(new[] { glow });
+                using var glowOnly = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(16, 16, 256, bounces: 1),
+                    new FinalRenderOptions { BackgroundLuminance = 0f, Seed = 2 });
+                float both = hdr.MeanLuminance(8, 8, 3);
+                float sum = FinalRenderSupport.Luminance(strongOnly.RawResultHdr(), strongOnly.Exposure).MeanLuminance(8, 8, 3) +
+                            FinalRenderSupport.Luminance(glowOnly.RawResultHdr(), glowOnly.Exposure).MeanLuminance(8, 8, 3);
+                Assert.True(MathF.Abs(both - sum) / sum < 0.03f, $"floor under both lenses {both} cd/m², sum of each alone {sum} cd/m²");
+            }
+
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    /// <summary>
     /// A translucent white surface (a diffusing gel or a frosted screen hung flat: transmission t, no Fresnel) reflects
     /// the share 1 − t of the direct light like a Lambertian surface, whichever lobe the path continues with — the
     /// transmitted share goes through (into the black surroundings here).
