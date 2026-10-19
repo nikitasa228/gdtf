@@ -368,7 +368,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` runs in about two minutes. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` runs in well under a minute (longer on a cold GDTF cache). It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.
