@@ -202,6 +202,66 @@ public sealed class BeamReviewTests
         }
     }
 
+    [SkippableTheory]
+    [InlineData(0f)]
+    [InlineData(0.6f)]
+    [InlineData(1.5f)]
+    public void LookingUpANarrowBeamFromAfarMatchesTheIntegral(float aboveLens)
+    {
+        // The eye 20 m down a 6° beam, 0.4 m off its axis, looking back at the fixture at a low resolution: the view
+        // rays run inside the beam for metres, so the thin-beam widening must not dim them (a widening of the whole
+        // beam lost 7–18 % here). Looking past the lens the centre pixels follow the integral; looking into the lens
+        // (smaller than a half-resolution sample) its light is spread over the samples around it, so the light of the
+        // pixels around the lens follows the integral.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = Haze, Anisotropy = Anisotropy });
+            var light = StageScene.Spot(new Vector3(0f, 0f, 3f), new Vector3(0f, 40f, 3f), 200000f, 6f, 9f, shadows: false, type: BeamType.Spot);
+            renderer.World.SetLights(new[] { light });
+            const int width = 160, height = 120;
+            var camera = RenderCamera.LookAt(new Vector3(0.4f, 20f, 3.1f), new Vector3(0f, 0f, 3f + aboveLens), 30f);
+            camera.Ev100 = 2f;
+            using var rt = renderer.CreateTarget(width, height);
+            renderer.Render(rt, camera, Dark, new PreviewSettings { TemporalAccumulation = false, Bloom = false }, 1f / 60f);
+            var hdr = renderer.ReadHdr(rt);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            if (aboveLens > 0f)
+            {
+                double measured = CentreLuminance(hdr);
+                double expected = CentreReference(light, camera, width, height, null);
+                _output.WriteLine($"{aboveLens} m above the lens: measured {measured:0.0000}, reference {expected:0.0000} cd/m²");
+                Assert.True(expected > 0.1, $"reference {expected}");
+                Assert.InRange(Math.Abs(measured - expected) / expected, 0, 0.05);
+                return;
+            }
+
+            double windowMeasured = 0, windowReference = 0;
+            for (int y = height / 2 - 8; y < height / 2 + 8; y++)
+            {
+                for (int x = width / 2 - 8; x < width / 2 + 8; x++)
+                {
+                    windowMeasured += hdr.LuminanceAt(x, y);
+                    for (int sy = 0; sy < 4; sy++)
+                    {
+                        for (int sx = 0; sx < 4; sx++)
+                        {
+                            var (o, d) = BeamReference.PixelRay(camera, width, height, x - 0.375f + 0.25f * sx, y - 0.375f + 0.25f * sy);
+                            windowReference += BeamReference.InScatteringPacked(light, o, d, Haze, Anisotropy, 30, steps: 6000) / 16;
+                        }
+                    }
+                }
+            }
+
+            _output.WriteLine($"16 × 16 pixels around the lens: measured {windowMeasured:0}, reference {windowReference:0} cd/m² (sum)");
+            Assert.InRange(Math.Abs(windowMeasured - windowReference) / windowReference, 0, 0.05);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     [SkippableFact]
     public void TemporalAccumulationSettlesGoboBeamsOverTheBackground()
     {

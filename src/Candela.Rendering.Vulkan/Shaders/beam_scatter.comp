@@ -581,27 +581,38 @@ void nearField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, f
 
 // Thin-beam anti-aliasing. The half-resolution rays are two internal pixels apart, so a beam narrower than that (a
 // narrow beam seen from afar, near its lens, pixel beams of LED bars) would be hit by some rays and missed by the
-// next: broken, stair-stepped shafts that vanish towards the source. Where the facet's cut-off radius at the ray's
-// closest approach to the axis is below MIN_BEAM_SAMPLES sample spacings, the facet is widened for this ray by the
-// factor k that brings it there: every angle (beam, field, cut-off, iris, the near-field lens radius, the gate
-// coordinates of gobos and blades) times k and the intensity over k^2, which keeps the beam's flux and therefore its
-// light integrated across the screen; a resolved beam (k = 1) is untouched. Returns k and updates light and halfAngle.
+// next: broken, stair-stepped shafts that vanish towards the source. The facet's shaft radius at the point of the ray
+// closest to its axis (its cut-off radius, the lens near the lens) is compared with MIN_BEAM_SAMPLES sample spacings
+// there:
+//  - seen from the side, the facet is widened for this ray by the factor k that brings it there: every angle (beam,
+//    field, cut-off, iris, the near-field lens radius, the gate coordinates of gobos and blades) times k and the
+//    intensity over k^2 (the caller), which keeps the beam's flux and so its light integrated across the screen;
+//  - seen end-on (the ray runs inside the cone, so its path through the beam is long and the beam is not thin for it),
+//    the angles stay and only the lens radius is raised to that size: the near-field shaft of beam_scatter keeps the
+//    flux, the beam beyond the lens is unchanged, and the lens region a ray looks into is spread over the samples
+//    around it instead of being hit by one of them.
+// The two blend over the angle between the ray and the axis (from the cone's half-angle to twice it). A resolved
+// beam is untouched. Returns the angular factor k; updates light and halfAngle.
 float widenBeam(inout Light light, vec3 a, inout float halfAngle, BeamRay ray)
 {
     vec3 w0 = ray.origin - light.position;
     float b = dot(ray.dir, a);
     float denom = 1.0 - b * b;
     float t = denom > 1e-6 ? (b * dot(a, w0) - dot(ray.dir, w0)) / denom : 0.0;
+    // Closest to the axis behind the light (the ray passes the fixture): take the point closest to the lens instead.
+    if (dot(w0 + ray.dir * t, a) < 0.0)
+        t = -dot(w0, ray.dir);
     t = clamp(t, 0.0, ray.tMax);
     float z = max(dot(w0 + ray.dir * t, a), 0.0);
     float zeta = z * tan(halfAngle);
     float lens = light.sourceRadius;
     float radius = lens > 0.0 ? sqrt(sqrt(lens * lens * lens * lens + zeta * zeta * zeta * zeta)) : zeta;
     float depth = isOrthographic() ? 1.0 : max(ray.originDepth + t / ray.stretch, 0.0);
-    float spacing = 2.0 * ray.pixelSize * depth;
-    float k = clamp(MIN_BEAM_SAMPLES * spacing / max(radius, 1e-9), 1.0, min(MAX_WIDENING, 1.3 / max(halfAngle, 1e-4)));
-    if (!(k > 1.0))
+    float wanted = MIN_BEAM_SAMPLES * 2.0 * ray.pixelSize * depth;
+    if (!(wanted > radius))
         return 1.0;
+    float side = smoothstep(halfAngle, 2.0 * halfAngle, acos(min(abs(b), 1.0)));
+    float k = 1.0 + (clamp(wanted / max(radius, 1e-9), 1.0, min(MAX_WIDENING, 1.3 / max(halfAngle, 1e-4))) - 1.0) * side;
     light.invHalfBeam /= k;
     light.halfField *= k;
     light.cutoff *= k;
@@ -613,7 +624,7 @@ float widenBeam(inout Light light, vec3 a, inout float halfAngle, BeamRay ray)
     }
 
     light.gateScale /= k;
-    light.sourceRadius *= k;
+    light.sourceRadius = max(lens * k, (1.0 - side) * wanted);
     halfAngle *= k;
     return k;
 }
