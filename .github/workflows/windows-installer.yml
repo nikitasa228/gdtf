@@ -1,0 +1,126 @@
+# Builds the Windows installer of Candela (packaging/windows): restore, build, the tests that need no GPU, publish,
+# NSIS installer. The installer is uploaded as a workflow artifact; for a tag v<version> (the version of
+# Directory.Build.props, e.g. v0.1.0-preview.1) it is also attached to a GitHub release of that tag.
+name: Windows installer
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-installer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      CANDELA_CACHE_DIR: ${{ github.workspace }}\.ci-cache\candela
+      CANDELA_CONFIG_DIR: ${{ github.workspace }}\.ci-cache\config
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue) -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\NSIS\makensis.exe")) {
+            choco install nsis -y --no-progress
+          }
+
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $version = (dotnet msbuild src/Candela.App/Candela.App.csproj -nologo -getProperty:Version | Select-Object -Last 1).Trim()
+          "version=$version" >> $env:GITHUB_OUTPUT
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$version") {
+            throw "Tag $env:GITHUB_REF_NAME does not match the version in Directory.Build.props (v$version)."
+          }
+
+      - name: Restore
+        run: dotnet restore Candela.sln
+
+      - name: Build
+        run: dotnet build Candela.sln -c Release --no-restore
+
+      # Tests that need no GPU (the Vulkan, editor and engine render tests need a Vulkan device or Xvfb).
+      - name: Test
+        shell: pwsh
+        run: |
+          $projects = 'Core', 'Photometry', 'Gdtf', 'Dmx', 'Protocols', 'Electrical', 'Simulation', 'Mvr', 'Assets', 'Project'
+          foreach ($p in $projects) {
+            dotnet test "tests/Candela.$p.Tests/Candela.$p.Tests.csproj" -c Release --no-build --logger "trx;LogFileName=$p.trx" --results-directory TestResults
+            if ($LASTEXITCODE -ne 0) { throw "Candela.$p.Tests failed." }
+          }
+
+      - name: Build the installer
+        shell: pwsh
+        run: packaging/windows/build-installer.ps1 -Out artifacts/windows
+
+      - name: Upload the installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Candela-Setup-${{ steps.version.outputs.version }}-win-x64
+          path: |
+            artifacts/windows/Candela-Setup-*.exe
+            artifacts/windows/Candela-Setup-*.exe.sha256
+          if-no-files-found: error
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: ignore
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: installer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download the installer
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Candela-Setup-*
+          merge-multiple: true
+          path: dist
+
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          prerelease=""
+          case "$TAG" in *-*) prerelease="--prerelease" ;; esac
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" dist/* $prerelease --repo "$GITHUB_REPOSITORY" --title "Candela ${TAG#v}" \
+              --notes "Windows installer of Candela ${TAG#v}. See docs/install.md (installation, first start, SmartScreen, known limitations)."
+          fi
