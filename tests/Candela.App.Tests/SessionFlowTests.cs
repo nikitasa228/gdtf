@@ -1,3 +1,4 @@
+using System.Numerics;
 using Candela.App.Diagnostics;
 using Candela.App.Editing;
 using Candela.App.Session;
@@ -11,7 +12,6 @@ using Candela.Core.SceneGraph.Components;
 using Candela.Engine;
 using Candela.Project;
 using Hexa.NET.ImGui;
-using System.Numerics;
 
 namespace Candela.App.Tests;
 
@@ -91,14 +91,14 @@ public sealed class SessionFlowTests : IDisposable
     }
 
     [Fact]
-    public void A_crashed_session_is_offered_at_start_and_recovered()
+    public async Task A_crashed_session_is_offered_at_start_and_recovered()
     {
         string autosave = _dir.File("autosave");
         var crashed = new StageEngine(new StageEngineOptions { Library = EngineTestSupport.Library, CacheDirectory = _dir.File("cache-a") });
         crashed.New("Rehearsal");
         crashed.EnableAutosave(new AutosaveOptions { Directory = autosave, Interval = TimeSpan.FromHours(1) });
         crashed.Scene.Add(new Entity("work in progress"));
-        crashed.Autosave!.SaveNowAsync().Wait(TimeSpan.FromSeconds(30));
+        await crashed.Autosave!.SaveNowAsync().WaitAsync(TimeSpan.FromSeconds(30));
         crashed.Dispose(); // no clean exit: the recovery files stay
 
         using var session = EngineTestSupport.CreateSession(_log, _settings, _dir);
@@ -124,13 +124,13 @@ public sealed class SessionFlowTests : IDisposable
     }
 
     [Fact]
-    public void A_discarded_crash_is_deleted()
+    public async Task A_discarded_crash_is_deleted()
     {
         string autosave = _dir.File("autosave");
         var crashed = new StageEngine(new StageEngineOptions { Library = EngineTestSupport.Library, CacheDirectory = _dir.File("cache-b") });
         crashed.EnableAutosave(new AutosaveOptions { Directory = autosave, Interval = TimeSpan.FromHours(1) });
         crashed.Scene.Add(new Entity("lost"));
-        crashed.Autosave!.SaveNowAsync().Wait(TimeSpan.FromSeconds(30));
+        await crashed.Autosave!.SaveNowAsync().WaitAsync(TimeSpan.FromSeconds(30));
         crashed.Dispose();
         using var session = EngineTestSupport.CreateSession(_log, _settings, _dir);
         var dialogs = new SessionDialogs();

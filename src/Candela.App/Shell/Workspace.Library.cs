@@ -4,9 +4,9 @@ using Candela.App.Files;
 using Candela.App.Panels;
 using Candela.App.Session;
 using Candela.App.Ui;
-using Candela.Core.Settings;
 using Candela.Core.Editing;
 using Candela.Core.SceneGraph.Components;
+using Candela.Core.Settings;
 using Candela.Gdtf;
 using Hexa.NET.ImGui;
 

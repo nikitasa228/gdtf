@@ -1,3 +1,4 @@
+using System.Numerics;
 using Candela.App.Diagnostics;
 using Candela.App.Editing;
 using Candela.App.Panels;
@@ -10,7 +11,6 @@ using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Dmx;
 using Candela.Gdtf;
-using System.Numerics;
 
 namespace Candela.App.Tests;
 
