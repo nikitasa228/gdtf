@@ -69,8 +69,23 @@ public sealed class FinalRenderCliTests
     [Fact]
     public void Final_render_options_parse_and_belong_together()
     {
-        var o = RenderOptions.Parse([Scene, "--out", "x.png", "--final", "--samples", "16", "--exr", "x.exr", "--denoise", "--bounces", "3",
-            "--volume-bounces", "1", "--seed", "7", "--clamp", "500"]);
+        var o = RenderOptions.Parse([Scene,
+            "--out",
+            "x.png",
+            "--final",
+            "--samples",
+            "16",
+            "--exr",
+            "x.exr",
+            "--denoise",
+            "--bounces",
+            "3",
+            "--volume-bounces",
+            "1",
+            "--seed",
+            "7",
+            "--clamp",
+            "500"]);
         Assert.True(o.Final);
         Assert.Equal(16, o.Samples);
         Assert.True(o.SamplesGiven);
@@ -137,8 +152,18 @@ public sealed class FinalRenderCliTests
     {
         var recording = FullThenBlackout();
         var error = new StringWriter();
-        var options = RenderOptions.Parse([Scene, "--out", "out/show.png", "--look", "dmx-file", "t.cdmx", "--time", "01:00:00:10", "--end", "01:00:01:15",
-            "--fps", "2"]);
+        var options = RenderOptions.Parse([Scene,
+            "--out",
+            "out/show.png",
+            "--look",
+            "dmx-file",
+            "t.cdmx",
+            "--time",
+            "01:00:00:10",
+            "--end",
+            "01:00:01:15",
+            "--fps",
+            "2"]);
         var plan = RenderCommand.PlanFrames(options, recording, error)!;
         Assert.NotNull(plan);
         Assert.Equal(0.4, plan.Start, 6);
@@ -172,7 +197,8 @@ public sealed class FinalRenderCliTests
         SkipWithoutVulkan();
         string dir = TestEnvironment.NewTempDirectory("cli-final");
         string png = Path.Combine(dir, "fokina-final.png"), exr = Path.Combine(dir, "fokina-final.exr");
-        var (code, output, error) = Run(["render", .. Common(dir, "--out", png, "--width", "160", "--height", "90", "--look", "demo", "--final",
+        var (code, output, error) = Run(["render",
+            .. Common(dir, "--out", png, "--width", "160", "--height", "90", "--look", "demo", "--final",
             "--samples", "2", "--denoise", "--exr", exr, "--bounces", "3", "--seed", "3", "--clamp", "100000")]);
         Assert.True(code == Program.ExitOk, $"exit {code}\n{output}\n{error}");
         Assert.Contains("path traced, 2 samples per pixel, 3 bounces, 2 volume bounces, clamp 100000 cd/m², denoised, seed 3", output, StringComparison.Ordinal);

@@ -17,7 +17,8 @@ public sealed class FinalRenderOptions
     public uint Seed { get; set; }
 
     /// <summary>
-    /// Wall-clock budget of the whole render; null = none. The render completes when
+    /// Budget of rendering time (the time spent in <see cref="IFinalRender.Advance(TimeSpan)"/>, see
+    /// <see cref="IFinalRender.Elapsed"/>); null = none. The render completes when
     /// <see cref="FinalRenderSettings.SamplesPerPixel"/> samples are done or when the time is up, whichever comes first
     /// (the sample pass in progress is finished, so every pixel has the same number of samples).
     /// </summary>

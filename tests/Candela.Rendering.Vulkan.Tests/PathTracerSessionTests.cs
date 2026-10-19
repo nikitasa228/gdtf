@@ -370,13 +370,13 @@ public sealed class PathTracerSessionTests
             var camera = new RenderCamera { View = Matrix4x4.CreateLookAt(new Vector3(0f, -5f, 2f), Vector3.Zero, Vector3.UnitZ), FovY = float.NaN, Near = -1f, Ev100 = float.NaN };
             var settings = new FinalRenderSettings { Width = -5, Height = 100000, SamplesPerPixel = 0, MaxBounces = -3, MaxVolumeBounces = 1000, Denoise = true };
             using (var render = renderer.StartFinalRender(camera, settings, new FinalRenderOptions
-                   {
-                       FireflyClamp = float.NaN,
-                       ExposureCompensation = float.PositiveInfinity,
-                       BackgroundLuminance = -1f,
-                       DenoiseIterations = 99,
-                       TimeLimit = TimeSpan.FromSeconds(-1),
-                   }))
+            {
+                FireflyClamp = float.NaN,
+                ExposureCompensation = float.PositiveInfinity,
+                BackgroundLuminance = -1f,
+                DenoiseIterations = 99,
+                TimeLimit = TimeSpan.FromSeconds(-1),
+            }))
             {
                 Assert.Equal(1, render.Width);
                 while (!render.IsComplete)

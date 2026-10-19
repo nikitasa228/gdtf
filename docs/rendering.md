@@ -8,9 +8,11 @@ with PCSS soft shadows, light cookies (gobo, iris, framing blades, prism, frost)
 volumetric light in haze, smoke and flames (per-pixel single scattering of every beam, froxels with temporal
 reprojection for the rest — see [Volumetric beams](#volumetric-beams)), lens glow,
 indirect light (reflective shadow maps, or ray-traced GI with ray query), bloom, auto exposure, the resolution scale,
-the selection and beam outlines, reference drawings and the lux, noise and cable overlays. Stage 3 adds the path
-tracer (see [Stage 3](#stage-3)). Everything stays in cd/m² (pre-exposed in the HDR image) and agrees with the CPU
-photometry of `Candela.Photometry` (`LightMeter`, `Acoustics`, `BlackbodyRadiator`).
+the selection and beam outlines, reference drawings and the lux, noise and cable overlays. **Stage 3** adds the final
+render: a progressive photometric path tracer on Vulkan ray queries with multiple scattering in haze, smoke and
+flames, an edge-aware denoiser and OpenEXR output (see [Stage 3](#stage-3-the-path-tracer-final-render)). Everything
+stays in cd/m² (pre-exposed in the HDR image) and agrees with the CPU photometry of `Candela.Photometry`
+(`LightMeter`, `Acoustics`, `BlackbodyRadiator`).
 
 | Full view, haze 0.05 1/m, ray-traced GI | Lux overlay | Noise overlay |
 |---|---|---|
@@ -30,8 +32,11 @@ src/Candela.Rendering.Vulkan
   Rendering/    VulkanRenderer, VulkanRenderTarget, PipelineLibrary, DrawList, ReverseZ, ShadowAtlas, LightPlanner,
                 RendererResources, DescriptorWriter, the passes (Passes, LightingPasses, EffectPasses)
   Shaders/      GLSL 460 sources (embedded) + ShaderCompiler, ShaderLibrary, GpuStructs, ShaderConstants
-  Diagnostics/  ProceduralTestScene, ProceduralMeshes, ImageFiles (CLI, tests, golden images; opaque PNGs as RGB)
-src/Candela.Cli            candela render-test
+  PathTracing/  VulkanFinalRender (IFinalRender), PathTracer (pipelines, support check), PathTracerScene (light
+                lenses and cone boxes, media box), ExposureMeter; Scene/AccelerationStructures (BLAS/TLAS builders)
+  Diagnostics/  ProceduralTestScene, ProceduralMeshes, ImageFiles (CLI, tests, golden images; opaque PNGs as RGB),
+                OpenExr (OpenEXR reader/writer)
+src/Candela.Cli            candela render-test, candela render --final
 tests/Candela.Rendering.Vulkan.Tests
 ```
 
@@ -121,6 +126,8 @@ matrices have one source of truth; struct sizes are asserted against `GpuStructs
 | `froxel_inject.comp`, `froxel_integrate.comp`, `volumetric.frag` | volumetrics (froxels, composite with the beams' depth-aware upsampling) |
 | `beam.glsl`, `beam_cull.comp`, `beam_scatter.comp`, `beam_temporal.comp` | volumetric beams: cone geometry and tile masks, tile culling, single scattering, temporal accumulation |
 | `bloom_down.comp` (`FIRST`), `bloom_up.comp`, `histogram.comp`, `exposure.comp`, `depth_upsample.frag`, `selection.frag`, `outline.frag` | post and editor visuals |
+| `rt_geometry.glsl` | ray-query hit → surface (geometry table, interpolated vertex, material slot), shared by `rt_gi.comp` and the path tracer |
+| `pt_common.glsl`, `pt_trace.comp`, `pt_denoise.comp`, `pt_display.comp` | path tracer: parameters, random numbers and sampling helpers; one sample per pixel of a band of rows; à-trous denoiser (resolve + iterations); display transform with mean or histogram exposure |
 
 The test `ShaderTests.EveryShaderVariantCompilesAndValidates` compiles every variant and runs `spirv-val
 --target-env vulkan1.3 --scalar-block-layout` on the output when the tool is on `PATH`.
@@ -727,6 +734,13 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `RobustnessTests` | NaN / out-of-range settings, lights and atmosphere grids (empty, short, beyond the 3D image limit, NaN, infinite, null) in every view and overlay; 1000 shadow-casting lights with every feature (256 tiles, ≤ 256 VPLs); 2 Mcd into the camera through dense haze stays below the half-float limit and finite |
 | `MemoryTests` | alignment, free-list reuse and coalescing, granularity, dedicated allocations |
 | `SwapchainTests` | headless surface: acquire/present, resize, minimise, misuse errors, ImGui handoff state |
+| `PathTracerPhotometryTests` | path tracer: 10 000 cd (50°/80° wash) at 5 m onto a white Lambertian floor — the centre within 3 % of ρE/π, 30° off axis within 5 % |
+| `PathTracerFurnaceTests` | white furnace (surroundings of 1 cd/m²): a Lambertian sphere of albedo 1 shows exactly the background (0.999–1.005); white plastic, rough white metal and a mirror lose a little at grazing angles but never exceed it (brightest 4 × 4 block ≤ 1.03); a 4 m cube of scattering-only smoke of optical depth 4 and a room-sized haze, with up to 64 scattering events, vanish (3 %) |
+| `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %); smoke through the density grid scatters like haze of the same coefficient (4 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01) |
+| `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %) |
+| `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; a device without ray query says "not supported on this GPU" |
+| `PathTracerSceneTests` | the procedural stage in haze: finite and validation-clean, 16 samples at 240 × 180 within 2 minutes; writes `pt-stage-final.png` next to the real-time view |
+| `OpenExrTests` | bit-exact round trips for every compression and sample type (37 × 21: not a multiple of the 16-line ZIP blocks; long names), ZIP compresses smooth images, RGBA + layers, chromaticities and white luminance, damaged and tiled files rejected with `InvalidDataException`; the files were checked with the official OpenEXR library |
 
 Regenerate golden images after an intentional visual change with
 `CANDELA_UPDATE_GOLDEN=1 dotnet test tests/Candela.Rendering.Vulkan.Tests` (optionally `--filter` a class) and inspect
@@ -863,11 +877,155 @@ real hardware, with the settings that control them.
 * GPU timings per pass are printed by `candela render-test` and available as `VulkanContext.LastGpuTimings`
   (timestamps; on lavapipe they are not meaningful).
 
-## Stage 3
+## Stage 3: the path tracer (final render)
 
-The progressive path tracer behind `IRenderer.StartFinalRender` (currently `NotSupportedException ("path tracer
-arrives in stage 3")`) can share the BLAS per mesh and the geometry table of `RayTracingScene`, the materials, lights,
-cookies, photometric profiles and media of stages 1 and 2.
+`VulkanRenderer.StartFinalRender(camera, settings, options)` (`IRenderer.StartFinalRender`) starts a progressive,
+unbiased photometric path tracer on the same world, materials, textures, lights, cookies and media as the real-time
+view. It runs as compute shaders with Vulkan ray queries. A GPU without ray queries (`SupportsRayTracing` false, or
+`VulkanContextOptions.EnableRayTracing` off) gets a `NotSupportedException` whose message names the device and says the final render needs ray query support
+(`VK_KHR_ray_query`, `VK_KHR_acceleration_structure`) — "not supported on this GPU" — and the real-time view keeps
+working (a device below the descriptor limits of the path tracer's layout is refused the same way).
+
+| Real time (`candela render … --look demo`) | Path traced (`--final --samples 32 --denoise`) |
+|---|---|
+| ![real time](images/render-final-fokina-realtime.png) | ![path traced](images/render-final-fokina.png) |
+
+`Фокина.mvr` at 960 × 540 on lavapipe (demo look, haze from the hazers, 1291 beams). The beams and pools are the
+same; the path tracer adds what the real-time view leaves out: light scattered more than once in the haze (the glow
+around the beams and over the stage), light bounced between surfaces, soft shadows of the lenses.
+
+| Real time (ray-traced GI) | Path traced, 256 samples, denoised |
+|---|---|
+| ![real time](images/render-final-stage-realtime.png) | ![path traced](images/render-final-stage.png) |
+
+The procedural test scene in haze of 0.05 1/m (`PathTracerSceneTests` renders it at 240 × 180 with 16 samples).
+
+### API
+
+* `FinalRenderSettings` (the stored preset): size, `SamplesPerPixel`, `MaxBounces` (surface scattering events per
+  path), `MaxVolumeBounces` (scattering events in haze and smoke per path; 1 = single scattering), `Denoise`,
+  `ToneMapper`.
+* `FinalRenderOptions`: `Seed` (deterministic: the same scene, settings and seed give the same image), `TimeLimit`
+  (rendering time; the pass in progress is finished, so every pixel has the same number of samples),
+  `FireflyClamp` (cd/m², 0 = off: limits the luminance of each contribution that has scattered at least once — a small
+  bias for fewer fireflies), `AutoExposure` + `Metering` + `ExposureCompensation` (as in the real-time view),
+  `BackgroundLuminance` (the surroundings, 0.02 cd/m²; they also light the scene), `DenoiseIterations`.
+* `IFinalRender` (`VulkanFinalRender`): `Advance(budget[, cancellationToken])` renders for about the budget and
+  returns; `SamplesDone` / `SamplesTotal`, `IsComplete`, `IsCancelled`, `Elapsed`, `Exposure`; `Cancel()` keeps the
+  samples done; `Preview()` the tone-mapped RGBA8 image (denoised when the settings ask for it); `ResultHdr()` and
+  `RawResultHdr()` linear RGBA float (cd/m² × `Exposure`, Rec.2020); `DenoisedResultHdr()`; `ReadGuides()` the albedo
+  and the normal + view depth the denoiser uses. The camera, the settings and the **lights are fixed when the render
+  starts** (a snapshot of the world's lights); geometry, materials and media are read as they are when samples are
+  taken. Main thread only, like the renderer.
+* **Scheduling**: a pass is one sample for every pixel, split into bands of rows. The cost per row is measured and a
+  dispatch is planned to stay below 0.25 s (`MaxDispatchSeconds`; drivers reset a GPU that is stuck for about 2 s),
+  a submission below 0.5 s. `Advance` called while the caller records a frame adds one dispatch to that frame and
+  returns (the editor's frame loop); otherwise it submits and waits itself. With a time limit every submission ends at
+  a pass boundary, where the time is checked.
+* **Memory**: five RGBA32F images and one RGBA8 image of the output size (accumulation, albedo, normal + depth, two
+  denoiser buffers, display: 84 bytes per pixel, 174 MB at 1920 × 1080), the light snapshot (one `GpuLight`, a box
+  and a 16-gon per light, two small acceleration structures over them) and a TLAS; the BLAS per mesh, the geometry
+  table, materials and textures are the real-time view's. Nothing is stored per path or per bounce, so the memory does
+  not grow with samples, bounces or the 1291 beams of `Фокина.mvr`.
+
+### Lights
+
+The spot light's photometric distribution — the beam profile `I(θ)` of `BeamDistribution`, colour, gobo, iris,
+blades, prism, frost (`lighting.glsl`, the real-time functions) — is evaluated from the light's centre `c`, exactly as
+in the real-time renderer, so the illuminance on a surface is `I(θ)·cos α / d²` with the same profile and cookie. The
+lens (`SourceRadius`) is an area-preserving regular 16-gon 5 mm in front of the centre that emits
+
+    L(y → x) = I(θ_c(x)) · |x − y|² / (A · cos θ_y · |x − c|²)
+
+so a camera or a mirror sees the lens with the luminance that carries exactly the light's intensity, and next-event
+estimation through a uniformly chosen lens point `y` gives `I(θ_c)/|x − c|²` times the visibility of `y` — soft
+shadows the size of the lens. Shadow rays stop `LensClearance` (0.1 m, the real-time shadow near plane) before the
+lens, so the fixture's own housing never shadows its beam.
+
+**Many lights.** Each path vertex picks one light by weighted reservoir sampling over the lights that can reach it:
+a ray query against an acceleration structure of the lights' cone boxes (procedural AABBs, clipped to the media box)
+returns the candidates whose cone contains the point. The weight is the luminance of the unshadowed contribution
+(`I/d²` × BRDF × cos, the BRDF part floored so every reaching light keeps a chance), so a pool of one wash under 300
+other lights is sampled almost only from that wash. Lenses hit by BSDF samples (a mirror, a glossy floor) are weighted
+against the light selection by the power heuristic (multiple importance sampling).
+
+### Surfaces
+
+The energy-conserving BRDF of the real-time view (`brdf.glsl`: GGX with height-correlated Smith, Schlick Fresnel,
+Lambert weighted by 1 − F; metal/rough; normal maps; emission), sampled by lobe — GGX visible normals (Heitz 2018) or
+cosine-weighted diffuse — with probabilities from the lobes' albedos at the view angle. Thin-walled **transmission**
+(glass, gels, `MaterialData.Transmission`) is a third lobe straight through the surface with weight
+(1 − F) · transmission · tint; shadow rays through it are tinted the same way, so a red gel colours the light under it
+(test: within 5 % of (1 − F)² · colour² seen through it). Alpha-masked and blended surfaces are crossed
+stochastically (and pass 1 − α of the light to shadow rays). Emissive surfaces (LED walls, screens) emit their
+luminance and light the scene through the paths that hit them. Reference drawings show their display-referred base
+colour to the camera only, as in the real-time view. Russian roulette after the third scattering vertex, by the path throughput.
+
+### Media
+
+Haze (`AtmosphereState.BaseScattering`, uniform inside the **media box**: the bounds of the instances, the lights,
+the camera and the smoke and flame grids, grown by 30 m and clamped to ±10 km), the smoke density grid (scattering,
+albedo 1) and the flame temperature grids (absorption κ = 2 /m at full flame, blackbody emission κ·L_bb(T) from the
+real-time LUT), all with the Henyey–Greenstein phase function of `AtmosphereState.Anisotropy`:
+
+* **Single scattering of the spot lights** is estimated on every ray segment: one light chosen by the analytic
+  in-scattering of an isotropic point light of its peak intensity along the part of the segment inside its cone
+  (prism facets and the phase function at the closest approach included), then **equi-angular sampling** (Kulla &
+  Fajardo 2012) of a point inside the cone, its light `I(θ)·cookie/d²` through a lens point, the haze and smoke
+  transmittance towards it (ratio tracking) and its visibility. This is the estimator the real-time beams approximate,
+  and in the single-scattering limit the two agree (`PathTracerMediaTests`: a 6° spot and a 40° wash seen from the
+  side within 3 % of the double-precision integral of `BeamReference` and within 6 % of the real-time beam; measured
+  1.4 % below and 0.7 % above the integral, the real-time beams 1.9 % and 2.9 % above it).
+* **Multiple scattering**: free-flight sampling (delta tracking against the majorant of haze + smoke + flame on the
+  segment) continues the path from a real scattering event in a direction drawn from the phase function, up to
+  `MaxVolumeBounces` events; segments that may not scatter any more use ratio tracking. A haze or smoke that only
+  scatters is invisible in a white furnace (energy is conserved), and each order of scattering adds less light than
+  the one before.
+* **Flames** absorb (expected-value absorption, `beta *= 1 − σa/σ̄` at each tentative collision) and emit; their
+  emission is counted where the camera sees it. The light flames throw on the scene comes from the engine's flame
+  light samples (spot lights), as in the real-time view, so it is not counted twice.
+
+Lenses seen from a scattering vertex are left to the equi-angular estimator (weight 0 for the BSDF/phase sample), so
+nothing is counted twice.
+
+### Accumulation, denoising, display and output
+
+Every pass adds one sample per pixel to RGBA32F images: radiance sum and sample count, the first surface's albedo sum
+and the sum of squared sample luminance (for the variance), the first surface's normal and view depth. The raw result
+is the mean — the reference. **Denoising** (`--denoise`, `FinalRenderSettings.Denoise`) is separate from it: an
+à-trous wavelet filter (Dammertz et al. 2010) of five iterations (taps 1, 2, 4, 8, 16 px apart) with the edge-stopping
+of SVGF (Schied et al. 2017): normal (`max(n·n', 0)^64`), depth (2 % per tap distance), albedo (`|Δa|₁ / 0.1`) and
+luminance against four standard deviations of the mean (from the per-pixel variance, prefiltered 3 × 3) — converged
+pixels keep their value, noise is averaged only across surfaces of the same material, so edges, gobo patterns and
+textures stay sharp (test: RMSE inside surfaces 4.05 → 1.33 cd/m² at 8 samples against a 1024-sample reference; the
+image's total luminance within 3 %).
+
+The display uses the real-time view's transform (`tonemap.glsl: displayTransform`, the same AgX / ACES / Neutral
+curves and the same ordered dither), so a converged final render and the real-time view of a noise-free scene are
+identical to ±2/255. Auto exposure meters the image with the real-time histogram (stage metering by default) on the
+GPU and the trimmed mean on the CPU (`ExposureMeter`, the twin of `exposure.comp`), within 0.15 stop of the
+real-time meter. There is no bloom in the final render.
+
+`OpenExr` (`Diagnostics/OpenExr.cs`) writes and reads single-part scanline OpenEXR 2 images (no compression, ZIPS or
+ZIP with the format's byte reordering and predictor through `ZLibStream`; HALF, FLOAT, UINT channels; layer names;
+`chromaticities` and `whiteLuminance` attributes) — files the official OpenEXR library reads. `candela render --final
+--exr` writes R, G, B, A (float, linear Rec.2020, scaled by the PNG's exposure; `whiteLuminance` = 1 / exposure turns
+the values back into cd/m²), `raw.*` (with `--denoise`), `albedo.*`, `N.*` (world normal) and `Z` (view depth, m).
+
+### Correctness and robustness
+
+* Non-finite values never reach the accumulation (a path whose radiance is not finite counts as black); every result
+  is finite even for NaN / negative / huge settings, options and lights (`BadInputStaysFiniteAndValidationClean`).
+* The light count, surface and volume bounces, samples (65 536) and image size are clamped; a render longer than its
+  time limit finishes its pass; cancellation keeps the samples done.
+* All path-tracer tests run with the validation layer and synchronization validation and assert zero errors.
+
+### Performance
+
+On lavapipe (CPU, 4 threads) `Фокина.mvr` with the demo look takes about 6 s per sample at 480 × 270 and about 25 s
+at 960 × 540 (1291 beams in haze; most of the time is the equi-angular estimate of the beams on every segment and
+the tracking through the hazers' smoke). A desktop GPU with hardware ray tracing is two to three orders of magnitude
+faster.
 
 ## Known limitations
 
@@ -900,3 +1058,14 @@ cookies, photometric profiles and media of stages 1 and 2.
   | ![before](images/beams-fokina-front-before.png) | ![after](images/beams-fokina-front-after.png) |
 * **Noise overlay**: free-field point sources (no reflections, no directivity) unless a noise field is given.
 * Single graphics+compute queue; uploads and rendering share it (no async compute/transfer yet).
+* **Path tracer**:
+  * The lights are a snapshot taken when the render starts (a sequence starts one render per frame).
+  * Emissive surfaces (LED walls, screens) are found by the paths that hit them, not by next-event estimation: small,
+    bright emitters converge slowly. Lens glow set with `SetInstanceEmission` is not used; the lens polygons are what
+    rays see of a fixture.
+  * Flame emission is counted where the camera sees it; the light of flames on the scene comes from the engine's
+    flame light samples (as in the real-time view). Haze fills the media box (scene bounds + 30 m), not all of space.
+  * Transmission is thin-walled (no refraction, no volumes inside glass); the single-scattering GGX loses a few % of
+    energy on rough metals at grazing angles (no multiple-scattering compensation).
+  * No bloom or lens effects in the final render (the real-time view has bloom); the denoiser can blur fine detail
+    that differs neither in normal, depth nor albedo (e.g. a sharp shadow edge on a flat floor at very few samples).

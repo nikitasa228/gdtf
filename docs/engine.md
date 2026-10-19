@@ -265,16 +265,19 @@ complements, shutter open).
 ## Command-line tool
 
 `candela` (`src/Candela.Cli`). Exit codes: **0** success, **1** failure (file not readable, render or I/O error),
-**2** usage error, **3** no usable Vulkan device, **4** the input has errors (`validate` found error-level issues;
-`import-worker` rejected the model).
+**2** usage error, **3** no usable Vulkan device (for `render --final`: none that can run the path tracer), **4** the
+input has errors (`validate` found error-level issues; `import-worker` rejected the model), **130** cancelled with
+Ctrl+C (a final render writes what it has rendered).
 
 ```
 candela render <scene.mvr|scene.candela> --out <file.png> [--width W --height H]
                [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov deg]
                [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]
-               [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev auto|floor|<EV100>]
-               [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--device <name>]
-               [--library <dir>]... [--cache <dir>]
+               [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s|HH:MM:SS:FF>]
+               [--end <s|HH:MM:SS:FF> [--fps F]] [--ev auto|floor|<EV100>] [--auto-exposure] [--frames N] [--grid]
+               [--floor auto|none] [--device <name>] [--library <dir>]... [--cache <dir>]
+               [--final [--samples N] [--seconds S] [--exr <file.exr>] [--denoise] [--bounces N]
+                        [--volume-bounces N] [--seed N] [--clamp <cd/m²>]]
 candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset 0|1] [--scene <file>]
 candela info <file.gdtf|file.mvr|file.candela>
 candela validate <scene> [--plot]
@@ -305,6 +308,30 @@ stop less than halfway), so the still is fully adapted. `--ev floor` fixes the e
 `--ev <EV100>` at a value, and `--auto-exposure` adapts starting from the `--ev` value. `render stages/Фокина.mvr
 --out f.png --width 640 --height 360` takes about 14 s on lavapipe (12 frames; about 9 s with `--ev floor` and its
 6 frames).
+
+**Image sequences.** `--end` renders every 1/`--fps` s (default 25 fps) from `--time` up to and including `--end`
+(files `name_0001.png` …, at least four digits, like the editor's render job; at most 100 000 frames). The engine
+simulates from 0 to the first frame in steps of at most 1/30 s and then advances exactly one frame interval between
+frames — DMX playback, motors, haze, smoke and flames follow frame by frame. Times are seconds on the engine clock
+(= seconds into a `--look dmx-file` recording) or SMPTE timecodes `HH:MM:SS:FF` (`HH:MM:SS;FF` drop-frame) looked up in
+the recording's timecode track (`DmxRecording.FindTimecode`, frame rate from the recording's first timecode; a timecode
+the recording never received counts from its first timecode when that lands inside it, otherwise the render stops
+with exit code 1). Timecodes need `--look dmx-file`. The real-time view lets auto exposure settle on the first frame
+and then adapt in real time.
+
+**Final render** (`--final`): each image is path traced (`VulkanRenderer.StartFinalRender`, docs/rendering.md) with
+`--samples` per pixel (default 64) or until `--seconds` of rendering time are up (whichever comes first; `--seconds`
+alone renders until the time is up), `--bounces` surface and `--volume-bounces` haze/smoke scattering events (6 and 2),
+`--seed` (deterministic), `--clamp` (firefly clamp in cd/m², off by default) and `--denoise`. The PNG uses the same
+display transform as the real-time view; `--exr` also writes linear HDR OpenEXR (ZIP): R, G, B, A in float (Rec.2020,
+scaled by the PNG's exposure; the `whiteLuminance` attribute = 1 / exposure gives cd/m², `chromaticities` = Rec.2020),
+the raw result as layer `raw` when denoised, and `albedo`, `N` (world normal) and `Z` (view depth, m). Auto exposure
+meters the final image (stage metering); a sequence keeps the first frame's exposure (no flicker). Progress is printed
+every 10 s and a line per frame (samples, time, EV). Ctrl+C stops after the work in flight and writes the image of
+the samples done (exit code 130; nothing is written before the first sample). `--mode`, `--overlay` and `--grid` do
+not apply to `--final`, and the final-only options need it (usage errors). A GPU without ray queries gets the reason
+and exit code 3; the real-time `render` works there. `render stages/Фокина.mvr --look demo --final --seconds 60
+--width 480 --height 270` reaches 11 samples on lavapipe.
 
 **artnet-test** sends `ArtNetTestPattern` (pan/tilt sweep, colour chase, dimmer wave, zoom) with ArtSync and
 ArtTimeCode to a node, a directed broadcast or `127.0.0.1` — 8 moving heads (12 ch) and 8 RGBW pars per universe, or
@@ -387,6 +414,16 @@ a device):
   the stage; the thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames
   differ; a GDTF deleted since the scan gives a dark thumbnail, not an exception; `--look dmx-file` plays a recording
   for `--time` before rendering.
+* **Final render CLI** (`FinalRenderCliTests`): the `--final` options parse, have their defaults (`--seconds` alone
+  renders until the time is up) and are refused without `--final` or with `--mode`/`--overlay`/`--grid`; times parse
+  as seconds or timecodes (drop-frame with `;`), timecodes need a recording, an end before the start is refused; a
+  recording with EBU timecode from 01:00:00:00 plans 01:00:00:10 … 01:00:01:15 at 2 fps as frames at 0.4, 0.9 and
+  1.4 s named `_0001` …; a timecode outside the recording is reported. On Vulkan: `--final --samples 2 --denoise
+  --exr` on Фокина (demo look, 160 × 90) writes the PNG and an EXR with R, G, B, A (float), `raw.*`, `albedo.*`,
+  `N.*`, `Z`, Rec.2020 chromaticities and a white luminance, every value finite; the timecode range of a recording
+  (full, then a blackout at 1 s) renders three real-time PNGs and three path-traced PNG + EXR frames with one
+  exposure, the frame after the blackout darker than a quarter of the first; a render cancelled before its first
+  sample writes nothing and exits with 130.
 * **Integration review**: lights against independent computations (position = the beam part's pose, unit direction
   and up, colour of luminance 1 in Rec.2020 for every light of Фокина, the same pan/tilt on a fixture turned 90° gives
   the beam turned 90°); incremental render sync equals a fresh binding after moves, reparenting, removal, undo/redo, a
