@@ -178,6 +178,57 @@ public sealed class FlagRevisionTests
     }
 }
 
+/// <summary>The packet-rate recorder under concurrent receive threads.</summary>
+public sealed class RecorderConcurrencyTests
+{
+    [Fact]
+    public void Packets_from_several_receive_threads_are_all_recorded_in_time_order()
+    {
+        var hub = new Dmx.Input.DmxInputHub();
+        var recorder = new DmxRecorder(hub);
+        recorder.Start(0, "Stress");
+        const int Threads = 4, Packets = 1500;
+        using var go = new ManualResetEventSlim(false);
+        var workers = Enumerable.Range(0, Threads).Select(t => Task.Run(() =>
+        {
+            var source = new Dmx.Input.DmxSourceId("artnet", $"10.0.0.{t + 1}:6454");
+            var slots = new byte[512];
+            go.Wait();
+            for (int i = 1; i <= Packets; i++)
+            {
+                slots[0] = (byte)(i & 0xFF);
+                slots[1] = (byte)(i >> 8);
+                slots[2 + t] = (byte)t;
+                hub.Submit(source, t + 1, slots);
+                if (i % 100 == 0) hub.SubmitTimecode(new Dmx.Input.Timecode(0, 0, i / 100, t, Dmx.Input.TimecodeType.Ebu25), source);
+            }
+        })).ToArray();
+        go.Set();
+        double engineTime = 0;
+        while (!Task.WhenAll(workers).IsCompleted)
+        {
+            engineTime += 0.001;
+            recorder.Capture(engineTime);
+            _ = recorder.FrameCount;
+            _ = recorder.Duration;
+        }
+        Task.WaitAll(workers);
+        var recording = recorder.Stop()!;
+
+        Assert.True(recording.Frames.Zip(recording.Frames.Skip(1)).All(p => p.First.Time <= p.Second.Time));
+        // every packet changed its universe, so every one of them is in the recording
+        for (int t = 0; t < Threads; t++)
+            Assert.Equal(Packets, recording.Frames.SelectMany(f => f.Changes).Count(c => c.Universe == t + 1));
+        var state = new Dictionary<int, byte[]>();
+        recording.StateAt(recording.Duration, state);
+        for (int t = 0; t < Threads; t++)
+        {
+            Assert.Equal(Packets & 0xFF, state[t + 1][0]);
+            Assert.Equal(Packets >> 8, state[t + 1][1]);
+        }
+    }
+}
+
 /// <summary>The library event covers every way GDTF files enter the library.</summary>
 public sealed class LibraryEventRevisionTests
 {

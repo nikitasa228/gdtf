@@ -414,7 +414,7 @@ public abstract class ExternalProtocolBase : IExternalProtocol
         catch (Exception e)
         {
             // Releasing resources must not fail a stop; remember why for the panel.
-            lock (_statusLock) _lastError = ProtocolText.Literal($"{DisplayName} did not stop cleanly: {e.Message}");
+            lock (_statusLock) _lastError = ProtocolText.Create(ProtocolMessages.StopFailed, DisplayName, e.Message);
         }
     }
 

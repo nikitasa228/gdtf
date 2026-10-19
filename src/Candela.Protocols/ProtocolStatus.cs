@@ -192,6 +192,9 @@ public static class ProtocolMessages
     /// <summary>"{0} failed to start: {1}" — protocol name, system message.</summary>
     public const string StartFailed = "protocol.start-failed";
 
+    /// <summary>"{0} did not stop cleanly: {1}" — protocol name, system message (kept as the last error).</summary>
+    public const string StopFailed = "protocol.stop-failed";
+
     /// <summary>"{0} and {1} are both set to UDP port {2}; choose different ports."</summary>
     public const string PortConflict = "protocol.port-conflict";
 
@@ -318,6 +321,7 @@ public static class ProtocolMessages
         [Stopped] = "Stopped",
         [Unavailable] = "{0} is not available: {1}",
         [StartFailed] = "{0} failed to start: {1}",
+        [StopFailed] = "{0} did not stop cleanly: {1}",
         [PortConflict] = "{0} and {1} are both set to UDP port {2}; choose different ports.",
         [InvalidPort] = "{0} port {1} is not a valid UDP port (0–65535).",
         [PortInUse] = "{0}: UDP port {1} is already in use by another program on this computer (another visualiser, " +
