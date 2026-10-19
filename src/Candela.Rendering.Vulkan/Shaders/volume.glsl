@@ -66,15 +66,39 @@ vec3 blackbodyLuminance(float kelvin)
     return mix(a.rgb, b.rgb, f) * luminance;
 }
 
+// Flame temperature (K) at P: the hottest of the flame grids whose box contains P. Every grid is a block of the flame
+// atlas; its record (after the blackbody table) holds the box, the block's offset and its size in texels, and the
+// lookup is clamped to the block's own texels so neighbouring grids never bleed into each other.
+float flameTemperatureAt(vec3 P)
+{
+    vec3 uvw;
+    if (!boxCoordinates(P, frame.flameMin, frame.flameMax, uvw))
+        return 0.0;
+    uint count = uint(frame.flameMax.w);
+    uint first = uint(frame.flameLut.z);
+    vec3 atlas = vec3(textureSize(flameTexture, 0));
+    float kelvin = 0.0;
+    for (uint i = 0u; i < count; ++i)
+    {
+        uint r = first + 4u * i;
+        vec4 size = flameLutEntries[r + 3u];
+        if (!boxCoordinates(P, flameLutEntries[r], flameLutEntries[r + 1u], uvw))
+            continue;
+        vec3 texel = clamp(uvw * size.xyz, vec3(0.5), size.xyz - 0.5) + flameLutEntries[r + 2u].xyz;
+        kelvin = max(kelvin, textureLod(flameTexture, texel / atlas, 0.0).r);
+    }
+
+    return kelvin;
+}
+
 // Flame emission coefficient (cd/m2 per metre) and absorption (1/m) at P: a flame of temperature T emits like a
 // black body with absorption coefficient kappa (Kirchhoff): source = kappa x L_bb(T).
 vec3 flameEmissionAt(vec3 P, out float absorption)
 {
     absorption = 0.0;
-    vec3 uvw;
-    if (!hasFeature(FEATURE_FLAME) || !boxCoordinates(P, frame.flameMin, frame.flameMax, uvw))
+    if (!hasFeature(FEATURE_FLAME))
         return vec3(0.0);
-    float kelvin = textureLod(flameTexture, uvw, 0.0).r;
+    float kelvin = flameTemperatureAt(P);
     if (kelvin <= frame.flameLut.x)
         return vec3(0.0);
     absorption = frame.media.w;

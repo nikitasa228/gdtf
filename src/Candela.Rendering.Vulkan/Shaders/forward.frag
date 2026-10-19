@@ -1,7 +1,8 @@
 #version 460
 #extension GL_GOOGLE_include_directive : require
 // Full view: forward PBR shading with the physically based spot lights of the fragment's cluster.
-//   L = sum over lights of BRDF(v, l) * E_light + albedo / pi * E_indirect + L_emissive
+//   L = sum over lights of BRDF(v, l) * E_light + albedo / pi * E_indirect + L_emissive + L_instance
+// (L_instance: the instance's additive emission, e.g. the glowing lens of a lit fixture)
 //   E_light = I0 * profile(theta) * cookie * colour * shadow * cos(incidence) / d^2
 // Output: luminance (cd/m2, linear Rec.2020) x exposure, into the RGBA16F HDR image.
 // Variant TRANSPARENT (alpha BLEND and transmissive materials): premultiplied output; coverage = alpha *
@@ -145,6 +146,7 @@ void main()
     vec3 emissive = m.emissive;
     if ((m.flags & MATERIAL_EMISSIVE_TEXTURE) != 0u)
         emissive = rec709ToRec2020(sampleTexture(m.emissiveTexture, uv).rgb * m.emissive709);
+    emissive += instanceEmission(instances[inInstance], V);
 
 #ifdef TRANSPARENT
     float coverage = clamp(alpha * (1.0 - m.transmission), 0.0, 1.0);

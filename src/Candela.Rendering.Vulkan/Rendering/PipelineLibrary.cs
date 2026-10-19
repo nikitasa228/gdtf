@@ -203,6 +203,9 @@ internal sealed unsafe class PipelineLibrary : IDisposable
             VolumeComposite = Create(new GraphicsPipelineDesc("volumetric composite", ShaderPrograms.FullscreenVertex, ShaderPrograms.VolumeComposite,
                 VertexLayout.None, ColorTargets.One(TargetFormats.Hdr), BlendMode.Transmittance, DepthAttachment: false, DepthTest: false,
                 DynamicCull: false));
+            BeamCull = CreateCompute("beam tile culling", ShaderPrograms.BeamCull);
+            BeamScatter = CreateCompute("beam single scattering", ShaderPrograms.BeamScatter);
+            BeamTemporal = CreateCompute("beam temporal accumulation", ShaderPrograms.BeamTemporal);
 
             // Post.
             BloomDownsampleFirst = CreateCompute("bloom downsample (first)", ShaderPrograms.BloomDownsampleFirst);
@@ -268,6 +271,15 @@ internal sealed unsafe class PipelineLibrary : IDisposable
     public Pipeline FroxelInject { get; }
     public Pipeline FroxelIntegrate { get; }
     public Pipeline VolumeComposite { get; }
+
+    /// <summary>Beam culling into screen tiles (beam_cull.comp).</summary>
+    public Pipeline BeamCull { get; }
+
+    /// <summary>Per-pixel single scattering of the beams (beam_scatter.comp).</summary>
+    public Pipeline BeamScatter { get; }
+
+    /// <summary>Temporal accumulation of the beam modulation (beam_temporal.comp).</summary>
+    public Pipeline BeamTemporal { get; }
     public Pipeline BloomDownsampleFirst { get; }
     public Pipeline BloomDownsample { get; }
     public Pipeline BloomUpsample { get; }

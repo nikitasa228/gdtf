@@ -55,6 +55,15 @@ internal sealed class InstanceRecord
     public required MaterialRecord?[] Materials;
     public Vector4 WorldSphere;
     public int LivePosition;
+
+    /// <summary>Additive emitted luminance (linear Rec.2020 cd/m²), see <see cref="IRenderWorld.SetInstanceEmission(InstanceHandle, Vector3)"/>.</summary>
+    public Vector3 Emission;
+
+    /// <summary>Unit world axis of a directional emission (zero = uniform).</summary>
+    public Vector3 EmissionAxis;
+
+    /// <summary>1 / half-angle² of the directional emission (0 = uniform).</summary>
+    public float EmissionSharpness;
 }
 
 /// <summary>
@@ -467,6 +476,39 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             ShadowChanges.Add(record.WorldSphere);
     }
 
+    /// <summary>
+    /// Sets the additive emission of an instance (cd/m² per linear Rec.2020 channel; non-finite and negative
+    /// components count as zero). Written to the instance buffer only when it changes, so a fixture whose lens glow is
+    /// set every frame costs nothing while its intensity is steady.
+    /// </summary>
+    public void SetInstanceEmission(InstanceHandle instance, Vector3 luminance) => SetInstanceEmission(instance, luminance, Vector3.Zero, 0f);
+
+    /// <summary>
+    /// Sets a directional additive emission (a lens): <paramref name="luminance"/> seen along <paramref name="axis"/>,
+    /// 2^−(θ / <paramref name="halfAngle"/>)² off it; a zero or non-finite axis, or a half-angle that is not positive,
+    /// gives the uniform emission. Written to the instance buffer only when something changes.
+    /// </summary>
+    public void SetInstanceEmission(InstanceHandle instance, Vector3 luminance, Vector3 axis, float halfAngle)
+    {
+        var record = _instances.Get(instance.Value, out _, "instance");
+        var emission = new Vector3(SanitizeEmission(luminance.X), SanitizeEmission(luminance.Y), SanitizeEmission(luminance.Z));
+        float length = axis.Length();
+        bool directional = float.IsFinite(length) && length > 1e-6f && float.IsFinite(halfAngle) && halfAngle > 0f;
+        var unit = directional ? axis / length : Vector3.Zero;
+        // At most a hair's width (1e-4 rad) and at least a hemisphere: the falloff stays finite.
+        float sharpness = directional ? 1f / MathF.Pow(Math.Clamp(halfAngle, 1e-4f, MathF.PI), 2f) : 0f;
+        if (emission == record.Emission && unit == record.EmissionAxis && sharpness == record.EmissionSharpness)
+            return;
+        record.Emission = emission;
+        record.EmissionAxis = unit;
+        record.EmissionSharpness = sharpness;
+        ref var gpu = ref _instanceBuffer[record.Index];
+        gpu.Emission = emission;
+        gpu.EmissionAxis = unit;
+        gpu.EmissionSharpness = sharpness;
+        _instanceBuffer.MarkDirty(record.Index);
+    }
+
     /// <inheritdoc/>
     public void DestroyInstance(InstanceHandle instance)
     {
@@ -804,9 +846,17 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
             MaterialSlotOffset = (uint)record.SlotOffset,
             MaterialSlotCount = (uint)record.SlotCount,
             BoundingSphere = record.WorldSphere,
+            Emission = record.Emission,
+            EmissionAxis = record.EmissionAxis,
+            EmissionSharpness = record.EmissionSharpness,
         };
         _instanceBuffer.MarkDirty(record.Index);
     }
+
+    /// <summary>Largest emitted luminance kept (cd/m²): finite in single precision whatever the exposure.</summary>
+    private const float MaxEmission = 1e12f;
+
+    private static float SanitizeEmission(float value) => float.IsFinite(value) ? Math.Clamp(value, 0f, MaxEmission) : (value > 0f ? MaxEmission : 0f);
 
     private void CreateSetLayout()
     {

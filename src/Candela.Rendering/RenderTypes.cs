@@ -155,6 +155,25 @@ public enum ToneMapper
     Neutral,
 }
 
+/// <summary>Metering of the auto exposure.</summary>
+public enum ExposureMetering
+{
+    /// <summary>
+    /// Mean log luminance of the pixels between the 50th and 95th percentile at middle grey: an evenly lit room or
+    /// product view.
+    /// </summary>
+    Average,
+
+    /// <summary>
+    /// Stage looks (the default): a dark venue with bright beams, pools and lenses. Meters the lit part of the image
+    /// (mean log luminance between the 85th and 99th percentile, so the hottest 1 % — lenses, specular glints — does
+    /// not count) and places it one and a half stops below middle grey (the EV100 is 1.5 above that part's reading):
+    /// light pools stay below white, beams in haze stay visible and the dark venue is not lifted to grey. In an evenly
+    /// lit view it exposes about 1.5 stops darker than <see cref="Average"/>.
+    /// </summary>
+    Stage,
+}
+
 public enum IndirectLighting
 {
     Off,
@@ -183,8 +202,12 @@ public sealed class PreviewSettings
     /// <summary>Froxel grid depth slices (width/height follow the viewport at 8 px per froxel).</summary>
     public int VolumetricSlices { get; set; } = 128;
 
-    /// <summary>Narrow beams that get dedicated cone ray-marching for sharp gobos.</summary>
-    public int MaxRaymarchedBeams { get; set; } = 16;
+    /// <summary>
+    /// Most spot lights rendered as volumetric beams: per-pixel single scattering inside each beam (sharp shafts, soft
+    /// photometric edges, gobos, shadows in the air), the most important lights of the view first. Lights beyond it
+    /// (and very wide or diffuse emitters) go into the froxel volume. 0 = every light in the froxels. At most 8192.
+    /// </summary>
+    public int MaxRaymarchedBeams { get; set; } = 4096;
 
     public bool TemporalAccumulation { get; set; } = true;
     public IndirectLighting Indirect { get; set; } = IndirectLighting.ReflectiveShadowMaps;
@@ -194,6 +217,9 @@ public sealed class PreviewSettings
 
     /// <summary>When true the exposure adapts to the image; otherwise the camera EV100 is used.</summary>
     public bool AutoExposure { get; set; }
+
+    /// <summary>How <see cref="AutoExposure"/> meters the image (stage metering by default).</summary>
+    public ExposureMetering Metering { get; set; } = ExposureMetering.Stage;
 
     /// <summary>Added to the exposure in stops (user brightness trim).</summary>
     public float ExposureCompensation { get; set; }

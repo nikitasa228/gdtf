@@ -34,7 +34,7 @@ struct Material
     float ior;
 };
 
-// A placed mesh (160 bytes). Matrices are System.Numerics matrices uploaded verbatim: M * v in GLSL = v * M in C#.
+// A placed mesh (192 bytes). Matrices are System.Numerics matrices uploaded verbatim: M * v in GLSL = v * M in C#.
 struct Instance
 {
     mat4 world;
@@ -44,7 +44,20 @@ struct Instance
     uint materialSlotOffset; // first entry in materialSlots[]
     uint materialSlotCount;
     vec4 boundingSphere;     // world-space centre + radius
+    vec3 emission;           // additive emitted luminance, Rec.2020 cd/m2 (IRenderWorld.SetInstanceEmission: lens glow)
+    float emissionSharpness; // 1 / half-angle^2 of the directional falloff 2^-(theta^2 x sharpness), 0 = uniform
+    vec3 emissionAxis;       // world direction the directional emission is seen from (along which the light leaves)
+    float pad0;
 };
+
+// Additive emission of an instance seen from direction V (unit, surface to eye).
+vec3 instanceEmission(Instance inst, vec3 V)
+{
+    if (inst.emissionSharpness <= 0.0)
+        return inst.emission;
+    float theta = acos(clamp(dot(V, inst.emissionAxis), -1.0, 1.0));
+    return inst.emission * exp2(-inst.emissionSharpness * theta * theta);
+}
 
 // Spot light (224 bytes), packed by LightPacker.cs. The profile parameters are those of
 // Candela.Photometry.BeamDistribution; beamProfile() in photometry.glsl evaluates its Relative(theta). With a prism
@@ -81,7 +94,7 @@ struct Light
     float prismRotation;     // azimuth of the first facet, rad
     float boundingAngle;     // acos(cosCutoff)
     float solidAngle;        // effective solid angle of one facet's profile, sr (flux = intensity x solidAngle x facets)
-    float pad0;
+    float beamLayer;         // layer coordinate of the beam profile in the beam scattering table (family x exponent)
     vec4 blades[4];          // A..D: xy = edge normal in gate coordinates, z = offset (blocked where dot(p, xy) > z), w = 1 when inserted
 };
 
@@ -122,7 +135,7 @@ struct Vpl
     float pad2;
 };
 
-// Per-view constants (uniform block, 960 bytes).
+// Per-view constants (uniform block, 992 bytes).
 struct FrameData
 {
     mat4 view;
@@ -164,8 +177,8 @@ struct FrameData
     vec4 media;              // haze sigma_s (1/m), Henyey-Greenstein g, smoke sigma_s at density 1 (1/m), flame absorption (1/m)
     vec4 smokeMin;           // world box of the smoke grid
     vec4 smokeMax;
-    vec4 flameMin;           // world box of the flame temperature grid
-    vec4 flameMax;
+    vec4 flameMin;           // union box of the flame grids (w = 1 when present)
+    vec4 flameMax;           // w = number of flame grids (records after the blackbody table)
     vec4 noiseMin;           // world box of the noise field
     vec4 noiseMax;
     vec4 flameLut;           // blackbody LUT: first temperature (K), entries per kelvin, entries, last temperature
@@ -174,7 +187,7 @@ struct FrameData
     vec4 selectionColor;     // selection outline colour (sRGB + alpha)
     vec4 pixelFootprint;     // world size of a pixel: x = per metre of view depth (perspective), y = constant (orthographic)
     float lightRangeScale;   // squared light range = maxIntensity x lightRangeScale
-    uint raymarchCount;      // narrow beams marched at full resolution (raymarchList)
+    uint beamCount;          // volumetric beams integrated per pixel (raymarchList[0 .. beamCount))
     uint features;           // FEATURE_*
     uint overlayMode;        // OVERLAY_*
     uint vplCount;
@@ -185,6 +198,13 @@ struct FrameData
     float renderScale;       // internal / display resolution
     uint shadowTileCount;
     float volumeHistoryWeight; // weight of the reprojected froxel history (0 = none)
+    uvec2 beamTiles;         // beam culling tiles (BEAM_TILE_SIZE half-resolution pixels each), x and y
+    uint beamWordsPerTile;   // 32-bit mask words per tile (one bit per beam of raymarchList)
+    uint beamFlags;          // BEAM_FLAG_*
+    float beamHistoryWeight; // weight of the accumulated beam modulation ratio (0 = none)
+    float beamQuality;       // 0.25 .. 1: scales the segments and cookie samples per beam crossing (load shedding)
+    float beamSigmaRef;      // scattering coefficient (1/m) of the beam envelope image (temporal ratio reference)
+    float beamPad0;
 };
 
 layout(set = SET_VIEW, binding = BINDING_FRAME, scalar) uniform FrameBlock
@@ -207,6 +227,10 @@ layout(push_constant, scalar) uniform DrawConstants
 // blending, the bloom pyramid and temporal histories with inf/NaN. Pre-exposed 30000 is 15 stops above display
 // white (the tone mapper saturates long before), so the sum of two clamped values in a blend still fits.
 const float HALF_SAFE_MAX = 30000.0;
+
+// View depth (m) the volumetric beams use for the background: beyond the range of every beam (at most 2 km), so a
+// beam into the sky or an open venue is drawn to its end, not cut at the far end of the froxel volume.
+const float BEAM_BACKGROUND_DEPTH = 100000.0;
 
 // NaN -> 0, then clamped to [0, HALF_SAFE_MAX] (+inf -> HALF_SAFE_MAX).
 vec3 finiteLight(vec3 c)

@@ -117,19 +117,30 @@ public struct LineVertex
     public float Width;
 }
 
-/// <summary>A 3D scalar field over a box (smoke density, flame temperature) for the volumetric renderer.</summary>
+/// <summary>
+/// A 3D scalar field over a box (smoke density, flame temperature) for the volumetric renderer. The renderer reads it
+/// when it is set through <see cref="IRenderWorld.SetAtmosphere"/> and uploads it with the next frame, so a producer may
+/// reuse one grid (and its value array) from step to step.
+/// </summary>
 public sealed class VolumeGrid
 {
-    /// <summary>World-space box.</summary>
-    public Vector3 Min { get; init; }
+    /// <summary>World-space box, m.</summary>
+    public Vector3 Min { get; set; }
 
-    public Vector3 Max { get; init; }
-    public int SizeX { get; init; }
-    public int SizeY { get; init; }
-    public int SizeZ { get; init; }
+    /// <summary>World-space box, m.</summary>
+    public Vector3 Max { get; set; }
 
-    /// <summary>x fastest, then y, then z. Length = SizeX*SizeY*SizeZ.</summary>
-    public float[] Values { get; init; } = Array.Empty<float>();
+    /// <summary>Cells along x.</summary>
+    public int SizeX { get; set; }
+
+    /// <summary>Cells along y.</summary>
+    public int SizeY { get; set; }
+
+    /// <summary>Cells along z.</summary>
+    public int SizeZ { get; set; }
+
+    /// <summary>x fastest, then y, then z; cell centres at Min + (i + ½)·(Max − Min)/Size. At least SizeX·SizeY·SizeZ values (more are ignored).</summary>
+    public float[] Values { get; set; } = Array.Empty<float>();
 }
 
 /// <summary>Participating media of the scene this frame.</summary>
@@ -147,8 +158,18 @@ public sealed class AtmosphereState
     /// <summary>Scattering coefficient (1/m) at smoke density 1.</summary>
     public float SmokeScatteringAtFullDensity { get; set; } = 0.5f;
 
-    /// <summary>Flame temperature in kelvin (0 = no flame), emissive as a blackbody, or null.</summary>
+    /// <summary>
+    /// Flame temperature in kelvin (0 = no flame), emissive as a blackbody, or null. A single grid; see
+    /// <see cref="FlameTemperatures"/> for several flames, each with its own grid.
+    /// </summary>
     public VolumeGrid? FlameTemperature { get; set; }
+
+    /// <summary>
+    /// Flame temperature grids in kelvin (0 = no flame), one per flame (e.g. per flame projector), each over its own
+    /// box; emissive as a blackbody. Where boxes overlap the hottest flame wins. Null or empty = none. Used together
+    /// with <see cref="FlameTemperature"/> (both are drawn when both are set).
+    /// </summary>
+    public IReadOnlyList<VolumeGrid>? FlameTemperatures { get; set; }
 
     /// <summary>Sound pressure level field in dB for the noise overlay's volumetric fog, or null.</summary>
     public VolumeGrid? NoiseField { get; set; }
@@ -187,6 +208,27 @@ public interface IRenderWorld
     void UpdateInstance(InstanceHandle instance, Matrix4x4 world, InstanceFlags flags);
     void SetInstanceMaterials(InstanceHandle instance, ReadOnlySpan<MaterialHandle> materials);
     void DestroyInstance(InstanceHandle instance);
+
+    /// <summary>
+    /// Sets an additive emission of an instance on top of its materials' emission: emitted luminance in cd/m² per
+    /// linear Rec.2020 channel (zero = none, the default of a new instance). Used for the glowing lens of a lit
+    /// fixture (peak intensity / lens area in the beam's colour); the renderer's bloom adds the glare. Non-finite or
+    /// negative components count as zero. Renderers without emission support ignore it.
+    /// </summary>
+    void SetInstanceEmission(InstanceHandle instance, Vector3 luminance)
+    {
+    }
+
+    /// <summary>
+    /// Directional variant of <see cref="SetInstanceEmission(InstanceHandle, Vector3)"/> for a lens: the instance shows
+    /// <paramref name="luminance"/> when seen along <paramref name="axis"/> (the world direction the light leaves in) and
+    /// less off the axis, 2^−(θ / <paramref name="halfAngle"/>)² at the angle θ between the view direction and the axis
+    /// (half the luminance at <paramref name="halfAngle"/>, radians: half the beam angle), like the beam it emits. The
+    /// glow is what the camera sees of the lens; the light itself is the spot light (indirect light ignores it). A zero,
+    /// non-finite axis or a half-angle that is not positive gives the uniform emission. The default forwards to the
+    /// uniform overload.
+    /// </summary>
+    void SetInstanceEmission(InstanceHandle instance, Vector3 luminance, Vector3 axis, float halfAngle) => SetInstanceEmission(instance, luminance);
 
     void SetLights(ReadOnlySpan<SpotLight> lights);
 

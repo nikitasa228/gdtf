@@ -178,6 +178,7 @@ internal static class LightPacker
             PrismRotation = prismRotation,
             BoundingAngle = bounding,
             SolidAngle = ApproximateSolidAngle(distribution),
+            BeamLayer = distribution.Shape == BeamShape.GeneralizedGaussian ? BeamScatteringTable.LayerOf(distribution.Type, distribution.Exponent) : 0f,
         };
 
         // Framing blades: nominal sides top (A), right (B), bottom (C), left (D), turned by the module rotation.

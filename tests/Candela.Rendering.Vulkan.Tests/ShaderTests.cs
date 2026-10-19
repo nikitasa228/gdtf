@@ -74,13 +74,13 @@ public sealed class ShaderTests
     {
         Assert.Equal(48, Unsafe.SizeOf<GpuVertex>());
         Assert.Equal(112, Unsafe.SizeOf<GpuMaterial>());
-        Assert.Equal(160, Unsafe.SizeOf<GpuInstance>());
+        Assert.Equal(192, Unsafe.SizeOf<GpuInstance>());
         Assert.Equal(224, Unsafe.SizeOf<GpuLight>());
         Assert.Equal(16, Unsafe.SizeOf<GpuLightView>());
         Assert.Equal(192, Unsafe.SizeOf<GpuShadowSlot>());
         Assert.Equal(48, Unsafe.SizeOf<GpuVpl>());
         Assert.Equal(16, Unsafe.SizeOf<GpuExposureResult>());
-        Assert.Equal(960, Unsafe.SizeOf<GpuFrameData>());
+        Assert.Equal(992, Unsafe.SizeOf<GpuFrameData>());
         Assert.Equal(32, Unsafe.SizeOf<GpuDrawConstants>());
         Assert.Equal(16, Unsafe.SizeOf<GpuClusterCounter>());
         Assert.Equal(32, Unsafe.SizeOf<LineVertex>());

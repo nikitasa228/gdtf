@@ -77,7 +77,8 @@ layout(set = SET_VIEW, binding = BINDING_SMOKE) uniform sampler3D smokeTexture;
 layout(set = SET_VIEW, binding = BINDING_FLAME) uniform sampler3D flameTexture;
 layout(set = SET_VIEW, binding = BINDING_NOISE_FIELD) uniform sampler3D noiseFieldTexture;
 
-// Blackbody luminance table: per entry vec4(Rec.2020 colour normalised to luminance 1, luminance cd/m2).
+// Blackbody luminance table: per entry vec4(Rec.2020 colour normalised to luminance 1, luminance cd/m2); after its
+// frame.flameLut.z entries, four entries per flame grid (box min, box max, atlas offset, size in texels).
 layout(set = SET_VIEW, binding = BINDING_FLAME_LUT, scalar) readonly buffer FlameLutBuffer
 {
     vec4 flameLutEntries[];
@@ -100,6 +101,7 @@ layout(set = SET_VIEW, binding = BINDING_BLOOM) uniform sampler2D bloomTexture;
 layout(set = SET_VIEW, binding = BINDING_ANALYSIS) uniform sampler2D analysisTexture;
 layout(set = SET_VIEW, binding = BINDING_SELECTION_MASK) uniform sampler2D selectionMask;
 
+// Per-view light lists: the volumetric beams (frame.beamCount, score order), then the lights of the indirect light.
 layout(set = SET_VIEW, binding = BINDING_RAYMARCH_LIST, scalar) readonly buffer RaymarchListBuffer
 {
     uint raymarchList[];

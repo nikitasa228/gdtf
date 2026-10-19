@@ -42,6 +42,14 @@ internal sealed class AtmosphereVolume
 /// blackbody luminance table of the flame emission and the noise source list. Uploads are recorded into the next
 /// frame through the staging ring. Main thread only.
 /// </summary>
+/// <remarks>
+/// <b>Flames.</b> Every flame grid (<see cref="AtmosphereState.FlameTemperature"/> and each of
+/// <see cref="AtmosphereState.FlameTemperatures"/>, at most <see cref="MaxFlameGrids"/>) keeps its own box and
+/// resolution: the grids are packed side by side into one R16F atlas (stacked along z in columns, a new column when
+/// the device's 3D image limit is reached), and a record per grid (box, atlas offset, size) follows the blackbody table
+/// in <see cref="FlameLut"/>. The shader samples every grid whose box contains the point (clamped to the grid's own
+/// texels, so neighbours never bleed in) and takes the hottest.
+/// </remarks>
 internal sealed unsafe class AtmosphereResources : IDisposable
 {
     /// <summary>First temperature of the blackbody table, K (below: no visible emission).</summary>
@@ -53,29 +61,48 @@ internal sealed unsafe class AtmosphereResources : IDisposable
     /// <summary>Entries of the blackbody table.</summary>
     public const int FlameLutEntries = 1024;
 
+    /// <summary>Most flame grids drawn at once (further grids are ignored with a warning).</summary>
+    public const int MaxFlameGrids = 64;
+
+    /// <summary>Vector4 entries of one flame grid record after the blackbody table: box min, box max, atlas offset, size.</summary>
+    public const int FlameRecordSize = 4;
+
+    /// <summary>Most texels of the flame atlas (all grids together, 2 bytes each): 64 M (128 MiB).</summary>
+    public const long MaxFlameAtlasTexels = 1L << 26;
+
     private static readonly Lazy<Vector4[]> _flameLut = new(BuildFlameLut, LazyThreadSafetyMode.ExecutionAndPublication);
     private readonly VulkanContext _context;
     private readonly HashSet<string> _warned = new(StringComparer.Ordinal);
+    private readonly List<VolumeGrid> _flameGrids = new();
+    private readonly Vector4[] _flameRecords = new Vector4[MaxFlameGrids * FlameRecordSize];
+    private readonly (int X, int Z)[] _flamePlacement = new (int X, int Z)[MaxFlameGrids];
     private bool _lutUploaded;
+    private bool _flamesPending;
 
     public AtmosphereResources(VulkanContext context)
     {
         _context = context;
-        FlameLut = GpuBuffer.Create(context, (ulong)(FlameLutEntries * sizeof(Vector4)), BufferUsageFlags.StorageBufferBit | BufferUsageFlags.TransferDstBit,
-            MemoryUsage.GpuOnly, "blackbody luminance table");
+        FlameLut = GpuBuffer.Create(context, (ulong)((FlameLutEntries + MaxFlameGrids * FlameRecordSize) * sizeof(Vector4)),
+            BufferUsageFlags.StorageBufferBit | BufferUsageFlags.TransferDstBit, MemoryUsage.GpuOnly, "blackbody luminance table");
         NoiseSources = new SceneBuffer<Vector4>(context, BufferUsageFlags.StorageBufferBit, "noise sources", 16);
     }
 
     /// <summary>Smoke density 0..1 (scattering = density × SmokeScatteringAtFullDensity).</summary>
     public AtmosphereVolume Smoke { get; } = new("smoke density", 0f, 65000f);
 
-    /// <summary>Flame temperature, K.</summary>
+    /// <summary>Flame temperature, K: the atlas of every flame grid (box = the union of their boxes).</summary>
     public AtmosphereVolume Flame { get; } = new("flame temperature", 0f, 65000f);
+
+    /// <summary>Flame grids in the atlas (records after the blackbody table).</summary>
+    public int FlameGridCount { get; private set; }
 
     /// <summary>Sound pressure level, dB.</summary>
     public AtmosphereVolume Noise { get; } = new("noise level", -65000f, 65000f);
 
-    /// <summary>Blackbody table: per entry Rec.2020 colour (luminance 1) and luminance (cd/m²).</summary>
+    /// <summary>
+    /// Blackbody table: per entry Rec.2020 colour (luminance 1) and luminance (cd/m²); followed by
+    /// <see cref="FlameRecordSize"/> entries per flame grid (box min, box max, atlas offset in texels, size in texels).
+    /// </summary>
     public GpuBuffer FlameLut { get; }
 
     /// <summary>Noise sources (xyz position, w level at 1 m in dB(A)).</summary>
@@ -95,7 +122,7 @@ internal sealed unsafe class AtmosphereResources : IDisposable
     {
         State = state;
         Stage(Smoke, state?.SmokeDensity);
-        Stage(Flame, state?.FlameTemperature);
+        StageFlames(state);
         Stage(Noise, state?.NoiseField);
     }
 
@@ -117,9 +144,9 @@ internal sealed unsafe class AtmosphereResources : IDisposable
     public bool PrepareUpload(BarrierBatch barriers)
     {
         bool noise = NoiseSources.PrepareUpload(barriers);
-        if (!_lutUploaded)
+        if (!_lutUploaded || _flamesPending)
             barriers.Use(FlameLut, BufferUse.TransferDestination);
-        return noise || !_lutUploaded;
+        return noise || !_lutUploaded || _flamesPending;
     }
 
     /// <summary>Records the uploads (after the barriers of <see cref="PrepareUpload"/> were flushed).</summary>
@@ -139,7 +166,7 @@ internal sealed unsafe class AtmosphereResources : IDisposable
         }
 
         RecordVolume(cmd, barriers, Smoke);
-        RecordVolume(cmd, barriers, Flame);
+        RecordFlames(cmd, barriers);
         RecordVolume(cmd, barriers, Noise);
     }
 
@@ -172,6 +199,158 @@ internal sealed unsafe class AtmosphereResources : IDisposable
         }
 
         volume.Pending = grid;
+    }
+
+    /// <summary>Collects the valid flame grids of <paramref name="state"/> for the next upload (warns once about the rest).</summary>
+    private void StageFlames(AtmosphereState? state)
+    {
+        _flameGrids.Clear();
+        _flamesPending = true;
+        if (state is null)
+            return;
+        AddFlame(state.FlameTemperature);
+        if (state.FlameTemperatures is { } grids)
+        {
+            for (int i = 0; i < grids.Count; i++)
+                AddFlame(grids[i]);
+        }
+    }
+
+    private void AddFlame(VolumeGrid? grid)
+    {
+        if (grid is null)
+            return;
+        string? problem = Validate(grid, _context.Capabilities.MaxImageDimension3D);
+        if (problem is null && _flameGrids.Count >= MaxFlameGrids)
+            problem = $"more than {MaxFlameGrids} flame grids";
+        if (problem is not null)
+        {
+            if (_warned.Add(Flame.Name + problem))
+                _context.Log(VulkanLogLevel.Warning, $"Atmosphere {Flame.Name} grid ignored: {problem}.");
+            return;
+        }
+
+        _flameGrids.Add(grid);
+    }
+
+    /// <summary>
+    /// Packs the staged flame grids into the atlas (columns of grids stacked along z), uploads them and their records,
+    /// and sets the union box of <see cref="Flame"/>. Grids that do not fit the device's 3D image limit are skipped.
+    /// </summary>
+    private void RecordFlames(CommandBuffer cmd, BarrierBatch barriers)
+    {
+        if (!_flamesPending)
+            return;
+        _flamesPending = false;
+        int limit = (int)Math.Min(_context.Capabilities.MaxImageDimension3D, 2048u);
+        int column = 0, columnWidth = 0, z = 0, width = 0, height = 0, depth = 0, count = 0;
+        var min = new Vector3(float.MaxValue);
+        var max = new Vector3(float.MinValue);
+        for (int i = 0; i < _flameGrids.Count; i++)
+        {
+            var g = _flameGrids[i];
+            if (z + g.SizeZ > limit)
+            {
+                column += columnWidth;
+                columnWidth = 0;
+                z = 0;
+            }
+
+            if (column + g.SizeX > limit)
+            {
+                if (_warned.Add(Flame.Name + "atlas"))
+                    _context.Log(VulkanLogLevel.Warning, "Flame grids beyond the device's 3D image limit are not drawn.");
+                break;
+            }
+
+            // The whole atlas stays within MaxFlameAtlasTexels (memory, and the upload's span length).
+            long atlasTexels = (long)Math.Max(width, column + Math.Max(columnWidth, g.SizeX)) * Math.Max(height, g.SizeY) * Math.Max(depth, z + g.SizeZ);
+            if (atlasTexels > MaxFlameAtlasTexels)
+            {
+                if (_warned.Add(Flame.Name + "texels"))
+                    _context.Log(VulkanLogLevel.Warning, $"Flame grids beyond {MaxFlameAtlasTexels} texels in all are not drawn.");
+                break;
+            }
+
+            _flamePlacement[count] = (column, z);
+            int r = count * FlameRecordSize;
+            _flameRecords[r] = new Vector4(g.Min, 0f);
+            _flameRecords[r + 1] = new Vector4(g.Max, 0f);
+            _flameRecords[r + 2] = new Vector4(column, 0f, z, 0f);
+            _flameRecords[r + 3] = new Vector4(g.SizeX, g.SizeY, g.SizeZ, 0f);
+            min = Vector3.Min(min, g.Min);
+            max = Vector3.Max(max, g.Max);
+            z += g.SizeZ;
+            columnWidth = Math.Max(columnWidth, g.SizeX);
+            width = Math.Max(width, column + columnWidth);
+            height = Math.Max(height, g.SizeY);
+            depth = Math.Max(depth, z);
+            count++;
+        }
+
+        FlameGridCount = count;
+        if (count > 0)
+        {
+            ulong recordBytes = (ulong)(count * FlameRecordSize * sizeof(Vector4));
+            var records = _context.Upload.Allocate(recordBytes, 16);
+            fixed (Vector4* src = _flameRecords)
+                System.Buffer.MemoryCopy(src, records.Pointer, (long)recordBytes, (long)recordBytes);
+            var copy = new BufferCopy(records.Offset, (ulong)(FlameLutEntries * sizeof(Vector4)), recordBytes);
+            _context.Vk.CmdCopyBuffer(cmd, records.Buffer, FlameLut.Handle, 1, &copy);
+        }
+
+        if (count == 0)
+        {
+            Flame.Present = false;
+            return;
+        }
+
+        uint w = (uint)width, h = (uint)height, d = (uint)depth;
+        if (Flame.Image is null || Flame.Image.Width != w || Flame.Image.Height != h || Flame.Image.Depth != d)
+        {
+            if (Flame.Image is not null)
+                _context.DeferDispose(Flame.Image);
+            Flame.Image = GpuImage.Create3D(_context, w, h, d, TargetFormats.Scalar, ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit,
+                Flame.Name);
+        }
+
+        long texels = (long)width * height * depth;
+        var region = _context.Upload.Allocate((ulong)texels * 2, 16);
+        var dst = new Span<Half>(region.Pointer, (int)texels);
+        dst.Clear();
+        for (int i = 0; i < count; i++)
+        {
+            var g = _flameGrids[i];
+            var (x0, z0) = _flamePlacement[i];
+            var src = g.Values.AsSpan(0, g.SizeX * g.SizeY * g.SizeZ);
+            for (int gz = 0; gz < g.SizeZ; gz++)
+            {
+                for (int gy = 0; gy < g.SizeY; gy++)
+                {
+                    var row = src.Slice((gz * g.SizeY + gy) * g.SizeX, g.SizeX);
+                    var target = dst.Slice(((z0 + gz) * height + gy) * width + x0, g.SizeX);
+                    for (int gx = 0; gx < row.Length; gx++)
+                    {
+                        float v = row[gx];
+                        target[gx] = float.IsNaN(v) ? Half.Zero : (Half)Math.Clamp(v, Flame.MinValue, Flame.MaxValue);
+                    }
+                }
+            }
+        }
+
+        barriers.Use(Flame.Image, ImageUse.TransferDestination, discard: true);
+        barriers.Flush();
+        var imageCopy = new BufferImageCopy
+        {
+            BufferOffset = region.Offset,
+            ImageSubresource = new ImageSubresourceLayers(ImageAspectFlags.ColorBit, 0, 0, 1),
+            ImageExtent = new Extent3D(w, h, d),
+        };
+        _context.Vk.CmdCopyBufferToImage(cmd, region.Buffer, Flame.Image.Handle, ImageLayout.TransferDstOptimal, 1, &imageCopy);
+        Flame.Image.NeedsInitialization = false;
+        Flame.BoxMin = min;
+        Flame.BoxMax = max;
+        Flame.Present = true;
     }
 
     private static string? Validate(VolumeGrid grid, uint maxDimension)

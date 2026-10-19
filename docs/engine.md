@@ -159,7 +159,7 @@ update).
 
 | Content | How it is drawn |
 |---|---|
-| Fixtures | The models of each fixture type + mode are loaded once (`FixtureGeometryBuilder` + `GdtfModelLoader`, textures through `gdtf:` keys) — on a background task by default (`LoadFixtureModelsInBackground`; `CompletePendingLoads` waits) — and uploaded once; every fixture gets one instance per model part of every geometry part, whose world matrix follows the part's pose. |
+| Fixtures | The models of each fixture type + mode are loaded once (`FixtureGeometryBuilder` + `GdtfModelLoader`, textures through `gdtf:` keys) — on a background task by default (`LoadFixtureModelsInBackground`; `CompletePendingLoads` waits) — and uploaded once; every fixture gets one instance per model part of every geometry part, whose world matrix follows the part's pose. **Lens glow**: the instances of a beam's geometry part emit peak candela / lens area (π·r², r = the beam's `BeamRadius`, 5 cm when unset; summed over the beams of the part, at most 10⁹ cd/m²) in the beam's colour through `IRenderWorld.SetInstanceEmission(instance, luminance, axis, halfAngle)`, seen along the part's −Z axis and falling off like the beam (half at half the widest beam angle), so a lens glares only for eyes in its beam; the renderer's bloom adds the glare. Computed per fixture in one pass over its beams (a reused per-part buffer, linear in parts + beams + instances also for pixel bars with hundreds of beams) and sent only when it changes. |
 | Lights | `SetLights` every frame; gobo textures are created once per wheel slot from the GDTF media (alpha = transmission = linear luminance × alpha of the picture, RGB = tint of coloured glass). |
 | Walls, floors, ceilings | `WallMesh` + the built-in material (`MaterialLibrary`) with its UV scale. |
 | Images | `ImagePlaneMesh` + `ImagePlaneMesh.CreateMaterial`; reference drawings unlit (`InstanceFlags.Reference`), posters lit. |
@@ -167,7 +167,7 @@ update).
 | Trusses | Their model, or `TrussMesh` in aluminium. |
 | Cables | Tube meshes (`CableTubeMesh`, catenary sag from the slack factor, dark rubber tinted by the type) plus coloured lines (`SetLines`, the cable type's colour) for the cable overlay; rebuilt when an anchor entity moves. |
 | Consoles, power sources, rigging points | Simple primitives (desk, distro box, hoist). |
-| Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, the smoke density grid when the smoke simulation stepped, the flames' temperature grids composited into one grid; noise sources every frame. |
+| Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, the smoke density grid when the smoke simulation stepped, one temperature grid per flame (its own box and resolution: the first as `FlameTemperature`, the others as `FlameTemperatures`; the grid objects are reused between steps); noise sources every frame. |
 
 **Flags.** `Selected` (selection), `Hidden` (entity or an ancestor hidden, or its layer hidden; a hidden fixture still
 emits its light — hiding the rig to look at the stage keeps the stage lit; its dimmer switches it off), `CableHighlight`
@@ -259,7 +259,10 @@ the picture. `--out` must name a file (a folder is a usage error). `--overlay lu
 (a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
 the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
 temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure defaults to an
-incident-light reading of the lit floor (`--ev auto`); `--ev` sets EV100, `--auto-exposure` lets the renderer adapt.
+incident-light reading of the lit floor (`--ev auto`); `--ev` sets EV100, `--auto-exposure` lets the renderer adapt
+with its default **stage metering** (`ExposureMetering.Stage`: the lit part of the image — the 85th to 99th percentile
+of the luminance — placed 1.5 stops below middle grey, so light pools stay below white, beams in haze stay visible
+and the dark venue stays dark; see docs/rendering.md, auto exposure).
 `render stages/Фокина.mvr --out f.png --width 480 --height 270` takes about 6 s on lavapipe.
 
 **artnet-test** sends `ArtNetTestPattern` (pan/tilt sweep, colour chase, dimmer wave, zoom) with ArtSync and
@@ -347,6 +350,10 @@ a device):
   dimmer: the pixel beams take their dimmer from per-pixel virtual dimmers that are relation masters (a Candela.Dmx
   behaviour, reported for that module); the real MagicBlade R GDTF is not in the library anyway.
 * The light meter ignores gobos, blades, iris, prisms and shadows (the GPU lux overlay applies them).
-* Fixture lens glow (emissive lenses following the intensity) is not drawn; beams light the scene and the haze.
+* Lens glow is camera-only (the renderer's indirect light does not see it; the beam's light is the spot light).
+* `Фокина.mvr` at open white: its 32 `Zonda` pixel beams have GDTF beam type Glow and each receives an eighth of the
+  fixture's 465 000 cd (Candela.Dmx), so each is a Lambertian emitter of about 183 klm; in haze they light the air
+  evenly and mask the beams of the other fixtures (docs/rendering.md shows the stage with and without them).
 * The DMX recorder samples the input once per engine frame (not every received packet).
-* Flames from several devices are composited into one temperature grid of at most 96³ cells.
+* The renderer keeps at most 64 flame grids and 64 M texels in all (the hottest wins where they overlap; grids beyond
+  the budget are skipped with a warning).

@@ -89,7 +89,7 @@ vec3 shadeHit(uint instance, uint geometry, uint primitive, vec2 bary, vec3 rayD
     vec3 E = vec3(0.0);
     for (uint j = 0u; j < giLights; ++j)
     {
-        uint index = raymarchList[frame.raymarchCount + j];
+        uint index = raymarchList[frame.beamCount + j];
         Light light = lights[index];
         vec3 L;
         float d2;
@@ -100,6 +100,8 @@ vec3 shadeHit(uint instance, uint geometry, uint primitive, vec2 bary, vec3 rayD
         E += I * (cosI * shadowHard(lightViews[index].shadowSlot, P, N) / d2);
     }
 
+    // The instance emission (lens glow) is not added: it is what the camera sees of a light the spot light already
+    // emits.
     return albedo * INV_PI * E + m.emissive;
 }
 

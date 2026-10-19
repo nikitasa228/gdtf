@@ -1,7 +1,7 @@
 #version 460
 #extension GL_GOOGLE_include_directive : require
 // Reflective shadow maps, step 1: virtual point lights. One work group per light with a reflective shadow map in this
-// view (raymarchList[raymarchCount + group]). The light's shadow tile is divided into 16 x 16 cells; each thread
+// view (raymarchList[beamCount + group]). The light's shadow tile is divided into 16 x 16 cells; each thread
 // estimates the flux its cell reflects from 4 x 4 stratified texels,
 //   flux(texel) = I(omega) x cookie x T_haze x albedo x Omega_texel,   Omega_texel = (2 tan(a) / res)^2 x cos^3(theta)
 // (I = the light's current intensity, so the cached tile stays valid when dimmer, colour or cookie change). A prefix
@@ -53,7 +53,7 @@ vec3 texelFlux(Light light, ShadowSlot s, ivec2 tc, out vec3 P, out vec3 N)
 void main()
 {
     uint tid = gl_LocalInvocationIndex;
-    uint lightIndex = raymarchList[frame.raymarchCount + gl_WorkGroupID.x];
+    uint lightIndex = raymarchList[frame.beamCount + gl_WorkGroupID.x];
     LightView view = lightViews[lightIndex];
     Light light = lights[lightIndex];
     ShadowSlot s = shadowSlots[view.shadowSlot];

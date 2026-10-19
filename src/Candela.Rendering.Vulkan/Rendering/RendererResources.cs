@@ -89,8 +89,43 @@ internal sealed unsafe class RendererResources : IDisposable
     /// <summary>A zeroed storage buffer.</summary>
     public GpuBuffer DummyBuffer { get; } = null!;
 
+    /// <summary>
+    /// The beam scattering table (<see cref="BeamScatteringTable"/>, RG16F 3D texture), or null until the first view
+    /// with volumetric beams (<see cref="EnsureBeamTable"/>).
+    /// </summary>
+    public GpuImage? BeamTable { get; private set; }
+
+    /// <summary>
+    /// Creates the beam scattering table on first use and records its upload into the command buffer of
+    /// <paramref name="barriers"/> (through the staging ring; no wait).
+    /// </summary>
+    public void EnsureBeamTable(BarrierBatch barriers)
+    {
+        if (BeamTable is not null)
+            return;
+        var texels = BeamScatteringTable.Texels;
+        var image = GpuImage.Create3D(_context, BeamScatteringTable.YSteps, BeamScatteringTable.VSteps, BeamScatteringTable.Layers,
+            Format.R16G16Sfloat, ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit, "beam scattering table");
+        ulong bytes = (ulong)texels.Length * 2;
+        var region = _context.Upload.Allocate(bytes, 16);
+        fixed (Half* source = texels)
+            System.Buffer.MemoryCopy(source, region.Pointer, (long)bytes, (long)bytes);
+        barriers.Use(image, ImageUse.TransferDestination, discard: true);
+        barriers.Flush();
+        var copy = new BufferImageCopy
+        {
+            BufferOffset = region.Offset,
+            ImageSubresource = new ImageSubresourceLayers(ImageAspectFlags.ColorBit, 0, 0, 1),
+            ImageExtent = new Extent3D(BeamScatteringTable.YSteps, BeamScatteringTable.VSteps, BeamScatteringTable.Layers),
+        };
+        _context.Vk.CmdCopyBufferToImage(barriers.CommandBuffer, region.Buffer, image.Handle, ImageLayout.TransferDstOptimal, 1, &copy);
+        image.NeedsInitialization = false;
+        BeamTable = image;
+    }
+
     public void Dispose()
     {
+        BeamTable?.Dispose();
         Dummy2D?.Dispose();
         Dummy3D?.Dispose();
         DummyDepth?.Dispose();
@@ -167,6 +202,22 @@ internal struct ViewRequirements
 
     /// <summary>Luminance histogram and exposure read-back buffers.</summary>
     public bool AutoExposure;
+
+    /// <summary>Volumetric beam images (half the internal resolution; 0 = no beams).</summary>
+    public int BeamWidth;
+
+    public int BeamHeight;
+
+    /// <summary>Beam culling tiles along x and y.</summary>
+    public int BeamTilesX;
+
+    public int BeamTilesY;
+
+    /// <summary>Mask words per beam tile (one bit per beam).</summary>
+    public int BeamWords;
+
+    /// <summary>History images of the beam modulation (temporal accumulation).</summary>
+    public bool BeamHistory;
 }
 
 /// <summary>Small numeric helpers of the stage-2 renderer.</summary>

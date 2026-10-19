@@ -25,10 +25,17 @@ public sealed class VulkanRendererOptions
 /// <param name="Lights">Spot lights in the world.</param>
 /// <param name="ShadowedLights">Lights with a shadow-atlas tile in this view.</param>
 /// <param name="ShadowTilesRendered">Shadow tiles (re-)rendered for this view (0 when every tile was cached).</param>
-/// <param name="RaymarchedBeams">Narrow beams ray marched at full resolution.</param>
+/// <param name="RaymarchedBeams">Volumetric beams: spot lights whose single scattering is integrated per pixel.</param>
 /// <param name="VirtualPointLights">Virtual point lights of the reflective shadow maps.</param>
+/// <param name="FroxelLights">Lights in view whose volumetric light comes from the froxel volume (not beams).</param>
+/// <param name="BeamCoverage">Estimated beam crossings per pixel (sum of the beams' shares of the screen, facets counted).</param>
+/// <param name="BeamQuality">Quality factor of the beam integration (1 = full; lower when the load exceeds the budget).</param>
+/// <param name="BeamTiles">Culling tiles of the beam integration.</param>
+/// <param name="BeamTilePairs">Tile-beam pairs after GPU culling (read back from an earlier frame of this target; 0 until available).</param>
+/// <param name="BeamMaxPerTile">Most beams in one tile after GPU culling (earlier frame).</param>
 public readonly record struct RenderStatistics(double CpuMilliseconds, int VisibleInstances, int CulledInstances, int Draws, int Lights,
-    int ShadowedLights = 0, int ShadowTilesRendered = 0, int RaymarchedBeams = 0, int VirtualPointLights = 0);
+    int ShadowedLights = 0, int ShadowTilesRendered = 0, int RaymarchedBeams = 0, int VirtualPointLights = 0, int FroxelLights = 0,
+    float BeamCoverage = 0f, float BeamQuality = 1f, int BeamTiles = 0, int BeamTilePairs = 0, int BeamMaxPerTile = 0);
 
 /// <summary>Linear HDR read-back of a target (test/diagnostic hook): luminance units, i.e. HDR value / exposure.</summary>
 /// <param name="Width">Width, pixels.</param>
@@ -76,8 +83,22 @@ public sealed unsafe class VulkanRenderer : IRenderer
     /// <summary>Weight of the reprojected ray-traced GI history.</summary>
     public const float IndirectHistoryWeight = 0.9f;
 
+    /// <summary>
+    /// Weight of the accumulated modulation ratio of the volumetric beams (gobos, shadows, smoke in the air). Until it
+    /// is reached the history is a plain average of the frames since it was reset (n / (n + 1) after n frames), so a
+    /// few frames of a still view already converge.
+    /// </summary>
+    public const float BeamHistoryWeight = 0.9f;
+
     /// <summary>Speed of the auto-exposure adaptation (1/s; 1 − e^(−speed·dt) of the remaining difference per frame).</summary>
     public const float ExposureAdaptationSpeed = 1.5f;
+
+    /// <summary>
+    /// Stops below middle grey at which <see cref="ExposureMetering.Stage"/> places the metered lit part of the image
+    /// (the 85th to 99th percentile of the luminance, exposure.comp): the EV100 is this much higher than the reading of
+    /// that part, so light pools stay well below white and beams in haze stay visible.
+    /// </summary>
+    public const float StageMeteringStops = 1.5f;
 
     /// <summary>Absorption coefficient of luminous flames (soot), 1/m.</summary>
     public const float FlameAbsorption = 2f;
@@ -147,6 +168,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _passes.Add(new AnalysisPass());
             _passes.Add(new FroxelInjectPass());
             _passes.Add(new FroxelIntegratePass());
+            _passes.Add(new BeamCullPass());
+            _passes.Add(new BeamScatterPass());
+            _passes.Add(new BeamTemporalPass());
             _passes.Add(new VolumeCompositePass());
             _passes.Add(new ForwardTransparentPass());
             _passes.Add(new BloomPass());
@@ -311,6 +335,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 CameraPosition = eye,
                 Orthographic = (p.Data.Flags & ShaderConstants.FrameOrthographic) != 0,
                 TanHalfFovY = MathF.Abs(p.Data.Projection.M22) > 1e-6f ? 1f / MathF.Abs(p.Data.Projection.M22) : 1f,
+                Aspect = t.Width / (float)t.Height,
                 OrthoHeight = float.IsFinite(camera.OrthoHeight) && camera.OrthoHeight > 0f ? camera.OrthoHeight : 10f,
                 LightRangeScale = p.Data.LightRangeScale,
                 Shadows = decisions.Shadows,
@@ -319,7 +344,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 Rsm = decisions.Indirect == IndirectLighting.ReflectiveShadowMaps,
                 RayTracedGi = decisions.Indirect == IndirectLighting.RayTraced,
                 VplCapacity = decisions.VplCapacity,
-                MaxRaymarchedBeams = decisions.VolumeLights ? Math.Clamp(settings.MaxRaymarchedBeams, 0, 256) : 0,
+                VolumeLights = decisions.VolumeLights,
+                MaxRaymarchedBeams = decisions.VolumeLights ? Math.Clamp(settings.MaxRaymarchedBeams, 0, ShaderConstants.MaxBeams) : 0,
                 BeamOutlines = view.ShowBeamOutlines && _world.LightCount > 0,
                 FrameNumber = frame.Number,
             };
@@ -334,19 +360,38 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 p.RayTracing = _rayTracing;
             }
 
+            // Volumetric beams: half-resolution images, culling tiles, the scattering table (created on first use).
+            bool beams = decisions.Volumetrics && decisions.VolumeLights && _planner.BeamCount > 0;
+            if (beams)
+            {
+                ref var r = ref decisions.Requirements;
+                r.BeamWidth = Math.Max((r.RenderWidth + 1) / 2, 1);
+                r.BeamHeight = Math.Max((r.RenderHeight + 1) / 2, 1);
+                r.BeamTilesX = (r.BeamWidth + ShaderConstants.BeamTileSize - 1) / ShaderConstants.BeamTileSize;
+                r.BeamTilesY = (r.BeamHeight + ShaderConstants.BeamTileSize - 1) / ShaderConstants.BeamTileSize;
+                r.BeamWords = (_planner.BeamCount + 31) / 32;
+                r.BeamHistory = settings.TemporalAccumulation;
+                _shared.EnsureBeamTable(barriers);
+            }
+
+            p.BeamsActive = beams;
+            ReadBeamStatistics(t, frame);
+            if (beams && t.LastBeamGpuStats.TotalTiles > 0)
+                _planner.UseMeasuredBeamLoad(t.LastBeamGpuStats.Pairs / (float)t.LastBeamGpuStats.TotalTiles);
+
             // Per-view resources and descriptors.
             t.Prepare(decisions.Requirements);
             UpdateGradient(t, decisions, barriers);
             bool lightViews = t.LightViews.PrepareUpload(barriers);
             bool lists = t.Lists.PrepareUpload(barriers);
-            bool beams = t.BeamLines.PrepareUpload(barriers);
+            bool beamLines = t.BeamLines.PrepareUpload(barriers);
             bool slots = _atlas is not null && _atlas.Slots.PrepareUpload(barriers);
             barriers.Flush();
             if (lightViews)
                 t.LightViews.RecordUpload(cmd);
             if (lists)
                 t.Lists.RecordUpload(cmd);
-            if (beams)
+            if (beamLines)
                 t.BeamLines.RecordUpload(cmd);
             if (slots)
                 _atlas!.Slots.RecordUpload(cmd);
@@ -374,6 +419,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
             barriers.Flush();
 
             t.IndirectHistoryValid = decisions.Indirect == IndirectLighting.RayTraced && p.RayTracing is { HasTlas: true };
+            if (!beams || !settings.TemporalAccumulation)
+                t.BeamHistoryValid = false;
             t.IndirectHistoryMode = decisions.Indirect;
             if (!decisions.Volumetrics || !settings.TemporalAccumulation)
                 t.VolumeHistoryValid = false;
@@ -403,8 +450,13 @@ public sealed unsafe class VulkanRenderer : IRenderer
         }
 
         int draws = _pass.Draws.Opaque.Length + _pass.Draws.Masked.Length + _pass.Draws.Blended.Length;
+        bool beamsDrawn = _pass.BeamsActive;
+        var beamGpu = t.LastBeamGpuStats;
         LastStatistics = new RenderStatistics(Stopwatch.GetElapsedTime(start).TotalMilliseconds, _pass.Draws.VisibleInstances,
-            _pass.Draws.CulledInstances, draws, _world.LightCount, _planner.ShadowedLights, tilesRendered, _planner.RaymarchCount, _planner.VplCount);
+            _pass.Draws.CulledInstances, draws, _world.LightCount, _planner.ShadowedLights, tilesRendered, beamsDrawn ? _planner.BeamCount : 0,
+            _planner.VplCount, _planner.FroxelLights, beamsDrawn ? _planner.BeamCoverage : 0f, beamsDrawn ? _planner.BeamQuality : 1f,
+            beamsDrawn ? (int)(_pass.Data.BeamTilesX * _pass.Data.BeamTilesY) : 0, beamsDrawn ? (int)beamGpu.Pairs : 0,
+            beamsDrawn ? (int)beamGpu.MaxPerTile : 0);
     }
 
     /// <summary>
@@ -603,6 +655,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
         _barriers.Use(readback, BufferUse.TransferDestination);
         _barriers.Flush();
         CopyToBuffer(cmd, image, ImageAspectFlags.ColorBit, 0, 0, (uint)w, (uint)h, readback, 0);
+        // Back to a sampled layout: view descriptor sets keep referencing images (bloom) that a later frame with the
+        // feature off never transitions.
+        _barriers.Use(image, ImageUse.SampledAnyShader);
         _barriers.Use(readback, BufferUse.HostRead);
         _barriers.Flush();
         Context.Immediate.SubmitAndWait();
@@ -795,7 +850,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
         if (float.IsNaN(t.AdaptedLog2Luminance))
             return Units.ExposureFromEv100(cameraEv);
-        float ev = Units.Ev100FromLuminance(MathF.Pow(2f, t.AdaptedLog2Luminance)) - compensation;
+        float metering = settings.Metering == ExposureMetering.Stage ? StageMeteringStops : 0f;
+        float ev = Units.Ev100FromLuminance(MathF.Pow(2f, t.AdaptedLog2Luminance)) + metering - compensation;
         return Units.ExposureFromEv100(ev);
     }
 
@@ -952,19 +1008,35 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.SmokeMin = new Vector4(gpu.Smoke.BoxMin, gpu.Smoke.Present ? 1f : 0f);
         d.SmokeMax = new Vector4(gpu.Smoke.BoxMax, 0f);
         d.FlameMin = new Vector4(gpu.Flame.BoxMin, gpu.Flame.Present ? 1f : 0f);
-        d.FlameMax = new Vector4(gpu.Flame.BoxMax, 0f);
+        d.FlameMax = new Vector4(gpu.Flame.BoxMax, gpu.Flame.Present ? gpu.FlameGridCount : 0f);
         d.NoiseMin = new Vector4(gpu.Noise.BoxMin, gpu.Noise.Present ? 1f : 0f);
         d.NoiseMax = new Vector4(gpu.Noise.BoxMax, 0f);
         d.FlameLut = new Vector4(AtmosphereResources.FlameLutMinKelvin, 1f / AtmosphereResources.FlameLutStep, AtmosphereResources.FlameLutEntries,
             AtmosphereResources.FlameLutMaxKelvin);
         d.NoiseSourceCount = (uint)gpu.NoiseSources.Count;
-        d.RaymarchCount = (uint)_planner.RaymarchCount;
+        d.BeamCount = _pass.BeamsActive ? (uint)_planner.BeamCount : 0u;
         d.VplCount = (uint)_planner.VplCount;
         d.ShadowTileCount = (uint)(_atlas?.TileCount ?? 0);
         d.FrameIndex = t.FrameIndex;
         d.BloomIntensity = dec.Bloom ? Math.Clamp(settings.BloomIntensity, 0f, 1f) : 0f;
         d.IndirectIntensity = 1f;
         d.PreviousViewProjection = t.HasPreviousFrame ? t.PreviousViewProjection : d.ViewProjection;
+
+        if (_pass.BeamsActive)
+        {
+            var r = dec.Requirements;
+            d.BeamTilesX = (uint)r.BeamTilesX;
+            d.BeamTilesY = (uint)r.BeamTilesY;
+            d.BeamWordsPerTile = (uint)r.BeamWords;
+            bool history = settings.TemporalAccumulation && t.BeamHistoryValid && t.HasPreviousFrame;
+            if (!history)
+                t.BeamHistoryFrames = 0;
+            d.BeamHistoryWeight = history ? MathF.Min(BeamHistoryWeight, t.BeamHistoryFrames / (t.BeamHistoryFrames + 1f)) : 0f;
+            d.BeamFlags = history ? ShaderConstants.BeamFlagHistory : 0u;
+            d.BeamQuality = _planner.BeamQuality;
+            float smokeReference = dec.Smoke ? 0.1f * atmosphere!.SmokeScatteringAtFullDensity : 0f;
+            d.BeamSigmaRef = MathF.Max(dec.Haze ? atmosphere!.BaseScattering : smokeReference, 1e-3f);
+        }
 
         if (dec.Volumetrics)
         {
@@ -1023,6 +1095,21 @@ public sealed unsafe class VulkanRenderer : IRenderer
     }
 
     private static float Finite(float value, float fallback) => float.IsFinite(value) ? value : fallback;
+
+    /// <summary>
+    /// Picks up the beam statistics the GPU copied into this frame slot's read-back buffer the last time the slot was
+    /// used (no wait: the slot's fence has been waited for by <see cref="VulkanContext.BeginFrame"/>).
+    /// </summary>
+    private void ReadBeamStatistics(VulkanRenderTarget t, VulkanFrame frame)
+    {
+        int slot = frame.SlotIndex;
+        if (t.BeamStatsReadback[slot] is not { } readback || t.BeamStatsFrame[slot] == 0 || t.BeamStatsFrame[slot] >= frame.Number)
+            return;
+        Context.Allocator.Invalidate(readback.Allocation, 0, 16);
+        var words = new ReadOnlySpan<uint>(readback.MappedPointer, 4);
+        t.LastBeamGpuStats = (words[0], words[1], words[2], t.BeamStatsTiles[slot]);
+        t.BeamStatsFrame[slot] = 0;
+    }
 
     /// <summary>Re-bakes the overlay gradient table of the target when the gradient changed (allocation only then).</summary>
     private void UpdateGradient(VulkanRenderTarget t, in Decisions d, BarrierBatch barriers)
