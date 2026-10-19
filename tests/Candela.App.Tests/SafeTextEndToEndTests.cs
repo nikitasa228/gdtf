@@ -59,22 +59,22 @@ public sealed class SafeTextEndToEndTests : IDisposable
         string Text(string name) => _dir.File(name + ".txt");
         string script = _dir.Write("nasty.json", $$"""
             { "actions": [
-                { "type": "wait", "frames": 6 },
+                { "type": "viewport", "viewport": "Viewport1", "shading": "Colorless" },
                 { "type": "select", "names": [ "{{Json("Spot " + Nasty)}}" ] },
-                { "type": "wait", "frames": 4 },
+                { "type": "wait", "frames": 3 },
                 { "type": "screenshot", "path": "{{Json(Shot("selected"))}}" },
                 { "type": "uiText", "path": "{{Json(Text("selected"))}}" },
                 { "type": "drop", "path": "{{Json(gdtf)}}", "x": 700, "y": 420 },
-                { "type": "wait", "frames": 10 },
+                { "type": "wait", "frames": 6 },
                 { "type": "screenshot", "path": "{{Json(Shot("library"))}}" },
                 { "type": "action", "id": "file.open" },
-                { "type": "wait", "frames": 4 },
+                { "type": "wait", "frames": 3 },
                 { "type": "screenshot", "path": "{{Json(Shot("browser"))}}" },
                 { "type": "uiText", "path": "{{Json(Text("browser"))}}" },
                 { "type": "key", "chord": "Escape" },
                 { "type": "wait", "frames": 2 },
                 { "type": "setting", "name": "language", "value": "ru" },
-                { "type": "wait", "frames": 4 },
+                { "type": "wait", "frames": 3 },
                 { "type": "screenshot", "path": "{{Json(Shot("russian"))}}" },
                 { "type": "uiText", "path": "{{Json(Text("russian"))}}" }
             ] }
