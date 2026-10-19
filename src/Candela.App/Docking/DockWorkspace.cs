@@ -152,10 +152,14 @@ internal sealed unsafe class DockWorkspace
         ImGui.PopStyleVar();
         var window = ImGuiP.GetCurrentWindow();
         if (!window.IsNull)
+        {
             Register(panel, window.ID);
+            panel.DockNodeId = window.DockId;
+        }
 
         if (visible)
         {
+            panel.LastShownFrame = ImGui.GetFrameCount();
             var node = ImGuiP.GetWindowDockNode();
             var style = TabStyle.TopTabs;
             if (!node.IsNull && window.DockIsActive)

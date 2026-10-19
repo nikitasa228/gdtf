@@ -53,6 +53,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private readonly RenderPanel _render;
     private readonly PreviewPanel _preview;
     private readonly ExternalControlPanel _external;
+    private readonly CableLinksPanel _cableLinks;
     private ViewportPanel? _activeViewport;
     private readonly FittedText _statusFit = new();
     private IReadOnlyList<string>? _savedLayouts;
@@ -122,10 +123,12 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _render = Add(new RenderPanel(_ctx, Report));
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
+        _cableLinks = Add(new CableLinksPanel(StagePanelContext.From(_ctx), ShowCableOverlay, ShowPropertiesOfSelection));
         _external = Add(new ExternalControlPanel(_ctx));
         _ctx.Tools.Stage.Browser = _browser;
         RegisterCommands();
         InitializeSession();
+        InitializeCabling();
         RestoreStartupLayout();
         _activeViewport = _viewports[0];
         _onLanguageChanged = () => _title = "";
@@ -216,6 +219,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             UiGuard.CloseAllPopups();
         }
 
+        _guard.Run("editing keys", _handleEditingKeys);
         _guard.Run("shortcuts", _dispatch);
         UpdateTitle();
     }
@@ -272,6 +276,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void Dispose()
     {
         Loc.LanguageChanged -= _onLanguageChanged;
+        DisposeCabling();
         DisposeSession();
         _library.Dispose();
         foreach (var viewport in _viewports)
@@ -517,6 +522,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         plan.Right.Add(_render.DockName);
         plan.Bottom.Add(_issues.DockName);
         plan.Bottom.Add(_console.DockName);
+        plan.Bottom.Add(_cableLinks.DockName);
         plan.Bottom.Add(_external.DockName);
         int count = fourViewports ? 4 : 1;
         for (int i = 0; i < count; i++)
@@ -759,6 +765,25 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         if (ids.Count == 0)
             throw new KeyNotFoundException($"no entity named {string.Join(", ", names)}");
         _ctx.Session.Selection.Set(ids);
+    }
+
+    /// <inheritdoc/>
+    public Vector2? ScreenPointOf(Vector3? world, string entityName)
+    {
+        var viewport = ActiveViewport;
+        Vector3 point;
+        if (world is { } w)
+        {
+            point = w;
+        }
+        else
+        {
+            var entity = _ctx.Session.Scene.All().FirstOrDefault(e => string.Equals(e.Name, entityName, StringComparison.OrdinalIgnoreCase))
+                         ?? throw new KeyNotFoundException($"no entity named {entityName}");
+            point = _ctx.Session.Content is { } content && content.TryGetBounds(entity.Id, out var bounds) && !bounds.IsEmpty ? bounds.Center : entity.WorldPosition;
+        }
+
+        return viewport.ScreenOf(point);
     }
 
     /// <inheritdoc/>

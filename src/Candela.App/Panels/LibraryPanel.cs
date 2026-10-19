@@ -15,10 +15,11 @@ namespace Candela.App.Panels;
 /// <summary>Something that can be dragged from the library into a viewport: a fixture type or a model-library file.</summary>
 /// <param name="Fixture">The fixture type (GDTF), or null.</param>
 /// <param name="Model">The model or image file, or null.</param>
-internal sealed record LibraryItem(FixtureLibraryEntry? Fixture, ModelLibraryItem? Model)
+/// <param name="Device">A cabling device of the Devices section (console, node, splitter, mains, distro, dimmer), or null.</param>
+internal sealed record LibraryItem(FixtureLibraryEntry? Fixture, ModelLibraryItem? Model, Electrical.DevicePreset? Device = null)
 {
     /// <summary>Name shown while dragging.</summary>
-    public string Name => Fixture?.ModelName ?? Model?.Name ?? "";
+    public string Name => Device is { } device ? CableLoc.DeviceName(device) : Fixture?.ModelName ?? Model?.Name ?? "";
 }
 
 /// <summary>What the library panel needs from the workspace.</summary>
@@ -40,7 +41,7 @@ internal interface ILibraryHost
 /// surface under the cursor). Pictures are made by the <see cref="ThumbnailWorker"/> in the background and shown as
 /// they arrive; only visible tiles ask for them, and at most <see cref="MaxTextures"/> stay in memory.
 /// </summary>
-internal sealed unsafe class LibraryPanel : Panel, IDisposable
+internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
 {
     /// <summary>Drag-and-drop payload type of library items.</summary>
     public const string PayloadType = "CANDELA_LIBRARY_ITEM";
@@ -203,6 +204,12 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
             ImGui.EndTabItem();
         }
 
+        if (ImGui.BeginTabItem(CableLoc.With(Icons.Cable, CableStr.LibDevices)))
+        {
+            DrawDevices();
+            ImGui.EndTabItem();
+        }
+
         if (ImGui.BeginTabItem(Labels.With(Icons.Box, Str.LibModels)))
         {
             DrawModels();
@@ -300,7 +307,8 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
             Array.Clear(_categoryCounts);
         foreach (var e in entries)
         {
-            if (!library.IsLatestRevision(e))
+            // The cable tool's generic devices are in the Devices section.
+            if (!library.IsLatestRevision(e) || Electrical.GenericDevices.IsGeneric(e.FileName))
                 continue;
             int categoryIndex = CategoryIndex(e.Category);
             if (libraryChanged && categoryIndex >= 0)
@@ -737,12 +745,12 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
         drawList.AddText(font, size, (min + max - textSize) * 0.5f, Theme.U32(Theme.WithAlpha(Theme.TextMuted, 0.7f)), icon);
     }
 
-    private void DragSource(FixtureLibraryEntry? entry, ModelLibraryItem? model, int size)
+    private void DragSource(FixtureLibraryEntry? entry, ModelLibraryItem? model, int size, Electrical.DevicePreset? device = null)
     {
         if (!ImGui.BeginDragDropSource(ImGuiDragDropFlags.None))
             return;
-        if (_dragged is null || !ReferenceEquals(_dragged.Fixture, entry) || !ReferenceEquals(_dragged.Model, model))
-            _dragged = new LibraryItem(entry, model);
+        if (_dragged is null || !ReferenceEquals(_dragged.Fixture, entry) || !ReferenceEquals(_dragged.Model, model) || !ReferenceEquals(_dragged.Device, device))
+            _dragged = new LibraryItem(entry, model, device);
         var item = _dragged;
         unsafe
         {
@@ -751,7 +759,8 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
         }
 
         // The drag tooltip: picture, name and how to place it.
-        string stillKey = item.Fixture is { } f ? KeysOf(f, size).Still : item.Model is { Kind: ModelItemKind.Image } m ? DetailsOf(m, size).ImageKey : "";
+        string stillKey = item.Fixture is { } f ? KeysOf(f, size).Still : item.Model is { Kind: ModelItemKind.Image } m ? DetailsOf(m, size).ImageKey
+            : item.Device is { } d && DeviceEntry(d) is { } de ? KeysOf(de, size).Still : "";
         if (TextureOf(stillKey) is { } texture)
         {
             float side = 72f * ImGui.GetStyle().FontScaleDpi * ImGui.GetStyle().FontScaleMain;
@@ -761,7 +770,7 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
 
         ImGui.BeginGroup();
         ImGui.TextUnformatted(item.Name);
-        ImGui.TextDisabled(Loc.Get(Str.LibDragHint));
+        ImGui.TextDisabled(item.Device is null ? Loc.Get(Str.LibDragHint) : CableLoc.Get(CableStr.DevicesDragHint));
         ImGui.EndGroup();
         ImGui.EndDragDropSource();
     }

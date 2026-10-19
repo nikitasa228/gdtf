@@ -5,27 +5,39 @@ namespace Candela.Core.Math;
 /// <summary>Axis-aligned bounding box in metres. An empty box has Min &gt; Max.</summary>
 public struct Aabb
 {
+    /// <summary>Lower corner, metres.</summary>
     public Vector3 Min;
+
+    /// <summary>Upper corner, metres.</summary>
     public Vector3 Max;
 
+    /// <summary>Creates a box from its corners.</summary>
     public Aabb(Vector3 min, Vector3 max)
     {
         Min = min;
         Max = max;
     }
 
+    /// <summary>The empty box (Min = +∞, Max = −∞); including a point makes it that point.</summary>
     public static Aabb Empty => new(new Vector3(float.PositiveInfinity), new Vector3(float.NegativeInfinity));
 
+    /// <summary>True when the box contains no point.</summary>
     public readonly bool IsEmpty => Min.X > Max.X || Min.Y > Max.Y || Min.Z > Max.Z;
+
+    /// <summary>Centre of the box (meaningless for an empty box).</summary>
     public readonly Vector3 Center => (Min + Max) * 0.5f;
+
+    /// <summary>Extent along each axis, metres (zero for an empty box).</summary>
     public readonly Vector3 Size => IsEmpty ? Vector3.Zero : Max - Min;
 
+    /// <summary>Grows the box to contain <paramref name="p"/>.</summary>
     public void Include(Vector3 p)
     {
         Min = Vector3.Min(Min, p);
         Max = Vector3.Max(Max, p);
     }
 
+    /// <summary>Grows the box to contain <paramref name="b"/> (an empty box changes nothing).</summary>
     public void Include(Aabb b)
     {
         if (b.IsEmpty) return;
@@ -33,6 +45,7 @@ public struct Aabb
         Include(b.Max);
     }
 
+    /// <summary>True when <paramref name="p"/> lies inside or on the box.</summary>
     public readonly bool Contains(Vector3 p) =>
         p.X >= Min.X && p.Y >= Min.Y && p.Z >= Min.Z && p.X <= Max.X && p.Y <= Max.Y && p.Z <= Max.Z;
 
@@ -74,5 +87,6 @@ public struct Aabb
 /// <summary>Ray with a normalised direction.</summary>
 public readonly record struct Ray(Vector3 Origin, Vector3 Direction)
 {
+    /// <summary>The point at distance <paramref name="t"/> along the ray, metres.</summary>
     public Vector3 At(float t) => Origin + Direction * t;
 }

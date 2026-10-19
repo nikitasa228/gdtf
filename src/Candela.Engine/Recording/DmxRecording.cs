@@ -33,7 +33,24 @@ public sealed record DmxUniverseChange(int Universe, DmxUniverseChangeKind Kind,
 /// <param name="Time">Seconds since the start of the recording.</param>
 /// <param name="Timecode">Timecode received by then (ArtTimeCode …), or null.</param>
 /// <param name="Changes">Universes that changed since the previous frame.</param>
-public sealed record DmxRecordedFrame(double Time, Timecode? Timecode, IReadOnlyList<DmxUniverseChange> Changes);
+public sealed record DmxRecordedFrame(double Time, Timecode? Timecode, IReadOnlyList<DmxUniverseChange> Changes)
+{
+    /// <summary>
+    /// True when <see cref="Timecode"/> arrived at this frame's time (a timecode packet), false when it was received
+    /// earlier and is only carried along. Seeking by timecode interpolates between arrivals.
+    /// </summary>
+    public bool TimecodeReceived { get; init; }
+}
+
+/// <summary>How a recording was captured.</summary>
+public enum DmxCaptureMode : byte
+{
+    /// <summary>Sampled once per engine frame (recordings of format version 1).</summary>
+    EngineFrames = 0,
+
+    /// <summary>Every change as it arrived from the protocols, with its own timestamp (<see cref="DmxRecorder"/>).</summary>
+    Packets = 1,
+}
 
 /// <summary>
 /// Recorded DMX input: timestamped frames of universe changes (delta-encoded) with the timecode that arrived with them.
@@ -41,11 +58,15 @@ public sealed record DmxRecordedFrame(double Time, Timecode? Timecode, IReadOnly
 /// exactly as the console played it.
 /// </summary>
 /// <remarks>
-/// <para><b>File</b> (<c>.cdmx</c>): <c>CDMX</c>, format version (int32), creation time (UTC ticks, int64), name, then a
-/// zlib stream of frames: tag 0xF1, time (float64 s), flags (bit 0: timecode follows as h, m, s, f, type bytes), number
-/// of changed universes (varint), and per universe its number (varint), the change kind (byte) and, for deltas, the runs
-/// (varint count; per run varint start, varint length, the bytes). A file cut short (a crash while recording) loads the
-/// complete frames before the cut and reports <see cref="EngineIssueCodes.RecordingDamaged"/>.</para>
+/// <para><b>File</b> (<c>.cdmx</c>): <c>CDMX</c>, format version (int32), creation time (UTC ticks, int64), name, the
+/// capture mode (byte, version 2), then a zlib stream of frames: tag 0xF1, time (float64 s), flags (bit 0: timecode
+/// follows as h, m, s, f, type bytes; bit 1: the timecode arrived at this frame, version 2), number of changed universes
+/// (varint), and per universe its number (varint), the change kind (byte) and, for deltas, the runs (varint count; per run
+/// varint start, varint length, the bytes). A file cut short (a crash while recording) loads the complete frames before
+/// the cut and reports <see cref="EngineIssueCodes.RecordingDamaged"/>.</para>
+/// <para><b>Versions.</b> Version 2 (packet-rate recordings) is written. Version 1 files (sampled per engine frame) still
+/// load: their capture mode is <see cref="DmxCaptureMode.EngineFrames"/> and a frame counts as a timecode arrival when its
+/// timecode differs from the previous frame's. Saving writes them as version 2.</para>
 /// <para><b>Seeking</b>: the full state of every universe is kept every <see cref="KeyframeInterval"/> seconds, so
 /// <see cref="StateAt"/> replays at most that much.</para>
 /// </remarks>
@@ -54,8 +75,11 @@ public sealed class DmxRecording
     /// <summary>File extension of recordings.</summary>
     public const string Extension = ".cdmx";
 
-    /// <summary>Current file format version.</summary>
-    public const int FormatVersion = 1;
+    /// <summary>Current file format version (written by <see cref="Save(Stream)"/>; version 1 files are read too).</summary>
+    public const int FormatVersion = 2;
+
+    /// <summary>Oldest file format version that loads.</summary>
+    public const int MinFormatVersion = 1;
 
     /// <summary>
     /// Frames up to this much after a requested time count as reached, s (absorbs the rounding of times computed as
@@ -67,8 +91,11 @@ public sealed class DmxRecording
     public const double KeyframeInterval = 2.0;
 
     private const byte FrameTag = 0xF1;
+    private const byte FlagTimecode = 1;
+    private const byte FlagTimecodeReceived = 2;
     private static readonly byte[] Magic = "CDMX"u8.ToArray();
     private readonly List<Keyframe> _keyframes = new();
+    private readonly int[] _arrivals;
 
     /// <summary>Creates a recording from frames (sorted by time; ties keep their order).</summary>
     public DmxRecording(string name, IEnumerable<DmxRecordedFrame> frames, DateTime createdUtc = default)
@@ -76,9 +103,16 @@ public sealed class DmxRecording
         ArgumentNullException.ThrowIfNull(frames);
         Name = string.IsNullOrWhiteSpace(name) ? "Recording" : name;
         CreatedUtc = createdUtc == default ? DateTime.UtcNow : createdUtc;
-        Frames = frames.Where(f => double.IsFinite(f.Time)).OrderBy(f => f.Time).ToList();
+        Frames = frames.Where(f => f is not null && double.IsFinite(f.Time)).OrderBy(f => f.Time).ToList();
         BuildKeyframes();
+        _arrivals = FindArrivals(Frames);
     }
+
+    /// <summary>How the recording was captured (<see cref="DmxCaptureMode.EngineFrames"/> for version 1 files and frames built by hand).</summary>
+    public DmxCaptureMode Capture { get; init; }
+
+    /// <summary>The file format version the recording was loaded from (<see cref="FormatVersion"/> when made in this session).</summary>
+    public int LoadedFormatVersion { get; private init; } = FormatVersion;
 
     /// <summary>Name of the recording (also the source name in the input hub during playback).</summary>
     public string Name { get; }
@@ -109,8 +143,9 @@ public sealed class DmxRecording
     {
         double target = timecode.TotalSeconds;
         DmxRecordedFrame? previous = null;
-        foreach (var f in Frames)
+        foreach (int index in _arrivals)
         {
+            var f = Frames[index];
             if (f.Timecode is not { } tc) continue;
             double s = tc.TotalSeconds;
             if (s >= target - 1e-6)
@@ -194,16 +229,18 @@ public sealed class DmxRecording
             header.Write(FormatVersion);
             header.Write(CreatedUtc.Ticks);
             header.Write(Name);
+            header.Write((byte)Capture);
         }
         using var z = new ZLibStream(output, CompressionLevel.Optimal, leaveOpen: true);
         using var w = new BinaryWriter(z, Encoding.UTF8, leaveOpen: true);
-        foreach (var f in Frames)
+        for (int i = 0; i < Frames.Count; i++)
         {
+            var f = Frames[i];
             w.Write(FrameTag);
             w.Write(f.Time);
             if (f.Timecode is { } tc)
             {
-                w.Write((byte)1);
+                w.Write((byte)(FlagTimecode | (IsArrival(i) ? FlagTimecodeReceived : 0)));
                 w.Write((byte)Math.Clamp(tc.Hours, 0, 255));
                 w.Write((byte)Math.Clamp(tc.Minutes, 0, 255));
                 w.Write((byte)Math.Clamp(tc.Seconds, 0, 255));
@@ -259,15 +296,25 @@ public sealed class DmxRecording
         ArgumentNullException.ThrowIfNull(input);
         string name;
         DateTime created;
+        int version;
+        var capture = DmxCaptureMode.EngineFrames;
         try
         {
             using var header = new BinaryReader(input, Encoding.UTF8, leaveOpen: true);
             if (!header.ReadBytes(4).AsSpan().SequenceEqual(Magic)) throw new InvalidDataException("Not a Candela DMX recording.");
-            int version = header.ReadInt32();
-            if (version != FormatVersion) throw new InvalidDataException($"Unsupported DMX recording version {version}.");
+            version = header.ReadInt32();
+            if (version < MinFormatVersion || version > FormatVersion)
+                throw new InvalidDataException(version > FormatVersion
+                    ? $"The DMX recording was written by a newer Candela (format version {version}); this version reads up to {FormatVersion}."
+                    : $"Unsupported DMX recording version {version}.");
             long ticks = header.ReadInt64();
             created = ticks >= DateTime.MinValue.Ticks && ticks <= DateTime.MaxValue.Ticks ? new DateTime(ticks, DateTimeKind.Utc) : DateTime.UnixEpoch;
             name = ReadName(header);
+            if (version >= 2)
+            {
+                capture = (DmxCaptureMode)header.ReadByte();
+                if (!Enum.IsDefined(capture)) throw new InvalidDataException("The DMX recording's capture mode is unknown.");
+            }
         }
         catch (EndOfStreamException e)
         {
@@ -294,7 +341,7 @@ public sealed class DmxRecording
                     problem = "an unknown record was found";
                     break;
                 }
-                frames.Add(ReadFrame(r));
+                frames.Add(ReadFrame(r, version));
             }
         }
         catch (Exception e) when (e is EndOfStreamException or InvalidDataException or IOException or FormatException or ArgumentException)
@@ -308,7 +355,7 @@ public sealed class DmxRecording
                 new Issue(IssueSeverity.Warning, IssueCategory.Program, EngineIssueCodes.RecordingDamaged,
                     $"The DMX recording '{name}' is damaged ({problem}); the first {frames.Count} frames are used."),
             };
-        return new DmxRecording(name, frames, created) { Issues = issues };
+        return new DmxRecording(name, frames, created) { Issues = issues, Capture = capture, LoadedFormatVersion = version };
     }
 
     /// <summary>Reads a recording file (see <see cref="Load(Stream)"/>).</summary>
@@ -339,13 +386,15 @@ public sealed class DmxRecording
         }
     }
 
-    private static DmxRecordedFrame ReadFrame(BinaryReader r)
+    private static DmxRecordedFrame ReadFrame(BinaryReader r, int version)
     {
         double time = r.ReadDouble();
         if (!double.IsFinite(time)) throw new InvalidDataException("A frame has an invalid time.");
         byte flags = r.ReadByte();
+        if ((flags & ~(version >= 2 ? FlagTimecode | FlagTimecodeReceived : FlagTimecode)) != 0)
+            throw new InvalidDataException("A frame has unknown flags.");
         Timecode? tc = null;
-        if ((flags & 1) != 0)
+        if ((flags & FlagTimecode) != 0)
         {
             int h = r.ReadByte(), m = r.ReadByte(), s = r.ReadByte(), f = r.ReadByte();
             var type = (TimecodeType)r.ReadByte();
@@ -378,7 +427,30 @@ public sealed class DmxRecording
             }
             changes.Add(new DmxUniverseChange(universe, kind, list));
         }
-        return new DmxRecordedFrame(time, tc, changes);
+        return new DmxRecordedFrame(time, tc, changes) { TimecodeReceived = tc is not null && (flags & FlagTimecodeReceived) != 0 };
+    }
+
+    /// <summary>True when frame <paramref name="index"/> is a timecode arrival (see <see cref="DmxRecordedFrame.TimecodeReceived"/>).</summary>
+    private bool IsArrival(int index) => Array.BinarySearch(_arrivals, index) >= 0;
+
+    /// <summary>
+    /// The frames where a timecode arrived, ascending: the flagged ones, or — for recordings without flags (version 1,
+    /// built by hand) — every frame whose timecode differs from the previous frame's.
+    /// </summary>
+    private static int[] FindArrivals(IReadOnlyList<DmxRecordedFrame> frames)
+    {
+        var flagged = new List<int>();
+        for (int i = 0; i < frames.Count; i++)
+            if (frames[i].TimecodeReceived && frames[i].Timecode is not null) flagged.Add(i);
+        if (flagged.Count > 0) return flagged.ToArray();
+        var derived = new List<int>();
+        Timecode? previous = null;
+        for (int i = 0; i < frames.Count; i++)
+        {
+            if (frames[i].Timecode is { } tc && tc != previous) derived.Add(i);
+            previous = frames[i].Timecode;
+        }
+        return derived.ToArray();
     }
 
     private void BuildKeyframes()

@@ -60,6 +60,9 @@ public abstract class OscReceiverBase : ExternalProtocolBase
     /// <summary>Called after the socket has been closed.</summary>
     protected abstract void OnClosed();
 
+    /// <summary>Universes this receiver writes with <paramref name="options"/> (for <see cref="ProtocolStatus.UniverseCount"/>; default 0).</summary>
+    protected virtual int UniverseCountOf(ProtocolOptions options) => 0;
+
     /// <summary>Handles the messages of one datagram (called on the receive thread, serialised).</summary>
     protected abstract void OnMessages(IReadOnlyList<OscMessage> messages, IPv4Endpoint sender, string senderText, DateTime nowUtc);
 
@@ -67,7 +70,7 @@ public abstract class OscReceiverBase : ExternalProtocolBase
     protected override string OnStart(ProtocolOptions options)
     {
         int port = PortFrom(options);
-        ProtocolOptions.ValidatePort(port, $"{ProtocolLabel} port");
+        ProtocolOptions.ValidatePort(port, ProtocolLabel);
         var interfaces = NetworkInterfaceCatalog.Enumerate();
         var selected = NetworkInterfaceCatalog.Resolve(options.NetworkInterface, interfaces);
         OnConfigure(options);
@@ -81,9 +84,12 @@ public abstract class OscReceiverBase : ExternalProtocolBase
         _channel = channel;
         channel.Start($"Candela {ProtocolLabel} receiver", ProcessPacket,
             _ => CountBadPacket($"internal error while processing an {ProtocolLabel} packet", default),
-            e => ReportFault($"{ProtocolLabel} socket failed: {e.Message}"));
-        var where = selected is null ? "all interfaces" : $"{selected.Name} {selected.Address}";
-        return $"Listening on UDP {channel.LocalEndPoint.Port} ({where})";
+            e => ReportFault(ProtocolText.Create(ProtocolMessages.SocketFailed, ProtocolLabel, e.Message), ProtocolErrorCode.SocketFailed));
+        int boundPort = channel.LocalEndPoint.Port;
+        var text = selected is null
+            ? ProtocolText.Create(ProtocolMessages.ListeningAll, boundPort)
+            : ProtocolText.Create(ProtocolMessages.Listening, boundPort, selected.Name, selected.Address);
+        return Running(text, channel.LocalEndPoint.ToString(), selected is null ? null : $"{selected.Name} {selected.Address}", UniverseCountOf(options));
     }
 
     /// <inheritdoc />

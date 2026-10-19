@@ -72,7 +72,25 @@ internal sealed partial class ViewportPanel
         var accent = Theme.Accent;
         Transform placement;
         Aabb box;
-        if (item.Fixture is { } entry)
+        if (item.Device is { } device)
+        {
+            var s = device.SizeM;
+            if (device.Kind == Electrical.DevicePresetKind.Gdtf)
+            {
+                placement = Placement.ForFixture(hit);
+                var deviceEntry = device.GdtfFile is { } file ? _ctx.Session.Engine?.Library.FindByFileName(file) : null;
+                box = deviceEntry is not null && _host.FixtureInfoOf(deviceEntry) is { } info
+                    ? info.RestBounds
+                    : new Aabb(new Vector3(-s.X / 2f, -s.Y / 2f, -s.Z), new Vector3(s.X / 2f, s.Y / 2f, 0f));
+            }
+            else
+            {
+                // Consoles and power sources stand on their origin.
+                placement = Placement.ForModel(hit);
+                box = new Aabb(new Vector3(-s.X / 2f, -s.Y / 2f, 0f), new Vector3(s.X / 2f, s.Y / 2f, s.Z));
+            }
+        }
+        else if (item.Fixture is { } entry)
         {
             placement = Placement.ForFixture(hit);
             box = _host.FixtureInfoOf(entry)?.RestBounds ?? FixtureInfoCache.DefaultBounds;

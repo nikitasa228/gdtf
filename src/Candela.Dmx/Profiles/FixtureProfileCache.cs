@@ -17,7 +17,7 @@ public sealed record ProfileResolution(FixtureProfile? Profile, FixtureLibraryEn
 
     /// <summary>
     /// For a <see cref="FixtureMatchKind.Substitute"/>: what the fixture asked for, the stand-in, and the patch spacing its
-    /// mode was chosen for (<see cref="SubstituteModes.Choose"/>); null otherwise.
+    /// mode was chosen for (<see cref="FixtureType.FitModeToSpacing(string?, int?)"/>); null otherwise.
     /// </summary>
     public FixtureSubstitution? Substitution { get; init; }
 }
@@ -69,7 +69,7 @@ public sealed class FixtureProfileCache
     /// <summary>
     /// <see cref="Resolve(string?, string?)"/> for a fixture whose type is patched <paramref name="patchSpacing"/> channels
     /// apart (<see cref="PatchSpacing"/>): when the library has only a similar model (a substitute), its mode is chosen
-    /// to fit that spacing (<see cref="SubstituteModes.Choose"/>) — the requested mode name belongs to the missing model —
+    /// to fit that spacing (<see cref="FixtureType.FitModeToSpacing(string?, int?)"/>) — the requested mode name belongs to the missing model —
     /// and <see cref="ProfileResolution.Substitution"/> says so. Exact matches ignore the spacing.
     /// </summary>
     public ProfileResolution Resolve(string? gdtfSpec, string? mode, int? patchSpacing)
@@ -90,7 +90,7 @@ public sealed class FixtureProfileCache
             string? chosen = mode;
             try
             {
-                chosen = SubstituteModes.Choose(Library.GetFixtureType(entry), mode, patchSpacing)?.Name ?? mode;
+                chosen = Library.GetFixtureType(entry).FitModeToSpacing(mode, patchSpacing)?.Name ?? mode;
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {

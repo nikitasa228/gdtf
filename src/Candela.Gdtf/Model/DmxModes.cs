@@ -53,6 +53,26 @@ public sealed class DmxMode
     }
 
     /// <summary>
+    /// Slots of the mode's first DMX break (the lowest break that uses any slot): what one patch address covers, so
+    /// fixtures patched back to back in this mode are this many channels apart. Falls back to
+    /// <see cref="DeclaredChannelCount"/> for a mode built in code without a layout.
+    /// </summary>
+    public int FirstBreakFootprint
+    {
+        get
+        {
+            int first = int.MaxValue, footprint = 0;
+            foreach (var (brk, slots) in BreakFootprints)
+            {
+                if (slots <= 0 || brk >= first) continue;
+                first = brk;
+                footprint = slots;
+            }
+            return first == int.MaxValue ? DeclaredChannelCount : footprint;
+        }
+    }
+
+    /// <summary>
     /// Highest offset written on the channels themselves, summed over breaks, ignoring geometry-reference instancing.
     /// This is the number simple tools (and <c>_specs/fixtures_index.json</c>) report; it is lower than
     /// <see cref="Footprint"/> for modes whose pixels are addressed through geometry references.

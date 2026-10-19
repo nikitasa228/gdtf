@@ -15,6 +15,7 @@ The scene is owned by the main thread; background work must not touch it.
 | Copying | `EntityCloner`, `EntityCloneOptions`, `EntityCloneResult`, `EntityReferenceRemapper`, `[EntityReference]` / `[AssetReference]` / `[LocalId]` |
 | Editing | `UndoStack`, `IUndoableCommand` and the commands in `Editing/SceneCommands.cs`, `Selection` |
 | Files | `CandelaJson`, `SceneSerializer` (`SceneFile`, `EntityRecord`) |
+| Issues | `Issue`, `IssueSeverity`, `IssueCategory`, `IIssueProvider`, `IssueLog` (providers' issues per refresh plus program messages; `Report` appends in amortised constant time) |
 | Settings | `AppSettings`, `KeyChord`, `KeyBindingSet`, `EditorActions`, `PresetLibrary<T>` |
 
 ## 1. Scene, entities, layers
@@ -173,6 +174,9 @@ parents before children; each record has `id`, `parent`, `name`, `layer`, `visib
 `FromFile(file, issues)` repairs the record; layers, settings and components of the record that still belong to a live
 scene (a record made by `ToFile`, or an object listed twice) are copied rather than taken over. Only text that is not JSON (`JsonException`), a root that is not an object
 and a newer format (`InvalidDataException`) throw. The `$type` discriminator may stand anywhere in a component object.
+Text may nest objects and arrays up to `SceneSerializer.MaxDepth` (= `CandelaJson.MaxDepth`, 256) levels — scene files
+are flat, so only component data and properties of newer versions nest at all; deeper text is refused with an
+`InvalidDataException` that says so, not a bare parser error.
 
 | Damage | Result | Issue code |
 |---|---|---|
@@ -224,6 +228,9 @@ PNG specification (chunk CRCs, IHDR fields, zlib stream, every filter type), not
   codes, a 100 000-level hierarchy, world matrices under arbitrary edits without allocation.
 * `KeyChordTests`, `CommandTests` (descriptions fixed and allocation-free, selection), `SceneTests`,
   `PresetAndSettingsTests`.
+* `FollowUpTests` — `IssueLog.Report` stays linear (thousands of reports without copying the list each time) and
+  `ClearProgramMessages` rebuilds `Current`; scene text nested past `MaxDepth` is refused with a clear message, text
+  just inside it loads.
 * `ReviewRegressionTests` — scene copies through `ToFile`/`FromFile`, one-scene ownership of layers and settings,
   selection no-op adds, case-insensitive chords, all-or-nothing multi-adds, one change per reparent, linear detached
   chains, independence of copies.

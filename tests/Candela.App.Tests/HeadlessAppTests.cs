@@ -49,7 +49,9 @@ public sealed class HeadlessAppTests : IDisposable
             RedirectStandardError = true,
             UseShellExecute = false,
         };
-        foreach (var a in new[] { "-a", "-s", "-screen 0 1920x1080x24", "dotnet", AppDll(), "--config-dir", _dir.File("config") })
+        // An explicit X authority file (see EditorProcess.Run): xvfb-run's own temporary directory makes it fail with
+        // exit code 5 now and then when the editor exits quickly.
+        foreach (var a in new[] { "-a", "-f", _dir.File("Xauthority"), "-s", "-screen 0 1920x1080x24", "dotnet", AppDll(), "--config-dir", _dir.File("config") })
             psi.ArgumentList.Add(a);
         foreach (var a in appArgs)
             psi.ArgumentList.Add(a);

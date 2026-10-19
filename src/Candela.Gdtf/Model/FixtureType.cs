@@ -123,6 +123,52 @@ public sealed class FixtureType
         return null;
     }
 
+    /// <summary>
+    /// The mode to use when this type stands in for another model (a substitute) whose fixtures are patched
+    /// <paramref name="spacing"/> channels apart: <paramref name="requested"/> (this type's mode of the requested name)
+    /// when it fits; else the mode with the largest <see cref="DmxMode.FirstBreakFootprint"/> that fits — the most
+    /// complete one that does not overlap the neighbours, GDTF order breaking ties; else, when none fits, the smallest.
+    /// Without a spacing (fewer than two fixtures in a universe), <paramref name="requested"/>, else the first mode.
+    /// Null only when the type has no modes.
+    /// </summary>
+    /// <remarks>
+    /// The one rule for stand-in modes: the MVR importer (which matches the requested name loosely) and the DMX engine
+    /// and patch (<c>FixtureProfileCache</c>, the engine's stand-in record) both use it, so they always agree.
+    /// </remarks>
+    /// <param name="requested">This type's mode of the requested name, or null when it has none.</param>
+    /// <param name="spacing">Channels between the start addresses of the fixtures (see
+    /// <see cref="DmxPatchSpacing.Infer"/>), or null when unknown.</param>
+    public DmxMode? FitModeToSpacing(DmxMode? requested, int? spacing)
+    {
+        if (DmxModes.Count == 0) return null;
+        if (spacing is not { } s || s < 1) return requested ?? DmxModes[0];
+        if (requested is not null && requested.FirstBreakFootprint <= s) return requested;
+        DmxMode? best = null, smallest = null;
+        int bestFootprint = 0, smallestFootprint = int.MaxValue;
+        foreach (var m in DmxModes)
+        {
+            int f = m.FirstBreakFootprint;
+            if (f <= s && (best is null || f > bestFootprint))
+            {
+                best = m;
+                bestFootprint = f;
+            }
+            if (f < smallestFootprint)
+            {
+                smallest = m;
+                smallestFootprint = f;
+            }
+        }
+        return best ?? smallest;
+    }
+
+    /// <summary>
+    /// <see cref="FitModeToSpacing(DmxMode?, int?)"/> with the requested mode given by name (<see cref="FindMode"/>: exact,
+    /// then ignoring case and surrounding spaces; an empty name requests nothing).
+    /// </summary>
+    public DmxMode? FitModeToSpacing(string? requestedMode, int? spacing) =>
+        FitModeToSpacing(string.IsNullOrWhiteSpace(requestedMode) ? null : FindMode(requestedMode), spacing);
+
     /// <summary>Every geometry of every top-level tree, depth first (GeometryReferences are not expanded).</summary>
     public IEnumerable<GdtfGeometry> AllGeometries()
     {

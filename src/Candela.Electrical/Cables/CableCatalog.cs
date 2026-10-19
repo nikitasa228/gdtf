@@ -25,7 +25,7 @@ public sealed class CableCatalog
         }
     }
 
-    /// <summary>The built-in catalogue (DMX XLR3/XLR5, etherCON Cat6, powerCON, TRUE1, TRUE1 TOP, Schuko, IEC, CEE 16/32/63 A, Socapex, Harting 16).</summary>
+    /// <summary>The built-in catalogue (DMX XLR3/XLR5, etherCON Cat6, powerCON, TRUE1, TRUE1 TOP, Schuko, IEC, CEE 16/32 A, CEE 16/32/63/125 A three phase, Powerlock, Socapex, Harting 16).</summary>
     public static CableCatalog Default { get; } = new(BuiltIn());
 
     /// <summary>All types in menu order.</summary>
@@ -84,8 +84,20 @@ public sealed class CableCatalog
         /// <summary>CEE 32 A three phase (5-pin).</summary>
         public const string Cee32ThreePhase = "cee32-3p";
 
+        /// <summary>CEE 32 A single phase (3-pin).</summary>
+        public const string Cee32 = "cee32";
+
+        /// <summary>CEE 16 A three phase (5-pin).</summary>
+        public const string Cee16ThreePhase = "cee16-3p";
+
         /// <summary>CEE 63 A three phase (5-pin).</summary>
         public const string Cee63ThreePhase = "cee63-3p";
+
+        /// <summary>CEE 125 A three phase (5-pin).</summary>
+        public const string Cee125ThreePhase = "cee125-3p";
+
+        /// <summary>Powerlock 400 A feeder (five single cores).</summary>
+        public const string Powerlock = "powerlock";
 
         /// <summary>Socapex 19-pin multicore, 6 circuits.</summary>
         public const string Socapex = "socapex";
@@ -217,6 +229,33 @@ public sealed class CableCatalog
         };
         yield return new CableType
         {
+            Id = Ids.Cee32,
+            DisplayName = "CEE 32 A single phase",
+            Signal = SignalKind.Power,
+            ConnectorA = C("CEE 32A"),
+            ConnectorB = C("CEE 32A"),
+            RatedCurrentA = 32f,
+            ConductorCrossSectionMm2 = 6f,
+            WeightKgPerM = 0.38f,
+            ColorHex = "#38BDF8",
+            IconKey = "cable-cee32",
+        };
+        yield return new CableType
+        {
+            Id = Ids.Cee16ThreePhase,
+            DisplayName = "CEE 16 A three phase",
+            Signal = SignalKind.Power,
+            ConnectorA = C("CEE 16A 3P"),
+            ConnectorB = C("CEE 16A 3P"),
+            RatedCurrentA = 16f,
+            ConductorCrossSectionMm2 = 2.5f,
+            WeightKgPerM = 0.3f,
+            ColorHex = "#F97316",
+            IconKey = "cable-cee16-3p",
+            Phases = 3,
+        };
+        yield return new CableType
+        {
             Id = Ids.Cee32ThreePhase,
             DisplayName = "CEE 32 A three phase",
             Signal = SignalKind.Power,
@@ -241,6 +280,34 @@ public sealed class CableCatalog
             WeightKgPerM = 1.25f,
             ColorHex = "#991B1B",
             IconKey = "cable-cee63-3p",
+            Phases = 3,
+        };
+        yield return new CableType
+        {
+            Id = Ids.Cee125ThreePhase,
+            DisplayName = "CEE 125 A three phase",
+            Signal = SignalKind.Power,
+            ConnectorA = C("CEE 125A 3P"),
+            ConnectorB = C("CEE 125A 3P"),
+            RatedCurrentA = 125f,
+            ConductorCrossSectionMm2 = 35f,
+            WeightKgPerM = 2.4f,
+            ColorHex = "#B45309",
+            IconKey = "cable-cee125-3p",
+            Phases = 3,
+        };
+        yield return new CableType
+        {
+            Id = Ids.Powerlock,
+            DisplayName = "Powerlock 400 A feeder (5 × 120 mm²)",
+            Signal = SignalKind.Power,
+            ConnectorA = C("Powerlock"),
+            ConnectorB = C("Powerlock"),
+            RatedCurrentA = 400f,
+            ConductorCrossSectionMm2 = 120f,
+            WeightKgPerM = 7.25f,
+            ColorHex = "#E879F9",
+            IconKey = "cable-powerlock",
             Phases = 3,
         };
         yield return new CableType

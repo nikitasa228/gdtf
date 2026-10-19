@@ -23,6 +23,35 @@ public enum DmxMergeMode
 /// <summary>Live information about one sender of one universe (for the external-control panel).</summary>
 public sealed record DmxSourceInfo(DmxSourceId Source, int Universe, int Priority, DateTime LastSeenUtc, long PacketCount, string? Name);
 
+/// <summary>A timecode message with its sender and arrival time (see <see cref="DmxInputHub.SubmitTimecode(Timecode, DmxSourceId)"/>).</summary>
+/// <param name="Timecode">The position.</param>
+/// <param name="Source">Who sent it (protocol and sender address, e.g. <c>Art-Net 192.168.1.20:6454</c>; the source
+/// <c>recording</c> for a recording being played); <see cref="DmxInputHub.UnnamedSource"/> when the submitter did not say.</param>
+/// <param name="ReceivedUtc">When it arrived (the hub's clock).</param>
+public sealed record TimecodeSample(Timecode Timecode, DmxSourceId Source, DateTime ReceivedUtc);
+
+/// <summary>
+/// Follows the hub's receive path (see <see cref="DmxInputHub.AddObserver"/>): told about every change of a merged
+/// universe and every timecode as they happen, with the hub's timestamps — a DMX recorder captures at packet rate this
+/// way. Calls come from the receiving threads while the hub is locked, one at a time: an observer must return quickly,
+/// must not block and must not call back into the hub.
+/// </summary>
+public interface IDmxInputObserver
+{
+    /// <summary>
+    /// The merged content of <paramref name="universe"/> after a packet, a source termination or a source timeout.
+    /// <paramref name="live"/> is false when no source sends it any more (<paramref name="merged"/> is then all zero).
+    /// </summary>
+    /// <param name="universe">Internal 1-based universe.</param>
+    /// <param name="merged">The 512 merged slots (valid during the call only).</param>
+    /// <param name="live">True while at least one source sends the universe.</param>
+    /// <param name="timestampUtc">When the change happened: the packet's arrival, or the moment a source timed out.</param>
+    void OnUniverse(int universe, ReadOnlySpan<byte> merged, bool live, DateTime timestampUtc);
+
+    /// <summary>A timecode arrived.</summary>
+    void OnTimecode(TimecodeSample sample);
+}
+
 /// <summary>
 /// Collects DMX universes from every protocol receiver and merges them. Receivers call <see cref="Submit"/> from their
 /// network threads; the engine reads merged universes on the main thread once per frame with <see cref="TryRead"/>.
@@ -43,6 +72,8 @@ public sealed class DmxInputHub
     private readonly object _lock = new();
     private readonly Dictionary<int, UniverseState> _universes = new();
     private readonly Func<DateTime> _clock;
+    private IDmxInputObserver[] _observers = Array.Empty<IDmxInputObserver>();
+    private TimecodeSample? _lastTimecode;
 
     /// <summary>Creates the hub; <paramref name="clockUtc"/> replaces the system clock (tests, offline playback).</summary>
     public DmxInputHub(Func<DateTime>? clockUtc = null) => _clock = clockUtc ?? (() => DateTime.UtcNow);
@@ -56,8 +87,23 @@ public sealed class DmxInputHub
     /// <summary>Raised on the receiving thread when a timecode message arrives (Art-Net ArtTimeCode, MIDI/LTC bridges…).</summary>
     public event Action<Timecode>? TimecodeReceived;
 
+    /// <summary>
+    /// Raised on the receiving thread when a timecode message arrives, with its sender and arrival time (see
+    /// <see cref="TimecodeReceived"/> for the position only).
+    /// </summary>
+    public event Action<TimecodeSample>? TimecodeSampleReceived;
+
     /// <summary>Last timecode received (null until the first one).</summary>
-    public Timecode? LastTimecode { get; private set; }
+    public Timecode? LastTimecode => Volatile.Read(ref _lastTimecode)?.Timecode;
+
+    /// <summary>The last timecode with its sender and arrival time (null until the first one); read atomically.</summary>
+    public TimecodeSample? LastTimecodeSample => Volatile.Read(ref _lastTimecode);
+
+    /// <summary>Who sent the last timecode (null until the first one).</summary>
+    public DmxSourceId? LastTimecodeSource => Volatile.Read(ref _lastTimecode)?.Source;
+
+    /// <summary>The hub's clock (UTC): the time base of packet and timecode timestamps.</summary>
+    public DateTime UtcNow => _clock();
 
     /// <summary>
     /// Stores the slots of one universe from one source. <paramref name="slots"/> may be shorter than 512 (missing slots
@@ -79,6 +125,7 @@ public sealed class DmxInputHub
             s.Name = sourceName ?? s.Name;
             s.Packets++;
             u.Dirty = true;
+            if (_observers.Length > 0) Notify(universe, u, now);
         }
     }
 
@@ -87,15 +134,81 @@ public sealed class DmxInputHub
     {
         lock (_lock)
         {
-            if (_universes.TryGetValue(universe, out var u) && u.Sources.Remove(source)) u.Dirty = true;
+            if (!_universes.TryGetValue(universe, out var u) || !u.Sources.Remove(source)) return;
+            u.Dirty = true;
+            if (_observers.Length > 0) Notify(universe, u, _clock());
         }
     }
 
-    /// <summary>Reports a timecode position (thread-safe).</summary>
-    public void SubmitTimecode(Timecode timecode)
+    /// <summary>The source of timecodes submitted without one (empty protocol and endpoint).</summary>
+    public static readonly DmxSourceId UnnamedSource = new("", "");
+
+    /// <summary>Reports a timecode position from an unnamed source (thread-safe).</summary>
+    public void SubmitTimecode(Timecode timecode) => SubmitTimecode(timecode, UnnamedSource);
+
+    /// <summary>
+    /// Reports a timecode position and its sender (thread-safe): <see cref="LastTimecodeSample"/> and
+    /// <see cref="LastTimecodeSource"/> then tell where it came from (Art-Net node address, a recording …).
+    /// </summary>
+    public void SubmitTimecode(Timecode timecode, DmxSourceId source)
     {
-        LastTimecode = timecode;
+        var sample = new TimecodeSample(timecode, source, _clock());
+        Volatile.Write(ref _lastTimecode, sample);
+        if (Volatile.Read(ref _observers).Length > 0)
+        {
+            lock (_lock)
+                foreach (var o in _observers) o.OnTimecode(sample);
+        }
         TimecodeReceived?.Invoke(timecode);
+        TimecodeSampleReceived?.Invoke(sample);
+    }
+
+    /// <summary>
+    /// Starts telling <paramref name="observer"/> about every change of a merged universe and every timecode (see
+    /// <see cref="IDmxInputObserver"/>). With <paramref name="reportCurrentState"/>, the observer first receives the
+    /// current merged content of every live universe (while the hub is locked, so nothing is missed or reported twice).
+    /// </summary>
+    public void AddObserver(IDmxInputObserver observer, bool reportCurrentState = true)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+        lock (_lock)
+        {
+            if (Array.IndexOf(_observers, observer) >= 0) return;
+            if (reportCurrentState)
+            {
+                var now = _clock();
+                foreach (var (n, u) in _universes)
+                {
+                    ExpireSources(u, now, n); // the observers already registered hear about a timeout found here
+                    if (u.Sources.Count == 0) continue;
+                    if (u.Dirty) Merge(u);
+                    observer.OnUniverse(n, u.Merged, live: true, now);
+                }
+            }
+            Volatile.Write(ref _observers, [.. _observers, observer]);
+        }
+    }
+
+    /// <summary>Stops notifying <paramref name="observer"/>; when this returns, no call to it is running any more.</summary>
+    public void RemoveObserver(IDmxInputObserver observer)
+    {
+        ArgumentNullException.ThrowIfNull(observer);
+        lock (_lock)
+        {
+            int i = Array.IndexOf(_observers, observer);
+            if (i < 0) return;
+            var list = new List<IDmxInputObserver>(_observers);
+            list.RemoveAt(i);
+            Volatile.Write(ref _observers, list.ToArray());
+        }
+    }
+
+    /// <summary>Merges <paramref name="u"/> and reports it to the observers (lock held).</summary>
+    private void Notify(int universe, UniverseState u, DateTime timestamp)
+    {
+        if (u.Dirty) Merge(u);
+        bool live = u.Sources.Count > 0;
+        foreach (var o in _observers) o.OnUniverse(universe, u.Merged, live, timestamp);
     }
 
     /// <summary>
@@ -114,7 +227,7 @@ public sealed class DmxInputHub
                 version = 0;
                 return false;
             }
-            ExpireSources(u, _clock());
+            ExpireSources(u, _clock(), universe);
             if (u.Dirty) Merge(u);
             u.Merged.AsSpan().CopyTo(destination);
             version = u.Version;
@@ -131,7 +244,7 @@ public sealed class DmxInputHub
             var list = new List<int>();
             foreach (var (n, u) in _universes)
             {
-                ExpireSources(u, now);
+                ExpireSources(u, now, n);
                 if (u.Sources.Count > 0) list.Add(n);
             }
             list.Sort();
@@ -148,21 +261,32 @@ public sealed class DmxInputHub
             var list = new List<DmxSourceInfo>();
             foreach (var (n, u) in _universes)
             {
-                ExpireSources(u, now);
+                ExpireSources(u, now, n);
                 foreach (var (id, s) in u.Sources) list.Add(new DmxSourceInfo(id, n, s.Priority, s.LastSeen, s.Packets, s.Name));
             }
             return list;
         }
     }
 
-    private void ExpireSources(UniverseState u, DateTime now)
+    /// <summary>
+    /// Drops the sources of <paramref name="u"/> that timed out; observers are told (at the moment the last of them timed
+    /// out) when <paramref name="universe"/> is given.
+    /// </summary>
+    private void ExpireSources(UniverseState u, DateTime now, int universe = 0)
     {
         List<DmxSourceId>? dead = null;
+        DateTime expiredAt = default;
         foreach (var (id, s) in u.Sources)
-            if (now - s.LastSeen > SourceTimeout) (dead ??= new()).Add(id);
+        {
+            if (now - s.LastSeen <= SourceTimeout) continue;
+            (dead ??= new()).Add(id);
+            var at = s.LastSeen + SourceTimeout;
+            if (at > expiredAt) expiredAt = at;
+        }
         if (dead is null) return;
         foreach (var id in dead) u.Sources.Remove(id);
         u.Dirty = true;
+        if (universe > 0 && _observers.Length > 0) Notify(universe, u, expiredAt);
     }
 
     private void Merge(UniverseState u)

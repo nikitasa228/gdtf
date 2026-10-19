@@ -80,7 +80,8 @@ internal static class Program
         writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]");
         writer.WriteLine("                 [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s|HH:MM:SS:FF>]");
         writer.WriteLine("                 [--end <s|HH:MM:SS:FF> [--fps F]] [--ev auto|floor|<EV100>] [--auto-exposure] [--frames N]");
-        writer.WriteLine("                 [--grid] [--device <name>] [--library <dir>]... [--cache <dir>]");
+        writer.WriteLine("                 [--grid] [--floor auto|none] [--work-light off|auto|on]");
+        writer.WriteLine("                 [--device <name>] [--library <dir>]... [--cache <dir>]");
         writer.WriteLine("                 [--final [--samples N] [--seconds S] [--exr <file.exr>] [--denoise] [--bounces N]");
         writer.WriteLine("                          [--volume-bounces N] [--seed N] [--clamp <cd/m²>]]");
         writer.WriteLine("      Loads the scene through the engine, applies the look, simulates --time seconds (DMX, motors, smoke,");
@@ -98,6 +99,8 @@ internal static class Program
         writer.WriteLine("      are up, --exr also writes linear HDR OpenEXR (with albedo, normal and depth layers), --denoise filters");
         writer.WriteLine("      the result (the EXR keeps the raw one as layer 'raw'). Auto exposure meters the first image; a sequence");
         writer.WriteLine("      keeps it. Defaults: 6 bounces, 2 volume bounces, seed 0, no clamp. Ctrl+C writes what is rendered.");
+        writer.WriteLine("      --work-light auto adds a dim neutral key and ambient light when no fixture emits, on always; a render");
+        writer.WriteLine("      never gets it unless asked (default off).");
         writer.WriteLine();
         writer.WriteLine("  candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset O]");
         writer.WriteLine("                      [--scene <file>] [--library <dir>]...");

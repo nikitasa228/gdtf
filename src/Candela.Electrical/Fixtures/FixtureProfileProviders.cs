@@ -16,7 +16,8 @@ public interface IFixtureProfileProvider
 /// <summary>
 /// Profiles from a <see cref="FixtureLibrary"/>: the spec is resolved with <see cref="FixtureLibrary.FindBySpec"/>
 /// (so MVR stub names find library files and substitutes), the GDTF is parsed through the library cache and the
-/// specs record comes from the library's specs index. A GDTF that cannot be read still gets a profile from its specs
+/// specs record comes from the library's specs index (or, for the cable tool's generic devices, from
+/// <see cref="GenericDevices"/>). A GDTF that cannot be read still gets a profile from its specs
 /// record (with a note); a spec unknown to both gives null. Profiles are cached per spec + mode.
 /// </summary>
 public sealed class LibraryFixtureProfileProvider : IFixtureProfileProvider
@@ -49,11 +50,12 @@ public sealed class LibraryFixtureProfileProvider : IFixtureProfileProvider
         var match = _library.FindBySpec(spec);
         if (match is null)
         {
-            var specsOnly = _library.Specs.Find(spec);
+            var specsOnly = _library.Specs.Find(spec) ?? GenericDevices.FindSpecs(spec);
             return specsOnly is null ? null : FixtureProfile.Build(spec, mode, null, specsOnly, specsOnly.File);
         }
         var entry = match.Entry;
-        var specs = entry.Specs ?? _library.Specs.Find(entry.FileName);
+        // Generic devices of the cable tool are not in the researched specs index; their typical values are built in.
+        var specs = entry.Specs ?? _library.Specs.Find(entry.FileName) ?? GenericDevices.FindSpecs(entry.FileName);
         FixtureType? type = null;
         var notes = new List<string>();
         try

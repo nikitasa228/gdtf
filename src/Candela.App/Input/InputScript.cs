@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 using System.Text.Json;
 
 namespace Candela.App.Input;
@@ -147,6 +148,18 @@ internal sealed record ScriptAction(ScriptActionType Type)
 
     /// <summary>Entity names (select).</summary>
     public IReadOnlyList<string> Names { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// A world point (metres) the mouse goes to instead of <see cref="X"/>/<see cref="Y"/>: its place in the active
+    /// viewport, resolved when the action runs (move, click, press, scroll).
+    /// </summary>
+    public Vector3? World { get; init; }
+
+    /// <summary>An entity whose drawn centre the mouse goes to instead of <see cref="X"/>/<see cref="Y"/> (move, click, press, scroll).</summary>
+    public string Entity { get; init; } = "";
+
+    /// <summary>True when the mouse position is resolved in the scene when the action runs.</summary>
+    public bool HasScenePoint => World is not null || Entity.Length > 0;
 }
 
 /// <summary>
@@ -244,6 +257,8 @@ internal sealed class InputScript
             Names = e.TryGetProperty("names", out var names) && names.ValueKind == JsonValueKind.Array
                 ? names.EnumerateArray().Select(n => n.GetString() ?? "").Where(n => n.Length > 0).ToList()
                 : Array.Empty<string>(),
+            World = WorldPoint(e),
+            Entity = Str(e, "entity") ?? "",
         };
         // "panel" names the panel of panel/undock/tabStyle actions; a panel action may also give it as "name"/"id".
         if (action.Type == ScriptActionType.Panel && action.Panel.Length == 0)
@@ -272,6 +287,25 @@ internal sealed class InputScript
             throw new FormatException("'window' needs \"width\" and \"height\" or a \"value\" (minimize, restore, maximize)");
         if (a.Type == ScriptActionType.Window && a.Value.Length > 0 && a.Value.ToLowerInvariant() is not ("minimize" or "restore" or "maximize"))
             throw new FormatException($"unknown window state '{a.Value}'");
+    }
+
+    /// <summary>"world": [x, y, z] in metres, or null when absent.</summary>
+    private static Vector3? WorldPoint(JsonElement e)
+    {
+        if (!e.TryGetProperty("world", out var w))
+            return null;
+        if (w.ValueKind != JsonValueKind.Array || w.GetArrayLength() != 3)
+            throw new FormatException("\"world\" must be an array of three numbers (x, y, z in metres)");
+        Span<float> v = stackalloc float[3];
+        int i = 0;
+        foreach (var item in w.EnumerateArray())
+        {
+            if (item.ValueKind != JsonValueKind.Number || !item.TryGetSingle(out float f) || !float.IsFinite(f))
+                throw new FormatException("\"world\" must be an array of three numbers (x, y, z in metres)");
+            v[i++] = f;
+        }
+
+        return new Vector3(v[0], v[1], v[2]);
     }
 
     private static int ParseButton(string? s) => s?.ToLowerInvariant() switch

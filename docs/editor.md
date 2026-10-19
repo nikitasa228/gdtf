@@ -8,7 +8,8 @@ viewports draw the engine's render binding of the real scene, and File → New /
 engine's operations. Phase A built the shell, workspace, viewports, selection and editing tools, settings and the
 headless verification mode; phase B1 connected the engine — documents, recovery, the fixture library with thumbnails and
 drag-and-drop placement, walls and floors (see [Documents](#documents), [Library](#library) and
-[Walls and floors](#walls-and-floors)).
+[Walls and floors](#walls-and-floors)); phase B2 the engine-backed panels; M4 cabling — devices, the Cable tool, the
+cable link window and a stage that follows its cables (see [Cabling](#cabling)).
 
 ![Default layout at start-up](images/editor-default-layout.png)
 
@@ -200,8 +201,9 @@ drawn (its tab covered, the panel closed) — fly mode suspends the shortcuts, a
 * **Duplicate, Copy, Paste** use Core's copying (`DuplicateEntitiesCommand`, `EntityCloner`, see [core.md](core.md)):
   copies get new ids, references among the copied objects point at the copies (a duplicated truss keeps its fixtures
   mounted on the copy), references to other objects are kept by Duplicate and kept by Paste only when the scene still
-  has their target. The clipboard holds copies taken at Copy time; every Paste gives fresh ids. Fixtures keep their DMX
-  address (an overlap is listed in the Issues panel).
+  has their target. The clipboard holds copies taken at Copy time; every Paste gives fresh ids. Copied fixtures keep
+  their DMX address, or are patched to the next free addresses, as *Settings → Editing* says (see
+  [Copies and Escape](#copies-and-escape)); an overlap that stays is listed in the Issues panel.
 
 ## Documents
 
@@ -253,7 +255,8 @@ New / Open replace the engine's project, so panels keep their references to the 
 
 ## Library
 
-The Library panel (requirement "окно выбора устройств") has two sub-tabs.
+The Library panel (requirement "окно выбора устройств") has three sub-tabs: Fixtures, Devices (consoles, nodes,
+splitters, mains supplies, distros and dimmers — see [Devices in the Library](#devices-in-the-library)) and Models.
 
 **Fixtures** shows the engine's fixture library (the library folders of the settings plus GDTF files brought in by
 projects and MVRs; one tile per model, its newest revision). Category chips filter by the `_specs` category — **All**,
@@ -306,6 +309,7 @@ under the press (a stage, an existing floor) or else the ground; Snapping (Alt+S
 half the grid spacing. The new shape gets the built-in material of its kind (floors: *Wooden stage*, walls: *Painted
 wall, white*; the Properties panel changes it), is selected and is one undo step; the tool stays active for the next
 one. Navigation keeps working with the other mouse buttons, and the tool's one-line help shows at the bottom of the view.
+**Escape** during the drag cancels it: nothing is added (a resize, below, goes back to the size it had).
 
 A selected wall, floor or ceiling shows **handles** (any tool): the ends and the top of a wall, the edges and corners
 of a floor. Dragging one changes the size while the opposite side stays where it is (the size follows the mouse
@@ -317,6 +321,170 @@ The whole drag is one undo step. The engine draws walls and floors with `WallMes
 *A floor and a wall drawn with the tools and two fixtures dragged from the library (standing on the floor, patched to
 1.001 and 1.039); the selected floor is being widened from its right edge.*
 
+## Cabling
+
+Phase M4 puts the electrical model of [electrical.md](electrical.md) into the editor: consoles, nodes, splitters, mains
+supplies, distros and dimmers come from the Library, the **Cable** tool draws DMX, Ethernet, power and multicore cables
+between their ports along walls, trusses and floors, and the stage follows the cables — a console drives only the
+fixtures cabled to it, a distro's breakers are checked against the fixtures it feeds, and the Issues panel lists what
+does not add up.
+
+![The cable tool in use](images/editor-cable-tool.png)
+
+*A DMX cable from Console 1 drawn over the stage floor (two route points anchored to the floor), up to the front truss
+and on to the first MagicBlade: the fixture under the cursor is outlined with its ports (green: the port the cable fits),
+the dashed line shows where the next click goes, the label the length and weight so far; the cursor carries the
+cable's connector.*
+
+### Devices in the Library
+
+The Library's **Devices** sub-tab (between Fixtures and Models) lists what cables connect, in five sections:
+
+| Section | Devices |
+|---|---|
+| Consoles | DMX consoles with 2, 4 or 8 XLR 5-pin outputs (DMX A, B … on universes 1, 2 …), network consoles sending 16 universes as Art-Net or sACN over one etherCON port |
+| Nodes & splitters | Art-Net / sACN nodes with 2 and 8 DMX outputs, a 19" opto splitter 1 → 6 and a truss splitter 1 → 4 (XLR 3-pin) |
+| Mains | wall socket Schuko 16 A, CEE 16 A and 32 A (230 V), CEE 32 A, 63 A and 125 A three phase, Powerlock 400 A |
+| Distros | 16 A → 4 × TRUE1, 32 A 3~ → 6 × Schuko or 6 × TRUE1, 63 A 3~ → 2 × Socapex + 3 × CEE 16 A, 125 A 3~, Powerlock 400 A |
+| Dimmers & PSUs | a generic 4 × 10 A dimmer pack, and every GDTF in the fixture library that distributes power (dimmer packs, power supplies, distros — the `_specs` records with outlets or output channels) |
+
+Section chips filter the list, the search field matches names, descriptions and connectors. A tile shows the device's
+icon and its connector drawings (GDTF devices their 3D thumbnail) with a summary ("4 × XLR 5-pin (DMX)"); the tooltip
+gives the description and every port with its connector, direction, universe or breaker. **Drag a tile into a
+viewport** to place the device like a fixture (ghost, surface under the cursor, one undo step, selected): consoles and
+mains supplies are boxes standing on the surface (`ConsoleComponent`, `PowerSourceComponent`), nodes, splitters and the
+generic dimmer are real GDTF devices — Candela writes them into the cache folder at start-up
+(`GenericDeviceLibrary`) and they travel inside saved projects like any GDTF. New devices are named after their kind
+("Console 2", "Distro 1", "Splitter 1"); a dimmer pack is auto-patched like a fixture and gets the next fixture id.
+Ports come from the electrical model (`PortResolver`): a console's outputs, a power source's outlets plus its *Mains
+In*, a GDTF's wiring objects.
+
+![Devices in the Library](images/editor-devices.png)
+![Устройства в библиотеке, русский интерфейс, 150 %](images/editor-devices-ru.png)
+
+### The Cable tool
+
+**Tools → Cable** (C, or the toolbar button) chooses the tool; the same submenu lists every cable type with its colour
+(DMX XLR 3/5-pin, Ethernet, powerCON / TRUE1 / TRUE1 TOP, Schuko, IEC, CEE 16 A / 32 A single and three phase, CEE
+63 A and 125 A, Powerlock, Socapex, Harting 16), and the chip at the top left of the viewport switches the type while
+the tool is active (grouped Data / Power / Multicore, with the connector drawings). With the tool:
+
+* **Click a device** to plug the cable in. When exactly one port fits — the right signal, a connector that mates (or
+  mates through an adapter), free, and the right direction for the cable's other end — the cable is plugged in at once;
+  otherwise the **port picker** opens (below). The first click starts the cable at a port, a later one ends it there.
+* **Click a wall, truss, floor or model** to add a **route point** fixed to that object: the point keeps its place on
+  it when the object is moved. A click on empty ground adds a free point.
+* **Click the middle of an existing cable** (not drawing) to start a **branch** there — a Y node is inserted into the
+  segment when the branch is finished, and the branch takes that cable's type; a click on a cable's free end continues
+  the cable from it. While drawing, a click on another cable of the same type **joins** the drawn cable into it.
+* A **daisy chain goes on by itself**: after a fixture is plugged in, the next cable starts from its DMX thru (or power
+  thru) when the choice is unambiguous, so clicking fixture after fixture cables a whole line.
+* **Right-click** (without dragging) or **Escape** finishes the cable: with two points or more it is added as it is
+  (a free end stays free), one undo step ("Add DMX 3", "Branch cable", "Join cable"); **Backspace** removes the last
+  point. Choosing another tool finishes the cable too; Undo while drawing drops the draft.
+
+While the mouse moves, the tool shows what a click would do: a device under the cursor is outlined with its ports
+coloured (green fits, amber needs an adapter, grey is in use or the wrong direction, red does not fit), a cable's
+middle shows the branch point, a free end "Continue this cable". A ray that passes through a gap of a device — between a
+yoke and its head, under a slim batten — still means the device, not the floor behind it. The dashed line runs to the
+next point and the label under the cursor gives the length so far (routed length × the cable's slack) and its weight.
+Cables are named by kind ("DMX 1", "Power 2", "Ethernet 1", "Multicore 1"), their length and weight come from the
+electrical model (`CableGeometry`).
+
+#### Port picker
+
+![Port picker](images/editor-port-picker.png)
+
+*A powerCON TRUE1 cable clicked onto Distro 1 whose first outlet is already used: the free outlets are listed first
+with their connector drawings, the mains input (which takes any termination) after them, the outlet in use last, with
+the cable plugged into it.*
+
+The picker opens next to the cursor and lists every port of the device for the cable: its number (keys **1–9** choose),
+connector drawing, name, connector, direction, universe or breaker, and why a port cannot be used — *in use: DMX 2*,
+*does not fit: a power cable cannot be plugged into a DMX512 port*, *adapter: XLR 3-pin to 5-pin adapter needed*, *the
+cable's other end is in an output too*. Usable ports come first (exact connector matches before adapters, then by the
+direction the cable needs, then in device order). Escape or a click outside closes it. The picker belongs to the
+viewport that was clicked (with four views open the other three leave it alone, and the cable can be finished in
+another view); it opens beside the cursor towards the inside of the window and is pushed back inside when it would hang
+over an edge (a device with many ports, a click low in the window, a large UI scale), so it never turns into a
+separate OS window. A cable type the catalogue does not know is named in the status bar instead of starting a cable.
+
+![Выбор разъёма, русский интерфейс, 150 %](images/editor-port-picker-ru.png)
+
+#### Cable nodes
+
+Selecting a cable (any tool) shows its nodes as handles. A **click** selects a node — the Properties panel shows its
+position, what it is fixed to, or the port it is plugged into — and the **Move gizmo** moves it along the three axes; a
+**drag** on a handle moves it in the view plane (snapping rounds it like objects). A node fixed to an object keeps its
+anchor and gets a new offset on it. Every move is one undo step; Escape drops the node selection, **Delete** removes the
+node (a route point joins its neighbours, an end point goes with its segment and plug, a branching node stays — the
+status bar says so; a cable left with one node is deleted). **Escape during a drag** puts the node back where the drag
+started, without an undo step.
+
+### Cable link window
+
+![Cable link window](images/editor-cable-links.png)
+
+*DMX 2 selected: the line from Console 1 DMX A — the console, then each fixture in signal order with its fixture id,
+address and the port the line enters, and between them the cables with their place on the line ("DMX A · cable 2").*
+
+The **Cable Links** panel (bottom group, Window menu) shows the line a cable belongs to as a strip of cards: for a data
+cable the console output it comes from (or the node, splitter, …) and every device in signal order, for a power cable
+the outlet, its phase and voltage and the devices it feeds. The selected cable is highlighted, branches and free ends are
+counted. A click on a **device card** selects the device and brings the Properties panel into view (it is opened when
+closed and its tab brought forward — unless it shares the link window's dock group, which would hide the strip); the
+window keeps the line. A click on a **cable** follows that cable; the buttons in the header select the cable itself or
+show the cable overlay. The source, the device count and the buttons share one header line, the space above the cards
+is kept only for the arcs of branches, and the strip scrolls in both directions when the panel is too low for it (a
+large UI scale in the bottom dock).
+It opens when a cable is clicked in a viewport, when *Show cable links* is pressed in a cable's properties, and when the
+data or power row of a fixture's patch is clicked (`StageToolState.CableLinkRequested`); it follows the selected cable.
+
+![Связи кабеля, русский интерфейс, 150 %](images/editor-cable-links-ru.png)
+
+### Consoles, patch and power
+
+* **Console-driven locking follows the cables.** A fixture is locked to a console only when a DMX line from that
+  console reaches it (through thru ports, splitters and nodes); fixtures without a cable to a console stay under manual
+  control even when the scene has consoles. The lock line names the source: *Locked: driven by console 'Console 1' (DMX
+  A · cable 2, universe 1).* Unplugging (deleting the cable, Undo) gives the fixture back.
+* The **DMX patch** of a fixture gets two rows: **Data** — *'Console 1' DMX A · cable 2 · U1*: the console, its output,
+  the fixture's place on the line and the universe that arrives — and **Power** — *'Distro 1' TRUE1 1 · L1 · 230 V*.
+  A click on either opens the cable link window.
+* A console output on another universe than the fixture's patch is an **error in the Issues panel**
+  (`data.universe-mismatch`), as are a Y-split DMX line, a DMX line without termination and too many devices on a line
+  (see [electrical.md](electrical.md)).
+* **Power**: a fixture is fed by the outlet its power cable chain starts at; the Issues panel lists overloaded
+  breakers (*Outlet 'TRUE1 1' of 'Distro 1' is overloaded: 3 devices draw 4740 W = 20.6 A on a 16 A breaker …*),
+  overloaded links, inlets, cables and dimmer channels, unbalanced phases, voltage and phase mismatches and devices
+  without power. A click on an issue selects the source and the fixtures it feeds.
+* **Properties** of the new objects: a **cable** shows its type (any catalogue type; the Issues panel says when it no
+  longer fits a port it is plugged into), label,
+  length (routed length × slack), weight, the slack (1.00–1.50), the ports its ends are plugged into (click to select
+  the device) and *Show cable links*; with a node selected, its position, anchor and plug. A **console** shows its
+  input protocol (Art-Net, sACN … from External Control, with a button to switch that input on), how many fixtures are
+  cabled to it, and its outputs (name, signal, first universe, universe count; add / remove). A **power source** shows
+  voltage, frequency, phases, the total load per phase, and its outlets (name, connector, breaker, phase; add / remove)
+  with the load on each outlet against its breaker — overloaded outlets in red. **Renaming** an output or an outlet
+  takes the plugs of the cables in it along (one undo step, *Rename console output* / *Rename outlet*), so the cables
+  stay plugged; removing one leaves its cable hanging free.
+* **Lengths follow the scene.** Cable lengths, weights and loads in the Properties panel, the cable link window, the
+  connector rows and the cable legend are those of the scene as it is now: when a fixture, truss or wall that cable
+  points are fixed to moves, the panels re-solve the network once for the new scene version (`CablingNetwork`, about a
+  millisecond for the 91-fixture Фокина rig with a cable to every fixture) — the engine's own solution is only renewed
+  when the scene's structure changes.
+
+### Copies and Escape
+
+* **Duplicated or pasted fixtures** keep their DMX addresses, which overlap their originals. *Settings → Editing →
+  Duplicated fixtures* chooses what happens: *Ask each time* (default; a question offers *Patch to free addresses* or
+  *Keep addresses*), *Patch them to the next free addresses* or *Keep their DMX addresses*. Re-patching moves every
+  overlapping copy to the next free addresses (`AutoPatch`, one search over all copies, so they follow one another) as
+  one undo step. The preference is stored in `editor-preferences.json` in the config folder.
+* **Escape** cancels a wall or floor being drawn or resized (the shape is dropped, a resize goes back to the size it had)
+  and a cable node being dragged (it goes back) without clearing the selection, finishes a cable being drawn, or drops a
+  selected cable node — before it clears the selection.
+
 ## Menus
 
 | Menu | Items |
@@ -324,7 +492,7 @@ The whole drag is one undo step. The engine draws walls and floors with `WallMes
 | File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image, GDTF fixture), Export (MVR scene), Render…, Settings…, Exit |
 | Edit | Undo / Redo (with the step name), Cut, Copy, Paste, Duplicate, Delete, Select All, Deselect |
 | View | Shading, Projection, Camera views, Overlay, Grid, Statistics, View cube, Frame selection, New viewport, Reset layout |
-| Tools | Select, Move, Rotate, Wall, Floor, Cable, Snapping, Local/World space, Open White (all fixtures), Pause Simulation |
+| Tools | Select, Move, Rotate, Wall, Floor, Cable (the tool, then every cable type with its colour), Snapping, Local/World space, Open White (all fixtures), Pause Simulation |
 | Window | open/close every panel, Layouts (Default, Four Viewports, saved, Save Layout As…, Delete Layout), Reset |
 | Help | Keyboard shortcuts, Documentation, About |
 
@@ -365,7 +533,9 @@ While a text field has the keyboard, plain keys type into it and the text-editin
 Y, Ctrl+arrows …) edit the text — they do not select, copy, paste or undo objects; other chords with Ctrl / Alt /
 Super (Ctrl+S, Ctrl+O …) still work. **Escape**
 first closes whatever is open — a menu, a combo box, a dialog, the Settings / Keyboard Shortcuts / About window, a
-shortcut being recorded — and only a press with nothing open clears the selection. Menus and the shortcut editor show
+shortcut being recorded — then cancels a wall or floor drag, finishes a cable being drawn or drops a selected cable
+node — and only a press with nothing open clears the selection. With the Cable tool, **Backspace** removes the cable's
+last point, **1–9** choose a port in the port picker and **Delete** removes a selected cable node. Menus and the shortcut editor show
 punctuation and keypad keys as `Ctrl+,` and `Num 7` (stored in the binding files as `Ctrl+Comma`, `Numpad7`).
 
 ## Settings
@@ -379,6 +549,7 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
 | Keyboard | key binding editor: search, click a chord to record a new one (the recorded press does not run the command), add / remove chords (right-click a chord), conflict warnings; presets *Default*, saved names and *Custom* (Core `PresetLibrary` over a `FilePresetStore` in `presets/`; any edit switches to *Custom*), Save as…, Delete, Reset to default |
 | Viewport | navigation style (Candela / Blender / Maya, with a summary of its mouse bindings), zoom speed, display units (metric / imperial), grid spacing (also the move-snapping step), rotation snapping step |
 | Library | library folders (add with the folder browser, remove; missing folders in red) |
+| Editing | duplicated fixtures: ask each time, patch them to the next free addresses, or keep their DMX addresses (`editor-preferences.json`) |
 | Network | network interface for Art-Net / sACN, Art-Net universe offset (internal universe = Art-Net port-address + offset; 1 or 0, see `protocols.md`) |
 | Files | autosave interval (off – 60 min), recent files count |
 | GPU | current device and driver, preferred GPU, Vulkan validation (on restart) |
@@ -431,7 +602,9 @@ fog / haze / fan output. A line above it says **who drives the fixture**:
 * *Manual control* — no live DMX: the controls below set the fixture.
 * *Locked: universe N receives live DMX* — an Art-Net / sACN / EntTec source sends the fixture's universe (see
   [External Control](#external-control)).
-* *Locked: driven by console …* — a console in the scene feeds the fixture through a DMX cable.
+* *Locked: driven by console 'Console 1' (DMX A · cable 2, universe 1).* — a console in the scene feeds the fixture
+  through DMX cables (see [Consoles, patch and power](#consoles-patch-and-power)); a console without a cable to the
+  fixture does not lock it.
 * *The fixture type could not be resolved* — with the reason (missing or broken GDTF file, unknown mode).
 
 While locked, the controls are disabled and show the values the console or DMX source sets; the tooltip repeats the
@@ -476,8 +649,9 @@ not candela).
 **Connectors**: every data and power port of the fixture with a vector drawing of its connector (powerCON / TRUE1,
 XLR 3/5-pin, RJ45 / etherCON, Schuko, IEC, CEE, Socapex, Harting … — 38 drawings, a neutral socket for anything else),
 signal and direction, current ratings and breakers, and the cable plugged in (label, type, length, the cable colour).
-Clicking a cable asks the cable editor to open it (`StageToolState.CableLinkRequested`); without a listener the cable
-is selected.
+Clicking a cable opens it in the [cable link window](#cable-link-window) (`StageToolState.CableLinkRequested`; without
+a listener the cable is selected). Below the patch, the **Data** and **Power** rows say where the fixture's DMX and power
+come from.
 
 ![Floor: size, material and preview](images/editor-properties-floor.png)
 
@@ -604,14 +778,22 @@ recording playback it started.
 ### Overlay legends
 
 ![Illuminance overlay with its legend](images/editor-overlay-lux.png)
-![Cables legend](images/editor-overlay-cables.png)
 
 With the *Illuminance* or *Noise* overlay, the viewport shows a legend in its lower-right corner: the colour gradient
 with its stops and range. Click the bar to add a stop, drag stops to move them, drag the range brackets to set the
 minimum and maximum, right-click a stop to recolour or remove it; the chevron expands numeric fields (from, to,
 logarithmic scale, the value of the selected stop). Values outside the range are drawn grey. Each gradient has presets
-like the Preview panel, applies to every viewport and is saved in the project. The *Cables* overlay shows the colour of
-each cable type (those in the scene, or the whole catalogue while there are none).
+like the Preview panel, applies to every viewport and is saved in the project.
+
+![Cable overlay with its legend](images/editor-overlay-cables.png)
+
+The *Cables* overlay (Alt+C) draws every cable in the colour of its type and highlights the devices with cables plugged
+in; everything else is grey. Its legend lists the types **in the scene** first — colour, connector drawing, localized
+name, and how many cables of the type there are with their total length and weight (*3 pcs · 20.5 m · 1.1 kg*; the
+figures move under the name when they do not fit beside it) — and folds the rest of the catalogue under *Other cable
+types*; while the scene has no cables, it lists the whole catalogue.
+
+![Оверлей кабелей, русский интерфейс, 150 %](images/editor-overlay-cables-ru.png)
 
 ### Implementation
 
@@ -649,8 +831,7 @@ Limitations: final path tracing and EXR output wait for the path tracer; the rec
 frame; status texts of the protocols and the issue messages of the engine (patch, MVR import) come in English; the
 timecode's source names the protocol, not the sender's address (the Art-Net receiver does not report it); changes of
 the preview, render and legend settings are saved with the project but do not count as unsaved changes, and they are
-not undo steps (the engine's modified flag covers the stage only); the cable editor that a cable link opens comes with
-phase B3.
+not undo steps (the engine's modified flag covers the stage only).
 
 ## Robustness
 
@@ -703,7 +884,9 @@ to keep them in the screenshot, or grab the whole X screen (`import -window root
 
 `--script <file.json>` replays input before the screenshot (and also in interactive runs). Actions run frame by frame;
 mouse and key events are queued into Dear ImGui exactly like real input, so a scripted click exercises the same code as
-a real one. Coordinates are pixels in the main window.
+a real one. Coordinates are pixels in the main window; `move`, `click`, `press` and `scroll` can instead aim at a
+point of the stage — `"world": [x, y, z]` in metres, or `"entity": "Console 1"` (the centre of its bounds) — resolved
+in the active viewport when the action runs, so a script does not depend on the window size or UI scale.
 
 ```json
 { "actions": [
@@ -719,10 +902,11 @@ a real one. Coordinates are pixels in the main window.
 | Type | Fields | Effect |
 |---|---|---|
 | `wait` | `frames` | do nothing for n frames |
-| `move` | `x`, `y` | move the mouse |
-| `click` | `x`, `y`, `button` (left/right/middle), `modifiers` ("ctrl+shift"), `double` | click |
+| `move` | `x`, `y` (or `world` / `entity`) | move the mouse |
+| `click` | `x`, `y` (or `world` / `entity`), `button` (left/right/middle), `modifiers` ("ctrl+shift"), `double` | click |
+| `press` / `release` | `x`, `y` (or `world` / `entity`), `button`, `modifiers` | press a button and hold it across later actions / release it where the mouse is |
 | `drag` | `x`, `y`, `toX`, `toY`, `steps`, `button`, `modifiers` | press, move in steps, release |
-| `scroll` | `x`, `y`, `delta` | mouse wheel |
+| `scroll` | `x`, `y` (or `world` / `entity`), `delta` | mouse wheel |
 | `key` | `chord` ("Ctrl+Shift+S") | press and release a key chord |
 | `text` | `text` | type text into the focused field |
 | `menu` | `path` ("File/Settings", "/" or ">" separated; labels in either language, ellipsis and icons ignored) | select a main-menu item |
@@ -748,26 +932,33 @@ src/Candela.App/
   Shell/      EditorApplication (start-up, frame loop, shutdown), GlfwPlatform, MainWindow, GpuDevice,
               ImGuiHost (context, backends, textures), SwapchainCapture, StartupFailureScreen, FrameTimer,
               Workspace (+ .Menus: panels, commands, menus, layouts, dialogs; + .Session: document commands,
-              busy operations, file drops, recovery; + .Library: library host, placement popup), FileDropQueue,
-              MenuScope, WorkspaceContext
+              busy operations, file drops, recovery; + .Library: library host, placement popup; + .Cables: cable
+              tool host, Tools → Cable menu, editing keys, duplicate re-patch), FileDropQueue, MenuScope,
+              WorkspaceContext
   Docking/    DockWorkspace (dock space, presets, tab styles, icon column), Panel, TabStyleMap, LayoutFile, LayoutStore
   Viewport/   ViewportPanel (+ .Surface: surface under the cursor, framing; + .Placement: library drops and ghost;
-              + .Drawing: Wall / Floor tools and resize handles), ViewportCamera, ViewCube, NavigationStyles
+              + .Drawing: Wall / Floor tools and resize handles; + .Cables: cable tool input, targets, draft,
+              port picker, cable node handles and gizmo), ViewportCamera, ViewCube, NavigationStyles, OverlayLegend
   Editing/    SelectionController, EditOperations, TransformMath, SceneLookup, Placement (orientation on a surface),
-              WallShapes (wall / floor geometry), AutoPatch, LibraryPlacement, FixtureInfoCache, ModelLibrary
+              WallShapes (wall / floor geometry), AutoPatch, LibraryPlacement, FixtureInfoCache, ModelLibrary,
+              CableTool (the tool's model: targets, draft, port choice, commits), CablePorts (port candidates and
+              positions), CableNodeEdits (moving / deleting nodes), DevicePlacement, DuplicatePatch
   Session/    EditorSession (the single gateway to StageEngine), EngineViewportContent (RenderSync → viewports,
               picking, bounds, outline), TrackedRenderWorld (mesh bounds for box selection and framing),
-              IViewportContent, PreviewStage (--preview-stage), SessionResult
+              IViewportContent, PreviewStage (--preview-stage), SessionResult, CableLinkModel (the strip of the
+              cable link window)
   Thumbnails/ ThumbnailWorker (background renderer for library stills and orbit frames), UiTextures (ImGui user
               textures with deferred release)
   Input/      key names, commands, KeyBindingMap / dispatcher, KeyBindingsService, InputScript, ScriptPlayer,
               SessionActions
   Files/      FileFilter, FileBrowserModel (pure logic), FileBrowserDialog (UI)
-  Panels/     Library, Properties, Issues, Console, Render, Preview
+  Panels/     Library (+ .Devices), Properties (+ ConnectionInspectorView: cables, consoles, power sources),
+              CableLinks, Issues, Console, Render, Preview
   Windows/    SettingsWindow, SessionDialogs (busy, unsaved changes, open-or-import, recovery), message boxes, About,
               Shortcuts
-  Settings/   SettingsStore
-  Ui/         Theme, FontSet, Icons, Loc / Str, Labels, PropertyGrid, UiScale
+  Settings/   SettingsStore, EditorPreferences (editor-preferences.json)
+  Ui/         Theme, FontSet, Icons, Loc / Str, Labels, PropertyGrid, UiScale, CableStrings (CableStr / CableLoc:
+              texts, cable type and device names in both languages), CableTypeMenu, PortPicker, DeviceIcons
   Diagnostics/AppLog
 ```
 
@@ -792,7 +983,7 @@ changes). Allocations happen on user actions (edits, opening menus and dialogs, 
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 450 tests, a little over a minute) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 550 tests, under two minutes) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
 the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
 styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
@@ -838,10 +1029,33 @@ Properties panel (and Escape must clear it), shortcuts must work after fly mode 
 session with resizes, tear-offs and new viewports under `--validation` must report no validation error, and a run
 without a Vulkan driver must exit with code 3. They are skipped when `xvfb-run` or a Vulkan device is missing.
 
+The M4 cabling tests: `CableToolTests` (the tool's model on a headless engine with a console, a wall, a truss with
+three spots and a distro: a route over the wall and the truss into a fixture with the console's port picker, the daisy
+chain continuing from each fixture's thru, a Y branch from the middle of a segment, the picker's in-use, incompatible
+and wrong-direction entries and the automatic choice when one port fits, free ends, joining, Backspace, node moves and
+deletes with undo, undo while drawing), `CablingPanelTests` (console-driven locking that follows the cables — with the
+lock text, the patch rows and a universe mismatch in the Issues panel —, a power overload after cabling three fixtures
+to a distro outlet and the outlet load in the power source's properties, the cable link window under a window-less
+Dear ImGui context: the strip, a device card selecting the device, a cable followed, Russian texts; devices of every
+section placed with their ports, names and a patch for the dimmer; cables, consoles, power sources and generic GDTF
+devices saved and reopened unchanged; copied fixtures re-patched in one undo step; the editor preferences file; the
+cable strings complete in both languages; scripted `world` / `entity` points) and `CableEndToEndTests` (the real editor
+under `xvfb-run`: the type chosen in Tools → Cable, the console clicked and DMX A taken with key 1 in the port picker, a
+point on the wall, fixtures clicked one after the other, Escape, a branch from the middle of the first cable to the
+third fixture ended with a right click, a power cable from a distro outlet over the floor, a floor drag cancelled with
+Escape, the project saved and read back — cables, anchors, plugs and the fixtures the console drives). The Electrical
+tests cover the catalogue additions (`DeviceCatalogTests`), the Engine tests `GenericDeviceLibrary`.
+
 ## Limitations
 
-* The Cable tool stays disabled (cables are drawn in a later phase). Walls and floors are rectangular boxes (no
-  polygons, no openings); a floor is drawn aligned to the world axes and turned afterwards with the Rotate gizmo.
+* Walls and floors are rectangular boxes (no polygons, no openings); a floor is drawn aligned to the world axes and
+  turned afterwards with the Rotate gizmo.
+* Cables: the engine draws every span with the cable's slack as a catenary, also spans lying on a floor, which then
+  sag below it (the length is right, the picture is not); the *Mains In* of consoles' and distros' power sources takes
+  any connector (the component has no inlet connector field); a cable's type can be changed to any type and the
+  Issues panel then reports the ports it no longer fits; generic nodes, splitters and the dimmer pack are exported to
+  MVR as GDTF fixtures (other programs see them as fixtures); route points are anchored to the object under the click,
+  not snapped to truss chords.
 * A fixture dropped from the Library lands with its default mode (another mode is chosen in the popup that follows the
   drop, or later in the Properties panel). A fixture type whose GDTF file cannot be read is still placed, without a
   mode and unpatched (its ghost is a 1 m box), and the engine reports the file in the Issues panel.

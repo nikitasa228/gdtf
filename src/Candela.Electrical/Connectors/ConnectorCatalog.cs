@@ -55,6 +55,14 @@ public static class ConnectorCatalog
         Power("CEE 63A 3P", "CEE 63 A 400 V (5-pin)", "CEE 63A 3P", 63f, 5, "connector-cee63-3p",
             "CEE63", "CEE 63A", "CEE63 3P", "CEE 63A 5P", "CEE 63A 5-pin", "CEE 63A 400V", "cee63-3p") with
         { Phases = 3 },
+        Power("CEE 125A 3P", "CEE 125 A 400 V (5-pin)", "CEE 125A 3P", 125f, 5, "connector-cee125-3p",
+            "CEE125", "CEE 125A", "CEE125 3P", "CEE 125A 5P", "CEE 125A 5-pin", "CEE 125A 400V", "cee125-3p") with
+        { Phases = 3 },
+
+        // ---- Powerlock: five single-pole connectors (L1, L2, L3, N, PE) of a 400 A three-phase supply
+        Power("Powerlock", "Powerlock 400 A (5 × single pole)", "Powerlock", 400f, 5, "connector-powerlock",
+            "Power Lock", "Powerlock 400", "Powerlock 400A", "Powerlock 400 A", "Powerlock 5-pole") with
+        { Phases = 3 },
 
         // ---- multicores (6 circuits)
         new ConnectorInfo

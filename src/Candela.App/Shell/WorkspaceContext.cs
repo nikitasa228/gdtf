@@ -1,4 +1,5 @@
 using Candela.App.Diagnostics;
+using Candela.App.Editing;
 using Candela.App.Session;
 using Candela.App.Settings;
 using Candela.App.Ui;
@@ -23,6 +24,9 @@ internal enum EditorTool
 
     /// <summary>Draws floors: a drag on a horizontal surface gives a rectangle.</summary>
     Floor,
+
+    /// <summary>Draws cables: clicks route a cable over surfaces and plug it into device ports (<see cref="CableTool"/>).</summary>
+    Cable,
 }
 
 /// <summary>Editing state shared by all viewports, menus and shortcuts.</summary>
@@ -50,6 +54,12 @@ internal sealed class ToolState
     public FinalRenderSettings FinalRender { get; } = new();
 
     private StageToolState? _stage;
+
+    /// <summary>The cable tool's state (type, the cable being drawn, the port picker); set by the workspace.</summary>
+    public CableTool? Cables { get; set; }
+
+    /// <summary>The selected cable node (cable nodes are moved with the gizmo and dragged like objects), or null.</summary>
+    public CableNodeRef? CableNode { get; set; }
 
     /// <summary>State of the engine-backed panels: presets, overlay legends, DMX recording, project settings binding.</summary>
     public StageToolState Stage => _stage ??= new StageToolState(Preview, FinalRender);

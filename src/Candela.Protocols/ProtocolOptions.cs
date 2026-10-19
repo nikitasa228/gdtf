@@ -108,9 +108,11 @@ public sealed record ProtocolOptions
     }
 
     /// <summary>Throws <see cref="ProtocolStartException"/> when <paramref name="port"/> is not a UDP port number.</summary>
-    internal static void ValidatePort(int port, string what)
+    /// <param name="port">The port.</param>
+    /// <param name="protocolLabel">"Art-Net", "sACN" … for the message.</param>
+    internal static void ValidatePort(int port, string protocolLabel)
     {
         if (port is < 0 or > 65535)
-            throw new ProtocolStartException($"{what} {port} is not a valid UDP port (0–65535).");
+            throw new ProtocolStartException(ProtocolText.Create(ProtocolMessages.InvalidPort, protocolLabel, port), ProtocolErrorCode.InvalidSettings);
     }
 }

@@ -1,11 +1,11 @@
 using System.Numerics;
+using System.Text.Json;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.Editing;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
-using Candela.Project.Internal;
 
 namespace Candela.Project;
 
@@ -187,14 +187,16 @@ public static class ProjectMerge
                 parent = targetScene.Find(pid) ?? throw new ArgumentException($"Entity {pid} is not in the scene.", nameof(options));
             }
 
-            // Every source entity gets a new id (tree order: parents first).
+            // Every source entity gets a new id (tree order: parents first); Core's EntityCloner copies the subtrees and
+            // rewrites the entity references (mounts, carried structures, cable anchors and ends) and asset ids.
             var sourceEntities = source.Scene.All().ToList();
             var entityIds = new Dictionary<Guid, Guid>(sourceEntities.Count);
             foreach (var e in sourceEntities) entityIds[e.Id] = Guid.NewGuid();
 
             var layers = MapLayers(targetScene, source.Scene, options, out var addedLayers);
             var assetIds = MapAssets(target, source, options, out var plannedAssets);
-            var gdtfNames = MapGdtfs(target, source, options, entityIds, issues, out var plannedGdtfs);
+            var gdtfIssues = new List<Issue>();
+            var gdtfNames = MapGdtfs(target, source, options, gdtfIssues, out var plannedGdtfs);
             var fixtureIds = options.RenumberFixtureIds ? PlanFixtureIds(targetScene, source.Scene) : null;
 
             // World transform the imported scene's root space ends up in (for world-space points in components).
@@ -209,28 +211,26 @@ public static class ProjectMerge
             group.Local = options.Placement;
             group.Add(new GroupComponent());
 
-            // Build the tree in a staging scene (Scene.Add is the only way to attach children), then detach it whole.
-            var staging = new Scene();
-            staging.Add(group);
-            var clones = new Dictionary<Guid, Entity>(sourceEntities.Count);
-            var remap = new ReferenceRemapper(entityIds, assetIds, target, source.Assets, gdtfNames, fixtureIds, groupWorld, issues);
-            foreach (var e in sourceEntities)
+            var completion = new MergeCompletion(target, source.Assets, assetIds, gdtfNames, fixtureIds, groupWorld, issues);
+            var copy = EntityCloner.Clone(source.Scene.Roots, new EntityCloneOptions
             {
-                var newId = entityIds[e.Id];
-                var newParent = e.Parent is { } p && clones.TryGetValue(p.Id, out var pc) ? pc : group;
-                var layer = e.LayerId != Guid.Empty && layers.TryGetValue(e.LayerId, out var l) ? l : newParent.LayerId;
-                var clone = new Entity(e.Name, newId) { LayerId = layer, Visible = e.Visible, Locked = e.Locked };
-                clone.Local = e.Local;
-                foreach (var c in e.Components)
-                {
-                    var copy = ProjectJson.Clone(c); // Component.Clone would turn a null that differs from the default into the default
-                    remap.Apply(c, copy, clone);
-                    clone.Add(copy);
-                }
-                staging.Add(clone, newParent);
-                clones[e.Id] = clone;
+                // the target is not given: the copies may go to layers that are added with them (they are not in it yet)
+                IdFactory = e => entityIds[e.Id],
+                ExternalReferences = ExternalReferenceHandling.Clear,
+                LayerMap = id => id != Guid.Empty && layers.TryGetValue(id, out var mapped) ? mapped : Guid.Empty,
+                AssetIdMap = assetIds,
+                ComponentCopied = completion.Complete,
+            });
+            foreach (var root in copy.Roots) group.AddChild(root);
+            entityIds = new Dictionary<Guid, Guid>(copy.IdMap);
+            foreach (var cleared in copy.ClearedReferences) completion.ReportCleared(cleared);
+            foreach (var issue in copy.Issues)
+            {
+                // removed references are reported one by one above, with what they referred to
+                if (issue.Code != EntityCloner.ReferencesRemovedCode) issues.Add(issue);
             }
-            staging.Remove(group);
+            foreach (var issue in gdtfIssues)
+                issues.Add(issue with { Entities = issue.Entities.Where(entityIds.ContainsKey).Select(id => entityIds[id]).ToArray() });
 
             // The imported project's own load issues, pointing at the new entities. Components of unknown types stay in the
             // imported file only: this version cannot translate the references they may hold, so they are not copied.
@@ -287,7 +287,15 @@ public static class ProjectMerge
                     map[layer.Id] = existing;
                     continue;
                 }
-                var copy = new Layer { Id = Guid.NewGuid(), Name = layer.Name, Visible = layer.Visible, Locked = layer.Locked };
+                var copy = new Layer
+                {
+                    Id = Guid.NewGuid(),
+                    Name = layer.Name,
+                    Visible = layer.Visible,
+                    Locked = layer.Locked,
+                    // properties of a newer version travel with the layer, as they do with the entities (Core's copy)
+                    UnknownProperties = layer.UnknownProperties is { } unknown ? new Dictionary<string, JsonElement>(unknown) : null,
+                };
                 added.Add(copy);
                 byName.TryAdd(copy.Name, copy.Id);
                 map[layer.Id] = copy.Id;
@@ -324,8 +332,12 @@ public static class ProjectMerge
             return map;
         }
 
+        /// <summary>
+        /// Stored GDTF name of the imported project → name in this project. Issues name the imported project's entities
+        /// (their ids are translated once the copies exist).
+        /// </summary>
         private static Dictionary<string, string> MapGdtfs(ProjectData target, ProjectData source, ProjectMergeOptions options,
-            Dictionary<Guid, Guid> entityIds, List<Issue> issues, out List<(string Name, byte[] Data)> planned)
+            List<Issue> issues, out List<(string Name, byte[] Data)> planned)
         {
             planned = new List<(string, byte[])>();
             var map = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -355,7 +367,7 @@ public static class ProjectMerge
                 planned.Add((renamed, data));
                 issues.Add(new Issue(IssueSeverity.Note, IssueCategory.Fixture, ProjectIssueCodes.MergeGdtfRenamed,
                     $"The imported fixture file '{name}' differs from the file of the same name in this project; it was added as '{renamed}'.",
-                    users.TryGetValue(name, out var related) ? related.Select(id => entityIds[id]).ToArray() : Array.Empty<Guid>()));
+                    users.TryGetValue(name, out var related) ? related.ToArray() : Array.Empty<Guid>()));
             }
             return map;
         }
@@ -446,58 +458,70 @@ public static class ProjectMerge
         }
     }
 
-    /// <summary>Translates the references of one cloned component.</summary>
-    private sealed class ReferenceRemapper(
-        Dictionary<Guid, Guid> entityIds,
-        Dictionary<Guid, Guid> assetIds,
+    /// <summary>
+    /// What a merge adds to Core's copy (<see cref="EntityCloneOptions.ComponentCopied"/>): GDTF file names, console
+    /// fixture ids, world-space points moved by the placement, asset texture keys inside material ids, asset references
+    /// that point nowhere, cable segments and ends whose node is missing; and the issues about removed references.
+    /// </summary>
+    private sealed class MergeCompletion(
         ProjectData target,
         AssetStore sourceAssets,
+        Dictionary<Guid, Guid> assetIds,
         Dictionary<string, string> gdtfNames,
         Dictionary<FixtureComponent, int>? fixtureIds,
         Matrix4x4 groupWorld,
         List<Issue> issues)
     {
         private readonly bool _moveWorldPoints = !groupWorld.IsIdentity;
+        private Dictionary<string, (string Stored, string Mapped)>? _gdtfNamesIgnoringCase;
 
-        /// <summary>Translates the references of <paramref name="copy"/>, a clone of <paramref name="original"/> owned by <paramref name="owner"/>.</summary>
-        public void Apply(Component original, Component copy, Entity owner)
+        /// <summary>Completes <paramref name="copy"/>, the copy of <paramref name="original"/> (references already remapped by Core).</summary>
+        public void Complete(Component original, Component copy)
         {
+            var owner = copy.Owner!;
             switch (copy)
             {
                 case FixtureComponent f:
-                    f.MountedOn = Entity(f.MountedOn, owner, "the object it is mounted on");
                     if (GdtfName(f.GdtfSpec) is { } gdtf) f.GdtfSpec = gdtf;
                     if (f.FocusPoint is { } focus && _moveWorldPoints) f.FocusPoint = Vector3.Transform(focus, groupWorld);
                     if (fixtureIds is not null && original is FixtureComponent source && fixtureIds.TryGetValue(source, out var fixtureId))
                         f.FixtureId = fixtureId;
                     break;
                 case CableComponent cable:
-                    RemapCable(cable, owner);
-                    break;
-                case RiggingPointComponent rig:
-                    var carries = new List<Guid>(rig.Carries.Count);
-                    foreach (var id in rig.Carries)
-                        if (Entity(id, owner, "a structure it carries") is { } mapped) carries.Add(mapped);
-                    rig.Carries = carries;
+                    DropDanglingCableParts(cable);
                     break;
                 case MeshComponent mesh:
-                    mesh.ModelAssetId = Asset(mesh.ModelAssetId, owner, "model") ?? Guid.Empty;
+                    mesh.ModelAssetId = Asset(((MeshComponent)original).ModelAssetId, mesh.ModelAssetId, owner, "model") ?? Guid.Empty;
                     foreach (var slot in mesh.MaterialOverrides.Keys.ToArray())
                         mesh.MaterialOverrides[slot] = AssetKey(mesh.MaterialOverrides[slot], owner);
                     break;
                 case ImageComponent image:
-                    image.ImageAssetId = Asset(image.ImageAssetId, owner, "image") ?? Guid.Empty;
+                    image.ImageAssetId = Asset(((ImageComponent)original).ImageAssetId, image.ImageAssetId, owner, "image") ?? Guid.Empty;
                     break;
                 case TrussComponent truss:
-                    truss.ModelAssetId = truss.ModelAssetId is { } tm ? Asset(tm, owner, "model") : null;
+                    truss.ModelAssetId = ((TrussComponent)original).ModelAssetId is { } tm ? Asset(tm, truss.ModelAssetId ?? tm, owner, "model") : null;
                     break;
                 case WallComponent wall:
                     wall.MaterialId = AssetKey(wall.MaterialId, owner);
                     break;
                 case CameraComponent camera:
-                    if (camera.Target is { } target && _moveWorldPoints) camera.Target = Vector3.Transform(target, groupWorld);
+                    if (camera.Target is { } point && _moveWorldPoints) camera.Target = Vector3.Transform(point, groupWorld);
                     break;
             }
+        }
+
+        /// <summary>Reports a reference Core removed because the imported project does not contain what it named.</summary>
+        public void ReportCleared(ClearedEntityReference cleared)
+        {
+            if (cleared.Component?.Owner is not { } owner) return;
+            string what = cleared.Component switch
+            {
+                FixtureComponent => "the object it is mounted on",
+                RiggingPointComponent => "a structure it carries",
+                CableComponent => "the object a cable node or cable end is connected to",
+                _ => "an object",
+            };
+            Dangling(owner, $"'{owner.Name}' referred to {what} ({cleared.EntityId:D}), which does not exist in the imported project; the reference was removed.");
         }
 
         /// <summary>
@@ -515,8 +539,6 @@ public static class ProjectMerge
                 : null;
         }
 
-        private Dictionary<string, (string Stored, string Mapped)>? _gdtfNamesIgnoringCase;
-
         private static Dictionary<string, (string Stored, string Mapped)> BuildCaseInsensitive(Dictionary<string, string> names)
         {
             // First wins, in the stored copies' order: the copy ProjectData.FindGdtf binds a case-variant name to.
@@ -525,64 +547,35 @@ public static class ProjectMerge
             return map;
         }
 
-        private void RemapCable(CableComponent cable, Entity owner)
+        /// <summary>Segments and ends of a copied cable that name a node the cable does not have are dropped.</summary>
+        private static void DropDanglingCableParts(CableComponent cable)
         {
-            // Node ids get new ids too, so cables of a project merged into itself never share node ids.
-            var nodeIds = new Dictionary<Guid, Guid>(cable.Nodes.Count);
+            var nodes = new HashSet<Guid>();
             foreach (var node in cable.Nodes)
-            {
-                var newId = Guid.NewGuid();
-                nodeIds.TryAdd(node.Id, newId);
-                node.Id = newId;
-                if (node.Anchor is { } anchor)
-                {
-                    if (Entity(anchor.EntityId, owner, "the object a cable node is anchored to") is { } mapped)
-                        node.Anchor = anchor with { EntityId = mapped };
-                    else
-                        node.Anchor = null;
-                }
-            }
-            var segments = new List<CableSegment>(cable.Segments.Count);
-            foreach (var s in cable.Segments)
-            {
-                if (nodeIds.TryGetValue(s.FromNode, out var from) && nodeIds.TryGetValue(s.ToNode, out var to))
-                    segments.Add(new CableSegment(from, to));
-            }
-            cable.Segments = segments;
-            var endpoints = new List<CableEndpoint>(cable.Endpoints.Count);
-            foreach (var ep in cable.Endpoints)
-            {
-                if (!nodeIds.TryGetValue(ep.NodeId, out var node)) continue;
-                if (Entity(ep.EntityId, owner, $"the device of cable end '{ep.PortName}'") is not { } device) continue;
-                endpoints.Add(new CableEndpoint { NodeId = node, EntityId = device, PortName = ep.PortName });
-            }
-            cable.Endpoints = endpoints;
+                if (node is not null) nodes.Add(node.Id);
+            cable.Segments.RemoveAll(s => !nodes.Contains(s.FromNode) || !nodes.Contains(s.ToNode));
+            cable.Endpoints.RemoveAll(e => e is null || !nodes.Contains(e.NodeId));
         }
 
-        private Guid? Entity(Guid? id, Entity owner, string what)
+        /// <summary>
+        /// The asset a copied component refers to: the mapped id when the imported project has the asset; the same id when
+        /// only this project has it (the file was a copy of this project), loaded or kept verbatim; else none (reported).
+        /// </summary>
+        private Guid? Asset(Guid original, Guid mapped, Entity owner, string what)
         {
-            if (id is not { } value || value == Guid.Empty) return id;
-            if (entityIds.TryGetValue(value, out var mapped)) return mapped;
-            Dangling(owner, $"'{owner.Name}' referred to {what} ({value:D}), which does not exist in the imported project; the reference was removed.");
-            return null;
-        }
-
-        private Guid? Asset(Guid id, Entity owner, string what)
-        {
-            if (id == Guid.Empty) return id;
-            if (assetIds.TryGetValue(id, out var mapped)) return mapped;
-            // Not in the imported project. Keep it when this project has that asset (the file was a copy of this project),
-            // loaded or kept verbatim.
-            if (!sourceAssets.Contains(id) && (target.Assets.Contains(id) || target.KeptAssetIds.Contains(id))) return id;
-            Dangling(owner, $"'{owner.Name}' referred to a {what} asset ({id:D}) that is not in the imported project; the reference was removed.");
+            if (original == Guid.Empty) return original;
+            if (assetIds.ContainsKey(original)) return mapped;
+            if (!sourceAssets.Contains(original) && (target.Assets.Contains(original) || target.KeptAssetIds.Contains(original))) return original;
+            Dangling(owner, $"'{owner.Name}' referred to a {what} asset ({original:D}) that is not in the imported project; the reference was removed.");
             return null;
         }
 
         private string AssetKey(string key, Entity owner)
         {
             if (!AssetKeys.TryParseAssetKey(key, out var id, out var relative)) return key;
-            if (Asset(id, owner, "texture") is not { } mapped || mapped == Guid.Empty) return MaterialIds.Default;
-            return relative is null ? AssetKeys.ForAsset(mapped) : AssetKeys.ForFile(mapped, relative);
+            var mapped = assetIds.TryGetValue(id, out var m) ? m : id;
+            if (Asset(id, mapped, owner, "texture") is not { } asset || asset == Guid.Empty) return MaterialIds.Default;
+            return relative is null ? AssetKeys.ForAsset(asset) : AssetKeys.ForFile(asset, relative);
         }
 
         private void Dangling(Entity owner, string message) =>
@@ -607,10 +600,12 @@ public sealed class ProjectImportCommand : IUndoableCommand
     {
         _target = target;
         _plan = plan;
+        Description = $"Import {plan.Group.Name}";
     }
 
     /// <inheritdoc />
-    public string Description => $"Import {_plan.Group.Name}";
+    /// <remarks>Fixed when the command is created: renaming the group later does not change the undo history's text.</remarks>
+    public string Description { get; }
 
     /// <summary>What the import adds (valid before the first <see cref="Do"/>; issues of adding assets appear after it).</summary>
     public ProjectMergeResult Result => _plan.Result;
@@ -622,11 +617,8 @@ public sealed class ProjectImportCommand : IUndoableCommand
         var scene = _target.Scene;
         var parent = _plan.ParentId is { } pid ? scene.Find(pid) : null;
 
-        if (_plan.Result.AddedLayers.Count > 0)
-        {
-            foreach (var layer in _plan.Result.AddedLayers) scene.Layers.Add(layer);
-            scene.NotifySettingsChanged();
-        }
+        // the layer collection raises LayersChanged itself
+        foreach (var layer in _plan.Result.AddedLayers) scene.Layers.Add(layer);
         _assetsAdded.Clear();
         foreach (var (entry, id) in _plan.Assets)
         {
@@ -669,11 +661,7 @@ public sealed class ProjectImportCommand : IUndoableCommand
             if (_target.GdtfFiles.TryGetValue(name, out var data) && ReferenceEquals(data, added)) _target.GdtfFiles.Remove(name);
         }
         foreach (var id in _assetsAdded) _target.Assets.Remove(id);
-        if (_plan.Result.AddedLayers.Count > 0)
-        {
-            foreach (var layer in _plan.Result.AddedLayers) scene.Layers.Remove(layer);
-            scene.NotifySettingsChanged();
-        }
+        foreach (var layer in _plan.Result.AddedLayers) scene.Layers.Remove(layer);
         _done = false;
     }
 }

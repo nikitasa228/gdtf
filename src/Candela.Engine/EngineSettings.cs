@@ -114,6 +114,12 @@ public sealed class ViewSettings
 
     /// <summary>Camera of the main view when the project was saved, or null.</summary>
     public SavedCamera? Camera { get; set; }
+
+    /// <summary>
+    /// The work light of the editor's preview (<see cref="RenderSync.WorkLight"/>): by default it lights the set dimly
+    /// while no fixture emits, so an unlit scene is not just black. Final renders do not use it unless asked.
+    /// </summary>
+    public WorkLightMode WorkLight { get; set; } = WorkLightMode.Auto;
 }
 
 /// <summary>A camera position stored with a project (world space, metres, degrees at this boundary).</summary>

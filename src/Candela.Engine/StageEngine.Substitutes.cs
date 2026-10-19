@@ -132,7 +132,7 @@ public sealed partial class StageEngine
             {
                 continue;
             }
-            var mode = (sub.RequestedMode is null ? null : type.FindMode(sub.RequestedMode)) ?? SubstituteModes.Choose(type, sub.RequestedMode, sub.PatchSpacing);
+            var mode = (sub.RequestedMode is null ? null : type.FindMode(sub.RequestedMode)) ?? type.FitModeToSpacing(sub.RequestedMode, sub.PatchSpacing);
             fixture.GdtfSpec = match.Entry.FileName;
             fixture.GdtfMode = mode?.Name ?? sub.RequestedMode;
             fixture.NotifyChanged();

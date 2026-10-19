@@ -193,6 +193,18 @@ internal sealed unsafe partial class ViewportPanel
         session.Selection.Set(entity.Id);
     }
 
+    /// <summary>
+    /// Escape during a wall or floor drag: the shape being drawn is dropped, a resize goes back to the size it had.
+    /// Returns true when a drag was cancelled.
+    /// </summary>
+    internal bool CancelShapeDrawing()
+    {
+        if (_shape.Mode == ShapeMode.None)
+            return false;
+        CancelShapeEdit();
+        return true;
+    }
+
     private void CancelShapeEdit()
     {
         if (_shape.Mode == ShapeMode.Resize && _shape.Entity is { Scene: not null } entity && entity.Get<WallComponent>() is { } wall && _shape.Moved)

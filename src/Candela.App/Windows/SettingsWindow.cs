@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Numerics;
 using Candela.App.Files;
 using Candela.App.Input;
+using Candela.App.Settings;
 using Candela.App.Shell;
 using Candela.App.Ui;
 using Candela.App.Viewport;
@@ -37,6 +38,9 @@ internal enum SettingsSection
 
     /// <summary>GPU selection and validation.</summary>
     Gpu,
+
+    /// <summary>Editing preferences (addresses of duplicated fixtures).</summary>
+    Editing,
 }
 
 /// <summary>
@@ -144,6 +148,7 @@ internal sealed class SettingsWindow
                 case SettingsSection.Network: DrawNetwork(); break;
                 case SettingsSection.Files: DrawFiles(); break;
                 case SettingsSection.Gpu: DrawGpu(); break;
+                case SettingsSection.Editing: DrawEditing(); break;
             }
 
             ImGui.EndChild();
@@ -169,7 +174,49 @@ internal sealed class SettingsWindow
         SectionItem(SettingsSection.Network, Icons.Network, Str.SettingsNetwork);
         SectionItem(SettingsSection.Files, Icons.Save, Str.SettingsFiles);
         SectionItem(SettingsSection.Gpu, Icons.Cpu, Str.SettingsGpu);
+        if (ImGui.Selectable(CableLoc.With(Icons.Pencil, CableStr.SettingsEditing), _section == SettingsSection.Editing, ImGuiSelectableFlags.None,
+                new Vector2(0, ImGui.GetFrameHeight())))
+        {
+            _section = SettingsSection.Editing;
+            StopCapture();
+        }
+
         ImGui.EndChild();
+    }
+
+    /// <summary>Editing preferences of the editor (set by the workspace).</summary>
+    public EditorPreferences? Preferences { get; set; }
+
+    /// <summary>Called after an editing preference changed (the workspace saves them).</summary>
+    public Action? PreferencesChanged { get; set; }
+
+    private void DrawEditing()
+    {
+        ImGui.PushFont(_ctx.Fonts.Heading, 0f);
+        ImGui.TextUnformatted(CableLoc.Get(CableStr.SettingsEditing));
+        ImGui.PopFont();
+        ImGui.Separator();
+        ImGui.Spacing();
+        if (Preferences is not { } prefs)
+            return;
+        ImGui.TextUnformatted(CableLoc.Get(CableStr.DuplicatePatch));
+        foreach (var (mode, label) in new[]
+                 {
+                     (DuplicatePatchMode.Ask, CableStr.DuplicatePatchAsk), (DuplicatePatchMode.NextFree, CableStr.DuplicatePatchNext),
+                     (DuplicatePatchMode.Keep, CableStr.DuplicatePatchKeep),
+                 })
+        {
+            if (ImGui.RadioButton(CableLoc.Get(label), prefs.DuplicatePatch == mode) && prefs.DuplicatePatch != mode)
+            {
+                prefs.DuplicatePatch = mode;
+                PreferencesChanged?.Invoke();
+            }
+        }
+
+        ImGui.Spacing();
+        ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
+        SafeText.Wrapped(CableLoc.Get(CableStr.DuplicatePatchHint));
+        ImGui.PopStyleColor();
     }
 
     private void SectionItem(SettingsSection section, string icon, Str label)

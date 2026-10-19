@@ -3,136 +3,235 @@ using Candela.Dmx.Input;
 namespace Candela.Engine;
 
 /// <summary>
-/// Records the live DMX input: once per engine frame (<see cref="Capture"/>, called by <see cref="StageEngine.Tick"/>)
-/// every universe the <see cref="DmxInputHub"/> receives is read, and the slots that changed since the previous frame
-/// are stored with the frame time and the last timecode received (ArtTimeCode …). Universes that stop arriving are
-/// recorded as lost. The result is a <see cref="DmxRecording"/> to save and to play back for offline rendering.
+/// Records the live DMX input at packet rate: the recorder follows the <see cref="DmxInputHub"/>'s receive path
+/// (<see cref="IDmxInputObserver"/>) and stores every change of a merged universe and every new timecode the moment the
+/// hub reports it — not once per engine frame — so a 44 Hz console recorded by a 30 fps editor keeps all of its frames
+/// and timecode seeks land between engine frames. Universes that stop (a source terminates or times out) are recorded
+/// as lost. The result is a <see cref="DmxRecording"/> (<see cref="DmxCaptureMode.Packets"/>) to save and to play back
+/// for offline rendering.
 /// </summary>
 /// <remarks>
-/// The input is sampled at the engine's frame rate; DMX frames arriving faster than that (44 Hz consoles in a 30 fps
-/// editor) are recorded at the frame times, which is what the renderer would have shown. Main thread only.
+/// <para><b>Timestamps.</b> Recording time is the hub's clock at arrival minus the hub's clock at <see cref="Start(string)"/>
+/// (packet precision). <see cref="StageEngine.Tick"/> reports the engine clock through <see cref="Capture"/>; when the
+/// engine clock runs ahead of real time (offline ticking, tests, a render job), the engine time of the last frame is the
+/// earliest time a packet can get, so the recording stays on the show's timeline. Live, the engine follows real time and
+/// the arrival times win. Changes of different universes arriving within <see cref="CoalesceWindow"/> share one recorded
+/// frame (a console's burst of universes).</para>
+/// <para><b>Threading.</b> <see cref="Start(string)"/>, <see cref="Capture"/> and <see cref="Stop"/> are called on the
+/// main thread; the capture itself runs on the protocol receive threads (inside the hub's lock, without blocking).
+/// Unchanged packets cost a 512-byte comparison and allocate nothing.</para>
 /// </remarks>
 public sealed class DmxRecorder
 {
-    /// <summary>How often the set of received universes is re-read from the hub, s of recording time.</summary>
+    /// <summary>How often <see cref="Capture"/> asks the hub to expire silent sources, s of engine time.</summary>
     public const double UniverseScanInterval = 0.25;
 
+    /// <summary>Changes of different universes closer together than this share one recorded frame, s.</summary>
+    public const double CoalesceWindow = 0.001;
+
     private readonly DmxInputHub _hub;
+    private readonly Observer _observer;
+    private readonly object _gate = new();
     private readonly Dictionary<int, UniverseTrack> _tracks = new();
     private readonly List<DmxRecordedFrame> _frames = new();
-    private readonly byte[] _buffer = new byte[DmxInputHub.SlotCount];
-    private readonly List<int> _lost = new();
-    private IReadOnlyList<int> _universes = Array.Empty<int>();
-    private double _start;
-    private double _nextScan;
+    private List<DmxUniverseChange>? _pendingChanges;
+    private double _pendingTime;
+    private Timecode? _pendingTimecode;
+    private bool _pendingTimecodeReceived;
+    private bool _hasPending;
     private Timecode? _lastTimecode;
+    private DateTime _startUtc;
+    private double _startEngine;
+    private double _engineFloor;
+    private double _nextScan;
+    private double _lastTime;
     private string _name = "Recording";
-    private DateTime _startedUtc;
+    private volatile bool _recording;
 
     /// <summary>Creates a recorder reading <paramref name="hub"/>.</summary>
-    public DmxRecorder(DmxInputHub hub) => _hub = hub ?? throw new ArgumentNullException(nameof(hub));
+    public DmxRecorder(DmxInputHub hub)
+    {
+        _hub = hub ?? throw new ArgumentNullException(nameof(hub));
+        _observer = new Observer(this);
+    }
 
-    /// <summary>True between <see cref="Start"/> and <see cref="Stop"/>.</summary>
-    public bool IsRecording { get; private set; }
+    /// <summary>True between <see cref="Start(string)"/> and <see cref="Stop"/>.</summary>
+    public bool IsRecording => _recording;
 
     /// <summary>Frames recorded so far.</summary>
-    public int FrameCount => _frames.Count;
+    public int FrameCount
+    {
+        get
+        {
+            lock (_gate) return _frames.Count + (_hasPending ? 1 : 0);
+        }
+    }
 
     /// <summary>Recording time of the last frame, s.</summary>
-    public double Duration => _frames.Count > 0 ? _frames[^1].Time : 0;
+    public double Duration
+    {
+        get
+        {
+            lock (_gate) return _hasPending ? _pendingTime : _frames.Count > 0 ? _frames[^1].Time : 0;
+        }
+    }
 
     /// <summary>
-    /// Starts a new recording at engine time <paramref name="engineTime"/> (frames are stored relative to it). A
-    /// recording in progress is discarded.
+    /// Starts a new recording now (the hub's clock); the universes being received are stored in full as the first
+    /// frame. A recording in progress is discarded.
+    /// </summary>
+    public void Start(string name = "Recording") => Start(0, name);
+
+    /// <summary>
+    /// Starts a new recording now (see <see cref="Start(string)"/>); <paramref name="engineTime"/> is the engine clock at
+    /// the start, against which later <see cref="Capture"/> calls are measured.
     /// </summary>
     public void Start(double engineTime, string name = "Recording")
     {
-        _tracks.Clear();
-        _frames.Clear();
-        _universes = Array.Empty<int>();
-        _start = double.IsFinite(engineTime) ? engineTime : 0;
-        _nextScan = 0;
-        _lastTimecode = null;
-        _name = string.IsNullOrWhiteSpace(name) ? "Recording" : name;
-        _startedUtc = DateTime.UtcNow;
-        IsRecording = true;
+        _hub.RemoveObserver(_observer);
+        lock (_gate)
+        {
+            _tracks.Clear();
+            _frames.Clear();
+            _pendingChanges = null;
+            _hasPending = false;
+            _lastTimecode = null;
+            _name = string.IsNullOrWhiteSpace(name) ? "Recording" : name;
+            _startUtc = _hub.UtcNow;
+            _startEngine = double.IsFinite(engineTime) ? engineTime : 0;
+            _engineFloor = 0;
+            _nextScan = UniverseScanInterval;
+            _lastTime = 0;
+            _recording = true;
+        }
+        // registered outside the recorder's lock: the hub calls back with its own lock held (lock order hub → recorder)
+        _hub.AddObserver(_observer, reportCurrentState: true);
     }
 
-    /// <summary>Stores the input as it is at engine time <paramref name="engineTime"/> (no-op when not recording).</summary>
+    /// <summary>
+    /// Reports the engine clock (called by <see cref="StageEngine.Tick"/>; no-op when not recording): packets arriving
+    /// from now on are not stamped earlier than this frame, and silent sources are expired every
+    /// <see cref="UniverseScanInterval"/> so lost universes are recorded even when nothing reads them.
+    /// </summary>
     public void Capture(double engineTime)
     {
-        if (!IsRecording || !double.IsFinite(engineTime)) return;
-        double t = Math.Max(0, engineTime - _start);
-        if (t >= _nextScan || _frames.Count == 0)
+        if (!_recording || !double.IsFinite(engineTime)) return;
+        double t;
+        lock (_gate) t = Math.Max(0, engineTime - _startEngine);
+        if (t >= _nextScan)
         {
-            _universes = _hub.ActiveUniverses();
+            // before the floor moves: a source that timed out since the last scan is stamped when it timed out
             _nextScan = t + UniverseScanInterval;
+            _ = _hub.ActiveUniverses();
         }
-
-        List<DmxUniverseChange>? changes = null;
-        foreach (int universe in _universes)
-        {
-            bool live = _hub.TryRead(universe, _buffer, out long version);
-            if (!_tracks.TryGetValue(universe, out var track))
-            {
-                if (!live) continue;
-                _tracks[universe] = track = new UniverseTrack();
-            }
-            if (!live)
-            {
-                if (track.Live) (changes ??= new()).Add(new DmxUniverseChange(universe, DmxUniverseChangeKind.Lost, Array.Empty<DmxSlotRun>()));
-                track.Live = false;
-                continue;
-            }
-            if (!track.Live)
-            {
-                (changes ??= new()).Add(new DmxUniverseChange(universe, DmxUniverseChangeKind.Full,
-                    new[] { new DmxSlotRun(0, (byte[])_buffer.Clone()) }));
-                _buffer.CopyTo(track.Slots, 0);
-                track.Live = true;
-                track.Version = version;
-                continue;
-            }
-            if (version == track.Version) continue;
-            track.Version = version;
-            var runs = DmxRecording.Diff(track.Slots, _buffer);
-            if (runs.Count == 0) continue;
-            _buffer.CopyTo(track.Slots, 0);
-            (changes ??= new()).Add(new DmxUniverseChange(universe, DmxUniverseChangeKind.Delta, runs));
-        }
-
-        // universes that disappeared from the hub's list entirely
-        _lost.Clear();
-        foreach (var (universe, track) in _tracks)
-            if (track.Live && !Contains(_universes, universe)) _lost.Add(universe);
-        foreach (int universe in _lost)
-        {
-            _tracks[universe].Live = false;
-            (changes ??= new()).Add(new DmxUniverseChange(universe, DmxUniverseChangeKind.Lost, Array.Empty<DmxSlotRun>()));
-        }
-
-        var timecode = _hub.LastTimecode;
-        bool timecodeChanged = timecode != _lastTimecode;
-        if (changes is null && !timecodeChanged && _frames.Count > 0) return;
-        _lastTimecode = timecode;
-        _frames.Add(new DmxRecordedFrame(t, timecode, (IReadOnlyList<DmxUniverseChange>?)changes ?? Array.Empty<DmxUniverseChange>()));
+        lock (_gate)
+            if (t > _engineFloor) _engineFloor = t;
     }
 
     /// <summary>Ends the recording and returns it (null when nothing was being recorded).</summary>
     public DmxRecording? Stop()
     {
-        if (!IsRecording) return null;
-        IsRecording = false;
-        var recording = new DmxRecording(_name, _frames.ToList(), _startedUtc);
-        _frames.Clear();
-        _tracks.Clear();
-        return recording;
+        if (!_recording) return null;
+        _hub.RemoveObserver(_observer); // no capture runs after this returns
+        lock (_gate)
+        {
+            _recording = false;
+            FlushPending();
+            var recording = new DmxRecording(_name, _frames.ToList(), _startUtc) { Capture = DmxCaptureMode.Packets };
+            _frames.Clear();
+            _tracks.Clear();
+            return recording;
+        }
     }
 
-    private static bool Contains(IReadOnlyList<int> list, int value)
+    /// <summary>Recording time of an event the hub stamped <paramref name="timestampUtc"/> (lock held).</summary>
+    private double TimeOf(DateTime timestampUtc)
     {
-        for (int i = 0; i < list.Count; i++)
-            if (list[i] == value) return true;
+        double t = Math.Max((timestampUtc - _startUtc).TotalSeconds, _engineFloor);
+        if (!double.IsFinite(t)) t = _engineFloor;
+        // monotonic even when the system clock steps back
+        if (t < _lastTime) t = _lastTime;
+        _lastTime = t;
+        return t;
+    }
+
+    private void OnUniverse(int universe, ReadOnlySpan<byte> merged, bool live, DateTime timestampUtc)
+    {
+        lock (_gate)
+        {
+            if (!_recording) return;
+            if (!_tracks.TryGetValue(universe, out var track))
+            {
+                if (!live) return;
+                _tracks[universe] = track = new UniverseTrack();
+            }
+            DmxUniverseChange change;
+            if (!live)
+            {
+                if (!track.Live) return;
+                track.Live = false;
+                change = new DmxUniverseChange(universe, DmxUniverseChangeKind.Lost, Array.Empty<DmxSlotRun>());
+            }
+            else if (!track.Live)
+            {
+                track.Live = true;
+                merged[..DmxInputHub.SlotCount].CopyTo(track.Slots);
+                change = new DmxUniverseChange(universe, DmxUniverseChangeKind.Full, new[] { new DmxSlotRun(0, track.Slots.ToArray()) });
+            }
+            else
+            {
+                if (merged[..DmxInputHub.SlotCount].SequenceEqual(track.Slots)) return;
+                var runs = DmxRecording.Diff(track.Slots, merged);
+                merged[..DmxInputHub.SlotCount].CopyTo(track.Slots);
+                change = new DmxUniverseChange(universe, DmxUniverseChangeKind.Delta, runs);
+            }
+            double t = TimeOf(timestampUtc);
+            if (!_hasPending || t - _pendingTime > CoalesceWindow || ContainsUniverse(_pendingChanges, universe)) BeginFrame(t);
+            (_pendingChanges ??= new List<DmxUniverseChange>(4)).Add(change);
+        }
+    }
+
+    private void OnTimecode(TimecodeSample sample)
+    {
+        lock (_gate)
+        {
+            if (!_recording || sample.Timecode == _lastTimecode) return;
+            _lastTimecode = sample.Timecode;
+            double t = TimeOf(sample.ReceivedUtc);
+            if (!_hasPending || t - _pendingTime > CoalesceWindow || _pendingTimecodeReceived) BeginFrame(t);
+            _pendingTimecode = sample.Timecode;
+            _pendingTimecodeReceived = true;
+        }
+    }
+
+    /// <summary>Closes the frame being collected and opens one at <paramref name="time"/> (lock held).</summary>
+    private void BeginFrame(double time)
+    {
+        FlushPending();
+        _hasPending = true;
+        _pendingTime = time;
+        _pendingChanges = null;
+        _pendingTimecode = _lastTimecode;
+        _pendingTimecodeReceived = false;
+    }
+
+    private void FlushPending()
+    {
+        if (!_hasPending) return;
+        _hasPending = false;
+        _frames.Add(new DmxRecordedFrame(_pendingTime, _pendingTimecode,
+            (IReadOnlyList<DmxUniverseChange>?)_pendingChanges ?? Array.Empty<DmxUniverseChange>())
+        {
+            TimecodeReceived = _pendingTimecodeReceived,
+        });
+        _pendingChanges = null;
+    }
+
+    private static bool ContainsUniverse(List<DmxUniverseChange>? changes, int universe)
+    {
+        if (changes is null) return false;
+        foreach (var c in changes)
+            if (c.Universe == universe) return true;
         return false;
     }
 
@@ -140,7 +239,15 @@ public sealed class DmxRecorder
     {
         public readonly byte[] Slots = new byte[DmxInputHub.SlotCount];
         public bool Live;
-        public long Version = -1;
+    }
+
+    /// <summary>The hub's view of the recorder (kept private so the capture entry points are not public API).</summary>
+    private sealed class Observer(DmxRecorder recorder) : IDmxInputObserver
+    {
+        public void OnUniverse(int universe, ReadOnlySpan<byte> merged, bool live, DateTime timestampUtc) =>
+            recorder.OnUniverse(universe, merged, live, timestampUtc);
+
+        public void OnTimecode(TimecodeSample sample) => recorder.OnTimecode(sample);
     }
 }
 
@@ -268,6 +375,6 @@ public sealed class DmxPlayer : IDisposable
             _hub.Terminate(_source, u);
             _sent.Remove(u);
         }
-        if (_timecode is { } tc && tc != _hub.LastTimecode) _hub.SubmitTimecode(tc);
+        if (_timecode is { } tc && tc != _hub.LastTimecode) _hub.SubmitTimecode(tc, _source);
     }
 }

@@ -215,9 +215,11 @@ fixtures of the spec and mode are patched at least two to a universe, the stand-
 first-break footprint fits the spacing — here the *smallest* gap between two start addresses in one universe, the most
 channels the real mode can use without overlapping — and otherwise its most complete mode that fits (largest
 footprint; GDTF order breaks ties), or its smallest mode when none fits. A replaced mode of the requested name is a
-`mvr.substitute-mode` note, a missing one a `mvr.mode-unknown` warning that names the spacing. This is the same rule as
-`Candela.Dmx.SubstituteModes.Choose`, which the engine uses for stand-ins it resolves itself; `SubstituteModeTests`
-checks that both pick the same mode for every library fixture type, mode name and a range of spacings. Without a
+`mvr.substitute-mode` note, a missing one a `mvr.mode-unknown` warning that names the spacing. The rule lives in
+Candela.Gdtf (`FixtureType.FitModeToSpacing`, `DmxMode.FirstBreakFootprint`, `DmxPatchSpacing.Infer`), which both this
+importer and the DMX engine (for stand-ins it resolves itself) use; `SubstituteModeTests` checks that the importer's
+loose name match and the engine's `FindMode` pick the same mode for every library fixture type, mode name and a range of
+spacings. Without a
 spacing (one fixture per universe) the mode is matched by name as above.
 
 When a mode still needs more channels than the patch spacing leaves (a closest mode, or a stand-in none of whose modes
@@ -338,6 +340,16 @@ files.
   written as binary glTF (Y up, metres) with SharpGLTF. Part transforms are baked, there is one primitive per sub-mesh,
   and materials are kept as metallic-roughness factors. Objects reference it through `Geometry3D`. Walls, floors and
   ceilings become scene objects with a generated box (`ExportWalls`).
+* **Candela's own data** (`CandelaUserData`). What MVR cannot hold goes into one `UserData/Data` block with
+  `provider="Candela" ver="1"`, which MVR 1.6 asks other programs to keep without interpreting it. Version 1 holds the
+  walls, floors and ceilings: one `<Wall object="{uuid}" geometry="{box file}">` per `WallComponent`, its text the
+  component as Candela JSON (kind, width, height, thickness in metres, material id, UV scale). Other programs see the
+  scene objects with their boxes; Candela's importer gives such an object its `WallComponent` back — with the material
+  — and skips the box, so it does not become an imported model. A wall textured with one of the exporting project's own
+  assets (`asset:` material ids) gets the default material, since the asset does not travel. A record that cannot be
+  read (damaged JSON, no object, an invalid size or kind) is reported once (`mvr.value-invalid`) and its box is imported
+  as a model instead, so nothing is lost; blocks of other providers are ignored, and elements of newer versions of the
+  block are kept by the document but not read.
 * **Geometry children.** Child entities that the importer created for extra geometry are folded back into `Geometry3D`
   entries of their parent, recognised by their derived ids. If such a child's name is not the stem of the file, it is
   written as a `Symbol` of a one-file `Symdef` named after it. Names and ids therefore survive import → export →
@@ -406,8 +418,8 @@ Writing the result again gives the same bytes.
   at various spacings: the stand-in's mode of the requested name is replaced when it overlaps (`mvr.substitute-mode`)
   and kept when it fits; an unknown mode name gets the widest fitting mode with a `mvr.mode-unknown` warning; when
   nothing fits, the smallest mode and `mvr.mode-footprint`; one fixture (no spacing) keeps the mode by name; universes
-  do not make a spacing; and the importer's rule picks the same mode as `Candela.Dmx.SubstituteModes.Choose` for every
-  library fixture type, mode name and a range of spacings (the test project references Candela.Dmx for this only).
+  do not make a spacing; and the importer's loose name match leads to the same stand-in mode as the DMX engine's lookup
+  for every library fixture type, mode name and a range of spacings.
 * **`SyntheticTests`.** A hand-written MVR 1.6 archive with every object type and nearly every attribute: nested
   groups, nested symdefs, a GLB and a 3DS model, a mirror matrix, a layer matrix, connections, and complete, stub and
   library-only GDTFs. The tests cover the reader, the importer mapping, the lossless and idempotent document round
@@ -432,6 +444,11 @@ Writing the result again gives the same bytes.
   must keep their DMX layout instead of a substitute, 20 000 nested groups, 10⁹ nested symbol instances and a glTF with
   an invalid URI.
 
+* **`CandelaUserDataTests`.** Walls, floors and ceilings with built-in materials survive export → import (kind, size,
+  UV scale, material; no box imported as a model, no asset) and a second round trip; a project texture becomes the
+  default material; damaged records are reported once and imported as models; other providers' blocks are ignored;
+  exports without walls write no block.
+
 ## Known gaps
 
 * **Data Core does not hold yet.** The following stay in the imported `MvrDocument` and are reported as
@@ -453,6 +470,4 @@ Writing the result again gives the same bytes.
   of newer MVR versions are kept as unknown elements but not interpreted.
 * **Substitutes.** A substitute GDTF is a best effort by name within the brand. The UI should show it as a substitute.
   Its mode fits the patch spacing, but its DMX layout is still the stand-in's, so a console's cues for the real model
-  drive the wrong attributes. `mvr.mode-footprint` flags patches none of the substitute's modes fits. The mode rule
-  exists twice (`ModeMatcher.FitToSpacing` here, `SubstituteModes.Choose` in Candela.Dmx) because Candela.Mvr may not
-  reference Candela.Dmx; a test keeps them in agreement.
+  drive the wrong attributes. `mvr.mode-footprint` flags patches none of the substitute's modes fits.

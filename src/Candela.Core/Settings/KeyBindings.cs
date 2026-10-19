@@ -294,39 +294,105 @@ public sealed class KeyBindingSet
     }
 }
 
-/// <summary>Stable action ids used by menus, toolbars and key bindings.</summary>
+/// <summary>
+/// Stable action ids used by menus, toolbars and key bindings. The ids are stored in key binding presets and never
+/// change; the editor maps them to localised menu labels.
+/// </summary>
 public static class EditorActions
 {
+    /// <summary>Undo the last edit (Ctrl+Z).</summary>
     public const string Undo = "edit.undo";
+
+    /// <summary>Redo the last undone edit (Ctrl+Y / Ctrl+Shift+Z).</summary>
     public const string Redo = "edit.redo";
+
+    /// <summary>Delete the selected entities (one undo step).</summary>
     public const string Delete = "edit.delete";
+
+    /// <summary>Duplicate the selection next to the originals (Ctrl+D).</summary>
     public const string Duplicate = "edit.duplicate";
+
+    /// <summary>Copy the selection to the clipboard.</summary>
     public const string Copy = "edit.copy";
+
+    /// <summary>Paste the clipboard into the scene with new ids.</summary>
     public const string Paste = "edit.paste";
+
+    /// <summary>Select every selectable entity of the scene.</summary>
     public const string SelectAll = "edit.selectAll";
+
+    /// <summary>Clear the selection.</summary>
     public const string DeselectAll = "edit.deselectAll";
+
+    /// <summary>Viewport tool: select (no gizmo).</summary>
     public const string ToolSelect = "tool.select";
+
+    /// <summary>Viewport tool: move gizmo.</summary>
     public const string ToolMove = "tool.move";
+
+    /// <summary>Viewport tool: rotate gizmo.</summary>
     public const string ToolRotate = "tool.rotate";
+
+    /// <summary>Viewport tool: draw cables between device ports.</summary>
     public const string ToolCable = "tool.cable";
+
+    /// <summary>Viewport tool: draw walls and floors.</summary>
     public const string ToolWall = "tool.wall";
+
+    /// <summary>Frame the selection (or the whole scene) in the active viewport.</summary>
     public const string FrameSelection = "view.frameSelection";
+
+    /// <summary>Look down the Z axis (top view).</summary>
     public const string ViewTop = "view.top";
+
+    /// <summary>Look along +Y, into the stage (front view).</summary>
     public const string ViewFront = "view.front";
+
+    /// <summary>Look along −X from the right side.</summary>
     public const string ViewRight = "view.right";
+
+    /// <summary>Switch the active viewport between perspective and orthographic projection.</summary>
     public const string ViewToggleOrtho = "view.toggleOrtho";
+
+    /// <summary>Viewport shading: wireframe (edges).</summary>
     public const string ShadingWireframe = "view.shading.wireframe";
+
+    /// <summary>Viewport shading: colorless grey geometry with a headlight.</summary>
     public const string ShadingColorless = "view.shading.colorless";
+
+    /// <summary>Viewport shading: full physically based lighting, volumetrics and post-processing.</summary>
     public const string ShadingFull = "view.shading.full";
+
+    /// <summary>Toggle the illuminance (lux) overlay.</summary>
     public const string OverlayLux = "view.overlay.lux";
+
+    /// <summary>Toggle the noise (dB(A) SPL) overlay.</summary>
     public const string OverlayNoise = "view.overlay.noise";
+
+    /// <summary>Toggle the cable overlay (scene greyed out, cables coloured by type).</summary>
     public const string OverlayCables = "view.overlay.cables";
+
+    /// <summary>Start a new, empty project.</summary>
     public const string FileNew = "file.new";
+
+    /// <summary>Open a project or MVR file.</summary>
     public const string FileOpen = "file.open";
+
+    /// <summary>Save the project (asks for a file name when it has none).</summary>
     public const string FileSave = "file.save";
+
+    /// <summary>Save the project under a new file name.</summary>
     public const string FileSaveAs = "file.saveAs";
+
+    /// <summary>Import a file into the open scene (MVR, project, 3D model, image, GDTF).</summary>
     public const string FileImport = "file.import";
+
+    /// <summary>Export the scene (MVR).</summary>
     public const string FileExport = "file.export";
+
+    /// <summary>Open the final render panel / start a render.</summary>
     public const string Render = "file.render";
+
+    /// <summary>Open the settings window.</summary>
     public const string Settings = "app.settings";
 }

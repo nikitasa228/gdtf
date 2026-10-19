@@ -21,8 +21,12 @@ public class CatalogTests
             "schuko",
             "iec",
             "cee16",
+            "cee32",
+            "cee16-3p",
             "cee32-3p",
             "cee63-3p",
+            "cee125-3p",
+            "powerlock",
             "socapex",
             "harting16",
         ];

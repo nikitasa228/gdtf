@@ -54,11 +54,12 @@ name or — for MVR stub names such as `Manufacturer@Model` — by manufacturer 
 caches failures too (`ProfileResolution.ErrorKind`: unknown file, unreadable file, unknown mode). When the stub resolves
 to a *similar* model (a substitute), `Resolve(spec, mode, patchSpacing)` gives the stand-in's mode that fits the
 fixtures' patch spacing rather than the mode of the requested name, which belongs to the missing model
-(`SubstituteModes.Choose`: the requested mode when the stand-in has it and its first-break footprint fits the spacing,
-else the largest mode that fits, else the smallest; without a spacing the requested mode, else the first), and says so
+(`FixtureType.FitModeToSpacing` in Candela.Gdtf, the one rule the MVR importer uses too: the requested mode when the
+stand-in has it and its first-break footprint (`DmxMode.FirstBreakFootprint`) fits the spacing, else the largest mode
+that fits, else the smallest; without a spacing the requested mode, else the first), and says so
 in `ProfileResolution.Substitution` (`FixtureSubstitution`: requested GDTF and mode, stand-in file, spacing).
-`PatchSpacing.Infer` is the smallest distance between start addresses of one universe — fixtures patched back to
-back in their real mode are that far apart. A mode that the stand-in lacks no longer leaves the fixture unresolved.
+`PatchSpacing.Infer` (over `DmxPatchSpacing.Infer` of Candela.Gdtf) is the smallest distance between start addresses
+of one universe — fixtures patched back to back in their real mode are that far apart. A mode that the stand-in lacks no longer leaves the fixture unresolved.
 
 Compilation (`FixtureProfile.Builder`):
 
@@ -395,6 +396,26 @@ by channel name and instance, else attribute and instance, else attribute and it
 of that attribute — modes and files that name their geometry differently, such as Zonda 3 FX's "YOKE Std" and
 "YOKE Ext", or a stand-in replaced by the real GDTF), so moving heads neither jump nor travel again; a fixture
 resolving for the first time starts where its DMX puts it.
+
+### Input hub (`DmxInputHub`)
+
+Protocol receivers `Submit` universes from their threads; the hub merges the sources of a universe (highest priority
+first, then HTP or LTP), expires silent sources after `SourceTimeout` and gives the engine the merged slots with a
+version (`TryRead`). Two additions serve the external-control panel and the recorder:
+
+* **Timecode with its sender.** `SubmitTimecode(timecode, source)` stores a `TimecodeSample` (position, sender
+  `DmxSourceId`, arrival time on the hub's clock); `LastTimecodeSample`, `LastTimecodeSource` (read atomically) and
+  `TimecodeSampleReceived` tell where it came from — `artnet 192.168.1.20:6454` for an ArtTimeCode, `recording <name>`
+  for a recording being played. `SubmitTimecode(timecode)` without a source records `DmxInputHub.UnnamedSource`;
+  `TimecodeReceived` and `LastTimecode` still give the position alone.
+* **Receive-path observers.** `AddObserver(IDmxInputObserver, reportCurrentState)` makes the hub call
+  `OnUniverse(universe, merged, live, timestamp)` for every change of a merged universe — after each packet, a source
+  termination, or a source timeout (stamped with the moment it timed out, reported when the hub notices it) — and
+  `OnTimecode` for every timecode, as they happen. The calls run on the receiving thread inside the hub's lock, one at
+  a time, so an observer must be quick and must not call back into the hub; `RemoveObserver` returns once no call is
+  running. With observers the hub merges a universe per packet instead of per read; without them nothing changes.
+  `UtcNow` exposes the hub's clock (the time base of all these timestamps). The engine's DMX recorder uses this to
+  capture at packet rate (docs/engine.md).
 
 ## Performance
 

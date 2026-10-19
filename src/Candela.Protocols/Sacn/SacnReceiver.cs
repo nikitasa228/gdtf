@@ -40,8 +40,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
     /// <summary>A stream without packets for this long may be forgotten when <see cref="MaxStreams"/> is reached.</summary>
     private static readonly TimeSpan StreamIdleTimeout = TimeSpan.FromSeconds(10);
 
-    private static readonly string StreamTableFullWarning =
-        $"More than {MaxStreams} sACN streams (source, universe) are active; new ones are ignored.";
+    private static readonly ProtocolText StreamTableFullWarning = ProtocolText.Create(ProtocolMessages.SacnStreamTableFull, MaxStreams);
 
     private readonly DmxInputHub _hub;
     private readonly object _gate = new();
@@ -92,7 +91,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
     /// <inheritdoc />
     protected override string OnStart(ProtocolOptions options)
     {
-        ProtocolOptions.ValidatePort(options.SacnPort, "sACN port");
+        ProtocolOptions.ValidatePort(options.SacnPort, "sACN");
         var interfaces = NetworkInterfaceCatalog.Enumerate();
         var selected = NetworkInterfaceCatalog.Resolve(options.NetworkInterface, interfaces);
         var subscribed = new HashSet<int>(options.SubscribedUniverses.Where(u => u is >= SacnProtocol.MinUniverse and <= SacnProtocol.MaxUniverse));
@@ -115,8 +114,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
             var failures = new List<int>();
             string? firstError = null;
             if (subscribed.Count > MaxMulticastJoins)
-                AddWarning($"{subscribed.Count} universes subscribed; multicast is joined for the first {MaxMulticastJoins} only. " +
-                           "Send the others by unicast.");
+                AddWarning(ProtocolText.Create(ProtocolMessages.SacnMulticastLimit, subscribed.Count, MaxMulticastJoins));
             foreach (int u in subscribed.Order().Take(MaxMulticastJoins))
             {
                 if (Join(rt, u, out var error)) joined++;
@@ -128,16 +126,20 @@ public sealed class SacnReceiver : ExternalProtocolBase
             }
             Join(rt, SacnProtocol.DiscoveryUniverse, out _);
             if (failures.Count > 0)
-                AddWarning($"Could not join sACN multicast for {failures.Count} universe(s) ({string.Join(", ", failures.Take(8))}" +
-                           $"{(failures.Count > 8 ? ", …" : "")}): {firstError}. Unicast sACN still works — set the console to " +
-                           "unicast to this computer's IP, or check the network interface.");
+                AddWarning(ProtocolText.Create(ProtocolMessages.SacnMulticastFailed, failures.Count,
+                    string.Join(", ", failures.Take(8)) + (failures.Count > 8 ? ", …" : ""), firstError));
         }
         channel.Start("Candela sACN receiver", ProcessPacket, _ => CountBadPacket("internal error while processing an sACN packet", default),
-            e => ReportFault($"sACN socket failed: {e.Message}"));
-        var where = selected is null ? "all interfaces" : $"{selected.Name} {selected.Address}";
-        return options.SacnJoinMulticast
-            ? $"Listening on UDP {channel.LocalEndPoint.Port} ({where}); multicast joined for {joined} of {subscribed.Count} universe(s)"
-            : $"Listening on UDP {channel.LocalEndPoint.Port} ({where}); unicast only";
+            e => ReportFault(ProtocolText.Create(ProtocolMessages.SocketFailed, "sACN", e.Message), ProtocolErrorCode.SocketFailed));
+        int port = channel.LocalEndPoint.Port;
+        var text = (options.SacnJoinMulticast, selected) switch
+        {
+            (true, null) => ProtocolText.Create(ProtocolMessages.SacnListeningAll, port, joined, subscribed.Count),
+            (true, { } s) => ProtocolText.Create(ProtocolMessages.SacnListening, port, s.Name, s.Address, joined, subscribed.Count),
+            (false, null) => ProtocolText.Create(ProtocolMessages.SacnUnicastAll, port),
+            (false, { } s) => ProtocolText.Create(ProtocolMessages.SacnUnicast, port, s.Name, s.Address),
+        };
+        return Running(text, channel.LocalEndPoint.ToString(), selected is null ? null : $"{selected.Name} {selected.Address}", subscribed.Count);
     }
 
     /// <inheritdoc />
@@ -391,7 +393,7 @@ public sealed class SacnReceiver : ExternalProtocolBase
         {
             if (!rt.Channel.TryJoinMulticast(SacnProtocol.MulticastGroup(universe), rt.JoinInterfaces, out var error)
                 && ReferenceEquals(rt, _runtime))
-                AddWarning($"Could not join the sACN synchronisation universe {universe}: {error}. Synchronised data is output unsynchronised.");
+                AddWarning(ProtocolText.Create(ProtocolMessages.SacnSyncJoinFailed, universe, error));
         });
     }
 

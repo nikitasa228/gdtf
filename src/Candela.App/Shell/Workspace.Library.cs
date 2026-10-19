@@ -74,6 +74,14 @@ internal sealed partial class Workspace : ILibraryHost
             return _label;
         _labelItem = item;
         _labelVersion = version;
+        if (item.Device is { } device)
+        {
+            var ports = device.Ports(session.Engine?.ElectricalProfiles);
+            var outputs = ports.Where(p => p.Direction != Electrical.PortDirection.Input).ToList();
+            string summary = LibraryPanel.Summary(outputs.Count > 0 ? outputs : ports);
+            return _label = summary.Length > 0 ? $"{CableLoc.DeviceName(device)} · {summary}" : CableLoc.DeviceName(device);
+        }
+
         if (item.Fixture is { } entry && session.Engine is { } engine)
         {
             var info = FixtureInfoOf(entry);
@@ -96,6 +104,24 @@ internal sealed partial class Workspace : ILibraryHost
     {
         ArgumentNullException.ThrowIfNull(item);
         var session = _ctx.Session;
+        if (item.Device is { } device)
+        {
+            if (session.Engine is not { } engine)
+                return;
+            var deviceEntry = DevicePlacement.EntryOf(engine, device);
+            if (device.Kind == Electrical.DevicePresetKind.Gdtf && deviceEntry is null)
+            {
+                Report(SessionResult.Failed(CableLoc.Get(CableStr.DeviceUnresolved)));
+                return;
+            }
+
+            var deviceInfo = deviceEntry is null ? null : _library.FixtureInfo?.Get(deviceEntry) ?? _library.FixtureInfo?.GetNow(deviceEntry, TimeSpan.FromSeconds(3));
+            var placed = DevicePlacement.Place(StagePanelContext.From(_ctx), device, deviceInfo, hit);
+            SetStatus(CableLoc.Format(CableStr.DevicePlaced, placed.Name));
+            _ctx.Log.Info("Library", $"Placed device '{device.Id}' as '{placed.Name}' at {hit.Position}.");
+            return;
+        }
+
         if (item.Fixture is { } entry)
         {
             if (session.Engine is null)
