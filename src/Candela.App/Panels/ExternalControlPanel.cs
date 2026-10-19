@@ -77,6 +77,9 @@ internal sealed unsafe class ExternalControlPanel : Panel
         set => _selected = Math.Clamp(value, 0, ProtocolRegistry.All.Count - 1);
     }
 
+    /// <summary>A tab to bring to the front at the next draw (0 protocols, 1 universes, 2 sources, 3 recorder; tests and scripts).</summary>
+    internal int? ShowTab { get; set; }
+
     /// <inheritdoc/>
     public override void Draw()
     {
@@ -102,25 +105,27 @@ internal sealed unsafe class ExternalControlPanel : Panel
 
         if (!ImGui.BeginTabBar("##external-tabs"))
             return;
-        if (ImGui.BeginTabItem(StageLoc.With(Icons.Network, StageStr.ExtTabProtocols)))
+        int? show = ShowTab;
+        ShowTab = null;
+        if (ImGui.BeginTabItem(StageLoc.With(Icons.Network, StageStr.ExtTabProtocols), TabFlags(show, 0)))
         {
             Protocols(engine, model);
             ImGui.EndTabItem();
         }
 
-        if (ImGui.BeginTabItem(StageLoc.With(Icons.LayoutGrid, StageStr.ExtTabUniverses)))
+        if (ImGui.BeginTabItem(StageLoc.With(Icons.LayoutGrid, StageStr.ExtTabUniverses), TabFlags(show, 1)))
         {
             Universes(engine, model);
             ImGui.EndTabItem();
         }
 
-        if (ImGui.BeginTabItem(StageLoc.With(StageIcons.Router, StageStr.ExtTabSources)))
+        if (ImGui.BeginTabItem(StageLoc.With(StageIcons.Router, StageStr.ExtTabSources), TabFlags(show, 2)))
         {
             Sources(engine, model);
             ImGui.EndTabItem();
         }
 
-        if (ImGui.BeginTabItem(StageLoc.With(StageIcons.Timer, StageStr.ExtTabRecorder)))
+        if (ImGui.BeginTabItem(StageLoc.With(StageIcons.Timer, StageStr.ExtTabRecorder), TabFlags(show, 3)))
         {
             Recorder(engine, model);
             ImGui.EndTabItem();
@@ -128,6 +133,8 @@ internal sealed unsafe class ExternalControlPanel : Panel
 
         ImGui.EndTabBar();
     }
+
+    private static ImGuiTabItemFlags TabFlags(int? show, int tab) => show == tab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
 
     private void HeaderBar(StageEngine engine, ExternalControl model)
     {
