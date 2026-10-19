@@ -111,6 +111,7 @@ public static class MvrImporter
         private readonly List<(MvrDeviceObject Object, Entity Entity)> _connectionOwners = new();
         private int _geometryBudget = MaxExpandedGeometries;
         private bool _geometryBudgetReported;
+        private IReadOnlyDictionary<Guid, CandelaUserData.WallRecord> _walls = new Dictionary<Guid, CandelaUserData.WallRecord>();
 
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
         {
@@ -138,6 +139,7 @@ public static class MvrImporter
         public MvrImportResult Run()
         {
             foreach (var s in _doc.AuxData.Symdefs) _symdefs.TryAdd(s.Uuid, s);
+            ReadCandelaData();
             Prepass();
             ResolveGdtfs();
             SetUpLayers();
@@ -161,6 +163,14 @@ public static class MvrImporter
             issues.AddRange(_doc.Issues);
             issues.AddRange(_issues);
             return new MvrImportResult(_scene, _group, _roots, _assets, _resolver.References, issues, _doc, _byUuid, _layers);
+        }
+
+        /// <summary>Candela's own block (walls written by a Candela export, see <see cref="CandelaUserData"/>).</summary>
+        private void ReadCandelaData()
+        {
+            var problems = new List<Issue>();
+            _walls = CandelaUserData.ReadWalls(_doc, problems);
+            foreach (var p in problems) _sink.Add(p.Severity, p.Category, p.Code, p.Message);
         }
 
         // ------------------------------------------------------------ pass 1: ids, focus points, GDTF users
@@ -428,7 +438,10 @@ public static class MvrImporter
                     }
                     break;
                 case MvrDeviceObject d:
-                    var (direct, rest) = PlanGeometry(d, entity.Id, isTruss: d is MvrTruss);
+                    // a wall, floor or ceiling of a Candela export: the wall again, without the box written for other programs
+                    var wall = d is not (MvrTruss or MvrSupport) && _walls.TryGetValue(d.Uuid, out var record) ? record : null;
+                    var (direct, rest) = PlanGeometry(d, entity.Id, isTruss: d is MvrTruss, skipFile: wall?.GeometryFile);
+                    if (wall is not null) entity.Add((WallComponent)wall.Wall.Clone());
                     children = rest;
                     switch (d)
                     {
@@ -551,10 +564,16 @@ public static class MvrImporter
         /// (<c>direct</c>); anything else becomes child entities. For trusses the first geometry at the origin is the
         /// truss model.
         /// </summary>
-        private (Guid? Direct, List<(Guid Asset, Matrix4x4 Local, string Name)> Children) PlanGeometry(MvrDeviceObject d, Guid owner, bool isTruss)
+        private (Guid? Direct, List<(Guid Asset, Matrix4x4 Local, string Name)> Children) PlanGeometry(MvrDeviceObject d, Guid owner, bool isTruss,
+            string? skipFile = null)
         {
             var flat = new List<(MvrGeometry3D Geometry, Matrix4x4 Local, string Name)>();
-            Flatten(d.Geometries, Matrix4x4.Identity, flat, new HashSet<Guid>(), 0, owner, null);
+            var geometries = skipFile is null
+                ? d.Geometries
+                : d.Geometries.Where(g => !(g is MvrGeometry3D g3 &&
+                                            string.Equals(MvrDocument.NormalizePath(g3.FileName), MvrDocument.NormalizePath(skipFile), StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+            Flatten(geometries, Matrix4x4.Identity, flat, new HashSet<Guid>(), 0, owner, null);
             var items = new List<(Guid Asset, Matrix4x4 Local, string Name)>();
             foreach (var (g, m, name) in flat)
                 if (GetAsset(g.FileName, owner) is { } asset) items.Add((asset.Id, m, name));

@@ -31,6 +31,7 @@ internal sealed class SceneExporter
     private readonly Dictionary<string, string?> _wallFiles = new(StringComparer.Ordinal);
     private readonly HashSet<string> _fileNames = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<(string Name, string File), Guid> _symdefs = new();
+    private readonly List<CandelaUserData.WallRecord> _walls = new();
     private int _objectCount;
     private int _connectionCount;
 
@@ -57,6 +58,8 @@ internal sealed class SceneExporter
         }
         foreach (var (layer, point) in _focusPoints) layer.Objects.Add(point);
         WriteConnections();
+        // walls, floors and ceilings come back as such when Candela imports the file (other programs see their boxes)
+        if (_walls.Count > 0) _doc.UserData.Add(CandelaUserData.Create(_walls));
         _sink.Complete();
         return new MvrExportResult(_doc, _issues, _objectCount, _focusPoints.Count, _connectionCount);
     }
@@ -551,6 +554,7 @@ internal sealed class SceneExporter
             _wallFiles[key] = file;
         }
         if (file is not null) device.Geometries.Add(new MvrGeometry3D { FileName = file });
+        _walls.Add(new CandelaUserData.WallRecord(device.Uuid, file, wall));
 
         static long Mm(float metres) => (long)System.Math.Round(metres * 1000.0);
     }
