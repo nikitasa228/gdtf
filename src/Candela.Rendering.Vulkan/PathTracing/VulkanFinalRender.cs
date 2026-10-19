@@ -30,6 +30,9 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     public const float LensClearance = ShadowAtlas.NearPlane;
 
     private const double MaxSubmitSeconds = 0.5;
+
+    /// <summary>Longest gap between two in-frame <see cref="Advance(TimeSpan, CancellationToken)"/> calls counted as rendering time, s.</summary>
+    private const double MaxInFrameSeconds = 0.5;
     private const int InitialPixelsPerDispatch = 1 << 18;
 
     private readonly VulkanRenderer _renderer;
@@ -99,6 +102,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     private TimeSpan _elapsed;
     private float _exposure;
     private long _work;
+    private long _lastInFrame;
     private long _denoisedWork = -1;
     private GpuImage? _denoised;
 
@@ -272,6 +276,18 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             return;
         var watch = Stopwatch.StartNew();
         double budgetSeconds = budget > TimeSpan.Zero ? budget.TotalSeconds : 0.0;
+        bool inFrame = _context.CurrentFrame is not null;
+        if (inFrame)
+        {
+            // Work recorded into the caller's frames runs while those frames render: the rendering time is the
+            // wall-clock time from one in-frame call to the next (a frame of the caller's loop; longer gaps are pauses),
+            // not the microseconds of recording.
+            long now = Stopwatch.GetTimestamp();
+            if (_lastInFrame != 0)
+                _elapsed += TimeSpan.FromSeconds(Math.Min(Stopwatch.GetElapsedTime(_lastInFrame, now).TotalSeconds, MaxInFrameSeconds));
+            _lastInFrame = now;
+        }
+
         try
         {
             while (!_complete)
@@ -316,7 +332,8 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         }
         finally
         {
-            _elapsed += watch.Elapsed;
+            if (!inFrame)
+                _elapsed += watch.Elapsed;
         }
     }
 

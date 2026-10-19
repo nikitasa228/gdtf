@@ -224,6 +224,67 @@ public sealed class PathTracerSessionTests
         }
     }
 
+    /// <summary>
+    /// The editor's way: <c>Advance</c> called while the caller records its own frames adds work to them. The image is
+    /// the same as rendered on its own (the samples depend only on pixel, sample index and seed), frames that also draw
+    /// the real-time view stay validation-clean, and a time limit counts the wall-clock time the frames take.
+    /// </summary>
+    [SkippableFact]
+    public void AdvanceInsideTheCallersFramesRendersTheSameImageAndKeepsTheTimeLimit()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var camera = BuildRoom(renderer);
+            var settings = FinalRenderSupport.Settings(40, 30, 6);
+            var options = new FinalRenderOptions { Seed = 9, BackgroundLuminance = 0f };
+            byte[] alone;
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, camera, settings, options))
+                alone = render.RawResultHdr().Pixels;
+
+            using var target = renderer.CreateTarget(40, 30);
+            using (var render = renderer.StartFinalRender(camera, settings, options))
+            {
+                render.MaxRowsPerDispatch = 8;
+                for (int frame = 0; frame < 1000 && !render.IsComplete; frame++)
+                {
+                    var open = renderer.Context.BeginFrame();
+                    if (frame % 3 == 0)
+                        renderer.Render(target, camera, new ViewOptions { ShowGrid = false }, new PreviewSettings(), 1f / 30f);
+                    render.Advance(TimeSpan.FromMilliseconds(10));
+                    renderer.Context.SubmitFrame(open);
+                }
+
+                Assert.True(render.IsComplete);
+                Assert.Equal((6, 6), render.SampleCountRange());
+                Assert.Equal(alone, render.RawResultHdr().Pixels);
+            }
+
+            using (var render = renderer.StartFinalRender(camera, FinalRenderSupport.Settings(40, 30, FinalRenderSettingsMax),
+                       new FinalRenderOptions { TimeLimit = TimeSpan.FromSeconds(0.5) }))
+            {
+                var watch = Stopwatch.StartNew();
+                while (!render.IsComplete && watch.Elapsed < TimeSpan.FromSeconds(30))
+                {
+                    var open = renderer.Context.BeginFrame();
+                    render.Advance(TimeSpan.FromMilliseconds(10));
+                    renderer.Context.SubmitFrame(open);
+                    Thread.Sleep(5); // the rest of the editor's frame
+                }
+
+                Assert.True(render.IsComplete && !render.IsCancelled, $"still rendering after {watch.Elapsed} ({render.SamplesDone} samples)");
+                Assert.True(render.Elapsed >= TimeSpan.FromSeconds(0.5) && render.Elapsed < TimeSpan.FromSeconds(5), $"elapsed {render.Elapsed}");
+                Assert.True(watch.Elapsed < TimeSpan.FromSeconds(5), $"wall clock {watch.Elapsed}");
+            }
+
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     [SkippableFact]
     public void DenoiserLowersTheErrorAndKeepsTheRawResult()
     {
