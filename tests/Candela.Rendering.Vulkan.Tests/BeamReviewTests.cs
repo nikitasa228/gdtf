@@ -203,12 +203,13 @@ public sealed class BeamReviewTests
     }
 
     [SkippableTheory]
-    [InlineData(0f)]
-    [InlineData(0.6f)]
-    [InlineData(1.5f)]
-    public void LookingUpANarrowBeamFromAfarMatchesTheIntegral(float aboveLens)
+    [InlineData(0f, 0.4f)]
+    [InlineData(0f, 0f)]
+    [InlineData(0.6f, 0.4f)]
+    [InlineData(1.5f, 0.4f)]
+    public void LookingUpANarrowBeamFromAfarMatchesTheIntegral(float aboveLens, float offAxis)
     {
-        // The eye 20 m down a 6° beam, 0.4 m off its axis, looking back at the fixture at a low resolution: the view
+        // The eye 20 m down a 6° beam (on or 0.4 m off its axis), looking back at the fixture at a low resolution: the view
         // rays run inside the beam for metres, so the thin-beam widening must not dim them (a widening of the whole
         // beam lost 7–18 % here). Looking past the lens the centre pixels follow the integral; looking into the lens
         // (smaller than a half-resolution sample) its light is spread over the samples around it, so the light of the
@@ -220,7 +221,7 @@ public sealed class BeamReviewTests
             var light = StageScene.Spot(new Vector3(0f, 0f, 3f), new Vector3(0f, 40f, 3f), 200000f, 6f, 9f, shadows: false, type: BeamType.Spot);
             renderer.World.SetLights(new[] { light });
             const int width = 160, height = 120;
-            var camera = RenderCamera.LookAt(new Vector3(0.4f, 20f, 3.1f), new Vector3(0f, 0f, 3f + aboveLens), 30f);
+            var camera = RenderCamera.LookAt(new Vector3(offAxis, 20f, 3f + 0.25f * offAxis), new Vector3(0f, 0f, 3f + aboveLens), 30f);
             camera.Ev100 = 2f;
             using var rt = renderer.CreateTarget(width, height);
             renderer.Render(rt, camera, Dark, new PreviewSettings { TemporalAccumulation = false, Bloom = false }, 1f / 60f);
