@@ -287,6 +287,68 @@ internal sealed class ViewportCamera
         OrthoHeight = 2f * radius / MathF.Min(1f, aspect) / 0.85f;
     }
 
+    /// <summary>
+    /// Frames a set of points as tightly as the view allows (a newly opened stage): the viewing direction is kept, the
+    /// camera moves sideways and along it until every point is inside the image with <paramref name="margin"/>
+    /// (1 = touching the edges) and the content is centred; the orbit target is put at the content's mean depth.
+    /// Orthographic views fit the points' extent. Returns false (nothing changed) when no point is finite.
+    /// </summary>
+    public bool FramePoints(ReadOnlySpan<Vector3> points, float aspect, float margin = 1.1f)
+    {
+        aspect = float.IsFinite(aspect) && aspect > 1e-3f ? aspect : 1f;
+        margin = float.IsFinite(margin) && margin >= 1f ? margin : 1.1f;
+        var forward = Forward;
+        var right = Right;
+        var up = Up;
+        float tanY = MathF.Tan(_fovY * 0.5f) / margin, tanX = tanY * aspect;
+        // In camera axes a point is inside when |x − ex| ≤ tan·(z − ez); each side plane touches its outermost point.
+        float a = float.NegativeInfinity, b = float.NegativeInfinity, c = float.NegativeInfinity, d = float.NegativeInfinity;
+        float xMin = float.PositiveInfinity, xMax = float.NegativeInfinity, yMin = float.PositiveInfinity, yMax = float.NegativeInfinity;
+        float zMin = float.PositiveInfinity, zMax = float.NegativeInfinity, zSum = 0f;
+        int n = 0;
+        foreach (var p in points)
+        {
+            if (!Finite(p))
+                continue;
+            float x = Vector3.Dot(p, right), y = Vector3.Dot(p, up), z = Vector3.Dot(p, forward);
+            a = MathF.Max(a, x - tanX * z);
+            b = MathF.Max(b, -x - tanX * z);
+            c = MathF.Max(c, y - tanY * z);
+            d = MathF.Max(d, -y - tanY * z);
+            xMin = MathF.Min(xMin, x);
+            xMax = MathF.Max(xMax, x);
+            yMin = MathF.Min(yMin, y);
+            yMax = MathF.Max(yMax, y);
+            zMin = MathF.Min(zMin, z);
+            zMax = MathF.Max(zMax, z);
+            zSum += z;
+            n++;
+        }
+
+        if (n == 0)
+            return false;
+        float meanZ = zSum / n;
+        if (Projection == ProjectionKind.Orthographic)
+        {
+            float width = MathF.Max(xMax - xMin, 0.1f), height = MathF.Max(yMax - yMin, 0.1f);
+            OrthoHeight = MathF.Max(height, width / aspect) * margin;
+            Target = right * ((xMin + xMax) * 0.5f) + up * ((yMin + yMax) * 0.5f) + forward * meanZ;
+            return true;
+        }
+
+        float ex = (a - b) / 2f, ey = (c - d) / 2f;
+        float ez = MathF.Min(-(a + b) / (2f * tanX), -(c + d) / (2f * tanY));
+        float extent = MathF.Max(zMax - zMin, 0.1f);
+        ez = MathF.Min(ez, zMin - MathF.Max(0.1f, 0.05f * extent));
+        var eye = right * ex + up * ey + forward * ez;
+        float focus = Math.Clamp(meanZ - ez, MinDistance, MaxDistance);
+        Distance = focus;
+        Target = eye + forward * focus;
+        // Keeps the apparent size when the view is switched to orthographic later.
+        OrthoHeight = 2f * focus * MathF.Tan(_fovY * 0.5f);
+        return true;
+    }
+
     /// <summary>Moves the target to a point (focus on double-click) keeping the direction and distance.</summary>
     public void FocusOn(Vector3 point)
     {

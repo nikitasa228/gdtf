@@ -2,11 +2,13 @@ using System.Globalization;
 using System.Numerics;
 using Candela.App.Docking;
 using Candela.App.Editing;
+using Candela.App.Panels;
 using Candela.App.Shell;
 using Candela.App.Ui;
 using Candela.Core.Editing;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
+using Candela.Gdtf;
 using Candela.Rendering;
 using Candela.Rendering.Vulkan;
 using Hexa.NET.ImGui;
@@ -66,6 +68,18 @@ internal interface IViewportHost
 
     /// <summary>Opens and focuses the real-time quality settings of the viewports (the Preview panel).</summary>
     void ShowViewportSettings();
+
+    /// <summary>The library item being dragged (null when none).</summary>
+    LibraryItem? DraggedLibraryItem { get; }
+
+    /// <summary>Modes and size of a fixture type (null while they are being read).</summary>
+    FixtureInfo? FixtureInfoOf(FixtureLibraryEntry entry);
+
+    /// <summary>One line describing where a dragged item would go ("Robin T1 · Mode 1 · 1.001").</summary>
+    string DropLabel(LibraryItem item);
+
+    /// <summary>Places a library item dropped on <paramref name="hit"/> (<paramref name="screen"/>: where the mouse was released).</summary>
+    void PlaceLibraryItem(LibraryItem item, SurfaceHit hit, Vector2 screen);
 }
 
 /// <summary>
@@ -76,7 +90,7 @@ internal interface IViewportHost
 /// view cube that snaps to the six orthographic views; click / Shift+click / box selection through the renderer's pick
 /// buffer; and ImGuizmo move / rotate gizmos with snapping, every drag one undo step.
 /// </summary>
-internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
+internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
 {
     private const float ToolbarAlpha = 0.82f;
     private readonly WorkspaceContext _ctx;
@@ -216,7 +230,12 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         // A user action: the delegate over the current content is made per call (the content changes with the scene).
         var bounds = SelectionController.FramingBounds(_ctx.Session.Scene, _ctx.Session.Selection.Ids, content.TryGetBounds);
         if (bounds.IsEmpty)
-            bounds = content.SceneBounds;
+        {
+            // Nothing selected: the whole stage, framed tightly.
+            FrameScene();
+            return;
+        }
+
         Camera.Frame(bounds, _imageSize.Y > 0 ? _imageSize.X / _imageSize.Y : 16f / 9f);
     }
 
@@ -310,7 +329,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
     }
 
     /// <summary>True while a navigation, box selection or gizmo drag is in progress (tests).</summary>
-    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive;
+    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive || IsEditingShape;
 
     private void EndInteraction()
     {
@@ -319,6 +338,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         _navigation = NavigationOperation.None;
         _selecting = false;
         EndGizmoDrag();
+        CancelShapeEdit();
     }
 
     /// <summary>Releases the render target and its ImGui texture (panel closed, workspace disposed).</summary>
@@ -392,6 +412,8 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         DrawStats(drawList);
         HandleInput(hovered, overOverlay);
         DrawBoxSelection(drawList);
+        DrawShapeEdit(drawList, ImGui.GetIO().MousePos, hovered);
+        HandleLibraryDrop(drawList);
     }
 
     private void EnsureTarget(Vector2 size)
@@ -455,7 +477,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
                     if (op == NavigationOperation.Fly)
                         _host.SuspendShortcuts(true);
                 }
-                else if (button == ImGuiMouseButton.Left && !gizmoBusy)
+                else if (button == ImGuiMouseButton.Left && !gizmoBusy && !BeginShapeEdit(mouse))
                 {
                     _selecting = true;
                     _selectShift = io.KeyShift;
@@ -465,7 +487,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
                 break;
             }
 
-            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy)
+            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy && !IsEditingShape)
             {
                 AddPick(PickKind.Focus, mouse, false);
                 _selecting = false;
@@ -486,6 +508,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
             }
         }
 
+        UpdateShapeEdit(mouse);
         if (_selecting && !ImGui.IsMouseDown(ImGuiMouseButton.Left))
         {
             _selecting = false;
@@ -571,7 +594,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
     {
         var session = _ctx.Session;
         var tools = _ctx.Tools;
-        if (tools.Tool == EditorTool.Select || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
+        if (tools.Tool is not (EditorTool.Move or EditorTool.Rotate) || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
             !SelectionController.IsEditable(session.Scene, primary))
         {
             _gizmoVisible = false;
@@ -644,6 +667,12 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         ImGui.SameLine();
         if (ToolButton(ToolbarLabels.RotateId, Str.ToolRotate, tools.Tool == EditorTool.Rotate))
             tools.Tool = EditorTool.Rotate;
+        ImGui.SameLine();
+        if (ToolButton(ToolbarLabels.WallId, Str.ToolWall, tools.Tool == EditorTool.Wall))
+            tools.Tool = EditorTool.Wall;
+        ImGui.SameLine();
+        if (ToolButton(ToolbarLabels.FloorId, Str.ToolFloor, tools.Tool == EditorTool.Floor))
+            tools.Tool = EditorTool.Floor;
         ImGui.SameLine();
         if (ToolButton(tools.LocalSpace ? ToolbarLabels.LocalId : ToolbarLabels.WorldId, tools.LocalSpace ? Str.ToolSpaceLocal : Str.ToolSpaceWorld, false))
             tools.LocalSpace = !tools.LocalSpace;
@@ -894,6 +923,8 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         public const string SelectId = Icons.Pointer + "##select";
         public const string MoveId = Icons.Move + "##move";
         public const string RotateId = Icons.Rotate3D + "##rotate";
+        public const string WallId = Icons.BrickWall + "##wall";
+        public const string FloorId = Icons.Square + "##floor";
         public const string LocalId = Icons.Box + "##space";
         public const string WorldId = Icons.Axis3D + "##space";
         public const string SnapId = Icons.Magnet + "##snap";

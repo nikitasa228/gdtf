@@ -77,6 +77,12 @@ internal sealed record AppOptions
     /// <summary>Print the usage and exit.</summary>
     public bool Help { get; init; }
 
+    /// <summary>
+    /// Diagnostics: the viewports show the renderer's procedural test scene instead of the engine's scene
+    /// (<c>--preview-stage</c>).
+    /// </summary>
+    public bool PreviewStage { get; init; }
+
     /// <summary>True when the run ends after writing a screenshot.</summary>
     public bool IsScreenshotMode => ScreenshotPath is not null;
 
@@ -142,6 +148,9 @@ internal sealed record AppOptions
                 case "--single-window":
                     o = o with { SingleWindow = true };
                     break;
+                case "--preview-stage":
+                    o = o with { PreviewStage = true };
+                    break;
                 default:
                     if (a.StartsWith('-'))
                         throw new AppUsageException($"Unknown option '{a}'.");
@@ -173,6 +182,7 @@ internal sealed record AppOptions
           --validation           enable the Vulkan validation layer
           --config-dir <dir>     folder for settings, layouts and presets of this run
           --single-window        keep torn-off panels inside the main window
+          --preview-stage        diagnostics: show the renderer's test scene instead of the stage
           --width <px>           initial window width  (default 1600)
           --height <px>          initial window height (default 900)
 

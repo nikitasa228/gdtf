@@ -68,6 +68,15 @@ internal enum ScriptActionType
     /// ("minimize", "restore", "maximize") — exercises swapchain recreation.
     /// </summary>
     Window,
+
+    /// <summary>Open a scene or project file (<c>path</c>), asking about unsaved changes like File → Open.</summary>
+    Open,
+
+    /// <summary>Drop files (<c>names</c>, or one <c>path</c>) onto the main window at (x, y), like a file manager does.</summary>
+    Drop,
+
+    /// <summary>Save the scene as a project (<c>path</c>), like File → Save As with that file chosen.</summary>
+    Save,
 }
 
 /// <summary>One scripted action. Coordinates are pixels of the main window's client area (top-left origin).</summary>
@@ -246,7 +255,9 @@ internal sealed class InputScript
     private static void Validate(ScriptAction a)
     {
         bool needsText = a.Type is ScriptActionType.Key or ScriptActionType.Menu or ScriptActionType.Action or ScriptActionType.Screenshot
-            or ScriptActionType.Layout or ScriptActionType.Setting;
+            or ScriptActionType.Layout or ScriptActionType.Setting or ScriptActionType.Open or ScriptActionType.Save;
+        if (a.Type == ScriptActionType.Drop && a.Text.Length == 0 && a.Names.Count == 0)
+            throw new FormatException("'drop' needs \"path\" or \"names\"");
         if (needsText && a.Text.Length == 0)
             throw new FormatException($"'{a.Type}' needs a value (text/chord/path/id/name)");
         if (a.Type is ScriptActionType.Panel or ScriptActionType.Undock or ScriptActionType.TabStyle && a.Panel.Length == 0)

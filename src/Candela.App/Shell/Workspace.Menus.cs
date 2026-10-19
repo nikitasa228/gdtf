@@ -27,7 +27,7 @@ internal sealed partial class Workspace
         bool HasSelection() => !session.Selection.IsEmpty;
 
         // File
-        Command(EditorActions.FileNew, Str.FileNew, Icons.FilePlus, () => Report(session.New()));
+        Command(EditorActions.FileNew, Str.FileNew, Icons.FilePlus, NewScene);
         Command(EditorActions.FileOpen, Str.FileOpen, Icons.FolderOpen, ShowOpen);
         Command(EditorActions.FileSave, Str.FileSave, Icons.Save, Save);
         Command(EditorActions.FileSaveAs, Str.FileSaveAs, Icons.Save, ShowSaveAs);
@@ -57,8 +57,10 @@ internal sealed partial class Workspace
         Command(EditorActions.ToolRotate, Str.ToolRotate, Icons.Rotate3D, () => tools.Tool = EditorTool.Rotate, null, () => tools.Tool == EditorTool.Rotate);
         Command(AppActions.ToggleSnap, Str.ToolSnapping, Icons.Magnet, () => tools.Snap = !tools.Snap, null, () => tools.Snap);
         Command(AppActions.ToggleSpace, Str.ToolSpaceLocal, Icons.Axis3D, () => tools.LocalSpace = !tools.LocalSpace, null, () => tools.LocalSpace);
-        Command(EditorActions.ToolWall, Str.ToolWall, Icons.BrickWall, () => { }, () => false);
-        Command(AppActions.ToolFloor, Str.ToolFloor, Icons.Square, () => { }, () => false);
+        Command(EditorActions.ToolWall, Str.ToolWall, Icons.BrickWall, () => tools.Tool = EditorTool.Wall, () => session.Engine is not null,
+            () => tools.Tool == EditorTool.Wall);
+        Command(AppActions.ToolFloor, Str.ToolFloor, Icons.Square, () => tools.Tool = EditorTool.Floor, () => session.Engine is not null,
+            () => tools.Tool == EditorTool.Floor);
         Command(EditorActions.ToolCable, Str.ToolCable, Icons.Cable, () => { }, () => false);
 
         // View (active viewport)
@@ -104,33 +106,11 @@ internal sealed partial class Workspace
         new[] { new FileFilter(Loc.Get(Str.BrowserScenes), "*.candela;*.mvr"), Named(ProjectFilter, Str.BrowserCandelaProjects), Named(MvrFilter, Str.BrowserMvr), AllFiles() },
         StartFolder(), null, OpenPath);
 
-    private void OpenPath(string path)
-    {
-        var result = _ctx.Session.Open(path);
-        if (result.Succeeded)
-            _ctx.Session.RememberRecentFile(path);
-        Report(result);
-    }
+    private void OpenPath(string path) => OpenFile(path);
 
-    private void Save()
-    {
-        if (_ctx.Session.FilePath is null)
-        {
-            ShowSaveAs();
-            return;
-        }
+    private void Save() => SaveThen(null);
 
-        Report(_ctx.Session.Save());
-    }
-
-    private void ShowSaveAs() => _browser.Show(FileBrowserMode.Save, Loc.Get(Str.BrowserSaveTitle),
-        new[] { Named(ProjectFilter, Str.BrowserCandelaProjects) }, StartFolder(), _ctx.Session.DisplayName + ".candela", path =>
-        {
-            var result = _ctx.Session.SaveAs(path);
-            if (result.Succeeded)
-                _ctx.Session.RememberRecentFile(path);
-            Report(result);
-        });
+    private void ShowSaveAs() => ShowSaveAs(null);
 
     private void ShowImport(ImportKind? kind)
     {
@@ -140,14 +120,16 @@ internal sealed partial class Workspace
             ImportKind.Model => new[] { Named(ModelFilter, Str.BrowserModels) },
             ImportKind.Mvr => new[] { Named(MvrFilter, Str.BrowserMvr) },
             ImportKind.Image => new[] { Named(ImageFilter, Str.BrowserImages) },
+            ImportKind.Gdtf => new[] { Named(GdtfFilter, Str.BrowserGdtf) },
             _ => new[]
             {
-                new FileFilter(Loc.Get(Str.FileImport), string.Join(";", ProjectFilter.Patterns.Concat(MvrFilter.Patterns).Concat(ModelFilter.Patterns).Concat(ImageFilter.Patterns))),
+                new FileFilter(Loc.Get(Str.FileImport), string.Join(";", ProjectFilter.Patterns.Concat(MvrFilter.Patterns).Concat(ModelFilter.Patterns).Concat(ImageFilter.Patterns).Concat(GdtfFilter.Patterns))),
                 Named(ProjectFilter, Str.BrowserCandelaProjects), Named(MvrFilter, Str.BrowserMvr), Named(ModelFilter, Str.BrowserModels), Named(ImageFilter, Str.BrowserImages),
+                Named(GdtfFilter, Str.BrowserGdtf),
             },
         };
         _browser.Show(FileBrowserMode.Open, Loc.Get(Str.BrowserImportTitle), filters, StartFolder(), null,
-            path => Report(_ctx.Session.Import(path, kind ?? KindOf(path))));
+            path => ImportFile(path, kind ?? KindOf(path)));
     }
 
     /// <summary>The import kind a file name implies (unknown extensions are treated as 3D models).</summary>
@@ -160,13 +142,15 @@ internal sealed partial class Workspace
             return ImportKind.Mvr;
         if (ImageFilter.Matches(name))
             return ImportKind.Image;
+        if (GdtfFilter.Matches(name))
+            return ImportKind.Gdtf;
         return ImportKind.Model;
     }
 
     private void ShowExport() => _browser.Show(FileBrowserMode.Save, Loc.Get(Str.BrowserExportTitle), new[] { Named(MvrFilter, Str.BrowserMvr) },
-        StartFolder(), _ctx.Session.DisplayName + ".mvr", path => Report(_ctx.Session.Export(path, ExportKind.Mvr)));
+        StartFolder(), SuggestedName() + ".mvr", ExportMvr);
 
-    private string? StartFolder() => _ctx.Session.FilePath is { } p ? Path.GetDirectoryName(p) : null;
+    private string? StartFolder() => (_ctx.Session.FilePath ?? _ctx.Session.SourcePath) is { } p ? Path.GetDirectoryName(p) : null;
 
     private static FileFilter Named(FileFilter f, Str name) => new(Loc.Get(name), f.Patterns.ToArray());
 
@@ -219,6 +203,8 @@ internal sealed partial class Workspace
                     ShowImport(ImportKind.Mvr);
                 if (_menu.Item(Str.FileImportImage, Icons.Image))
                     ShowImport(ImportKind.Image);
+                if (_menu.Item(Str.FileImportGdtf, Icons.Lightbulb))
+                    ShowImport(ImportKind.Gdtf);
                 _menu.End();
             }
 
@@ -322,8 +308,9 @@ internal sealed partial class Workspace
             Item(EditorActions.ToolWall);
             Item(AppActions.ToolFloor);
             Item(EditorActions.ToolCable);
-            if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-                ImGui.SetTooltip(Loc.Get(Str.ToolNeedsEngine));
+            _menu.Separator();
+            Item(SessionActions.OpenWhite);
+            Item(SessionActions.PauseSimulation);
             _menu.End();
         }
 

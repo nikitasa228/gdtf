@@ -127,7 +127,8 @@ public sealed class HeadlessAppTests : IDisposable
     public void Screenshot_of_the_default_layout_is_a_real_frame()
     {
         string png = _dir.File("default.png");
-        var run = RunApp(new[] { "--screenshot", png, "--frames", "6" });
+        // The renderer's test scene (--preview-stage) gives the viewport known, lit content.
+        var run = RunApp(new[] { "--preview-stage", "--screenshot", png, "--frames", "6" });
         Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
         var image = LoadPng(png);
         Assert.Equal((1600, 900), (image.Width, image.Height));
@@ -159,7 +160,7 @@ public sealed class HeadlessAppTests : IDisposable
                 { "type": "wait", "frames": 2 }
             ] }
             """);
-        var run = RunApp(new[] { "--screenshot", end, "--script", script });
+        var run = RunApp(new[] { "--preview-stage", "--screenshot", end, "--script", script });
         Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
         var a = LoadPng(before);
         var b = LoadPng(after);
@@ -196,7 +197,7 @@ public sealed class HeadlessAppTests : IDisposable
                 { "type": "wait", "frames": 3 }
             ] }
             """);
-        var run = RunApp(new[] { "--screenshot", end, "--script", script });
+        var run = RunApp(new[] { "--preview-stage", "--screenshot", end, "--script", script });
         Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
         // The status bar's left part gains the orange "8 selected".
         double changed = DifferentPixels(LoadPng(before), LoadPng(end), 80, 876, 400, 898);
@@ -228,7 +229,7 @@ public sealed class HeadlessAppTests : IDisposable
                 { "type": "wait", "frames": 3 }
             ] }
             """);
-        var run = RunApp(new[] { "--validation", "--screenshot", _dir.File("stress.png"), "--script", script });
+        var run = RunApp(new[] { "--preview-stage", "--validation", "--screenshot", _dir.File("stress.png"), "--script", script });
         Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
         Assert.Contains("validation on", run.Output);
         Assert.DoesNotContain("ERR [", run.Output);

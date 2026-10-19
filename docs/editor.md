@@ -2,15 +2,23 @@
 
 The desktop editor of Candela: a dockable workspace around Vulkan viewports, built on GLFW, the shared
 `VulkanContext` / `VulkanRenderer` of `Candela.Rendering.Vulkan` and Dear ImGui (docking + multi-viewport branch,
-through the Hexa.NET bindings). This document describes **phase A** — the shell, workspace, viewports, selection and
-editing tools, settings and the headless verification mode. Phase B connects the stage engine (fixture library,
-open/save/import/export, real stages); until then every engine operation is routed through one session class that
-answers with a clear *"not available yet"* message instead of failing.
+through the Hexa.NET bindings). The editor is a layer over the stage engine (`Candela.Engine.StageEngine`, see
+[engine.md](engine.md)): the scene, selection, undo history and issue log the panels work on are the engine's, the
+viewports draw the engine's render binding of the real scene, and File → New / Open / Save / Import / Export run the
+engine's operations. Phase A built the shell, workspace, viewports, selection and editing tools, settings and the
+headless verification mode; phase B1 connected the engine — documents, recovery, the fixture library with thumbnails and
+drag-and-drop placement, walls and floors (see [Documents](#documents), [Library](#library) and
+[Walls and floors](#walls-and-floors)).
 
-![Default layout with a selected object](images/editor-default-layout.png)
+![Default layout at start-up](images/editor-default-layout.png)
 
-*Default layout: Library on the left, the viewport in the centre (move gizmo on the selected sphere), Properties /
-Preview / Render on the right, Issues / Console below. The viewport shows the renderer's procedural test scene.*
+*Start-up without a scene: Library on the left (fixture thumbnails rendered in the background), an empty stage with its
+floor grid in the viewport, Properties / Preview / Render on the right, Issues / Console below.*
+
+![Фокина.mvr opened, a fixture selected](images/editor-fokina.png)
+
+*`stages/Фокина.mvr` (91 fixtures) opened and framed; a click on a fixture selects the whole fixture (orange outline, move
+gizmo) and the Properties panel shows it. Colorless shading; in Full shading the stage is lit only by its fixtures.*
 
 ## Running
 
@@ -23,7 +31,7 @@ without a GPU, Mesa's software driver (lavapipe, package `mesa-vulkan-drivers`) 
 
 | Option | Meaning |
 |---|---|
-| `scene` / `--open <file>` | scene or project to open at start (`.candela`, `.mvr`; phase B — today a "not available" message) |
+| `scene` / `--open <file>` | scene or project to open at start (`.candela`, `.mvr`), behind the busy overlay of the first frame |
 | `--layout <name>` | start with a layout: `default`, `viewports-4` or a saved layout name |
 | `--reset-layout` | ignore the saved workspace and start with the default layout |
 | `--scale <1-4>` | UI scale (1 = 100 %), overrides the setting |
@@ -36,11 +44,14 @@ without a GPU, Mesa's software driver (lavapipe, package `mesa-vulkan-drivers`) 
 | `--screenshot <png>` | headless verification: render, save the last frame as PNG and exit |
 | `--frames <n>` | frames rendered before the screenshot (default 12) |
 | `--script <json>` | replay scripted input first (see [Scripted input](#scripted-input)) |
+| `--preview-stage` | diagnostics: the viewports show the renderer's procedural test scene instead of the stage |
 
 Exit codes: `0` ok, `1` failure, `2` usage error (bad option, unreadable script), `3` no usable Vulkan device.
 
 `--scale`, `--language` and `--device` apply to the current run only: the settings file keeps its values unless the
-setting is changed in the editor during the run. Headless runs (`--screenshot`) never write settings or the workspace.
+setting is changed in the editor during the run. Headless runs (`--screenshot`) never write settings, the workspace or
+the model library, do not autosave, show no recovery prompt and load fixture models before the first frame instead of
+in the background (deterministic screenshots).
 
 Per-user files live in the Candela config folder (`%APPDATA%\Candela`, `~/.config/Candela`,
 `~/Library/Application Support/Candela`; `CANDELA_CONFIG_DIR` or `--config-dir` override it):
@@ -52,6 +63,7 @@ Per-user files live in the Candela config folder (`%APPDATA%\Candela`, `~/.confi
 | `presets/keybindings/*.json` | named key binding presets |
 | `keybindings.custom.json` | the edited ("Custom") key bindings |
 | `recent-places.json` | recently used folders of the file browser |
+| `model-library.json` | the files of the Library's Models tab (paths; see [Library](#library)) |
 | `logs/candela-app.log` | the log of the current run (also shown in the Console panel; at most 16 MB), `candela-app.previous.log` the one before |
 
 ## Workspace
@@ -68,7 +80,7 @@ windows have no OS decorations).*
 | Panel | Content |
 |---|---|
 | Viewport (1–16) | 3D view of the stage, see [Viewports](#viewports) |
-| Library | Fixtures / Models tabs, search, category chips — fills with the engine's fixture library in phase B |
+| Library | the engine's fixture library by category with 3D thumbnails and a rotating hover preview, the user's models and images; drag into a viewport to place (see [Library](#library)) |
 | Properties | name, visibility, lock, layer, numeric transform (metres or feet, Euler degrees), components, wall material |
 | Preview | real-time quality settings of the viewports (shadows, volumetrics, indirect light, bloom, exposure …) |
 | Render | final render settings (resolution, samples, bounces, format, frame range); *Render* asks the session |
@@ -113,6 +125,17 @@ and grid. Shortcuts and View-menu commands act on the **active viewport**: the o
 selected (a new viewport becomes active at once). With several viewports on screen it has an orange frame. A viewport
 hidden behind another tab of its group is never the target — the commands then go to a visible one.
 
+**What the viewports show** is the open document: `EngineViewportContent` binds the engine's render synchronisation
+(`RenderSync`) to the shared render world, so every viewport draws the same scene, each into its own target with its
+own camera. Fixture models load in the background; meanwhile the bottom-right corner says *Loading fixture models…
+(n)*. Opening a scene frames its content tightly (stage, set and fixtures — not the empty ground around them), and
+frames it again once the models have arrived, unless the camera was moved in between. Clicking any part of a fixture
+(base, yoke, head, lens) selects the fixture itself; the members of a selected group are outlined with it. In *Full*
+shading the stage is lit by its fixtures only, so a scene whose fixtures are all dark looks dark — *Tools → Open
+White* (one undo step) brings every fixture up in open white with the moving heads aimed at the stage. The command
+line option `--preview-stage` shows the renderer's procedural test stage instead of the document (the phase-A
+behaviour, kept for tests that need a fixed picture).
+
 ![Four viewports, Russian UI](images/editor-four-viewports-ru.png)
 
 *Four Viewports layout in Russian: top, front and right orthographic views (colourless) plus perspective, all showing
@@ -146,8 +169,9 @@ Orbiting leaves the snapped view.
 | Blender | MMB | Shift+MMB | wheel, Ctrl+MMB drag | Shift+RMB |
 | Maya | Alt+LMB | MMB, Alt+MMB | wheel, Alt+RMB drag | RMB |
 
-Double-click focuses the camera on the point under the cursor; *F* frames the selection (or the whole stage); an object
-without geometry (a light, a group) is framed as a 1 m box around its origin.
+Double-click focuses the camera on the point under the cursor; *F* frames the selection by its real bounds (with
+nothing selected, the whole scene, as tightly as on opening); an object without geometry (a light, an empty group) is
+framed as a 1 m box around its origin.
 The camera works in metres with Z up; orthographic views keep the apparent size when switching projection, also when fly
 mode (which needs a perspective eye) starts from an orthographic view. The far plane follows the zoom-out limit, so the
 stage never disappears when zooming far out. A navigation, box selection or gizmo drag ends when its viewport stops being
@@ -155,9 +179,10 @@ drawn (its tab covered, the panel closed) — fly mode suspends the shortcuts, a
 
 ## Selection and editing
 
-* **Click** selects the object under the cursor (through the renderer's pick buffer), a click on the background clears
-  the selection; **Shift+click** adds or removes; **drag** draws a selection box (Shift adds) that selects the objects
-  lying *entirely* inside it — a box drawn around props does not also pick up the floor or the walls behind them.
+* **Click** selects the object under the cursor (through the renderer's pick buffer; any part of a fixture selects
+  the fixture), a click on the background clears the selection; **Shift+click** adds or removes; **drag** draws a selection box (Shift adds) that selects the objects
+  lying *entirely* inside it (by the bounds of their rendered geometry, fixture models included) — a box drawn around
+  props does not also pick up the floor or the walls behind them.
   Hidden and locked objects, and objects on hidden or locked layers, are never selected.
 * **Gizmos** (ImGuizmo): *Move* (W) and *Rotate* (E) in world or local space; with several objects selected they move
   rigidly around the primary (last selected) object. An object selected together with its parent moves once, with the
@@ -172,15 +197,134 @@ drawn (its tab covered, the panel closed) — fly mode suspends the shortcuts, a
   viewport is finished (the drag would re-apply its transform at once and the redo history would be lost). Delete,
   Duplicate, Cut, Copy and Paste work on the top-level selected objects (children follow their parents) and are single
   steps too.
+* **Duplicate, Copy, Paste** use Core's copying (`DuplicateEntitiesCommand`, `EntityCloner`, see [core.md](core.md)):
+  copies get new ids, references among the copied objects point at the copies (a duplicated truss keeps its fixtures
+  mounted on the copy), references to other objects are kept by Duplicate and kept by Paste only when the scene still
+  has their target. The clipboard holds copies taken at Copy time; every Paste gives fresh ids. Fixtures keep their DMX
+  address (an overlap is listed in the Issues panel).
+
+## Documents
+
+`EditorSession` owns one `StageEngine` for the whole run (`EditorSession.Engine`, never null while the editor runs);
+New / Open replace the engine's project, so panels keep their references to the engine and its `Scene`, `Selection`,
+`Undo` and `Issues` and only re-read when `SceneReplaced` is raised.
+
+| Operation | Behaviour |
+|---|---|
+| **New** (Ctrl+N) | An empty stage named *Untitled*: no objects, the floor grid, the camera back over the stage origin. |
+| **Open** (Ctrl+O, Open Recent, `--open`, a dropped file) | `.candela` projects and `.mvr` scenes. An MVR opens as a new, unsaved project (no file yet: Save asks for one). Every open viewport frames the new stage tightly (each side of the picture touches the outermost object), and again once the fixture models have loaded — unless the camera was moved in between. A recent file that no longer exists is removed from the list. |
+| **Save / Save As** (Ctrl+S / Ctrl+Shift+S) | Atomic `.candela` write through the engine (scene, assets, copies of the GDTF files used, `engine`/`view` settings). A scene still called *Untitled* takes the file's name. The file goes to the top of the recent list. |
+| **Import** (Ctrl+I, File → Import) | Another Candela project or an MVR (merged under a new group, one undo step), a 3D model (OBJ, FBX, DAE, 3DS, glTF/GLB, STL, PLY — native formats in the engine's isolated import worker), an image (a reference drawing; the popup that follows makes it a poster), a GDTF file (added to the fixture library). Imported models and images are also added to the Library's Models tab. |
+| **Export** | MVR 1.6 with the fixtures' GDTF files and the models as GLB. |
+| **Open White** (Tools) | Every fixture at full in open white, moving heads aimed at the stage (`StageLooks.ApplyOpenWhite`, one undo step): a quick way to see a rig that was imported dark. |
+| **Pause Simulation** (Tools, Alt+P) | Freezes smoke, fire and sound (`EngineSettings.SimulationPaused`); DMX and moving lights keep running. |
+
+* **Progress.** A file operation runs between two frames behind a **busy overlay** that names it ("Opening
+  Фокина.mvr…"), so the window shows what it is doing instead of freezing silently. The result goes to the status bar
+  ("Opened Фокина.mvr · 91 fixtures · 0 errors, 7 warnings"), a failure to a message box, and the operation's issues
+  to the **Issues panel** (brought to the front when there are errors). Content problems never throw; an unexpected
+  exception is reported as a program error and the editor goes on.
+* **Unsaved changes.** New, Open, recovering a session and closing the window ask *"Save the changes to “Show”
+  first?"* — **Save** (then continue; a scene without a file asks for one first; a failed save stops there),
+  **Don't Save**, **Cancel**. Enter answers Save and Escape Cancel only once the question is on screen: the key press
+  that asked it (Enter confirming a file in the file browser) never answers it unseen. Closing the window while another
+  dialog is open (file browser, message, question) waits until that dialog is closed.
+* **Title.** The window title is `Candela — <scene name>` with a `•` while there are unsaved changes.
+* **Dropped files.** Files dragged from a file manager onto the window (GLFW drop callback) are opened or imported:
+  a single `.candela`/`.mvr` opens directly when the stage is empty and unchanged, otherwise the editor asks **Open**
+  (instead of the current scene) or **Import** (into it). Models and images dropped onto a viewport land on the surface
+  under the cursor (a model stands on it, an image lies on it — see [Library](#library)); several files are imported
+  side by side; `.gdtf` files go into the fixture library; anything else is reported as not importable.
+* **Engine tick.** Every frame `Update` ticks the engine (DMX input, fixture motors, smoke, fire, sound, lights, render
+  binding) — also while the window is minimised (ten times a second, without drawing); the issue analysis (patch, power, rigging, assets) runs again half a second after the last edit, so a
+  gizmo drag does not re-check the scene every frame. Clicking an issue selects and frames the objects it names.
+* **Autosave and recovery.** The engine autosaves the open project at the interval of *Settings → Files* (only when
+  something changed; a save removes the session's autosaves; a clean exit deletes them). Changing the interval, or
+  turning autosave off and on, adjusts the running autosave session instead of starting another one (which would leave
+  the first session's files behind as a "crashed" session). Only a clean exit — the window closed after the
+  unsaved-changes question — deletes the recovery files: when the editor stops abnormally (an exception outside the
+  frame loop, 120 failed frames in a row) unsaved changes are autosaved once more and the files stay for the
+  recovery prompt. A *Save As* that fails leaves the scene's name as it was. At start-up the editor lists
+  sessions of runs that did not end cleanly — scene, time of the last autosave, its file (or *never saved*) — with
+  **Recover** (opens the newest readable autosave; Save writes back to the original file), **Delete** (asks once
+  more) and **Decide Later** (they are offered again at the next start).
+
+![Unsaved changes, Russian](images/editor-unsaved-ru.png)
+
+## Library
+
+The Library panel (requirement "окно выбора устройств") has two sub-tabs.
+
+**Fixtures** shows the engine's fixture library (the library folders of the settings plus GDTF files brought in by
+projects and MVRs; one tile per model, its newest revision). Category chips filter by the `_specs` category — **All**,
+PROFILE, WASH, WASH BEAM, BEAM, SPOT, FOLLOW SPOT, LED BAR, PAR, HAZE, FOG, FAN, SCANER, LASER, STROBE, BLINDER, UV,
+BSW, GENERATOR FIRE (the tooltip of a chip gives its count) — and the search field matches model, manufacturer and
+file name in any case. Each tile shows the fixture's **3D thumbnail** with its name and manufacturer under it.
+
+![Library: thumbnails and the hover preview](images/editor-library-hover.png)
+
+*Hovering AM-WASH300: its tile grows upward into a card with the rotating 3D preview, the category, the number of DMX
+modes, weight and power.*
+
+* **Thumbnails** are rendered by Candela.Engine's `FixtureThumbnailRenderer` on a background thread with a Vulkan
+  renderer of its own (a second, window-less device on the same GPU), so drawing the panel never waits for them; still
+  pictures are cached on disk in Candela.Assets' `ThumbnailStore` (keyed by the GDTF file's content), so a fixture is
+  rendered once per machine. Only tiles on screen ask for pictures, newest request first; pictures arrive a few per frame
+  as Dear ImGui user textures, at most 240 stay in memory (least recently drawn are released).
+* **Hover preview.** Resting on a tile for a moment grows it upward (0.18 s, ease-out) into a card twice its size — it
+  hangs down from the top when there is no room above — showing the fixture **turning** (24 frames around it,
+  rendered coarse-to-fine in the background and cross-faded, so a whole turn is visible early) and a line of facts.
+* **Drag into a viewport** places the fixture — dragged from its tile or from its grown hover card (the card is the
+  drag source where it covers other tiles, so the fixture it shows is the one placed): while dragging, the viewport shows a **ghost** — the fixture's box (from
+  its GDTF geometry) mounted on the surface under the cursor, a footprint ring and *"Robin T1 · Mode 1 · 38 ch · 1.001"*.
+  The surface is the renderer's pick of the last frame (position and normal); where nothing is drawn, the ground
+  plane; looking above the horizon, the plane through the camera's target. GDTF fixtures hang, so on a **floor** the
+  fixture is turned over and stands on its base, under a **ceiling or truss** it hangs, on a **wall** its base is
+  against the wall and the beam points into the room.
+* **Mode and patch.** A dropped fixture gets the GDTF's first (default) DMX mode, the next free fixture id, a name
+  (*model id*) and is **auto-patched**: each DMX break of the mode goes to the lowest address — universe 1 address 1
+  first, after the previous break — where its whole footprint fits into one universe without overlapping any channel a
+  patched fixture uses (resolved footprints; a footprint over 512 channels stays unpatched). One undo step; the fixture
+  becomes the selection. When the type has several modes, a popup at the drop point lists them with their channel
+  counts; choosing another mode patches the fixture again (its own old channels count as free; one more undo step).
+
+![Placement popup, Russian, 150 %](images/editor-placement-ru.png)
+
+**Models** lists the user's custom 3D models and images (`model-library.json` in the config folder: paths, newest
+first; a model's companion files — MTL, textures — stay next to it). **Import…** adds files; models and images imported
+into a scene are added too; right-click → *Remove from Library*. Images show a downscaled picture, models a format
+badge. Dragging an item into a viewport imports it there (a model stands on the surface, an image lies on it as a
+reference drawing; the popup that follows switches it to a lit poster). A file that no longer exists is marked
+*file missing*.
+
+## Walls and floors
+
+The **Wall** (B) and **Floor** (Shift+B) tools draw the requirement's "walls and floors as resizable rectangles" with
+`WallComponent` (Core): with the Floor tool a left-button drag draws a rectangle, with the Wall tool a drag draws the
+line a wall (3 m high, 10 cm thick, its front facing the camera) stands on. The drawing plane is the horizontal surface
+under the press (a stage, an existing floor) or else the ground; Snapping (Alt+S, Ctrl inverts it) rounds the corners to
+half the grid spacing. The new shape gets the built-in material of its kind (floors: *Wooden stage*, walls: *Painted
+wall, white*; the Properties panel changes it), is selected and is one undo step; the tool stays active for the next
+one. Navigation keeps working with the other mouse buttons, and the tool's one-line help shows at the bottom of the view.
+
+A selected wall, floor or ceiling shows **handles** (any tool): the ends and the top of a wall, the edges and corners
+of a floor. Dragging one changes the size while the opposite side stays where it is (the size follows the mouse
+along the handle's axis, corners in the floor's plane; snapping rounds the size); the size is shown next to the cursor.
+The whole drag is one undo step. The engine draws walls and floors with `WallMesh` and their material.
+
+![Wall and floor tools](images/editor-walls-floors.png)
+
+*A floor and a wall drawn with the tools and two fixtures dragged from the library (standing on the floor, patched to
+1.001 and 1.039); the selected floor is being widened from its right edge.*
 
 ## Menus
 
 | Menu | Items |
 |---|---|
-| File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image), Export (MVR scene), Render…, Settings…, Exit |
+| File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image, GDTF fixture), Export (MVR scene), Render…, Settings…, Exit |
 | Edit | Undo / Redo (with the step name), Cut, Copy, Paste, Duplicate, Delete, Select All, Deselect |
 | View | Shading, Projection, Camera views, Overlay, Grid, Statistics, View cube, Frame selection, New viewport, Reset layout |
-| Tools | Select, Move, Rotate, Wall, Floor, Cable (the drawing tools arrive with the engine), Snapping, Local/World space |
+| Tools | Select, Move, Rotate, Wall, Floor, Cable, Snapping, Local/World space, Open White (all fixtures), Pause Simulation |
 | Window | open/close every panel, Layouts (Default, Four Viewports, saved, Save Layout As…, Delete Layout), Reset |
 | Help | Keyboard shortcuts, Documentation, About |
 
@@ -195,11 +339,7 @@ listed but refused when opened; `~` in the path bar is the home folder.
 
 ![File browser](images/editor-file-browser.png)
 
-File operations that need the stage engine go through `EditorSession`, the only class that will talk to
-`StageEngine` in phase B. Today they change nothing and say so — in a message box, the status bar, the log and as a
-note in the Issues panel:
-
-![Not available yet](images/editor-not-available.png)
+File operations go through `EditorSession`, the editor's gateway to `StageEngine` (see [Documents](#documents)).
 
 ## Keyboard shortcuts
 
@@ -219,6 +359,7 @@ Shortcuts are commands bound to key chords (Core `KeyBindingSet`); menus show th
 | Perspective ↔ orthographic | Num 5 | Grid | Alt+G |
 | Wireframe / Colorless / Full | Alt+1 / Alt+2 / Alt+3 | Overlay None / Lux / Noise / Cables | Alt+0 / Alt+L / Alt+N / Alt+C |
 | New viewport | Ctrl+Alt+N | Keyboard shortcuts | F1 |
+| Pause / resume simulation | Alt+P | Import GDTF, Open White | (unbound) |
 
 While a text field has the keyboard, plain keys type into it and the text-editing chords (Ctrl+A / C / V / X / Z /
 Y, Ctrl+arrows …) edit the text — they do not select, copy, paste or undo objects; other chords with Ctrl / Alt /
@@ -271,8 +412,12 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
   100, 1000 … occurrences), and appears once in the Issues panel (at most 200 different program messages; the panel's
   clear button really empties the list and lets them be reported again). The log file holds the current run and stops
   at 16 MB; the previous run is kept as `candela-app.previous.log`.
-* Swapchain loss, resize and minimise are handled (the loop idles while minimised); GPU objects of closed viewports
-  are released after the frames that used them.
+* Swapchain loss, resize and minimise are handled (the loop idles while minimised, still ticking the engine for DMX
+  and autosave); GPU objects of closed viewports are released after the frames that used them.
+* Background work never ends the program: a fixture type whose GDTF cannot be read (for any reason) gets no modes
+  and is placed unpatched; a picture the thumbnail thread cannot make (an image too large to decode included) becomes
+  an icon; a failure while drawing the busy overlay lets the waiting file operation run without it instead of blocking
+  every later one.
 * Without a Vulkan device the editor explains what to install, in a small OpenGL window (or on standard error in
   headless runs) and exits with code 3:
 
@@ -337,6 +482,9 @@ a real one. Coordinates are pixels in the main window.
 | `layout` | `name` | apply a layout |
 | `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection), `value` | change a setting |
 | `window` | `width`, `height` (screen pixels), or `value` (minimize, restore, maximize) | resize the main window or change its state (swapchain recreation) |
+| `open` | `path` | open a scene or project like *File → Open* (asks about unsaved changes) |
+| `drop` | `path`, or `names` (several files), `x`, `y` | drop files onto the main window at (x, y), as a file manager does |
+| `save` | `path` | save the document as a `.candela` project, like *Save As* with that file chosen |
 | `screenshot` | `path` | save the current frame (in `--screenshot` runs) |
 
 ## Architecture
@@ -346,38 +494,52 @@ src/Candela.App/
   Program.cs, AppOptions.cs        command line, exit codes
   Shell/      EditorApplication (start-up, frame loop, shutdown), GlfwPlatform, MainWindow, GpuDevice,
               ImGuiHost (context, backends, textures), SwapchainCapture, StartupFailureScreen, FrameTimer,
-              Workspace (+ .Menus: panels, commands, menus, layouts, dialogs), MenuScope, WorkspaceContext
+              Workspace (+ .Menus: panels, commands, menus, layouts, dialogs; + .Session: document commands,
+              busy operations, file drops, recovery; + .Library: library host, placement popup), FileDropQueue,
+              MenuScope, WorkspaceContext
   Docking/    DockWorkspace (dock space, presets, tab styles, icon column), Panel, TabStyleMap, LayoutFile, LayoutStore
-  Viewport/   ViewportPanel, ViewportCamera, ViewCube, NavigationStyles
-  Editing/    SelectionController, EditOperations, TransformMath, SceneLookup
-  Session/    EditorSession (the single gateway to the engine), PreviewStage, SessionResult
-  Input/      key names, commands, KeyBindingMap / dispatcher, KeyBindingsService, InputScript, ScriptPlayer
+  Viewport/   ViewportPanel (+ .Surface: surface under the cursor, framing; + .Placement: library drops and ghost;
+              + .Drawing: Wall / Floor tools and resize handles), ViewportCamera, ViewCube, NavigationStyles
+  Editing/    SelectionController, EditOperations, TransformMath, SceneLookup, Placement (orientation on a surface),
+              WallShapes (wall / floor geometry), AutoPatch, LibraryPlacement, FixtureInfoCache, ModelLibrary
+  Session/    EditorSession (the single gateway to StageEngine), EngineViewportContent (RenderSync → viewports,
+              picking, bounds, outline), TrackedRenderWorld (mesh bounds for box selection and framing),
+              IViewportContent, PreviewStage (--preview-stage), SessionResult
+  Thumbnails/ ThumbnailWorker (background renderer for library stills and orbit frames), UiTextures (ImGui user
+              textures with deferred release)
+  Input/      key names, commands, KeyBindingMap / dispatcher, KeyBindingsService, InputScript, ScriptPlayer,
+              SessionActions
   Files/      FileFilter, FileBrowserModel (pure logic), FileBrowserDialog (UI)
   Panels/     Library, Properties, Issues, Console, Render, Preview
-  Windows/    SettingsWindow, message boxes, About, Shortcuts
+  Windows/    SettingsWindow, SessionDialogs (busy, unsaved changes, open-or-import, recovery), message boxes, About,
+              Shortcuts
   Settings/   SettingsStore
   Ui/         Theme, FontSet, Icons, Loc / Str, Labels, PropertyGrid, UiScale
   Diagnostics/AppLog
 ```
 
-**Frame order** (main thread): poll events → session update → workspace *BeforeFrame* (pending layout ini, viewport
-pick queries of the last frame) → scripted input → ImGui NewFrame → workspace draw (menus, status bar, dock space,
+**Frame order** (main thread): poll events → session update (engine `Tick`: DMX, simulation, autosave, issues) →
+workspace *BeforeFrame* (pending layout ini, viewport pick queries of the last frame, queued file drops, a queued busy
+operation — open, save, import, export run here, between two frames, after the busy overlay has been drawn once — and
+library thumbnails finished by the worker) → scripted input → ImGui NewFrame → workspace draw (menus, status bar, dock space,
 panels, dialogs, shortcut dispatch) → ImGui Render → GPU frame: viewports sync and render into their targets →
 swapchain acquire → ImGui draw data → (screenshot copy) → present → platform windows.
 
 Picking runs outside the GPU frame (the renderer's `Pick` reads the pick buffer of the last rendered frame), so a click
 is answered on the next frame. The scene, selection and undo stack are Core types (`Scene`, `Selection`, `UndoStack`)
-owned by `EditorSession`; in phase B the session takes them from `StageEngine` instead and `PreviewStage` gives way to
-the engine's render synchronisation.
+owned by the session's `StageEngine` (`EditorSession.Engine`); every panel reaches them through `EditorSession`, which
+also turns engine results and exceptions into Issues-panel entries, so a failing file operation never ends the
+program.
 
 **Steady-state frames do not allocate** on the managed heap in the editor's own code: labels are built once per
 language (`Labels`), status texts and statistics only when their values change (statistics at most four times a
-second), commands are cached delegates, and the preview stage re-derives instance flags without LINQ. Allocations
-happen on user actions (edits, opening menus and dialogs).
+second), commands are cached delegates, the render world wrapper updates instance flags and bounds in place, and the
+Library panel caches its tile keys, labels and filtered lists (rebuilt when the search, category or catalogue
+changes). Allocations happen on user actions (edits, opening menus and dialogs, drags) and when thumbnails arrive.
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 400 tests, about a minute) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 450 tests, a little over a minute) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
 the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
 styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
@@ -387,8 +549,31 @@ the choice of the active viewport, docking (default and four-viewport presets, i
 round trip through a saved file, loading a layout while running), layout files and store, the file browser model and
 filters, command-line and script parsing, settings robustness, localisation completeness (issue categories too),
 layout rules found by exercising the UI (menus opening towards the window's inside, the property grid's label column,
-transform fields stacking instead of cutting numbers, the file dialog fitting without scrolling), the editor session,
-and the preview stage on a real (headless) Vulkan renderer with picking. `RobustnessTests.cs` tries to break the
+transform fields stacking instead of cutting numbers, the file dialog fitting without scrolling), and the preview stage
+on a real (headless) Vulkan renderer with picking.
+
+The phase-B1 tests: `EngineSessionTests` (`EditorSession` over the real engine: Фокина opened, saved as `.candela`
+and reopened unchanged; a project, an MVR, a 3D model, an image and a GDTF imported, each one undo step; MVR export
+and reopening it; missing and damaged files failing with a reason in the Issues panel instead of an exception, in
+English and Russian; recent files; simulation pause), `SessionFlowTests` (the unsaved-changes, busy, open-or-import
+and recovery dialogs answered headlessly, recovery of an autosaved session, discarding it, file classification,
+Duplicate / Copy / Paste of a truss with its fixtures — references remapped, kept or cleared), `EngineViewportTests`
+(on a headless Vulkan device: the Фокина scene picked fixture by fixture — a part never comes back instead of its
+fixture —, bounds for box selection, the outline of selected fixtures and groups, framing that keeps every point in
+the picture; the thumbnail worker rendering stills, orbit frames and image previews in the background), `PlacementAndShapeTests` (orientation of
+fixtures, models and images on floors, ceilings and walls; floors and walls from a drag, resizing with the opposite side
+fixed, snapping, handles), `LibraryTests` (auto-patch to the next free address without straddling universes, placing a
+fixture with its default mode and changing the mode, the model library file, image resizing, the library search and
+category filter). `SessionSafetyTests` (changing or switching off the autosave interval during a run leaves no
+"crashed" session behind after a clean exit; a run that does not end cleanly keeps its recovery files and they recover
+the unsaved work; the engine's own frames never mark an opened rig modified and allocate nothing; a failed Save As keeps
+the scene name; Enter or Escape pressed in the frame a question opens does not answer it) and `LibraryRobustnessTests`
+(unreadable GDTF files give fixture types without modes that are placed unpatched instead of throwing; a model library of
+thousands of entries loads in linear time). `EditorEndToEndTests` start the real editor under `xvfb-run` with scripted input: open the Фокина
+scene, click a fixture, check that the Properties panel names it and that the viewport shows the orange outline, save
+it as `.candela`, reopen it and compare the scene (entities, transforms, components, patch) with the original; and
+build a stage — draw a floor and a wall, drag a fixture from the Library onto the floor, drop an image onto the
+viewport, save — then read the saved project and check each object. `RobustnessTests.cs` tries to break the
 editor: exceptions inside a UI frame and inside a modal dialog, damaged dock trees (each of which aborted or hung Dear
 ImGui), repeated failures, log size and rotation, damaged settings and key binding files, gizmo drags of parent +
 child, locked layers and rotations around the pivot, the far plane at the zoom limit, fly mode from an orthographic
@@ -400,11 +585,16 @@ Properties panel (and Escape must clear it), shortcuts must work after fly mode 
 session with resizes, tear-offs and new viewports under `--validation` must report no validation error, and a run
 without a Vulkan driver must exit with code 3. They are skipped when `xvfb-run` or a Vulkan device is missing.
 
-## Limitations of phase A
+## Limitations
 
-* No stage engine yet: the Library is empty, New / Open / Save / Import / Export / Render only report that they need
-  the engine, the drawing tools (wall, floor, cable) are disabled, and the viewports show the renderer's procedural
-  test scene as a stand-in stage (its objects can be selected, moved, rotated, duplicated and deleted).
+* The Cable tool stays disabled (cables are drawn in a later phase). Walls and floors are rectangular boxes (no
+  polygons, no openings); a floor is drawn aligned to the world axes and turned afterwards with the Rotate gizmo.
+* A fixture dropped from the Library lands with its default mode (another mode is chosen in the popup that follows the
+  drop, or later in the Properties panel). A fixture type whose GDTF file cannot be read is still placed, without a
+  mode and unpatched (its ghost is a 1 m box), and the engine reports the file in the Issues panel.
+* Thumbnails are rendered on a second (headless) Vulkan device in the background; without one (or before it has
+  started) the Library shows category icons instead.
+* *Render* in the Render panel still answers that final rendering is not available yet (it comes with the Render
+  panel's job runner).
 * File dialogs are the editor's own browser on every platform (no native OS dialogs).
 * Multi-object editing in the Properties panel edits the primary object; the gizmo moves all selected objects.
-* Autosave is configurable but saves nothing until the engine can write projects.

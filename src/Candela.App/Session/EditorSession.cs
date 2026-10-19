@@ -1,99 +1,194 @@
+using System.Globalization;
 using Candela.App.Diagnostics;
 using Candela.App.Settings;
 using Candela.App.Ui;
 using Candela.Core.Diagnostics;
 using Candela.Core.Editing;
+using Candela.Core.SceneGraph.Components;
+using Candela.Engine;
+using Candela.Project;
 using Candela.Rendering;
 using SceneModel = Candela.Core.SceneGraph.Scene;
 
 namespace Candela.App.Session;
 
+/// <summary>How an <see cref="EditorSession"/> sets up its stage engine.</summary>
+internal sealed record EditorSessionOptions
+{
+    /// <summary>Engine options (library folders, caches); null builds them from the user settings.</summary>
+    public StageEngineOptions? Engine { get; init; }
+
+    /// <summary>
+    /// Diagnostics: the viewports show the renderer's procedural test scene (<see cref="PreviewStage"/>) instead of the
+    /// engine's render binding (<c>--preview-stage</c>). The engine still runs; its issue analysis is skipped.
+    /// </summary>
+    public bool PreviewStage { get; init; }
+
+    /// <summary>Autosave folder; null = <see cref="AutosaveService.DefaultDirectory"/> (in the Candela cache folder).</summary>
+    public string? AutosaveDirectory { get; init; }
+
+    /// <summary>Autosave at the interval of the settings (false: never, e.g. tests).</summary>
+    public bool Autosave { get; init; } = true;
+
+    /// <summary>Fixture models load on background threads (false: during the frame that needs them; tests).</summary>
+    public bool LoadFixtureModelsInBackground { get; init; } = true;
+}
+
 /// <summary>
-/// The document being edited and every operation that needs the stage engine — the one place the editor talks to it.
-/// Holds the scene, selection, undo history and issue log the panels work on, the current file and its modified
-/// state, and routes File → New / Open / Save / Save As / Import / Export / Render. In this build the stage engine
-/// (<c>Candela.Engine.StageEngine</c>) is not available yet, so those operations return
-/// <see cref="SessionOutcome.NotAvailable"/> with a clear message and change nothing, and the viewports show the
-/// <see cref="PreviewStage"/>. The next build phase fills these methods with the engine calls (open/save through
-/// <c>Candela.Project</c>, MVR import/export, autosave, the engine tick and its render synchronisation).
+/// The document being edited and the editor's only gateway to the stage engine (<see cref="StageEngine"/>): the scene,
+/// selection, undo history and issue log the panels work on are the engine's; File → New / Open / Save / Save As /
+/// Import / Export run the engine's operations and turn their <see cref="EngineResult"/> into localised one-line results
+/// (the issues go to the issues panel). Each frame <see cref="Update"/> ticks the engine (DMX input, fixture motors,
+/// smoke, fire, sound, lights, render binding), re-runs the issue analysis shortly after edits, and applies the autosave
+/// interval of the settings. Nothing here throws for content problems: a damaged file is a failed result with a reason.
 /// </summary>
 internal sealed class EditorSession : IDisposable
 {
-    private readonly AppLog _log;
-    private readonly SettingsStore _settings;
-    private IViewportContent? _content;
-    private long _savedVersion;
-    private bool _disposed;
-
-    /// <summary>Creates a session with an empty scene.</summary>
-    public EditorSession(AppLog log, SettingsStore settings)
-    {
-        _log = log ?? throw new ArgumentNullException(nameof(log));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        Scene = new SceneModel(Loc.Get(Str.Untitled));
-        Selection = new Selection();
-        Undo = new UndoStack();
-        Issues = new IssueLog();
-        _savedVersion = Scene.Version;
-        _entityExists = id => Scene.Find(id) is not null;
-    }
-
-    private readonly Func<Guid, bool> _entityExists;
-    private readonly HashSet<(string Code, string Message)> _reported = new();
-
     /// <summary>
     /// Most distinct program messages kept in the issues panel; an error repeated every frame is reported once, so
     /// a recurring failure cannot flood the panel (each report copies the issue list).
     /// </summary>
     public const int MaxProgramMessages = 200;
 
-    /// <summary>The scene being edited (main thread only).</summary>
-    public SceneModel Scene { get; private set; }
+    /// <summary>Seconds after the last edit before the issue analysis (patch, power, rigging, assets) runs again.</summary>
+    public const double IssueRefreshDelay = 0.5;
+
+    private readonly AppLog _log;
+    private readonly SettingsStore _settings;
+    private readonly EditorSessionOptions _options;
+    private readonly HashSet<(string Code, string Message)> _reported = new();
+    private readonly Func<Guid, bool> _entityExists;
+    private IViewportContent? _content;
+    private long _previewBaseline = -1;
+    private long _issuesVersion = -1;
+    private long _seenVersion = -1;
+    private double _lastChangeAt;
+    private double _clock;
+    private int _autosaveMinutes = -1;
+    private bool _endedCleanly;
+    private string? _displaySource;
+    private string _displayFileName = "";
+    private bool _disposed;
+
+    /// <summary>Creates a session with a new, empty scene and its stage engine.</summary>
+    public EditorSession(AppLog log, SettingsStore settings, EditorSessionOptions? options = null)
+    {
+        _log = log ?? throw new ArgumentNullException(nameof(log));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _options = options ?? new EditorSessionOptions();
+        var engineOptions = _options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings);
+        Engine = new StageEngine(engineOptions);
+        Engine.New(Loc.Get(Str.Untitled));
+        Engine.SceneReplaced += OnEngineSceneReplaced;
+        _entityExists = id => Engine.Scene.Find(id) is not null;
+        _log.Info("Session", $"Stage engine ready: {Engine.Library.Count} fixtures in the library ({string.Join(", ", Engine.Library.Folders)}).");
+    }
+
+    /// <summary>The stage engine (the open project, fixture library, DMX, simulations, render binding); never null.</summary>
+    public StageEngine? Engine { get; }
+
+    /// <summary>The scene being edited (main thread only); replaced by New / Open.</summary>
+    public SceneModel Scene => EngineOrThrow.Scene;
 
     /// <summary>The selected entities (Shift+click adds/removes; the last one is the primary selection).</summary>
-    public Selection Selection { get; }
+    public Selection Selection => EngineOrThrow.Selection;
 
     /// <summary>Undo/redo history of every scene edit.</summary>
-    public UndoStack Undo { get; }
+    public UndoStack Undo => EngineOrThrow.Undo;
 
     /// <summary>Errors, warnings and notes about the scene and the program (issues panel).</summary>
-    public IssueLog Issues { get; }
+    public IssueLog Issues => EngineOrThrow.Issues;
 
-    /// <summary>The file the scene was opened from / saved to, or null for a new scene.</summary>
-    public string? FilePath { get; private set; }
+    /// <summary>The project file the scene was opened from / saved to, or null (new scene, opened MVR).</summary>
+    public string? FilePath => EngineOrThrow.ProjectPath;
 
-    /// <summary>True when the stage engine is available (open/save/import/export work).</summary>
-    public bool EngineAvailable => false;
+    /// <summary>The file the scene came from: the project file, or the MVR it was opened from; null for a new scene.</summary>
+    public string? SourcePath { get; private set; }
+
+    /// <summary>True: the stage engine is part of this build (open/save/import/export work).</summary>
+    public bool EngineAvailable => true;
+
+    /// <summary>True in the <c>--preview-stage</c> diagnostics mode.</summary>
+    public bool IsPreviewStage => _options.PreviewStage;
 
     /// <summary>What the viewports show (null until a renderer is attached).</summary>
     public IViewportContent? Content => _content;
 
-    /// <summary>True when the scene changed since it was opened or saved.</summary>
-    public bool IsModified => Scene.Version != _savedVersion;
+    /// <summary>True when the scene, its assets or its settings changed since it was opened or saved.</summary>
+    public bool IsModified => _options.PreviewStage ? Scene.Version != _previewBaseline : EngineOrThrow.IsModified;
 
-    /// <summary>Name for the title bar: the file name, or the scene name for a new scene.</summary>
-    public string DisplayName => FilePath is { Length: > 0 } path ? Path.GetFileNameWithoutExtension(path) : Scene.Name;
+    /// <summary>
+    /// Name for the title bar and dialogs: the scene's name; for a scene still called "Untitled" the file name, else
+    /// "Untitled" in the current language.
+    /// </summary>
+    public string DisplayName
+    {
+        get
+        {
+            string name = Scene.Name;
+            if (!IsDefaultName(name))
+                return name;
+            if (SourcePath is not { Length: > 0 } path)
+                return Loc.Get(Str.Untitled);
+            // Read every frame by the title bar: the file name is taken once per source file.
+            if (!ReferenceEquals(path, _displaySource))
+            {
+                _displaySource = path;
+                _displayFileName = Path.GetFileNameWithoutExtension(path);
+            }
 
-    /// <summary>Raised when the scene object was replaced (new/open); panels drop cached entity references.</summary>
+            return _displayFileName;
+        }
+    }
+
+    /// <summary>Smoke, fire and sound are frozen (DMX and moving lights keep running).</summary>
+    public bool SimulationPaused
+    {
+        get => EngineOrThrow.Settings.SimulationPaused;
+        set
+        {
+            if (EngineOrThrow.Settings.SimulationPaused == value)
+                return;
+            EngineOrThrow.Settings.SimulationPaused = value;
+            _log.Info("Session", value ? "Simulation paused." : "Simulation resumed.");
+        }
+    }
+
+    /// <summary>Raised after the scene was replaced (new, open, recover); panels drop cached entity references.</summary>
     public event Action? SceneReplaced;
 
-    /// <summary>Connects the renderer: builds what the viewports show.</summary>
+    private StageEngine EngineOrThrow => Engine ?? throw new ObjectDisposedException(nameof(EditorSession));
+
+    /// <summary>Connects the renderer: the viewports show the engine's scene (or the preview stage in diagnostics mode).</summary>
     public void AttachRenderer(IRenderer renderer)
     {
         ArgumentNullException.ThrowIfNull(renderer);
+        ObjectDisposedException.ThrowIf(_disposed, this);
         _content?.Dispose();
-        _content = PreviewStage.Create(renderer.World, Scene, Selection);
-        // Building the preview is not a user edit.
-        _savedVersion = Scene.Version;
-        Undo.Clear();
-        _log.Info("Session", "The viewports show the preview stage (the renderer's test scene); the stage engine arrives in the next build phase.");
+        if (_options.PreviewStage)
+        {
+            _content = PreviewStage.Create(renderer.World, Scene, Selection);
+            Undo.Clear();
+            _previewBaseline = Scene.Version;
+            _log.Info("Session", "Diagnostics: the viewports show the preview stage (the renderer's test scene).");
+            return;
+        }
+
+        _content = new EngineViewportContent(EngineOrThrow, renderer, _options.LoadFixtureModelsInBackground);
     }
 
-    /// <summary>Per-frame update before the UI (the engine tick: DMX input, fixture motors, simulations).</summary>
+    /// <summary>
+    /// Per-frame update before the UI: autosave interval from the settings, the engine tick (DMX input, fixture motors,
+    /// simulations, lights, render binding) and — half a second after the last edit — the issue analysis.
+    /// </summary>
     public void Update(double deltaTime)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        _ = deltaTime;
+        var engine = EngineOrThrow;
+        double dt = double.IsFinite(deltaTime) && deltaTime > 0 ? Math.Min(deltaTime, 1.0) : 0;
+        _clock += dt;
+        ApplyAutosaveSetting();
+
         // Deleted entities leave the selection (checked without allocating; Prune only when needed).
         var ids = Selection.Ids;
         for (int i = 0; i < ids.Count; i++)
@@ -104,57 +199,104 @@ internal sealed class EditorSession : IDisposable
                 break;
             }
         }
+
+        engine.Tick(dt);
+        (_content as EngineViewportContent)?.MarkTicked();
+        RefreshIssuesWhenSettled();
     }
 
-    /// <summary>Brings scene changes into the render world (after the UI edited the scene, before viewports render).</summary>
+    /// <summary>Brings this frame's UI edits into the render world (after the UI, before the viewports render).</summary>
     public void SyncRender() => _content?.Sync();
 
-    /// <summary>File → New.</summary>
-    public SessionResult New() => NotAvailable(Loc.Get(Str.FileNew));
+    /// <summary>File → New: an empty scene (the caller has asked about unsaved changes).</summary>
+    public SessionResult New()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        var result = EngineOrThrow.New(Loc.Get(Str.Untitled));
+        SourcePath = null;
+        return result.Success ? SessionResult.Done(Loc.Get(Str.MsgNewScene)) : Failed(result);
+    }
 
-    /// <summary>File → Open (a <c>.candela</c> project or an MVR scene).</summary>
+    /// <summary>File → Open: a <c>.candela</c> project or an MVR scene replaces the open scene.</summary>
     public SessionResult Open(string path)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (!File.Exists(path))
-            return SessionResult.Failed($"'{path}' does not exist.");
-        return NotAvailable(Loc.Get(Str.FileOpen).TrimEnd('…'));
+            return SessionResult.Failed(Loc.Format(Str.MsgFileMissing, path));
+        var result = EngineOrThrow.Open(path);
+        if (!result.Success)
+            return Failed(result);
+        SourcePath = Path.GetFullPath(path);
+        _log.Info("Session", result.Summary);
+        return Done(Loc.Format(Str.MsgOpened, Path.GetFileName(path), FixtureCount()), result);
     }
 
-    /// <summary>File → Save (to the current file; callers ask for a path first when there is none).</summary>
-    public SessionResult Save() => FilePath is null
-        ? SessionResult.Failed("The scene has no file yet; use Save As.")
-        : NotAvailable(Loc.Get(Str.FileSave));
+    /// <summary>File → Save (to the current project file; callers ask for a path first when there is none).</summary>
+    public SessionResult Save()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (FilePath is not { } path)
+            return SessionResult.Failed(Loc.Get(Str.MsgNeedsSaveAs));
+        return SaveAs(path);
+    }
 
-    /// <summary>File → Save As (<c>.candela</c>).</summary>
+    /// <summary>File → Save As: writes a <c>.candela</c> project (the extension is added when missing).</summary>
     public SessionResult SaveAs(string path)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
-        return NotAvailable(Loc.Get(Str.FileSaveAs).TrimEnd('…'));
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!path.EndsWith(StageEngine.ProjectExtension, StringComparison.OrdinalIgnoreCase))
+            path += StageEngine.ProjectExtension;
+        // A scene saved for the first time takes the file's name instead of "Untitled" (not when the save fails).
+        string previousName = Scene.Name;
+        if (FilePath is null && IsDefaultName(previousName))
+            Scene.Name = Path.GetFileNameWithoutExtension(path);
+        var result = EngineOrThrow.SaveAs(path);
+        if (!result.Success)
+        {
+            if (!string.Equals(Scene.Name, previousName, StringComparison.Ordinal))
+                Scene.Name = previousName;
+            return Failed(result);
+        }
+
+        SourcePath = EngineOrThrow.ProjectPath ?? Path.GetFullPath(path);
+        _previewBaseline = Scene.Version;
+        _log.Info("Session", result.Summary);
+        return Done(Loc.Format(Str.MsgSaved, Path.GetFileName(path)), result);
     }
 
-    /// <summary>File → Import (merges into the open scene).</summary>
-    public SessionResult Import(string path, ImportKind kind)
+    /// <summary>
+    /// File → Import: merges a project or an MVR under a new group, places a 3D model or an image (at
+    /// <paramref name="options"/>' placement), or adds a GDTF file to the fixture library. Undoable.
+    /// </summary>
+    public SessionResult Import(string path, ImportKind kind, EngineImportOptions? options = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (!File.Exists(path))
-            return SessionResult.Failed($"'{path}' does not exist.");
-        string what = kind switch
-        {
-            ImportKind.Project => Loc.Get(Str.FileImportProject),
-            ImportKind.Model => Loc.Get(Str.FileImportModel),
-            ImportKind.Mvr => Loc.Get(Str.FileImportMvr),
-            _ => Loc.Get(Str.FileImportImage),
-        };
-        return NotAvailable($"{Loc.Get(Str.FileImport)}: {what.TrimEnd('…')}");
+            return SessionResult.Failed(Loc.Format(Str.MsgFileMissing, path));
+        _ = kind; // the engine decides by the file's content type; the kind only chose the file dialog's filter
+        var result = EngineOrThrow.Import(path, options);
+        if (!result.Success)
+            return Failed(result);
+        _log.Info("Session", result.Summary);
+        return Done(Loc.Format(Str.MsgImported, Path.GetFileName(path)), result);
     }
 
-    /// <summary>File → Export.</summary>
+    /// <summary>File → Export: MVR 1.6 with the fixtures' GDTF files and the models as GLB.</summary>
     public SessionResult Export(string path, ExportKind kind)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
-        _ = kind;
-        return NotAvailable($"{Loc.Get(Str.FileExport)}: {Loc.Get(Str.FileExportMvr).TrimEnd('…')}");
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        _ = kind; // MVR is the only export format
+        if (!path.EndsWith(StageEngine.MvrExtension, StringComparison.OrdinalIgnoreCase))
+            path += StageEngine.MvrExtension;
+        var result = EngineOrThrow.ExportMvr(path);
+        if (!result.Success)
+            return Failed(result);
+        _log.Info("Session", result.Summary);
+        return Done(Loc.Format(Str.MsgExported, Path.GetFileName(path)), result);
     }
 
     /// <summary>Render panel → Render (final, path-traced frame or timecode range).</summary>
@@ -164,6 +306,48 @@ internal sealed class EditorSession : IDisposable
         return SessionResult.NotAvailable(Loc.Get(Str.RenderNotAvailable));
     }
 
+    /// <summary>Autosaved sessions of earlier runs that did not end cleanly, newest first (start-up recovery prompt).</summary>
+    public IReadOnlyList<RecoverableSession> FindRecoverable()
+    {
+        try
+        {
+            return AutosaveService.FindRecoverable(_options.AutosaveDirectory);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            _log.Warn("Autosave", $"The autosave folder could not be read: {e.Message}");
+            return Array.Empty<RecoverableSession>();
+        }
+    }
+
+    /// <summary>Opens the newest autosave of a crashed session as the scene (unsaved; saving writes back to its original file).</summary>
+    public SessionResult Recover(RecoverableSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        var result = EngineOrThrow.Recover(session);
+        if (!result.Success)
+            return Failed(result);
+        SourcePath = session.OriginalPath;
+        _log.Info("Session", result.Summary);
+        return Done(Loc.Format(Str.MsgRecovered, session.SceneName ?? Loc.Get(Str.Untitled)), result);
+    }
+
+    /// <summary>Deletes the autosave files of a crashed session the user does not want back.</summary>
+    public SessionResult Discard(RecoverableSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        try
+        {
+            session.Delete();
+            return SessionResult.Done(Loc.Format(Str.MsgRecoveryDiscarded, session.SceneName ?? Loc.Get(Str.Untitled)));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return SessionResult.Failed(e.Message);
+        }
+    }
+
     /// <summary>
     /// Reports a program error (exception caught by the frame loop, failed panel) in the issues panel — once per code
     /// and message until the messages are cleared, and at most <see cref="MaxProgramMessages"/> different ones.
@@ -171,16 +355,35 @@ internal sealed class EditorSession : IDisposable
     public void ReportProgramError(string code, string message) =>
         ReportOnce(new Issue(IssueSeverity.Error, IssueCategory.Program, code, message));
 
+    /// <summary>Reports a program note (shown once per message, like errors).</summary>
+    public void ReportProgramNote(string code, string message) =>
+        ReportOnce(new Issue(IssueSeverity.Note, IssueCategory.Program, code, message));
+
     /// <summary>
-    /// Issues panel → clear: removes the program messages (errors, "not available" notes) and shows the scene's own
-    /// issues again; the same messages can be reported anew afterwards.
+    /// Issues panel → clear: removes the program messages (errors, notes of operations) and shows the scene's own issues
+    /// again; the same messages can be reported anew afterwards.
     /// </summary>
     public void ClearProgramMessages()
     {
         _reported.Clear();
         Issues.ClearProgramMessages();
-        // IssueLog keeps showing the old list until it is rebuilt.
-        Issues.Refresh(Scene);
+        RefreshIssuesNow();
+    }
+
+    /// <summary>Runs the issue analysis now (after a structural edit the user wants to see checked at once).</summary>
+    public void RefreshIssuesNow()
+    {
+        if (_disposed)
+            return;
+        _issuesVersion = Scene.Version;
+        if (_options.PreviewStage)
+        {
+            // The preview stage's procedural meshes are not project assets: only program messages are listed.
+            Issues.Refresh(new SceneModel());
+            return;
+        }
+
+        EngineOrThrow.RefreshIssues();
     }
 
     /// <summary>Adds a file to the recent-files list of the settings (after a successful open/save).</summary>
@@ -190,22 +393,188 @@ internal sealed class EditorSession : IDisposable
         _settings.RequestSave(0);
     }
 
-    /// <inheritdoc/>
+    /// <summary>Removes a file from the recent-files list (it no longer exists).</summary>
+    public void ForgetRecentFile(string path)
+    {
+        var recent = _settings.Settings.RecentFiles;
+        recent.RemoveAll(p => string.Equals(p, path, StringComparison.Ordinal));
+        _settings.RequestSave(0);
+    }
+
+    /// <summary>
+    /// Marks the end of the run as clean (the window was closed after the unsaved-changes question was answered):
+    /// <see cref="Dispose"/> then deletes the session's recovery files. Without it — the frame loop gave up, an exception
+    /// ended the program — they are kept (after a last autosave of unsaved changes) and offered at the next start.
+    /// </summary>
+    public void EndCleanly() => _endedCleanly = true;
+
+    /// <summary>
+    /// Ends the session: autosave stops; after <see cref="EndCleanly"/> the session's recovery files are deleted,
+    /// otherwise unsaved changes are autosaved one last time and the files stay for recovery. The render binding and the
+    /// engine are released.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
             return;
         _disposed = true;
-        _content?.Dispose();
+        try
+        {
+            _content?.Dispose();
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            // The render binding of a failing renderer must not keep the recovery data below from being written.
+            _log.Warn("Session", $"The render binding could not be released: {e.Message}");
+        }
+
         _content = null;
+        if (Engine is { } engine)
+        {
+            engine.SceneReplaced -= OnEngineSceneReplaced;
+            if (!_endedCleanly)
+                SaveRecoveryNow(engine);
+            try
+            {
+                engine.DisableAutosave(completeSession: _endedCleanly);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                _log.Warn("Autosave", $"The autosave files could not be removed: {e.Message}");
+            }
+
+            engine.Dispose();
+        }
     }
 
-    private SessionResult NotAvailable(string operation)
+    /// <summary>Number of fixtures in the scene.</summary>
+    internal int FixtureCount()
     {
-        string message = Loc.Format(Str.MsgEngineMissing, operation);
-        _log.Info("Session", message);
-        ReportOnce(new Issue(IssueSeverity.Note, IssueCategory.Program, "app.engine-not-available", message));
-        return SessionResult.NotAvailable(message);
+        int n = 0;
+        foreach (var _ in Scene.Query<FixtureComponent>())
+            n++;
+        return n;
+    }
+
+    private static bool IsDefaultName(string name) =>
+        string.IsNullOrWhiteSpace(name) || name == "Untitled" || name == Loc.English_(Str.Untitled) ||
+        Loc.Russian_(Str.Untitled) is { } ru && name == ru;
+
+    private void OnEngineSceneReplaced(SceneModel scene)
+    {
+        _ = scene;
+        _reported.Clear();
+        _issuesVersion = -1;
+        SceneReplaced?.Invoke();
+    }
+
+    /// <summary>
+    /// Follows the autosave interval of the settings. The engine's autosave session is started once; later changes of
+    /// the interval (or turning autosave off and on) adjust the running session instead of starting a new one, which
+    /// would leave the old session's files behind to be offered as a crashed session at the next start. Projects opened
+    /// later get a session of their own from the engine; it is brought to the setting here too. Allocation-free while
+    /// nothing changes.
+    /// </summary>
+    private void ApplyAutosaveSetting()
+    {
+        int minutes = _options.Autosave && !_options.PreviewStage ? Math.Clamp(_settings.Settings.AutosaveMinutes, 0, 24 * 60) : 0;
+        var engine = EngineOrThrow;
+        if (minutes != _autosaveMinutes)
+        {
+            bool first = _autosaveMinutes < 0;
+            _autosaveMinutes = minutes;
+            if (minutes > 0 && engine.Autosave is null)
+            {
+                try
+                {
+                    engine.EnableAutosave(new AutosaveOptions
+                    {
+                        Directory = _options.AutosaveDirectory,
+                        Interval = TimeSpan.FromMinutes(minutes),
+                    });
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+                {
+                    _log.Warn("Autosave", $"Autosave could not be set up: {e.Message}");
+                }
+            }
+
+            if (minutes > 0)
+                _log.Info("Autosave", string.Create(CultureInfo.InvariantCulture, $"Autosave every {minutes} min."));
+            else if (first || engine.Autosave is not null)
+                _log.Info("Autosave", "Autosave is off.");
+        }
+
+        if (engine.Autosave is { } service)
+        {
+            bool enabled = minutes > 0;
+            if (service.Enabled != enabled)
+                service.Enabled = enabled;
+            if (enabled)
+            {
+                var interval = TimeSpan.FromMinutes(minutes);
+                if (service.Interval != interval)
+                    service.Interval = interval;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The run is ending without a clean exit: unsaved changes are autosaved now (waiting a few seconds for the write),
+    /// so the recovery offered at the next start holds the latest state rather than the one of the last interval.
+    /// </summary>
+    private void SaveRecoveryNow(StageEngine engine)
+    {
+        if (engine.Autosave is not { } service || !engine.IsModified)
+            return;
+        try
+        {
+            if (!service.SaveNowAsync().Wait(TimeSpan.FromSeconds(10)))
+                _log.Warn("Autosave", "The last autosave did not finish in time; the previous one is kept for recovery.");
+            else
+                _log.Info("Autosave", $"Unsaved changes were autosaved for recovery ({service.FilePath}).");
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            _log.Warn("Autosave", $"The last autosave failed: {e.Message}");
+        }
+    }
+
+    /// <summary>Runs the issue analysis once the scene has not changed for <see cref="IssueRefreshDelay"/> seconds.</summary>
+    private void RefreshIssuesWhenSettled()
+    {
+        long version = Scene.Version;
+        if (version != _seenVersion)
+        {
+            // A gizmo drag changes the scene every frame: the analysis waits until the edit has settled.
+            _seenVersion = version;
+            _lastChangeAt = _clock;
+        }
+
+        if (version != _issuesVersion && _clock - _lastChangeAt >= IssueRefreshDelay)
+            RefreshIssuesNow();
+    }
+
+    private SessionResult Done(string message, EngineResult result)
+    {
+        int errors = 0, warnings = 0;
+        foreach (var issue in result.Issues)
+        {
+            if (issue.Severity == IssueSeverity.Error)
+                errors++;
+            else if (issue.Severity == IssueSeverity.Warning)
+                warnings++;
+        }
+
+        if (errors > 0 || warnings > 0)
+            message += " · " + Loc.Format(Str.MsgIssueCounts, errors, warnings);
+        return SessionResult.Done(message) with { Errors = errors, Warnings = warnings, Entities = result.Entities };
+    }
+
+    private SessionResult Failed(EngineResult result)
+    {
+        _log.Warn("Session", result.Summary);
+        return SessionResult.Failed(result.Summary);
     }
 
     private void ReportOnce(Issue issue)
@@ -213,23 +582,5 @@ internal sealed class EditorSession : IDisposable
         if (_reported.Count >= MaxProgramMessages || !_reported.Add((issue.Code, issue.Message)))
             return;
         Issues.Report(issue);
-    }
-
-    /// <summary>Marks the scene as saved (used by the engine-backed save, and tests).</summary>
-    internal void MarkSaved(string? path)
-    {
-        FilePath = path;
-        _savedVersion = Scene.Version;
-    }
-
-    /// <summary>Replaces the scene (engine-backed open/new) and notifies the panels.</summary>
-    internal void ReplaceScene(SceneModel scene, string? path)
-    {
-        ArgumentNullException.ThrowIfNull(scene);
-        Scene = scene;
-        Selection.Clear();
-        Undo.Clear();
-        MarkSaved(path);
-        SceneReplaced?.Invoke();
     }
 }

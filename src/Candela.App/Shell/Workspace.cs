@@ -115,13 +115,14 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
         _ctx.Session.AttachRenderer(_ctx.Gpu.Renderer);
         AddViewport();
-        _library = Add(new LibraryPanel(_ctx));
+        _library = Add(new LibraryPanel(_ctx, this, CreateModelLibrary()));
         _properties = Add(new PropertiesPanel(_ctx));
         _preview = Add(new PreviewPanel(_ctx));
         _render = Add(new RenderPanel(_ctx, Report));
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
         RegisterCommands();
+        InitializeSession();
         RestoreStartupLayout();
         _activeViewport = _viewports[0];
         _onLanguageChanged = () => _title = "";
@@ -171,6 +172,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
         foreach (var viewport in _viewports)
             viewport.ProcessPicks(_ctx.Gpu.Renderer);
+        RunSessionWork();
+        _library.Update();
     }
 
     /// <summary>
@@ -188,6 +191,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _guard.Run("dock space", _drawDockSpace);
         _guard.Run("panels", _drawPanels);
         _guard.Run("tab style menu", _drawTabStyleMenu);
+        DrawPlacementPopupGuarded();
         if (!_guard.Run("settings", _drawSettings))
             _settingsWindow.IsOpen = false;
         if (!_guard.Run("about", _drawAbout))
@@ -200,7 +204,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             UiGuard.CloseAllPopups();
         }
 
-        if (!_guard.Run("message", _drawMessages))
+        DrawSessionDialogs();
+        if (!_sessionDialogs.IsOpen && !_guard.Run("message", _drawMessages))
         {
             _messages.DismissCurrent();
             UiGuard.CloseAllPopups();
@@ -249,11 +254,11 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     {
     }
 
-    /// <summary>Whether the window may close (unsaved changes are confirmed once the engine can save).</summary>
-    public bool ConfirmClose() => true;
+    /// <summary>Whether the window may close now (asks about unsaved changes first; see <see cref="ConfirmCloseRequest"/>).</summary>
+    public bool ConfirmClose() => ConfirmCloseRequest();
 
-    /// <summary>Opens a file given on the command line.</summary>
-    public void OpenAtStartup(string path) => Report(_ctx.Session.Open(path));
+    /// <summary>Opens a file given on the command line (behind the busy overlay of the first frame).</summary>
+    public void OpenAtStartup(string path) => OpenFile(path);
 
     /// <summary>Saves the current workspace as the layout restored at the next start.</summary>
     public void SaveWorkspace() => _layouts.SaveWorkspace(CaptureLayout(LayoutStore.WorkspaceName));
@@ -262,6 +267,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void Dispose()
     {
         Loc.LanguageChanged -= _onLanguageChanged;
+        DisposeSession();
+        _library.Dispose();
         foreach (var viewport in _viewports)
             viewport.ReleaseTarget();
     }

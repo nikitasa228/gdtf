@@ -241,7 +241,7 @@ public sealed class FailureReportingTests : IDisposable
         Loc.SetLanguage("en");
         _settings = new SettingsStore(_log, _dir.File("settings.json"));
         _settings.Load();
-        _session = new EditorSession(_log, _settings);
+        _session = EngineTestSupport.CreateSession(_log, _settings, _dir);
     }
 
     public void Dispose()
@@ -269,7 +269,7 @@ public sealed class FailureReportingTests : IDisposable
     public void Clearing_the_messages_empties_the_issues_panel_and_allows_new_reports()
     {
         _session.ReportProgramError("app.panel-exception", "Panel failed");
-        _ = _session.Open(_dir.Write("scene.mvr", "x")); // a "not available" note
+        _ = _session.Open(_dir.Write("scene.mvr", "x")); // not an MVR: the open fails with an error message
         Assert.Equal(2, _session.Issues.Current.Count);
 
         _session.ClearProgramMessages();
