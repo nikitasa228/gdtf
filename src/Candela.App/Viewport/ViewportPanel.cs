@@ -266,6 +266,9 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
             {
                 case PickKind.Select:
                     SelectionController.Click(session.Scene, session.Selection, entity, request.Shift);
+                    // Clicking a cable shows how it links its devices (requirement: the cable link window opens).
+                    if (!request.Shift && entity is { } picked && session.Scene.Find(picked)?.Has<Core.SceneGraph.Components.CableComponent>() == true)
+                        _ctx.Tools.Stage.RequestCableLink(picked);
                     break;
                 case PickKind.Focus:
                     if (hit is { } focus)
@@ -329,7 +332,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     }
 
     /// <summary>True while a navigation, box selection or gizmo drag is in progress (tests).</summary>
-    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive || IsEditingShape;
+    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive || IsEditingShape || _nodeDrag.Active;
 
     private void EndInteraction()
     {
@@ -338,7 +341,10 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         _navigation = NavigationOperation.None;
         _selecting = false;
         EndGizmoDrag();
+        EndNodeGizmo();
         CancelShapeEdit();
+        CancelNodeDrag();
+        _cablePress = new Vector2(float.NaN);
     }
 
     /// <summary>Releases the render target and its ImGui texture (panel closed, workspace disposed).</summary>
@@ -390,6 +396,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
 
         // The gizmo runs before the input surface: ImGuizmo only starts a drag when no ImGui item is hovered or active,
         // so the surface is left out while the mouse is over (or dragging) a gizmo handle.
+        ValidateNodeSelection();
         DrawGizmo(drawList);
         bool gizmoHot = _gizmoVisible && (ImGuizmo.IsOver() || ImGuizmo.IsUsing());
         ImGui.SetCursorScreenPos(_imageMin);
@@ -412,8 +419,13 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         DrawStats(drawList);
         overOverlay |= OverlayLegend.Draw(_ctx, this, _imageMin, avail, _host.IsActive(this));
         HandleInput(hovered, overOverlay);
+        var mouse = ImGui.GetIO().MousePos;
+        UpdateCableInput(hovered, overOverlay, mouse);
+        UpdateNodeDrag(mouse);
         DrawBoxSelection(drawList);
-        DrawShapeEdit(drawList, ImGui.GetIO().MousePos, hovered);
+        DrawShapeEdit(drawList, mouse, hovered);
+        DrawNodeHandles(drawList, mouse, hovered);
+        DrawCableTool(drawList, mouse, hovered && !overOverlay);
         HandleLibraryDrop(drawList);
     }
 
@@ -478,7 +490,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
                     if (op == NavigationOperation.Fly)
                         _host.SuspendShortcuts(true);
                 }
-                else if (button == ImGuiMouseButton.Left && !gizmoBusy && !BeginShapeEdit(mouse))
+                else if (button == ImGuiMouseButton.Left && !gizmoBusy && !BeginShapeEdit(mouse) && !BeginNodeDrag(mouse) && !BeginCableClick(mouse))
                 {
                     _selecting = true;
                     _selectShift = io.KeyShift;
@@ -488,7 +500,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
                 break;
             }
 
-            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy && !IsEditingShape)
+            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy && !IsEditingShape && _ctx.Tools.Tool != EditorTool.Cable && !_nodeDrag.Active)
             {
                 AddPick(PickKind.Focus, mouse, false);
                 _selecting = false;
@@ -515,7 +527,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
             _selecting = false;
             if (SelectionController.IsBoxDrag(_pressPosition, mouse))
                 BoxSelect(_pressPosition, mouse, _selectShift);
-            else
+            else if (!SelectCableUnder(_pressPosition, _selectShift))
                 AddPick(PickKind.Select, _pressPosition, _selectShift);
         }
     }
@@ -595,6 +607,14 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     {
         var session = _ctx.Session;
         var tools = _ctx.Tools;
+        if (DrawNodeGizmo(drawList))
+        {
+            // A selected cable node is moved instead of its cable.
+            _gizmoVisible = true;
+            EndGizmoDrag();
+            return;
+        }
+
         if (tools.Tool is not (EditorTool.Move or EditorTool.Rotate) || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
             !SelectionController.IsEditable(session.Scene, primary))
         {
@@ -674,6 +694,9 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         ImGui.SameLine();
         if (ToolButton(ToolbarLabels.FloorId, Str.ToolFloor, tools.Tool == EditorTool.Floor))
             tools.Tool = EditorTool.Floor;
+        ImGui.SameLine();
+        if (ToolButton(ToolbarLabels.CableId, Str.ToolCable, tools.Tool == EditorTool.Cable) && _ctx.Session.Engine is not null)
+            tools.Tool = EditorTool.Cable;
         ImGui.SameLine();
         if (ToolButton(tools.LocalSpace ? ToolbarLabels.LocalId : ToolbarLabels.WorldId, tools.LocalSpace ? Str.ToolSpaceLocal : Str.ToolSpaceWorld, false))
             tools.LocalSpace = !tools.LocalSpace;
@@ -926,6 +949,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         public const string RotateId = Icons.Rotate3D + "##rotate";
         public const string WallId = Icons.BrickWall + "##wall";
         public const string FloorId = Icons.Square + "##floor";
+        public const string CableId = Icons.Cable + "##cable";
         public const string LocalId = Icons.Box + "##space";
         public const string WorldId = Icons.Axis3D + "##space";
         public const string SnapId = Icons.Magnet + "##snap";

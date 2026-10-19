@@ -61,7 +61,8 @@ internal sealed partial class Workspace
             () => tools.Tool == EditorTool.Wall);
         Command(AppActions.ToolFloor, Str.ToolFloor, Icons.Square, () => tools.Tool = EditorTool.Floor, () => session.Engine is not null,
             () => tools.Tool == EditorTool.Floor);
-        Command(EditorActions.ToolCable, Str.ToolCable, Icons.Cable, () => { }, () => false);
+        Command(EditorActions.ToolCable, Str.ToolCable, Icons.Cable, () => tools.Tool = EditorTool.Cable, () => session.Engine is not null,
+            () => tools.Tool == EditorTool.Cable);
 
         // View (active viewport)
         Command(EditorActions.FrameSelection, Str.ViewFrameSelection, Icons.Focus, () => ActiveViewport.FrameSelection());
@@ -307,7 +308,7 @@ internal sealed partial class Workspace
             _menu.Separator();
             Item(EditorActions.ToolWall);
             Item(AppActions.ToolFloor);
-            Item(EditorActions.ToolCable);
+            DrawCableMenu();
             _menu.Separator();
             Item(SessionActions.OpenWhite);
             Item(SessionActions.PauseSimulation);

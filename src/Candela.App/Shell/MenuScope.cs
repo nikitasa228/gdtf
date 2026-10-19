@@ -15,6 +15,9 @@ internal sealed class MenuScope
     private IReadOnlyList<string>? _path;
     private int _depth;
 
+    /// <summary>True when the innermost begun menu is really open (items drawn now are on screen).</summary>
+    public bool IsRealOpen => _realOpen.Count == 0 || _realOpen.Peek();
+
     /// <summary>True while a scripted selection is pending.</summary>
     public bool HasPending => _path is not null;
 

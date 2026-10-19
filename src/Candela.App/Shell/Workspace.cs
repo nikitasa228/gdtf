@@ -53,6 +53,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private readonly RenderPanel _render;
     private readonly PreviewPanel _preview;
     private readonly ExternalControlPanel _external;
+    private readonly CableLinksPanel _cableLinks;
     private ViewportPanel? _activeViewport;
     private readonly FittedText _statusFit = new();
     private IReadOnlyList<string>? _savedLayouts;
@@ -123,9 +124,11 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
         _external = Add(new ExternalControlPanel(_ctx));
+        _cableLinks = Add(new CableLinksPanel(StagePanelContext.From(_ctx), ShowCableOverlay));
         _ctx.Tools.Stage.Browser = _browser;
         RegisterCommands();
         InitializeSession();
+        InitializeCabling();
         RestoreStartupLayout();
         _activeViewport = _viewports[0];
         _onLanguageChanged = () => _title = "";
@@ -216,6 +219,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             UiGuard.CloseAllPopups();
         }
 
+        _guard.Run("editing keys", _handleEditingKeys);
         _guard.Run("shortcuts", _dispatch);
         UpdateTitle();
     }
@@ -272,6 +276,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void Dispose()
     {
         Loc.LanguageChanged -= _onLanguageChanged;
+        DisposeCabling();
         DisposeSession();
         _library.Dispose();
         foreach (var viewport in _viewports)
@@ -518,6 +523,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         plan.Bottom.Add(_issues.DockName);
         plan.Bottom.Add(_console.DockName);
         plan.Bottom.Add(_external.DockName);
+        plan.Bottom.Add(_cableLinks.DockName);
         int count = fourViewports ? 4 : 1;
         for (int i = 0; i < count; i++)
             plan.Center.Add(_viewports[i].DockName);

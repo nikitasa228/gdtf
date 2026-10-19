@@ -40,6 +40,9 @@ internal enum CableStr
 
     // Cable tool
     ToolCableType,
+    CableGroupData,
+    CableGroupPower,
+    CableGroupMulticore,
     ToolCableHint,
     ToolCableDrawingHint,
     ToolCableLength,
@@ -255,6 +258,9 @@ internal static class CableLoc
         (CableStr.NameCableMulticore, "Multicore", "Многожильный"),
 
         (CableStr.ToolCableType, "Cable type", "Тип кабеля"),
+        (CableStr.CableGroupData, "Data", "Данные"),
+        (CableStr.CableGroupPower, "Power", "Питание"),
+        (CableStr.CableGroupMulticore, "Multicore", "Многожильные"),
         (CableStr.ToolCableHint,
             "Cable ({0}): click a device to plug in, click walls, trusses or the floor to fix the cable there, click the middle of a cable to branch it. Right-click or Esc finishes.",
             "Кабель ({0}): щелчок по устройству — подключить, по стене, ферме или полу — закрепить кабель, по середине кабеля — разветвить. Правая кнопка или Esc — закончить."),
