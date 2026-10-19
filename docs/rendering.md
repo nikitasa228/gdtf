@@ -894,7 +894,8 @@ is refused the same way).
 |---|---|
 | ![real time](images/render-final-fokina-realtime.png) | ![path traced](images/render-final-fokina.png) |
 
-`Фокина.mvr` at 960 × 540 on lavapipe (demo look, haze from the hazers, 1291 beams). The beams and pools are the
+`Фокина.mvr` at 960 × 540 on lavapipe (demo look, haze from the hazers, 1291 beams; the path-traced image re-rendered
+after the review fixes, 32 samples in 16 min). The beams and pools are the
 same; the path tracer adds what the real-time view leaves out: light scattered more than once in the haze (the glow
 around the beams and over the stage) and light bounced between surfaces. (The MVR's fixtures do not cast shadows —
 `CastShadow` is off in the file — so neither view shadows their light.)
@@ -1066,7 +1067,7 @@ the values back into cd/m²), `raw.*` (with `--denoise`), `albedo.*`, `N.*` (wor
 
 ### Performance
 
-On lavapipe (CPU, 4 threads) `Фокина.mvr` with the demo look takes about 6.5 s per sample at 480 × 270 and about 25 s
+On lavapipe (CPU, 4 threads) `Фокина.mvr` with the demo look takes about 6.5 s per sample at 480 × 270 and about 30 s
 at 960 × 540 (1291 beams in haze; most of the time is finding and weighing the beams a camera ray crosses — the light
 selection of the in-scattering estimate), the procedural scene 0.3 s per sample at 480 × 360. A desktop GPU with
 hardware ray tracing is two to three orders of magnitude faster.
