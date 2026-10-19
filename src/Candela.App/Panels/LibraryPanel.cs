@@ -102,8 +102,8 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     private FixtureLibraryEntry? _selected;
     private bool _revealSelected;
     private bool _showFixturesTab;
-    private Engine.StageEngine? _subscribed;
-    private readonly Action<Engine.FixtureLibraryChange> _onLibraryChanged;
+    private readonly FixtureLibraryWatcher _watcher = new();
+    private int _loggedChanges;
     private bool _disposed;
 
     /// <summary>Creates the panel; <paramref name="models"/> is the user's model library (loaded by the caller).</summary>
@@ -113,7 +113,6 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         _ctx = context ?? throw new ArgumentNullException(nameof(context));
         _host = host ?? throw new ArgumentNullException(nameof(host));
         _models = models ?? throw new ArgumentNullException(nameof(models));
-        _onLibraryChanged = OnLibraryChanged;
     }
 
     /// <summary>
@@ -123,7 +122,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     public FixtureLibraryEntry? SelectedEntry => _selected;
 
     /// <summary>Times the engine reported new GDTF files (tests).</summary>
-    internal int LibraryChanges { get; private set; }
+    internal int LibraryChanges => _watcher.Changes;
 
     /// <summary>
     /// Selects <paramref name="entry"/> in the Fixtures tab (after a GDTF import): the tab comes forward, the category and
@@ -132,8 +131,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     public void Select(FixtureLibraryEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        var library = _ctx.Session.Engine?.Library;
-        var shown = library is not null && library.GetRevisions(entry) is { Count: > 0 } revisions ? revisions[0] : entry;
+        var shown = FixtureLibraryWatcher.TileFor(_ctx.Session.Engine?.Library, entry);
         _selected = shown;
         _revealSelected = true;
         _showFixturesTab = true;
@@ -144,18 +142,21 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     }
 
     /// <summary>
-    /// GDTF files reached the engine's library (an imported <c>.gdtf</c>, the GDTFs of an MVR or a project): the grid,
-    /// the category counts, the Devices section and the hover facts are rebuilt; tiles of the new types ask for their
-    /// pictures as they come into view.
+    /// GDTF files reached the engine's library (an imported <c>.gdtf</c>, the GDTFs of an MVR or a project) or the
+    /// session has another engine: the grid, the category counts, the Devices section and the hover facts are rebuilt;
+    /// tiles of the new types ask for their pictures as they come into view.
     /// </summary>
-    private void OnLibraryChanged(Engine.FixtureLibraryChange change)
+    private void OnLibraryChanged()
     {
-        LibraryChanges++;
         _entries = null;
         _filteredCategory = int.MinValue;
         _devicesDirty = true;
         _facts = null;
-        _ctx.Log.Info("Library", $"{change.Added.Count} fixture type(s) added to the library ({change.Source}).");
+        if (_watcher.Changes != _loggedChanges && _watcher.LastChange is { } change)
+        {
+            _loggedChanges = _watcher.Changes;
+            _ctx.Log.Info("Library", $"{change.Added.Count} fixture type(s) added to the library ({change.Source}).");
+        }
     }
 
     /// <inheritdoc/>
@@ -211,14 +212,9 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         _frame++;
         _textures.Update();
         var engine = _ctx.Session.Engine;
-        if (!ReferenceEquals(engine, _subscribed))
-        {
-            if (_subscribed is not null)
-                _subscribed.FixtureLibraryChanged -= _onLibraryChanged;
-            _subscribed = engine;
-            if (engine is not null)
-                engine.FixtureLibraryChanged += _onLibraryChanged;
-        }
+        _watcher.Follow(engine);
+        if (_watcher.TakeChanged())
+            OnLibraryChanged();
 
         if (engine is not null && !ReferenceEquals(engine.Library, _library))
         {
@@ -285,9 +281,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         if (_disposed)
             return;
         _disposed = true;
-        if (_subscribed is not null)
-            _subscribed.FixtureLibraryChanged -= _onLibraryChanged;
-        _subscribed = null;
+        _watcher.Dispose();
         _worker?.Dispose();
         _worker = null;
         _textures.Dispose();
