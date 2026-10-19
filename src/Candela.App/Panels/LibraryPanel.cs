@@ -74,6 +74,7 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
     private readonly Dictionary<FixtureLibraryEntry, PictureKeys> _keys = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<ModelLibraryItem, ModelDetails> _details = new(ReferenceEqualityComparer.Instance);
     private FactsText? _facts;
+    private Vector2 _gridMin, _gridMax;
     private ThumbnailWorker? _worker;
     private FixtureInfoCache? _info;
     private FixtureLibrary? _library;
@@ -327,6 +328,9 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
         var style = ImGui.GetStyle();
         float spacing = 8f * scale;
         float avail = ImGui.GetContentRegionAvail().X;
+        _gridMin = ImGui.GetWindowPos();
+        _gridMax = new Vector2(ImGui.GetCursorScreenPos().X + avail, _gridMin.Y + ImGui.GetWindowSize().Y);
+        _gridMin.X = ImGui.GetCursorScreenPos().X;
         float minTile = 104f * scale;
         int columns = Math.Max(1, (int)((avail + spacing) / (minTile + spacing)));
         float tile = MathF.Floor((avail - (columns - 1) * spacing) / columns);
@@ -430,8 +434,9 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
     /// <summary>The card's full-size rectangle: twice the tile, its bottom on the tile's bottom, inside the grid window.</summary>
     private bool CardRect(out Vector2 min, out Vector2 max)
     {
-        var windowMin = ImGui.GetWindowPos();
-        var windowMax = windowMin + ImGui.GetWindowSize();
+        // The grid's visible content area (without the scroll bar).
+        var windowMin = _gridMin;
+        var windowMax = _gridMax;
         float tileWidth = _hoverTileMax.X - _hoverTileMin.X;
         float width = MathF.Min(tileWidth * 2.1f, windowMax.X - windowMin.X - 8f);
         float textBlock = ImGui.GetTextLineHeightWithSpacing() * 3.4f;

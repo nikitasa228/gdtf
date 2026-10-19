@@ -57,8 +57,10 @@ internal sealed partial class Workspace
         Command(EditorActions.ToolRotate, Str.ToolRotate, Icons.Rotate3D, () => tools.Tool = EditorTool.Rotate, null, () => tools.Tool == EditorTool.Rotate);
         Command(AppActions.ToggleSnap, Str.ToolSnapping, Icons.Magnet, () => tools.Snap = !tools.Snap, null, () => tools.Snap);
         Command(AppActions.ToggleSpace, Str.ToolSpaceLocal, Icons.Axis3D, () => tools.LocalSpace = !tools.LocalSpace, null, () => tools.LocalSpace);
-        Command(EditorActions.ToolWall, Str.ToolWall, Icons.BrickWall, () => { }, () => false);
-        Command(AppActions.ToolFloor, Str.ToolFloor, Icons.Square, () => { }, () => false);
+        Command(EditorActions.ToolWall, Str.ToolWall, Icons.BrickWall, () => tools.Tool = EditorTool.Wall, () => session.Engine is not null,
+            () => tools.Tool == EditorTool.Wall);
+        Command(AppActions.ToolFloor, Str.ToolFloor, Icons.Square, () => tools.Tool = EditorTool.Floor, () => session.Engine is not null,
+            () => tools.Tool == EditorTool.Floor);
         Command(EditorActions.ToolCable, Str.ToolCable, Icons.Cable, () => { }, () => false);
 
         // View (active viewport)

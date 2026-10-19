@@ -17,6 +17,12 @@ internal enum EditorTool
 
     /// <summary>Rotate gizmo on three axes.</summary>
     Rotate,
+
+    /// <summary>Draws walls: a drag on a horizontal surface gives the line a wall stands on.</summary>
+    Wall,
+
+    /// <summary>Draws floors: a drag on a horizontal surface gives a rectangle.</summary>
+    Floor,
 }
 
 /// <summary>Editing state shared by all viewports, menus and shortcuts.</summary>

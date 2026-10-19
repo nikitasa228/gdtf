@@ -324,7 +324,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     }
 
     /// <summary>True while a navigation, box selection or gizmo drag is in progress (tests).</summary>
-    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive;
+    internal bool IsInteracting => _navigation != NavigationOperation.None || _selecting || _drag.IsActive || IsEditingShape;
 
     private void EndInteraction()
     {
@@ -333,6 +333,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         _navigation = NavigationOperation.None;
         _selecting = false;
         EndGizmoDrag();
+        CancelShapeEdit();
     }
 
     /// <summary>Releases the render target and its ImGui texture (panel closed, workspace disposed).</summary>
@@ -406,6 +407,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         DrawStats(drawList);
         HandleInput(hovered, overOverlay);
         DrawBoxSelection(drawList);
+        DrawShapeEdit(drawList, ImGui.GetIO().MousePos, hovered);
         HandleLibraryDrop(drawList);
     }
 
@@ -470,7 +472,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
                     if (op == NavigationOperation.Fly)
                         _host.SuspendShortcuts(true);
                 }
-                else if (button == ImGuiMouseButton.Left && !gizmoBusy)
+                else if (button == ImGuiMouseButton.Left && !gizmoBusy && !BeginShapeEdit(mouse))
                 {
                     _selecting = true;
                     _selectShift = io.KeyShift;
@@ -480,7 +482,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
                 break;
             }
 
-            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy)
+            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) && !gizmoBusy && !IsEditingShape)
             {
                 AddPick(PickKind.Focus, mouse, false);
                 _selecting = false;
@@ -501,6 +503,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
             }
         }
 
+        UpdateShapeEdit(mouse);
         if (_selecting && !ImGui.IsMouseDown(ImGuiMouseButton.Left))
         {
             _selecting = false;
@@ -586,7 +589,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     {
         var session = _ctx.Session;
         var tools = _ctx.Tools;
-        if (tools.Tool == EditorTool.Select || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
+        if (tools.Tool is not (EditorTool.Move or EditorTool.Rotate) || session.Selection.Primary is not { } primaryId || session.Scene.Find(primaryId) is not { } primary ||
             !SelectionController.IsEditable(session.Scene, primary))
         {
             _gizmoVisible = false;
@@ -659,6 +662,12 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         ImGui.SameLine();
         if (ToolButton(ToolbarLabels.RotateId, Str.ToolRotate, tools.Tool == EditorTool.Rotate))
             tools.Tool = EditorTool.Rotate;
+        ImGui.SameLine();
+        if (ToolButton(ToolbarLabels.WallId, Str.ToolWall, tools.Tool == EditorTool.Wall))
+            tools.Tool = EditorTool.Wall;
+        ImGui.SameLine();
+        if (ToolButton(ToolbarLabels.FloorId, Str.ToolFloor, tools.Tool == EditorTool.Floor))
+            tools.Tool = EditorTool.Floor;
         ImGui.SameLine();
         if (ToolButton(tools.LocalSpace ? ToolbarLabels.LocalId : ToolbarLabels.WorldId, tools.LocalSpace ? Str.ToolSpaceLocal : Str.ToolSpaceWorld, false))
             tools.LocalSpace = !tools.LocalSpace;
@@ -909,6 +918,8 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         public const string SelectId = Icons.Pointer + "##select";
         public const string MoveId = Icons.Move + "##move";
         public const string RotateId = Icons.Rotate3D + "##rotate";
+        public const string WallId = Icons.BrickWall + "##wall";
+        public const string FloorId = Icons.Square + "##floor";
         public const string LocalId = Icons.Box + "##space";
         public const string WorldId = Icons.Axis3D + "##space";
         public const string SnapId = Icons.Magnet + "##snap";
