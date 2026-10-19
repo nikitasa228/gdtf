@@ -254,8 +254,9 @@ public static class MvrImporter
         /// </summary>
         private void RestoreChildOrder()
         {
-            foreach (var (target, known) in _childOrder)
+            foreach (var (target, joined) in _childOrder)
             {
+                var known = joined.Where(j => ReferenceEquals(j.Child.Parent, target)).ToList();
                 known.Sort((a, b) => a.Index.CompareTo(b.Index));
                 var placed = new HashSet<Entity>(known.Count, ReferenceEqualityComparer.Instance);
                 foreach (var (child, _) in known) placed.Add(child);

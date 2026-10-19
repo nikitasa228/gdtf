@@ -198,7 +198,7 @@ public sealed class ExportFidelityTests
     public void Children_on_another_layer_keep_their_layer_through_export_and_import()
     {
         var scene = LayeredScene(out var venue, out var light);
-        var (export, document, bytes) = Export(scene, PlainOptions());
+        var (export, document, _) = Export(scene, PlainOptions());
 
         // other programs: every object on its own layer, under a group of its layer that repeats the parent
         Assert.Equal(new[] { "Venue", "Light" }, document.Layers.Select(l => l.Name));
