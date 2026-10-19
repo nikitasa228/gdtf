@@ -361,8 +361,10 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
     // segment: integral of m x profile = dH x (the profile-weighted Simpson average of m), i.e. ((1 - lambda) m(y0) +
     // lambda m(y1)) with lambda the profile's centroid in the segment. Second order in the segment length, so the
     // strongly forward-peaked phase function needs no more segments. In the iris band the iris factor joins m.
-    // Modulation (cookie x shadow x local scattering x exact/table profile) is sampled at positions distributed like
-    // the profile within each segment (stratified, inverted from the table), so the estimate is unbiased.
+    // Modulation (cookie x shadow x local scattering) is sampled at positions distributed like the profile within each
+    // segment (stratified, inverted from the table), weighted by the exact/table profile ratio and the smooth factor,
+    // and applied to the segment's integral as their weighted mean (a ratio estimator: consistent, and noise-free
+    // where the modulation is uniform).
     vec3 accL = vec3(0.0);
     float accB = 0.0;
     for (int part = 0; part < 3; ++part)
@@ -415,7 +417,11 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
                 continue;
             }
 
-            vec3 modulation = vec3(0.0);
+            // Ratio estimator: the segment's deterministic integral w times the weighted mean modulation of its
+            // samples (weights = the unmodulated integrand over the sampling density), so a modulation that is
+            // uniform over the segment — an open gobo, haze without smoke, an unobstructed shadow map — adds no noise.
+            vec3 num = vec3(0.0);
+            float den = 0.0;
             for (int s = 0; s < perSegment; ++s)
             {
                 float xi = fract(stratum(ray, salt, i + 16 * part) + float(s) / float(perSegment));
@@ -425,6 +431,15 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
                 float cj = cos(gj);
                 if (cj <= 1e-6)
                     continue;
+                // Exact profile (iris included) against the table's chord approximation at this point, times the
+                // smooth factor at the sample (linear in the segment).
+                float chord = sqrt(mChord2 + R * 4.0 * sin(0.5 * uj) * sin(0.5 * uj));
+                float exact = beamProfile(light, 2.0 * asin(min(0.5 * chord, 1.0)));
+                float approx = shapeProfile(light, profileScale * sqrt(v * v + yj * yj));
+                float weight = (approx > 1e-4 ? clamp(exact / approx, 0.0, 4.0) : 1.0) * mix(m0, m1, clamp((yj - y0) / dy, 0.0, 1.0));
+                if (!(weight > 0.0))
+                    continue;
+                den += weight;
                 float tj = tc + D * tan(gj);
                 float rj = D / cj;
                 vec3 X = ray.origin + ray.dir * tj;
@@ -435,20 +450,13 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
                     continue;
                 // Smoke along the light path.
                 float smokeLight = hasFeature(FEATURE_SMOKE) ? smokeLightTransmittance(light.position, X, smokeAtLight, smoke) : 1.0;
-                // Exact profile (iris included) against the table's chord approximation at this point.
-                float chord = sqrt(mChord2 + R * 4.0 * sin(0.5 * uj) * sin(0.5 * uj));
-                float exact = beamProfile(light, 2.0 * asin(min(0.5 * chord, 1.0)));
-                float approx = shapeProfile(light, profileScale * sqrt(v * v + yj * yj));
-                float ratio = approx > 1e-4 ? clamp(exact / approx, 0.0, 4.0) : 1.0;
                 float shadow = shadowHard(slot, X, vec3(0.0));
                 float pixelGate = ray.pixelSize * max(ray.originDepth + tj / ray.stretch, 0.0) / max(rj, 1e-3) * light.gateScale * ray.widening;
                 vec3 c = facetCookie(light, k, facets, omega, max(footprint, pixelGate));
-                // The smooth factor at the sample (linear in the segment) over its profile-weighted mean.
-                float mj = mix(m0, m1, clamp((yj - y0) / dy, 0.0, 1.0));
-                modulation += c * (sigma * ratio * shadow * smokeLight * mj);
+                num += c * (sigma * shadow * smokeLight * weight);
             }
 
-            accL += dH * modulation / float(perSegment);
+            accL += den > 0.0 ? w * num / den : vec3(w * sigmaH);
         }
     }
 

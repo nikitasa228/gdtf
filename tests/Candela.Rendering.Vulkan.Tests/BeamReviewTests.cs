@@ -263,6 +263,58 @@ public sealed class BeamReviewTests
     }
 
     [SkippableFact]
+    public void UnobstructedShadowedBeamIsAsSmoothAsAnUnshadowedOne()
+    {
+        // A shadow-casting spot over a floor with nothing in its beam: the shadow map modulates every sample by 1, so a
+        // single frame must equal the same beam without a shadow map — no sampling noise (the cookie samples' weighted
+        // mean is applied to the exact integral of each segment, a ratio estimator).
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(20f, scene.Lambert(new Vector3(0.3f)));
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = Haze, Anisotropy = Anisotropy });
+            var camera = RenderCamera.LookAt(new Vector3(0f, -7f, 2f), new Vector3(0f, 0f, 2f), 40f);
+            camera.Ev100 = 3f;
+            var settings = new PreviewSettings { TemporalAccumulation = false, Bloom = false, Indirect = IndirectLighting.Off };
+            HdrReadback Render(bool shadows)
+            {
+                var light = StageScene.Spot(LightPosition, new Vector3(0.5f, 0f, 0f), 30000f, 20f, 30f, shadows: shadows, type: BeamType.Spot);
+                renderer.World.SetLights(new[] { light });
+                using var rt = renderer.CreateTarget(160, 120);
+                renderer.Render(rt, camera, Dark, settings, 1f / 60f);
+                Assert.Equal(shadows ? 1 : 0, renderer.LastStatistics.ShadowedLights);
+                return renderer.ReadHdr(rt);
+            }
+
+            var plain = Render(false);
+            var shadowed = Render(true);
+            double peak = 0, worst = 0;
+            for (int y = 0; y < 60; y++)
+            {
+                for (int x = 0; x < plain.Width; x++)
+                    peak = Math.Max(peak, plain.LuminanceAt(x, y));
+            }
+
+            // The haze above the floor (the upper half of the image): the floor itself is lit with the shadow test.
+            for (int y = 0; y < 60; y++)
+            {
+                for (int x = 0; x < plain.Width; x++)
+                    worst = Math.Max(worst, Math.Abs(shadowed.LuminanceAt(x, y) - plain.LuminanceAt(x, y)) / peak);
+            }
+
+            _output.WriteLine($"peak {peak:0.000} cd/m², largest difference {worst:P2} of the peak");
+            Assert.True(peak > 0.1, $"peak {peak}");
+            Assert.InRange(worst, 0, 0.0005);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void TemporalAccumulationSettlesGoboBeamsOverTheBackground()
     {
         // A gobo beam against the empty background (no geometry): the temporal pass reprojects the background at the
