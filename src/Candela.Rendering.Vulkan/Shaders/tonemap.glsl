@@ -77,4 +77,17 @@ vec3 tonemapNeutral(vec3 rec2020)
     return clamp(mix(color, vec3(newPeak), g), 0.0, 1.0);
 }
 
+// Display transform of the tone mapper `mode` (TONE_*): exposed scene-referred Rec.2020 -> display-linear Rec.709.
+// TONE_PASSTHROUGH (display-referred views) only clamps.
+vec3 displayTransform(vec3 hdr, uint mode)
+{
+    if (mode == TONE_AGX)
+        return tonemapAgx(hdr);
+    if (mode == TONE_ACES)
+        return tonemapAces(hdr);
+    if (mode == TONE_NEUTRAL)
+        return tonemapNeutral(hdr);
+    return clamp(hdr, 0.0, 1.0);
+}
+
 #endif

@@ -291,3 +291,35 @@ internal struct GpuExposureResult
     public uint Pad0;
     public uint Pad1;
 }
+
+/// <summary>Path tracer parameters (uniform buffer, 112 bytes), see <c>PtParams</c> in pt_common.glsl.</summary>
+[StructLayout(LayoutKind.Sequential)]
+internal struct GpuPtParams
+{
+    /// <summary>Box the haze fills (xyz), m.</summary>
+    public Vector4 MediaMin;
+
+    /// <summary>Box the haze fills (xyz), m; w = haze scattering coefficient, 1/m.</summary>
+    public Vector4 MediaMax;
+
+    /// <summary>x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 1 / exposure.</summary>
+    public Vector4 Majorants;
+
+    /// <summary>rgb = background luminance (Rec.2020, cd/m²), w = firefly clamp (cd/m², 0 = off).</summary>
+    public Vector4 Background;
+
+    /// <summary>x = lens clearance of shadow rays (m), y = lens polygon offset in front of the light (m), z = polygon radius factor.</summary>
+    public Vector4 Geometry;
+
+    public uint LightCount;
+    public uint MaxBounces;
+    public uint MaxVolumeBounces;
+
+    /// <summary>PT_FLAG_* bits.</summary>
+    public uint Flags;
+
+    public uint Seed;
+    public uint Width;
+    public uint Height;
+    public uint Pad0;
+}

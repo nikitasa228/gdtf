@@ -5,8 +5,9 @@ namespace Candela.Cli;
 
 /// <summary>
 /// Headless entry point (<c>candela</c>). Exit codes: 0 success; 1 failure (file not readable, render or I/O error);
-/// 2 usage error; 3 no usable Vulkan device; 4 the input has errors (<c>validate</c> found error-level issues,
-/// <c>import-worker</c> rejected the model).
+/// 2 usage error; 3 no usable Vulkan device (for <c>render --final</c>: none that supports the path tracer); 4 the input
+/// has errors (<c>validate</c> found error-level issues, <c>import-worker</c> rejected the model); 130 cancelled with
+/// Ctrl+C (a final render keeps what it rendered).
 /// </summary>
 internal static class Program
 {
@@ -15,6 +16,7 @@ internal static class Program
     internal const int ExitUsage = 2;
     internal const int ExitNoVulkan = 3;
     internal const int ExitInputErrors = 4;
+    internal const int ExitCancelled = 130;
 
     private static int Main(string[] args) => Run(args, Console.Out, Console.Error);
 
@@ -76,9 +78,12 @@ internal static class Program
         writer.WriteLine("  candela render <scene.mvr|scene.candela> --out <file.png> [--width W] [--height H]");
         writer.WriteLine("                 [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov <deg>]");
         writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]");
-        writer.WriteLine("                 [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev auto|floor|<EV100>]");
-        writer.WriteLine("                 [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--work-light off|auto|on]");
+        writer.WriteLine("                 [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s|HH:MM:SS:FF>]");
+        writer.WriteLine("                 [--end <s|HH:MM:SS:FF> [--fps F]] [--ev auto|floor|<EV100>] [--auto-exposure] [--frames N]");
+        writer.WriteLine("                 [--grid] [--floor auto|none] [--work-light off|auto|on]");
         writer.WriteLine("                 [--device <name>] [--library <dir>]... [--cache <dir>]");
+        writer.WriteLine("                 [--final [--samples N] [--seconds S] [--exr <file.exr>] [--denoise] [--bounces N]");
+        writer.WriteLine("                          [--volume-bounces N] [--seed N] [--clamp <cd/m²>]]");
         writer.WriteLine("      Loads the scene through the engine, applies the look, simulates --time seconds (DMX, motors, smoke,");
         writer.WriteLine("      fire), renders it and writes the PNG. Prints issues and timings. Defaults: 1280 x 720, auto view,");
         writer.WriteLine("      full shading, no overlay, the scene's haze, look open-white, time 0, auto exposure (--ev auto: the renderer adapts");
@@ -88,6 +93,12 @@ internal static class Program
         writer.WriteLine("      judging the picture (moving heads in symmetric fans and crossings over the stage and the audience, saturated");
         writer.WriteLine("      colours and white, narrow beams, gobos on some spots, washes colouring the floor, hazers running);");
         writer.WriteLine("      show = the manual values saved with the scene; dmx-file = a DMX recording played from its start.");
+        writer.WriteLine("      --end renders an image sequence (name_0001.png …) from --time to --end at --fps (default 25), the engine");
+        writer.WriteLine("      advancing frame by frame; timecodes (HH:MM:SS:FF, ;FF drop-frame) are looked up in the recording.");
+        writer.WriteLine("      --final path-traces each image (Vulkan ray queries): --samples per pixel (default 64) or until --seconds");
+        writer.WriteLine("      are up, --exr also writes linear HDR OpenEXR (with albedo, normal and depth layers), --denoise filters");
+        writer.WriteLine("      the result (the EXR keeps the raw one as layer 'raw'). Auto exposure meters the first image; a sequence");
+        writer.WriteLine("      keeps it. Defaults: 6 bounces, 2 volume bounces, seed 0, no clamp. Ctrl+C writes what is rendered.");
         writer.WriteLine("      --work-light auto adds a dim neutral key and ambient light when no fixture emits, on always; a render");
         writer.WriteLine("      never gets it unless asked (default off).");
         writer.WriteLine();
@@ -107,7 +118,7 @@ internal static class Program
         writer.WriteLine("  candela render-test --out <dir> [options]   (renderer self-test with a procedural scene; see --help of the");
         writer.WriteLine("                                               renderer documentation)");
         writer.WriteLine();
-        writer.WriteLine("Exit codes: 0 ok, 1 failure, 2 usage error, 3 no Vulkan device, 4 the input has errors.");
+        writer.WriteLine("Exit codes: 0 ok, 1 failure, 2 usage error, 3 no (suitable) Vulkan device, 4 the input has errors, 130 cancelled.");
     }
 }
 

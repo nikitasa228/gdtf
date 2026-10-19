@@ -1,0 +1,133 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+// Edge-aware denoiser of the final render (optional, separate from the raw accumulation): an a-trous wavelet filter
+// (Dammertz et al. 2010) with the luminance edge-stopping of SVGF (Schied et al. 2017), guided by the first surface's
+// albedo, normal and depth that the path tracer accumulates next to the radiance.
+//  draw.mode = PT_DENOISE_RESOLVE: sum + count -> mean radiance (rgb) and the variance of the mean's luminance (a).
+//  draw.mode = PT_DENOISE_ITERATE: one 5 x 5 B3-spline iteration with taps draw.materialIndex pixels apart, weighted by
+//    normal:    max(n_p . n_q, 0)^64 (pixels without a surface only mix with each other),
+//    depth:     exp(-|z_p - z_q| / (0.02 z_p step)),
+//    albedo:    exp(-|a_p - a_q|_1 / 0.1),
+//    luminance: exp(-|l_p - l_q| / (4 sqrt(var_p) + eps)), var_p the 3 x 3 Gaussian of the variance around p,
+//  the variance filtered with the squared weights. A converged pixel (variance ~ 0) keeps its value; noise is averaged
+//  only along surfaces of the same material, so edges, gobo patterns and textures stay sharp.
+
+#include "pt_common.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = SET_PASS, binding = BINDING_PT_ACCUM, rgba32f) uniform readonly image2D ptAccum;
+layout(set = SET_PASS, binding = BINDING_PT_AUX, rgba32f) uniform readonly image2D ptAux;
+layout(set = SET_PASS, binding = BINDING_PT_GUIDE, rgba32f) uniform readonly image2D ptGuide;
+layout(set = SET_PASS, binding = BINDING_PT_INPUT, rgba32f) uniform readonly image2D ptInput;
+layout(set = SET_PASS, binding = BINDING_PT_OUTPUT, rgba32f) uniform writeonly image2D ptOutput;
+
+const float SIGMA_LUMINANCE = 4.0;
+const float SIGMA_DEPTH = 0.02;
+const float SIGMA_ALBEDO = 0.1;
+const float NORMAL_POWER = 64.0;
+
+struct Guide
+{
+    vec3 albedo;
+    vec3 normal;   // unit, or zero where the camera sees no surface
+    float depth;
+};
+
+Guide guideAt(ivec2 p)
+{
+    float n = max(imageLoad(ptAccum, p).a, 1.0);
+    Guide g;
+    g.albedo = imageLoad(ptAux, p).rgb / n;
+    vec4 nd = imageLoad(ptGuide, p) / n;
+    float len = length(nd.xyz);
+    g.normal = len > 0.5 ? nd.xyz / len : vec3(0.0);
+    g.depth = nd.w;
+    return g;
+}
+
+void main()
+{
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(ptOutput);
+    if (any(greaterThanEqual(p, size)))
+        return;
+
+    if (draw.mode == PT_DENOISE_RESOLVE)
+    {
+        vec4 sum = imageLoad(ptAccum, p);
+        float n = max(sum.a, 1.0);
+        vec3 mean = sum.rgb / n;
+        float meanLum = luminanceRec2020(mean);
+        float secondMoment = imageLoad(ptAux, p).a / n;
+        float variance = max(secondMoment - meanLum * meanLum, 0.0) / n;
+        if (!isFiniteVec(mean) || isnan(variance) || isinf(variance))
+        {
+            mean = vec3(0.0);
+            variance = 0.0;
+        }
+
+        imageStore(ptOutput, p, vec4(mean, variance));
+        return;
+    }
+
+    int step = max(int(draw.materialIndex), 1);
+    vec4 centre = imageLoad(ptInput, p);
+    Guide gp = guideAt(p);
+    float lumP = luminanceRec2020(centre.rgb);
+    // The variance of a few samples is itself noisy: a 3 x 3 Gaussian of it sets the luminance tolerance (SVGF).
+    float variance = 0.0;
+    const float gauss[2] = float[](0.25, 0.125);
+    for (int dy = -1; dy <= 1; ++dy)
+    {
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            ivec2 q = clamp(p + ivec2(dx, dy), ivec2(0), size - 1);
+            float v = imageLoad(ptInput, q).a;
+            variance += (isnan(v) || isinf(v) ? 0.0 : max(v, 0.0)) * gauss[abs(dx)] * gauss[abs(dy)] * 4.0;
+        }
+    }
+
+    float sigmaL = SIGMA_LUMINANCE * sqrt(variance) + 1e-6 * max(lumP, 1e-6);
+    bool surfaceP = dot(gp.normal, gp.normal) > 0.0;
+    const float kernel[3] = float[](0.375, 0.25, 0.0625);
+    vec3 sum = vec3(0.0);
+    float filteredVariance = 0.0;
+    float weightSum = 0.0;
+    for (int dy = -2; dy <= 2; ++dy)
+    {
+        for (int dx = -2; dx <= 2; ++dx)
+        {
+            ivec2 q = p + ivec2(dx, dy) * step;
+            if (any(lessThan(q, ivec2(0))) || any(greaterThanEqual(q, size)))
+                continue;
+            vec4 s = imageLoad(ptInput, q);
+            float w = kernel[abs(dx)] * kernel[abs(dy)];
+            if (dx != 0 || dy != 0)
+            {
+                Guide gq = guideAt(q);
+                bool surfaceQ = dot(gq.normal, gq.normal) > 0.0;
+                if (surfaceP != surfaceQ)
+                    continue;
+                if (surfaceP)
+                {
+                    w *= pow(max(dot(gp.normal, gq.normal), 0.0), NORMAL_POWER);
+                    w *= exp(-abs(gp.depth - gq.depth) / (SIGMA_DEPTH * max(gp.depth, 1e-3) * float(step)));
+                }
+
+                vec3 da = abs(gp.albedo - gq.albedo);
+                w *= exp(-(da.r + da.g + da.b) / SIGMA_ALBEDO);
+                w *= exp(-abs(luminanceRec2020(s.rgb) - lumP) / sigmaL);
+            }
+
+            if (!(w > 0.0) || !isFiniteVec(s.rgb))
+                continue;
+            sum += s.rgb * w;
+            filteredVariance += max(s.a, 0.0) * w * w;
+            weightSum += w;
+        }
+    }
+
+    vec4 result = weightSum > 0.0 ? vec4(sum / weightSum, filteredVariance / (weightSum * weightSum)) : centre;
+    imageStore(ptOutput, p, result);
+}

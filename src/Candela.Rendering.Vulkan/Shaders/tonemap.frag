@@ -26,17 +26,6 @@ const float CABLE_DIM = 0.32;
 const int NOISE_FOG_STEPS = 24;
 const float NOISE_FOG_RANGE = 60.0;
 
-vec3 displayTransform(vec3 hdr)
-{
-    if (draw.mode == TONE_AGX)
-        return tonemapAgx(hdr);
-    if (draw.mode == TONE_ACES)
-        return tonemapAces(hdr);
-    if (draw.mode == TONE_NEUTRAL)
-        return tonemapNeutral(hdr);
-    return clamp(hdr, 0.0, 1.0);
-}
-
 // Noise overlay fog along the ray origin + t direction, t in [0, tMax]: (display colour, transmittance).
 vec4 noiseFog(vec3 origin, vec3 direction, float tMax, float jitter)
 {
@@ -72,7 +61,7 @@ void main()
     if (hasFeature(FEATURE_BLOOM))
         hdr = mix(hdr, finiteLight(textureLod(bloomTexture, uv, 0.0).rgb) * draw.width, frame.bloomIntensity);
 
-    vec3 display = displayTransform(hdr);
+    vec3 display = displayTransform(hdr, draw.mode);
 
     if (frame.overlayMode != OVERLAY_NONE)
     {

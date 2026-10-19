@@ -29,18 +29,58 @@ public readonly record struct PickResult(uint PickId, Vector3 WorldPosition, Vec
 /// <summary>Progress of a running final (path-traced) render.</summary>
 public interface IFinalRender : IDisposable
 {
+    /// <summary>Samples per pixel accumulated so far (every pixel has at least this many).</summary>
     int SamplesDone { get; }
+
+    /// <summary>Samples per pixel the render aims for (it may complete earlier when a time limit is reached).</summary>
     int SamplesTotal { get; }
+
+    /// <summary>The render has finished: all samples are done, its time limit was reached or it was cancelled.</summary>
     bool IsComplete { get; }
+
+    /// <summary>True when <see cref="Cancel"/> stopped the render (or a cancellation token passed to <see cref="Advance(TimeSpan, CancellationToken)"/>).</summary>
+    bool IsCancelled => false;
+
+    /// <summary>Wall-clock time spent rendering so far.</summary>
+    TimeSpan Elapsed => TimeSpan.Zero;
+
+    /// <summary>
+    /// Exposure the HDR results are scaled by (HDR value = luminance in cd/m² × exposure): from the camera's EV100 and
+    /// the compensation, or metered from the image with auto exposure.
+    /// </summary>
+    float Exposure => 1f;
 
     /// <summary>Renders more samples for at most <paramref name="budget"/> (keeps the UI responsive).</summary>
     void Advance(TimeSpan budget);
 
-    /// <summary>Tone-mapped preview of the current accumulation (8-bit sRGB RGBA).</summary>
+    /// <summary>
+    /// Renders more samples for at most <paramref name="budget"/>; returns early when <paramref name="cancellationToken"/>
+    /// is cancelled, which also cancels the render (the samples done so far stay available).
+    /// </summary>
+    void Advance(TimeSpan budget, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            Cancel();
+            return;
+        }
+
+        Advance(budget);
+    }
+
+    /// <summary>Stops the render: no further samples; the accumulated result stays available.</summary>
+    void Cancel()
+    {
+    }
+
+    /// <summary>Tone-mapped preview of the current accumulation (8-bit sRGB RGBA; denoised when the settings ask for it).</summary>
     ImageData Preview();
 
-    /// <summary>Linear HDR result (RGBA float, cd/m² scaled by exposure) for EXR export.</summary>
+    /// <summary>Linear HDR result (RGBA float, cd/m² scaled by exposure) for EXR export; denoised when the settings ask for it.</summary>
     ImageData ResultHdr();
+
+    /// <summary>The raw (not denoised) linear HDR result, RGBA float, cd/m² scaled by <see cref="Exposure"/>.</summary>
+    ImageData RawResultHdr() => ResultHdr();
 }
 
 /// <summary>
@@ -65,4 +105,10 @@ public interface IRenderer : IDisposable
 
     /// <summary>Starts a progressive path-traced render of the current world.</summary>
     IFinalRender StartFinalRender(RenderCamera camera, FinalRenderSettings settings);
+
+    /// <summary>
+    /// Starts a progressive path-traced render of the current world with <paramref name="options"/> (exposure,
+    /// background, seed, time limit, firefly clamp). Renderers without these options ignore them.
+    /// </summary>
+    IFinalRender StartFinalRender(RenderCamera camera, FinalRenderSettings settings, FinalRenderOptions options) => StartFinalRender(camera, settings);
 }
