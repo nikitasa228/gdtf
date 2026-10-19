@@ -356,7 +356,7 @@ internal sealed unsafe class RenderPanel : Panel
                 ImGui.SetTooltip(StageLoc.Get(StageStr.RenderRangeHint));
             PropertyGrid.Row(Loc.Get(Str.RenderFrameRate));
             float fps = (float)s.FrameRate;
-            if (ImGui.DragFloat("##fps", ref fps, 0.1f, 1f, 120f, "%.2f fps"))
+            if (ImGui.DragFloat("##fps", ref fps, 0.1f, 1f, 120f, StageUnits.Current.FormatFramesPerSecond))
             {
                 s.FrameRate = Math.Clamp(fps, 1f, 240f);
                 edited = true;

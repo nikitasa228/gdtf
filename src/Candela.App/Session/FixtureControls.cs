@@ -448,20 +448,24 @@ internal sealed class FixtureControls
             }
         }
 
+        // Colour-temperature filters often give kelvin physicals without declaring the unit (Rivale: CTO 6500 … 2800).
+        if (unit == PhysicalUnit.None && cls.Kind is AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc && MathF.Min(min, max) >= 1000f)
+            unit = PhysicalUnit.Temperature;
         bool level = unit is PhysicalUnit.None or PhysicalUnit.ColorComponent && min >= -0.0001f && max <= 1.0001f && max > min;
         float scale = level ? 100f : 1f;
+        var units = StageUnits.Current;
         string format = level ? "%.0f%%" : unit switch
         {
             PhysicalUnit.Angle => "%.1f°",
             PhysicalUnit.Percent => "%.0f%%",
-            PhysicalUnit.Frequency => "%.2f Hz",
+            PhysicalUnit.Frequency => units.FormatHertz,
             PhysicalUnit.Temperature => "%.0f K",
-            PhysicalUnit.Length => "%.2f m",
-            PhysicalUnit.Time => "%.2f s",
+            PhysicalUnit.Length => units.FormatMetres,
+            PhysicalUnit.Time => units.FormatSeconds,
             PhysicalUnit.AngularSpeed => "%.0f°/s",
-            PhysicalUnit.Speed => "%.2f m/s",
-            PhysicalUnit.WaveLength => "%.0f nm",
-            PhysicalUnit.LuminousIntensity => "%.0f cd",
+            PhysicalUnit.Speed => units.FormatMetresPerSecond,
+            PhysicalUnit.WaveLength => units.FormatNanometres,
+            PhysicalUnit.LuminousIntensity => units.FormatCandela,
             _ => wheel >= 0 ? "%.2f" : NumberFormat(min, max),
         };
 

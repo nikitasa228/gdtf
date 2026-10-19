@@ -97,9 +97,11 @@ internal sealed class FixtureInspectorView
         }
         else
         {
-            string cct = float.IsFinite(live.Cct) ? string.Create(inv, $" · {live.Cct:0} K") : "";
+            // No-break spaces keep each value with its unit (and digit groups together) when the line wraps.
+            string cct = float.IsFinite(live.Cct) ? string.Create(inv, $" · {live.Cct:0}\u00a0K") : "";
+            string flux = string.Create(inv, $"{live.Flux:#,0}\u00a0{StageUnits.Current.Lumen}").Replace(',', '\u202f');
             _liveLine1 = string.Create(inv,
-                $"{live.Intensity * 100f:0}% · {DeviceFacts.FormatCandela(live.PeakCandela)} · {live.Flux:0} lm · x {live.Xy.X:0.000} y {live.Xy.Y:0.000}{cct}");
+                $"{live.Intensity * 100f:0}% · {DeviceFacts.FormatCandela(live.PeakCandela).Replace(' ', '\u00a0')} · {flux} · x\u00a0{live.Xy.X:0.000}\u00a0y\u00a0{live.Xy.Y:0.000}{cct}");
             string pan = float.IsFinite(live.Pan) ? string.Create(inv, $"{StageLoc.Get(StageStr.LivePan)} {live.Pan * 180f / MathF.PI:0.0}°  ") : "";
             string tilt = float.IsFinite(live.Tilt) ? string.Create(inv, $"{StageLoc.Get(StageStr.LiveTilt)} {live.Tilt * 180f / MathF.PI:0.0}°  ") : "";
             _liveLine2 = pan + tilt + string.Create(inv,
@@ -111,7 +113,7 @@ internal sealed class FixtureInspectorView
                 string.Create(inv, $"{StageLoc.Get(StageStr.LiveFrost)} {live.Frost * 100f:0}%"),
             };
             if (live.Strobe > 0f)
-                parts.Add(string.Create(inv, $"{StageLoc.Get(StageStr.LiveStrobe)} {live.Strobe:0.#} Hz"));
+                parts.Add(string.Create(inv, $"{StageLoc.Get(StageStr.LiveStrobe)} {live.Strobe:0.#} {StageUnits.Current.Hertz}"));
             if (live.GoboSlot > 0)
                 parts.Add(string.Create(inv, $"{StageLoc.Get(StageStr.LiveGobo)} {live.GoboSlot}"));
             if (live.PrismFacets > 0)
@@ -261,18 +263,20 @@ internal sealed class FixtureInspectorView
     {
         PropertyGrid.Row(c.Label);
         ImGui.BeginDisabled(locked || c.IsConstant);
-        if (c.Manual is not null)
+        if (c.Manual is not null && !locked)
         {
             // Manual values are marked with an accent bar on the left edge of the field.
             var p = ImGui.GetCursorScreenPos();
             ImGui.GetWindowDrawList().AddRectFilled(p - new Vector2(4f, 0f), p + new Vector2(-2f, ImGui.GetFrameHeight()), Theme.U32(Theme.Accent));
         }
 
-        float value = c.Shown;
+        // While a console or live DMX drives the fixture its manual values are not in effect: show what drives it.
+        bool unknown = locked ? !float.IsFinite(c.Live) : c.IsUnknown;
+        float value = !locked ? c.Shown : float.IsFinite(c.Live) ? c.Live : c.Min;
         bool changed = false;
         if (c.Choices is { } choices)
         {
-            int index = c.ChoiceIndex(value);
+            int index = unknown ? -1 : c.ChoiceIndex(value);
             if (ImGui.BeginCombo(c.Id, index >= 0 ? choices[index] : "—"))
             {
                 for (int i = 0; i < choices.Length; i++)
@@ -291,7 +295,7 @@ internal sealed class FixtureInspectorView
         {
             float shown = value * c.DisplayScale;
             // A control whose channel currently runs another function shows no number until it is set.
-            if (ImGui.SliderFloat(c.Id, ref shown, c.Min * c.DisplayScale, c.Max * c.DisplayScale, c.IsUnknown ? "—" : c.Format))
+            if (ImGui.SliderFloat(c.Id, ref shown, c.Min * c.DisplayScale, c.Max * c.DisplayScale, unknown ? "—" : c.Format))
             {
                 value = shown / c.DisplayScale;
                 changed = true;

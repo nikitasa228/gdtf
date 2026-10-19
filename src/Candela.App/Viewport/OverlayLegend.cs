@@ -169,11 +169,11 @@ internal sealed class OverlayLegend
         {
             PropertyGrid.Row(StageLoc.Get(StageStr.LegendRangeMin));
             float min = gradient.RangeMin;
-            if (ImGui.InputFloat("##min", ref min, 0f, 0f, "%.3g") && GradientEditor.SetRange(gradient, true, min))
+            if (ImGui.InputFloat("##min", ref min, 0f, 0f, "%.6g") && GradientEditor.SetRange(gradient, true, min))
                 binding.MarkEdited();
             PropertyGrid.Row(StageLoc.Get(StageStr.LegendRangeMax));
             float max = gradient.RangeMax;
-            if (ImGui.InputFloat("##max", ref max, 0f, 0f, "%.3g") && GradientEditor.SetRange(gradient, false, max))
+            if (ImGui.InputFloat("##max", ref max, 0f, 0f, "%.6g") && GradientEditor.SetRange(gradient, false, max))
                 binding.MarkEdited();
             PropertyGrid.Row(StageLoc.Get(StageStr.LegendLogScale));
             bool log = gradient.Logarithmic;
@@ -206,7 +206,7 @@ internal sealed class OverlayLegend
                 ImGui.SameLine(0f, ImGui.GetStyle().ItemInnerSpacing.X);
                 float value = stop.Value;
                 ImGui.SetNextItemWidth(MathF.Max(40f, ImGui.GetContentRegionAvail().X - ImGui.GetFrameHeight() - ImGui.GetStyle().ItemInnerSpacing.X));
-                if (ImGui.InputFloat("##stop-value", ref value, 0f, 0f, "%.3g") && float.IsFinite(value) && (!gradient.Logarithmic || value > 0f))
+                if (ImGui.InputFloat("##stop-value", ref value, 0f, 0f, "%.6g") && float.IsFinite(value) && (!gradient.Logarithmic || value > 0f))
                 {
                     gradient.Stops[selected] = stop with { Value = value };
                     binding.MarkEdited();

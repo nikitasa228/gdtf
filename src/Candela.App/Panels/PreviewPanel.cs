@@ -280,7 +280,7 @@ internal sealed class PreviewPanel : Panel
         var settings = scene.Settings;
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewHaze));
         float haze = settings.BaseHazeScattering;
-        if (ImGui.SliderFloat("##haze", ref haze, 0f, 0.2f, "%.3f /m", ImGuiSliderFlags.Logarithmic))
+        if (ImGui.SliderFloat("##haze", ref haze, 0f, 0.2f, StageUnits.Current.FormatPerMetre, ImGuiSliderFlags.Logarithmic))
             _stage.Undo.Execute(SceneSetting(scene, "haze", s => s.BaseHazeScattering, (s, v) => s.BaseHazeScattering = v, Math.Clamp(haze, 0f, 1f)));
         EndDrag();
         if (ImGui.IsItemHovered())
@@ -292,7 +292,7 @@ internal sealed class PreviewPanel : Panel
         EndDrag();
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewAmbient));
         float ambient = settings.AmbientLuminance;
-        if (ImGui.SliderFloat("##ambient", ref ambient, 0f, 5f, "%.3f cd/m²", ImGuiSliderFlags.Logarithmic))
+        if (ImGui.SliderFloat("##ambient", ref ambient, 0f, 5f, StageUnits.Current.FormatLuminance, ImGuiSliderFlags.Logarithmic))
             _stage.Undo.Execute(SceneSetting(scene, "ambient", s => s.AmbientLuminance, (s, v) => s.AmbientLuminance = v, Math.Clamp(ambient, 0f, 100f)));
         EndDrag();
 
@@ -305,7 +305,7 @@ internal sealed class PreviewPanel : Panel
             ImGui.SetTooltip(StageLoc.Get(StageStr.PreviewGridHint));
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewGridSpacing));
         float spacing = settings.GridSpacing;
-        if (ImGui.DragFloat("##grid-spacing", ref spacing, 0.01f, 0.05f, 10f, "%.2f m"))
+        if (ImGui.DragFloat("##grid-spacing", ref spacing, 0.01f, 0.05f, 10f, StageUnits.Current.FormatMetres))
             _stage.Undo.Execute(SceneSetting(scene, "grid", s => s.GridSpacing, (s, v) => s.GridSpacing = v, Math.Clamp(spacing, 0.05f, 100f)));
         EndDrag();
     }

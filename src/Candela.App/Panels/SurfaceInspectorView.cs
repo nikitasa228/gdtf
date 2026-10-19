@@ -302,9 +302,8 @@ internal sealed class SurfaceInspectorView
     private static void MaterialPreview(string? materialId)
     {
         float size = MathF.Round(ImGui.GetTextLineHeight() * 5f);
-        ImGui.Indent(MathF.Max(0f, (ImGui.GetContentRegionAvail().X - size) * 0.5f));
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + MathF.Max(0f, MathF.Floor((ImGui.GetContentRegionAvail().X - size) * 0.5f)));
         MaterialSwatch.Sphere(materialId, size);
-        ImGui.Unindent(MathF.Max(0f, (ImGui.GetContentRegionAvail().X - size) * 0.5f));
         if (MaterialLibrary.Default.Find(materialId) is { } m)
         {
             if (!s_materialNotes.TryGetValue((m.Id, Loc.Language), out var note))

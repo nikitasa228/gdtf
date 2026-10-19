@@ -143,11 +143,11 @@ internal sealed class DeviceFacts
 
         double? weight = electrical?.WeightKg ?? specs?.WeightKg;
         if (weight is > 0)
-            rows.Add(new(StageStr.FactWeight, string.Create(inv, $"{weight:0.##} kg"), StageIcons.Weight));
+            rows.Add(new(StageStr.FactWeight, string.Create(inv, $"{weight:0.##} {StageUnits.Current.Kilogram}"), StageIcons.Weight));
         double? power = electrical?.PowerW ?? specs?.PowerConsumptionW;
         if (power is > 0)
         {
-            string text = string.Create(inv, $"{power:0.#} W");
+            string text = string.Create(inv, $"{power:0.#} {StageUnits.Current.Watt}");
             if (electrical is { PowerFactor: < 0.999f and > 0f } e)
                 text += string.Create(inv, $" · cos φ {e.PowerFactor:0.00}");
             rows.Add(new(StageStr.FactPower, text, Icons.Zap));
@@ -165,7 +165,7 @@ internal sealed class DeviceFacts
         }
 
         if (flux is > 0)
-            rows.Add(new(StageStr.FactFlux, string.Create(inv, $"{flux:#,0} lm").Replace(',', ' '), Icons.Sparkle));
+            rows.Add(new(StageStr.FactFlux, string.Create(inv, $"{flux:#,0} {StageUnits.Current.Lumen}").Replace(',', ' '), Icons.Sparkle));
         if (specs?.BeamAngleDeg is { } beamAngle)
             rows.Add(new(StageStr.FactBeamAngle, FormatRange(beamAngle, "°", "0.#"), StageIcons.Aperture));
         else if (profile is { Beams.Count: > 0 })
@@ -188,7 +188,7 @@ internal sealed class DeviceFacts
         }
 
         if (specs?.NoiseLevelDb is > 0 and var noise)
-            rows.Add(new(StageStr.FactNoise, string.Create(inv, $"{noise:0.#} dB(A)"), StageIcons.Volume));
+            rows.Add(new(StageStr.FactNoise, string.Create(inv, $"{noise:0.#} {StageUnits.Current.DecibelA}"), StageIcons.Volume));
         if (FirstNonEmpty(specs?.IpRating) is { } ip)
             rows.Add(new(StageStr.FactIpRating, ip, Icons.CloudFog));
         string? supply = SupplyText(specs, electrical);
@@ -220,13 +220,13 @@ internal sealed class DeviceFacts
         var parts = new List<string>();
         var range = electrical?.VoltageRangeV ?? specs?.VoltageRangeV;
         if (range is { } r)
-            parts.Add(FormatRange(r, " V", "0"));
+            parts.Add(FormatRange(r, " " + StageUnits.Current.Volt, "0"));
         var networks = specs?.SupportedPowerNetworks;
         if (networks is { Count: > 0 } && range is null)
             parts.Add(string.Join(", ", networks));
         var frequency = electrical?.FrequencyRangeHz ?? specs?.FrequencyRangeHz;
         if (frequency is { } f)
-            parts.Add(FormatRange(f, " Hz", "0"));
+            parts.Add(FormatRange(f, " " + StageUnits.Current.Hertz, "0"));
         if (specs?.BatteryPowered == true)
             parts.Add(StageLoc.Get(StageStr.FactBattery));
         if (FirstNonEmpty(specs?.PowerSupplyType) is { } psu)
@@ -305,9 +305,9 @@ internal sealed class DeviceFacts
             if (port.Universe is { } universe)
                 detail.Append(inv, $" · U{universe}{(port.UniverseCount > 1 ? $"–{universe + port.UniverseCount - 1}" : "")}");
             if (port.MaxThroughCurrentA is { } amps && port.Role is PortRole.PowerLink or PortRole.PowerDistribution or PortRole.PowerOutlet)
-                detail.Append(inv, $" · {amps:0.#} A");
+                detail.Append(inv, $" · {amps:0.#} {StageUnits.Current.Ampere}");
             if (port.BreakerA is { } breaker)
-                detail.Append(inv, $" · {StageLoc.Get(StageStr.PortBreaker)} {breaker:0} A");
+                detail.Append(inv, $" · {StageLoc.Get(StageStr.PortBreaker)} {breaker:0} {StageUnits.Current.Ampere}");
 
             Guid? cableId = null;
             string? cableText = null;
@@ -317,7 +317,7 @@ internal sealed class DeviceFacts
                 var cable = plugged.Cable;
                 cableId = cable.EntityId;
                 string typeName = cable.Type?.DisplayName ?? cable.TypeId;
-                cableText = string.Create(inv, $"{cable.DisplayLabel} · {typeName} · {cable.LengthM:0.0} m");
+                cableText = string.Create(inv, $"{cable.DisplayLabel} · {typeName} · {cable.LengthM:0.0} {StageUnits.Current.Metre}");
                 if (cable.Type is { } type)
                 {
                     var (r, g, b) = type.ColorSrgb;
@@ -331,9 +331,16 @@ internal sealed class DeviceFacts
         return rows;
     }
 
-    /// <summary>A candela value with thin-space thousands separators ("760 000 cd").</summary>
-    internal static string FormatCandela(double cd) =>
-        cd >= 1e6 ? string.Create(CultureInfo.InvariantCulture, $"{cd / 1e6:0.##} Mcd") : string.Create(CultureInfo.InvariantCulture, $"{cd:#,0} cd").Replace(',', ' ');
+    /// <summary>
+    /// A candela value in the UI language's symbols with narrow no-break thousands separators ("760 000 cd", "1.48 Mcd").
+    /// </summary>
+    internal static string FormatCandela(double cd)
+    {
+        var units = StageUnits.Current;
+        return cd >= 1e6
+            ? string.Create(CultureInfo.InvariantCulture, $"{cd / 1e6:0.##} {units.Megacandela}")
+            : string.Create(CultureInfo.InvariantCulture, $"{cd:#,0} {units.Candela}").Replace(',', '\u202f');
+    }
 
     private static string FormatRange(SpecRange range, string unit, string format)
     {

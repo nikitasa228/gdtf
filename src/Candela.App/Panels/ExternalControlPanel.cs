@@ -826,7 +826,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         ImGui.SameLine();
         float position = (float)(player is not null && ReferenceEquals(player.Recording, recording) ? player.Position : 0);
         ImGui.SetNextItemWidth(MathF.Max(80f, ImGui.GetContentRegionAvail().X * 0.5f));
-        if (ImGui.SliderFloat("##position", ref position, 0f, (float)Math.Max(recording.Duration, 0.001), "%.2f s"))
+        if (ImGui.SliderFloat("##position", ref position, 0f, (float)Math.Max(recording.Duration, 0.001), StageUnits.Current.FormatSeconds))
             model.Seek(engine, position);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(110f * style.FontScaleMain);
