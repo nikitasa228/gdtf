@@ -433,8 +433,12 @@ public sealed partial class FixtureProfile
             }
             sets.Sort((x, y) => x.DmxFrom.CompareTo(y.DmxFrom));
             if (cls.Kind == AttributeKind.Dimmer) ReconcileDimmerNames(f, sets);
-            if (IsWheelSelection(cls.Kind) && !selectsSlot && (f.Wheel < 0 || Wheels[f.Wheel].SlotCount <= 1)) MarkInsertionRamps(sets);
-            if (IsWheelSelection(cls.Kind)) MarkInsertionCycles(sets);
+            if (IsWheelSelection(cls.Kind))
+            {
+                f.RampSlot = f.Wheel >= 0 ? SingleItemSlot(f.Wheel) : 0;
+                if (!selectsSlot && (f.Wheel < 0 || f.RampSlot > 0)) MarkInsertionRamps(sets);
+                MarkInsertionCycles(sets);
+            }
             f.SetSets(sets.ToArray());
 
             float maxAbs = MathF.Max(MathF.Abs(f.PhysicalFrom), MathF.Abs(f.PhysicalTo));
@@ -512,6 +516,25 @@ public sealed partial class FixtureProfile
         }
 
         /// <summary>
+        /// The 1-based slot of the only item on profile wheel <paramref name="wheel"/>: its single slot, or the one slot that
+        /// is not open on a wheel of an open position and one item (Cameo Oron H2 "Open" + "Animation Wheel"); 0 when the
+        /// wheel holds several items or none.
+        /// </summary>
+        private int SingleItemSlot(int wheel)
+        {
+            var open = Wheels[wheel].SlotOpenArray;
+            if (open.Length <= 1) return 1;
+            int item = 0;
+            for (int i = 0; i < open.Length; i++)
+            {
+                if (open[i]) continue;
+                if (item != 0) return 0;
+                item = i + 1;
+            }
+            return item;
+        }
+
+        /// <summary>
         /// Marks the ranges in which the mechanism keeps moving in and out of the beam ("Ramping from open to full position
         /// max" … unnamed … "… min": the animation-wheel ramps of Robe fixtures): a named end, the unnamed ranges after it
         /// and the other named end of the same ramp form one group whose cycle rate runs from fast ("max") to slow.
@@ -548,8 +571,8 @@ public sealed partial class FixtureProfile
         }
 
         /// <summary>
-        /// Marks the ranges of a single-slot selection function (an animation wheel, a one-prism wheel) that move the
-        /// mechanism gradually into the beam: a range right after an "out" range that has no name ("Open", "", "Animation
+        /// Marks the ranges of a selection function of a single-item wheel (an animation wheel, a one-prism wheel, also
+        /// with an open slot next to the item) that move the mechanism gradually into the beam: a range right after an "out" range that has no name ("Open", "", "Animation
         /// In": Cameo Oron H2, EK H1), names a transition out of the open state ("Open to Dots": Elation Proteus Hybrid
         /// Max) or an insertion "in proportion" (ADJ Protege). Insertion runs 0 → 1 across such a range.
         /// </summary>

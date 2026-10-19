@@ -302,6 +302,13 @@ public sealed class ProfileFunction
     /// </summary>
     internal bool ImpliesInsertion { get; set; } = true;
 
+    /// <summary>
+    /// For slot selections on a wheel that holds a single item (one slot, or an open slot and one item: Cameo Oron H2
+    /// "Open" + "Animation Wheel"): the 1-based slot of that item, which insertion ramps and cycles move in and out of the
+    /// beam; 0 otherwise.
+    /// </summary>
+    internal int RampSlot { get; set; }
+
     /// <summary>Colour code of ColorRgb/ColorSub/BladeSoft functions: 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y, 6 side A, 7 side B; −1 otherwise.</summary>
     internal int ColorCode { get; set; } = -1;
 

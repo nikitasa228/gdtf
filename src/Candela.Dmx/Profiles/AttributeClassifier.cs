@@ -478,6 +478,8 @@ public static class AttributeClassifier
         return r switch
         {
             _ when Eq(r, "SelectSpin") => new(AttributeKind.WheelSelectSpin, n, family),
+            // "AnimationWheelSpin" (Ayrton Rivale Wash): slot selection with spin, the only spin an animation wheel has
+            _ when Eq(r, "Spin") && family == WheelFamily.Animation => new(AttributeKind.WheelSelectSpin, n, family),
             _ when Eq(r, "SelectShake") => new(AttributeKind.WheelSelectShake, n, family),
             _ when Eq(r, "SelectEffects") => new(AttributeKind.WheelSelect, n, family),
             _ when Eq(r, "WheelIndex") => new(AttributeKind.WheelIndex, n, family),

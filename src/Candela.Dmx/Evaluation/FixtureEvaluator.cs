@@ -932,7 +932,7 @@ public static class FixtureEvaluator
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake:
                 {
                     // a range named "Open", "Off", "Removed" … (WheelOut) takes the mechanism out of the beam; a ramp after
-                    // it moves a single-slot mechanism in gradually (both found while the profile is compiled)
+                    // it moves a single-item mechanism in gradually (both found while the profile is compiled)
                     bool isOut = (flags & ChannelSetFlags.WheelOut) != 0;
                     float insertion = float.NaN;
                     if (isOut)
@@ -950,7 +950,10 @@ public static class FixtureEvaluator
                     }
                     if (f.Wheel >= 0)
                     {
-                        w.Position = f.UsesSlotPosition ? r.Value : 1f;
+                        // a ramp or cycle moves the wheel's single item in and out (not the wheel from slot to slot)
+                        w.Position = f.RampSlot > 0 && (flags & (ChannelSetFlags.InsertionRamp | ChannelSetFlags.InsertionCycle)) != 0
+                            ? f.RampSlot
+                            : f.UsesSlotPosition ? r.Value : 1f;
                     }
                     else
                     {
