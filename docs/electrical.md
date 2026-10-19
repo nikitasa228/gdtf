@@ -21,6 +21,8 @@ the scene. Units follow [ARCHITECTURE.md](ARCHITECTURE.md): metres, kilograms, w
 | `ElectricalIssueProvider`, `RiggingIssueProvider` | Core `IIssueProvider`s for the issues panel. |
 | `PowerReport`, `DataReport`, `CableSchedule`, `CableLinkView` | View models for the UI tables and the cable link window. |
 | `IssueCodes` | Stable issue codes (`power.breaker-overload`, `data.y-split`, …). |
+| `DeviceCatalog` / `DevicePreset` / `DeviceGroup` | The devices the editor's Devices section places: consoles, nodes and splitters, mains supplies, distros, dimmers (built in and from the fixture library). |
+| `GenericDevices` / `GenericDevice` | Deterministic GDTF files of generic DMX splitters, Art-Net / sACN nodes and a dimmer pack, with built-in specs. |
 
 Typical wiring in the engine:
 
@@ -49,8 +51,12 @@ pair, tour-grade Cat6.
 | `schuko` | Power | Schuko ↔ Schuko | 16 A | 1.5 | 0.13 | – | `#14B8A6` |
 | `iec` | Power | Schuko → IEC C13 | 10 A | 1.0 | 0.08 | – | `#EC4899` |
 | `cee16` | Power | CEE 16 A 3-pin | 16 A | 2.5 | 0.20 | – | `#3B82F6` |
+| `cee32` | Power | CEE 32 A 3-pin (230 V) | 32 A | 6 | 0.38 | – | `#38BDF8` |
+| `cee16-3p` | Power, 3 phases | CEE 16 A 5-pin | 16 A | 2.5 | 0.30 | – | `#F97316` |
 | `cee32-3p` | Power, 3 phases | CEE 32 A 5-pin | 32 A | 6 | 0.55 | – | `#EF4444` |
 | `cee63-3p` | Power, 3 phases | CEE 63 A 5-pin | 63 A | 16 | 1.25 | – | `#991B1B` |
+| `cee125-3p` | Power, 3 phases | CEE 125 A 5-pin | 125 A | 35 | 2.4 | – | `#B45309` |
+| `powerlock` | Power, 3 phases | Powerlock single poles (5 × 120 mm²) | 400 A | 120 | 7.25 | – | `#E879F9` |
 | `socapex` | Multicore, 6 circuits | Socapex 19-pin | 16 A per circuit | 2.5 | 0.95 | – | `#84CC16` |
 | `harting16` | Multicore, 6 circuits | Harting Han 16E | 16 A per circuit | 2.5 | 0.85 | – | `#65A30D` |
 
@@ -125,6 +131,37 @@ data input (tested over all 1091 files).
 "sACN", "E1.31"), plus universe and count.
 **Power sources** get one port per outlet (breaker, phase, connector) and a `Mains In` input, so a distro can itself
 be fed from a generator or another distro.
+
+## Devices for the editor
+
+`DeviceCatalog.BuiltIn` lists the devices of the editor's Devices section in library order; each `DevicePreset` has a
+stable id, its section (`DeviceGroup`: Console, DataDistribution, Mains, Distro, Dimmer), a kind (`DevicePresetKind`:
+a `ConsoleComponent`, a `PowerSourceComponent` or a GDTF `FixtureComponent`), English name, short entity name,
+description, icon key and box size, and creates a fresh component per placement (`CreateComponent`). `Ports(profiles)`
+gives its ports through `PortResolver` (for GDTF devices, through the profile provider).
+
+| Section | Ids |
+|---|---|
+| Console | `console-dmx-2`, `-4`, `-8` (outputs "DMX A" … on universes 1 …, XLR5), `console-artnet-16`, `console-sacn-16` (one etherCON "Network" output, universes 1–16) |
+| DataDistribution | `artnet-node-2`, `artnet-node-8`, `dmx-splitter-6`, `dmx-splitter-4-xlr3` (generic GDTF devices) |
+| Mains | `mains-schuko-16`, `mains-cee16`, `mains-cee32` (230 V), `mains-cee32-3p`, `mains-cee63-3p`, `mains-cee125-3p`, `mains-powerlock-400` (one outlet each, plus `Mains In`) |
+| Distro | `distro-16-true1` (4 × TRUE1 10 A), `distro-32-schuko` and `distro-32-true1` (6 outlets 16 A on L1, L2, L3, L1, L2, L3), `distro-63-socapex`, `distro-125`, `distro-powerlock-400` |
+| Dimmer | `dimmer-4x10` (generic GDTF dimmer pack, 4 × 10 A) |
+
+`DeviceCatalog.LibraryDevices(library)` adds the power-distribution devices of a fixture library — the newest revision
+of every model whose `_specs` record has `maxLoadW`, `maxInputPowerW` or `outputChannels` (the PRstage Dimmer Pack 4,
+P3 PowerPorts, PSUs …), ids `gdtf:<file name>`, sorted by manufacturer and model. `GroupOf(entity)` gives the section
+of a scene entity (for icons).
+
+`GenericDevices.All` are real GDTF 1.2 files generated in code — a box with one WiringObject per connector on its rear
+face (DMX In / Thru / Out 1–6 of a splitter, Ethernet In / Thru and DMX A–H of a node, Power In / Thru, the dimmer's
+Schuko channels) and, for the dimmer, one DMX mode "4 channels". `GdtfBytes` is byte-identical on every run (fixed
+timestamps and order), so caches and thumbnails keyed by content stay valid; file names are
+`Candela@Generic_…@v1.gdtf`. Their `_specs`-like records come from `GenericDevices.FindSpecs`, which the profile
+providers fall back to, so the solver treats a splitter as a splitter (every output starts a new DMX segment), a node
+as an Ethernet → DMX converter (one universe per output, in order) and the dimmer as a distribution device with
+channel limits. The engine writes the files into its cache and adds them to its library (`GenericDeviceLibrary`,
+[engine.md](engine.md)); projects copy them like any GDTF.
 
 ## Data network
 
@@ -312,7 +349,7 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 87 tests and runs in about 20 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` has 100 tests and runs in about 30 s. It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.
@@ -331,6 +368,11 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
   allocation-free drawing. Truss overload (uniform and point), unmounted, riser and missing mount, cable weight on a
   truss, lever-rule rigging points, unknown weight.
 * **Integration.** Malformed scenes, the issue log with both providers, and a 1000-fixture timing.
+* **Devices.** `GenericDeviceTests`: every generic GDTF parses with its ports and mode, the bytes are deterministic, a
+  splitter starts new DMX lines, a node sends one universe per output, the dimmer distributes dimmed power within its
+  channel limits, and the mains cable types added for supplies. `DeviceCatalogTests`: unique ids in five sections,
+  fresh components per placement, console outputs and universes, known outlet connectors with breakers and phases,
+  ports of GDTF devices, the library's power-distribution devices, and the section of a scene entity.
 * **Review regressions.** A 34-fixture chain of BeamZ Cobra 100 Spots (XLR3 + XLR5 thru) still trips the 32-device
   warning, while a real splitter starts new segments. Also tested: both thru sockets in use, DMX breaks, the 240 A
   "fuse" of the BeamZ Ignite 740 thru, thru sockets typed as inputs, 400 V three-phase sources, a three-phase distro

@@ -44,8 +44,8 @@ internal sealed partial class Workspace
         Command(EditorActions.Redo, Str.EditRedo, Icons.Redo, session.Undo.Redo, () => session.Undo.CanRedo && !ViewportBusy());
         Command(AppActions.Cut, Str.EditCut, Icons.Scissors, () => Notify(Count(_edit.Cut(session.Scene, session.Selection, session.Undo), Str.EditCut)), HasSelection);
         Command(EditorActions.Copy, Str.EditCopy, Icons.Copy, () => Notify(Count(_edit.Copy(session.Scene, session.Selection), Str.EditCopy)), HasSelection);
-        Command(EditorActions.Paste, Str.EditPaste, Icons.Clipboard, () => _edit.Paste(session.Scene, session.Selection, session.Undo), () => _edit.CanPaste);
-        Command(EditorActions.Duplicate, Str.EditDuplicate, Icons.Copy, () => EditOperations.Duplicate(session.Scene, session.Selection, session.Undo), HasSelection);
+        Command(EditorActions.Paste, Str.EditPaste, Icons.Clipboard, () => AfterCopy(_edit.Paste(session.Scene, session.Selection, session.Undo)), () => _edit.CanPaste);
+        Command(EditorActions.Duplicate, Str.EditDuplicate, Icons.Copy, () => AfterCopy(EditOperations.Duplicate(session.Scene, session.Selection, session.Undo)), HasSelection);
         Command(EditorActions.Delete, Str.EditDelete, Icons.Trash, () => EditOperations.Delete(session.Scene, session.Selection, session.Undo), HasSelection);
         Command(EditorActions.SelectAll, Str.EditSelectAll, Icons.BoxSelect, () => SelectionController.SelectAll(session.Scene, session.Selection));
         Command(EditorActions.DeselectAll, Str.EditDeselect, Icons.X, session.Selection.Clear, HasSelection);
@@ -61,7 +61,8 @@ internal sealed partial class Workspace
             () => tools.Tool == EditorTool.Wall);
         Command(AppActions.ToolFloor, Str.ToolFloor, Icons.Square, () => tools.Tool = EditorTool.Floor, () => session.Engine is not null,
             () => tools.Tool == EditorTool.Floor);
-        Command(EditorActions.ToolCable, Str.ToolCable, Icons.Cable, () => { }, () => false);
+        Command(EditorActions.ToolCable, Str.ToolCable, Icons.Cable, () => tools.Tool = EditorTool.Cable, () => session.Engine is not null,
+            () => tools.Tool == EditorTool.Cable);
 
         // View (active viewport)
         Command(EditorActions.FrameSelection, Str.ViewFrameSelection, Icons.Focus, () => ActiveViewport.FrameSelection());
@@ -307,7 +308,7 @@ internal sealed partial class Workspace
             _menu.Separator();
             Item(EditorActions.ToolWall);
             Item(AppActions.ToolFloor);
-            Item(EditorActions.ToolCable);
+            DrawCableMenu();
             _menu.Separator();
             Item(SessionActions.OpenWhite);
             Item(SessionActions.PauseSimulation);

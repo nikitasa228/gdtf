@@ -32,7 +32,10 @@ internal sealed class OverlayLegend
     private int _appliedVersion;
     private bool _expanded;
     private long _cablesVersion = -1;
-    private readonly List<(CableType Type, string? Detail)> _cables = new();
+    private object? _cablesScene;
+    private readonly List<(CableType Type, string Name, string? Detail, bool Used)> _cables = new();
+    private int _usedCount;
+    private string _othersLabel = "";
     private bool _cablesUsed;
     private string _cablesSummary = "";
     private string _language = "";
@@ -237,8 +240,6 @@ internal sealed class OverlayLegend
     {
         ImGui.TextUnformatted(StageLoc.With(Icons.Cable, StageStr.LegendCables));
         RefreshCables(engine);
-        var dl = ImGui.GetWindowDrawList();
-        float swatch = ImGui.GetTextLineHeight();
         if (!_cablesUsed)
         {
             ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
@@ -248,19 +249,23 @@ internal sealed class OverlayLegend
             ImGui.PopStyleColor();
         }
 
-        foreach (var (type, detail) in _cables)
+        // The types in the scene with their count, length and weight; the rest of the catalogue below (folded while
+        // the scene has cables, so the legend stays small).
+        for (int i = 0; i < _cables.Count; i++)
         {
-            var p = ImGui.GetCursorScreenPos();
-            var (r, g, b) = type.ColorSrgb;
-            dl.AddRectFilled(p + new Vector2(0f, swatch * 0.35f), p + new Vector2(swatch * 1.6f, swatch * 0.7f), Theme.U32(new Vector4(r, g, b, 1f)), 2f);
-            ImGui.Dummy(new Vector2(swatch * 1.8f, swatch));
-            ImGui.SameLine();
-            ImGui.TextUnformatted(type.DisplayName);
-            if (detail is not null)
+            if (_cables[i].Used || !_cablesUsed)
+                LegendRow(_cables[i].Type, _cables[i].Name, _cables[i].Detail, 1f);
+        }
+
+        if (_cablesUsed && _cables.Count > _usedCount && ImGui.TreeNodeEx(_othersLabel, ImGuiTreeNodeFlags.SpanAvailWidth))
+        {
+            for (int i = 0; i < _cables.Count; i++)
             {
-                ImGui.SameLine();
-                ImGui.TextDisabled(detail);
+                if (!_cables[i].Used)
+                    LegendRow(_cables[i].Type, _cables[i].Name, null, 0.6f);
             }
+
+            ImGui.TreePop();
         }
 
         if (_cablesSummary.Length > 0)
@@ -273,57 +278,94 @@ internal sealed class OverlayLegend
         }
     }
 
+    private static void LegendRow(CableType type, string name, string? detail, float alpha)
+    {
+        var dl = ImGui.GetWindowDrawList();
+        float swatch = ImGui.GetTextLineHeight();
+        var p = ImGui.GetCursorScreenPos();
+        var (r, g, b) = type.ColorSrgb;
+        // The colour of the cable's line in the overlay, and the drawing of its connector.
+        dl.AddRectFilled(p + new Vector2(0f, swatch * 0.35f), p + new Vector2(swatch * 1.6f, swatch * 0.7f), Theme.U32(new Vector4(r, g, b, alpha)), 2f);
+        ImGui.Dummy(new Vector2(swatch * 1.7f, swatch));
+        ImGui.SameLine();
+        var icon = ImGui.GetCursorScreenPos();
+        ConnectorIcons.Draw(dl, icon, swatch, type.ConnectorA.IllustrationKey);
+        ImGui.Dummy(new Vector2(swatch, swatch));
+        ImGui.SameLine();
+        float textX = ImGui.GetCursorPosX();
+        ImGui.PushStyleColor(ImGuiCol.Text, Theme.WithAlpha(Theme.Text, alpha));
+        ImGui.TextUnformatted(name);
+        ImGui.PopStyleColor();
+        if (detail is not null)
+        {
+            // Beside the name when it fits, else on its own line under the name.
+            ImGui.SameLine();
+            if (ImGui.GetContentRegionAvail().X < ImGui.CalcTextSize(detail).X)
+            {
+                ImGui.NewLine();
+                ImGui.SetCursorPosX(textX);
+            }
+
+            SafeText.Disabled(detail);
+        }
+    }
+
     /// <summary>Counts the cables of each type (when the scene changed); used types first, in catalogue order.</summary>
     private void RefreshCables(StageEngine? engine)
     {
         long version = engine?.Scene.Version ?? -2;
-        if (version == _cablesVersion && string.Equals(_language, Loc.Language, StringComparison.Ordinal))
+        // Another scene (a file opened) can have the same version number: the scene itself is part of the key.
+        if (version == _cablesVersion && ReferenceEquals(engine?.Scene, _cablesScene) && string.Equals(_language, Loc.Language, StringComparison.Ordinal))
             return;
         _cablesVersion = version;
+        _cablesScene = engine?.Scene;
         _language = Loc.Language;
         _cables.Clear();
         _cablesUsed = false;
+        _usedCount = 0;
+        _othersLabel = CableLoc.Get(CableStr.LegendOthers);
         _cablesSummary = StageLoc.Get(StageStr.LegendCablesHint);
         var catalog = engine?.Network.Catalog ?? CableCatalog.Default;
-        if (engine is null)
-        {
-            foreach (var type in catalog.All)
-                _cables.Add((type, null));
-            return;
-        }
-
-        var counts = new Dictionary<string, (int Count, float Length)>(StringComparer.OrdinalIgnoreCase);
+        var counts = new Dictionary<string, (int Count, float Length, float Weight)>(StringComparer.OrdinalIgnoreCase);
         int unknown = 0;
-        try
+        if (engine is not null)
         {
-            foreach (var cable in engine.NetworkSolution.Cables)
+            try
             {
-                if (cable.Type is null)
+                foreach (var cable in CablingNetwork.Current(engine).Cables)
                 {
-                    unknown++;
-                    continue;
-                }
+                    if (cable.Type is null)
+                    {
+                        unknown++;
+                        continue;
+                    }
 
-                var (n, l) = counts.GetValueOrDefault(cable.Type.Id);
-                counts[cable.Type.Id] = (n + 1, l + (float.IsFinite(cable.LengthM) ? cable.LengthM : 0f));
+                    var (n, l, w) = counts.GetValueOrDefault(cable.Type.Id);
+                    float length = float.IsFinite(cable.LengthM) ? cable.LengthM : 0f;
+                    counts[cable.Type.Id] = (n + 1, l + length, w + (float.IsFinite(cable.WeightKg) ? cable.WeightKg : 0f));
+                }
+            }
+            catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+            {
+                counts.Clear();
             }
         }
-        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
-        {
-            counts.Clear();
-        }
 
+        var inv = CultureInfo.InvariantCulture;
         foreach (var type in catalog.All)
         {
             if (counts.TryGetValue(type.Id, out var c))
-                _cables.Add((type, string.Create(CultureInfo.InvariantCulture, $"× {c.Count} · {c.Length:0.#} m")));
+            {
+                _cables.Add((type, CableLoc.CableName(type), CableLoc.Format(CableStr.LegendInScene, c.Count, c.Length.ToString("0.#", inv), c.Weight.ToString("0.#", inv)), true));
+                _usedCount++;
+            }
         }
 
-        _cablesUsed = _cables.Count > 0;
-        if (!_cablesUsed)
+        _cablesUsed = _usedCount > 0;
+        foreach (var type in catalog.All)
         {
-            foreach (var type in catalog.All)
-                _cables.Add((type, null));
+            if (!counts.ContainsKey(type.Id))
+                _cables.Add((type, CableLoc.CableName(type), null, false));
         }
 
         if (unknown > 0)

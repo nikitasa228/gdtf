@@ -45,6 +45,10 @@ internal sealed class MessageBoxes
     public void Ask(string title, string text, Action<bool> onAnswer) =>
         _queue.Enqueue(new Message(MessageKind.Info, title, text, onAnswer, null));
 
+    /// <summary>Queues a question with its own button texts (<paramref name="yes"/> answers true, <paramref name="no"/> and Escape false).</summary>
+    public void Ask(string title, string text, string yes, string no, Action<bool> onAnswer) =>
+        _queue.Enqueue(new Message(MessageKind.Info, title, text, onAnswer, null) { YesLabel = yes, NoLabel = no });
+
     /// <summary>Queues a prompt for a name; <paramref name="onName"/> receives the trimmed text when confirmed.</summary>
     public void Prompt(string title, string hint, Action<string> onName) =>
         _queue.Enqueue(new Message(MessageKind.Info, title, hint, null, onName));
@@ -116,14 +120,16 @@ internal sealed class MessageBoxes
             ImGui.Spacing();
             if (m.OnAnswer is not null)
             {
-                if (ImGui.Button(Loc.Get(Str.MsgYes), new Vector2(110, 0) * scale))
+                var yesSize = m.YesLabel is null ? new Vector2(110, 0) * scale : Vector2.Zero;
+                var noSize = m.NoLabel is null ? new Vector2(110, 0) * scale : Vector2.Zero;
+                if (ImGui.Button(m.YesLabel ?? Loc.Get(Str.MsgYes), yesSize))
                 {
                     done = true;
                     answer = true;
                 }
 
                 ImGui.SameLine();
-                if (ImGui.Button(Loc.Get(Str.MsgNo), new Vector2(110, 0) * scale) || ImGui.IsKeyPressed(ImGuiKey.Escape))
+                if (ImGui.Button(m.NoLabel ?? Loc.Get(Str.MsgNo), noSize) || ImGui.IsKeyPressed(ImGuiKey.Escape))
                     done = true;
             }
             else if (ImGui.Button(Loc.Get(Str.MsgOk), new Vector2(110, 0) * scale) || ImGui.IsKeyPressed(ImGuiKey.Enter) ||
@@ -154,6 +160,8 @@ internal sealed class MessageBoxes
         public string Text { get; } = text;
         public Action<bool>? OnAnswer { get; } = onAnswer;
         public Action<string>? OnName { get; } = onName;
+        public string? YesLabel { get; init; }
+        public string? NoLabel { get; init; }
         public string Input = "";
     }
 }

@@ -71,7 +71,7 @@ internal sealed class DeviceFactsView
     internal void Refresh(StageEngine engine, Entity entity)
     {
         object? profile = engine.Dmx.GetState(entity.Id)?.Profile;
-        object? network = engine.NetworkSolution;
+        object? network = CablingNetwork.Current(engine);
         if (_facts is not null && ReferenceEquals(entity, _for) && ReferenceEquals(profile, _profileOf) && ReferenceEquals(network, _networkOf) &&
             string.Equals(_language, Loc.Language, StringComparison.Ordinal))
             return;

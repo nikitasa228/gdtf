@@ -17,7 +17,7 @@ internal static class EngineTestSupport
         DevelopmentLibrary.FindRepositoryRoot() ?? throw new InvalidOperationException("Tests must run inside the repository (Candela.sln not found)."));
 
     private static readonly Lazy<FixtureLibrary> s_library = new(() =>
-        FixtureLibrary.Scan(Root, FixtureSpecsIndex.Load(Path.Combine(Root, FixtureSpecsIndex.DefaultRelativePath))));
+        GenericDeviceFiles.AddTo(FixtureLibrary.Scan(Root, FixtureSpecsIndex.Load(Path.Combine(Root, FixtureSpecsIndex.DefaultRelativePath)))));
 
     /// <summary>The repository root.</summary>
     public static string Root => s_root.Value;

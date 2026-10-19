@@ -42,6 +42,15 @@ internal sealed partial class ViewportPanel
         return GroundAt(screen);
     }
 
+    /// <summary>The screen point (Dear ImGui coordinates) of a world point in this viewport, or null when it is not on the image.</summary>
+    public Vector2? ScreenOf(Vector3 world)
+    {
+        if (_imageSize.X <= 0 || !Camera.WorldToScreen(world, _imageSize, out var s))
+            return null;
+        var p = s + _imageMin;
+        return ContainsScreenPoint(p) ? p : null;
+    }
+
     /// <summary>The ground point under <paramref name="screen"/> (or the view plane through the camera's target).</summary>
     public SurfaceHit GroundAt(Vector2 screen)
     {

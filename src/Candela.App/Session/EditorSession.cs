@@ -78,6 +78,8 @@ internal sealed class EditorSession : IDisposable
         _options = options ?? new EditorSessionOptions();
         var engineOptions = _options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings);
         Engine = new StageEngine(engineOptions);
+        // The cable tool's generic devices (splitters, nodes, dimmer) join the fixture library before any scene opens.
+        GenericDeviceLibrary.Register(Engine);
         Engine.New(Loc.Get(Str.Untitled));
         Engine.SceneReplaced += OnEngineSceneReplaced;
         _entityExists = id => Engine.Scene.Find(id) is not null;

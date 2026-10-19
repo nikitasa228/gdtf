@@ -202,7 +202,9 @@ internal static class EditorProcess
         Skip.If(xvfb is null, "xvfb-run is not installed");
         string dll = Path.Combine(AppContext.BaseDirectory, "candela-app.dll");
         var psi = new ProcessStartInfo(xvfb!) { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
-        foreach (var a in new[] { "-a", "-s", "-screen 0 1920x1080x24", "dotnet", dll, "--config-dir", dir.File("config") })
+        // An explicit X authority file: without one xvfb-run makes a temporary directory whose removal races the X
+        // server's exit and then fails the run with its own exit code 5 instead of the editor's.
+        foreach (var a in new[] { "-a", "-f", dir.File("Xauthority"), "-s", "-screen 0 1920x1080x24", "dotnet", dll, "--config-dir", dir.File("config") })
             psi.ArgumentList.Add(a);
         foreach (var a in appArgs)
             psi.ArgumentList.Add(a);
