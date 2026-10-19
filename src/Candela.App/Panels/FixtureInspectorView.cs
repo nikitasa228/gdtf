@@ -62,6 +62,8 @@ internal sealed class FixtureInspectorView
         var engine = _stage.Engine;
         if (engine is null)
         {
+            // Nothing of a previous stage (profile, modes) may show for this fixture.
+            _controls.Clear();
             Muted(StageLoc.Get(StageStr.PropsNoEngine));
             Patch(entity, fixture, null, labelWidth);
             return;
@@ -273,7 +275,7 @@ internal sealed class FixtureInspectorView
         // While a console or live DMX drives the fixture its manual values are not in effect: show what drives it.
         bool unknown = locked ? !float.IsFinite(c.Live) : c.IsUnknown;
         float value = !locked ? c.Shown : float.IsFinite(c.Live) ? c.Live : c.Min;
-        bool changed = false;
+        bool changed = false, discrete = false;
         if (c.Choices is { } choices)
         {
             int index = unknown ? -1 : c.ChoiceIndex(value);
@@ -285,6 +287,7 @@ internal sealed class FixtureInspectorView
                     {
                         value = c.ChoiceValues![i];
                         changed = true;
+                        discrete = true;
                     }
                 }
 
@@ -309,18 +312,22 @@ internal sealed class FixtureInspectorView
         if (!locked && c.Manual is not null && ImGui.BeginPopupContextItem(c.Id + "-menu"))
         {
             if (ImGui.MenuItem(StageLoc.Get(StageStr.PropsClearManual)))
-                SetManual(engine, entity, c, null);
+                SetManual(engine, entity, c, null, discrete: true);
             ImGui.EndPopup();
         }
 
         if (changed && !locked)
-            SetManual(engine, entity, c, Math.Clamp(value, c.Min, c.Max));
+            SetManual(engine, entity, c, Math.Clamp(value, c.Min, c.Max), discrete);
         if (finished)
             _stage.Undo.BreakMerge();
     }
 
-    /// <summary>Sets (or clears) the manual value of a control on the primary fixture and every other selected fixture that has the attribute.</summary>
-    internal void SetManual(StageEngine engine, Entity entity, FixtureControl control, float? value)
+    /// <summary>
+    /// Sets (or clears) the manual value of a control on the primary fixture and every other selected fixture that has
+    /// the attribute. Slider steps of one drag merge into one undo step; a <paramref name="discrete"/> change (a wheel
+    /// slot picked, a value cleared) is a step of its own.
+    /// </summary>
+    internal void SetManual(StageEngine engine, Entity entity, FixtureControl control, float? value, bool discrete = false)
     {
         var targets = new List<FixtureComponent>();
         if (entity.Get<FixtureComponent>() is { } primary && !engine.Dmx.IsConsoleDriven(entity.Id))
@@ -341,6 +348,8 @@ internal sealed class FixtureInspectorView
             ? $"Set {control.Attribute} of {targets.Count} fixtures"
             : $"Set {control.Attribute} of {entity.Name}";
         _stage.Undo.Execute(new ManualAttributeCommand(targets, control.Attribute, value, description));
+        if (discrete)
+            _stage.Undo.BreakMerge();
     }
 
     private bool HasManualValues()
@@ -360,6 +369,7 @@ internal sealed class FixtureInspectorView
             return;
         _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.ManualAttributes = new Dictionary<string, float>(),
             $"Reset manual values of {entity.Name}"));
+        _stage.Undo.BreakMerge();
     }
 
     private void Patch(Entity entity, FixtureComponent fixture, StageEngine? engine, float labelWidth)
@@ -382,7 +392,7 @@ internal sealed class FixtureInspectorView
         PropertyGrid.Row(StageLoc.Get(StageStr.PatchFixtureId));
         ImGui.InputInt("##fixture-id", ref _fixtureId);
         if (ImGui.IsItemDeactivatedAfterEdit() && _fixtureId != fixture.FixtureId && _fixtureId >= 0)
-            _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.FixtureId = _fixtureId, $"Set fixture id of {entity.Name}"));
+            SetFixtureId(entity, fixture, _fixtureId);
 
         PropertyGrid.Row(StageLoc.Get(StageStr.PatchMode));
         string mode = profile?.Mode.Name ?? fixture.GdtfMode ?? "—";
@@ -393,10 +403,7 @@ internal sealed class FixtureInspectorView
                 foreach (var m in profile.FixtureType.DmxModes)
                 {
                     if (ImGui.Selectable(m.Name, m.Name == profile.Mode.Name) && m.Name != profile.Mode.Name)
-                    {
-                        string name = m.Name;
-                        _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.GdtfMode = name, $"Change mode of {entity.Name}"));
-                    }
+                        SetMode(entity, fixture, m.Name);
                 }
             }
             else
@@ -441,6 +448,25 @@ internal sealed class FixtureInspectorView
             PatchIssues(engine, entity);
     }
 
+    /// <summary>Sets the fixture id as one undo step of its own (two edits in a row are two steps).</summary>
+    internal void SetFixtureId(Entity entity, FixtureComponent fixture, int fixtureId)
+    {
+        if (fixtureId < 0 || fixtureId == fixture.FixtureId)
+            return;
+        _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.FixtureId = fixtureId, $"Set fixture id of {entity.Name}"));
+        _stage.Undo.BreakMerge();
+    }
+
+    /// <summary>Changes the DMX mode as one undo step of its own (two mode changes in a row are two steps).</summary>
+    internal void SetMode(Entity entity, FixtureComponent fixture, string mode)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(mode);
+        if (string.Equals(fixture.GdtfMode, mode, StringComparison.Ordinal))
+            return;
+        _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.GdtfMode = mode, $"Change mode of {entity.Name}"));
+        _stage.Undo.BreakMerge();
+    }
+
     private void ApplyAddress(Entity entity, FixtureComponent fixture, int index, int dmxBreak)
     {
         _patchUniverse[index] = Math.Clamp(_patchUniverse[index], 1, 63999);
@@ -467,6 +493,7 @@ internal sealed class FixtureInspectorView
             list.Add(new DmxAddress(universe, address, list.Count + 1));
         list[index] = new DmxAddress(universe, address, Math.Max(1, dmxBreak));
         _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.Addresses = list, $"Patch {entity.Name} to {universe}.{address:D3}"));
+        _stage.Undo.BreakMerge();
         return true;
     }
 

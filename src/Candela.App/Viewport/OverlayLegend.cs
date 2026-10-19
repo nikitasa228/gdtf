@@ -103,6 +103,8 @@ internal sealed class OverlayLegend
         if (ImGui.BeginChild(LegendId(mode), new Vector2(width, 0f), ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings))
         {
+            _luxEditor.Unit = StageUnits.Current.Lux;
+            _noiseEditor.Unit = StageUnits.Current.Decibel;
             switch (mode)
             {
                 case OverlayMode.Lux:

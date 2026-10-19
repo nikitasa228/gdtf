@@ -26,6 +26,7 @@ internal sealed class DeviceFactsView
     private string[] _cableLabels = Array.Empty<string>();
     private string[] _iconTooltips = Array.Empty<string>();
     private string _notConnected = "";
+    private string _references = "";
 
     /// <summary>Creates the view.</summary>
     public DeviceFactsView(StagePanelContext stage)
@@ -61,6 +62,7 @@ internal sealed class DeviceFactsView
         }
 
         _notConnected = StageIcons.Unplug + "  " + StageLoc.Get(StageStr.PropsNotConnected);
+        _references = _facts.References.Count > 0 ? StageLoc.Format(StageStr.FactsReferences, string.Join(" · ", _facts.References)) : "";
     }
 
     /// <summary>Draws the fixture-type and connector sections (the type section only for fixtures).</summary>
@@ -68,7 +70,9 @@ internal sealed class DeviceFactsView
     {
         Refresh(engine, entity);
         var facts = _facts!;
-        if (facts.Rows.Count > 0 && ImGui.CollapsingHeader(StageLoc.With(Icons.BookOpen, StageStr.PropsFixtureType), ImGuiTreeNodeFlags.DefaultOpen))
+        // An unresolved fixture without a specs record still gets the section: its note says why nothing is known.
+        bool typeSection = facts.Rows.Count > 0 || facts.Note is not null && entity.Has<Core.SceneGraph.Components.FixtureComponent>();
+        if (typeSection && ImGui.CollapsingHeader(StageLoc.With(Icons.BookOpen, StageStr.PropsFixtureType), ImGuiTreeNodeFlags.DefaultOpen))
         {
             ImGui.PushTextWrapPos(0f);
             ImGui.TextUnformatted(facts.Title);
@@ -89,11 +93,29 @@ internal sealed class DeviceFactsView
                 {
                     PropertyGrid.Row(StageLoc.Get(row.Label));
                     ImGui.PushTextWrapPos(0f);
-                    ImGui.TextUnformatted(row.Value);
+                    if (row.Source == Gdtf.SpecSource.Estimated)
+                        ImGui.TextColored(Theme.TextMuted, row.Value);
+                    else
+                        ImGui.TextUnformatted(row.Value);
                     ImGui.PopTextWrapPos();
+                    // Where the value comes from: the GDTF file, derived from it, a datasheet, or an estimate.
+                    if (DeviceFacts.SourceText(row.Source) is { } source && ImGui.IsItemHovered())
+                        ImGui.SetTooltip(StageLoc.Get(source));
                 }
 
                 PropertyGrid.End();
+            }
+
+            if (facts.HasEstimates || _references.Length > 0)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
+                ImGui.PushTextWrapPos(0f);
+                if (facts.HasEstimates)
+                    ImGui.TextUnformatted(StageLoc.Get(StageStr.FactsEstimatedNote));
+                if (_references.Length > 0)
+                    ImGui.TextUnformatted(_references);
+                ImGui.PopTextWrapPos();
+                ImGui.PopStyleColor();
             }
 
             if (facts.Description is { } description && ImGui.TreeNodeEx(StageLoc.Get(StageStr.PropsDescription), ImGuiTreeNodeFlags.SpanAvailWidth))

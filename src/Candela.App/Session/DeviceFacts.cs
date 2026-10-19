@@ -12,8 +12,11 @@ using ElectricalProfile = Candela.Electrical.FixtureProfile;
 
 namespace Candela.App.Session;
 
-/// <summary>One line of the manufacturer data: a localised label, the value text and an icon.</summary>
-internal readonly record struct FactRow(StageStr Label, string Value, string Icon);
+/// <summary>
+/// One line of the manufacturer data: a localised label, the value text, an icon and where the value comes from (the
+/// <c>_source</c> of the <c>_specs</c> record, or the GDTF file). Estimated values start with "≈".
+/// </summary>
+internal readonly record struct FactRow(StageStr Label, string Value, string Icon, SpecSource Source = SpecSource.Unknown);
 
 /// <summary>
 /// A port of a device as the properties panel shows it: the connector (with its illustration key), the direction and
@@ -36,8 +39,11 @@ internal sealed record PortRow(
 /// </summary>
 internal sealed class DeviceFacts
 {
+    /// <summary>Prefix of an estimated value ("≈" and a no-break space).</summary>
+    public const string EstimatedMark = "≈\u00a0";
+
     private DeviceFacts(string title, string subtitle, string? description, IReadOnlyList<FactRow> rows, IReadOnlyList<PortRow> ports,
-        string? note)
+        string? note, IReadOnlyList<string> references)
     {
         Title = title;
         Subtitle = subtitle;
@@ -45,7 +51,15 @@ internal sealed class DeviceFacts
         Rows = rows;
         Ports = ports;
         Note = note;
+        References = references;
+        HasEstimates = rows.Any(r => r.Source == SpecSource.Estimated);
     }
+
+    /// <summary>Datasheets and product pages the researched values come from (<c>_refs</c> of the specs record), or empty.</summary>
+    public IReadOnlyList<string> References { get; }
+
+    /// <summary>True when at least one row is an estimate (the panel explains the "≈" mark).</summary>
+    public bool HasEstimates { get; }
 
     /// <summary>Manufacturer and model.</summary>
     public string Title { get; }
@@ -76,6 +90,7 @@ internal sealed class DeviceFacts
         var rows = new List<FactRow>();
         string title = entity.Name, subtitle = "";
         string? description = null, note = null;
+        IReadOnlyList<string> references = Array.Empty<string>();
         var fixture = entity.Get<FixtureComponent>();
         if (fixture is not null)
         {
@@ -98,6 +113,8 @@ internal sealed class DeviceFacts
                 : profile is not null && !string.IsNullOrWhiteSpace(profile.FixtureType.Description) ? profile.FixtureType.Description.Trim()
                 : null;
             FixtureRows(rows, profile, specs, electrical);
+            if (specs is { Refs.Count: > 0 })
+                references = specs.Refs.Where(r => !string.IsNullOrWhiteSpace(r)).Select(r => r.Trim()).Distinct(StringComparer.Ordinal).ToArray();
             if (resolution is { Success: true, MatchKind: { } kind } && kind is not (FixtureMatchKind.ExactFileName))
             {
                 note = StageLoc.Format(kind is FixtureMatchKind.SameModel or FixtureMatchKind.ModelOnly ? StageStr.FactsMatched : StageStr.FactsSubstitute,
@@ -110,7 +127,7 @@ internal sealed class DeviceFacts
         }
 
         var ports = PortRows(engine, entity);
-        return new DeviceFacts(title, subtitle, description, rows, ports, note);
+        return new DeviceFacts(title, subtitle, description, rows, ports, note, references);
     }
 
     private static (string Title, string Subtitle) Titles(FixtureComponent fixture, DmxProfile? profile, FixtureSpecs? specs)
@@ -131,88 +148,149 @@ internal sealed class DeviceFacts
         var inv = CultureInfo.InvariantCulture;
         string? manufacturer = FirstNonEmpty(specs?.Manufacturer, profile?.FixtureType.Manufacturer);
         if (manufacturer is not null)
-            rows.Add(new(StageStr.FactManufacturer, manufacturer, Icons.House));
+            Add(rows, StageStr.FactManufacturer, manufacturer, Icons.House, Of(specs, "manufacturer", SpecSource.Gdtf));
         string? model = FirstNonEmpty(profile?.FixtureType.LongName, profile?.FixtureType.Name, specs?.LongName);
         if (model is not null)
-            rows.Add(new(StageStr.FactModel, model, Icons.Lightbulb));
+            Add(rows, StageStr.FactModel, model, Icons.Lightbulb, profile is not null ? SpecSource.Gdtf : Of(specs, "longName", SpecSource.Gdtf));
         var category = specs?.Category ?? profile?.Category;
         if (category is { } cat)
-            rows.Add(new(StageStr.FactCategory, cat.DisplayName(), Icons.Tag));
+            Add(rows, StageStr.FactCategory, cat.DisplayName(), Icons.Tag, Of(specs, "category", SpecSource.GdtfDerived));
         if (FirstNonEmpty(specs?.LightSourceType) is { } source)
-            rows.Add(new(StageStr.FactLightSource, source, Icons.Sun));
+            Add(rows, StageStr.FactLightSource, source, Icons.Sun, Of(specs, "lightSourceType", SpecSource.Unknown));
 
         double? weight = electrical?.WeightKg ?? specs?.WeightKg;
         if (weight is > 0)
-            rows.Add(new(StageStr.FactWeight, string.Create(inv, $"{weight:0.##} {StageUnits.Current.Kilogram}"), StageIcons.Weight));
+        {
+            var weightSource = electrical is { WeightKg: > 0, WeightSource: WeightDataSource.Gdtf } ? SpecSource.Gdtf
+                : Of(specs, "weightKg", SpecSource.Unknown);
+            Add(rows, StageStr.FactWeight, string.Create(inv, $"{weight:0.##} {StageUnits.Current.Kilogram}"), StageIcons.Weight, weightSource);
+        }
+
         double? power = electrical?.PowerW ?? specs?.PowerConsumptionW;
         if (power is > 0)
         {
             string text = string.Create(inv, $"{power:0.#} {StageUnits.Current.Watt}");
-            if (electrical is { PowerFactor: < 0.999f and > 0f } e)
+            // The electrical model assumes 0.95 when neither the GDTF nor the specs give a power factor: that is not data.
+            if (electrical is { PowerFactor: < 0.999f and > 0f } e && e.PowerFactor != ElectricalProfile.DefaultPowerFactor)
                 text += string.Create(inv, $" · cos φ {e.PowerFactor:0.00}");
-            rows.Add(new(StageStr.FactPower, text, Icons.Zap));
+            var powerSource = electrical is { PowerW: > 0 }
+                ? electrical.PowerSource switch
+                {
+                    PowerDataSource.Specs => Of(specs, "powerConsumptionW", SpecSource.Unknown),
+                    PowerDataSource.GdtfPowerConsumption or PowerDataSource.GdtfWiring => SpecSource.Gdtf,
+                    // The lamp power of the beams, not the mains draw of the fixture.
+                    PowerDataSource.GdtfBeams => SpecSource.Estimated,
+                    _ => SpecSource.Unknown,
+                }
+                : Of(specs, "powerConsumptionW", SpecSource.Unknown);
+            Add(rows, StageStr.FactPower, text, Icons.Zap, powerSource);
         }
 
         if (specs?.MaxLuminousIntensityCd is > 0 and var cd)
-            rows.Add(new(StageStr.FactIntensity, FormatCandela(cd), Icons.SunMedium));
+            Add(rows, StageStr.FactIntensity, FormatCandela(cd), Icons.SunMedium, Of(specs, "maxLuminousIntensityCd", SpecSource.Unknown));
         double? flux = specs?.LuminousFluxLm;
+        var fluxSource = Of(specs, "luminousFluxLm", SpecSource.Unknown);
         if (flux is null && profile is not null)
         {
             double sum = 0;
             foreach (var beam in profile.Beams)
                 sum += float.IsFinite(beam.ReferenceFlux) ? beam.ReferenceFlux : 0;
             flux = sum > 0 ? sum : null;
+            fluxSource = SpecSource.GdtfDerived;
         }
 
         if (flux is > 0)
-            rows.Add(new(StageStr.FactFlux, string.Create(inv, $"{flux:#,0} {StageUnits.Current.Lumen}").Replace(',', ' '), Icons.Sparkle));
+            Add(rows, StageStr.FactFlux, string.Create(inv, $"{flux:#,0} {StageUnits.Current.Lumen}").Replace(',', ' '), Icons.Sparkle, fluxSource);
         if (specs?.BeamAngleDeg is { } beamAngle)
-            rows.Add(new(StageStr.FactBeamAngle, FormatRange(beamAngle, "°", "0.#"), StageIcons.Aperture));
+            Add(rows, StageStr.FactBeamAngle, FormatRange(beamAngle, "°", "0.#"), StageIcons.Aperture, Of(specs, "beamAngleDeg", SpecSource.Unknown));
         else if (profile is { Beams.Count: > 0 })
-            rows.Add(new(StageStr.FactBeamAngle, string.Create(inv, $"{profile.Beams[0].NativeBeamAngle * 180f / MathF.PI:0.#}°"), StageIcons.Aperture));
+            Add(rows, StageStr.FactBeamAngle, string.Create(inv, $"{profile.Beams[0].NativeBeamAngle * 180f / MathF.PI:0.#}°"), StageIcons.Aperture,
+                SpecSource.Gdtf);
         if (specs?.FieldAngleDeg is > 0 and var field)
-            rows.Add(new(StageStr.FactFieldAngle, string.Create(inv, $"{field:0.#}°"), StageIcons.Aperture));
+            Add(rows, StageStr.FactFieldAngle, string.Create(inv, $"{field:0.#}°"), StageIcons.Aperture, Of(specs, "fieldAngleDeg", SpecSource.Unknown));
         if (specs?.ColorTemperatureK is { } cct)
-            rows.Add(new(StageStr.FactCct, FormatRange(cct, " K", "0"), StageIcons.Thermometer));
+            Add(rows, StageStr.FactCct, FormatRange(cct, " K", "0"), StageIcons.Thermometer, Of(specs, "colorTemperatureK", SpecSource.Unknown));
         else if (profile is { Beams.Count: > 0 } && float.IsFinite(profile.Beams[0].SourceKelvin) && profile.Beams[0].SourceKelvin > 0)
-            rows.Add(new(StageStr.FactCct, string.Create(inv, $"{profile.Beams[0].SourceKelvin:0} K"), StageIcons.Thermometer));
+            Add(rows, StageStr.FactCct, string.Create(inv, $"{profile.Beams[0].SourceKelvin:0} K"), StageIcons.Thermometer, SpecSource.Gdtf);
         if (profile is { Beams.Count: > 0 } && profile.Beams[0].Geometry.IsColorRenderingIndexSpecified)
-            rows.Add(new(StageStr.FactCri, string.Create(inv, $"{profile.Beams[0].Geometry.ColorRenderingIndex:0}"), Icons.Palette));
+            Add(rows, StageStr.FactCri, string.Create(inv, $"{profile.Beams[0].Geometry.ColorRenderingIndex:0}"), Icons.Palette, SpecSource.Gdtf);
         string? mixing = FirstNonEmpty(specs?.ColorMixing);
         if (mixing is not null || specs?.ColorWheel == true)
         {
             string text = mixing ?? "";
             if (specs?.ColorWheel == true)
                 text = text.Length > 0 ? text + " · " + StageLoc.Get(StageStr.FactColorWheel) : StageLoc.Get(StageStr.FactColorWheel);
-            rows.Add(new(StageStr.FactColorMixing, text, Icons.Palette));
+            Add(rows, StageStr.FactColorMixing, text, Icons.Palette, Of(specs, mixing is not null ? "colorMixing" : "colorWheel", SpecSource.Unknown));
         }
 
         if (specs?.NoiseLevelDb is > 0 and var noise)
-            rows.Add(new(StageStr.FactNoise, string.Create(inv, $"{noise:0.#} {StageUnits.Current.DecibelA}"), StageIcons.Volume));
+        {
+            Add(rows, StageStr.FactNoise, string.Create(inv, $"{noise:0.#} {StageUnits.Current.DecibelA}"), StageIcons.Volume,
+                Of(specs, "noiseLevelDb", SpecSource.Unknown));
+        }
+
         if (FirstNonEmpty(specs?.IpRating) is { } ip)
-            rows.Add(new(StageStr.FactIpRating, ip, Icons.CloudFog));
+            Add(rows, StageStr.FactIpRating, ip, Icons.CloudFog, Of(specs, "ipRating", SpecSource.Unknown));
         string? supply = SupplyText(specs, electrical);
         if (supply is not null)
-            rows.Add(new(StageStr.FactSupply, supply, StageIcons.PlugZap));
+        {
+            var supplySource = specs?.VoltageRangeV is not null ? Of(specs, "voltageRangeV", SpecSource.Unknown)
+                : electrical?.VoltageRangeV is not null ? SpecSource.Gdtf
+                : Of(specs, "supportedPowerNetworks", SpecSource.Unknown);
+            Add(rows, StageStr.FactSupply, supply, StageIcons.PlugZap, supplySource);
+        }
+
         if (specs is { PanRangeDeg: > 0 } || specs is { TiltRangeDeg: > 0 })
         {
             string pan = specs.InfinitePan == true ? "∞" : specs.PanRangeDeg is { } p ? string.Create(inv, $"{p:0.#}°") : "—";
             string tilt = specs.InfiniteTilt == true ? "∞" : specs.TiltRangeDeg is { } t ? string.Create(inv, $"{t:0.#}°") : "—";
-            rows.Add(new(StageStr.FactPanTiltRange, $"{pan} / {tilt}", Icons.Orbit));
+            Add(rows, StageStr.FactPanTiltRange, $"{pan} / {tilt}", Icons.Orbit,
+                Weakest(Of(specs, "panRangeDeg", SpecSource.Unknown), Of(specs, "tiltRangeDeg", SpecSource.Unknown)));
         }
 
         if (specs?.OperatingTemperatureC is { } temp)
-            rows.Add(new(StageStr.FactOperatingTemperature, FormatRange(temp, " °C", "0"), StageIcons.Thermometer));
+        {
+            Add(rows, StageStr.FactOperatingTemperature, FormatRange(temp, " °C", "0"), StageIcons.Thermometer,
+                Of(specs, "operatingTemperatureC", SpecSource.Unknown));
+        }
+
         if (Features(specs) is { Length: > 0 } features)
-            rows.Add(new(StageStr.FactFeatures, features, Icons.Sparkles));
+            Add(rows, StageStr.FactFeatures, features, Icons.Sparkles, SpecSource.GdtfDerived);
         if (specs is { ControlSignal.Count: > 0 })
-            rows.Add(new(StageStr.FactControl, string.Join(", ", specs.ControlSignal), Icons.Network));
+            Add(rows, StageStr.FactControl, string.Join(", ", specs.ControlSignal), Icons.Network, Of(specs, "controlSignal", SpecSource.Unknown));
         if (profile is not null)
         {
             int modes = profile.FixtureType.DmxModes.Count;
-            rows.Add(new(StageStr.FactModes, string.Create(inv, $"{modes}"), Icons.List));
+            Add(rows, StageStr.FactModes, string.Create(inv, $"{modes}"), Icons.List, SpecSource.Gdtf);
         }
     }
+
+    /// <summary>Adds a row; an estimated value starts with <see cref="EstimatedMark"/>.</summary>
+    private static void Add(List<FactRow> rows, StageStr label, string value, string icon, SpecSource source) =>
+        rows.Add(new FactRow(label, source == SpecSource.Estimated ? EstimatedMark + value : value, icon, source));
+
+    /// <summary>Where a field of the specs record comes from (<paramref name="fallback"/> without a record or an entry).</summary>
+    private static SpecSource Of(FixtureSpecs? specs, string field, SpecSource fallback)
+    {
+        if (specs is null)
+            return fallback;
+        var source = specs.SourceOf(field);
+        return source == SpecSource.Unknown ? fallback : source;
+    }
+
+    /// <summary>The less reliable of two sources (an estimate taints a combined value).</summary>
+    private static SpecSource Weakest(SpecSource a, SpecSource b) =>
+        a == SpecSource.Estimated || b == SpecSource.Estimated ? SpecSource.Estimated : a != SpecSource.Unknown ? a : b;
+
+    /// <summary>The tooltip text of a value's source, or null when the source is not recorded.</summary>
+    internal static StageStr? SourceText(SpecSource source) => source switch
+    {
+        SpecSource.Gdtf => StageStr.FactSourceGdtf,
+        SpecSource.GdtfDerived => StageStr.FactSourceDerived,
+        SpecSource.Manual => StageStr.FactSourceDatasheet,
+        SpecSource.Estimated => StageStr.FactSourceEstimated,
+        _ => null,
+    };
 
     private static string? SupplyText(FixtureSpecs? specs, ElectricalProfile? electrical)
     {

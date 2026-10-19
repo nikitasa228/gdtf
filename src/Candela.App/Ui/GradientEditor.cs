@@ -16,7 +16,7 @@ namespace Candela.App.Ui;
 internal sealed class GradientEditor
 {
     private const int Segments = 64;
-    private readonly string _unit;
+    private string _unit;
     private readonly string _surfaceId;
     private readonly string _menuId;
     private readonly string _colorId;
@@ -37,6 +37,13 @@ internal sealed class GradientEditor
         _menuId = "##stop-menu-" + id;
         _colorId = "##stop-color-" + id;
         Array.Fill(_labelValues, float.NaN);
+    }
+
+    /// <summary>Unit appended to the values in tooltips ("lx", "dB"; follows the UI language when the owner sets it).</summary>
+    public string Unit
+    {
+        get => _unit;
+        set => _unit = value ?? "";
     }
 
     /// <summary>Index of the selected stop (−1 = none).</summary>

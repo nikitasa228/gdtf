@@ -451,13 +451,12 @@ internal sealed class FixtureControls
         // Colour-temperature filters often give kelvin physicals without declaring the unit (Rivale: CTO 6500 … 2800).
         if (unit == PhysicalUnit.None && cls.Kind is AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc && MathF.Min(min, max) >= 1000f)
             unit = PhysicalUnit.Temperature;
-        bool level = unit is PhysicalUnit.None or PhysicalUnit.ColorComponent && min >= -0.0001f && max <= 1.0001f && max > min;
-        float scale = level ? 100f : 1f;
+        var (scale, levelFormat) = LevelDisplay(cls, unit, min, max);
         var units = StageUnits.Current;
-        string format = level ? "%.0f%%" : unit switch
+        string format = levelFormat ?? unit switch
         {
             PhysicalUnit.Angle => "%.1f°",
-            PhysicalUnit.Percent => "%.0f%%",
+            PhysicalUnit.Percent => PercentFormat(max - min),
             PhysicalUnit.Frequency => units.FormatHertz,
             PhysicalUnit.Temperature => "%.0f K",
             PhysicalUnit.Length => units.FormatMetres,
@@ -509,6 +508,33 @@ internal sealed class FixtureControls
         AttributeKind.Ctc or AttributeKind.Cto or AttributeKind.Ctb => 2,
         _ => 10,
     };
+
+    /// <summary>
+    /// How a relative level is shown, or (1, null) when the value is not a level. GDTF files give levels as fractions
+    /// 0 … 1 with no unit, as colour components, as <c>Percent</c> or — the GDTF attribute definition of
+    /// <c>Dimmer</c> — as <c>LuminousIntensity</c>; none of them is a candela value, so they are shown in percent
+    /// (× 100). A dimmer or <c>Percent</c> attribute whose physical range is already 0 … 100 is shown as is.
+    /// </summary>
+    /// <returns>Factor from the control value to the displayed number, and the printf format (null: not a level).</returns>
+    internal static (float Scale, string? Format) LevelDisplay(AttributeClass cls, PhysicalUnit unit, float min, float max)
+    {
+        if (!(max > min) || !float.IsFinite(min) || !float.IsFinite(max))
+            return (1f, null);
+        bool unitless = unit is PhysicalUnit.None or PhysicalUnit.ColorComponent or PhysicalUnit.Percent or PhysicalUnit.LuminousIntensity;
+        if (unitless && min >= -0.0001f && max <= 1.0001f)
+            return (100f, PercentFormat((max - min) * 100f));
+        bool percentRange = min >= -0.0001f && max <= 100.0001f;
+        if (percentRange && (unit == PhysicalUnit.Percent || unitless && cls.Kind == AttributeKind.Dimmer))
+            return (1f, PercentFormat(max - min));
+        return (1f, null);
+    }
+
+    /// <summary>A percent format with decimals for small spans ("%.0f%%", "%.1f%%", "%.2f%%").</summary>
+    internal static string PercentFormat(float span)
+    {
+        span = MathF.Abs(span);
+        return span >= 10f ? "%.0f%%" : span >= 1f ? "%.1f%%" : "%.2f%%";
+    }
 
     /// <summary>A printf format with a sensible number of decimals for the range (no exponent notation).</summary>
     internal static string NumberFormat(float min, float max)

@@ -387,6 +387,18 @@ internal enum StageStr
     LegendStop,
     GradientColor,
     GradientRemoveStop,
+
+    // Review additions: provenance of manufacturer data, timecode source, slot attributes
+    FactSourceGdtf,
+    FactSourceDerived,
+    FactSourceDatasheet,
+    FactSourceEstimated,
+    FactsEstimatedNote,
+    FactsReferences,
+    FactPowerFactor,
+    ExtTimecodeFromArtNet,
+    ExtTimecodeFromRecording,
+    ExtTestTargetInterface,
 }
 
 /// <summary>
@@ -886,5 +898,16 @@ internal static class StageLoc
         (StageStr.LegendStop, "Stop", "Точка"),
         (StageStr.GradientColor, "Colour…", "Цвет…"),
         (StageStr.GradientRemoveStop, "Remove stop", "Удалить точку"),
+        (StageStr.FactSourceGdtf, "From the GDTF file", "Из файла GDTF"),
+        (StageStr.FactSourceDerived, "Derived from the GDTF data (channels, wheels, geometry)", "Выведено из данных GDTF (каналы, колёса, геометрия)"),
+        (StageStr.FactSourceDatasheet, "From the manufacturer's datasheet or product page", "Из паспорта или страницы изделия производителя"),
+        (StageStr.FactSourceEstimated, "Estimated — not from a datasheet (similar model, typical value of the device class)",
+            "Оценка — не из паспорта (похожая модель, типичное значение для класса приборов)"),
+        (StageStr.FactsEstimatedNote, "≈ marks estimated values that are not from a datasheet.", "≈ — оценочные значения, не взятые из паспорта."),
+        (StageStr.FactsReferences, "Sources: {0}", "Источники: {0}"),
+        (StageStr.FactPowerFactor, "power factor", "коэффициент мощности"),
+        (StageStr.ExtTimecodeFromArtNet, "Art-Net", "Art-Net"),
+        (StageStr.ExtTimecodeFromRecording, "DMX recording", "запись DMX"),
+        (StageStr.ExtTestTargetInterface, "{0} (this computer on the selected network interface)", "{0} (этот компьютер на выбранном сетевом интерфейсе)"),
     };
 }

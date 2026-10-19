@@ -10,17 +10,19 @@ internal sealed class StageUnits
     private static readonly StageUnits English = new(
         candela: "cd", megacandela: "Mcd", lumen: "lm", kilogram: "kg", watt: "W", volt: "V", ampere: "A", hertz: "Hz",
         decibelA: "dB(A)", metre: "m", second: "s", metrePerSecond: "m/s", nanometre: "nm", candelaPerSquareMetre: "cd/m²",
-        framesPerSecond: "fps");
+        framesPerSecond: "fps", lux: "lx", decibel: "dB");
 
     private static readonly StageUnits Russian = new(
         candela: "кд", megacandela: "Мкд", lumen: "лм", kilogram: "кг", watt: "Вт", volt: "В", ampere: "А", hertz: "Гц",
         decibelA: "дБ(А)", metre: "м", second: "с", metrePerSecond: "м/с", nanometre: "нм", candelaPerSquareMetre: "кд/м²",
-        framesPerSecond: "к/с");
+        framesPerSecond: "к/с", lux: "лк", decibel: "дБ");
 
     private StageUnits(string candela, string megacandela, string lumen, string kilogram, string watt, string volt, string ampere,
         string hertz, string decibelA, string metre, string second, string metrePerSecond, string nanometre,
-        string candelaPerSquareMetre, string framesPerSecond)
+        string candelaPerSquareMetre, string framesPerSecond, string lux, string decibel)
     {
+        Lux = lux;
+        Decibel = decibel;
         Candela = candela;
         Megacandela = megacandela;
         Lumen = lumen;
@@ -45,6 +47,12 @@ internal sealed class StageUnits
 
     /// <summary>The table of the current UI language.</summary>
     public static StageUnits Current => Loc.Language == "ru" ? Russian : English;
+
+    /// <summary>Lux (illuminance).</summary>
+    public string Lux { get; }
+
+    /// <summary>Decibel (sound level; the overlay legend's values).</summary>
+    public string Decibel { get; }
 
     /// <summary>Candela (luminous intensity).</summary>
     public string Candela { get; }

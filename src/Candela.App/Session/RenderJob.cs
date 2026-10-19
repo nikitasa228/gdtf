@@ -90,6 +90,7 @@ internal sealed class RenderJobRunner : IDisposable
     private static readonly float[] SrgbToLinear = BuildSrgbTable();
 
     private RenderRequest? _request;
+    private StageEngine? _playing;
     private IRenderTarget? _target;
     private IRenderer? _targetOwner;
     private float[]? _accumulator;
@@ -201,19 +202,28 @@ internal sealed class RenderJobRunner : IDisposable
         if (request.Range is { } r && engine is not null)
         {
             // Play from a little before the first frame so motors, haze and flames have settled; the clock is ours now.
-            double preroll = Math.Min(Preroll, r.StartSeconds);
-            engine.Play(r.Recording, r.StartSeconds - preroll);
-            int steps = (int)Math.Round(preroll * r.FrameRate);
-            for (int i = 0; i < steps; i++)
-                engine.Tick(1.0 / r.FrameRate);
-            engine.Player?.Seek(r.StartSeconds, engine.Time);
-            engine.Tick(0);
+            _playing = engine;
+            try
+            {
+                double preroll = Math.Min(Preroll, r.StartSeconds);
+                engine.Play(r.Recording, r.StartSeconds - preroll);
+                int steps = (int)Math.Round(preroll * r.FrameRate);
+                for (int i = 0; i < steps; i++)
+                    engine.Tick(1.0 / r.FrameRate);
+                engine.Player?.Seek(r.StartSeconds, engine.Time);
+                engine.Tick(0);
+            }
+            catch (Exception e) when (!IsFatal(e))
+            {
+                StopPlayback();
+                return Fail(StageLoc.Format(StageStr.RenderFailed, e.Message));
+            }
         }
 
         return true;
     }
 
-    /// <summary>Stops the job (files already written stay).</summary>
+    /// <summary>Stops the job (files already written stay) and the recording playback a sequence started.</summary>
     public void Cancel()
     {
         if (State != RenderJobState.Running)
@@ -222,7 +232,28 @@ internal sealed class RenderJobRunner : IDisposable
         Message = StageLoc.Format(StageStr.RenderCancelled, FrameIndex, FrameCount);
         MessageIsError = false;
         _accumulator = null;
+        StopPlayback();
     }
+
+    /// <summary>Stops the playback of the recording the running sequence plays (the engine returns to live input).</summary>
+    private void StopPlayback()
+    {
+        var engine = _playing;
+        _playing = null;
+        if (engine is null)
+            return;
+        try
+        {
+            engine.Play(null);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The stage was closed meanwhile: nothing plays any more.
+        }
+    }
+
+    /// <summary>Errors that must not be turned into a failed job (the process cannot continue safely).</summary>
+    private static bool IsFatal(Exception e) => e is OutOfMemoryException or StackOverflowException or AccessViolationException;
 
     /// <summary>Renders for about <see cref="Budget"/> (at least one pass) and writes the frames that are complete.</summary>
     public void Step(StageEngine? engine, IRenderer renderer, double now)
@@ -261,19 +292,26 @@ internal sealed class RenderJobRunner : IDisposable
                     PassIndex = 0;
                     if (FrameIndex >= FrameCount)
                     {
-                        Complete(engine, request);
+                        Complete(request);
                         return;
                     }
                 }
             }
             while (Stopwatch.GetElapsedTime(start) < Budget);
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidOperationException or NotSupportedException
-                                       or ArgumentException or OutOfMemoryException)
+        catch (OutOfMemoryException e)
         {
+            // An output too large for this computer (accumulation buffer, read-back): the job stops, the editor goes on.
             Fail(StageLoc.Format(StageStr.RenderFailed, e.Message));
-            if (request.Range is not null && engine is not null)
-                engine.Play(null);
+            StopPlayback();
+        }
+        catch (Exception e) when (!IsFatal(e))
+        {
+            // Any renderer or file error (Vulkan device errors included) ends the job with the reason instead of
+            // escaping into the editor's frame loop, which would retry it — and fail — every frame.
+            Fail(StageLoc.Format(StageStr.RenderFailed, e.Message));
+            StopPlayback();
+            ReleaseTargetWhenIdle();
         }
     }
 
@@ -350,7 +388,7 @@ internal sealed class RenderJobRunner : IDisposable
         _accumulated = 0;
     }
 
-    private void Complete(StageEngine? engine, RenderRequest request)
+    private void Complete(RenderRequest request)
     {
         State = RenderJobState.Completed;
         MessageIsError = false;
@@ -358,8 +396,7 @@ internal sealed class RenderJobRunner : IDisposable
             ? StageLoc.Format(StageStr.RenderSequenceDone, FrameCount, Path.GetDirectoryName(LastOutput ?? request.OutputPath) ?? "")
             : StageLoc.Format(StageStr.RenderFrameDone, LastOutput ?? request.OutputPath);
         _accumulator = null;
-        if (request.Range is not null && engine is not null)
-            engine.Play(null);
+        StopPlayback();
     }
 
     private bool Fail(string message)
@@ -415,7 +452,12 @@ internal sealed class RenderJobRunner : IDisposable
         if (_disposed)
             return;
         _disposed = true;
-        State = State == RenderJobState.Running ? RenderJobState.Cancelled : State;
+        if (State == RenderJobState.Running)
+        {
+            State = RenderJobState.Cancelled;
+            StopPlayback();
+        }
+
         Release(_target);
         _target = null;
     }

@@ -23,7 +23,7 @@ internal sealed class SurfaceInspectorView
     private readonly List<MeshComponent> _meshes = new();
     private long _selectionKey = -1;
     private long _sceneVersion = -1;
-    private Guid _modelFor;
+    private (Guid Entity, Guid Asset, Vector3 Scale, object? Engine, string Language) _modelKey;
     private string _modelSize = "";
     private string[] _slotNames = Array.Empty<string>();
     private string _formatsLanguage = "";
@@ -31,6 +31,7 @@ internal sealed class SurfaceInspectorView
     private string _metres3 = "%.3f m";
     private float _areaValue = float.NaN;
     private string _areaText = "";
+    private string _areaLanguage = "";
 
     /// <summary>Creates the view.</summary>
     public SurfaceInspectorView(StagePanelContext stage)
@@ -43,6 +44,9 @@ internal sealed class SurfaceInspectorView
 
     /// <summary>The selected models (primary first).</summary>
     internal IReadOnlyList<MeshComponent> Meshes => _meshes;
+
+    /// <summary>The size text of the primary model (tests).</summary>
+    internal string ModelSize => _modelSize;
 
     /// <summary>Draws the surface and model sections for the selection whose primary object is <paramref name="entity"/>.</summary>
     public void Draw(Entity entity, float labelWidth)
@@ -114,10 +118,7 @@ internal sealed class SurfaceInspectorView
         foreach (var w in _walls)
             mixed |= w.MaterialId != current;
         if (MaterialCombo("##wall-material", current, mixed, allowOwn: false, ownName: null, out string? chosen) && chosen is not null)
-        {
-            _stage.Undo.Execute(new SetFieldCommand<WallComponent, string>(_walls, "material", static w => w.MaterialId,
-                static (w, v) => w.MaterialId = v, chosen, StageLoc.Format(StageStr.UndoMaterial, PropertiesPanel.MaterialName(chosen))));
-        }
+            SetWallMaterial(chosen);
 
         FloatRow(StageLoc.Get(StageStr.SurfaceUvScale), "uv", static w => w.UvScale, static (w, v) => w.UvScale = v, 0.01f, 0.05f, 50f, "%.2f×");
         PropertyGrid.End();
@@ -169,20 +170,7 @@ internal sealed class SurfaceInspectorView
             foreach (var m in _meshes)
                 mixed |= SlotMaterial(m, slot) != current;
             if (MaterialCombo("##slot", current, mixed, allowOwn: true, ownName, out string? chosen))
-            {
-                int s = slot;
-                _stage.Undo.Execute(new SetFieldCommand<MeshComponent, string?>(_meshes, "material-" + s.ToString(CultureInfo.InvariantCulture),
-                    m => m.MaterialOverrides is { } mo && mo.TryGetValue(s, out var v) ? v : null,
-                    (m, v) =>
-                    {
-                        m.MaterialOverrides ??= new Dictionary<int, string>();
-                        if (v is null)
-                            m.MaterialOverrides.Remove(s);
-                        else
-                            m.MaterialOverrides[s] = v;
-                    },
-                    chosen, StageLoc.Format(StageStr.UndoMaterial, chosen is null ? StageLoc.Get(StageStr.ModelOwnMaterial) : PropertiesPanel.MaterialName(chosen))));
-            }
+                SetSlotMaterial(slot, chosen);
 
             ImGui.PopID();
         }
@@ -195,29 +183,82 @@ internal sealed class SurfaceInspectorView
         if (shadowMixed)
             MixedMarker();
         if (ImGui.Checkbox("##cast-shadow", ref cast))
-            _stage.Undo.Execute(new SetFieldCommand<MeshComponent, bool>(_meshes, "shadow", static m => m.CastShadow, static (m, v) => m.CastShadow = v,
-                cast, StageLoc.Get(StageStr.ModelCastShadow)));
+            SetCastShadow(cast);
         PropertyGrid.End();
         if (first.MaterialOverrides is { Count: > 0 } overrides && overrides.TryGetValue(0, out var shown))
             MaterialPreview(shown);
     }
 
-    private void RefreshModel(Entity entity)
+    /// <summary>
+    /// Gives every selected wall the material <paramref name="materialId"/> as one undo step. A pick is a discrete
+    /// edit: it never merges with the next one, so undo steps back through every material that was chosen.
+    /// </summary>
+    internal void SetWallMaterial(string materialId)
     {
-        if (entity.Id == _modelFor && _modelSize.Length > 0)
+        ArgumentException.ThrowIfNullOrEmpty(materialId);
+        if (_walls.Count == 0)
             return;
-        _modelFor = entity.Id;
+        _stage.Undo.Execute(new SetFieldCommand<WallComponent, string>(_walls, "material", static w => w.MaterialId,
+            static (w, v) => w.MaterialId = v, materialId, StageLoc.Format(StageStr.UndoMaterial, PropertiesPanel.MaterialName(materialId))));
+        _stage.Undo.BreakMerge();
+    }
+
+    /// <summary>
+    /// Overrides material slot <paramref name="slot"/> of every selected model with <paramref name="materialId"/> (null:
+    /// the model's own material) as one undo step that does not merge with the next edit.
+    /// </summary>
+    internal void SetSlotMaterial(int slot, string? materialId)
+    {
+        if (_meshes.Count == 0 || slot < 0)
+            return;
+        _stage.Undo.Execute(new SetFieldCommand<MeshComponent, string?>(_meshes, "material-" + slot.ToString(CultureInfo.InvariantCulture),
+            m => m.MaterialOverrides is { } mo && mo.TryGetValue(slot, out var v) ? v : null,
+            (m, v) =>
+            {
+                m.MaterialOverrides ??= new Dictionary<int, string>();
+                if (v is null)
+                    m.MaterialOverrides.Remove(slot);
+                else
+                    m.MaterialOverrides[slot] = v;
+            },
+            materialId,
+            StageLoc.Format(StageStr.UndoMaterial, materialId is null ? StageLoc.Get(StageStr.ModelOwnMaterial) : PropertiesPanel.MaterialName(materialId))));
+        _stage.Undo.BreakMerge();
+    }
+
+    /// <summary>Turns shadow casting of every selected model on or off as one undo step (never merged with the next edit).</summary>
+    internal void SetCastShadow(bool cast)
+    {
+        if (_meshes.Count == 0)
+            return;
+        _stage.Undo.Execute(new SetFieldCommand<MeshComponent, bool>(_meshes, "shadow", static m => m.CastShadow, static (m, v) => m.CastShadow = v,
+            cast, StageLoc.Get(StageStr.ModelCastShadow)));
+        _stage.Undo.BreakMerge();
+    }
+
+    /// <summary>
+    /// Rebuilds the size text and slot names when the primary model, its asset, its scale, the engine or the language
+    /// changed (the bounds are computed from the vertices, so not every frame).
+    /// </summary>
+    internal void RefreshModel(Entity entity)
+    {
+        var engine = _stage.Engine;
+        var mesh = entity.Get<MeshComponent>();
+        var key = (entity.Id, mesh?.ModelAssetId ?? Guid.Empty, entity.Local.Scale, (object?)engine, Loc.Language);
+        if (key == _modelKey && _modelSize.Length > 0)
+            return;
+        _modelKey = key;
         _modelSize = "—";
         _slotNames = Array.Empty<string>();
-        var engine = _stage.Engine;
-        if (engine is null || entity.Get<MeshComponent>() is not { } mesh)
+        if (engine is null || mesh is null)
             return;
         try
         {
             if (engine.Models.GetBounds(mesh.ModelAssetId) is { IsEmpty: false } bounds)
             {
                 var size = (bounds.Max - bounds.Min) * Vector3.Abs(entity.Local.Scale);
-                _modelSize = string.Create(CultureInfo.InvariantCulture, $"{size.X:0.###} × {size.Y:0.###} × {size.Z:0.###} m");
+                _modelSize = string.Create(CultureInfo.InvariantCulture,
+                    $"{size.X:0.###} × {size.Y:0.###} × {size.Z:0.###} {StageUnits.Current.Metre}");
             }
 
             if (engine.Models.GetModelData(mesh.ModelAssetId) is { } model)
@@ -336,10 +377,11 @@ internal sealed class SurfaceInspectorView
 
     private string AreaText(float area)
     {
-        if (area != _areaValue || _areaText.Length == 0)
+        if (area != _areaValue || _areaText.Length == 0 || !string.Equals(_areaLanguage, Loc.Language, StringComparison.Ordinal))
         {
+            _areaLanguage = Loc.Language;
             _areaValue = area;
-            _areaText = string.Create(CultureInfo.InvariantCulture, $"{area:0.##} m²");
+            _areaText = string.Create(CultureInfo.InvariantCulture, $"{area:0.##} {StageUnits.Current.Metre}²");
         }
 
         return _areaText;

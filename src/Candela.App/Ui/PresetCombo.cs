@@ -97,13 +97,26 @@ internal sealed unsafe class PresetCombo<T> where T : class
         ImGui.SameLine(0f, style.ItemInnerSpacing.X);
         ImGui.BeginDisabled(!canDelete);
         if (ImGui.Button(Icons.Trash + _comboId + "-delete", new Vector2(button, 0f)))
-            changed |= _binding.Delete(_binding.CurrentName) && _binding.Select(PresetLibrary<T>.DefaultName);
+            DeleteCurrent();
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(StageLoc.Get(StageStr.PresetDelete));
 
         DrawSavePopup();
         return changed;
+    }
+
+    /// <summary>
+    /// Deletes the selected saved preset. The values in use stay as they are — deleting a preset must not change the
+    /// look of the viewports — and the dropdown shows <c>Custom</c> (they are no saved preset any more). Default and
+    /// Custom cannot be deleted. Returns true when a preset was deleted.
+    /// </summary>
+    internal bool DeleteCurrent()
+    {
+        string name = _binding.CurrentName;
+        if (name is PresetLibrary<T>.DefaultName or PresetLibrary<T>.CustomName)
+            return false;
+        return _binding.Delete(name);
     }
 
     private void DrawSavePopup()
