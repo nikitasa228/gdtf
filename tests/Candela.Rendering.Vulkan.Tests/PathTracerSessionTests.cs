@@ -475,6 +475,39 @@ public sealed class PathTracerSessionTests
         }
     }
 
+    /// <summary>
+    /// A panel may show a render's preview before its first sample (and after a cancellation before it): every result is
+    /// a black image of the render's size, the denoised one included, without GPU errors; the render then proceeds.
+    /// </summary>
+    [SkippableFact]
+    public void ResultsBeforeTheFirstSampleAreBlackAndValidationClean()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var camera = BuildRoom(renderer);
+            var settings = FinalRenderSupport.Settings(24, 16, 2);
+            settings.Denoise = true;
+            using var render = renderer.StartFinalRender(camera, settings, new FinalRenderOptions { AutoExposure = true });
+            var preview = render.Preview();
+            Assert.Equal((24, 16), (preview.Width, preview.Height));
+            foreach (var hdr in new[] { render.ResultHdr(), render.RawResultHdr(), render.DenoisedResultHdr(), render.ReadGuides().Albedo })
+                Assert.All(FinalRenderSupport.Luminance(hdr, 1f).Rgba.Where((_, i) => (i & 3) != 3), v => Assert.Equal(0f, v));
+            Assert.Equal(0, render.SamplesDone);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+
+            while (!render.IsComplete)
+                render.Advance(TimeSpan.FromSeconds(1));
+            Assert.Equal(2, render.SamplesDone);
+            Assert.True(FinalRenderSupport.Luminance(render.ResultHdr(), render.Exposure).MeanLuminance(12, 8, 12) > 0f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     [SkippableFact]
     public void BadInputStaysFiniteAndValidationClean()
     {

@@ -54,6 +54,46 @@ public sealed class PathTracerPhotometryTests
     }
 
     /// <summary>
+    /// Looking into the beam, the lens shows the luminance that carries the light's intensity: L = I(θ) / (A cos θ_y)
+    /// (times |x − y|² / |x − c|² for the lens 5 mm in front of the centre), on the axis and 10° off it (where the
+    /// lens is seen foreshortened and the profile has fallen off).
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(0f)]
+    [InlineData(10f)]
+    public void LensSeenFromTheBeamHasTheLuminanceOfItsIntensity(float offAxisDeg)
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+            const float radius = 0.1f;
+            var position = new Vector3(0f, 0f, Height);
+            var light = ProceduralTestScene.Spot(position, Vector3.Zero, LightColor.White, PeakCandela, BeamDeg, FieldDeg);
+            light.SourceRadius = radius;
+            renderer.World.SetLights(new[] { light });
+            float angle = offAxisDeg * MathF.PI / 180f;
+            var eye = position + Height * new Vector3(MathF.Sin(angle), 0f, -MathF.Cos(angle));
+            var camera = RenderCamera.LookAt(eye, position, 0.5f);
+            camera.Ev100 = 18f;
+            using var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(8, 8, 4),
+                new FinalRenderOptions { BackgroundLuminance = 0f });
+            var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
+            var beam = BeamDistribution.Create(BeamType.Wash, BeamDeg * MathF.PI / 180f, FieldDeg * MathF.PI / 180f);
+            var lensCentre = position + light.Direction * PathTracerScene.LensOffset;
+            float dy = Vector3.Distance(eye, lensCentre), dc = Vector3.Distance(eye, position);
+            float expected = PeakCandela * beam.Relative(angle) * dy * dy / (MathF.PI * radius * radius * MathF.Cos(angle) * dc * dc);
+            float measured = hdr.MeanLuminance(4, 4, 2);
+            Assert.True(MathF.Abs(measured - expected) / expected < 0.01f, $"lens {measured} cd/m², expected {expected} cd/m²");
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    /// <summary>
     /// A translucent white surface (a diffusing gel or a frosted screen hung flat: transmission t, no Fresnel) reflects
     /// the share 1 − t of the direct light like a Lambertian surface, whichever lobe the path continues with — the
     /// transmitted share goes through (into the black surroundings here).
