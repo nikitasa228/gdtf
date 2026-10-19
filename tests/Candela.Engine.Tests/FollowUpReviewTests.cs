@@ -67,4 +67,33 @@ public class FollowUpReviewTests
             Assert.All(manual.Keys, k => Assert.True(known.ContainsKey(k), $"'{k}' is not an attribute of {evaluated}"));
         }
     }
+
+    [Fact]
+    public void Wide_washes_are_not_reported_as_clamped_but_a_bulb_wider_than_the_renderer_cone_is()
+    {
+        // an ARRI SkyPanel's soft light has a field of 179° (the DMX profile's limit); a bulb radiates beyond 170° with its
+        // 50 % cone already. Only the bulb is drawn narrower than it is.
+        using var engine = TestEnvironment.CreateEngine("field-clamp");
+        var panel = SceneBuilder.Fixture(engine.Scene, "ARRI@SkyPanel_S60C@DMX_v4.4_13_Jan_2021.gdtf", null, new Vector3(-2, 0, 4), 1, 1);
+        var bulb = SceneBuilder.Fixture(engine.Scene, "Astera_LED_Technology@FP7_LunaBulb@tested_by_Astera__V1.gdtf", null, new Vector3(2, 0, 4), 2, 1);
+        Assert.Equal(2, StageLooks.ApplyOpenWhite(engine, new OpenWhiteOptions { Undoable = false, Zoom = 1f }));
+        var world = new RecordingRenderWorld();
+        engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        engine.Tick(0);
+        engine.Tick(1.0 / 30);
+
+        var panelBeams = engine.Dmx.GetState(panel.Id)!.Beams.Where(b => b.PeakCandela > 0f).ToList();
+        Assert.NotEmpty(panelBeams);
+        Assert.Contains(panelBeams, b => b.FieldAngle > StageLightCollector.MaxFieldAngle);
+        Assert.Contains(engine.Dmx.GetState(bulb.Id)!.Beams, b => b.PeakCandela > 0f && b.BeamAngle > StageLightCollector.MaxFieldAngle);
+        Assert.All(world.Lights, l =>
+        {
+            Assert.InRange(l.BeamAngle, 0f, StageLightCollector.MaxFieldAngle + 1e-5f);
+            Assert.InRange(l.FieldAngle, l.BeamAngle, StageLightCollector.MaxFieldAngle + 1e-5f);
+        });
+        Assert.Equal([bulb.Id], engine.LightCollector.ClampedFieldFixtures);
+        engine.RefreshIssues();
+        var clamped = Assert.Single(engine.Issues.Current, i => i.Code == EngineIssueCodes.FieldClamped);
+        Assert.Equal([bulb.Id], clamped.Entities);
+    }
 }

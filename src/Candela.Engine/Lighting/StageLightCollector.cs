@@ -31,10 +31,12 @@ public sealed class StageLightCollector
     public const float FlameHemisphereFieldAngle = 270f * MathF.PI / 180f;
 
     /// <summary>
-    /// Widest field angle passed to the renderer, rad (170°): its spot cone stops short of a hemisphere. Candela.Dmx
-    /// already keeps field angles at 179° and below and recognises files that write the zoom range into the Beam
-    /// geometry, so only very wide washes reach this sanity clamp; the fixtures it limits are listed in
-    /// <see cref="ClampedFieldFixtures"/> and reported as <c>engine.field-clamped</c>.
+    /// Widest beam and field angle passed to the renderer, rad (170°): its spot cone stops short of a hemisphere.
+    /// Candela.Dmx already keeps field angles at 179° and below and recognises files that write the zoom range into the
+    /// Beam geometry. Wide washes (LED panels and battens, strobes, tubes: about 7 % of the library's beams) reach this
+    /// sanity clamp with their field — the faint 10 % edge, trimmed by a few degrees — which is not reported; a beam
+    /// whose 50 % cone itself is wider (bulbs radiating in every direction) is drawn narrower than it is: those fixtures
+    /// are listed in <see cref="ClampedFieldFixtures"/> and reported as <c>engine.field-clamped</c>.
     /// </summary>
     public const float MaxFieldAngle = 170f * MathF.PI / 180f;
 
@@ -53,7 +55,7 @@ public sealed class StageLightCollector
     /// <summary>Number of lights from flames in the last collection (two per flame light sample).</summary>
     public int FlameLightCount { get; private set; }
 
-    /// <summary>Fixtures (entity ids) whose field angle was wider than <see cref="MaxFieldAngle"/> in the last collection.</summary>
+    /// <summary>Fixtures (entity ids) with a beam angle wider than <see cref="MaxFieldAngle"/> in the last collection.</summary>
     public IReadOnlyCollection<Guid> ClampedFieldFixtures => _clamped;
 
     private readonly HashSet<Guid> _clamped = new();
@@ -84,9 +86,14 @@ public sealed class StageLightCollector
                 light.Up = up;
                 light.Color = beam.Color.Rgb;
                 light.PeakCandela = candela;
-                light.BeamAngle = beam.BeamAngle;
-                light.FieldAngle = PlausibleField(beam.BeamAngle, beam.FieldAngle);
-                if (light.FieldAngle < beam.FieldAngle) _clamped.Add(pose.Entity.Id);
+                float beamAngle = beam.BeamAngle;
+                if (beamAngle > MaxFieldAngle)
+                {
+                    beamAngle = MaxFieldAngle;
+                    _clamped.Add(pose.Entity.Id);
+                }
+                light.BeamAngle = beamAngle;
+                light.FieldAngle = PlausibleField(beamAngle, beam.FieldAngle);
                 light.BeamType = beam.BeamType;
                 light.SourceRadius = SourceRadius(beam.Beam.Geometry.BeamRadius);
                 light.Iris = float.IsFinite(beam.Iris) ? Math.Clamp(beam.Iris, 0f, 1f) : 1f;

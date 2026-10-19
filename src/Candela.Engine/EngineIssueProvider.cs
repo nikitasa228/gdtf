@@ -57,7 +57,7 @@ public sealed class EngineIssueProvider : IIssueProvider
         if (clamped.Count > 0)
         {
             issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Fixture, EngineIssueCodes.FieldClamped,
-                $"{clamped.Count} fixture(s) have a field angle wider than {StageLightCollector.MaxFieldAngle * 180f / MathF.PI:F0}°; their light is drawn with that angle.",
+                $"{clamped.Count} fixture(s) have a beam angle wider than {StageLightCollector.MaxFieldAngle * 180f / MathF.PI:F0}° (light in nearly every direction); the renderer draws their light as a {StageLightCollector.MaxFieldAngle * 180f / MathF.PI:F0}° cone.",
                 clamped.ToArray()));
         }
         return issues;

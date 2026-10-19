@@ -151,8 +151,10 @@ so embedded and generated images never require the native importer again.
    frost), iris, framing blades (insertion, tilt from A/B, module rotation), prism (facets and spread from the wheel
    slot's facet offsets), frost, `CastShadow`; plus two hemispherical lights per flame light sample. The field angle
    comes from the DMX profile, which already reads beam/field angles that are a zoom range or an implausible ratio as
-   the type's typical ratio (docs/dmx.md); the collector only keeps it within the renderer's 170° cone as a sanity
-   clamp, lists the fixtures it had to clamp (`ClampedFieldFixtures`) and reports them (`engine.field-clamped`).
+   the type's typical ratio (docs/dmx.md); the collector only keeps beam and field within the renderer's 170° cone as
+   a sanity clamp. Wide washes (LED panels, battens, strobes, tubes) reach it with their faint field edge only, which
+   is not reported; fixtures whose beam (50 %) cone itself is wider — bulbs radiating in nearly every direction — are
+   listed (`ClampedFieldFixtures`) and reported (`engine.field-clamped`).
 6. **Render sync** (below).
 
 The result depends only on the scene, the DMX received and the sequence of frame times (tested: two engines, same
@@ -326,7 +328,7 @@ adds the light plot).
 | `engine.recording-damaged` | warning | a DMX recording is truncated or damaged |
 | `engine.settings-invalid` | warning | a project's `engine`/`view` section could not be read |
 | `engine.library-missing` | warning/error | no library folder, or it cannot be scanned |
-| `engine.field-clamped` | warning | a fixture's field angle was wider than the renderer's 170° cone and was clamped |
+| `engine.field-clamped` | warning | a fixture's beam angle (50 % cone) is wider than the renderer's 170° cone; its light is drawn as that cone (a wide wash whose field alone is trimmed to 170° is not reported) |
 | `engine.substitute-replaced` | note | fixtures that stood in for a missing model now use its GDTF, which the library has |
 
 Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (electrical), `asset.*` (asset store),
