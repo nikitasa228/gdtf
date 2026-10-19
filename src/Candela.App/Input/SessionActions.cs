@@ -11,6 +11,9 @@ internal static class SessionActions
     /// <summary>File → Import → GDTF Fixture: adds a fixture file to the library.</summary>
     public const string ImportGdtf = "file.importGdtf";
 
+    /// <summary>Tools → Open White: every fixture at full in open white, moving heads aimed at the stage (one undo step).</summary>
+    public const string OpenWhite = "look.openWhite";
+
     /// <summary>Default chords of the session actions (merged into the default set with the other app actions).</summary>
     public static void AddDefaults(KeyBindingSet set)
     {
@@ -19,5 +22,7 @@ internal static class SessionActions
             set.Set(PauseSimulation, new KeyChord("P", KeyModifiers.Alt));
         if (!set.Bindings.ContainsKey(ImportGdtf))
             set.Set(ImportGdtf);
+        if (!set.Bindings.ContainsKey(OpenWhite))
+            set.Set(OpenWhite);
     }
 }

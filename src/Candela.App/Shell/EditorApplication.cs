@@ -139,7 +139,13 @@ internal sealed class EditorApplication : IDisposable
         ApplyScale(force: true);
         _capture = new SwapchainCapture(_gpu.Context);
 
-        _session = new EditorSession(_log, _settings);
+        // Headless runs neither autosave nor load fixture models in the background (screenshots show every model).
+        _session = new EditorSession(_log, _settings, new EditorSessionOptions
+        {
+            PreviewStage = _options.PreviewStage,
+            Autosave = !_options.IsScreenshotMode,
+            LoadFixtureModelsInBackground = !_options.IsScreenshotMode,
+        });
         _workspace = new Workspace(new WorkspaceContext(_log, _settings, _session, _gpu, _imgui, fonts, _window, this, _timer), _options);
 
         if (_options.ScriptPath is { } scriptPath)

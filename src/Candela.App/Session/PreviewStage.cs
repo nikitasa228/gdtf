@@ -171,6 +171,20 @@ internal sealed class PreviewStage : IViewportContent
     }
 
     /// <inheritdoc/>
+    public bool IsSettled => true;
+
+    /// <inheritdoc/>
+    public void CollectFramingPoints(List<Vector3> points)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+        var b = SceneBounds;
+        if (b.IsEmpty)
+            return;
+        for (int i = 0; i < 8; i++)
+            points.Add(new Vector3((i & 1) == 0 ? b.Min.X : b.Max.X, (i & 2) == 0 ? b.Min.Y : b.Max.Y, (i & 4) == 0 ? b.Min.Z : b.Max.Z));
+    }
+
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (_disposed)

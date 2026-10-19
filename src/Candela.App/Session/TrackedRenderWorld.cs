@@ -82,6 +82,22 @@ internal sealed class TrackedRenderWorld : IRenderWorld
         return bounds;
     }
 
+    /// <summary>Appends the eight world corners of every visible instance's box (framing the view on what is drawn).</summary>
+    public void CollectVisibleCorners(List<Vector3> corners)
+    {
+        ArgumentNullException.ThrowIfNull(corners);
+        foreach (var (_, state) in _instances)
+        {
+            if ((state.Flags & InstanceFlags.Hidden) != 0 || !_meshBounds.TryGetValue(state.Mesh, out var local) || local.IsEmpty)
+                continue;
+            var world = local.Transform(state.World);
+            if (!IsFinite(world) || world.Size.Length() > 10_000f)
+                continue;
+            for (int i = 0; i < 8; i++)
+                corners.Add(new Vector3((i & 1) == 0 ? world.Min.X : world.Max.X, (i & 2) == 0 ? world.Min.Y : world.Max.Y, (i & 4) == 0 ? world.Min.Z : world.Max.Z));
+        }
+    }
+
     /// <summary>
     /// Sets the pick ids whose instances are outlined because an ancestor of their entity is selected, and re-sends the
     /// flags of the instances whose highlight changed.

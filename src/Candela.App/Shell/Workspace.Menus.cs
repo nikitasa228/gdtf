@@ -309,6 +309,7 @@ internal sealed partial class Workspace
             Item(AppActions.ToolFloor);
             Item(EditorActions.ToolCable);
             _menu.Separator();
+            Item(SessionActions.OpenWhite);
             Item(SessionActions.PauseSimulation);
             _menu.End();
         }

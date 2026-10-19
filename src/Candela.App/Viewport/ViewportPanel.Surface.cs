@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Candela.App.Editing;
 using Candela.Core.Math;
 using Candela.Rendering;
@@ -60,19 +61,29 @@ internal sealed partial class ViewportPanel
     /// </summary>
     public void FrameScene()
     {
-        var content = _ctx.Session.Content;
-        var bounds = content?.SceneBounds ?? Aabb.Empty;
-        if (bounds.IsEmpty)
+        _framingPoints.Clear();
+        _ctx.Session.Content?.CollectFramingPoints(_framingPoints);
+        float aspect = _imageSize.Y > 0 ? _imageSize.X / _imageSize.Y : 16f / 9f;
+        if (!Camera.FramePoints(CollectionsMarshal.AsSpan(_framingPoints), aspect))
         {
             var home = new ViewportCamera();
             Camera.Target = home.Target;
             Camera.Distance = home.Distance;
             Camera.OrthoHeight = home.OrthoHeight;
-            return;
         }
 
-        Camera.Frame(bounds, _imageSize.Y > 0 ? _imageSize.X / _imageSize.Y : 16f / 9f);
+        _framedCamera = CameraState();
     }
+
+    /// <summary>True when the camera was moved since <see cref="FrameScene"/> last set it.</summary>
+    public bool CameraMovedSinceFraming => _framedCamera != CameraState();
+
+    private (Vector3, float, float, float, float, ProjectionKind) CameraState() =>
+        (Camera.Target, Camera.Distance, Camera.OrthoHeight, Camera.Yaw, Camera.Pitch, Camera.Projection);
+
+    private (Vector3, float, float, float, float, ProjectionKind)? _framedCamera;
+
+    private readonly List<Vector3> _framingPoints = new();
 
     private static bool Finite(Vector3 v) => float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z);
 }

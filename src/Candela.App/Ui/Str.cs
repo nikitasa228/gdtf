@@ -414,7 +414,11 @@ internal enum Str
     MsgFloorCreated,
     WallSize,
     LibFileMissing,
+    LookOpenWhite,
+    BusyOpenWhite,
+    MsgOpenWhite,
     // (end of engine integration strings)
+
 
 
     // Built-in materials (Core MaterialIds)

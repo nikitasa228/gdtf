@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 using Candela.App.Ui;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
@@ -29,6 +30,7 @@ internal sealed class EngineViewportContent : IViewportContent
     private readonly Action<Scene> _onSceneReplaced;
     private readonly Func<Guid, Aabb?> _modelBounds;
     private bool _selectionDirty = true;
+    private bool _tickedSinceReplace;
     private long _inheritedVersion = -1;
     private int _inheritedInstances = -1;
     private long _syncedVersion = -1;
@@ -50,7 +52,11 @@ internal sealed class EngineViewportContent : IViewportContent
         _modelBounds = id => _engine.Models.GetBounds(id);
         _sync = engine.AttachRenderWorld(_world, loadFixtureModelsInBackground);
         _onSelectionChanged = () => _selectionDirty = true;
-        _onSceneReplaced = _ => _selectionDirty = true;
+        _onSceneReplaced = _ =>
+        {
+            _selectionDirty = true;
+            _tickedSinceReplace = false;
+        };
         engine.Selection.Changed += _onSelectionChanged;
         engine.SceneReplaced += _onSceneReplaced;
         _syncedVersion = engine.Scene.Version;
@@ -101,7 +107,14 @@ internal sealed class EngineViewportContent : IViewportContent
     }
 
     /// <summary>Marks the render world as up to date after the engine's tick (no second update this frame).</summary>
-    public void MarkTicked() => _syncedVersion = _engine.Scene.Version;
+    public void MarkTicked()
+    {
+        _syncedVersion = _engine.Scene.Version;
+        _tickedSinceReplace = true;
+    }
+
+    /// <inheritdoc/>
+    public bool IsSettled => _tickedSinceReplace && _sync.PendingFixtureTypes == 0;
 
     /// <inheritdoc/>
     public Guid? EntityForPick(uint pickId)
@@ -150,6 +163,17 @@ internal sealed class EngineViewportContent : IViewportContent
             bounds.Include(EngineSceneBounds.Compute(_engine.Scene, _modelBounds));
             return bounds;
         }
+    }
+
+    /// <inheritdoc/>
+    public void CollectFramingPoints(List<Vector3> points)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+        EngineSceneBounds.CollectContentCorners(_engine.Scene, points, _modelBounds);
+        EngineSceneBounds.CollectFixtureParts(_engine.Poses, points);
+        // What is really drawn (fixture models in their pose, decoded models) — the component boxes above cover what
+        // is still loading.
+        _world.CollectVisibleCorners(points);
     }
 
     /// <inheritdoc/>

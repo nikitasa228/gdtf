@@ -470,7 +470,11 @@ internal static class Loc
         (Str.MsgFloorCreated, "Floor {0} × {1} m", "Пол {0} × {1} м"),
         (Str.WallSize, "{0} × {1} m", "{0} × {1} м"),
         (Str.LibFileMissing, "file missing", "файл не найден"),
+        (Str.LookOpenWhite, "Open White (All Fixtures)", "Открытый белый (все приборы)"),
+        (Str.BusyOpenWhite, "Setting every fixture to open white…", "Все приборы в открытый белый…"),
+        (Str.MsgOpenWhite, "{0} fixtures in open white", "Открытый белый: приборов — {0}"),
         // (end of engine integration strings)
+
 
 
         (Str.MaterialPaintedWallWhite, "Painted wall, white", "Окрашенная стена, белая"),

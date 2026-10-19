@@ -230,7 +230,12 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         // A user action: the delegate over the current content is made per call (the content changes with the scene).
         var bounds = SelectionController.FramingBounds(_ctx.Session.Scene, _ctx.Session.Selection.Ids, content.TryGetBounds);
         if (bounds.IsEmpty)
-            bounds = content.SceneBounds;
+        {
+            // Nothing selected: the whole stage, framed tightly.
+            FrameScene();
+            return;
+        }
+
         Camera.Frame(bounds, _imageSize.Y > 0 ? _imageSize.X / _imageSize.Y : 16f / 9f);
     }
 

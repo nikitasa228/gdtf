@@ -37,6 +37,7 @@ internal sealed partial class Workspace
     private bool _closeConfirmed;
     private bool _recoveryChecked;
     private bool _frameScenePending;
+    private bool _framedOnce;
     private int _frameSceneAttempts;
 
     /// <summary>The session dialogs (tests and scripts).</summary>
@@ -53,6 +54,7 @@ internal sealed partial class Workspace
         {
             _frameScenePending = true;
             _frameSceneAttempts = 0;
+            _framedOnce = false;
         };
         _ctx.Session.SceneReplaced += _onSessionSceneReplaced;
         _drawSessionDialogs = () =>
@@ -66,6 +68,7 @@ internal sealed partial class Workspace
         Command(SessionActions.PauseSimulation, Str.SimPause, Icons.Clock, ToggleSimulation, () => session.Engine is not null,
             () => session.SimulationPaused);
         Command(SessionActions.ImportGdtf, Str.FileImportGdtf, Icons.Lightbulb, () => ShowImport(ImportKind.Gdtf));
+        Command(SessionActions.OpenWhite, Str.LookOpenWhite, Icons.Sun, ApplyOpenWhite, () => session.Engine is not null && session.FixtureCount() > 0);
     }
 
     /// <summary>Releases the drop target and the scene subscription.</summary>
@@ -270,6 +273,12 @@ internal sealed partial class Workspace
         return string.IsNullOrWhiteSpace(name) ? "scene" : name;
     }
 
+    private void ApplyOpenWhite() => RunBusy(Loc.Get(Str.BusyOpenWhite), () =>
+    {
+        int n = Candela.Engine.StageLooks.ApplyOpenWhite(_ctx.Session.Engine!);
+        return SessionResult.Done(Loc.Format(Str.MsgOpenWhite, n));
+    });
+
     private void ToggleSimulation()
     {
         var session = _ctx.Session;
@@ -430,19 +439,41 @@ internal sealed partial class Workspace
 
     // ---- framing ----------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// Frames every open viewport on a scene that was just opened: at once (from what is known), and again when the
+    /// fixture models have loaded and been drawn — unless the user has moved the camera in between.
+    /// </summary>
     private void FrameNewScene()
     {
         // The viewports need a laid-out image (size) to frame for; wait a few frames for a scene opened at start-up.
         bool laidOut = false;
         foreach (var v in _viewports)
             laidOut |= v.IsOpen && v.ImageRect.Size.X > 0;
-        if (!laidOut && ++_frameSceneAttempts < 30)
+        _frameSceneAttempts++;
+        if (!laidOut && _frameSceneAttempts < 30)
             return;
-        _frameScenePending = false;
+        if (!_framedOnce)
+        {
+            _framedOnce = true;
+            FrameOpenViewports(onlyUntouched: false);
+        }
+
+        bool settled = _ctx.Session.Content?.IsSettled ?? true;
+        if (settled || _frameSceneAttempts > 1800)
+        {
+            FrameOpenViewports(onlyUntouched: true);
+            _frameScenePending = false;
+            _framedOnce = false;
+        }
+    }
+
+    private void FrameOpenViewports(bool onlyUntouched)
+    {
         foreach (var v in _viewports)
         {
-            if (v.IsOpen)
-                v.FrameScene();
+            if (!v.IsOpen || (onlyUntouched && v.CameraMovedSinceFraming))
+                continue;
+            v.FrameScene();
         }
     }
 
