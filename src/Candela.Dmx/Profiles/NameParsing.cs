@@ -311,13 +311,19 @@ public static class NameParsing
         return int.TryParse(s.AsSpan(j + 1, end - j - 1), NumberStyles.None, CultureInfo.InvariantCulture, out int n) && n is > 0 and < 100 ? n : 0;
     }
 
-    /// <summary>True when the name describes an open/empty wheel position ("Open", "Open/Hole", "Open position", "No prism").</summary>
+    /// <summary>
+    /// True when the name describes an open/empty wheel position ("Open", "Open/Hole", "Open position", "No prism"), also
+    /// with "open" as its last word ("Animator OPEN", "Wheel Slot 0: OPEN", "No Prism(Open)") unless it combines it with
+    /// something else ("Red/Open", "Half open", "Close to Open").
+    /// </summary>
     public static bool IsOpenSlotName(string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) return false;
         string s = name.Trim().ToLowerInvariant();
-        return s.StartsWith("open", StringComparison.Ordinal) || s is "white" or "empty" or "hole" or "no gobo" or "no prism" or "none" ||
-            s.StartsWith("no prism", StringComparison.Ordinal) || s.StartsWith("empty", StringComparison.Ordinal);
+        if (s.StartsWith("open", StringComparison.Ordinal) || s is "white" or "empty" or "hole" or "no gobo" or "no prism" or "none" ||
+            s.StartsWith("no prism", StringComparison.Ordinal) || s.StartsWith("empty", StringComparison.Ordinal))
+            return true;
+        return LastWordIs(s, "open") && !ContainsAny(s, "/", "+", "&", ">", " to ", "half", "clos", "split");
     }
 
     /// <summary>
@@ -329,7 +335,7 @@ public static class NameParsing
     {
         if (string.IsNullOrWhiteSpace(name)) return false;
         string s = name.Trim().ToLowerInvariant();
-        if (s is "hole" or "empty" or "none" or "no gobo" or "no prism") return true;
+        if (s is "hole" or "empty" or "none" or "no gobo" or "no prism" or "white") return true;
         if (!s.StartsWith("open", StringComparison.Ordinal)) return false;
         var rest = s.AsSpan(4);
         int i = 0;
@@ -369,7 +375,22 @@ public static class NameParsing
         {
             if (s.StartsWith(prefix, StringComparison.Ordinal)) return true;
         }
-        return false;
+        // "No Flower Effect", "No selection" — but "No rotation", "No shake" only stop a movement of a selected item
+        if (s.StartsWith("no ", StringComparison.Ordinal) &&
+            !ContainsAny(s, "rot", "shake", "spin", "mov", "speed", "strobe", "flash", "fade", "index", "scroll", "random"))
+            return true;
+        // "Animation Rotation OFF", "Wheel Slot 0 OFF": the mechanism is switched off (but "Shake off" only stops a shake)
+        return LastWordIs(s, "off") && !ContainsAny(s, "/", "+", "&", "shake", "strobe", " on");
+    }
+
+    /// <summary>True when the last word of a lower-case name, ignoring punctuation, is <paramref name="word"/>.</summary>
+    private static bool LastWordIs(string s, string word)
+    {
+        int end = s.Length;
+        while (end > 0 && !char.IsLetterOrDigit(s[end - 1])) end--;
+        int start = end;
+        while (start > 0 && char.IsLetter(s[start - 1])) start--;
+        return s.AsSpan(start, end - start).SequenceEqual(word);
     }
 
     /// <summary>

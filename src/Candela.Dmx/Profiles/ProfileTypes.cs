@@ -294,6 +294,14 @@ public sealed class ProfileFunction
     /// </summary>
     internal bool OnSelectionChannel { get; set; }
 
+    /// <summary>
+    /// True when the function being active means its mechanism is in the beam (slot selections, whole-wheel index and
+    /// spin, item rotation on the mechanism's selection channel or in a range naming a slot); false for the rotation or
+    /// indexing of a prism, animation disc or beam shaper on a channel of its own, which turns the item only while
+    /// another channel inserts it (ADJ Focus Profile "Prism1Pos" next to a "Prism1" channel at "No Effect").
+    /// </summary>
+    internal bool ImpliesInsertion { get; set; } = true;
+
     /// <summary>Colour code of ColorRgb/ColorSub/BladeSoft functions: 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y, 6 side A, 7 side B; −1 otherwise.</summary>
     internal int ColorCode { get; set; } = -1;
 

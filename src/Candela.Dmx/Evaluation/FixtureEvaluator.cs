@@ -909,10 +909,12 @@ public static class FixtureEvaluator
         if ((flags & ChannelSetFlags.WheelOut) != 0 && f.Class.Kind is not (AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin
                 or AttributeKind.WheelSelectShake or AttributeKind.AnimationInsertion))
         {
-            // a rotation, index, spin or rate function in a range named "No function", "Off" … does nothing to the
+            // an item rotation, index or rate function in a range named "No function", "Off" … does nothing to the
             // mechanism — it does not put it in the beam — unless its channel is the mechanism's selection channel, where
-            // the range takes the mechanism out (Robe Esprite "EffectWheelIndex" / "No function")
-            if (f.OnSelectionChannel)
+            // the range takes the mechanism out (Robe Esprite "EffectWheelIndex" / "No function"); a whole-wheel index or
+            // spin positions the wheel, so its "Open" range is the open position (ADJ Hydro Profile "Gobo 1 - 7 Index")
+            if (f.OnSelectionChannel || f.Class.Kind is AttributeKind.WheelIndex or AttributeKind.WheelSpin or AttributeKind.WheelRandom
+                    or AttributeKind.WheelShake)
             {
                 if (f.Wheel >= 0) w.Wheel = f.Wheel;
                 SetInsertion(ref w, 0f);
@@ -920,7 +922,7 @@ public static class FixtureEvaluator
             return;
         }
         int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
-        if (f.Wheel >= 0) w.Wheel = f.Wheel;
+        if (f.Wheel >= 0 && f.ImpliesInsertion) w.Wheel = f.Wheel;
         switch (f.Class.Kind)
         {
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake:

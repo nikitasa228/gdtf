@@ -246,6 +246,7 @@ public sealed partial class FixtureProfile
         private void InheritSiblingWheels(ProfileChannel ch)
         {
             int end = ch.FirstFunction + ch.FunctionCount;
+            MarkPlainOpenSets(ch);
             for (int k = ch.FirstFunction; k < end; k++)
             {
                 var f = Functions[k];
@@ -256,6 +257,10 @@ public sealed partial class FixtureProfile
                     f.OnSelectionChannel = j != k && g.Class.Wheel == f.Class.Wheel && g.Class.Number == f.Class.Number &&
                         (IsWheelSelection(g.Class.Kind) || g.Class.Kind == AttributeKind.AnimationInsertion);
                 }
+                f.ImpliesInsertion = f.Class.Kind is not (AttributeKind.SlotIndex or AttributeKind.SlotRotate or AttributeKind.SlotShake
+                        or AttributeKind.EffectRate) ||
+                    f.Class.Wheel is not (WheelFamily.Prism or WheelFamily.Animation or WheelFamily.AnimationSystem or WheelFamily.BeamShaper) ||
+                    f.OnSelectionChannel || Array.Exists(f.SetArray, s => s.WheelSlot > 0);
                 if (f.Wheel >= 0) continue;
                 for (int j = ch.FirstFunction; j < end; j++)
                 {
@@ -264,6 +269,43 @@ public sealed partial class FixtureProfile
                     if (IsWheelSelection(f.Class.Kind) && Wheels[g.Wheel].SlotCount > 1) break;
                     f.Wheel = g.Wheel;
                     break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A channel whose selection functions have no range that takes the mechanism out, but a range named plainly
+        /// "Open" that selects a slot which is not a hole (PRstage Spot 460 animation wheel: "Open" → "Wheel Slot 1"): the
+        /// file put the open position on a placeholder slot, so that range takes the mechanism out. Where the channel
+        /// does have an out range (ACME Sana: "Close" selects the hole, "Open" the 8-facet prism) the slots decide.
+        /// </summary>
+        private void MarkPlainOpenSets(ProfileChannel ch)
+        {
+            int end = ch.FirstFunction + ch.FunctionCount;
+            bool selection = false;
+            for (int k = ch.FirstFunction; k < end; k++)
+            {
+                var f = Functions[k];
+                if (!IsWheelSelection(f.Class.Kind) || f.Wheel < 0) continue;
+                selection = true;
+                if ((f.NameFlags & ChannelSetFlags.WheelOut) != 0 || Array.Exists(f.SetFlagArray, s => (s & ChannelSetFlags.WheelOut) != 0)) return;
+            }
+            if (!selection) return;
+            for (int k = ch.FirstFunction; k < end; k++)
+            {
+                var f = Functions[k];
+                if (!IsWheelSelection(f.Class.Kind) || f.Wheel < 0) continue;
+                bool changed = false;
+                foreach (var s in f.SetArray)
+                {
+                    if (!NameParsing.IsPlainOpenSlotName(s.Name)) continue;
+                    s.Flags |= ChannelSetFlags.WheelOut;
+                    changed = true;
+                }
+                if (changed)
+                {
+                    f.SetSets(f.SetArray);
+                    Warnings.Add($"{f.Source.FullName}: a range named 'Open' selects a slot that is not open; read as open.");
                 }
             }
         }
@@ -952,13 +994,16 @@ public sealed partial class FixtureProfile
                 transmission[s] = float.IsFinite(c.X) && float.IsFinite(c.Y) && c.Y > 0f
                     ? Filters.PhysicalChannelTransmission(LightColor.FromXy(c.X, c.Y), y)
                     : Vector3.One;
-                facets[s] = slot.Facets.Count > 0 ? slot.Facets.Count : NameParsing.ParseFacetCount(slot.Name);
+                // a single facet is not a prism: it passes the beam on (BeamZ Ignite's "Wheel Slot 1" under "Prism1 OPEN")
+                facets[s] = slot.Facets.Count > 1 ? slot.Facets.Count : slot.Facets.Count == 1 ? 0 : NameParsing.ParseFacetCount(slot.Name);
+                if (facets[s] == 1) facets[s] = 0;
                 bool media = slot.MediaPath is not null || slot.MediaFileName is not null;
                 bool defaultColour = y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f;
-                open[s] = slot.Facets.Count == 0 && slot.AnimationSystem is null && facets[s] == 0 &&
+                open[s] = slot.Facets.Count <= 1 && slot.AnimationSystem is null && facets[s] == 0 &&
                     (media
                         ? NameParsing.IsPlainOpenSlotName(slot.Name) || IsOpenMediaName(slot.MediaFileName)
-                        : NameParsing.IsOpenSlotName(slot.Name) || (defaultColourIsOpen && defaultColour));
+                        : NameParsing.IsOpenSlotName(slot.Name) || (defaultColourIsOpen && defaultColour) ||
+                            (NameParsing.IsWheelOutName(slot.Name) && !slot.Name.Contains("clos", StringComparison.OrdinalIgnoreCase)));
                 // an open slot is a hole: files often store the lamp's own colour there, which is not a filter
                 if (open[s] && y >= 0.9f) transmission[s] = Vector3.One;
             }
