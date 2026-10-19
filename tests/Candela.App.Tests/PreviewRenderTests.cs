@@ -50,7 +50,7 @@ public sealed class PreviewRenderTests
         var settings = new SettingsStore(log, dir.File("settings.json"));
         settings.Load();
         using var renderer = CreateOrSkip();
-        using var session = new EditorSession(log, settings);
+        using var session = EngineTestSupport.CreateSession(log, settings, dir, previewStage: true);
         session.AttachRenderer(renderer);
         var content = Assert.IsType<PreviewStage>(session.Content);
         Assert.Equal(8, session.Scene.Count);
