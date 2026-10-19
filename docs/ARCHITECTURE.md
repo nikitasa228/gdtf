@@ -98,6 +98,9 @@ from Core). This keeps project serialisation in one place and lets every module 
 
 ## 4. Scene model (`Candela.Core`)
 
+Details — change notifications, reference classification and subtree copying (duplicate, paste, merge), undo,
+tolerant `scene.json` reading, key chords — are in [core.md](core.md).
+
 * `Scene` — the document: name, layers, root entities, `SceneSettings` (units display, atmosphere domain defaults…).
 * `Entity` — id, name, parent/children, local `Transform` (position m, rotation quaternion, scale), layer, visible,
   locked, list of components. World matrices are computed on demand and cached with a dirty flag.

@@ -29,7 +29,7 @@ src/Candela.Rendering.Vulkan
   Rendering/    VulkanRenderer, VulkanRenderTarget, PipelineLibrary, DrawList, ReverseZ, ShadowAtlas, LightPlanner,
                 RendererResources, DescriptorWriter, the passes (Passes, LightingPasses, EffectPasses)
   Shaders/      GLSL 460 sources (embedded) + ShaderCompiler, ShaderLibrary, GpuStructs, ShaderConstants
-  Diagnostics/  ProceduralTestScene, ProceduralMeshes, ImageFiles (CLI, tests, golden images)
+  Diagnostics/  ProceduralTestScene, ProceduralMeshes, ImageFiles (CLI, tests, golden images; opaque PNGs as RGB)
 src/Candela.Cli            candela render-test
 tests/Candela.Rendering.Vulkan.Tests
 ```

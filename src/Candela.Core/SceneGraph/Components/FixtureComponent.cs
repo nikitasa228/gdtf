@@ -18,15 +18,20 @@ public sealed class FixtureComponent : Component
     /// <summary>Console fixture id (MVR FixtureID).</summary>
     public int FixtureId { get; set; }
 
+    /// <summary>Unit number from the paperwork / MVR UnitNumber (free text), if any.</summary>
     public string? UnitNumber { get; set; }
+
+    /// <summary>MVR CustomId (an additional numbering scheme of the console), 0 = none.</summary>
     public int CustomId { get; set; }
 
     /// <summary>Gel / identification colour from MVR (CIE 1931 xyY), if any.</summary>
     public CieColor? Color { get; set; }
 
+    /// <summary>True when the fixture's body casts shadows of other lights.</summary>
     public bool CastShadow { get; set; } = true;
 
     /// <summary>Entity that carries the fixture's weight (truss, pipe, rigging point, wall bracket); null = free-standing.</summary>
+    [EntityReference]
     public Guid? MountedOn { get; set; }
 
     /// <summary>
@@ -37,6 +42,9 @@ public sealed class FixtureComponent : Component
 
     /// <summary>Optional point the fixture is focused on (world space, metres), as in MVR focus points.</summary>
     public System.Numerics.Vector3? FocusPoint { get; set; }
+
+    /// <inheritdoc/>
+    protected internal override void RemapReferences(EntityReferenceRemapper remapper) => MountedOn = remapper.Remap(MountedOn);
 }
 
 /// <summary>
@@ -48,9 +56,11 @@ public readonly record struct DmxAddress(int Universe, int Address, int Break = 
     /// <summary>Absolute address as used by MVR and many consoles: (universe-1)*512 + address.</summary>
     public int Absolute => (Universe - 1) * 512 + Address;
 
+    /// <summary>The address of an absolute address (1 = universe 1, address 1; 513 = universe 2, address 1).</summary>
     public static DmxAddress FromAbsolute(int absolute, int dmxBreak = 1) =>
         new((absolute - 1) / 512 + 1, (absolute - 1) % 512 + 1, dmxBreak);
 
+    /// <summary>"universe.address" with a three-digit address, e.g. "2.101".</summary>
     public override string ToString() => $"{Universe}.{Address:D3}";
 }
 

@@ -7,7 +7,9 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [x] Solution layout, build settings, lint (`dotnet format`), test runner
 - [x] Cloud toolchain hook: .NET 8 SDK, lavapipe Vulkan, validation layers, Xvfb
 - [x] Architecture, conventions, requirement map (this file)
-- [x] Core scene model: entities, transforms, components, selection, undo/redo, issues, presets, settings, key bindings
+- [x] Core scene model: entities, transforms, components, selection, undo/redo, issues, presets, settings, key bindings;
+      change notifications for every scene state, subtree copying with reference remapping (duplicate, paste, merge),
+      tolerant forward-compatible `scene.json` (docs/core.md)
 
 ## M1 — Data core
 - [x] GDTF reader: fixture type, geometry tree, models (3DS/glTF), DMX modes/channels/functions/sets, wheels (colour,
