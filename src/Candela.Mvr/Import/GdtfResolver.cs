@@ -30,20 +30,23 @@ internal sealed class GdtfResolver
 
     /// <summary>
     /// The resolution of a spec (resolved once per distinct spec; <paramref name="users"/> are listed in issues;
-    /// <paramref name="patched"/> tells whether any of them has a DMX address).
+    /// <paramref name="patched"/> tells whether any of them has a DMX address). <paramref name="candelaDevice"/> is the
+    /// GDTF file name of one of Candela's generic devices when Candela's <c>UserData</c> marks the spec as such: the
+    /// library's file of that name is used, else the embedded copy under that name, quietly (their GDTF has no model
+    /// files and splitters and nodes have no DMX channels, which is what they are, not a placeholder).
     /// </summary>
-    public MvrGdtfReference Resolve(string spec, IReadOnlyList<Guid> users, bool patched = true)
+    public MvrGdtfReference Resolve(string spec, IReadOnlyList<Guid> users, bool patched = true, string? candelaDevice = null)
     {
         string key = spec.Trim();
         if (_bySpec.TryGetValue(key, out var existing)) return existing;
         var r = new MvrGdtfReference(key);
         _bySpec[key] = r;
         _ordered.Add(r);
-        ResolveCore(r, users.Take(64).ToArray(), patched);
+        ResolveCore(r, users.Take(64).ToArray(), patched, candelaDevice);
         return r;
     }
 
-    private void ResolveCore(MvrGdtfReference r, Guid[] users, bool patched)
+    private void ResolveCore(MvrGdtfReference r, Guid[] users, bool patched, string? candelaDevice)
     {
         string spec = r.SpecName;
         FixtureType? embedded = null;
@@ -75,6 +78,7 @@ internal sealed class GdtfResolver
                     embedded = null;
                 }
             }
+            if (candelaDevice is not null && ResolveCandelaDevice(r, candelaDevice, embedded)) return;
             if (embedded is not null && !r.EmbeddedIsStub)
             {
                 r.Source = MvrGdtfSource.Embedded;
@@ -84,6 +88,7 @@ internal sealed class GdtfResolver
             }
         }
 
+        if (file is null && candelaDevice is not null && ResolveCandelaDevice(r, candelaDevice, null)) return;
         var match = FindInLibrary(spec, embedded);
         if (match is { Kind: FixtureMatchKind.Substitute } && embedded is not null && !IsPlaceholder(embedded, patched))
         {
@@ -154,6 +159,44 @@ internal sealed class GdtfResolver
                 ? $"GDTF '{spec}' is not usable from the MVR and no fixture library was given."
                 : $"GDTF '{spec}' is not usable from the MVR and the fixture library has no matching fixture.",
             users);
+    }
+
+    /// <summary>
+    /// One of Candela's generic devices: the library's file named <paramref name="fileName"/> (the device as this
+    /// version generates it), else the <paramref name="embedded"/> copy under that name. False when neither is usable
+    /// (then the spec is resolved like any other).
+    /// </summary>
+    private bool ResolveCandelaDevice(MvrGdtfReference r, string fileName, FixtureType? embedded)
+    {
+        if (_library?.FindByFileName(fileName) is { } entry)
+        {
+            FixtureType? type = null;
+            try
+            {
+                type = _library.GetFixtureType(entry);
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                // an unreadable library copy: the embedded copy below, or the ordinary resolution, takes over
+            }
+            if (type is not null)
+            {
+                r.Source = MvrGdtfSource.Library;
+                r.FileName = entry.FileName;
+                r.LibraryEntry = entry;
+                r.MatchKind = FixtureMatchKind.ExactFileName;
+                r.MatchScore = 1;
+                r.FixtureType = type;
+                r.IsCandelaDevice = true;
+                return true;
+            }
+        }
+        if (embedded is null) return false;
+        r.Source = MvrGdtfSource.Embedded;
+        r.FileName = fileName;
+        r.FixtureType = embedded;
+        r.IsCandelaDevice = true;
+        return true;
     }
 
     private FixtureMatch? FindInLibrary(string spec, FixtureType? embedded)

@@ -92,6 +92,13 @@ public sealed class MvrGdtfReference
     /// <summary>Number of MVR objects that reference this spec.</summary>
     public int ObjectCount { get; internal set; }
 
+    /// <summary>
+    /// True when Candela's <c>UserData</c> marks the spec as one of Candela's generic devices (splitters, nodes, dimmer
+    /// packs; see <see cref="CandelaUserData"/>): it resolved to the device's own file name, from the library or from
+    /// the embedded copy, without stub or substitute reports.
+    /// </summary>
+    public bool IsCandelaDevice { get; internal set; }
+
     /// <summary>Mode resolution per requested mode name, in order of first use.</summary>
     public IReadOnlyList<MvrModeResolution> Modes { get; internal set; } = Array.Empty<MvrModeResolution>();
 

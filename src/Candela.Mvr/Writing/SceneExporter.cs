@@ -32,6 +32,7 @@ internal sealed class SceneExporter
     private readonly HashSet<string> _fileNames = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<(string Name, string File), Guid> _symdefs = new();
     private readonly List<CandelaUserData.WallRecord> _walls = new();
+    private readonly List<CandelaUserData.DeviceRecord> _candelaDevices = new();
     private int _objectCount;
     private int _connectionCount;
 
@@ -58,8 +59,9 @@ internal sealed class SceneExporter
         }
         foreach (var (layer, point) in _focusPoints) layer.Objects.Add(point);
         WriteConnections();
-        // walls, floors and ceilings come back as such when Candela imports the file (other programs see their boxes)
-        if (_walls.Count > 0) _doc.UserData.Add(CandelaUserData.Create(_walls));
+        // walls, floors and ceilings come back as such when Candela imports the file (other programs see their boxes), and
+        // Candela's generic devices as those devices (other programs see fixtures)
+        if (_walls.Count > 0 || _candelaDevices.Count > 0) _doc.UserData.Add(CandelaUserData.Create(_walls, _candelaDevices));
         _sink.Complete();
         return new MvrExportResult(_doc, _issues, _objectCount, _focusPoints.Count, _connectionCount);
     }
@@ -236,6 +238,12 @@ internal sealed class SceneExporter
             d.GdtfSpec = EmbedGdtf(spec, e.Id);
         }
         d.GdtfMode = string.IsNullOrWhiteSpace(fc.GdtfMode) ? null : fc.GdtfMode.Trim();
+        if (spec.Length > 0 && IsCandelaDevice(spec))
+        {
+            // the device's own file name (the embedded copy may have been renamed to keep archive names unique)
+            string file = GdtfResolver.EnsureGdtfExtension(MvrDocument.FileNameOf(MvrDocument.NormalizePath(spec)));
+            _candelaDevices.Add(new CandelaUserData.DeviceRecord(d.Uuid, file, d.GdtfMode));
+        }
         if (d.GdtfMode is null && spec.Length > 0)
         {
             // Core null means "the first mode"; MVR requires GDTFMode whenever GDTFSpec is written.
@@ -319,6 +327,20 @@ internal sealed class SceneExporter
         {
             _sink.Aggregate(IssueSeverity.Note, IssueCategory.Fixture, MvrIssueCodes.NotRepresentable, "manual-attributes",
                 n => $"{n} fixture(s) have manual attribute values; MVR has no programming data, so they are not exported.", e.Id);
+        }
+    }
+
+    /// <summary>True when the options say <paramref name="spec"/> is one of Candela's generic devices (never throws).</summary>
+    private bool IsCandelaDevice(string spec)
+    {
+        if (_options.IsCandelaDevice is not { } test) return false;
+        try
+        {
+            return test(spec);
+        }
+        catch (Exception e) when (e is not OutOfMemoryException)
+        {
+            return false; // a failing predicate only costs the marker: the object is still a valid fixture
         }
     }
 

@@ -40,6 +40,15 @@ public sealed class MvrExportOptions
     public bool ExportWalls { get; init; } = true;
 
     /// <summary>
+    /// Tells which GDTF specs (<c>FixtureComponent.GdtfSpec</c>) are Candela's own generic devices — the DMX splitters,
+    /// Art-Net / sACN nodes and dimmer packs whose GDTF files Candela generates (<c>Candela.Electrical.GenericDevices</c>).
+    /// Their objects are written as ordinary MVR fixtures with the GDTF embedded, so other programs see valid fixtures,
+    /// and are also listed in Candela's <c>UserData</c> block (<see cref="CandelaUserData"/>), so Candela imports them
+    /// as those devices again. Null: no object is marked.
+    /// </summary>
+    public Func<string, bool>? IsCandelaDevice { get; init; }
+
+    /// <summary>
     /// A GDTF provider that reads files of a fixture library by file name (<c>FixtureLibrary.FindByFileName</c>), then
     /// from the extra folders in order (e.g. a project's <c>fixtures/</c> folder). Unreadable files give null.
     /// </summary>

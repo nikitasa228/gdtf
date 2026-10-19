@@ -19,6 +19,12 @@ namespace Candela.Mvr;
 /// programs) and <c>geometry</c> the file of that box. The importer gives such an object its <see cref="WallComponent"/>
 /// back and skips the box (it would otherwise become an imported model); a block it cannot read is reported and the
 /// box is imported as a model instead, so nothing is lost.</para>
+/// <para>It also marks Candela's generic devices (DMX splitters, Art-Net / sACN nodes, dimmer packs, whose GDTF files
+/// Candela generates): one <c>&lt;Device object="{uuid}" gdtf="{file}" mode="{mode}"/&gt;</c> per exported device. The
+/// object itself is an ordinary MVR <c>Fixture</c> with its GDTF embedded, which is what other programs read; the
+/// record tells Candela that <c>gdtf</c> is the file name of one of its own generic devices, so the import resolves it
+/// to that device (the library's generated file, or the embedded copy under that name) without reporting the channel-less
+/// GDTF as a placeholder stub. Readers that do not know the element (older Candela versions) skip it.</para>
 /// </remarks>
 public static class CandelaUserData
 {
@@ -32,8 +38,14 @@ public static class CandelaUserData
     public const int MaxRecords = 100_000;
 
     private const string WallElement = "Wall";
+    private const string DeviceElement = "Device";
     private const string ObjectAttribute = "object";
     private const string GeometryAttribute = "geometry";
+    private const string GdtfAttribute = "gdtf";
+    private const string ModeAttribute = "mode";
+
+    /// <summary>Longest GDTF file name accepted in a device record (characters).</summary>
+    private const int MaxFileNameLength = 255;
 
     /// <summary>The asset-key scheme of Candela.Assets (<c>asset:{id}/…</c>): textures of the project's own assets.</summary>
     private const string AssetScheme = "asset:";
@@ -44,10 +56,20 @@ public static class CandelaUserData
     /// <param name="Wall">The wall, floor or ceiling.</param>
     public sealed record WallRecord(Guid ObjectId, string? GeometryFile, WallComponent Wall);
 
+    /// <summary>A generic device of the block: the MVR object and the device's GDTF file name and DMX mode.</summary>
+    /// <param name="ObjectId">Uuid of the MVR fixture.</param>
+    /// <param name="GdtfFile">File name of the generic device's GDTF (no folder, ending in <c>.gdtf</c>).</param>
+    /// <param name="Mode">DMX mode name, or null for the GDTF's first mode.</param>
+    public sealed record DeviceRecord(Guid ObjectId, string GdtfFile, string? Mode);
+
     /// <summary>Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/>.</summary>
-    public static MvrUserData Create(IEnumerable<WallRecord> walls)
+    public static MvrUserData Create(IEnumerable<WallRecord> walls) => Create(walls, Array.Empty<DeviceRecord>());
+
+    /// <summary>Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/> and generic <paramref name="devices"/>.</summary>
+    public static MvrUserData Create(IEnumerable<WallRecord> walls, IEnumerable<DeviceRecord> devices)
     {
         ArgumentNullException.ThrowIfNull(walls);
+        ArgumentNullException.ThrowIfNull(devices);
         var data = new XElement("Data", new XAttribute("provider", Provider), new XAttribute("ver", Version));
         foreach (var w in walls)
         {
@@ -56,7 +78,59 @@ public static class CandelaUserData
             element.Value = CandelaJson.SerializeComponent(w.Wall);
             data.Add(element);
         }
+        foreach (var d in devices)
+        {
+            var element = new XElement(DeviceElement, new XAttribute(ObjectAttribute, d.ObjectId.ToString("D")), new XAttribute(GdtfAttribute, d.GdtfFile));
+            if (!string.IsNullOrEmpty(d.Mode)) element.Add(new XAttribute(ModeAttribute, d.Mode));
+            data.Add(element);
+        }
         return new MvrUserData { Provider = Provider, Version = Version, Element = data };
+    }
+
+    /// <summary>
+    /// The generic devices of Candela's blocks in <paramref name="document"/> by MVR object uuid. A record without a
+    /// valid object uuid or with a GDTF name that is not a plain <c>.gdtf</c> file name is reported in
+    /// <paramref name="issues"/> (<see cref="MvrIssueCodes.ValueInvalid"/>) and left out (the object is then imported as
+    /// the fixture it is); blocks of other providers are ignored.
+    /// </summary>
+    public static IReadOnlyDictionary<Guid, DeviceRecord> ReadDevices(MvrDocument document, ICollection<Issue>? issues = null)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+        var devices = new Dictionary<Guid, DeviceRecord>();
+        int damaged = 0;
+        foreach (var block in document.UserData)
+        {
+            if (!string.Equals(block.Provider, Provider, StringComparison.Ordinal) || block.Element is null) continue;
+            foreach (var element in block.Element.Elements())
+            {
+                if (element.Name.LocalName != DeviceElement) continue;
+                if (devices.Count >= MaxRecords) break;
+                string? file = ((string?)element.Attribute(GdtfAttribute))?.Trim();
+                string? mode = ((string?)element.Attribute(ModeAttribute))?.Trim();
+                if (!Guid.TryParse((string?)element.Attribute(ObjectAttribute), out var objectId) || objectId == Guid.Empty || !IsPlainGdtfName(file))
+                {
+                    damaged++;
+                    continue;
+                }
+                devices.TryAdd(objectId, new DeviceRecord(objectId, file!, string.IsNullOrEmpty(mode) ? null : mode));
+            }
+        }
+        if (damaged > 0)
+        {
+            issues?.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.ValueInvalid,
+                $"{damaged} device record(s) in Candela's data of the MVR could not be read; those objects are imported as the fixtures they are."));
+        }
+        return devices;
+    }
+
+    /// <summary>A file name without folders or reserved characters that ends in <c>.gdtf</c>.</summary>
+    private static bool IsPlainGdtfName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name) || name.Length > MaxFileNameLength || !name.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase) || name.StartsWith('.'))
+            return false;
+        foreach (char c in name)
+            if (c < ' ' || c is '/' or '\\' or ':' or '<' or '>' or '"' or '|' or '?' or '*') return false;
+        return name.Length > ".gdtf".Length;
     }
 
     /// <summary>

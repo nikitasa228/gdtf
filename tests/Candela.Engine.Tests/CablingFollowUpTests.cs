@@ -260,4 +260,59 @@ public sealed class CablingFollowUpTests
         Assert.Equal(DeviceCatalog.PowerSourceSize.Z, boxBounds.Size.Z, 4);
         Assert.Equal(0.5f, boxBounds.Min.Z, 4);
     }
+    [Fact]
+    public void Generic_devices_go_through_an_mvr_as_fixtures_and_come_back_as_candela_devices()
+    {
+        using var engine = TestEnvironment.CreateEngine("generic-mvr");
+        GenericDeviceLibrary.Register(engine);
+        var placed = new Dictionary<string, Entity>();
+        int x = 0;
+        foreach (var device in GenericDevices.All)
+        {
+            var e = new Entity(device.Model) { Local = new Transform(new Vector3(x++, 2, 0)) };
+            var fixture = new FixtureComponent { GdtfSpec = device.FileName, GdtfMode = device.ModeName };
+            if (device.DmxChannels > 0) fixture.Addresses.Add(new DmxAddress(3, 1 + 10 * x));
+            e.Add(fixture);
+            engine.Scene.Add(e);
+            placed[device.FileName] = e;
+        }
+        var node = placed[GenericDevices.All.First(d => d.Kind == GenericDeviceKind.NetworkNode).FileName];
+        var splitter = placed[GenericDevices.All.First(d => d.Kind == GenericDeviceKind.DmxSplitter).FileName];
+        SceneBuilder.Cable(engine.Scene, node, "DMX A", splitter, "DMX In"); // written as an MVR connection
+
+        string path = Path.Combine(TestEnvironment.NewTempDirectory("generic-mvr"), "devices.mvr");
+        Assert.True(engine.ExportMvr(path).Success);
+
+        // other programs: plain MVR fixtures with the GDTF embedded and readable, and Candela's marker beside them
+        var document = Mvr.MvrReader.ReadFile(path);
+        var records = Mvr.CandelaUserData.ReadDevices(document);
+        Assert.Equal(GenericDevices.All.Count, records.Count);
+        foreach (var (file, entity) in placed)
+        {
+            var obj = Assert.IsType<Mvr.MvrFixture>(document.AllObjects().Single(o => o.Uuid == entity.Id));
+            Assert.Equal(file, records[entity.Id].GdtfFile);
+            Assert.Equal(GenericDevices.Find(file)!.ModeName, obj.GdtfMode);
+            using var archive = Gdtf.GdtfArchive.FromBytes(document.FindFile(obj.GdtfSpec!)!.Bytes!, obj.GdtfSpec!);
+            Assert.Contains(Gdtf.GdtfReader.Read(archive).DmxModes, m => m.Name == obj.GdtfMode);
+        }
+
+        // Candela: the same devices, recognised as such, without placeholder-stub reports
+        using var other = TestEnvironment.CreateEngine("generic-mvr-open");
+        GenericDeviceLibrary.Register(other);
+        var opened = other.Open(path);
+        Assert.True(opened.Success, opened.Summary);
+        Assert.DoesNotContain(opened.Issues, i => i.Code is Mvr.MvrIssueCodes.GdtfStub or Mvr.MvrIssueCodes.GdtfUnresolved or
+            Mvr.MvrIssueCodes.GdtfSubstitute or Mvr.MvrIssueCodes.GdtfNoGeometry);
+        foreach (var (file, entity) in placed)
+        {
+            var copy = other.Scene.Find(entity.Id)!;
+            var fixture = copy.Get<FixtureComponent>()!;
+            Assert.Equal(file, fixture.GdtfSpec);
+            Assert.Equal(GenericDevices.Find(file)!.ModeName, fixture.GdtfMode);
+            Assert.NotNull(DeviceCatalog.GroupOf(copy));
+            Assert.NotEmpty(other.Network.Ports.GetPorts(copy));
+        }
+        // the connection between two generic devices comes back as a cable plugged into the devices' ports
+        Assert.Contains(other.NetworkSolution.Cables, c => c.Endpoints.Count(ep => ep.IsUsable && (ep.EntityId == splitter.Id || ep.EntityId == node.Id)) == 2);
+    }
 }

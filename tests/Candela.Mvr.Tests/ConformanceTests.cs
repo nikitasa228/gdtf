@@ -178,7 +178,7 @@ public sealed class ConformanceTests
     /// A minimal GDTF without a drawable model: <paramref name="channels"/> DMX channels in one mode "Mode A" (zero
     /// channels: a passive device, like a bracket).
     /// </summary>
-    private static byte[] ModellessGdtf(string manufacturer, string name, int channels)
+    internal static byte[] ModellessGdtf(string manufacturer, string name, int channels)
     {
         string[] attributes = { "Dimmer", "Pan", "Tilt", "Zoom" };
         var dmx = new StringBuilder();
