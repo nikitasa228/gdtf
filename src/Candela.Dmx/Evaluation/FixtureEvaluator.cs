@@ -903,25 +903,59 @@ public static class FixtureEvaluator
             _ => null,
         };
         if (arr is null || arr.Length == 0) return;
+        var flags = r.SetFlags;
         if (n >= arr.Length) n = arr.Length - 1;
         ref var w = ref arr[n];
-        var flags = r.SetFlags;
+        if ((flags & ChannelSetFlags.WheelOut) != 0 && f.Class.Kind is not (AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin
+                or AttributeKind.WheelSelectShake or AttributeKind.AnimationInsertion))
+        {
+            // a rotation, index, spin or rate function in a range named "No function", "Off" … does nothing to the
+            // mechanism — it does not put it in the beam — unless its channel is the mechanism's selection channel, where
+            // the range takes the mechanism out (Robe Esprite "EffectWheelIndex" / "No function")
+            if (f.OnSelectionChannel)
+            {
+                if (f.Wheel >= 0) w.Wheel = f.Wheel;
+                SetInsertion(ref w, 0f);
+            }
+            return;
+        }
         int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
         if (f.Wheel >= 0) w.Wheel = f.Wheel;
         switch (f.Class.Kind)
         {
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake:
-                if (f.Wheel >= 0) w.Position = f.UsesSlotPosition ? r.Value : 1f;
-                else
                 {
-                    // a prism or effect without wheel data: in unless the range says open/off
-                    bool open = (flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction | ChannelSetFlags.Closed)) != 0 ||
-                        (set is not null && NameParsing.IsOpenSlotName(set.Name));
-                    w.Position = float.NaN;
-                    w.IsOpen = open;
-                    w.Facets = open || f.Class.Wheel != WheelFamily.Prism ? 0 : Math.Max(NameParsing.ParseFacetCount(set?.Name ?? f.Name), 3);
-                    w.Insertion = open ? 0f : 1f;
-                    w.Rate = r.Physical;
+                    // a range named "Open", "Off", "Removed" … (WheelOut) takes the mechanism out of the beam; a ramp after
+                    // it moves a single-slot mechanism in gradually (both found while the profile is compiled)
+                    bool isOut = (flags & ChannelSetFlags.WheelOut) != 0;
+                    float insertion = float.NaN;
+                    if (isOut)
+                    {
+                        insertion = 0f;
+                    }
+                    else if ((flags & ChannelSetFlags.InsertionCycle) != 0 && set is not null)
+                    {
+                        insertion = set.CycleInsertion(r.Dmx, ctx.Time);
+                        animating = true;
+                    }
+                    else if ((flags & ChannelSetFlags.InsertionRamp) != 0 && set is not null && set.DmxTo > set.DmxFrom)
+                    {
+                        insertion = Math.Clamp((float)(r.Dmx - set.DmxFrom) / (set.DmxTo - set.DmxFrom), 0f, 1f);
+                    }
+                    if (f.Wheel >= 0)
+                    {
+                        w.Position = f.UsesSlotPosition ? r.Value : 1f;
+                    }
+                    else
+                    {
+                        // a prism or effect without wheel data: in unless the range says it is out
+                        w.Position = float.NaN;
+                        w.IsOpen = isOut;
+                        w.Facets = isOut || f.Class.Wheel != WheelFamily.Prism ? 0 : Math.Max(NameParsing.ParseFacetCount(set?.Name ?? f.Name), 3);
+                        w.Rate = r.Physical;
+                        if (float.IsNaN(insertion)) insertion = 1f;
+                    }
+                    if (!float.IsNaN(insertion)) SetInsertion(ref w, insertion);
                 }
                 if (f.Class.Kind == AttributeKind.WheelSelectSpin)
                 {
@@ -989,9 +1023,20 @@ public static class FixtureEvaluator
                 w.Rate = r.Physical;
                 break;
             case AttributeKind.AnimationInsertion:
-                w.Insertion = Level(f, r.Value);
+                SetInsertion(ref w, (flags & ChannelSetFlags.WheelOut) != 0 ? 0f : Level(f, r.Value));
                 break;
         }
+    }
+
+    /// <summary>
+    /// Sets a mechanism's insertion from a channel that states it (an "out" range, a ramp, an animation-system insertion
+    /// channel); several such channels on one mechanism combine to the smallest insertion.
+    /// </summary>
+    private static void SetInsertion(ref WheelState w, float insertion)
+    {
+        insertion = float.IsFinite(insertion) ? Math.Clamp(insertion, 0f, 1f) : 0f;
+        w.Insertion = w.InsertionSet ? MathF.Min(w.Insertion, insertion) : insertion;
+        w.InsertionSet = true;
     }
 
     private static void ResetWheels(BeamState s)
@@ -1051,6 +1096,13 @@ public static class FixtureEvaluator
             if (w.Wheel >= 0 && !float.IsFinite(w.Position)) w.Position = 1f;
             if (w.Wheel < 0)
             {
+                if (w.InsertionSet && !(w.Insertion > 0f))
+                {
+                    // a wheel-less prism/effect taken out by its range
+                    w.IsOpen = true;
+                    w.Facets = 0;
+                    w.Insertion = 0f;
+                }
                 if (float.IsNaN(w.Position) && w.Insertion > 0f) continue; // wheel-less prism/effect set in ApplyWheel
                 w.Slot = 0;
                 w.NextSlot = 0;
@@ -1077,7 +1129,21 @@ public static class FixtureEvaluator
             w.IsOpen = open0 && (blend == 0f || open1);
             int facets = blend > 0.5f ? wheel.SlotFacetArray[i1] : wheel.SlotFacetArray[i0];
             w.Facets = prisms ? (facets > 0 ? facets : (blend > 0.5f ? open1 : open0) ? 0 : 3) : facets;
-            if (w.Insertion == 0f) w.Insertion = w.IsOpen ? 0f : 1f;
+            if (!w.InsertionSet)
+            {
+                w.Insertion = w.IsOpen ? 0f : 1f;
+            }
+            else if (!(w.Insertion > 0f))
+            {
+                // taken out of the beam by its range ("Open", "Off", "Removed" …), whatever slot the wheel rests on
+                w.IsOpen = true;
+                w.Facets = 0;
+                w.Insertion = 0f;
+            }
+            else if (w.IsOpen)
+            {
+                w.Insertion = 0f; // an open slot is a hole however far it is inserted
+            }
             _ = n;
         }
     }
@@ -1186,7 +1252,7 @@ public static class FixtureEvaluator
         }
         foreach (ref readonly var w in bs.ColorWheels.AsSpan())
         {
-            if (w.Wheel < 0 || w.Slot <= 0) continue;
+            if (w.Wheel < 0 || w.Slot <= 0 || w.IsOpen) continue;
             var t = p.WheelArray[w.Wheel].SlotTransmissionArray;
             var tr = t[w.Slot - 1];
             if (w.Blend > 0f) tr = Vector3.Lerp(tr, t[w.NextSlot - 1], w.Blend);

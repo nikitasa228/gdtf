@@ -386,6 +386,8 @@ public static class AttributeClassifier
         {
             if (asRest.IsEmpty || Is(asRest, "Insertion")) return new(AttributeKind.AnimationInsertion, asN, WheelFamily.AnimationSystem);
             if (Is(asRest, "Shake")) return new(AttributeKind.WheelShake, asN, WheelFamily.AnimationSystem);
+            // the system ramping in and out of the beam over time (Robe "Ramping from open to full position max … min")
+            if (Is(asRest, "Ramp")) return new(AttributeKind.WheelSelect, asN, WheelFamily.AnimationSystem);
             return Wheel(WheelFamily.AnimationSystem, asN, asRest);
         }
         if (TryNumbered(s, "Gobo", out int goboN, out var goboRest)) return Wheel(WheelFamily.Gobo, goboN, goboRest);

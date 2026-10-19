@@ -25,6 +25,26 @@ public enum ChannelSetFlags
 
     /// <summary>The range inverts tilt.</summary>
     InvertTilt = 16,
+
+    /// <summary>
+    /// A wheel selection range that takes the wheel, prism, animation or effect out of the beam ("Open", "Off",
+    /// "Removed", "No prism", "Closed" …, selecting no slot or an open one). Set while a profile is compiled.
+    /// </summary>
+    WheelOut = 32,
+
+    /// <summary>
+    /// A wheel selection range that moves a single-slot mechanism (animation wheel, prism) gradually into the beam
+    /// from the "out" range before it: an unnamed range after "Open", "Open to Dots", "Enter in proportion". Insertion
+    /// runs 0 → 1 across the range. Set while a profile is compiled.
+    /// </summary>
+    InsertionRamp = 64,
+
+    /// <summary>
+    /// A wheel selection range in which the mechanism keeps moving in and out of the beam between two insertions
+    /// ("Ramping from open to full position max … min": Robe animation wheels), at a rate that runs across the range.
+    /// Set while a profile is compiled.
+    /// </summary>
+    InsertionCycle = 128,
 }
 
 /// <summary>
@@ -298,6 +318,123 @@ public static class NameParsing
         string s = name.Trim().ToLowerInvariant();
         return s.StartsWith("open", StringComparison.Ordinal) || s is "white" or "empty" or "hole" or "no gobo" or "no prism" or "none" ||
             s.StartsWith("no prism", StringComparison.Ordinal) || s.StartsWith("empty", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// True when a slot name says the slot is a hole even though the file gives it a media file (an image of an open
+    /// aperture): "Open", "Open/Hole", "Open position", "Open (2)", "Hole", "No gobo" — but not "Open 2" next to a
+    /// gobo image, "Open+Red" or "Open/Close 1", which name a real gobo, a split colour or a shape.
+    /// </summary>
+    public static bool IsPlainOpenSlotName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (s is "hole" or "empty" or "none" or "no gobo" or "no prism") return true;
+        if (!s.StartsWith("open", StringComparison.Ordinal)) return false;
+        var rest = s.AsSpan(4);
+        int i = 0;
+        while (i < rest.Length)
+        {
+            char c = rest[i];
+            if (char.IsLetter(c))
+            {
+                int j = i;
+                while (j < rest.Length && char.IsLetter(rest[j])) j++;
+                var word = rest[i..j];
+                if (!(word is "hole" or "position" or "slot" or "white")) return false;
+                i = j;
+                continue;
+            }
+            // "(2)" is a second open position; a bare number ("Open 2") is often a mislabelled gobo
+            if (char.IsAsciiDigit(c) && !(i > 0 && rest[i - 1] == '(')) return false;
+            i++;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// True when the name of a wheel selection range or function says the mechanism is out of the beam: an open
+    /// position ("Open", "Open/Hole", "No prism"), "Off", "Removed", "Out", "Closed", "No function", "Idle", "Disabled",
+    /// "None", "Empty". A range that moves from such a state to another ("Open to Dots", "Open > Close") is not out.
+    /// </summary>
+    public static bool IsWheelOutName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (IsTransition(s)) return false;
+        if (IsOpenSlotName(s)) return true;
+        if (s is "off" or "out" or "removed" or "remove" or "idle" or "neutral" or "disable" or "disabled" or "close" or "closed") return true;
+        foreach (string prefix in (ReadOnlySpan<string>)["off ", "off(", "off-", "removed", "out ", "closed", "close ", "no function", "nofunction",
+            "no feature", "nofeature", "no animation", "no effect", "no gobo", "no shaper", "no beam shaper", "empty"])
+        {
+            if (s.StartsWith(prefix, StringComparison.Ordinal)) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// True when a wheel selection range named <paramref name="name"/> that follows an "out" range moves the mechanism
+    /// gradually into the beam: no name (the ramp between "Open" and "Animation In"), a transition out of an open
+    /// state ("Open to Dots", "Open > In"), or an insertion "in proportion".
+    /// </summary>
+    public static bool IsInsertionRampName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return true;
+        string s = name.Trim().ToLowerInvariant();
+        if (s.Contains("proportion", StringComparison.Ordinal) || s.Contains("insertion", StringComparison.Ordinal)) return true;
+        if (!IsTransition(s)) return false;
+        int cut = TransitionIndex(s);
+        return cut > 0 && IsWheelOutName(s[..cut]);
+    }
+
+    /// <summary>
+    /// A range that keeps moving a mechanism between two insertions: "Ramping from open to full position max",
+    /// "Ramp from half position to full position min". <paramref name="from"/> and <paramref name="to"/> are the
+    /// insertions (open 0, half 0.5, full 1); <paramref name="speedEnd"/> is +1 when the name marks the fast end of the
+    /// range ("max"), −1 for the slow end ("min"), 0 when it names neither.
+    /// </summary>
+    public static bool TryParseInsertionCycle(string? name, out float from, out float to, out int speedEnd)
+    {
+        from = to = float.NaN;
+        speedEnd = 0;
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (!s.StartsWith("ramp", StringComparison.Ordinal)) return false;
+        int f = s.IndexOf("from ", StringComparison.Ordinal);
+        if (f < 0) return false;
+        int t = s.IndexOf(" to ", f, StringComparison.Ordinal);
+        if (t < 0) return false;
+        from = InsertionWord(s.AsSpan(f + 5, t - f - 5));
+        to = InsertionWord(s.AsSpan(t + 4));
+        if (float.IsNaN(from) || float.IsNaN(to) || from == to) return false;
+        if (ContainsWord(s, "max")) speedEnd = 1;
+        else if (ContainsWord(s, "min")) speedEnd = -1;
+        return true;
+    }
+
+    /// <summary>Insertion named by the first word of <paramref name="s"/>: open 0, half 0.5, full 1; NaN otherwise.</summary>
+    private static float InsertionWord(ReadOnlySpan<char> s)
+    {
+        s = s.TrimStart();
+        if (s.StartsWith("open", StringComparison.Ordinal)) return 0f;
+        if (s.StartsWith("half", StringComparison.Ordinal)) return 0.5f;
+        if (s.StartsWith("full", StringComparison.Ordinal)) return 1f;
+        return float.NaN;
+    }
+
+    /// <summary>True for "A to B", "A > B", "A -> B", "A → B".</summary>
+    private static bool IsTransition(string s) => TransitionIndex(s) > 0;
+
+    private static int TransitionIndex(string s)
+    {
+        int i = s.IndexOf(" to ", StringComparison.Ordinal);
+        if (i > 0) return i;
+        foreach (string arrow in (ReadOnlySpan<string>)["->", "→", ">"])
+        {
+            i = s.IndexOf(arrow, StringComparison.Ordinal);
+            if (i > 0) return i;
+        }
+        return -1;
     }
 
     private static bool ContainsAny(string s, params string[] words)

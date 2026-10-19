@@ -123,6 +123,44 @@ public sealed class ProfileChannelSet
     /// <summary>True when <paramref name="value"/> lies in the set's DMX range.</summary>
     public bool Contains(uint value) => value >= DmxFrom && value <= DmxTo;
 
+    /// <summary>Fastest in/out cycle of an <see cref="ChannelSetFlags.InsertionCycle"/> range, Hz (one full in-and-out per period).</summary>
+    internal const float CycleFastHz = 0.5f;
+
+    /// <summary>Slowest in/out cycle of an <see cref="ChannelSetFlags.InsertionCycle"/> range, Hz.</summary>
+    internal const float CycleSlowHz = 0.025f;
+
+    /// <summary>For <see cref="ChannelSetFlags.InsertionCycle"/> ranges: the insertions (0 … 1) the mechanism moves between.</summary>
+    internal float CycleFrom { get; set; } = float.NaN;
+
+    /// <inheritdoc cref="CycleFrom"/>
+    internal float CycleTo { get; set; } = float.NaN;
+
+    /// <summary>DMX range of the whole cycle group (the named fast/slow ends and the unnamed range between them).</summary>
+    internal uint CycleDmxFrom { get; set; }
+
+    /// <inheritdoc cref="CycleDmxFrom"/>
+    internal uint CycleDmxTo { get; set; }
+
+    /// <summary>True when the group runs from fast ("max") at its first DMX value to slow at its last.</summary>
+    internal bool CycleFastFirst { get; set; } = true;
+
+    /// <summary>
+    /// Insertion (0 … 1) of an <see cref="ChannelSetFlags.InsertionCycle"/> range at <paramref name="time"/> s for DMX
+    /// <paramref name="dmx"/>: a triangle between <see cref="CycleFrom"/> and <see cref="CycleTo"/> whose rate runs
+    /// logarithmically from <see cref="CycleFastHz"/> to <see cref="CycleSlowHz"/> across the group (deterministic in time).
+    /// </summary>
+    internal float CycleInsertion(uint dmx, double time)
+    {
+        float t = CycleDmxTo > CycleDmxFrom ? Math.Clamp((float)(dmx - Math.Min(dmx, CycleDmxFrom)) / (CycleDmxTo - CycleDmxFrom), 0f, 1f) : 0f;
+        if (!CycleFastFirst) t = 1f - t;
+        double hz = CycleFastHz * Math.Pow(CycleSlowHz / CycleFastHz, t);
+        double phase = time * hz;
+        float frac = (float)(phase - Math.Floor(phase));
+        float tri = 1f - MathF.Abs(2f * frac - 1f);
+        float v = CycleFrom + (CycleTo - CycleFrom) * tri;
+        return float.IsFinite(v) ? Math.Clamp(v, 0f, 1f) : 0f;
+    }
+
     /// <inheritdoc />
     public override string ToString() => $"{Name} [{DmxFrom}…{DmxTo}]";
 }
@@ -248,6 +286,13 @@ public sealed class ProfileFunction
 
     /// <summary>Angular acceleration of a rotation's speed ramp, deg/s² (∞ = instant).</summary>
     internal double SpinAcceleration { get; set; } = double.PositiveInfinity;
+
+    /// <summary>
+    /// For rotation, index and spin functions of a wheel-like mechanism: true when the same channel also selects or
+    /// inserts that mechanism (Robe "EffectWheelIndex" next to the animation wheel's ramps), so that a range of this
+    /// function named "No function" / "Open" takes the mechanism out of the beam instead of merely doing nothing.
+    /// </summary>
+    internal bool OnSelectionChannel { get; set; }
 
     /// <summary>Colour code of ColorRgb/ColorSub/BladeSoft functions: 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y, 6 side A, 7 side B; −1 otherwise.</summary>
     internal int ColorCode { get; set; } = -1;

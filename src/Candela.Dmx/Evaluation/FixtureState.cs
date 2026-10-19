@@ -95,11 +95,18 @@ public struct WheelState
     /// <summary>True when the current slot is open (no filter, gobo or prism).</summary>
     public bool IsOpen;
 
-    /// <summary>Insertion 0 … 1 (animation systems; 1 for wheels).</summary>
+    /// <summary>
+    /// Insertion 0 … 1: 0 when the mechanism is out of the beam (an open slot, or a range named "Open", "Off",
+    /// "Removed" …), 1 when a slot is in; in between for animation systems and for ranges that move a single-slot
+    /// mechanism gradually into the beam ("Open" → "Animation In").
+    /// </summary>
     public float Insertion;
 
     /// <summary>Effect rate (effects wheels, built-in effects), Hz or the GDTF physical value.</summary>
     public float Rate;
+
+    /// <summary>True when a channel set <see cref="Insertion"/> explicitly this frame (out, ramp, animation-system insertion).</summary>
+    internal bool InsertionSet;
 
     /// <summary>A mechanism that is not used.</summary>
     public static WheelState Unused => UnusedState;

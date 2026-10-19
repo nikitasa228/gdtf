@@ -224,6 +224,7 @@ public sealed partial class FixtureProfile
                     }
                 }
                 pc.FunctionCount = Functions.Count - pc.FirstFunction;
+                InheritSiblingWheels(pc);
                 pc.InitialFunction = pc.FunctionCount == 0 ? -1 : pc.FirstFunction;
                 for (int k = pc.FirstFunction; k < pc.FirstFunction + pc.FunctionCount; k++)
                 {
@@ -232,6 +233,37 @@ public sealed partial class FixtureProfile
                         pc.InitialFunction = k;
                         break;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// A rotation, index, spin or shake function written without its wheel, on the channel of a selection function
+        /// of the same mechanism that names it (Elation Artiste Picasso "AnimationWheel1PosRotate" next to
+        /// "AnimationWheel1"), turns that wheel: the mechanism is in the beam while it rotates. Selection functions inherit
+        /// the wheel only when it has a single slot (an animation disc, a single prism), whose position needs no slot map.
+        /// </summary>
+        private void InheritSiblingWheels(ProfileChannel ch)
+        {
+            int end = ch.FirstFunction + ch.FunctionCount;
+            for (int k = ch.FirstFunction; k < end; k++)
+            {
+                var f = Functions[k];
+                if (f.Class.Wheel == WheelFamily.None) continue;
+                for (int j = ch.FirstFunction; j < end && !f.OnSelectionChannel; j++)
+                {
+                    var g = Functions[j];
+                    f.OnSelectionChannel = j != k && g.Class.Wheel == f.Class.Wheel && g.Class.Number == f.Class.Number &&
+                        (IsWheelSelection(g.Class.Kind) || g.Class.Kind == AttributeKind.AnimationInsertion);
+                }
+                if (f.Wheel >= 0) continue;
+                for (int j = ch.FirstFunction; j < end; j++)
+                {
+                    var g = Functions[j];
+                    if (g.Wheel < 0 || g.Class.Wheel != f.Class.Wheel || g.Class.Number != f.Class.Number) continue;
+                    if (IsWheelSelection(f.Class.Kind) && Wheels[g.Wheel].SlotCount > 1) break;
+                    f.Wheel = g.Wheel;
+                    break;
                 }
             }
         }
@@ -309,6 +341,12 @@ public sealed partial class FixtureProfile
             // "Open/Close", "open / closed": a range that does both, not a state
             if (src.Name.Contains("open", StringComparison.OrdinalIgnoreCase) && src.Name.Contains("clos", StringComparison.OrdinalIgnoreCase))
                 nameFlags = ChannelSetFlags.None;
+            if (src.Wheel is { } wheel) f.Wheel = WheelIndexOf(wheel, cls.Wheel);
+            // a wheel selection function named "Open", "Off", "Removed" … that selects no slot keeps the wheel out of the
+            // beam wherever no named channel set says otherwise (ACME Chiron "Prism1" function "Open")
+            bool selects = IsWheelSelection(cls.Kind) || cls.Kind == AttributeKind.AnimationInsertion;
+            bool selectsSlot = selects && src.ChannelSets.Exists(s => s.WheelSlotIndex > 0);
+            if (selects && !selectsSlot && NameParsing.IsWheelOutName(src.Name)) nameFlags |= ChannelSetFlags.WheelOut;
             f.NameFlags = nameFlags;
 
             // channel sets
@@ -322,6 +360,15 @@ public sealed partial class FixtureProfile
                 var setFlags = string.IsNullOrWhiteSpace(s.Name) ? nameFlags : NameParsing.Flags(s.Name, cls.Kind);
                 if (cls.Kind == AttributeKind.Shutter && (setFlags & ChannelSetFlags.Closed) != 0 && IsStrobeOff(src, s.Name))
                     setFlags = (setFlags & ~ChannelSetFlags.Closed) | ChannelSetFlags.Open;
+                // a selection range named "Open", "Off", "Removed" … that selects no slot, or an open one, takes the
+                // mechanism out of the beam (Rivale AnimationWheel1 "open", Elation Artiste Picasso "OPEN"); in a rotation,
+                // index or spin function of the mechanism such a range ("No function") leaves the mechanism alone
+                // A set that selects a slot of a wheel with several slots is decided by that slot, not its name (ACME Sana's
+                // prism "Close" selects the hole and "Open" the 8-facet prism); on a single-slot wheel the slot index says
+                // nothing (PRstage Spot 460 "Open" → slot 1, the animation disc)
+                if ((selects || cls.Wheel != WheelFamily.None) && !string.IsNullOrWhiteSpace(s.Name) && NameParsing.IsWheelOutName(s.Name) &&
+                    (s.WheelSlotIndex <= 0 || f.Wheel < 0 || Wheels[f.Wheel].SlotCount <= 1 || IsOpenSlot(f.Wheel, s.WheelSlotIndex)))
+                    setFlags |= ChannelSetFlags.WheelOut;
                 var set = new ProfileChannelSet(s, from, to, pf, pt, setFlags);
                 switch (cls.Kind)
                 {
@@ -343,6 +390,8 @@ public sealed partial class FixtureProfile
             }
             sets.Sort((x, y) => x.DmxFrom.CompareTo(y.DmxFrom));
             if (cls.Kind == AttributeKind.Dimmer) ReconcileDimmerNames(f, sets);
+            if (IsWheelSelection(cls.Kind) && !selectsSlot && (f.Wheel < 0 || Wheels[f.Wheel].SlotCount <= 1)) MarkInsertionRamps(sets);
+            if (IsWheelSelection(cls.Kind)) MarkInsertionCycles(sets);
             f.SetSets(sets.ToArray());
 
             float maxAbs = MathF.Max(MathF.Abs(f.PhysicalFrom), MathF.Abs(f.PhysicalTo));
@@ -350,7 +399,6 @@ public sealed partial class FixtureProfile
                 if (s.HasPhysical) maxAbs = MathF.Max(maxAbs, MathF.Max(MathF.Abs(s.PhysicalFrom), MathF.Abs(s.PhysicalTo)));
             f.LevelScale = maxAbs > 1.5f ? (maxAbs <= 100.5f ? 100f : maxAbs) : 1f;
 
-            if (src.Wheel is { } wheel) f.Wheel = WheelIndexOf(wheel);
             if (cls.Kind == AttributeKind.ColorAdd) f.Emitter = EmitterIndexOf(src, cls.Code ?? "");
             if (cls.Kind is AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc)
             {
@@ -407,6 +455,71 @@ public sealed partial class FixtureProfile
         }
 
         private static bool IsKelvin(float v) => v is >= 1000f and <= 25000f;
+
+        /// <summary>Wheel slot selection attributes (plain, with spin, with shake).</summary>
+        private static bool IsWheelSelection(AttributeKind kind) =>
+            kind is AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake;
+
+        /// <summary>True when 1-based slot <paramref name="slot"/> of profile wheel <paramref name="wheel"/> is open (a hole); false without a wheel.</summary>
+        private bool IsOpenSlot(int wheel, int slot)
+        {
+            if (wheel < 0) return false;
+            var open = Wheels[wheel].SlotOpenArray;
+            return slot >= 1 && slot <= open.Length && open[slot - 1];
+        }
+
+        /// <summary>
+        /// Marks the ranges in which the mechanism keeps moving in and out of the beam ("Ramping from open to full position
+        /// max" … unnamed … "… min": the animation-wheel ramps of Robe fixtures): a named end, the unnamed ranges after it
+        /// and the other named end of the same ramp form one group whose cycle rate runs from fast ("max") to slow.
+        /// </summary>
+        private static void MarkInsertionCycles(List<ProfileChannelSet> sets)
+        {
+            int i = 0;
+            while (i < sets.Count)
+            {
+                if (!NameParsing.TryParseInsertionCycle(sets[i].Name, out float from, out float to, out int end))
+                {
+                    i++;
+                    continue;
+                }
+                int j = i + 1;
+                while (j < sets.Count && string.IsNullOrWhiteSpace(sets[j].Name)) j++;
+                int last = j < sets.Count && NameParsing.TryParseInsertionCycle(sets[j].Name, out float from2, out float to2, out int end2) &&
+                    from2 == from && to2 == to && end2 != 0 && end2 != end
+                    ? j
+                    : j - 1;
+                uint groupFrom = sets[i].DmxFrom, groupTo = sets[last].DmxTo;
+                for (int k = i; k <= last; k++)
+                {
+                    var s = sets[k];
+                    s.Flags = (s.Flags | ChannelSetFlags.InsertionCycle) & ~ChannelSetFlags.WheelOut;
+                    s.CycleFrom = from;
+                    s.CycleTo = to;
+                    s.CycleDmxFrom = groupFrom;
+                    s.CycleDmxTo = groupTo;
+                    s.CycleFastFirst = end >= 0;
+                }
+                i = last + 1;
+            }
+        }
+
+        /// <summary>
+        /// Marks the ranges of a single-slot selection function (an animation wheel, a one-prism wheel) that move the
+        /// mechanism gradually into the beam: a range right after an "out" range that has no name ("Open", "", "Animation
+        /// In": Cameo Oron H2, EK H1), names a transition out of the open state ("Open to Dots": Elation Proteus Hybrid
+        /// Max) or an insertion "in proportion" (ADJ Protege). Insertion runs 0 → 1 across such a range.
+        /// </summary>
+        private static void MarkInsertionRamps(List<ProfileChannelSet> sets)
+        {
+            for (int i = 1; i < sets.Count; i++)
+            {
+                var previous = sets[i - 1];
+                var set = sets[i];
+                if ((previous.Flags & ChannelSetFlags.WheelOut) == 0 || (set.Flags & ChannelSetFlags.WheelOut) != 0) continue;
+                if (set.DmxTo > set.DmxFrom && NameParsing.IsInsertionRampName(set.Name)) set.Flags |= ChannelSetFlags.InsertionRamp;
+            }
+        }
 
         /// <summary>True for GDTF's default physical range 0 … 1 (either direction).</summary>
         private static bool IsDefaultRange(float from, float to) => (from == 0f && to == 1f) || (from == 1f && to == 0f);
@@ -535,7 +648,8 @@ public sealed partial class FixtureProfile
         /// way of describing continuous wheel indexing, e.g. "Blue" −0.5…+0.5) maps linearly across the slot; other slot
         /// sets hold the slot. Between sets the position is interpolated when the slots are adjacent (split colours) and
         /// held otherwise. Going from the last slot to the first continues past the end (position n + 1 is slot 1 again),
-        /// so a wheel turning through "Open" keeps moving in one direction.
+        /// so a wheel turning through "Open" keeps moving in one direction. On a two-slot wheel (Ayrton Rivale's beam
+        /// shaper: "Open", "Beam Shaper") 1 → 2 is the next slot, not a step back across the end.
         /// </summary>
         private static void BuildSlotMap(ProfileFunction f, int slotCount)
         {
@@ -548,7 +662,7 @@ public sealed partial class FixtureProfile
             {
                 int k = s.WheelSlot;
                 if (k <= 0) continue;
-                if (prevK > 0 && slotCount > 1)
+                if (prevK > 0 && slotCount > 2)
                 {
                     if (prevK == slotCount && k == 1) offset += slotCount;
                     else if (prevK == 1 && k == slotCount) offset -= slotCount;
@@ -808,13 +922,22 @@ public sealed partial class FixtureProfile
 
         // ------------------------------------------------------------------ wheels and emitters
 
-        private int WheelIndexOf(Wheel wheel)
+        /// <summary>
+        /// The profile wheel of a GDTF wheel, compiled on first use with the family of the function that uses it first
+        /// (colour, gobo, prism, animation, effects, beam shaper). A slot is open — a hole, no filter, gobo, prism or
+        /// animation — when it has no facets and no animation system and either has no media and an open name or GDTF's
+        /// default colour (D65 at 100 %, which files leave on colour, gobo and prism slots without a filter; not on beam
+        /// shaper or animation slots, whose lens or disc has no colour), or names itself plainly open next to an image of
+        /// the aperture ("Open" with media "G1": CLF Aorun, Cameo AZOR).
+        /// </summary>
+        private int WheelIndexOf(Wheel wheel, WheelFamily family)
         {
             if (_wheelIndex.TryGetValue(wheel, out int i)) return i;
             int n = Math.Max(1, wheel.Slots.Count);
             var transmission = new Vector3[n];
             var facets = new int[n];
             var open = new bool[n];
+            bool defaultColourIsOpen = family is not (WheelFamily.BeamShaper or WheelFamily.Animation or WheelFamily.AnimationSystem);
             for (int s = 0; s < n; s++)
             {
                 if (s >= wheel.Slots.Count)
@@ -830,8 +953,12 @@ public sealed partial class FixtureProfile
                     ? Filters.PhysicalChannelTransmission(LightColor.FromXy(c.X, c.Y), y)
                     : Vector3.One;
                 facets[s] = slot.Facets.Count > 0 ? slot.Facets.Count : NameParsing.ParseFacetCount(slot.Name);
-                open[s] = slot.MediaPath is null && slot.MediaFileName is null && slot.Facets.Count == 0 && slot.AnimationSystem is null &&
-                    (NameParsing.IsOpenSlotName(slot.Name) || (y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f && facets[s] == 0));
+                bool media = slot.MediaPath is not null || slot.MediaFileName is not null;
+                bool defaultColour = y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f;
+                open[s] = slot.Facets.Count == 0 && slot.AnimationSystem is null && facets[s] == 0 &&
+                    (media
+                        ? NameParsing.IsPlainOpenSlotName(slot.Name) || IsOpenMediaName(slot.MediaFileName)
+                        : NameParsing.IsOpenSlotName(slot.Name) || (defaultColourIsOpen && defaultColour));
                 // an open slot is a hole: files often store the lamp's own colour there, which is not a filter
                 if (open[s] && y >= 0.9f) transmission[s] = Vector3.One;
             }
@@ -839,6 +966,17 @@ public sealed partial class FixtureProfile
             Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open));
             _wheelIndex[wheel] = i;
             return i;
+        }
+
+        /// <summary>A media file named as an open aperture ("Open", "open_1", "Open-2"): the slot is a hole.</summary>
+        private static bool IsOpenMediaName(string? media)
+        {
+            if (string.IsNullOrWhiteSpace(media)) return false;
+            var s = media.AsSpan().Trim();
+            if (!s.StartsWith("open", StringComparison.OrdinalIgnoreCase)) return false;
+            foreach (char c in s[4..])
+                if (char.IsLetter(c)) return false;
+            return true;
         }
 
         private int EmitterIndexOf(ChannelFunction src, string code)
