@@ -285,6 +285,56 @@ public sealed class PathTracerMediaTests
         }
     }
 
+    /// <summary>
+    /// Thin smoke filling a 20 m hall with one very dense cell near a fog nozzle (density 200, far from the view ray):
+    /// the grid's majorant is set by that cell, so tracking takes thousands of tentative collisions along the ray, and
+    /// the transmittance must still be that of the whole 20 m of thin smoke (no light leaking through what the tracking
+    /// did not reach), with and without volume bounces.
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void SparseDenseSmokeDimsTheViewAlongItsWholeLength(int volumeBounces)
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            const int n = 8;
+            var values = Enumerable.Repeat(0.05f, n * n * n).ToArray();
+            values[0] = 200f; // the corner cell at (-10, -4, -2)
+            var grid = new VolumeGrid { Min = new Vector3(-10f, -4f, -2f), Max = new Vector3(10f, 4f, 6f), SizeX = n, SizeY = n, SizeZ = n, Values = values };
+            const float sigma = 0.5f;
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f, Anisotropy = 0f, SmokeDensity = grid, SmokeScatteringAtFullDensity = sigma });
+            // a bright emissive panel (1.5 m square) behind the hall, seen along the hall's length
+            var scene = new StageScene(renderer);
+            var panel = renderer.World.CreateMaterial(new MaterialData
+            {
+                Name = "panel",
+                BaseColorFactor = new Vector4(0f, 0f, 0f, 1f),
+                EmissiveLuminance = 100f,
+                Ior = 1f,
+                Roughness = 1f,
+            }, null);
+            scene.Box(new Vector3(0.1f, 1.5f, 1.5f), new Vector3(11f, 0f, 2f), panel);
+            var camera = RenderCamera.LookAt(new Vector3(-10.5f, 0f, 2f), new Vector3(11f, 0f, 2f), 2f);
+            camera.Ev100 = 6f;
+            using var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(8, 8, 64, bounces: 0, volumeBounces: volumeBounces),
+                new FinalRenderOptions { BackgroundLuminance = 0f });
+            var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
+            float measured = hdr.MeanLuminance(4, 4, 2);
+            // 20 m of smoke with σ = 0.05 x 0.5 /m: the panel is seen through e^-0.5 (scattering out of the view ray; with
+            // a volume bounce, isotropic scattering of the panel's light back into the view ray adds a little)
+            float expected = 100f * MathF.Exp(-0.05f * sigma * 20f);
+            _output.WriteLine($"{volumeBounces} volume bounces: {measured:0.00} cd/m², transmitted {expected:0.00} cd/m²");
+            Assert.InRange(measured, expected * 0.97f, expected * (volumeBounces == 0 ? 1.03f : 1.06f));
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     private static ImageData HalfGobo()
     {
         const int size = 64;

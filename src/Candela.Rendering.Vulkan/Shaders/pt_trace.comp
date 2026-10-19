@@ -53,7 +53,11 @@ layout(set = SET_PASS, binding = BINDING_PT_LIGHTS, scalar) readonly buffer PtLi
 const float PT_FAR = 1.0e7;
 const int PT_MAX_ITERATIONS = 96;      // scattering events + pass-through events per path
 const int PT_MAX_LAYERS = 16;          // alpha / transmissive surfaces crossed by one ray
-const int PT_MAX_COLLISIONS = 512;     // tentative collisions of one tracking loop
+// Tentative collisions of one tracking loop: a safety bound only (the loops end where the ray leaves the media). The
+// majorant is the densest cell of the smoke grid, so a ray through thin smoke of a grid with a dense cell (a fog
+// nozzle) takes majorant x length of them; stopping early would let light through the rest of the ray.
+const int PT_MAX_COLLISIONS = 16384;
+const float PT_TRACKING_ROULETTE = 0.02; // ratio tracking plays Russian roulette below this transmittance
 const float PT_WEIGHT_FLOOR = 1e-3;    // smallest BRDF x cos of a light-selection weight (1/sr)
 const float PT_BACKGROUND_DEPTH = 1.0e5;
 const uint PT_SEGMENT_SAMPLES = 4u;     // light samples of the in-scattering along a segment the camera sees
@@ -186,8 +190,14 @@ float trackTransmittance(vec3 o, vec3 d, float tEnd, inout uint rng, vec3 beta, 
             if (emit && absorption > 0.0)
                 radiance += beta * (T * hazeTransmittance(h, t) * absorption / majorant) * blackbody;
             T *= max(1.0 - (smokeAt(x) + absorption) / majorant, 0.0);
-            if (T <= 0.0)
-                return 0.0;
+            if (T < PT_TRACKING_ROULETTE)
+            {
+                // an optically thick stretch: continue with probability 1/2 at twice the weight (unbiased, and the
+                // tracking through dense smoke ends early)
+                if (!(T > 0.0) || rand(rng) >= 0.5)
+                    return 0.0;
+                T *= 2.0;
+            }
         }
     }
 
