@@ -78,6 +78,61 @@ public sealed class EngineSessionTests : IDisposable
     }
 
     [Fact]
+    public void Every_kind_of_file_is_imported_as_one_undo_step_and_the_scene_exports_as_MVR()
+    {
+        // A project to merge: one wall, saved and closed.
+        var wall = new Entity("Back wall");
+        wall.Add(new WallComponent { Kind = WallKind.Wall, Width = 4, Height = 3 });
+        _session.Scene.Add(wall);
+        string project = _dir.File("set.candela");
+        Assert.True(_session.SaveAs(project).Succeeded);
+        Assert.True(_session.New().Succeeded);
+        Assert.Equal(_session.DisplayName, Loc.Get(Str.Untitled));
+
+        var merged = _session.Import(project, ImportKind.Project);
+        Assert.True(merged.Succeeded, merged.Message);
+        Assert.NotEmpty(merged.Entities);
+        Assert.Contains(_session.Scene.All(), e => e.Name == "Back wall" && e.Id != wall.Id);
+        Assert.True(_session.IsModified);
+        _session.Undo.Undo();
+        Assert.Equal(0, _session.Scene.Count);
+        _session.Undo.Redo();
+
+        var mvr = _session.Import(EngineTestSupport.Fokina, ImportKind.Mvr);
+        Assert.True(mvr.Succeeded, mvr.Message);
+        Assert.Equal(91, _session.FixtureCount());
+
+        string stl = _dir.Write("wedge.stl",
+            "solid wedge\n facet normal 0 0 1\n  outer loop\n   vertex 0 0 0\n   vertex 1 0 0\n   vertex 0 1 0\n  endloop\n endfacet\n" +
+            " facet normal 0 -1 0\n  outer loop\n   vertex 0 0 0\n   vertex 0 0 1\n   vertex 1 0 0\n  endloop\n endfacet\nendsolid wedge\n");
+        var model = _session.Import(stl, ImportKind.Model, new Candela.Engine.EngineImportOptions { Placement = new Candela.Core.Math.Transform(new Vector3(1, 2, 0)) });
+        Assert.True(model.Succeeded, model.Message);
+        var modelEntity = _session.Scene.Find(Assert.Single(model.Entities))!;
+        Assert.Equal(new Vector3(1, 2, 0), modelEntity.Local.Position);
+
+        string png = Path.Combine(EngineTestSupport.Root, "docs", "images", "editor-view-cube.png");
+        var image = _session.Import(png, ImportKind.Image, new Candela.Engine.EngineImportOptions { ImageMode = ImageMode.Poster });
+        Assert.True(image.Succeeded, image.Message);
+        Assert.Equal(ImageMode.Poster, _session.Scene.Find(Assert.Single(image.Entities))!.Get<ImageComponent>()!.Mode);
+
+        // A GDTF the library already has is accepted without changing the (shared) library.
+        int libraryCount = EngineTestSupport.Library.Count;
+        var gdtf = _session.Import(EngineTestSupport.Library.Entries[0].FilePath, ImportKind.Gdtf);
+        Assert.True(gdtf.Succeeded, gdtf.Message);
+        Assert.Equal(libraryCount, EngineTestSupport.Library.Count);
+
+        var export = _session.Export(_dir.File("show"), ExportKind.Mvr);
+        Assert.True(export.Succeeded, export.Message);
+        Assert.True(File.Exists(_dir.File("show.mvr")));
+        Assert.True(_session.IsModified, "exporting is not saving the project");
+        var reopened = _session.Open(_dir.File("show.mvr"));
+        Assert.True(reopened.Succeeded, reopened.Message);
+        Assert.Equal(91, _session.FixtureCount());
+        // MVR has no walls: the wall travels as geometry under its name.
+        Assert.Contains(_session.Scene.All(), e => e.Name == "Back wall");
+    }
+
+    [Fact]
     public void Missing_damaged_and_unsaved_files_fail_with_a_reason_and_keep_the_scene()
     {
         var keep = _session.Scene.Add(new Entity("keep"));
