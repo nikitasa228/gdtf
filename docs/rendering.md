@@ -573,9 +573,9 @@ a beam in front of a depth edge stays continuous across it. Added to the froxel 
 display transform hides the 8-bit quantisation of smooth beams (no banding).
 
 **Scalability.** Cost ∝ Σ over tiles of (beams in the tile) × pixels × segments. `LightPlanner` scales the segment and
-cookie-sample counts by a **quality** `clamp(48 / load, 0.25, 1)`, where load = tile-beam pairs per tile with beams
-from the GPU statistics (the CPU estimate of the beams' screen coverage before the first measurement), so hundreds of
-overlapping beams degrade gracefully instead of stalling. `RenderStatistics` reports `RaymarchedBeams` (beams),
+cookie-sample counts by a **quality** `clamp(48 / load, 0.25, 1)`, where load = tile-beam pairs per tile over all
+tiles of the view (so it follows the total cost) from the GPU statistics (the CPU estimate of the beams' screen
+coverage before the first measurement), so hundreds of overlapping beams degrade gracefully instead of stalling. `RenderStatistics` reports `RaymarchedBeams` (beams),
 `FroxelLights`, `BeamCoverage` (estimated beams per pixel), `BeamQuality`, `BeamTiles`, `BeamTilePairs` and
 `BeamMaxPerTile`. On lavapipe (4 cores) at 320 × 180: 300 beams take about 280–370 ms per frame (12 317 tile-beam
 pairs, 300 in the busiest of 60 tiles, quality 0.25), 1000 beams about 490–590 ms (38 953 pairs); on a GPU these are a
