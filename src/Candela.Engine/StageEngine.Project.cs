@@ -59,8 +59,9 @@ public sealed partial class StageEngine
             saved = ProjectFile.Save(path, _project, SaveOptions());
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException
-            or InvalidDataException or ProjectFormatException)
+            or InvalidDataException or ProjectFormatException or System.Text.Json.JsonException)
         {
+            // data that cannot be written (e.g. kept JSON of a newer version the writer refuses) fails the save, not the editor
             return Fail(EngineIssueCodes.SaveFailed, $"'{Path.GetFileName(path)}' could not be saved: {e.Message}");
         }
         ProjectPath = saved.Path ?? Path.GetFullPath(path);
