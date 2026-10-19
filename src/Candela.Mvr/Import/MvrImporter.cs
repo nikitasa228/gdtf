@@ -115,6 +115,15 @@ public static class MvrImporter
         private IReadOnlyDictionary<Guid, CandelaUserData.DeviceRecord> _candelaDevices = new Dictionary<Guid, CandelaUserData.DeviceRecord>();
         private readonly Dictionary<string, CandelaUserData.DeviceRecord> _candelaSpecs = new(StringComparer.OrdinalIgnoreCase);
 
+        // objects a Candela export split across layers (see CandelaUserData.LayerPartRecord): part group → object it repeats
+        private IReadOnlyDictionary<Guid, CandelaUserData.LayerPartRecord> _layerPartRecords = new Dictionary<Guid, CandelaUserData.LayerPartRecord>();
+        private readonly Dictionary<MvrObject, MvrObject> _layerParts = new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<MvrObject, Matrix4x4> _partWorlds = new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<MvrObject, Entity> _built = new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<MvrObject, List<PendingPart>> _pendingParts = new(ReferenceEqualityComparer.Instance);
+        private readonly HashSet<MvrObject> _partsAsGroups = new(ReferenceEqualityComparer.Instance);
+        private int _unmatchedParts;
+
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
         {
             _doc = doc;
@@ -157,6 +166,7 @@ public static class MvrImporter
                 foreach (var obj in layer.Objects)
                     Build(obj, _group, null, layerId, layerTransform ? obj.Matrix * layer.Matrix : obj.Matrix);
             }
+            ImportUnjoinedParts();
             CreateCables();
             ReportUnrepresentable();
             _sink.Complete();
@@ -173,8 +183,81 @@ public static class MvrImporter
             var problems = new List<Issue>();
             _walls = CandelaUserData.ReadWalls(_doc, problems);
             _candelaDevices = CandelaUserData.ReadDevices(_doc, problems);
+            _layerPartRecords = CandelaUserData.ReadLayerParts(_doc, problems);
             foreach (var p in problems) _sink.Add(p.Severity, p.Category, p.Code, p.Message);
         }
+
+        // ------------------------------------------------------------ layer parts
+
+        /// <summary>
+        /// Matches the layer-part records with the file's objects (after the prepass collected them): a record is used
+        /// when its part is a GroupObject and the object it repeats exists, is not a focus point and is not a part itself.
+        /// Other records are counted (reported with the parts that cannot be joined) and their groups imported as such.
+        /// </summary>
+        private void MatchLayerParts(Dictionary<Guid, MvrObject> parts, Dictionary<Guid, MvrObject> originals)
+        {
+            foreach (var (partId, record) in _layerPartRecords)
+            {
+                if (parts.TryGetValue(partId, out var part) && originals.TryGetValue(record.OriginalId, out var original) &&
+                    part is MvrGroupObject && original is not MvrFocusPoint && !_layerPartRecords.ContainsKey(original.Uuid) &&
+                    !ReferenceEquals(part, original))
+                {
+                    _layerParts[part] = original;
+                }
+                else
+                {
+                    _unmatchedParts++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Builds the children of a layer part under the entity of the object it repeats, on the part's layer, relative to
+        /// that object (corrected by the difference of their world matrices, should another program have moved one of
+        /// them), with the object as their MVR parent (a fixture in a part of a truss is mounted on the truss).
+        /// </summary>
+        private void JoinLayerPart(PendingPart pending, Entity target)
+        {
+            var part = pending.Part;
+            var original = _layerParts[part];
+            var delta = Matrix4x4.Identity;
+            if (_partWorlds.TryGetValue(part, out var partWorld) && _partWorlds.TryGetValue(original, out var originalWorld) &&
+                Matrix4x4.Invert(originalWorld, out var inverse))
+            {
+                var d = partWorld * inverse;
+                if (!MvrMatrix.IsIdentity(d, 1e-4f)) delta = d;
+            }
+            _byUuid.TryAdd(part.Uuid, target);
+            foreach (var c in part.ChildObjects)
+                Build(c, target, original, pending.LayerId, delta.IsIdentity ? c.Matrix : c.Matrix * delta);
+        }
+
+        /// <summary>
+        /// Layer parts whose object was never built (it failed, or the part sits inside its own object's part) are
+        /// imported as the plain groups they are, at their place, so nothing is lost; parts inside them are joined if
+        /// their object exists by then.
+        /// </summary>
+        private void ImportUnjoinedParts()
+        {
+            while (_pendingParts.Count > 0)
+            {
+                var leftovers = new List<PendingPart>();
+                foreach (var list in _pendingParts.Values) leftovers.AddRange(list);
+                _pendingParts.Clear();
+                foreach (var p in leftovers) _partsAsGroups.Add(p.Part);
+                _unmatchedParts += leftovers.Count;
+                foreach (var p in leftovers) Build(p.Part, p.ParentEntity, p.ParentObject, p.LayerId, p.Local);
+            }
+            if (_unmatchedParts > 0)
+            {
+                _sink.Add(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.LayerSplit,
+                    string.Create(CultureInfo.InvariantCulture,
+                        $"{_unmatchedParts} layer part(s) in Candela's data of the MVR no longer match the file's objects; their groups are imported as plain groups."));
+            }
+        }
+
+        /// <summary>A layer part waiting for the entity of the object it repeats, and where it would go as a plain group.</summary>
+        private sealed record PendingPart(MvrObject Part, Entity? ParentEntity, MvrObject? ParentObject, Guid LayerId, Matrix4x4 Local);
 
         // ------------------------------------------------------------ pass 1: ids, focus points, GDTF users
 
@@ -182,15 +265,31 @@ public static class MvrImporter
         {
             var used = new HashSet<Guid>();
             int remapped = 0;
+            Dictionary<Guid, MvrObject>? partObjects = null, partOriginals = null;
+            HashSet<Guid>? originalIds = null;
+            if (_layerPartRecords.Count > 0)
+            {
+                partObjects = new Dictionary<Guid, MvrObject>();
+                partOriginals = new Dictionary<Guid, MvrObject>();
+                originalIds = new HashSet<Guid>();
+                foreach (var record in _layerPartRecords.Values) originalIds.Add(record.OriginalId);
+            }
             foreach (var layer in _doc.Layers)
             {
                 foreach (var root in layer.Objects)
                     Visit(root, layer.HasMatrix ? layer.Matrix : Matrix4x4.Identity);
             }
+            if (partObjects is not null) MatchLayerParts(partObjects, partOriginals!);
 
             void Visit(MvrObject obj, Matrix4x4 parentWorld)
             {
                 var world = obj.Matrix * parentWorld;
+                if (partObjects is not null)
+                {
+                    // the first object of a uuid is the one the records mean (later ones are remapped)
+                    if (_layerPartRecords.ContainsKey(obj.Uuid) && partObjects.TryAdd(obj.Uuid, obj)) _partWorlds[obj] = world;
+                    if (originalIds!.Contains(obj.Uuid) && partOriginals!.TryAdd(obj.Uuid, obj)) _partWorlds[obj] = world;
+                }
                 if (obj is MvrFocusPoint)
                 {
                     _focusWorld.TryAdd(obj.Uuid, world.Translation);
@@ -382,6 +481,19 @@ public static class MvrImporter
                 return;
             }
 
+            // the part of an object on another layer (a Candela export): its children belong to that object's entity
+            if (_layerParts.TryGetValue(obj, out var original) && !_partsAsGroups.Contains(obj))
+            {
+                var pending = new PendingPart(obj, parentEntity, parentObject, layerId, local);
+                if (_built.TryGetValue(original, out var target)) JoinLayerPart(pending, target);
+                else
+                {
+                    if (!_pendingParts.TryGetValue(original, out var waiting)) _pendingParts[original] = waiting = new List<PendingPart>();
+                    waiting.Add(pending);
+                }
+                return;
+            }
+
             Entity entity;
             List<(Guid Asset, Matrix4x4 Local, string Name)> geometryChildren;
             try
@@ -400,6 +512,7 @@ public static class MvrImporter
             }
 
             _byUuid[obj.Uuid] = entity;
+            _built[obj] = entity;
             if (parentEntity is null) _roots.Add(entity);
             if (obj is MvrDeviceObject { Connections.Count: > 0 } dev) _connectionOwners.Add((dev, entity));
 
@@ -413,6 +526,9 @@ public static class MvrImporter
             }
 
             foreach (var c in obj.ChildObjects) Build(c, entity, obj, layerId, c.Matrix);
+            // its parts on other layers that were met before it
+            if (_pendingParts.Remove(obj, out var parts))
+                foreach (var part in parts) JoinLayerPart(part, entity);
 
             if (obj is MvrSupport && entity.Get<RiggingPointComponent>() is { } rig)
             {

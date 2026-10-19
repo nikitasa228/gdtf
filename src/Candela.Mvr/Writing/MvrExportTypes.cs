@@ -20,7 +20,8 @@ public sealed class MvrExportOptions
     /// <summary>
     /// Returns the model of an asset id (<c>MeshComponent.ModelAssetId</c>, <c>TrussComponent.ModelAssetId</c>) in engine
     /// units (metres, Z up), or null when it is not available. Each model is exported once as a binary glTF file and
-    /// referenced by <c>Geometry3D</c>. Null: objects are written without geometry (reported).
+    /// referenced by <c>Geometry3D</c>; its material textures come from <see cref="TextureProvider"/>. Null: objects are
+    /// written without geometry (reported).
     /// </summary>
     public Func<Guid, ModelData?>? ModelProvider { get; init; }
 
@@ -47,6 +48,30 @@ public sealed class MvrExportOptions
     /// as those devices again. Null: no object is marked.
     /// </summary>
     public Func<string, bool>? IsCandelaDevice { get; init; }
+
+    /// <summary>
+    /// Tells, for a fixture entity, which model it stands in for: a fixture drawn with a similar model's GDTF because
+    /// the library had no file of the model the scene asks for (e.g. an MVR import of a Depence stub). The writer then
+    /// exports the requested <c>GDTFSpec</c> and <c>GDTFMode</c> — what the scene really holds — and embeds the GDTF
+    /// <see cref="GdtfProvider"/> supplies for the requested name, unless <see cref="WriteStandIns"/> is set. Returns
+    /// null for every other fixture. Null: no fixture is a stand-in.
+    /// </summary>
+    public Func<Guid, MvrStandIn?>? StandInOf { get; init; }
+
+    /// <summary>
+    /// Write stand-in fixtures (<see cref="StandInOf"/>) with the stand-in's GDTF and mode instead of the model and mode
+    /// the scene asks for (default false). Other programs then receive the stand-in's fixture type and DMX layout, so
+    /// every such fixture is reported as an <see cref="MvrIssueCodes.SubstituteExported"/> warning.
+    /// </summary>
+    public bool WriteStandIns { get; init; }
+
+    /// <summary>
+    /// Returns the encoded image of a material texture key (<c>MaterialData.BaseColorTexture</c> etc.) as PNG or JPEG
+    /// bytes — the formats glTF can embed — or null when it is not available. Each key is requested once per export and
+    /// the image is embedded in the binary glTF of every model that uses it. Null: models are written with their
+    /// material factors only (reported when they have textures).
+    /// </summary>
+    public Func<string, byte[]?>? TextureProvider { get; init; }
 
     /// <summary>
     /// A GDTF provider that reads files of a fixture library by file name (<c>FixtureLibrary.FindByFileName</c>), then
@@ -78,17 +103,44 @@ public sealed class MvrExportOptions
     }
 }
 
+/// <summary>
+/// The model a stand-in fixture represents (see <see cref="MvrExportOptions.StandInOf"/>): the <c>GDTFSpec</c> and
+/// <c>GDTFMode</c> the scene asks for, while the fixture is drawn with another model's GDTF.
+/// </summary>
+/// <param name="RequestedSpec">GDTF file name of the requested model as the source scene wrote it (e.g. <c>Ayrton@MagicBlade R.gdtf</c>).</param>
+/// <param name="RequestedMode">DMX mode the source scene asks for, or null for the GDTF's first mode.</param>
+public sealed record MvrStandIn(string RequestedSpec, string? RequestedMode);
+
 /// <summary>Result of an MVR export.</summary>
 public sealed class MvrExportResult
 {
-    internal MvrExportResult(MvrDocument document, IReadOnlyList<Issue> issues, int objectCount, int focusPointCount, int connectionCount)
+    internal MvrExportResult(MvrDocument document, IReadOnlyList<Issue> issues, int objectCount, int focusPointCount, int connectionCount,
+        int standInCount, int layerPartCount, int textureCount)
     {
         Document = document;
         Issues = issues;
         ObjectCount = objectCount;
         FocusPointCount = focusPointCount;
         ConnectionCount = connectionCount;
+        StandInCount = standInCount;
+        LayerPartCount = layerPartCount;
+        TextureCount = textureCount;
     }
+
+    /// <summary>
+    /// Number of stand-in fixtures (<see cref="MvrExportOptions.StandInOf"/>): written with the requested model and
+    /// mode, or with the stand-in's when <see cref="MvrExportOptions.WriteStandIns"/> is set.
+    /// </summary>
+    public int StandInCount { get; }
+
+    /// <summary>
+    /// Number of GroupObjects written to repeat a parent on another layer, because some of its children are on that layer
+    /// (<see cref="MvrIssueCodes.LayerSplit"/>).
+    /// </summary>
+    public int LayerPartCount { get; }
+
+    /// <summary>Number of distinct texture images embedded in the exported binary glTF models.</summary>
+    public int TextureCount { get; }
 
     /// <summary>The MVR object model that was (or would be) written, including the embedded files.</summary>
     public MvrDocument Document { get; }

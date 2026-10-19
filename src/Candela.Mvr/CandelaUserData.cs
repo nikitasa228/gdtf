@@ -29,6 +29,11 @@ namespace Candela.Mvr;
 /// block but changed the object) — or, without an embedded GDTF, references another file — is stale and ignored, so the
 /// object is imported as the fixture it now is. Readers that do not know the element (older Candela versions) skip
 /// it.</para>
+/// <para>And it joins objects split across layers: MVR keeps an object's children on the object's layer, so a child on
+/// another layer is exported under a GroupObject of its own layer that repeats its parent's place; one
+/// <c>&lt;LayerPart object="{group uuid}" original="{parent uuid}"/&gt;</c> per such group lets the importer put the
+/// group's children back under the parent (other programs see two groups of the same name, one per layer). Older
+/// readers skip the element and import the group as a plain group.</para>
 /// </remarks>
 public static class CandelaUserData
 {
@@ -43,6 +48,8 @@ public static class CandelaUserData
 
     private const string WallElement = "Wall";
     private const string DeviceElement = "Device";
+    private const string LayerPartElement = "LayerPart";
+    private const string OriginalAttribute = "original";
     private const string ObjectAttribute = "object";
     private const string GeometryAttribute = "geometry";
     private const string GdtfAttribute = "gdtf";
@@ -71,14 +78,30 @@ public static class CandelaUserData
     /// </param>
     public sealed record DeviceRecord(Guid ObjectId, string GdtfFile, string? Mode, Guid? FixtureTypeId = null);
 
+    /// <summary>
+    /// A part of an object on another layer: the GroupObject the export wrote on a second layer to hold the children of
+    /// <paramref name="OriginalId"/> that are on that layer (MVR keeps children on their parent's layer).
+    /// </summary>
+    /// <param name="ObjectId">Uuid of the GroupObject written for the layer.</param>
+    /// <param name="OriginalId">Uuid of the object it repeats (on its own layer).</param>
+    public sealed record LayerPartRecord(Guid ObjectId, Guid OriginalId);
+
     /// <summary>Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/>.</summary>
     public static MvrUserData Create(IEnumerable<WallRecord> walls) => Create(walls, Array.Empty<DeviceRecord>());
 
     /// <summary>Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/> and generic <paramref name="devices"/>.</summary>
-    public static MvrUserData Create(IEnumerable<WallRecord> walls, IEnumerable<DeviceRecord> devices)
+    public static MvrUserData Create(IEnumerable<WallRecord> walls, IEnumerable<DeviceRecord> devices) =>
+        Create(walls, devices, Array.Empty<LayerPartRecord>());
+
+    /// <summary>
+    /// Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/>, generic <paramref name="devices"/> and
+    /// the <paramref name="layerParts"/> of objects whose children are on other layers.
+    /// </summary>
+    public static MvrUserData Create(IEnumerable<WallRecord> walls, IEnumerable<DeviceRecord> devices, IEnumerable<LayerPartRecord> layerParts)
     {
         ArgumentNullException.ThrowIfNull(walls);
         ArgumentNullException.ThrowIfNull(devices);
+        ArgumentNullException.ThrowIfNull(layerParts);
         var data = new XElement("Data", new XAttribute("provider", Provider), new XAttribute("ver", Version));
         foreach (var w in walls)
         {
@@ -94,7 +117,48 @@ public static class CandelaUserData
             if (d.FixtureTypeId is { } type && type != Guid.Empty) element.Add(new XAttribute(TypeAttribute, type.ToString("D")));
             data.Add(element);
         }
+        foreach (var p in layerParts)
+        {
+            data.Add(new XElement(LayerPartElement, new XAttribute(ObjectAttribute, p.ObjectId.ToString("D")),
+                new XAttribute(OriginalAttribute, p.OriginalId.ToString("D"))));
+        }
         return new MvrUserData { Provider = Provider, Version = Version, Element = data };
+    }
+
+    /// <summary>
+    /// The layer parts of Candela's blocks in <paramref name="document"/>: GroupObject uuid → uuid of the object it
+    /// repeats on its layer. A record without two valid, different uuids is reported in <paramref name="issues"/>
+    /// (<see cref="MvrIssueCodes.ValueInvalid"/>) and left out (its GroupObject is then imported as a plain group);
+    /// blocks of other providers are ignored.
+    /// </summary>
+    public static IReadOnlyDictionary<Guid, LayerPartRecord> ReadLayerParts(MvrDocument document, ICollection<Issue>? issues = null)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+        var parts = new Dictionary<Guid, LayerPartRecord>();
+        int damaged = 0;
+        foreach (var block in document.UserData)
+        {
+            if (!string.Equals(block.Provider, Provider, StringComparison.Ordinal) || block.Element is null) continue;
+            foreach (var element in block.Element.Elements())
+            {
+                if (element.Name.LocalName != LayerPartElement) continue;
+                if (parts.Count >= MaxRecords) break;
+                if (!Guid.TryParse((string?)element.Attribute(ObjectAttribute), out var objectId) || objectId == Guid.Empty ||
+                    !Guid.TryParse((string?)element.Attribute(OriginalAttribute), out var originalId) || originalId == Guid.Empty ||
+                    objectId == originalId)
+                {
+                    damaged++;
+                    continue;
+                }
+                parts.TryAdd(objectId, new LayerPartRecord(objectId, originalId));
+            }
+        }
+        if (damaged > 0)
+        {
+            issues?.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.ValueInvalid,
+                $"{damaged} layer part record(s) in Candela's data of the MVR could not be read; those groups are imported as plain groups."));
+        }
+        return parts;
     }
 
     /// <summary>
