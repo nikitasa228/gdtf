@@ -64,8 +64,18 @@ public sealed class RenderingTests
         var output = new StringWriter();
         var error = new StringWriter();
         int code = Cli.Program.Run(
-            ["render", TestEnvironment.Fokina, "--out", png, "--width", "480", "--height", "270",
-                "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root],
+            ["render",
+                TestEnvironment.Fokina,
+                "--out",
+                png,
+                "--width",
+                "480",
+                "--height",
+                "270",
+                "--cache",
+                Path.Combine(dir, "cache"),
+                "--library",
+                TestEnvironment.Root],
             output, error);
         Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
         Assert.Contains("auto exposure", output.ToString(), StringComparison.Ordinal);
