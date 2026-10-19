@@ -323,8 +323,9 @@ public sealed partial class StageEngine
         Report(issues);
         RefreshIssues();
         FixtureLibraryChanged?.Invoke(new FixtureLibraryChange(new[] { entry }, FixtureLibraryChangeSource.Import));
-        return new EngineResult(true, $"Added '{name}' ({type.Manufacturer} {type.Name}, {type.DmxModes.Count} mode{(type.DmxModes.Count == 1 ? "" : "s")}) to the fixture library.",
-            issues, Array.Empty<Guid>()) { LibraryEntry = entry };
+        string modes = type.DmxModes.Count == 1 ? "1 mode" : $"{type.DmxModes.Count} modes";
+        var result = new EngineResult(true, $"Added '{name}' ({type.Manufacturer} {type.Name}, {modes}) to the fixture library.", issues, Array.Empty<Guid>());
+        return result with { LibraryEntry = entry };
     }
 
     /// <summary>

@@ -37,19 +37,19 @@ while (running)
 | Member | What it is |
 |---|---|
 | `Scene`, `Project`, `Assets` | The open project (`Candela.Project.ProjectData`): scene, asset store, settings sections, GDTF copies, thumbnail. Replaced by `New`/`Open` (`SceneReplaced` event). |
-| `Library`, `Specs`, `Profiles` | Fixture library (library folders + GDTFs brought in by projects and MVR files), `_specs/fixtures_index.json`, compiled DMX profiles. |
+| `Library`, `Specs`, `Profiles`, `FixtureLibraryChanged` | Fixture library (library folders + GDTFs brought in by projects and MVR files), `_specs/fixtures_index.json`, compiled DMX profiles. `FixtureLibraryChanged` (`FixtureLibraryChange`: the new entries and their source — `Import` of a `.gdtf`, GDTFs embedded in an `Mvr`, a `Project`'s copies) is raised after GDTF files were added and every fixture was re-resolved. |
 | `Input`, `Protocols`, `StartProtocols` | DMX input hub and the protocol manager; `StartProtocols` subscribes to the universes the patch uses. |
 | `Dmx`, `Poses` | DMX evaluation of every fixture; world matrices of every fixture part. |
 | `Simulation` | Smoke, fire and the acoustic field (`StageSimulation`). |
 | `Network`, `Rigging`, `ElectricalProfiles`, `NetworkSolution`, `HasConsoles` | Cable/power/data solver, rigging analyzer, electrical fixture data. |
 | `Issues`, `RefreshIssues()` | Issue log with the patch, electrical, rigging and engine providers, plus the issues of the last operations. |
 | `Undo`, `Selection` | Undo history and selection of the open scene. |
-| `Settings` (`EngineSettings`), `View` (`ViewSettings`) | Stored with the project in the `engine` and `view` settings sections. |
+| `Settings` (`EngineSettings`), `View` (`ViewSettings`), `MarkSettingsChanged()`, `MarkViewSettingsChanged()`, `SettingsVersion` | Stored with the project in the `engine` and `view` settings sections. Assigning another object, or calling `Mark…Changed()` after changing one in place (the editor's Preview/Render panels, overlay legends, work light, saved camera), makes the project modified (`IsModified`) and is picked up by the next autosave; `SettingsVersion` counts these changes. `New`/`Open` start unmodified. |
 | `Models`, `Images` | Decoded models (native formats through the import worker) and the image source for every texture key. |
 | `LightMeter`, `Recorder`, `Play`, `Player` | Illuminance and light plot; DMX recording and playback. |
 | `Lights`, `LightCollector`, `Time`, `Frame` | The frame's photometric lights and clock. |
 | `Render`, `AttachRenderWorld`, `DetachRenderWorld` | The renderer binding. |
-| `Autosave`, `EnableAutosave`, `DisableAutosave`, `Recover` | Autosave of the open project (`AutosaveService`, driven by `Tick`; a project is autosaved only when its scene, an asset (import options changed, removed) or the `engine`/`view` settings changed; a successful save discards the session's autosaves) and recovery of crashed sessions. `Recover(session)` continues the crashed session's files (`AutosaveOptions.Resume`), so the next successful save removes them — also when autosave is off — and a recovered project is never offered again after it was saved; until then the crash data stays recoverable. Opening another project closes the session normally; on a clean exit the application calls `DisableAutosave()` before disposing the engine (disposing alone keeps the recovery files). |
+| `Autosave`, `EnableAutosave`, `ConfigureAutosave`, `DisableAutosave`, `Recover`, `IsAutosaveEnabled`, `AutosaveInterval` | `ConfigureAutosave(enabled, interval)` changes the interval or pauses/resumes autosave **on the running session** — its files, lock and session key stay, so changing the setting never leaves a session behind to be offered as a crash; projects opened later use the same values; when autosave was never set up (or was disabled) enabling starts a session with the options last given to `EnableAutosave` (else the defaults), and a non-positive interval pauses and keeps the previous one. Autosave of the open project (`AutosaveService`, driven by `Tick`; a project is autosaved only when its scene, an asset (import options changed, removed) or the `engine`/`view` settings changed; a successful save discards the session's autosaves) and recovery of crashed sessions. `Recover(session)` continues the crashed session's files (`AutosaveOptions.Resume`), so the next successful save removes them — also when autosave is off — and a recovered project is never offered again after it was saved; until then the crash data stays recoverable. Opening another project closes the session normally; on a clean exit the application calls `DisableAutosave()` before disposing the engine (disposing alone keeps the recovery files). |
 
 **Construction.** `new StageEngine(StageEngineOptions)`: `LibraryFolders` (empty → the repository during development:
 the folder containing `Candela.sln`, searched upwards from the program and the current directory), `SpecsIndexPath`
@@ -68,7 +68,7 @@ false only when nothing happened (the open scene is then unchanged).
 | `New(name)` | Empty project; undo, selection, settings and assets start afresh. |
 | `Open(path)` | `.candela` through `Candela.Project` (tolerant loading; load issues reported; the `engine`/`view` sections restored, a section that no longer parses gives `engine.settings-invalid` and the defaults); `.mvr` through `Candela.Mvr` as a new, unsaved project. |
 | `Save()`, `SaveAs(path)` | Atomic `.candela` write with the scene, every asset (original bytes), copies of the GDTF files the fixtures use (from the library or the project's own copies), the thumbnail (`Project.Thumbnail`) and the `engine`/`view` sections. `Save()` without a path fails with "Save as". |
-| `Import(path, EngineImportOptions)` | `.mvr` merged under a new group (undoable); `.candela` merged under a group through `ProjectMerge` (new ids, references remapped, undoable); 3D models (OBJ, FBX, DAE, 3DS, STL, PLY, glTF/GLB) as a `MeshComponent` entity at `Placement`; images (PNG, JPEG, TGA, BMP, PSD, GIF, HDR) as an `ImageComponent` reference drawing or poster sized to the image's aspect; `.gdtf` added to the fixture library. SketchUp files are refused with advice. |
+| `Import(path, EngineImportOptions)` | `.mvr` merged under a new group (undoable); `.candela` merged under a group through `ProjectMerge` (new ids, references remapped, undoable); 3D models (OBJ, FBX, DAE, 3DS, STL, PLY, glTF/GLB) as a `MeshComponent` entity at `Placement`; images (PNG, JPEG, TGA, BMP, PSD, GIF, HDR) as an `ImageComponent` reference drawing or poster sized to the image's aspect; `.gdtf` read completely first (`GdtfReader`) and added to the fixture library only when it is a readable fixture type with at least one DMX mode — a broken file is refused with `engine.import-failed` (category Fixture) and never becomes a library entry; warnings of the reader become one `engine.gdtf-warnings` note. The result carries the new (or already present) entry in `EngineResult.LibraryEntry` and `FixtureLibraryChanged` is raised, so the editor can select it. SketchUp files are refused with advice. |
 | `ExportMvr(path)` | MVR 1.6 with the library's GDTF files and the models as GLB (`Candela.Mvr`). |
 
 **GDTF files that are not in the library.** Complete GDTFs embedded in an MVR, and the GDTF copies of a project, are
@@ -191,7 +191,31 @@ emits its light — hiding the rig to look at the stage keeps the stage lit; its
 (cables and the devices they plug into), `CastShadow` (`FixtureComponent`/`MeshComponent.CastShadow`; walls, trusses
 and posters cast, reference drawings and cables do not), `Reference`. Every drawn entity has a pick id:
 `TryGetEntity(pickId, out entityId)`, `PickIdOf(entityId)`; `InstancesOf(entityId)` lists what was drawn (part names,
-world matrices, flags) for tools and tests.
+world matrices, flags and world bounds) for tools and tests. With `OutlineSelectedDescendants` the descendants of a
+selected entity are drawn `Selected` too (the outline of a selected group shows its content; off by default).
+
+Flags are derived from the scene's change kinds, not by scanning every entity each frame: `VisibilityChanged` and
+`Reparented` re-derive the entity's subtree, `LayerChanged` the entity, `LayersChanged` (a layer shown, hidden, added or
+removed) every entity once, a selection change only the entities whose selection changed, a cable change the devices
+whose cable highlight changed; `LockedChanged` does not affect drawing. Steady frames send no flag updates (tested: 120
+random visibility/layer/selection/reparent/cable edits always give the flags a per-frame scan would give).
+
+**World bounds.** `TryGetWorldBounds(entityId | pickId, out Aabb, includeHidden = true)`, `IncludeWorldBounds(pickId, ref
+bounds)`, `VisibleWorldBounds()` and `CollectVisibleCorners(list)` give the world-space boxes (m) of what is drawn —
+each instance's mesh bounds placed with its current world matrix (a fixture in its current pan/tilt pose, a decoded
+model, a wall, a cable) — for box selection, framing and drop targets; boxes larger than `MaxContentExtent` (10 km)
+and non-finite placements are left out of the visible totals. Nothing is allocated per query beyond the caller's list.
+
+**Work light.** `RenderSync.WorkLight` (`WorkLightMode`: `Off` — the default, so renders never get it unless asked —,
+`Auto`, `On`) adds `WorkLightRig`'s dim neutral rig to the light list sent to the renderer: one D65 key light from the
+audience side (front-left, above; 40 lx at the centre on a surface facing it; casts shadows) and a soft ambient of six
+very wide lights from ±X, ±Y and ±Z (8 lx each on a surface facing them; no shadows), aimed at the centre of the drawn
+content from 2.5 × its radius (at least 5 m). `Auto` adds it only while no stage light reaches 1 cd (no fixture emits,
+every dimmer closed). The rig depends only on `VisibleWorldBounds()` and is recomputed only when the scene or the set of
+drawn entities changes, so it is deterministic and costs nothing per frame. It is not stage light: `engine.Lights`, the
+light meter and the light plot never include it, and it is left out while the project's view shows the lux overlay. The
+editor's preview passes `ViewSettings.WorkLight` (stored with the project, default `Auto`); `candela render
+--work-light auto|on` asks for it in a render. `IsWorkLightOn` and `WorkLights` tell what the last update sent.
 
 ## Light meter and light plot
 
@@ -208,16 +232,28 @@ electrical profile (`_specs` / GDTF), position, layer and the current peak cande
 
 ## DMX recording and playback
 
-`engine.Recorder.Start(engine.Time, name)` … `Stop()` records the merged hub input once per frame: for every received
-universe the slots that changed (runs; gaps of up to four equal slots bridged), universes that appear (full) or stop
-(lost), with the frame time and the last timecode received (ArtTimeCode …). `DmxRecording.Save/Load` (`.cdmx`): magic,
-version, creation time, name, then a zlib stream of frames (varint-encoded runs). A file cut short loads the frames
-before the damage with `engine.recording-damaged`; anything that is not a recording throws `InvalidDataException`.
-Recordings keep a full state every 2 s for seeking.
+`engine.Recorder.Start(engine.Time, name)` … `Stop()` records the merged hub input **at packet rate**: the recorder
+follows the hub's receive path (`DmxInputHub.AddObserver`, called on the protocol threads inside the hub's lock) and
+stores every change of a merged universe the moment it arrives — the slots that changed (runs; gaps of up to four equal
+slots bridged), universes that appear (full; those already live at the start make the first frame) or stop (lost,
+stamped when the last source timed out) — and every new timecode (frames where one arrived are flagged
+`TimecodeReceived`; the others carry the last one). Timestamps are the recorder's own: the hub's clock at arrival
+relative to the start, so a 44 Hz console recorded by a 30 fps editor keeps all of its frames. `Tick` reports the engine
+clock (`Capture`); when the engine runs ahead of real time (offline ticking, a render job, tests) the engine time of the
+last frame is the earliest time a packet can get, so a recording made that way stays on the show's timeline. Changes of
+different universes within 1 ms share a frame. Unchanged packets cost a 512-byte comparison and allocate nothing.
+
+`DmxRecording.Save/Load` (`.cdmx`, format version 2): magic, version, creation time, name, capture mode
+(`DmxCaptureMode.Packets`; `EngineFrames` for recordings sampled per frame), then a zlib stream of frames (time,
+flags — bit 0 timecode, bit 1 timecode arrived here — and varint-encoded runs). Version 1 files load
+(`LoadedFormatVersion` 1, `EngineFrames`; a frame counts as a timecode arrival when its timecode differs from the
+previous frame's) and are written as version 2; a file of a newer version is refused with a clear
+`InvalidDataException`. A file cut short loads the frames before the damage with `engine.recording-damaged`; anything
+that is not a recording throws `InvalidDataException`. Recordings keep a full state every 2 s for seeking.
 
 `engine.Play(recording, startSeconds)` plays it into the hub as the source `recording` following the engine clock;
-`DmxPlayer.Seek(time)`, `SeekTimecode(timecode)` (to the moment that timecode was received, interpolated between
-captures) rebuild the state from the nearest keyframe, so rendering a timecode range means: seek, then tick at the
+`DmxPlayer.Seek(time)`, `SeekTimecode(timecode)` (to the moment that timecode arrived, interpolated between arrivals;
+the player submits its timecode with the source `recording`, so `Input.LastTimecodeSource` names it) rebuild the state from the nearest keyframe, so rendering a timecode range means: seek, then tick at the
 frame rate. Universes are re-sent every frame so they never time out in the hub.
 
 ## Fixture thumbnails
@@ -273,8 +309,8 @@ candela render <scene.mvr|scene.candela> --out <file.png> [--width W --height H]
                [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov deg]
                [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]
                [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev auto|floor|<EV100>]
-               [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--device <name>]
-               [--library <dir>]... [--cache <dir>]
+               [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--work-light off|auto|on]
+               [--device <name>] [--library <dir>]... [--cache <dir>]
 candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset 0|1] [--scene <file>]
 candela info <file.gdtf|file.mvr|file.candela>
 candela validate <scene> [--plot]
@@ -294,7 +330,8 @@ the picture. `--out` must name a file (a folder is a usage error). `--overlay lu
 (1 … 5000 lx) unless the floor is brighter; then the same colours are stretched up to the brightest floor reading
 (a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
 the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
-temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure is automatic by default
+temporary wooden stage floor under its footprint (`--floor none` disables it). `--work-light auto` (or `on`) adds the
+work light (see RenderSync) for scenes whose fixtures are dark; a render never gets it unless asked. The exposure is automatic by default
 (`--ev auto`): a stage picture is mostly dark air with bright beams and pools, which a reading of the floor alone says
 little about, so the renderer adapts to the picture (`PreviewSettings.AutoExposure` with **stage metering**, `ExposureMetering.Stage`:
 the lit part of the image — the 85th to 99th percentile of the luminance — placed 1.5 stops below middle grey, so light
@@ -327,6 +364,7 @@ adds the light plot).
 | `engine.fixture-model-failed` | warning | a fixture type's 3D model could not be loaded (its light is still drawn) |
 | `engine.extra-atmosphere` | warning | several atmosphere volumes; only the first is simulated |
 | `engine.gdtf-missing` | warning | a GDTF from a project or MVR could not be written to the cache |
+| `engine.gdtf-warnings` | note | an imported `.gdtf` was read with warnings (defaults used) |
 | `engine.recording-damaged` | warning | a DMX recording is truncated or damaged |
 | `engine.settings-invalid` | warning | a project's `engine`/`view` section could not be read |
 | `engine.library-missing` | warning/error | no library folder, or it cannot be scanned |
@@ -399,6 +437,19 @@ a device):
   saving (with and without autosave); worker crashes with a lingering child, garbage output, and a project whose model
   crashes the worker; framing fits every point tightly; thousands of damaged recordings and model packages load or are
   refused with `InvalidDataException`.
+* **Editor follow-ups** (`EngineFollowUpTests`, `RenderSyncFollowUpTests`, `PacketRecordingTests`): importing a
+  library GDTF returns its entry and raises `FixtureLibraryChanged` once; random bytes, a truncated archive, broken XML
+  and a GDTF without DMX modes are refused with an issue and never enter the library; the autosave interval and pause
+  change on the running session (same service and session key), carry over to projects opened later and start a session
+  only when enabled; view/engine settings changes make the project modified, survive save and reopen and reach the
+  autosave; flags after 120 random visibility/layer/selection/reparent/lock/cable edits equal a per-frame scan, steady
+  frames send no flag updates, a selected group can outline its content; world bounds per entity and pick id follow
+  moves and hiding; the work light lights a dark scene in `Auto` (40 lx key at the centre, never in `engine.Lights` or
+  the light meter, off with a lit fixture, on top of it in `On`, off under the lux overlay, deterministic) and its key
+  covers the content; a 44 Hz console recorded by a 30 fps engine keeps every packet at its arrival time and a
+  timecode seek lands between engine frames; unchanged packets are not recorded, a timed-out source is stamped when it
+  timed out; a version-1 recording loads, migrates to version 2 and a newer version is refused; the engine records at
+  packet rate while it ticks.
 * **Follow-up review**: a background model decode that throws is recorded as failed in the asset store and not started
   again; fixtures named by an MVR stub spec get the same stand-in mode in the looks and the Art-Net test pattern as in
   the DMX engine; an ARRI SkyPanel's 179° field is trimmed to the renderer's 170° cone silently, while an Astera
@@ -416,6 +467,8 @@ a device):
 * `Фокина.mvr` at open white: its 32 `Zonda` pixel beams have GDTF beam type Glow and each receives an eighth of the
   fixture's 465 000 cd (Candela.Dmx), so each is a Lambertian emitter of about 183 klm; in haze they light the air
   evenly and mask the beams of the other fixtures (docs/rendering.md shows the stage with and without them).
-* The DMX recorder samples the input once per engine frame (not every received packet).
+* The work light is made of spot lights (the render contracts have no ambient term): in haze its six wide ambient
+  lights scatter a faint even glow (about a fifth of the brightness of a lit surface at the default haze), and the
+  renderer's lux overlay would count it if a view showed lux while the project's view does not.
 * The renderer keeps at most 64 flame grids and 64 M texels in all (the hottest wins where they overlap; grids beyond
   the budget are skipped with a warning).

@@ -81,10 +81,17 @@ changes: `fixture`, `mesh`, `wall`, `image`, `truss`, `riggingPoint`, `cable`, `
 JSON arrays; enums are strings; non-finite numbers are the strings `"NaN"`, `"Infinity"`, `"-Infinity"`; JSON is
 camelCase and tolerant of unknown properties (forward compatible).
 
-Null values are omitted, **except** for a property whose default is not null: `"protocolId": null` (a console without
-protocol input, whose default is Art-Net) is written explicitly, because an omitted value reads back as the default.
-Components of types this version does not know (written by a newer version) are kept from loading and written back
-unchanged to the entities that still exist (`ProjectData.UnknownComponents`).
+The file is written with Core's `CandelaJson.Options`. Null values are omitted, **except** for a property whose default
+is not null: `"protocolId": null` (a console without protocol input, whose default is Art-Net) is written explicitly,
+because an omitted value reads back as the default. (Candela.Project used to apply this rule with options of its own;
+Core's options now do the same and write byte-identical files, so no migration is needed.)
+
+**Properties of newer versions are kept.** Properties this version does not know — at the top of the file, in an entity
+record, a layer, the scene settings or a component — are read into Core's `UnknownProperties` of the scene, entity,
+layer, settings or component and written back unchanged on save (the tolerant reader collects them for the scene and
+the entity records it reads element by element; layers, settings and components keep them through Core's JSON
+extension data). Components of types this version does not know are kept from loading and written back unchanged to
+the entities that still exist (`ProjectData.UnknownComponents`).
 
 ### 1.3 `settings.json`
 
@@ -274,8 +281,12 @@ main thread. Assets are not decoded during loading (models and images decode laz
 * **Layers** are matched by id, then by name (`MergeLayersByName`); missing ones are added.
 * Console fixture ids are kept as authored; `RenumberFixtureIds` moves colliding ones above the highest id in use.
   Overlapping DMX addresses are left to the patch checks.
-* Components are copied without losing values (a null that differs from the default, such as a console without
-  protocol input, stays null).
+* The copy is made by Core's `EntityCloner` (`ExternalReferenceHandling.Clear`, the merge's layer and asset tables as
+  `LayerMap` / `AssetIdMap`), which copies entities, flags, transforms, components and properties of newer versions
+  exactly (a null that differs from the default, such as a console without protocol input, stays null) and rewrites
+  the entity references; the merge completes each copy (`ComponentCopied`) with what Core does not know — GDTF file
+  names, console fixture ids, world-space points moved by the placement, asset texture keys, asset ids that point
+  nowhere, cable segments and ends whose node is missing — and reports every removed reference by name.
 * Components of unknown types and assets this version cannot load (kept verbatim in the imported project) are not
   imported — their contents may refer to ids that cannot be translated; the result says so
   (`project.scene-component-unknown`, `project.asset-kept`).
@@ -283,8 +294,9 @@ main thread. Assets are not decoded during loading (models and images decode laz
   the result, with entity ids translated.
 
 `ProjectMerge.CreateCommand` returns a `ProjectImportCommand` (`IUndoableCommand`): the imported tree is built
-detached up front; `Do` adds layers, assets, GDTF copies and the group in one scene change; `Undo` removes exactly what
-was added. `ProjectMergeResult` lists the id maps (`EntityIds`, `AssetIds`, `GdtfNames`), what was added and the issues.
+detached up front (no staging scene); `Do` adds layers (the layer collection raises `LayersChanged` itself), assets,
+GDTF copies and the group in one scene change; `Undo` removes exactly what was added. Its `Description` ("Import
+&lt;group&gt;") is fixed when the command is made, so renaming the group later does not change the undo history. `ProjectMergeResult` lists the id maps (`EntityIds`, `AssetIds`, `GdtfNames`), what was added and the issues.
 
 ## 6. Autosave and recovery
 

@@ -187,7 +187,11 @@ into the same show through `ITestPatternEncoder`.
   * Style StNode, MAC of the interface, BindIp and BindIndex;
   * Status1 `0xD0`, Status2 `0x08` (15-bit port-addresses), and RefreshRate 44.
 * **ArtTimeCode (0x9700).** Fields are range-checked: frames below the type's rate, hours up to 23, type 0–3. Valid
-  packets go to `DmxInputHub.SubmitTimecode` and raise `ArtNetReceiver.TimeCodeReceived`.
+  packets go to `DmxInputHub.SubmitTimecode(timecode, source)` with the sender as source
+  (`DmxSourceId("artnet", "<sender IP>:<port>")`, one cached id per sender, so steady timecode does not allocate):
+  `DmxInputHub.LastTimecodeSample` / `LastTimecodeSource` and `TimecodeSampleReceived` tell where the timecode came from
+  and when it arrived. The receiver raises `TimeCodeReceived` (the packet) and `TimeCodeReceivedFrom`
+  (`ArtTimeCodeReceived`: packet, sender endpoint, arrival time).
 * **ArtPollReply from others** fills `ArtNetReceiver.Nodes` (consoles and nodes on the network). Candela's own looped
   replies are ignored. All other opcodes are counted as ignored.
 
@@ -282,8 +286,18 @@ m/s, m/s², radians): how it maps to Candela's Z-up stage frame depends on the t
 `IExternalProtocol.Status` returns a `ProtocolStatus` snapshot:
 
 * **State:** Stopped, Running, Warning, Error or Unavailable.
-* **Message:** a one-line summary, for example "Listening on UDP 6454 (eth0 2.0.0.10); announcing 4 universe(s)…".
-* **LastError**, and **Warnings**.
+* **Message:** a one-line summary in English, for example "Listening on UDP 6454 (eth0 2.0.0.10); announcing 4
+  universe(s)…", and **Text**, the same as a localisable `ProtocolText`: a stable key (`ProtocolMessages`, e.g.
+  `artnet.listening`), its arguments (language-neutral values: ports, addresses, names, counts, system messages) and the
+  English text. Keys ending in `.all` are the "all interfaces" variants; `ProtocolMessages.All` lists every key with its
+  English template (`{0}`, `{1}` … are the arguments), so the editor translates the template and fills in the arguments.
+* **LastError** / **ErrorText**, **ErrorCode** (`ProtocolErrorCode`: `PortInUse`, `PortConflict`, `InterfaceNotFound`,
+  `AddressNotAvailable`, `SocketError`, `SocketFailed`, `InvalidSettings`, `DeviceNotFound`, `DeviceNotResponding`,
+  `DeviceDisconnected`, `Unavailable`, `StartFailed`; kept with the error after a stop), and **Warnings** /
+  **WarningTexts** (same order).
+* **Binding** while running: **BoundEndpoint** (`0.0.0.0:6454`, or the serial port of a DMX widget),
+  **NetworkInterface** (`eth0 192.168.1.20`, null for all interfaces) and **UniverseCount** (announced for Art-Net,
+  subscribed for sACN, mapped by the patterns for OSC, 1 for an EntTec widget, 0 for PosiStageNet).
 * **Counters:** Packets (accepted), BadPackets (malformed), IgnoredPackets (well-formed but not for Candela), the last
   packet time, and the last bad packet with its reason and sender.
 * **Universes:** per universe, the packets, sequence errors, last packet time, measured packets per second and last

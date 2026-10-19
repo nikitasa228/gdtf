@@ -340,6 +340,16 @@ files.
   written as binary glTF (Y up, metres) with SharpGLTF. Part transforms are baked, there is one primitive per sub-mesh,
   and materials are kept as metallic-roughness factors. Objects reference it through `Geometry3D`. Walls, floors and
   ceilings become scene objects with a generated box (`ExportWalls`).
+* **Candela's own data** (`CandelaUserData`). What MVR cannot hold goes into one `UserData/Data` block with
+  `provider="Candela" ver="1"`, which MVR 1.6 asks other programs to keep without interpreting it. Version 1 holds the
+  walls, floors and ceilings: one `<Wall object="{uuid}" geometry="{box file}">` per `WallComponent`, its text the
+  component as Candela JSON (kind, width, height, thickness in metres, material id, UV scale). Other programs see the
+  scene objects with their boxes; Candela's importer gives such an object its `WallComponent` back — with the material
+  — and skips the box, so it does not become an imported model. A wall textured with one of the exporting project's own
+  assets (`asset:` material ids) gets the default material, since the asset does not travel. A record that cannot be
+  read (damaged JSON, no object, an invalid size or kind) is reported once (`mvr.value-invalid`) and its box is imported
+  as a model instead, so nothing is lost; blocks of other providers are ignored, and elements of newer versions of the
+  block are kept by the document but not read.
 * **Geometry children.** Child entities that the importer created for extra geometry are folded back into `Geometry3D`
   entries of their parent, recognised by their derived ids. If such a child's name is not the stem of the file, it is
   written as a `Symbol` of a one-file `Symdef` named after it. Names and ids therefore survive import → export →
@@ -433,6 +443,11 @@ Writing the result again gives the same bytes.
   elements MVR 1.6 makes mandatory on export, no invented `UserData` attributes, GDTFs without drawable models that
   must keep their DMX layout instead of a substitute, 20 000 nested groups, 10⁹ nested symbol instances and a glTF with
   an invalid URI.
+
+* **`CandelaUserDataTests`.** Walls, floors and ceilings with built-in materials survive export → import (kind, size,
+  UV scale, material; no box imported as a model, no asset) and a second round trip; a project texture becomes the
+  default material; damaged records are reported once and imported as models; other providers' blocks are ignored;
+  exports without walls write no block.
 
 ## Known gaps
 
