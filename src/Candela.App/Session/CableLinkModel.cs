@@ -53,6 +53,8 @@ internal sealed class CableLinkModel
         Cards = cards;
         Links = links;
         FreeEnds = freeEnds;
+        foreach (var l in links)
+            HasBranches |= l.To != l.From + 1;
     }
 
     /// <summary>The cable shown.</summary>
@@ -84,6 +86,9 @@ internal sealed class CableLinkModel
 
     /// <summary>Ends of the cable that are not plugged into anything.</summary>
     public int FreeEnds { get; }
+
+    /// <summary>True when a cable links two cards that are not next to each other (a branch: drawn as an arc above the cards).</summary>
+    public bool HasBranches { get; }
 
     /// <summary>The model for <paramref name="cableId"/>, or null when the cable is not in the scene.</summary>
     public static CableLinkModel? Build(StageEngine engine, Guid cableId)

@@ -32,6 +32,7 @@ internal sealed class CableLinksPanel : Panel
     private string[] _inPorts = Array.Empty<string>();
     private string _header = "";
     private string _counts = "";
+    private string _sourceLabel = "";
 
     /// <summary>
     /// Creates the panel; <paramref name="showOverlay"/> switches the active viewport to the cable overlay,
@@ -111,7 +112,9 @@ internal sealed class CableLinksPanel : Panel
         if (_model is { } m)
         {
             _header = $"{m.Title}  ·  {m.TypeName}  ·  {m.Summary}";
-            _counts = CableLoc.Format(CableStr.LinksDevices, m.Cards.Count) + (m.FreeEnds > 0 ? "  ·  " + CableLoc.Format(CableStr.LinksFreeEnds, m.FreeEnds) : "");
+            _counts = (m.Source is null ? "" : "·  ") + CableLoc.Format(CableStr.LinksDevices, m.Cards.Count) +
+                      (m.FreeEnds > 0 ? "  ·  " + CableLoc.Format(CableStr.LinksFreeEnds, m.FreeEnds) : "");
+            _sourceLabel = CableLoc.Get(CableStr.LinksSource) + ":";
         }
     }
 
@@ -148,9 +151,11 @@ internal sealed class CableLinksPanel : Panel
         ImGui.TextUnformatted(_header);
         if (model.Source is { } source)
         {
-            SafeText.Disabled(CableLoc.Get(CableStr.LinksSource) + ":");
+            // Source, device count and the buttons on one line, so the strip keeps its room in a low panel.
+            SafeText.Disabled(_sourceLabel);
             ImGui.SameLine();
             ImGui.TextUnformatted(source);
+            ImGui.SameLine();
         }
         else
         {
@@ -181,12 +186,16 @@ internal sealed class CableLinksPanel : Panel
     {
         float line = ImGui.GetTextLineHeight();
         float cardW = 176f * scale, cardH = 3f * line + 18f * scale, gap = 112f * scale;
-        float top = 2f * line + 16f * scale; // room for arcs and labels above the cards
+        // Room above the cards for the arcs of branches (and their labels); a plain chain needs none, so the cards fit
+        // into a low bottom panel at large UI scales.
+        float top = model.HasBranches ? 2f * line + 16f * scale : 6f * scale;
         int n = model.Cards.Count;
         float contentW = n * cardW + Math.Max(0, n - 1) * gap + 16f * scale;
         float hintH = ImGui.GetTextLineHeightWithSpacing();
         var avail = ImGui.GetContentRegionAvail();
-        if (!ImGui.BeginChild("##strip", new Vector2(0f, MathF.Max(cardH + top + 3f * line, avail.Y - hintH)), ImGuiChildFlags.None,
+        // The strip takes the room the panel has and scrolls (both ways) when the cards need more: a strip taller
+        // than the panel would be cut off, since the panel window itself does not scroll.
+        if (!ImGui.BeginChild("##strip", new Vector2(0f, MathF.Max(avail.Y - hintH, 2f * line)), ImGuiChildFlags.None,
                 ImGuiWindowFlags.HorizontalScrollbar))
         {
             ImGui.EndChild();

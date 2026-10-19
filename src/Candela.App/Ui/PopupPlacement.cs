@@ -38,6 +38,19 @@ internal static class PopupPlacement
     }
 
     /// <summary>
+    /// The position that keeps a window at <paramref name="position"/> of <paramref name="size"/> inside the area at
+    /// <paramref name="areaPos"/> of <paramref name="areaSize"/> (moved as little as possible; a window larger than the
+    /// area keeps its top left corner in it).
+    /// </summary>
+    public static Vector2 Inside(Vector2 position, Vector2 size, Vector2 areaPos, Vector2 areaSize)
+    {
+        if (!float.IsFinite(position.X) || !float.IsFinite(position.Y))
+            return areaPos;
+        var max = Vector2.Max(areaPos, areaPos + areaSize - size);
+        return Vector2.Clamp(position, areaPos, max);
+    }
+
+    /// <summary>
     /// The first size of a dialog window: <paramref name="desired"/> (already scaled), but at most 92 % of the main
     /// window's work area. A dialog larger than the main window would hang over its edge and, with multi-viewport
     /// enabled, turn into a separate OS window.

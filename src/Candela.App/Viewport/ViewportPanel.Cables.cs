@@ -617,6 +617,13 @@ internal sealed unsafe partial class ViewportPanel
             return;
         }
 
+        // Its size is known only once it is drawn: pushed back inside the main window whenever it hangs over an edge
+        // (a picker of many ports opened low in the window would otherwise reach below it and become an OS window).
+        var mainViewport = ImGui.GetMainViewport();
+        var at = PopupPlacement.Inside(ImGui.GetWindowPos(), ImGui.GetWindowSize(), mainViewport.WorkPos, mainViewport.WorkSize);
+        if (at != ImGui.GetWindowPos())
+            ImGui.SetWindowPos(at);
+
         if (PortPicker.Draw(pick, type, scale) is { } chosen)
         {
             ImGui.CloseCurrentPopup();
