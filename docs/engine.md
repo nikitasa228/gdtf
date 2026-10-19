@@ -211,11 +211,14 @@ and non-finite placements are left out of the visible totals. Nothing is allocat
 audience side (front-left, above; 40 lx at the centre on a surface facing it; casts shadows) and a soft ambient of six
 very wide lights from ±X, ±Y and ±Z (8 lx each on a surface facing them; no shadows), aimed at the centre of the drawn
 content from 2.5 × its radius (at least 5 m). `Auto` adds it only while no stage light reaches 1 cd (no fixture emits,
-every dimmer closed). The rig depends only on `VisibleWorldBounds()` and is recomputed only when the scene or the set of
-drawn entities changes, so it is deterministic and costs nothing per frame. It is not stage light: `engine.Lights`, the
+every dimmer closed). The rig is placed around `WorkLightContent`: the visible instances like `VisibleWorldBounds()`, but
+with each fixture's parts at the fixture's own placement instead of their pan/tilt pose, so where the heads point (DMX,
+motors still travelling when the rig was placed) never moves it. It depends only on that box and is recomputed only when
+the scene or the set of drawn entities changes, so the same scene always gets the same work light, whatever happened
+before, and it costs nothing per frame. It is not stage light: `engine.Lights`, the
 light meter and the light plot never include it, and it is left out while the project's view shows the lux overlay. The
 editor's preview passes `ViewSettings.WorkLight` (stored with the project, default `Auto`); `candela render
---work-light auto|on` asks for it in a render. `IsWorkLightOn` and `WorkLights` tell what the last update sent.
+--work-light auto|on` asks for it in a render. `IsWorkLightOn` and `WorkLights` tell what the last update sent, `WorkLightContent` the box the rig was placed around.
 
 ## Light meter and light plot
 
@@ -331,7 +334,8 @@ the picture. `--out` must name a file (a folder is a usage error). `--overlay lu
 (a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
 the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
 temporary wooden stage floor under its footprint (`--floor none` disables it). `--work-light auto` (or `on`) adds the
-work light (see RenderSync) for scenes whose fixtures are dark; a render never gets it unless asked. The exposure is automatic by default
+work light (see RenderSync) for scenes whose fixtures are dark; a render never gets it unless asked, and never in a
+`--overlay lux` picture (the overlay of the picture rendered decides, not the one saved with a project). The exposure is automatic by default
 (`--ev auto`): a stage picture is mostly dark air with bright beams and pools, which a reading of the floor alone says
 little about, so the renderer adapts to the picture (`PreviewSettings.AutoExposure` with **stage metering**, `ExposureMetering.Stage`:
 the lit part of the image — the 85th to 99th percentile of the luminance — placed 1.5 stops below middle grey, so light
