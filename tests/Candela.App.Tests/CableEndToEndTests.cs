@@ -144,10 +144,13 @@ public sealed class CableEndToEndTests : IDisposable
         var settings = new SettingsStore(_log, _dir.File("settings.json"));
         settings.Load();
         string rig = _dir.File("rig.candela"), cabled = _dir.File("cabled.candela"), picker = _dir.File("picker.png");
+        Vector3 plug;
         using (var session = EngineTestSupport.CreateSession(_log, settings, _dir))
         {
-            CablingScene.Populate(session.Engine!);
+            var console = CablingScene.Populate(session.Engine!).Console;
             Assert.True(session.SaveAs(rig).Succeeded);
+            var (port, index, count) = CablePorts.Find(session.Engine!, console, "DMX B");
+            plug = CablePorts.WorldPosition(console, port!, index, count);
         }
 
         string script = _dir.Write("cables.json", $$"""
@@ -171,6 +174,17 @@ public sealed class CableEndToEndTests : IDisposable
                 { "type": "key", "chord": "Escape" },
                 { "type": "wait", "frames": 3 },
                 { "type": "action", "id": "tool.select" },
+                { "type": "select", "names": ["DMX 1"] },
+                { "type": "wait", "frames": 3 },
+                { "type": "press", "world": {{Point(plug)}} },
+                { "type": "move", "world": {{Point(plug + new Vector3(1f, 0f, 1f))}} },
+                { "type": "wait", "frames": 2 },
+                { "type": "move", "world": {{Point(plug + new Vector3(2f, 0f, 2f))}} },
+                { "type": "wait", "frames": 2 },
+                { "type": "key", "chord": "Escape" },
+                { "type": "wait", "frames": 2 },
+                { "type": "release" },
+                { "type": "wait", "frames": 2 },
                 { "type": "save", "path": "{{Json(cabled)}}" },
                 { "type": "wait", "frames": 3 }
             ] }
@@ -186,6 +200,12 @@ public sealed class CableEndToEndTests : IDisposable
         var cable = Assert.Single(scene.Query<CableComponent>()).Component;
         Assert.Equal(new[] { "Console 1:DMX B", "Spot 2:DMX IN" },
             cable.Endpoints.Select(p => $"{scene.Find(p.EntityId)?.Name}:{p.PortName}").OrderBy(p => p, StringComparer.Ordinal));
+        // The plug's node was dragged and the drag cancelled with Escape: it is where it was, still on the console.
+        var end = cable.Endpoints.Single(p => p.PortName == "DMX B");
+        var node = cable.FindNode(end.NodeId)!;
+        var at = CableNodeEdits.WorldPosition(scene, scene.Find(cable.Owner!.Id)!, node);
+        Assert.True(Vector3.Distance(plug, at) < 1e-3f, $"the plug moved from {plug} to {at}");
+        Assert.Equal(end.EntityId, node.Anchor!.Value.EntityId);
     }
 
     private static string Json(string path) => path.Replace("\\", "/");

@@ -721,6 +721,18 @@ internal sealed unsafe partial class ViewportPanel
         _nodeDrag.Moved = true;
     }
 
+    /// <summary>
+    /// Escape during a mouse drag of a cable node: the node goes back to where the drag started (nothing is recorded).
+    /// Returns true when a drag was cancelled. (A drag of the Move gizmo ends with the mouse button.)
+    /// </summary>
+    internal bool CancelNodeDragging()
+    {
+        if (!_nodeDrag.Active || _nodeDrag.Gizmo)
+            return false;
+        CancelNodeDrag();
+        return true;
+    }
+
     private void CancelNodeDrag()
     {
         if (!_nodeDrag.Active)

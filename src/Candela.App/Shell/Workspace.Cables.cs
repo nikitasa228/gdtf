@@ -13,9 +13,9 @@ namespace Candela.App.Shell;
 /// <summary>
 /// Cabling in the workspace: the cable tool's state and status messages, the Tools → Cable menu with every cable type,
 /// the cable link window opened from a cable click or a connector's cable link, and the editing keys that belong to
-/// the viewports' tools — Escape finishes the cable being drawn (or cancels a wall/floor drag, or drops the selected
-/// cable node) before it would clear the selection, Backspace removes the last cable point, Delete removes the selected
-/// cable node instead of the whole cable.
+/// the viewports' tools — Escape finishes the cable being drawn (or cancels a wall/floor drag or a cable node drag, or
+/// drops the selected cable node) before it would clear the selection, Backspace removes the last cable point, Delete
+/// removes the selected cable node instead of the whole cable.
 /// </summary>
 internal sealed partial class Workspace
 {
@@ -169,10 +169,11 @@ internal sealed partial class Workspace
     }
 
     /// <summary>
-    /// Keys of the viewport tools, handled before the shortcuts: Escape ends the cable being drawn, cancels a wall or
-    /// floor being drawn or resized, or drops the selected cable node; Backspace removes the cable's last point; Delete
-    /// removes the selected cable node. A key used here does not also run its shortcut. A cable still being drawn when
-    /// another tool is chosen is finished.
+    /// Keys of the viewport tools, handled before the shortcuts: Escape cancels a wall or floor being drawn or resized
+    /// and a cable node being dragged, else ends the cable being drawn, else drops the selected cable node; Backspace
+    /// removes the cable's last point; Delete removes the selected cable node (a branching node stays, and the status
+    /// bar says why). A key used here does not also run its shortcut. A cable still being drawn when another tool is
+    /// chosen is finished.
     /// </summary>
     private void HandleEditingKeys()
     {
@@ -187,7 +188,7 @@ internal sealed partial class Workspace
         {
             bool handled = false;
             foreach (var viewport in _viewports)
-                handled |= viewport.CancelShapeDrawing();
+                handled |= viewport.CancelShapeDrawing() | viewport.CancelNodeDragging();
             if (!handled && cables is { IsDrawing: true })
             {
                 cables.Finish();
