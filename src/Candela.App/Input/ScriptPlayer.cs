@@ -291,7 +291,8 @@ internal sealed class ScriptPlayer
                 At(schedule, frame);
                 return frame + 1;
             case ScriptActionType.UiText:
-                _textLogs[frame] = Path.GetFullPath(a.Text);
+                // Used as given (relative to the working folder); a path that cannot be opened is reported then.
+                _textLogs[frame] = a.Text;
                 At(schedule, frame);
                 return frame + 1;
             default:

@@ -303,9 +303,15 @@ internal sealed class EditorApplication : IDisposable
 
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(log)!);
+            // Dear ImGui asserts (aborts the process) when it cannot open the log file, so it must open here first.
+            log = Path.GetFullPath(log);
+            if (Path.GetDirectoryName(log) is { Length: > 0 } folder)
+                Directory.CreateDirectory(folder);
+            using (new FileStream(log, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+            {
+            }
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
             _log.Warn("Script", $"The UI text log '{log}' cannot be written: {e.Message}");
             _workspace!.Draw(_frameDelta);
