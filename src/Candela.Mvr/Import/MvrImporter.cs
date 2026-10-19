@@ -122,6 +122,7 @@ public static class MvrImporter
         private readonly Dictionary<MvrObject, Entity> _built = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<MvrObject, List<PendingPart>> _pendingParts = new(ReferenceEqualityComparer.Instance);
         private readonly HashSet<MvrObject> _partsAsGroups = new(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<Entity, List<(Entity Child, int Index)>> _childOrder = new(ReferenceEqualityComparer.Instance);
         private int _unmatchedParts;
 
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
@@ -167,6 +168,7 @@ public static class MvrImporter
                     Build(obj, _group, null, layerId, layerTransform ? obj.Matrix * layer.Matrix : obj.Matrix);
             }
             ImportUnjoinedParts();
+            RestoreChildOrder();
             CreateCables();
             ReportUnrepresentable();
             _sink.Complete();
@@ -228,8 +230,47 @@ public static class MvrImporter
                 if (!MvrMatrix.IsIdentity(d, 1e-4f)) delta = d;
             }
             _byUuid.TryAdd(part.Uuid, target);
-            foreach (var c in part.ChildObjects)
+            var children = part.ChildObjects;
+            var indices = _layerPartRecords.TryGetValue(part.Uuid, out var record) && record.ChildIndices is { } known && known.Count == children.Count
+                ? known
+                : null;
+            for (int k = 0; k < children.Count; k++)
+            {
+                var c = children[k];
                 Build(c, target, original, pending.LayerId, delta.IsIdentity ? c.Matrix : c.Matrix * delta);
+                // where the child stood among the object's children before the export split them by layer
+                if (indices is not null && indices[k] >= 0 && _built.TryGetValue(c, out var child) && ReferenceEquals(child.Parent, target))
+                {
+                    if (!_childOrder.TryGetValue(target, out var order)) _childOrder[target] = order = new List<(Entity, int)>();
+                    order.Add((child, indices[k]));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Puts the children joined from layer parts back at their places among their siblings: the children with a
+        /// recorded index take it, the others (the object's own children) fill the remaining places in their order. Only
+        /// children that are not in place are moved.
+        /// </summary>
+        private void RestoreChildOrder()
+        {
+            foreach (var (target, known) in _childOrder)
+            {
+                known.Sort((a, b) => a.Index.CompareTo(b.Index));
+                var placed = new HashSet<Entity>(known.Count, ReferenceEqualityComparer.Instance);
+                foreach (var (child, _) in known) placed.Add(child);
+                var order = new List<Entity>(target.Children.Count);
+                int next = 0;
+                foreach (var child in target.Children)
+                {
+                    if (placed.Contains(child)) continue;
+                    while (next < known.Count && known[next].Index <= order.Count) order.Add(known[next++].Child);
+                    order.Add(child);
+                }
+                while (next < known.Count) order.Add(known[next++].Child);
+                for (int i = 0; i < order.Count; i++)
+                    if (!ReferenceEquals(target.Children[i], order[i])) _scene.Reparent(order[i], target, keepWorldTransform: false, index: i);
+            }
         }
 
         /// <summary>

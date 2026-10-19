@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
 using Candela.Core.Diagnostics;
@@ -50,6 +51,7 @@ public static class CandelaUserData
     private const string DeviceElement = "Device";
     private const string LayerPartElement = "LayerPart";
     private const string OriginalAttribute = "original";
+    private const string ChildrenAttribute = "children";
     private const string ObjectAttribute = "object";
     private const string GeometryAttribute = "geometry";
     private const string GdtfAttribute = "gdtf";
@@ -84,7 +86,12 @@ public static class CandelaUserData
     /// </summary>
     /// <param name="ObjectId">Uuid of the GroupObject written for the layer.</param>
     /// <param name="OriginalId">Uuid of the object it repeats (on its own layer).</param>
-    public sealed record LayerPartRecord(Guid ObjectId, Guid OriginalId);
+    /// <param name="ChildIndices">
+    /// For each object of the group's <c>ChildList</c>, in order, its index among the children of the original entity,
+    /// or −1 for a nested part; lets the importer put the children back in their order among their siblings. Null when
+    /// unknown.
+    /// </param>
+    public sealed record LayerPartRecord(Guid ObjectId, Guid OriginalId, IReadOnlyList<int>? ChildIndices = null);
 
     /// <summary>Builds Candela's <c>UserData/Data</c> block for <paramref name="walls"/>.</summary>
     public static MvrUserData Create(IEnumerable<WallRecord> walls) => Create(walls, Array.Empty<DeviceRecord>());
@@ -119,8 +126,11 @@ public static class CandelaUserData
         }
         foreach (var p in layerParts)
         {
-            data.Add(new XElement(LayerPartElement, new XAttribute(ObjectAttribute, p.ObjectId.ToString("D")),
-                new XAttribute(OriginalAttribute, p.OriginalId.ToString("D"))));
+            var element = new XElement(LayerPartElement, new XAttribute(ObjectAttribute, p.ObjectId.ToString("D")),
+                new XAttribute(OriginalAttribute, p.OriginalId.ToString("D")));
+            if (p.ChildIndices is { Count: > 0 } indices)
+                element.Add(new XAttribute(ChildrenAttribute, string.Join(' ', indices.Select(i => i.ToString(CultureInfo.InvariantCulture)))));
+            data.Add(element);
         }
         return new MvrUserData { Provider = Provider, Version = Version, Element = data };
     }
@@ -150,7 +160,7 @@ public static class CandelaUserData
                     damaged++;
                     continue;
                 }
-                parts.TryAdd(objectId, new LayerPartRecord(objectId, originalId));
+                parts.TryAdd(objectId, new LayerPartRecord(objectId, originalId, ReadIndices((string?)element.Attribute(ChildrenAttribute))));
             }
         }
         if (damaged > 0)
@@ -204,6 +214,23 @@ public static class CandelaUserData
                 $"{damaged} device record(s) in Candela's data of the MVR could not be read; those objects are imported as the fixtures they are."));
         }
         return devices;
+    }
+
+    /// <summary>
+    /// The child indices of a layer part (space-separated integers ≥ −1), or null when absent or damaged (the order of the
+    /// children is then simply not restored; nothing else depends on it). At most <see cref="MaxRecords"/> values.
+    /// </summary>
+    private static IReadOnlyList<int>? ReadIndices(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        var values = new List<int>();
+        foreach (var token in text.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (values.Count >= MaxRecords || !int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value) || value < -1)
+                return null;
+            values.Add(value);
+        }
+        return values;
     }
 
     /// <summary>A file name without folders or reserved characters that ends in <c>.gdtf</c>.</summary>

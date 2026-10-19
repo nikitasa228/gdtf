@@ -34,8 +34,7 @@ internal sealed class SceneExporter
     private readonly List<CandelaUserData.WallRecord> _walls = new();
     private readonly List<CandelaUserData.DeviceRecord> _candelaDevices = new();
     private readonly Dictionary<Guid, (MvrObject Object, MvrLayer Layer)> _written = new();
-    private readonly Dictionary<(Guid Entity, Guid Layer), MvrGroupObject> _layerParts = new();
-    private readonly List<CandelaUserData.LayerPartRecord> _layerPartRecords = new();
+    private readonly Dictionary<(Guid Entity, Guid Layer), LayerPartInfo> _layerParts = new();
     private readonly Dictionary<string, byte[]?> _textures = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _standInGdtfs = new(StringComparer.OrdinalIgnoreCase);
     private int _objectCount;
@@ -69,13 +68,15 @@ internal sealed class SceneExporter
         ReportLayerParts();
         // walls, floors and ceilings come back as such when Candela imports the file (other programs see their boxes),
         // Candela's generic devices as those devices (other programs see fixtures), and objects split across layers as one
-        if (_walls.Count > 0 || _candelaDevices.Count > 0 || _layerPartRecords.Count > 0)
-            _doc.UserData.Add(CandelaUserData.Create(_walls, _candelaDevices, _layerPartRecords));
+        var layerParts = new List<CandelaUserData.LayerPartRecord>(_layerParts.Count);
+        foreach (var part in _layerParts.Values) layerParts.Add(new CandelaUserData.LayerPartRecord(part.Group.Uuid, part.OriginalId, part.ChildIndices));
+        if (_walls.Count > 0 || _candelaDevices.Count > 0 || layerParts.Count > 0)
+            _doc.UserData.Add(CandelaUserData.Create(_walls, _candelaDevices, layerParts));
         _sink.Complete();
         int textures = 0;
         foreach (var t in _textures.Values)
             if (t is not null) textures++;
-        return new MvrExportResult(_doc, _issues, _objectCount, _focusPoints.Count, _connectionCount, _standInCount, _layerPartRecords.Count, textures);
+        return new MvrExportResult(_doc, _issues, _objectCount, _focusPoints.Count, _connectionCount, _standInCount, layerParts.Count, textures);
     }
 
     // ------------------------------------------------------------------ layers
@@ -115,13 +116,21 @@ internal sealed class SceneExporter
     }
 
     /// <summary>
-    /// Where a child of <paramref name="parent"/> that is written to <paramref name="layer"/> goes: the parent's own
-    /// child list when the parent is on that layer, else the child list of the parent's part on that layer.
+    /// Adds the object of a child of <paramref name="parent"/> written to <paramref name="layer"/>: to the parent's own
+    /// child list when the parent is on that layer, else to the child list of the parent's part on that layer, noting
+    /// the child's index among the parent's children (−1 for a nested part) so the importer restores the order.
     /// </summary>
-    private List<MvrObject> ChildListFor(Entity parent, MvrLayer layer)
+    private void AddChild(Entity parent, MvrLayer layer, MvrObject child, int index)
     {
         var (obj, parentLayer) = _written[parent.Id];
-        return ReferenceEquals(parentLayer, layer) ? ChildrenOf(obj) : LayerPart(parent, layer).Children;
+        if (ReferenceEquals(parentLayer, layer))
+        {
+            ChildrenOf(obj).Add(child);
+            return;
+        }
+        var part = LayerPart(parent, layer);
+        part.Group.Children.Add(child);
+        part.ChildIndices.Add(index);
     }
 
     /// <summary>
@@ -131,23 +140,26 @@ internal sealed class SceneExporter
     /// the object) of <paramref name="e"/>'s parent on that layer. The world place of every child is therefore unchanged.
     /// A <c>LayerPart</c> record in Candela's user data lets the importer join the parts again.
     /// </summary>
-    private MvrGroupObject LayerPart(Entity e, MvrLayer layer)
+    private LayerPartInfo LayerPart(Entity e, MvrLayer layer)
     {
         if (_layerParts.TryGetValue((e.Id, layer.Uuid), out var part)) return part;
         var original = _written[e.Id].Object;
-        part = new MvrGroupObject
+        var group = new MvrGroupObject
         {
             Uuid = DeterministicGuid.Create(original.Uuid, "layer-part:" + layer.Uuid.ToString("D")),
             Name = original.Name,
             Matrix = original.Matrix,
             HasMatrix = original.HasMatrix,
         };
+        part = new LayerPartInfo(group, original.Uuid, e.Id, new List<int>());
         _layerParts[(e.Id, layer.Uuid)] = part;
-        _layerPartRecords.Add(new CandelaUserData.LayerPartRecord(part.Uuid, original.Uuid));
-        if (e.Parent is { } parent && _written.ContainsKey(parent.Id)) ChildListFor(parent, layer).Add(part);
-        else layer.Objects.Add(part);
+        if (e.Parent is { } parent && _written.ContainsKey(parent.Id)) AddChild(parent, layer, group, -1);
+        else layer.Objects.Add(group);
         return part;
     }
+
+    /// <summary>A part of an entity on another layer: the group written there, the object it repeats and the indices of its children.</summary>
+    private sealed record LayerPartInfo(MvrGroupObject Group, Guid OriginalId, Guid EntityId, List<int> ChildIndices);
 
     private static List<MvrObject> ChildrenOf(MvrObject obj) => obj switch
     {
@@ -158,16 +170,16 @@ internal sealed class SceneExporter
 
     private void ReportLayerParts()
     {
-        if (_layerPartRecords.Count == 0) return;
-        var related = new List<Guid>(System.Math.Min(64, _layerPartRecords.Count));
-        foreach (var (key, _) in _layerParts)
+        if (_layerParts.Count == 0) return;
+        var related = new List<Guid>(System.Math.Min(64, _layerParts.Count));
+        foreach (var part in _layerParts.Values)
         {
             if (related.Count >= 64) break;
-            related.Add(key.Entity);
+            related.Add(part.EntityId);
         }
         _sink.Add(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.LayerSplit,
             string.Create(CultureInfo.InvariantCulture,
-                $"{_splitChildren} object(s) are on another layer than their parent; MVR keeps children on their parent's layer, so they are written under {_layerPartRecords.Count} GroupObject(s) of their own layer that repeat the parent's name and place. Candela joins them again on import; other programs show the parent once per layer."),
+                $"{_splitChildren} object(s) are on another layer than their parent; MVR keeps children on their parent's layer, so they are written under {_layerParts.Count} GroupObject(s) of their own layer that repeat the parent's name and place. Candela joins them again on import; other programs show the parent once per layer."),
             related.ToArray());
     }
 
@@ -218,7 +230,7 @@ internal sealed class SceneExporter
         switch (obj)
         {
             case MvrGroupObject:
-                foreach (var c in e.Children) PlaceChild(c, LayerOf(c, layer), e, layer);
+                for (int k = 0; k < e.Children.Count; k++) PlaceChild(e.Children[k], k, LayerOf(e.Children[k], layer), e, layer);
                 break;
 
             case MvrDeviceObject device:
@@ -244,8 +256,9 @@ internal sealed class SceneExporter
                 if (device is MvrSupport { ChainLength: null } support) support.ChainLength = 0;
 
                 var geometryChildren = device is MvrFixture ? null : GeometryChildren(e);
-                foreach (var c in e.Children)
+                for (int k = 0; k < e.Children.Count; k++)
                 {
+                    var c = e.Children[k];
                     var childLayer = LayerOf(c, layer);
                     // geometry the importer split off this object goes back into it (unless it was moved to another layer)
                     if (geometryChildren is not null && geometryChildren.Contains(c.Id) && ReferenceEquals(childLayer, layer))
@@ -253,7 +266,7 @@ internal sealed class SceneExporter
                         AddGeometry(device, c.Get<MeshComponent>()!.ModelAssetId, LocalMatrix(c), c.Id, c);
                         continue;
                     }
-                    PlaceChild(c, childLayer, e, layer);
+                    PlaceChild(c, k, childLayer, e, layer);
                 }
                 break;
         }
@@ -261,14 +274,15 @@ internal sealed class SceneExporter
     }
 
     /// <summary>
-    /// Writes a child entity: under its parent's object when both are on the same layer, else under the parent's part on
-    /// the child's layer (<see cref="LayerPart"/>), so the child keeps its layer and its world place.
+    /// Writes a child entity (the <paramref name="index"/>-th child of <paramref name="parent"/>): under its parent's
+    /// object when both are on the same layer, else under the parent's part on the child's layer
+    /// (<see cref="LayerPart"/>), so the child keeps its layer and its world place.
     /// </summary>
-    private void PlaceChild(Entity child, MvrLayer childLayer, Entity parent, MvrLayer parentLayer)
+    private void PlaceChild(Entity child, int index, MvrLayer childLayer, Entity parent, MvrLayer parentLayer)
     {
         if (Convert(child, childLayer) is not { } obj) return;
         if (!ReferenceEquals(childLayer, parentLayer)) _splitChildren++;
-        ChildListFor(parent, childLayer).Add(obj);
+        AddChild(parent, childLayer, obj, index);
     }
 
     private Matrix4x4 LocalMatrix(Entity e)
