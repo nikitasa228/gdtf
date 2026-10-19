@@ -62,7 +62,7 @@ public sealed class ExternalControlTests
         Assert.True(model.IsPatched(2));
         Assert.False(model.IsActive(1));
         Assert.Contains(model.Sources, s => s.Protocol == "Art-Net" && s.Address == "127.0.0.1" && s.Universes == "2");
-        Assert.Equal(new Timecode(1, 2, 3, 4, TimecodeType.Ebu25), model.LastTimecode!.Value.Timecode);
+        Assert.Equal(new Timecode(1, 2, 3, 4, TimecodeType.Ebu25), model.LastTimecode!.Timecode);
         model.SelectedUniverse = 2;
         var read = model.ReadSelectedUniverse(engine, out bool live);
         Assert.True(live);

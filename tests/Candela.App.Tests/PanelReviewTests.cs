@@ -342,7 +342,7 @@ public sealed class PanelReviewTests
     }
 
     [Fact]
-    public void The_timecode_shows_its_source_art_net_or_the_recording()
+    public void The_timecode_shows_its_sender_art_net_with_its_endpoint_or_the_recording_by_name()
     {
         Loc.SetLanguage("en");
         using var dir = new TempDir();
@@ -356,24 +356,40 @@ public sealed class PanelReviewTests
         model.Bind(engine, app);
         model.SetEnabled(engine, app, ProtocolIds.ArtNet, true);
         model.Poll(engine);
-        Assert.Equal(TimecodeSource.Unknown, model.LastTimecodeSource);
+        Assert.Null(model.LastTimecode);
         using (var sender = new ArtNetSender(IPAddress.Loopback))
         {
             var target = new IPEndPoint(IPAddress.Loopback, port);
             Assert.True(StageTestSupport.TickUntil(engine, () =>
             {
                 sender.SendTimeCode(target, new Timecode(1, 0, 0, 5, TimecodeType.Ebu25));
-                return model.LastTimecodeSource == TimecodeSource.ArtNet;
+                return model.LastTimecode is { Source.Protocol: ArtNetReceiver.SourceProtocol };
             }, TimeSpan.FromSeconds(10)), "a timecode over Art-Net is attributed to Art-Net");
         }
+
+        // The hub's sample: the sender's address and port, the arrival time on the hub's clock.
+        var art = model.LastTimecode!;
+        Assert.Equal(new Timecode(1, 0, 0, 5, TimecodeType.Ebu25), art.Timecode);
+        Assert.StartsWith("127.0.0.1:", art.Source.Endpoint, StringComparison.Ordinal);
+        Assert.Equal("Art-Net from " + art.Source.Endpoint, ExternalControl.DescribeTimecodeSource(art.Source));
+        Assert.InRange(model.SecondsSince(art), 0, 30);
 
         model.SetEnabled(engine, app, ProtocolIds.ArtNet, false);
         var frames = new List<DmxRecordedFrame>();
         for (int i = 0; i < 25; i++)
             frames.Add(new DmxRecordedFrame(i / 25.0, new Timecode(2, 0, 0, i, TimecodeType.Ebu25), Array.Empty<DmxUniverseChange>()));
-        engine.Play(new DmxRecording("tc", frames), 0);
+        engine.Play(new DmxRecording("Show 100% %s", frames), 0);
         Assert.True(StageTestSupport.TickUntil(engine, () => model.LastTimecode?.Timecode.Hours == 2, TimeSpan.FromSeconds(5)));
-        Assert.Equal(TimecodeSource.Recording, model.LastTimecodeSource);
+        var played = model.LastTimecode!;
+        Assert.Equal(DmxPlayer.SourceProtocol, played.Source.Protocol);
+        Assert.Equal("recording 'Show 100% %s'", ExternalControl.DescribeTimecodeSource(played.Source));
+        Loc.SetLanguage("ru");
+        Assert.Equal("запись «Show 100% %s»", ExternalControl.DescribeTimecodeSource(played.Source));
+        Assert.Equal("Art-Net от 10.0.0.9:6454", ExternalControl.DescribeTimecodeSource(new DmxSourceId(ArtNetReceiver.SourceProtocol, "10.0.0.9:6454")));
+        Loc.SetLanguage("en");
+        // A sender the registry does not know keeps its protocol id; an unnamed one says nothing.
+        Assert.Equal("ltc from hw:1", ExternalControl.DescribeTimecodeSource(new DmxSourceId("ltc", "hw:1")));
+        Assert.Equal("", ExternalControl.DescribeTimecodeSource(DmxInputHub.UnnamedSource));
         engine.Play(null);
     }
 
