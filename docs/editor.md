@@ -302,7 +302,9 @@ zoom …), framing blades in blade order. Values are physical: degrees for pan, 
 kelvin for colour-temperature filters, Hz for strobes, the GDTF unit otherwise; wheels are drop-downs of their slots
 with the slot names. A control whose channel currently runs another function shows "—". Setting a control writes a
 *manual value* into the fixture (`FixtureComponent.ManualAttributes`, saved with the project); manual values carry an
-orange bar at the left edge; right-click one to clear it, *Reset manual values* clears them all. With several fixtures
+orange bar at the left edge; right-click one to clear it, *Reset manual values* clears them all. A slider drag is one
+undo step; every discrete change — a wheel slot, a cleared value, a mode, a fixture ID, an address, a material, the
+shadow switch — is a step of its own. With several fixtures
 selected, a change applies to every selected fixture that has the attribute and is not driven by a console or live DMX
 (the panel says how many); the panel shows the primary fixture.
 
@@ -315,6 +317,13 @@ flux, beam and field angle (zoom range), colour temperature, CRI, colour mixing,
 frequency, connector), pan / tilt range, operating temperature, features, control protocols and the number of DMX modes
 — taken from the curated specification sheet when there is one, else from the GDTF file and the electrical profile. A
 note says when a fixture was matched to a substitute type (an MVR fixture whose exact GDTF is not in the library).
+Every value says where it comes from (tooltip: the GDTF file, derived from the GDTF data, the manufacturer's datasheet,
+or an estimate); **estimated values** — the `_source` of the `_specs` record is `estimated`, e.g. most noise levels and
+many peak intensities, or lamp power standing in for the mains draw — are shown dimmed with a leading **≈**, and the
+datasheets the researched values come from are listed below the table. The power factor is shown only when the GDTF
+or the specs declare one (the 0.95 the electrical model assumes otherwise is not data). Levels are percentages whatever
+unit the GDTF gives them (a GDTF `Dimmer` declares *LuminousIntensity* with physical values 0 … 1: that is 0 … 100 %,
+not candela).
 
 **Connectors**: every data and power port of the fixture with a vector drawing of its connector (powerCON / TRUE1,
 XLR 3/5-pin, RJ45 / etherCON, Schuko, IEC, CEE, Socapex, Harting … — 38 drawings, a neutral socket for anything else),
@@ -341,7 +350,8 @@ selected walls or models are edited together.
 running at 320 packets/s and the status of the receiver; the selected fixture is locked to the live DMX and its current
 state follows the show.*
 
-The header shows the **last timecode** received (Art-Net ArtTimeCode: frame rate, *live* or how long ago), the **merge
+The header shows the **last timecode** received with its source (*Art-Net* ArtTimeCode, or the *DMX recording* being
+played), its frame rate and *live* or how long ago, the **merge
 mode** of the DMX input hub (*HTP*: highest level per slot wins; *LTP*: the latest change wins — for two consoles on one
 universe) and **Send Art-Net test** (below). The tabs:
 
@@ -400,7 +410,8 @@ merge mode, test target); the network interface and the Art-Net universe offset 
 Without a console, **Send Art-Net test** does the same over the network: it encodes a moving show for the stage's own
 patch (pan, tilt, dimmer, colour, zoom and focus mapped onto each fixture's channel functions from its GDTF) with a
 running timecode and sends it as a separate Art-Net console to the test target (127.0.0.1 = this computer; Art-Net is
-switched on for it). Sending to
+switched on for it). When *Network interface* names one adapter, "this computer" is reached at that adapter's address
+instead of 127.0.0.1 (a receiver bound to one adapter, as on Windows, does not see loopback datagrams). Sending to
 another address feeds a second Candela or any Art-Net node. An empty stage gets a demo rig's show.
 
 ### Preview
@@ -418,7 +429,7 @@ ambient light (cd/m²), grid and grid spacing.
 
 The **preset drop-down** (also in Render and in the legends) lists *Default* (read-only), *Custom* (the edited values,
 shown as soon as anything differs from the chosen preset) and saved presets; the save button stores the current
-values under a name, the bin deletes the chosen preset. Presets are Core `PresetLibrary` files in
+values under a name, the bin deletes the chosen preset (the values in use stay; the drop-down then shows *Custom*). Presets are Core `PresetLibrary` files in
 `presets/preview/`, `presets/final-render/`, `presets/lux-gradient/` and `presets/noise-gradient/` of the config folder;
 the current values are saved in the project (`settings.json`, section `view`) and come back when it is opened.
 
@@ -438,7 +449,9 @@ size. A **timecode range** renders an image sequence
 (`name_0001.png`, …): the job takes over the engine clock (the editor stops ticking the stage with wall-clock time),
 plays the recording from two seconds before the start so moving heads and fades have arrived, and for every frame seeks
 the player, ticks the engine by one frame period and renders. The job runs a slice per editor frame (about 60 ms) with
-a progress bar and *Cancel*, so the editor stays usable; errors (folder not writable, disk full) stop it with the reason.
+a progress bar and *Cancel*, so the editor stays usable; errors (folder not writable, disk full, a GPU error such as a
+lost device or a target too large for the GPU) stop it with the reason, and a cancelled or failed sequence stops the
+recording playback it started.
 
 ### Overlay legends
 
