@@ -60,7 +60,14 @@ internal sealed record RenderRequest(
     int Supersample,
     int Passes,
     string OutputPath,
-    RenderRange? Range);
+    RenderRange? Range)
+{
+    /// <summary>
+    /// The work light of the render (<see cref="RenderSync.WorkLight"/>): <see cref="WorkLightMode.Off"/> unless the user
+    /// asks for it, so a final picture shows the stage light only, whatever the preview uses.
+    /// </summary>
+    public WorkLightMode WorkLight { get; init; } = WorkLightMode.Off;
+}
 
 /// <summary>
 /// The final render: until the path tracer exists (rendering stage 3), the real-time renderer renders the frame at
@@ -135,6 +142,12 @@ internal sealed class RenderJobRunner : IDisposable
     /// must not tick it with wall-clock time meanwhile (<c>EditorSession.EngineClockHeld</c>).
     /// </summary>
     public bool HoldsEngineClock => State == RenderJobState.Running && _request?.Range is not null;
+
+    /// <summary>
+    /// The work light the running job renders with (it decides alone while it runs: the viewports' setting must not leak
+    /// into a final picture), or null while no job runs.
+    /// </summary>
+    public WorkLightMode? WorkLightInUse => State == RenderJobState.Running && _request is { } request ? request.WorkLight : null;
 
     /// <summary>
     /// Supersampling and accumulation for a requested sample count: 2 × 2 supersampling from 4 samples per pixel (when
@@ -270,6 +283,7 @@ internal sealed class RenderJobRunner : IDisposable
         try
         {
             EnsureTarget(renderer, request);
+            ApplyWorkLight(engine, request);
             do
             {
                 if (PassIndex == 0 && FrameIndex > 0 && request.Range is { } range && engine is not null)
@@ -313,6 +327,18 @@ internal sealed class RenderJobRunner : IDisposable
             StopPlayback();
             ReleaseTargetWhenIdle();
         }
+    }
+
+    /// <summary>
+    /// Gives the render binding the job's work light before a pass is rendered: the light list the editor's last tick
+    /// sent may hold the preview's work light, which a final picture must not show unless it was asked for.
+    /// </summary>
+    private static void ApplyWorkLight(StageEngine? engine, RenderRequest request)
+    {
+        if (engine?.Render is not { } sync || sync.WorkLight == request.WorkLight)
+            return;
+        sync.WorkLight = request.WorkLight;
+        sync.Update();
     }
 
     private void EnsureTarget(IRenderer renderer, RenderRequest request)

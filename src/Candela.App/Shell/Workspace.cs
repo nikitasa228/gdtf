@@ -253,6 +253,17 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     /// <summary>Renders every visible viewport (inside the GPU frame).</summary>
     public void RenderViewports(float deltaTime)
     {
+        if (_ctx.Session.Content is EngineViewportContent content)
+        {
+            // One light list serves every viewport: a view measuring stage light (lux overlay) keeps the work light out,
+            // and a running final render decides the work light alone.
+            bool lux = false;
+            foreach (var viewport in _viewports)
+                lux |= viewport.IsShown && viewport.View.Overlay == OverlayMode.Lux;
+            content.LuxOverlayShown = lux;
+            content.WorkLightOverride = _ctx.Tools.Stage.Render.WorkLightInUse;
+        }
+
         _ctx.Session.SyncRender();
         foreach (var viewport in _viewports)
             viewport.Render(_ctx.Gpu.Renderer, deltaTime);
