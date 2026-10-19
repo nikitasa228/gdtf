@@ -113,7 +113,7 @@ internal sealed partial class Workspace
     /// </summary>
     private void ShowPropertiesOfSelection()
     {
-        if (_properties.IsShown)
+        if (_properties.IsOnScreen)
             return;
         bool sharesGroup = _properties.IsOpen && _properties.DockNodeId != 0 && _properties.DockNodeId == _cableLinks.DockNodeId;
         if (!sharesGroup)

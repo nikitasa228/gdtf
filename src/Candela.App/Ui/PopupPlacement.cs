@@ -24,6 +24,20 @@ internal static class PopupPlacement
     }
 
     /// <summary>
+    /// Position and pivot of a popup opened at a point (the mouse) in a viewport at <paramref name="viewportPos"/> of
+    /// <paramref name="viewportSize"/>: <paramref name="gap"/> pixels beside the point, towards the inside of the
+    /// window — to the right and below in the upper left quarter, to the left and above in the lower right one — so a
+    /// popup opened near an edge stays in the main window.
+    /// </summary>
+    public static (Vector2 Position, Vector2 Pivot) AtPoint(Vector2 point, float gap, Vector2 viewportPos, Vector2 viewportSize)
+    {
+        var centre = viewportPos + viewportSize * 0.5f;
+        bool left = point.X > centre.X;
+        bool above = point.Y > centre.Y;
+        return (new Vector2(left ? point.X - gap : point.X + gap, above ? point.Y - gap : point.Y + gap), new Vector2(left ? 1f : 0f, above ? 1f : 0f));
+    }
+
+    /// <summary>
     /// The first size of a dialog window: <paramref name="desired"/> (already scaled), but at most 92 % of the main
     /// window's work area. A dialog larger than the main window would hang over its edge and, with multi-viewport
     /// enabled, turn into a separate OS window.

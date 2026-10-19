@@ -239,7 +239,7 @@ internal sealed unsafe partial class ViewportPanel
     }
 
     /// <summary>
-    /// <see cref="CableUnder"/> for one cable (the selected cable's node handles, every frame while it is hovered —
+    /// <see cref="CableUnder(Vector2, bool, float, bool)"/> for one cable (the selected cable's node handles, every frame while it is hovered —
     /// without walking the scene's other cables).
     /// </summary>
     private CableTarget? CableUnder(Entity entity, CableComponent cable, Vector2 mouse)
@@ -583,12 +583,18 @@ internal sealed unsafe partial class ViewportPanel
             _openPicker = false;
             if (tool.Pick is not null)
             {
-                ImGui.SetNextWindowPos(_pickerAt + new Vector2(14f, 14f) * scale, ImGuiCond.Always);
+                // Next to the cursor, towards the inside of the main window, and never taller than it (a device
+                // with many ports scrolls): a popup hanging over the window's edge would become an OS window.
+                var main = ImGui.GetMainViewport();
+                var (position, pivot) = PopupPlacement.AtPoint(_pickerAt, 14f * scale, main.WorkPos, main.WorkSize);
+                ImGui.SetNextWindowPos(position, ImGuiCond.Always, pivot);
                 ImGui.OpenPopup(PortPickerId);
                 _pickerShown = tool.Pick;
             }
         }
 
+        var work = ImGui.GetMainViewport().WorkSize;
+        ImGui.SetNextWindowSizeConstraints(Vector2.Zero, new Vector2(work.X * 0.9f, work.Y * 0.85f));
         if (!ImGui.BeginPopup(PortPickerId, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
         {
             // Closed by a click outside or Escape: the cable keeps going without this device. Only the viewport that

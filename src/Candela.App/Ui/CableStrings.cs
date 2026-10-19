@@ -54,6 +54,7 @@ internal enum CableStr
     ToolCableBranched,
     ToolCableConnected,
     ToolCableNeedsEngine,
+    ToolCableUnknownType,
     ToolCableTooShort,
     ToolCableOwnBranch,
 
@@ -281,6 +282,8 @@ internal static class CableLoc
         (CableStr.ToolCableBranched, "Branch added to cable '{0}' ({1} m in total).", "К кабелю «{0}» добавлено ответвление (всего {1} м)."),
         (CableStr.ToolCableConnected, "'{0}' {1} connected.", "«{0}»: {1} подключён."),
         (CableStr.ToolCableNeedsEngine, "Cables need an open stage.", "Для кабелей нужна открытая сцена."),
+        (CableStr.ToolCableUnknownType, "The cable type '{0}' is not in the cable catalogue; choose a type in Tools → Cable.",
+            "Типа кабеля «{0}» нет в каталоге; выберите тип в меню «Инструменты → Кабель»."),
         (CableStr.ToolCableTooShort, "The cable needs at least two points; nothing was added.", "Кабелю нужны хотя бы две точки; ничего не добавлено."),
         (CableStr.ToolCableOwnBranch, "A cable cannot join itself.", "Кабель нельзя соединить сам с собой."),
 

@@ -84,7 +84,7 @@ internal abstract class Panel
     public uint DockNodeId { get; set; }
 
     /// <summary>True when the panel's content was on screen in the previous or the current frame.</summary>
-    public bool IsShown => IsOpen && LastShownFrame >= ImGui.GetFrameCount() - 1;
+    public bool IsOnScreen => IsOpen && LastShownFrame >= ImGui.GetFrameCount() - 1;
 
     /// <summary>Exception that stopped the panel, shown instead of the content until the user retries.</summary>
     public Exception? Fault { get; set; }

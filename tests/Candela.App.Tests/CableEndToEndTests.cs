@@ -135,6 +135,59 @@ public sealed class CableEndToEndTests : IDisposable
         Assert.True(Vector3.Distance(Named("Spot 1").WorldPosition, new Vector3(-2f, 0f, 5f)) < 1e-4f);
     }
 
+    [SkippableFact]
+    public void The_port_picker_stays_open_with_four_viewports()
+    {
+        // The picker belongs to the viewport that was clicked: the other three must not close it (they did, so with
+        // the four-view layout the picker flashed for a frame and the console could not be cabled). The cable is
+        // started in the top view and plugged into the fixture in the front view.
+        var settings = new SettingsStore(_log, _dir.File("settings.json"));
+        settings.Load();
+        string rig = _dir.File("rig.candela"), cabled = _dir.File("cabled.candela"), picker = _dir.File("picker.png");
+        using (var session = EngineTestSupport.CreateSession(_log, settings, _dir))
+        {
+            CablingScene.Populate(session.Engine!);
+            Assert.True(session.SaveAs(rig).Succeeded);
+        }
+
+        string script = _dir.Write("cables.json", $$"""
+            { "actions": [
+                { "type": "wait", "frames": 6 },
+                { "type": "layout", "name": "viewports-4" },
+                { "type": "wait", "frames": 6 },
+                { "type": "viewport", "viewport": "Viewport1", "view": "Top", "shading": "Colorless" },
+                { "type": "wait", "frames": 3 },
+                { "type": "menu", "path": "Tools/Cable/dmx-xlr5" },
+                { "type": "wait", "frames": 2 },
+                { "type": "click", "entity": "Console 1" },
+                { "type": "wait", "frames": 4 },
+                { "type": "screenshot", "path": "{{Json(picker)}}" },
+                { "type": "key", "chord": "2" },
+                { "type": "wait", "frames": 2 },
+                { "type": "viewport", "viewport": "Viewport2", "view": "Front", "shading": "Colorless" },
+                { "type": "wait", "frames": 3 },
+                { "type": "click", "entity": "Spot 2" },
+                { "type": "wait", "frames": 2 },
+                { "type": "key", "chord": "Escape" },
+                { "type": "wait", "frames": 3 },
+                { "type": "action", "id": "tool.select" },
+                { "type": "save", "path": "{{Json(cabled)}}" },
+                { "type": "wait", "frames": 3 }
+            ] }
+            """);
+        var run = EditorProcess.Run(_dir, new[] { "--open", rig, "--screenshot", _dir.File("end.png"), "--script", script });
+        Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
+        Assert.DoesNotContain("ERR [", run.Output);
+        Assert.Equal(1600, EditorProcess.LoadPng(picker).Width);
+
+        using var reopened = EngineTestSupport.CreateSession(_log, settings, _dir);
+        Assert.True(reopened.Open(cabled).Succeeded);
+        var scene = reopened.Scene;
+        var cable = Assert.Single(scene.Query<CableComponent>()).Component;
+        Assert.Equal(new[] { "Console 1:DMX B", "Spot 2:DMX IN" },
+            cable.Endpoints.Select(p => $"{scene.Find(p.EntityId)?.Name}:{p.PortName}").OrderBy(p => p, StringComparer.Ordinal));
+    }
+
     private static string Json(string path) => path.Replace("\\", "/");
 
     private static string Point(Vector3 p) => FormattableString.Invariant($"[{p.X:0.####}, {p.Y:0.####}, {p.Z:0.####}]");

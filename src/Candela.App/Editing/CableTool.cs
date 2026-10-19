@@ -325,7 +325,7 @@ internal sealed class CableTool
         if (Draft is null)
         {
             if (Type is not { } type)
-                return Reject(CableLoc.Get(CableStr.ToolCableNeedsEngine));
+                return Reject(CableLoc.Format(CableStr.ToolCableUnknownType, CableTypeId));
             var draft = new CableDraft { Type = type };
             draft.Points.Add(point);
             Draft = draft;
@@ -365,7 +365,7 @@ internal sealed class CableTool
         if (Draft is null)
         {
             if (cableType is null)
-                return Reject(CableLoc.Get(CableStr.ToolCableNeedsEngine));
+                return Reject(CableLoc.Format(CableStr.ToolCableUnknownType, cable.CableTypeId));
             // A branch belongs to the cable it starts from: it takes that cable's type.
             CableTypeId = cableType.Id;
             if (target.Kind == CableTargetKind.CableNode)
