@@ -158,10 +158,11 @@ public static class ColorMixing
         for (int iteration = 0; iteration < 200; iteration++)
         {
             // residual and Jacobian rows (∂/∂xᵢ of Σ e^xᵢ pᵢ and Σ e^xᵢ qᵢ)
-            double r1 = 0, r2 = 0, j11 = 0, j12 = 0, j22 = 0, jx1 = 0, jx2 = 0;
+            double r1 = 0, r2 = 0, j11 = 0, j12 = 0, j22 = 0, jx1 = 0, jx2 = 0, flux = 0;
             for (int i = 0; i < n; i++)
             {
                 double k = Math.Exp(x[i]);
+                flux += k * emitters[i].MaxFlux;
                 double u = k * p[i], v = k * q[i];
                 r1 += u;
                 r2 += v;
@@ -171,8 +172,10 @@ public static class ColorMixing
                 jx1 += u * x[i];
                 jx2 += v * x[i];
             }
+            // converged relative to the current mix: the conditions are homogeneous in k, so shrinking every factor
+            // together would shrink the residual without reaching the target (two emitters off the line through it)
             double scale = Math.Max(Math.Abs(r1), Math.Abs(r2));
-            if (scale <= 1e-10 * total) break;
+            if (scale <= 1e-10 * flux) break;
             if (iteration == 199) return false;
             // x ← Jᵀ (J Jᵀ)⁻¹ (J x − r): the smallest x that meets the linearised conditions
             double det = j11 * j22 - j12 * j12;
