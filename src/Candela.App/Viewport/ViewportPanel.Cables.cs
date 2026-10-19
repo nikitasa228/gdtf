@@ -41,7 +41,7 @@ internal sealed unsafe partial class ViewportPanel
     private bool _nodeGizmoVisible;
     private Matrix4x4 _nodeGizmoMatrix;
     private IReadOnlyList<PortCandidate>? _hoverPorts;
-    private (Guid Device, long Version, string? Start, string Type) _hoverPortsKey;
+    private (Guid Device, long Version, int Draft, string Type) _hoverPortsKey;
     private string _cableLabel = "";
     private float _cableLabelLength = float.NaN;
     private readonly CableToolLabels _cableLabels = new();
@@ -136,26 +136,30 @@ internal sealed unsafe partial class ViewportPanel
     }
 
     /// <summary>
-    /// What the cable tool would act on at <paramref name="mouse"/>: a cable node or the middle of a cable segment
-    /// (screen distance to the drawn line, so thin cables are easy to hit), a device, a surface anchored to the object
-    /// under the cursor, or the ground.
+    /// What the cable tool would act on at <paramref name="mouse"/>, in this order: a free cable node (not one plugged
+    /// into a device: clicking a device must plug into it) within a few pixels, a device under the cursor, the middle of
+    /// a cable segment within a few pixels of its drawn line (so thin cables are easy to hit and win over the wall or
+    /// floor behind them), a surface anchored to the object under the cursor, or the ground.
     /// </summary>
     internal CableTarget ResolveCableTarget(Vector2 mouse)
     {
         var session = _ctx.Session;
         if (session.Engine is not { } engine || !ContainsScreenPoint(mouse))
             return default;
-        if (CableUnder(mouse, includeSegments: true) is { } onCable)
-            return onCable;
+        if (CableUnder(mouse, includeSegments: false, skipPlugged: true) is { } node)
+            return node;
         var hit = SurfaceAt(mouse, _ctx.Gpu.Renderer);
-        if (hit.Kind == SurfaceKind.Geometry && hit.PickId != 0 && session.Content is EngineViewportContent content &&
-            content.EntityOfPick(hit.PickId) is { } entity)
+        Entity? entity = hit.Kind == SurfaceKind.Geometry && hit.PickId != 0 && session.Content is EngineViewportContent content
+            ? content.EntityOfPick(hit.PickId)
+            : null;
+        if (entity is not null && entity.Get<CableComponent>() is null && DeviceOf(engine, entity) is { } device)
+            return CableTarget.Device(device.Id, hit.Position);
+        if (CableUnder(mouse, includeSegments: true, skipPlugged: true) is { } onCable)
+            return onCable;
+        if (entity is not null)
         {
             if (entity.Get<CableComponent>() is not null)
-                return CableUnder(mouse, includeSegments: true, radiusScale: 3f) ?? CableTarget.Surface(hit.Position, hit.Normal, Guid.Empty);
-            var device = DeviceOf(engine, entity);
-            if (device is not null)
-                return CableTarget.Device(device.Id, hit.Position);
+                return CableUnder(mouse, includeSegments: true, radiusScale: 3f, skipPlugged: true) ?? CableTarget.Surface(hit.Position, hit.Normal, Guid.Empty);
             return CableTarget.Surface(hit.Position, hit.Normal, entity.Id);
         }
 
@@ -178,7 +182,7 @@ internal sealed unsafe partial class ViewportPanel
     /// The cable node within a few pixels of <paramref name="mouse"/>, else (with <paramref name="includeSegments"/>) the
     /// closest point on a cable segment within a few pixels — the world point is where the mouse ray passes the segment.
     /// </summary>
-    internal CableTarget? CableUnder(Vector2 mouse, bool includeSegments, float radiusScale = 1f)
+    internal CableTarget? CableUnder(Vector2 mouse, bool includeSegments, float radiusScale = 1f, bool skipPlugged = false)
     {
         var scene = _ctx.Session.Scene;
         var style = ImGui.GetStyle();
@@ -201,6 +205,8 @@ internal sealed unsafe partial class ViewportPanel
                 if (nodes[i] is not { } node)
                     continue;
                 _nodeIndex.TryAdd(node.Id, i);
+                if (skipPlugged && IsPlugged(cable, node.Id))
+                    continue;
                 if (!Camera.WorldToScreen(_nodeWorld[i], _imageSize, out var s))
                     continue;
                 float d = Vector2.DistanceSquared(s + _imageMin, mouse);
@@ -231,6 +237,17 @@ internal sealed unsafe partial class ViewportPanel
         }
 
         return best;
+    }
+
+    private static bool IsPlugged(CableComponent cable, Guid node)
+    {
+        foreach (var e in cable.Endpoints)
+        {
+            if (e is not null && e.NodeId == node)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>Squared screen distance from <paramref name="p"/> to the segment a–b, and the parameter of the closest point.</summary>
@@ -321,7 +338,8 @@ internal sealed unsafe partial class ViewportPanel
         }
 
         var size = ImGui.CalcTextSize(_cableLabel);
-        var pos = mouse + new Vector2(30f, 8f) * scale;
+        // Below the cable icon that follows the cursor.
+        var pos = mouse + new Vector2(14f, 46f) * scale;
         drawList.AddRectFilled(pos - new Vector2(6f, 3f) * scale, pos + size + new Vector2(6f, 3f) * scale,
             Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, 0.9f)), 4f * scale);
         drawList.AddText(pos, Theme.U32(Theme.Text), _cableLabel);
@@ -385,12 +403,11 @@ internal sealed unsafe partial class ViewportPanel
         if (session.Content is { } content && content.TryGetBounds(deviceId, out var bounds) && !bounds.IsEmpty)
             DrawBox(drawList, bounds, Theme.U32(Theme.WithAlpha(Theme.Accent, 0.9f)), 1.5f * scale);
 
-        var key = (deviceId, session.Scene.Version, tool.Draft?.StartPortRef?.ToString(), type.Id);
+        var key = (deviceId, session.Scene.Version, tool.Draft is { } d ? d.GetHashCode() : 0, type.Id);
         if (_hoverPorts is null || key != _hoverPortsKey)
         {
             _hoverPortsKey = key;
-            var side = tool.Draft is null ? PortSide.Start : tool.Draft.StartPort is { } start ? CablePorts.FarSide(start) : PortSide.AfterFree;
-            _hoverPorts = CablePorts.Candidates(engine, device, type, side, tool.Draft?.StartPortRef);
+            _hoverPorts = CablePorts.Candidates(engine, device, type, tool.DraftSide(), tool.Draft?.StartPortRef);
         }
 
         int count = engine.Network.Ports.GetPorts(device).Count;

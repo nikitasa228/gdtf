@@ -504,6 +504,8 @@ internal sealed class FixtureInspectorView
     private string _cablingLanguage = "";
     private string _dataText = "";
     private string _powerText = "";
+    private string _dataPlain = "";
+    private string _powerPlain = "";
     private Guid? _dataCable;
     private Guid? _powerCable;
 
@@ -537,24 +539,26 @@ internal sealed class FixtureInspectorView
                     feed.UniverseCount > 1 ? $"{feed.FirstUniverse}–{feed.FirstUniverse + feed.UniverseCount - 1}" : feed.FirstUniverse.ToString(CultureInfo.InvariantCulture));
             var power = solution.PowerFeedOf(entity.Id);
             _powerCable = power?.CableEntityId;
-            _powerText = power is null
+            _powerText = (power is null
                 ? CableLoc.Get(CableStr.PatchPowerNone)
                 : CableLoc.Format(CableStr.PatchPowerLine, _stage.Scene.Find(power.SourceEntityId)?.Name ?? "?", power.OutletPort, power.Phase,
-                    power.VoltageV.ToString("0", CultureInfo.InvariantCulture)) + "##power-feed";
+                    power.VoltageV.ToString("0", CultureInfo.InvariantCulture))) + "##power-feed";
             _dataText += "##data-feed";
+            _dataPlain = _dataText[.._dataText.IndexOf("##", StringComparison.Ordinal)];
+            _powerPlain = _powerText[.._powerText.IndexOf("##", StringComparison.Ordinal)];
         }
 
         PropertyGrid.Row(CableLoc.Get(CableStr.PatchData));
-        CablingLink(_dataText, _dataCable);
+        CablingLink(_dataText, _dataPlain, _dataCable);
         PropertyGrid.Row(CableLoc.Get(CableStr.PatchPower));
-        CablingLink(_powerText, _powerCable);
+        CablingLink(_powerText, _powerPlain, _powerCable);
     }
 
-    private void CablingLink(string text, Guid? cable)
+    private void CablingLink(string text, string plain, Guid? cable)
     {
         if (cable is not { } id)
         {
-            ImGui.TextDisabled(text[..text.IndexOf("##", StringComparison.Ordinal)]);
+            ImGui.TextDisabled(plain);
             return;
         }
 

@@ -289,6 +289,34 @@ internal sealed class CableTool
             Pick = null;
     }
 
+    /// <summary>
+    /// Which ports the cable being drawn may end on: anything for a new cable (outputs first); for a cable that starts
+    /// at a port, the other direction; for a branch, the direction the cable it branches from carries (a branch of a
+    /// line fed from an output ends on inputs); for a cable with a free start, anything (inputs first).
+    /// </summary>
+    public PortSide DraftSide()
+    {
+        if (Draft is not { } draft)
+            return PortSide.Start;
+        if (draft.StartPort is { } start)
+            return CablePorts.FarSide(start);
+        if (draft.ExistingCable is { } cableId && _stage.Engine is { } engine && _stage.Scene.Find(cableId)?.Get<CableComponent>() is { } cable)
+        {
+            bool output = false, input = false;
+            foreach (var end in cable.Endpoints)
+            {
+                if (end is null || _stage.Scene.Find(end.EntityId) is not { } device || engine.Network.Ports.FindPort(device, end.PortName) is not { } port)
+                    continue;
+                output |= port.Direction == PortDirection.Output;
+                input |= port.Direction == PortDirection.Input;
+            }
+
+            return output ? PortSide.AfterOutput : input ? PortSide.AfterInput : PortSide.AfterFree;
+        }
+
+        return PortSide.AfterFree;
+    }
+
     // ---- clicks -----------------------------------------------------------------------------------------------------
 
     private CableClickOutcome ClickSurface(CableTarget target)
@@ -316,8 +344,7 @@ internal sealed class CableTool
         var type = Draft?.Type ?? Type;
         if (type is null)
             return CableClickOutcome.Ignored;
-        var side = Draft is null ? PortSide.Start : Draft.StartPort is { } start ? CablePorts.FarSide(start) : PortSide.AfterFree;
-        var candidates = CablePorts.Candidates(engine, device, type, side, Draft?.StartPortRef);
+        var candidates = CablePorts.Candidates(engine, device, type, DraftSide(), Draft?.StartPortRef);
         var usable = candidates.Where(c => c.Usable).ToList();
         if (usable.Count == 1)
             return Connect(device, usable[0]);
