@@ -49,6 +49,21 @@ public sealed class PanelReviewTests
         Assert.Equal(format, f);
     }
 
+    [Theory]
+    [InlineData("%.1f°", 0.05f)]
+    [InlineData("%.0f%%", 0.5f)]
+    [InlineData("%.2f Hz", 0.005f)]
+    [InlineData("—", 0.5f)]
+    public void Numbers_that_round_to_zero_are_shown_as_zero_not_minus_zero(string format, float band)
+    {
+        Assert.Equal(band, FixtureControls.ZeroBandOf(format), 6);
+        Assert.Equal(0f, FixtureControls.CleanZero(-band * 0.5f, band));
+        Assert.False(float.IsNegative(FixtureControls.CleanZero(-band * 0.5f, band)));
+        Assert.Equal(-band * 3f, FixtureControls.CleanZero(-band * 3f, band));
+        // A motor that settles at −0.00004 rad reads "0.0°" in the current-state line.
+        Assert.Equal("0.0", FixtureInspectorView.Degrees(-0.00004f).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture));
+    }
+
     [Fact]
     public void A_dimmer_with_the_candela_unit_of_the_gdtf_definition_is_a_percent_control_not_cd()
     {

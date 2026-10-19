@@ -104,8 +104,8 @@ internal sealed class FixtureInspectorView
             string flux = string.Create(inv, $"{live.Flux:#,0}\u00a0{StageUnits.Current.Lumen}").Replace(',', '\u202f');
             _liveLine1 = string.Create(inv,
                 $"{live.Intensity * 100f:0}% · {DeviceFacts.FormatCandela(live.PeakCandela).Replace(' ', '\u00a0')} · {flux} · x\u00a0{live.Xy.X:0.000}\u00a0y\u00a0{live.Xy.Y:0.000}{cct}");
-            string pan = float.IsFinite(live.Pan) ? string.Create(inv, $"{StageLoc.Get(StageStr.LivePan)} {live.Pan * 180f / MathF.PI:0.0}°  ") : "";
-            string tilt = float.IsFinite(live.Tilt) ? string.Create(inv, $"{StageLoc.Get(StageStr.LiveTilt)} {live.Tilt * 180f / MathF.PI:0.0}°  ") : "";
+            string pan = float.IsFinite(live.Pan) ? string.Create(inv, $"{StageLoc.Get(StageStr.LivePan)} {Degrees(live.Pan):0.0}°  ") : "";
+            string tilt = float.IsFinite(live.Tilt) ? string.Create(inv, $"{StageLoc.Get(StageStr.LiveTilt)} {Degrees(live.Tilt):0.0}°  ") : "";
             _liveLine2 = pan + tilt + string.Create(inv,
                 $"{StageLoc.Get(StageStr.LiveBeam)} {live.BeamAngle * 180f / MathF.PI:0.#}° / {live.FieldAngle * 180f / MathF.PI:0.#}°");
             var parts = new List<string>(6)
@@ -296,7 +296,7 @@ internal sealed class FixtureInspectorView
         }
         else
         {
-            float shown = value * c.DisplayScale;
+            float shown = FixtureControls.CleanZero(value * c.DisplayScale, c.ZeroBand);
             // A control whose channel currently runs another function shows no number until it is set.
             if (ImGui.SliderFloat(c.Id, ref shown, c.Min * c.DisplayScale, c.Max * c.DisplayScale, unknown ? "—" : c.Format))
             {
@@ -539,6 +539,9 @@ internal sealed class FixtureInspectorView
             ImGui.PopStyleColor();
         }
     }
+
+    /// <summary>Radians to degrees for display (values that round to 0.0 are exactly 0, never "-0.0").</summary>
+    internal static float Degrees(float radians) => FixtureControls.CleanZero(radians * 180f / MathF.PI, 0.05f);
 
     private static void Muted(string text)
     {

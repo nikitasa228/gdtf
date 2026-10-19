@@ -71,6 +71,9 @@ internal sealed class FixtureControl
     /// <summary>printf format of the slider (displayed number).</summary>
     public string Format { get; init; } = "%.2f";
 
+    /// <summary>Displayed numbers smaller than this (half the last digit of <see cref="Format"/>) are shown as 0, never "-0.0".</summary>
+    public float ZeroBand { get; init; } = 0.005f;
+
     /// <summary>Wheel slot names for slot selection (combo box), else null.</summary>
     public string[]? Choices { get; init; }
 
@@ -478,6 +481,7 @@ internal sealed class FixtureControls
             Unit = unit,
             DisplayScale = scale,
             Format = format,
+            ZeroBand = ZeroBandOf(format),
             Choices = choices,
             ChoiceValues = values,
             Id = "##ctl-" + attribute,
@@ -528,6 +532,20 @@ internal sealed class FixtureControls
             return (1f, PercentFormat(max - min));
         return (1f, null);
     }
+
+    /// <summary>Half the last displayed digit of a printf format ("%.1f°" → 0.05); 0.5 without decimals.</summary>
+    internal static float ZeroBandOf(string format)
+    {
+        int dot = format.IndexOf("%.", StringComparison.Ordinal);
+        int decimals = dot >= 0 && dot + 2 < format.Length && char.IsAsciiDigit(format[dot + 2]) ? format[dot + 2] - '0' : 0;
+        return 0.5f * MathF.Pow(10f, -decimals);
+    }
+
+    /// <summary>
+    /// A displayed number with the values that round to zero made exactly zero: a pan of −0.00004° must read "0.0°",
+    /// not "-0.0°".
+    /// </summary>
+    internal static float CleanZero(float value, float band) => MathF.Abs(value) < band ? 0f : value;
 
     /// <summary>A percent format with decimals for small spans ("%.0f%%", "%.1f%%", "%.2f%%").</summary>
     internal static string PercentFormat(float span)
