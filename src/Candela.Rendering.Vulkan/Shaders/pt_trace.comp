@@ -3,8 +3,8 @@
 #extension GL_EXT_ray_query : require
 #extension GL_EXT_buffer_reference : require
 #extension GL_EXT_buffer_reference_uvec2 : require
-// Final render: one sample per pixel of an unbiased photometric path tracer (rows draw.materialIndex + gl_GlobalInvocationID.y,
-// sample index draw.instanceIndex), added to the accumulation images. Everything is in cd/m2 (luminance, linear Rec.2020).
+// Final render: one sample per pixel of an unbiased photometric path tracer (rows draw.materialIndex + gl_GlobalInvocationID.y
+// below draw.mode, the end of the band; sample index draw.instanceIndex), added to the accumulation images. Everything is in cd/m2 (luminance, linear Rec.2020).
 //
 // Surfaces: the energy-conserving BRDF of brdf.glsl (GGX + Fresnel-weighted Lambert, metal/rough, normal maps,
 // emission), thin-walled transmission (glass, gels: straight through, tinted, weighted by 1 - F), alpha mask/blend
@@ -58,6 +58,10 @@ const float PT_WEIGHT_FLOOR = 1e-3;    // smallest BRDF x cos of a light-selecti
 const float PT_BACKGROUND_DEPTH = 1.0e5;
 const uint PT_SEGMENT_SAMPLES = 4u;     // light samples of the in-scattering along a segment the camera sees
 const int PT_PHASE_BINS = 8;           // bins of the phase-function fit of equi-angular sampling
+// BSDF samples count for a lens only where their power-heuristic share is above this (both strategies apply the same
+// rule, so the weights still sum to one; below it next-event estimation takes the lens alone and need not test whether
+// a BSDF sample could reach it)
+const float PT_MIS_MIN_SHARE = 1e-4;
 
 const uint HIT_NONE = 0u;
 const uint HIT_SURFACE = 1u;
@@ -402,6 +406,57 @@ vec3 surfaceTransmittance(vec3 o, vec3 d, float tMax)
     return vec3(0.0);
 }
 
+// Whether a BSDF sample leaving o along d reaches the lens point at distance tLens, as the path would trace it: no
+// surface (shadow caster or not) and no other lens in front of it; alpha holes and blended surfaces are crossed
+// stochastically (as traceSurface does) and transmissive surfaces are crossed (the path passes them by its transmission
+// lobe). Next-event estimation only tests the shadow casters, and not the last LensClearance before the lens, so where
+// this is false BSDF sampling cannot find the light and next-event estimation must take it with weight 1.
+bool lensReachable(vec3 o, vec3 d, float tLens, inout uint rng)
+{
+    float tMax = tLens - max(1e-4, 1e-4 * tLens);
+    float tMin = 0.0;
+    if (!(tMax > 0.0))
+        return true;
+    for (int layer = 0; layer < PT_MAX_LAYERS; ++layer)
+    {
+        rayQueryEXT q;
+        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_SCENE | PT_MASK_DISC, o, tMin, d, tMax);
+        while (rayQueryProceedEXT(q))
+        {
+            if (rayQueryGetIntersectionTypeEXT(q, false) == gl_RayQueryCandidateIntersectionTriangleEXT)
+            {
+                uint light = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false)) / PT_DISC_SEGMENTS;
+                if (light < params.lightCount && dot(d, ptLights[light].direction) < 0.0)
+                    rayQueryConfirmIntersectionEXT(q);
+            }
+        }
+
+        if (rayQueryGetIntersectionTypeEXT(q, true) != gl_RayQueryCommittedIntersectionTriangleEXT)
+            return true;
+        uint custom = uint(rayQueryGetIntersectionInstanceCustomIndexEXT(q, true));
+        if (custom == PT_CUSTOM_DISC)
+            return false;
+        float t = rayQueryGetIntersectionTEXT(q, true);
+        uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(q, true));
+        Material m = materials[rtMaterialIndex(custom, geometry)];
+        bool pass = (m.flags & MATERIAL_TRANSMISSIVE) != 0u;
+        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
+        {
+            RtSurface s = rtFetchSurface(custom, geometry, uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, true)),
+                                         rayQueryGetIntersectionBarycentricsEXT(q, true));
+            float coverage = coverageOf(m, s.uv);
+            if (coverage < 1.0 && rand(rng) >= coverage)
+                pass = true;
+        }
+
+        if (!pass)
+            return false;
+        tMin = t + max(1e-4, 1e-5 * t);
+    }
+
+    return false;
+}
+
 // ================================================================================================ lights
 
 // Intensity (cd per channel) of light l towards P, from its centre (profile, cookie, prism), and the squared
@@ -700,6 +755,9 @@ vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out f
     vec3 none = vec3(0.0);
     T *= trackTransmittance(origin, L, dist, rng, vec3(0.0), none, false);
 
+    // MIS against BSDF samples hitting the lens (power heuristic), where BSDF sampling can find it: not where its
+    // share is negligible (the lens hit in main applies the same rule) and not where a surface the shadow ray ignores
+    // (no CastShadow, or within the lens clearance) stops the BSDF sample before the lens.
     float weight = 1.0;
     if (lens)
     {
@@ -708,7 +766,9 @@ vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out f
         lobeProbabilities(b, clamp(abs(dot(N, V)), 1e-4, 1.0), pSpecular, pDiffuse, pTransmission, Ft);
         float pBsdf = bsdfPdf(b, N, V, L, pSpecular, pDiffuse);
         float pLight = pSelect * dist * dist / (lensArea(l) * cosY);
-        weight = pLight * pLight / (pLight * pLight + pBsdf * pBsdf);
+        float b2 = pBsdf * pBsdf, l2 = pLight * pLight;
+        if (b2 > PT_MIS_MIN_SHARE * l2 && lensReachable(origin, L, dist, rng))
+            weight = l2 / (l2 + b2);
     }
 
     return contribution * T * weight;
@@ -854,7 +914,7 @@ vec3 clampContribution(vec3 c, bool scattered)
 void main()
 {
     uvec2 pixel = uvec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + draw.materialIndex);
-    if (pixel.x >= params.width || pixel.y >= params.height)
+    if (pixel.x >= params.width || pixel.y >= min(params.height, draw.mode))
         return;
     uint rng = rngSeed(pixel, draw.instanceIndex, params.seed);
 
@@ -978,9 +1038,12 @@ void main()
                     float weight = 1.0;
                     if (prevKind == PREV_SURFACE && prevSumW > 0.0)
                     {
+                        // the power heuristic against next-event estimation from that vertex, with surfaceNee's rule:
+                        // a negligible BSDF share is left to next-event estimation entirely
                         float pSelect = surfaceLightWeight(l, prevP, prevN, prevV, prevBsdf) / prevSumW;
                         float pLight = pSelect * dy2 / (area * cosY);
-                        weight = prevPdf * prevPdf / (prevPdf * prevPdf + pLight * pLight);
+                        float b2 = prevPdf * prevPdf, l2 = pLight * pLight;
+                        weight = b2 > PT_MIS_MIN_SHARE * l2 ? b2 / (b2 + l2) : 0.0;
                     }
 
                     radiance += clampContribution(beta * Le * weight, scattered);

@@ -196,6 +196,34 @@ public sealed class PathTracerSessionTests
         }
     }
 
+    /// <summary>
+    /// Every pixel gets exactly one sample per pass, whatever the width: the first band of rows is sized from a pixel
+    /// budget (262 144 / 1000 = 262 rows here, not a multiple of the 8-row workgroup), and the rows a band's last
+    /// workgroup overhangs must not be traced twice.
+    /// </summary>
+    [SkippableFact]
+    public void EveryPixelGetsOneSamplePerPassWhateverTheBandSize()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var camera = BuildRoom(renderer);
+            foreach (int width in new[] { 1000, 1100 })
+            {
+                using var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(width, 300, 2, bounces: 1, volumeBounces: 0),
+                    new FinalRenderOptions { BackgroundLuminance = 0f });
+                Assert.Equal((2, 2), render.SampleCountRange());
+                Assert.Equal(2, render.SamplesDone);
+            }
+
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     [SkippableFact]
     public void DenoiserLowersTheErrorAndKeepsTheRawResult()
     {

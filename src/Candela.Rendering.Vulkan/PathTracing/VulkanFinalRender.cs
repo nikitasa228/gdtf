@@ -174,7 +174,8 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             Width = (uint)_width,
             Height = (uint)_height,
         };
-        _rowsPerDispatch = Math.Clamp(InitialPixelsPerDispatch / _width, 8, _height);
+        // bands of whole 8-row workgroups (the last band of a pass may be shorter)
+        _rowsPerDispatch = Math.Clamp(InitialPixelsPerDispatch / _width / 8 * 8, 8, _height);
 
         try
         {
@@ -416,6 +417,21 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         return (ToImage(albedo), ToImage(normal));
     }
 
+    /// <summary>The fewest and the most samples any pixel has accumulated (the accumulation's per-pixel counts).</summary>
+    internal (int Min, int Max) SampleCountRange()
+    {
+        ThrowIfDisposed();
+        var accum = ReadFloats(_accum);
+        float min = float.MaxValue, max = 0f;
+        for (int i = 3; i < accum.Length; i += 4)
+        {
+            min = MathF.Min(min, accum[i]);
+            max = MathF.Max(max, accum[i]);
+        }
+
+        return ((int)min, (int)max);
+    }
+
     /// <summary>Stops the render and releases its GPU resources (after the GPU has finished with them).</summary>
     public void Dispose()
     {
@@ -490,7 +506,8 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             DeclareTraceResources(b);
             b.Flush();
             int count = Math.Min(RowsPerDispatch, _height - _row);
-            _tracer.Push(cmd, new GpuDrawConstants { InstanceIndex = (uint)_sample, MaterialIndex = (uint)_row });
+            // rows [_row, _row + count): the last workgroup's overhang is not traced (it belongs to the next band)
+            _tracer.Push(cmd, new GpuDrawConstants { InstanceIndex = (uint)_sample, MaterialIndex = (uint)_row, Mode = (uint)(_row + count) });
             vk.CmdDispatch(cmd, ((uint)_width + 7) / 8, ((uint)count + 7) / 8, 1);
             rows += count;
             _row += count;

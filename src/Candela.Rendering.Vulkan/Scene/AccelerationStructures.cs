@@ -180,7 +180,9 @@ internal sealed unsafe class BottomLevelStructure : IDisposable
     /// <summary>
     /// Records the build of a structure of axis-aligned boxes (<c>VkAabbPositionsKHR</c>, 24 bytes each, starting at the
     /// first byte of <paramref name="boxes"/>); a box whose minimum x is NaN is inactive. Boxes are never opaque: ray
-    /// queries report them as candidates (procedural primitives).
+    /// queries report them as candidates (procedural primitives), each box exactly once per traversal
+    /// (<c>NO_DUPLICATE_ANY_HIT_INVOCATION</c>: without it an implementation may report a box several times, which would
+    /// count its weight more than once in the path tracer's light selection).
     /// </summary>
     public static BottomLevelStructure BuildAabbs(AccelerationStructureDevice device, CommandBuffer cmd, BarrierBatch barriers, GpuBuffer boxes,
         uint count, string name)
@@ -189,7 +191,7 @@ internal sealed unsafe class BottomLevelStructure : IDisposable
         {
             SType = StructureType.AccelerationStructureGeometryKhr,
             GeometryType = GeometryTypeKHR.AabbsKhr,
-            Flags = GeometryFlagsKHR.None,
+            Flags = GeometryFlagsKHR.NoDuplicateAnyHitInvocationBitKhr,
         };
         geometry.Geometry.Aabbs = new AccelerationStructureGeometryAabbsDataKHR
         {
