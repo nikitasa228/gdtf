@@ -1,4 +1,5 @@
 using System.Numerics;
+using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Rendering;
@@ -13,8 +14,12 @@ public sealed class FollowUpRevisionTests
 {
     private const double Frame = 1.0 / 30.0;
 
-    /// <summary>The work-light rig of a scene with one moving head tilted to <paramref name="tilt"/>, reached by <paramref name="path"/>.</summary>
-    private static SpotLight[] RigAfter(float tilt, bool settleFirst, string name)
+    /// <summary>
+    /// The work-light rig of a scene with one moving head sent to <paramref name="tilt"/>. The edit makes the binding place
+    /// the rig while the head starts travelling; with <paramref name="renameAfterArrival"/> an unrelated edit (a rename)
+    /// after the head arrived makes it place the rig again.
+    /// </summary>
+    private static (SpotLight[] Rig, Aabb Content) RigAfter(float tilt, bool renameAfterArrival, string name)
     {
         using var engine = TestEnvironment.CreateEngine(name);
         var head = SceneBuilder.Fixture(engine.Scene, SceneBuilder.MacViper, "Basic", new Vector3(0, 0, 6));
@@ -25,41 +30,29 @@ public sealed class FollowUpRevisionTests
         var fixture = head.Get<FixtureComponent>()!;
         fixture.ManualAttributes["Tilt"] = tilt;
         fixture.NotifyChanged();
-        // the motors take their time: the head is still travelling when the edit is drawn
-        for (int i = 0; i < (settleFirst ? 150 : 1); i++) engine.Tick(Frame);
-        if (!settleFirst)
-            for (int i = 0; i < 150; i++) engine.Tick(Frame);
+        for (int i = 0; i < 150; i++) engine.Tick(Frame); // the motors take their time
+        if (renameAfterArrival)
+        {
+            head.Name = "Spot 1";
+            engine.Tick(Frame);
+        }
         Assert.True(sync.IsWorkLightOn);
-        return world.Lights.ToArray();
+        return (world.Lights.ToArray(), sync.WorkLightContent);
     }
 
     [Fact]
     public void The_work_light_rig_does_not_depend_on_where_the_heads_pointed_when_it_was_placed()
     {
-        // the same scene: one engine drew the edit while the head was still moving, the other renamed the head after it
-        // head arrived (an unrelated edit that makes the binding place the rig again)
-        var travelling = RigAfter(110f, settleFirst: false, "work-light-travelling");
-        SpotLight[] arrived;
-        {
-            using var engine = TestEnvironment.CreateEngine("work-light-arrived");
-            var head = SceneBuilder.Fixture(engine.Scene, SceneBuilder.MacViper, "Basic", new Vector3(0, 0, 6));
-            var world = new RecordingRenderWorld();
-            var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
-            sync.WorkLight = WorkLightMode.On;
-            engine.Tick(0);
-            var fixture = head.Get<FixtureComponent>()!;
-            fixture.ManualAttributes["Tilt"] = 110f;
-            fixture.NotifyChanged();
-            for (int i = 0; i < 150; i++) engine.Tick(Frame);
-            head.Name = "Spot 1";
-            engine.Tick(Frame);
-            arrived = world.Lights.ToArray();
-        }
-        Assert.Equal(WorkLightRig.LightCount, travelling.Length);
-        Assert.Equal(travelling, arrived);
+        // the same scene: placed while the head was travelling, or again after it arrived
+        var travelling = RigAfter(110f, renameAfterArrival: false, "work-light-travelling");
+        var arrived = RigAfter(110f, renameAfterArrival: true, "work-light-arrived");
+        Assert.Equal(WorkLightRig.LightCount, travelling.Rig.Length);
+        Assert.False(travelling.Content.IsEmpty);
+        Assert.Equal(travelling.Content, arrived.Content);
+        Assert.Equal(travelling.Rig, arrived.Rig);
 
-        // and a head pointing elsewhere does not move the rig either
-        Assert.Equal(travelling, RigAfter(-60f, settleFirst: true, "work-light-other-tilt"));
+        // a head pointing elsewhere does not move the rig either
+        Assert.Equal(travelling.Rig, RigAfter(-60f, renameAfterArrival: true, "work-light-other-tilt").Rig);
     }
 }
 
@@ -182,7 +175,7 @@ public sealed class FlagRevisionTests
 public sealed class RecorderConcurrencyTests
 {
     [Fact]
-    public void Packets_from_several_receive_threads_are_all_recorded_in_time_order()
+    public async Task Packets_from_several_receive_threads_are_all_recorded_in_time_order()
     {
         var hub = new Dmx.Input.DmxInputHub();
         var recorder = new DmxRecorder(hub);
@@ -212,7 +205,7 @@ public sealed class RecorderConcurrencyTests
             _ = recorder.FrameCount;
             _ = recorder.Duration;
         }
-        Task.WaitAll(workers);
+        await Task.WhenAll(workers);
         var recording = recorder.Stop()!;
 
         Assert.True(recording.Frames.Zip(recording.Frames.Skip(1)).All(p => p.First.Time <= p.Second.Time));
@@ -315,8 +308,23 @@ public sealed class CliWorkLightTests
         {
             var output = new StringWriter();
             var error = new StringWriter();
-            string[] args = ["render", file, "--out", Path.Combine(dir, $"r{extra.Length}.png"), "--width", "64", "--height", "36",
-                "--look", "show", "--ev", "0", "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root, .. extra];
+            string[] args = ["render",
+                file,
+                "--out",
+                Path.Combine(dir, $"r{extra.Length}.png"),
+                "--width",
+                "64",
+                "--height",
+                "36",
+                "--look",
+                "show",
+                "--ev",
+                "0",
+                "--cache",
+                Path.Combine(dir, "cache"),
+                "--library",
+                TestEnvironment.Root,
+                .. extra];
             int code = Cli.Program.Run(args, output, error);
             Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
             return output.ToString();
