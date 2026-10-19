@@ -21,6 +21,12 @@ internal readonly record struct SessionResult(SessionOutcome Outcome, string Mes
     /// <summary>True when the operation happened.</summary>
     public bool Succeeded => Outcome == SessionOutcome.Done;
 
+    /// <summary>Error-level issues the operation found (listed in the issues panel).</summary>
+    public int Errors { get; init; }
+
+    /// <summary>Warnings the operation found (listed in the issues panel).</summary>
+    public int Warnings { get; init; }
+
     /// <summary>A successful result.</summary>
     public static SessionResult Done(string message) => new(SessionOutcome.Done, message);
 
@@ -45,6 +51,9 @@ internal enum ImportKind
 
     /// <summary>An image used as a reference drawing or poster.</summary>
     Image,
+
+    /// <summary>A GDTF fixture file added to the fixture library.</summary>
+    Gdtf,
 }
 
 /// <summary>Export formats.</summary>
