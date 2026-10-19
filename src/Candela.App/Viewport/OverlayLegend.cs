@@ -32,6 +32,7 @@ internal sealed class OverlayLegend
     private int _appliedVersion;
     private bool _expanded;
     private long _cablesVersion = -1;
+    private object? _cablesScene;
     private readonly List<(CableType Type, string Name, string? Detail, bool Used)> _cables = new();
     private int _usedCount;
     private string _othersLabel = "";
@@ -313,9 +314,11 @@ internal sealed class OverlayLegend
     private void RefreshCables(StageEngine? engine)
     {
         long version = engine?.Scene.Version ?? -2;
-        if (version == _cablesVersion && string.Equals(_language, Loc.Language, StringComparison.Ordinal))
+        // Another scene (a file opened) can have the same version number: the scene itself is part of the key.
+        if (version == _cablesVersion && ReferenceEquals(engine?.Scene, _cablesScene) && string.Equals(_language, Loc.Language, StringComparison.Ordinal))
             return;
         _cablesVersion = version;
+        _cablesScene = engine?.Scene;
         _language = Loc.Language;
         _cables.Clear();
         _cablesUsed = false;
@@ -329,7 +332,7 @@ internal sealed class OverlayLegend
         {
             try
             {
-                foreach (var cable in engine.NetworkSolution.Cables)
+                foreach (var cable in CablingNetwork.Current(engine).Cables)
                 {
                     if (cable.Type is null)
                     {

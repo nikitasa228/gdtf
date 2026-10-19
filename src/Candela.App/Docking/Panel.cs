@@ -77,6 +77,15 @@ internal abstract class Panel
     /// <summary>The id part used by ImGui for docking (<c>###Id</c>).</summary>
     public string DockName => "###" + Id;
 
+    /// <summary>The ImGui frame in which the panel's content was last on screen (its tab active), or −1.</summary>
+    public int LastShownFrame { get; set; } = -1;
+
+    /// <summary>The dock node the panel's window was last drawn in (0: floating or never drawn).</summary>
+    public uint DockNodeId { get; set; }
+
+    /// <summary>True when the panel's content was on screen in the previous or the current frame.</summary>
+    public bool IsShown => IsOpen && LastShownFrame >= ImGui.GetFrameCount() - 1;
+
     /// <summary>Exception that stopped the panel, shown instead of the content until the user retries.</summary>
     public Exception? Fault { get; set; }
 

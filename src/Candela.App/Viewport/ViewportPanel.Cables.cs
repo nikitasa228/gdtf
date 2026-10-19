@@ -33,6 +33,7 @@ internal sealed unsafe partial class ViewportPanel
     private Vector2 _rightPress = new(float.NaN);
     private bool _openPicker;
     private Vector2 _pickerAt;
+    private PortPick? _pickerShown;
     private Vector3[] _nodeWorld = new Vector3[64];
     private readonly Dictionary<Guid, int> _nodeIndex = new();
     private readonly Vector2[] _boxCorners = new Vector2[8];
@@ -230,59 +231,93 @@ internal sealed unsafe partial class ViewportPanel
     /// </summary>
     internal CableTarget? CableUnder(Vector2 mouse, bool includeSegments, float radiusScale = 1f, bool skipPlugged = false)
     {
-        var scene = _ctx.Session.Scene;
-        var style = ImGui.GetStyle();
-        float scale = style.FontScaleMain * style.FontScaleDpi;
-        float nodeRadius = 9f * scale * radiusScale, lineRadius = 6f * scale * radiusScale;
         CableTarget? best = null;
-        float bestNode = nodeRadius * nodeRadius, bestLine = lineRadius * lineRadius;
-        bool nodeFound = false;
-        var ray = Camera.RayThrough(mouse - _imageMin, _imageSize);
-        foreach (var (entity, cable) in scene.Query<CableComponent>())
-        {
-            if (!entity.IsVisibleInHierarchy || cable.Nodes is not { Count: > 0 } nodes)
-                continue;
-            if (_nodeWorld.Length < nodes.Count)
-                _nodeWorld = new Vector3[Math.Max(nodes.Count, _nodeWorld.Length * 2)];
-            int n = CableGeometry.WriteNodeWorldPositions(scene, entity, cable, _nodeWorld);
-            _nodeIndex.Clear();
-            for (int i = 0; i < n; i++)
-            {
-                if (nodes[i] is not { } node)
-                    continue;
-                _nodeIndex.TryAdd(node.Id, i);
-                if (skipPlugged && IsPlugged(cable, node.Id))
-                    continue;
-                if (!Camera.WorldToScreen(_nodeWorld[i], _imageSize, out var s))
-                    continue;
-                float d = Vector2.DistanceSquared(s + _imageMin, mouse);
-                if (d < bestNode)
-                {
-                    bestNode = d;
-                    nodeFound = true;
-                    best = CableTarget.Node(entity.Id, node.Id, _nodeWorld[i]);
-                }
-            }
+        var probe = new CableProbe(mouse, includeSegments, radiusScale, skipPlugged);
+        foreach (var (entity, cable) in _ctx.Session.Scene.Query<CableComponent>())
+            ProbeCable(entity, cable, ref probe, ref best);
+        return best;
+    }
 
-            if (!includeSegments || nodeFound)
+    /// <summary>
+    /// <see cref="CableUnder"/> for one cable (the selected cable's node handles, every frame while it is hovered —
+    /// without walking the scene's other cables).
+    /// </summary>
+    private CableTarget? CableUnder(Entity entity, CableComponent cable, Vector2 mouse)
+    {
+        CableTarget? best = null;
+        var probe = new CableProbe(mouse, false, 1f, false);
+        ProbeCable(entity, cable, ref probe, ref best);
+        return best;
+    }
+
+    /// <summary>Search state of <see cref="CableUnder(Vector2, bool, float, bool)"/>: squared pick radii and the best distances so far.</summary>
+    private struct CableProbe
+    {
+        public CableProbe(Vector2 mouse, bool includeSegments, float radiusScale, bool skipPlugged)
+        {
+            var style = ImGui.GetStyle();
+            float scale = style.FontScaleMain * style.FontScaleDpi;
+            float nodeRadius = 9f * scale * radiusScale, lineRadius = 6f * scale * radiusScale;
+            Mouse = mouse;
+            IncludeSegments = includeSegments;
+            SkipPlugged = skipPlugged;
+            BestNode = nodeRadius * nodeRadius;
+            BestLine = lineRadius * lineRadius;
+        }
+
+        public Vector2 Mouse;
+        public bool IncludeSegments;
+        public bool SkipPlugged;
+        public float BestNode;
+        public float BestLine;
+        public bool NodeFound;
+    }
+
+    private void ProbeCable(Entity entity, CableComponent cable, ref CableProbe probe, ref CableTarget? best)
+    {
+        var scene = _ctx.Session.Scene;
+        var mouse = probe.Mouse;
+        if (!entity.IsVisibleInHierarchy || cable.Nodes is not { Count: > 0 } nodes)
+            return;
+        if (_nodeWorld.Length < nodes.Count)
+            _nodeWorld = new Vector3[Math.Max(nodes.Count, _nodeWorld.Length * 2)];
+        int n = CableGeometry.WriteNodeWorldPositions(scene, entity, cable, _nodeWorld);
+        _nodeIndex.Clear();
+        for (int i = 0; i < n; i++)
+        {
+            if (nodes[i] is not { } node)
                 continue;
-            foreach (var segment in cable.Segments)
+            _nodeIndex.TryAdd(node.Id, i);
+            if (probe.SkipPlugged && IsPlugged(cable, node.Id))
+                continue;
+            if (!Camera.WorldToScreen(_nodeWorld[i], _imageSize, out var s))
+                continue;
+            float d = Vector2.DistanceSquared(s + _imageMin, mouse);
+            if (d < probe.BestNode)
             {
-                if (!_nodeIndex.TryGetValue(segment.FromNode, out int a) || !_nodeIndex.TryGetValue(segment.ToNode, out int b))
-                    continue;
-                var p0 = _nodeWorld[a];
-                var p1 = _nodeWorld[b];
-                if (!Camera.WorldToScreen(p0, _imageSize, out var s0) || !Camera.WorldToScreen(p1, _imageSize, out var s1))
-                    continue;
-                float d = DistanceToSegmentSquared(mouse, s0 + _imageMin, s1 + _imageMin, out _);
-                if (d >= bestLine)
-                    continue;
-                bestLine = d;
-                best = CableTarget.Segment(entity.Id, segment.FromNode, segment.ToNode, ClosestOnSegment(ray, p0, p1));
+                probe.BestNode = d;
+                probe.NodeFound = true;
+                best = CableTarget.Node(entity.Id, node.Id, _nodeWorld[i]);
             }
         }
 
-        return best;
+        if (!probe.IncludeSegments || probe.NodeFound)
+            return;
+        var ray = Camera.RayThrough(mouse - _imageMin, _imageSize);
+        foreach (var segment in cable.Segments)
+        {
+            if (!_nodeIndex.TryGetValue(segment.FromNode, out int a) || !_nodeIndex.TryGetValue(segment.ToNode, out int b))
+                continue;
+            var p0 = _nodeWorld[a];
+            var p1 = _nodeWorld[b];
+            if (!Camera.WorldToScreen(p0, _imageSize, out var s0) || !Camera.WorldToScreen(p1, _imageSize, out var s1))
+                continue;
+            float d = DistanceToSegmentSquared(mouse, s0 + _imageMin, s1 + _imageMin, out _);
+            if (d >= probe.BestLine)
+                continue;
+            probe.BestLine = d;
+            best = CableTarget.Segment(entity.Id, segment.FromNode, segment.ToNode, ClosestOnSegment(ray, p0, p1));
+        }
     }
 
     private static bool IsPlugged(CableComponent cable, Guid node)
@@ -550,14 +585,22 @@ internal sealed unsafe partial class ViewportPanel
             {
                 ImGui.SetNextWindowPos(_pickerAt + new Vector2(14f, 14f) * scale, ImGuiCond.Always);
                 ImGui.OpenPopup(PortPickerId);
+                _pickerShown = tool.Pick;
             }
         }
 
         if (!ImGui.BeginPopup(PortPickerId, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
         {
-            // Closed by a click outside or Escape: the cable keeps going without this device.
-            if (tool.Pick is not null && !ImGui.IsPopupOpen(PortPickerId) && !_openPicker)
-                tool.CancelPick();
+            // Closed by a click outside or Escape: the cable keeps going without this device. Only the viewport that
+            // opened the picker closes it (the popup id belongs to its window: in the other viewports it is never open),
+            // and only the pick it showed (a click in another viewport may have opened a new one there).
+            if (_pickerShown is { } shown)
+            {
+                _pickerShown = null;
+                if (ReferenceEquals(tool.Pick, shown))
+                    tool.CancelPick();
+            }
+
             return;
         }
 
@@ -614,8 +657,9 @@ internal sealed unsafe partial class ViewportPanel
     {
         if (_ctx.Tools.Tool == EditorTool.Cable || SelectedCable() is not var (entity, cable))
             return false;
-        if (CableUnder(mouse, includeSegments: false) is not { Kind: CableTargetKind.CableNode } hit || hit.EntityId != entity.Id ||
-            cable.FindNode(hit.NodeId) is not { } node)
+        // Only the selected cable's handles are drawn, so only its nodes are grabbed (a node of another cable close by
+        // on screen does not hide them).
+        if (CableUnder(entity, cable, mouse) is not { Kind: CableTargetKind.CableNode } hit || cable.FindNode(hit.NodeId) is not { } node)
             return false;
         _ctx.Tools.CableNode = new CableNodeRef(entity.Id, node.Id);
         var world = CableNodeEdits.WorldPosition(_ctx.Session.Scene, entity, node);
@@ -704,9 +748,7 @@ internal sealed unsafe partial class ViewportPanel
         float scale = style.FontScaleMain * style.FontScaleDpi;
         var scene = _ctx.Session.Scene;
         var selected = _ctx.Tools.CableNode;
-        Guid? hot = hovered && !_nodeDrag.Active && CableUnder(mouse, includeSegments: false) is { Kind: CableTargetKind.CableNode } h && h.EntityId == entity.Id
-            ? h.NodeId
-            : null;
+        Guid? hot = hovered && !_nodeDrag.Active && CableUnder(entity, cable, mouse) is { Kind: CableTargetKind.CableNode } h ? h.NodeId : null;
         float r = 4.5f * scale;
         foreach (var node in cable.Nodes)
         {

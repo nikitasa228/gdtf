@@ -1,4 +1,5 @@
 using System.Numerics;
+using Candela.App.Session;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Electrical;
@@ -57,7 +58,7 @@ internal static class CablePorts
         NetworkSolution? solution = null;
         try
         {
-            solution = engine.NetworkSolution;
+            solution = CablingNetwork.Current(engine);
         }
         catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
         {

@@ -62,13 +62,13 @@ internal sealed class ConnectionInspectorView
         if (entity.Get<ConsoleComponent>() is { } console)
             DrawConsole(engine, entity, console, labelWidth);
         if (entity.Get<PowerSourceComponent>() is { } source)
-            DrawPowerSource(source, labelWidth);
+            DrawPowerSource(entity, source, labelWidth);
     }
 
     /// <summary>Rebuilds the texts when the entity, the network solution or the language changed.</summary>
     internal void Refresh(StageEngine engine, Entity entity)
     {
-        var solution = engine.NetworkSolution;
+        var solution = CablingNetwork.Current(engine);
         if (ReferenceEquals(solution, _textsOf) && entity.Id == _textsFor && _textsLanguage == Loc.Language)
             return;
         _textsOf = solution;
@@ -296,10 +296,7 @@ internal sealed class ConnectionInspectorView
                 if (ImGui.IsItemDeactivatedAfterEdit())
                 {
                     _nameBuffers.Remove(i);
-                    string trimmed = name.Trim();
-                    if (trimmed.Length > 0 && trimmed != output.PortName && !console.Outputs.Any(o => o is not null && !ReferenceEquals(o, output) &&
-                            string.Equals(o.PortName, trimmed, StringComparison.OrdinalIgnoreCase)))
-                        EditConsole(console, i, o => o.PortName = trimmed, "Console output");
+                    RenameConsoleOutput(entity, console, i, name);
                 }
 
                 ImGui.TableNextColumn();
@@ -374,6 +371,75 @@ internal sealed class ConnectionInspectorView
         _nameBuffers.Clear();
     }
 
+    /// <summary>
+    /// Renames output <paramref name="index"/> of the console on <paramref name="entity"/> to <paramref name="name"/>
+    /// (trimmed; empty or another output's name is refused) as one undo step; the cables plugged into the output stay
+    /// plugged (their plugs name the port). Returns true when renamed.
+    /// </summary>
+    internal bool RenameConsoleOutput(Entity entity, ConsoleComponent console, int index, string name)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(console);
+        if (index < 0 || index >= console.Outputs.Count || console.Outputs[index] is not { } output)
+            return false;
+        string trimmed = (name ?? "").Trim();
+        string old = output.PortName;
+        if (trimmed.Length == 0 || trimmed == old || console.Outputs.Any(o => o is not null && !ReferenceEquals(o, output) &&
+                string.Equals(o.PortName, trimmed, StringComparison.OrdinalIgnoreCase)))
+            return false;
+        using (_stage.Undo.Group("Rename console output"))
+        {
+            EditConsole(console, index, o => o.PortName = trimmed, "Console output");
+            MovePlugs(entity, old, trimmed);
+        }
+
+        _stage.Undo.BreakMerge();
+        return true;
+    }
+
+    /// <summary>
+    /// Renames outlet <paramref name="index"/> of the power source on <paramref name="entity"/> (as
+    /// <see cref="RenameConsoleOutput"/>): one undo step, the cables plugged into it stay plugged.
+    /// </summary>
+    internal bool RenameOutlet(Entity entity, PowerSourceComponent source, int index, string name)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(source);
+        if (index < 0 || index >= source.Outlets.Count || source.Outlets[index] is not { } outlet)
+            return false;
+        string trimmed = (name ?? "").Trim();
+        string old = outlet.PortName;
+        if (trimmed.Length == 0 || trimmed == old || source.Outlets.Any(o => o is not null && !ReferenceEquals(o, outlet) &&
+                string.Equals(o.PortName, trimmed, StringComparison.OrdinalIgnoreCase)))
+            return false;
+        using (_stage.Undo.Group("Rename outlet"))
+        {
+            EditOutlet(source, index, o => o.PortName = trimmed, "Outlet name");
+            MovePlugs(entity, old, trimmed);
+        }
+
+        _stage.Undo.BreakMerge();
+        return true;
+    }
+
+    /// <summary>The plugs in port <paramref name="from"/> of <paramref name="device"/> follow the port to its new name.</summary>
+    private void MovePlugs(Entity device, string from, string to)
+    {
+        foreach (var (_, cable) in _stage.Scene.Query<CableComponent>())
+        {
+            if (!cable.Endpoints.Exists(e => e is not null && e.EntityId == device.Id && string.Equals(e.PortName, from, StringComparison.OrdinalIgnoreCase)))
+                continue;
+            _stage.Undo.Execute(ModifyComponentCommand.Create(cable, c =>
+            {
+                foreach (var e in c.Endpoints)
+                {
+                    if (e is not null && e.EntityId == device.Id && string.Equals(e.PortName, from, StringComparison.OrdinalIgnoreCase))
+                        e.PortName = to;
+                }
+            }, "Move plug"));
+        }
+    }
+
     private static string NextOutputName(ConsoleComponent console)
     {
         for (char c = 'A'; c <= 'Z'; c++)
@@ -402,7 +468,7 @@ internal sealed class ConnectionInspectorView
 
     // ---- power source -----------------------------------------------------------------------------------------------
 
-    private void DrawPowerSource(PowerSourceComponent source, float labelWidth)
+    private void DrawPowerSource(Entity entity, PowerSourceComponent source, float labelWidth)
     {
         if (!ImGui.CollapsingHeader(CableLoc.With(DeviceIcons.Glyph(DeviceGroup.Distro), CableStr.PropsPowerSource), ImGuiTreeNodeFlags.DefaultOpen))
             return;
@@ -473,10 +539,7 @@ internal sealed class ConnectionInspectorView
                 if (ImGui.IsItemDeactivatedAfterEdit())
                 {
                     _nameBuffers.Remove(i);
-                    string trimmed = name.Trim();
-                    if (trimmed.Length > 0 && trimmed != outlet.PortName && !source.Outlets.Any(o => o is not null && !ReferenceEquals(o, outlet) &&
-                            string.Equals(o.PortName, trimmed, StringComparison.OrdinalIgnoreCase)))
-                        EditOutlet(source, i, o => o.PortName = trimmed, "Outlet name");
+                    RenameOutlet(entity, source, i, name);
                 }
 
                 if (_power?.Loads.TryGetValue(outlet.PortName, out var load) == true && ImGui.IsItemHovered())

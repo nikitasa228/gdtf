@@ -19,6 +19,7 @@ internal sealed class CableLinksPanel : Panel
 {
     private readonly StagePanelContext _stage;
     private readonly Action? _showOverlay;
+    private readonly Action? _showProperties;
     private Guid? _cable;
     private Guid? _lastPrimary;
     private CableLinkModel? _model;
@@ -32,12 +33,16 @@ internal sealed class CableLinksPanel : Panel
     private string _header = "";
     private string _counts = "";
 
-    /// <summary>Creates the panel; <paramref name="showOverlay"/> switches the active viewport to the cable overlay.</summary>
-    public CableLinksPanel(StagePanelContext stage, Action? showOverlay = null)
+    /// <summary>
+    /// Creates the panel; <paramref name="showOverlay"/> switches the active viewport to the cable overlay,
+    /// <paramref name="showProperties"/> brings the Properties panel into view after a device was selected here.
+    /// </summary>
+    public CableLinksPanel(StagePanelContext stage, Action? showOverlay = null, Action? showProperties = null)
         : base("CableLinks", Icons.Cable)
     {
         _stage = stage ?? throw new ArgumentNullException(nameof(stage));
         _showOverlay = showOverlay;
+        _showProperties = showProperties;
     }
 
     /// <inheritdoc/>
@@ -55,7 +60,7 @@ internal sealed class CableLinksPanel : Panel
     /// <summary>Shows <paramref name="cableId"/>.</summary>
     public void Show(Guid cableId) => _cable = cableId;
 
-    /// <summary>Selects the device of card <paramref name="index"/> (the Properties panel shows it).</summary>
+    /// <summary>Selects the device of card <paramref name="index"/> and brings the Properties panel, which shows it, into view.</summary>
     internal void SelectCard(int index)
     {
         if (_model is not { } model || index < 0 || index >= model.Cards.Count)
@@ -65,6 +70,7 @@ internal sealed class CableLinksPanel : Panel
         {
             _stage.Selection.Set(id);
             _lastPrimary = id;
+            _showProperties?.Invoke();
         }
     }
 
@@ -94,7 +100,7 @@ internal sealed class CableLinksPanel : Panel
             return;
         }
 
-        object solution = engine.NetworkSolution;
+        object solution = CablingNetwork.Current(engine);
         if (_model is not null && ReferenceEquals(solution, _modelSolution) && _modelCable == cable && _modelLanguage == Loc.Language)
             return;
         _modelSolution = solution;

@@ -106,6 +106,20 @@ internal sealed partial class Workspace
             _ctx.Session.SceneReplaced -= _onCablesSceneReplaced;
     }
 
+    /// <summary>
+    /// Brings the Properties panel into view after the cable link window selected a device: it is opened when closed
+    /// and its tab brought to the front when hidden behind another — unless it shares the link window's dock group,
+    /// where that would hide the strip the user is clicking through.
+    /// </summary>
+    private void ShowPropertiesOfSelection()
+    {
+        if (_properties.IsShown)
+            return;
+        bool sharesGroup = _properties.IsOpen && _properties.DockNodeId != 0 && _properties.DockNodeId == _cableLinks.DockNodeId;
+        if (!sharesGroup)
+            FocusPanel(_properties);
+    }
+
     /// <summary>Shows the cable overlay in the active viewport (from the cable link window).</summary>
     private void ShowCableOverlay() => ActiveViewport.View.Overlay = OverlayMode.Cables;
 
@@ -203,6 +217,11 @@ internal sealed partial class Workspace
             {
                 tools.CableNode = null;
                 SetStatus(CableLoc.Get(CableStr.NodeDeleted));
+            }
+            else if (CableNodeEdits.Resolve(session.Scene, node) is not null)
+            {
+                // A branching point stays (the branches would fall apart): say why nothing happened.
+                SetStatus(CableLoc.Get(CableStr.NodeBranchKept));
             }
 
             _dispatcher.Consume(ImGuiKey.Delete);

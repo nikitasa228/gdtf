@@ -158,7 +158,7 @@ internal sealed class FixtureInspectorView
 
     private string LockReasonConsole(StageEngine engine, Entity entity)
     {
-        var feed = engine.NetworkSolution.DataFeedOf(entity.Id);
+        var feed = CablingNetwork.Current(engine).DataFeedOf(entity.Id);
         if (feed is null)
             return StageLoc.Get(StageStr.LockConsole);
         string console = _stage.Scene.Find(feed.ConsoleEntityId)?.Name ?? "?";
@@ -528,7 +528,7 @@ internal sealed class FixtureInspectorView
         NetworkSolution solution;
         try
         {
-            solution = engine.NetworkSolution;
+            solution = CablingNetwork.Current(engine);
         }
         catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
         {

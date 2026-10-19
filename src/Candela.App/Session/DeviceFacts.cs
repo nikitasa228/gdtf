@@ -352,7 +352,7 @@ internal sealed class DeviceFacts
         {
             ports = engine.Network.Ports.GetPorts(entity);
             if (ports.Count > 0)
-                solution = engine.NetworkSolution;
+                solution = CablingNetwork.Current(engine);
         }
         catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or FormatException)
         {

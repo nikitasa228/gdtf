@@ -89,7 +89,7 @@ internal sealed class CableLinkModel
     public static CableLinkModel? Build(StageEngine engine, Guid cableId)
     {
         ArgumentNullException.ThrowIfNull(engine);
-        var solution = engine.NetworkSolution;
+        var solution = CablingNetwork.Current(engine);
         var view = CableLinkView.Build(solution, cableId);
         if (view is null || solution.FindCable(cableId) is not { } info)
             return null;

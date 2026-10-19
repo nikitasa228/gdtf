@@ -123,7 +123,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _render = Add(new RenderPanel(_ctx, Report));
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
-        _cableLinks = Add(new CableLinksPanel(StagePanelContext.From(_ctx), ShowCableOverlay));
+        _cableLinks = Add(new CableLinksPanel(StagePanelContext.From(_ctx), ShowCableOverlay, ShowPropertiesOfSelection));
         _external = Add(new ExternalControlPanel(_ctx));
         _ctx.Tools.Stage.Browser = _browser;
         RegisterCommands();
