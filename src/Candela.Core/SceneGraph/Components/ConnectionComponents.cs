@@ -210,6 +210,15 @@ public sealed class PowerSourceComponent : Component
     {
         new PowerOutlet { PortName = "Outlet 1", Connector = "Schuko", BreakerA = 16f },
     };
+
+    /// <summary>
+    /// Connector of the inlet ("Mains In") through which this source is itself fed by a cable — a distro's input, e.g.
+    /// "CEE 32A 3P" (names as in <see cref="PowerOutlet.Connector"/>). Null (the default, and what projects saved before
+    /// this property existed load with) lets Candela.Electrical derive it from the kind of source: a supply with a single
+    /// outlet takes the same connector as that outlet (fed in line, like an extension), a distro the CEE or Powerlock
+    /// inlet one size above its largest outlet, with the source's number of phases.
+    /// </summary>
+    public string? MainsInConnector { get; set; }
 }
 
 /// <summary>One outlet of a <see cref="PowerSourceComponent"/>.</summary>
