@@ -443,7 +443,8 @@ with up to 30 m of beam), quantised to 25 % steps so the range stays stable, at 
    to the opaque scene and the background; transparent surfaces apply the same lookup at their own depth.
 
 **Flames**: every grid of the flame atlas is sampled (`flameTemperatureAt`), so several flame devices each keep their
-own resolution.
+own resolution. The atlas holds at most 64 grids and 64 M texels in all; grids beyond that are skipped with a warning
+(three tiny grids of 2047 × 1 × 1, 1 × 2048 × 1 and 1 × 1 × 2047 used to ask for an 8.6-billion-texel image).
 
 **Haze transmittance along light paths** `T_light = e^(−σ_h · d)` multiplies all light reaching a surface, a froxel,
 a beam sample, an RSM texel or a GI hit. Smoke dims the view path everywhere and, for the beams, also the light path
@@ -454,7 +455,9 @@ a beam sample, an RSM texel or a GI hit. Smoke dims the view path everywhere and
 
 Every spot light whose beam reaches into the view and whose bounding cone is at most 80° wide (`LightPlanner.IsBeam`;
 Lambertian emitters such as Glow beams and very wide floods stay in the froxels), up to `MaxRaymarchedBeams` (default
-4096, at most 8192) in the order of their contribution, is a **volumetric beam**: its single scattering is integrated
+4096, at most 8192) in the order of their contribution, is a **volumetric beam**. (`PreviewSettings.MaxRaymarchedBeams`
+and `RenderStatistics.RaymarchedBeams` keep their names from the earlier ray-marched beams for compatibility; both mean
+volumetric beams now — nothing is ray marched in steps any more.) A volumetric beam: its single scattering is integrated
 per pixel and it is left out of the froxel injection (`LIGHT_VIEW_BEAM`), so nothing is counted twice. The froxels
 keep the other lights and the flames, and with smoke or flames they also give the beams their view-path transmittance
 (`T_view` from the integrated volume); the smoke density itself is sampled per beam sample.
@@ -497,24 +500,50 @@ cone of its own (1/N of the intensity, its own axis and cookie frame).
   (the same for every ray through the beam, `K = ⌈2 θ_c / 0.1⌉`, 2 … 8, so no seams), m linear on each segment
   (`∫ m f̂ = ΔH · ((1 − λ) m₀ + λ m₁)`, λ the profile's centroid in the segment by Simpson's rule) — second order, so the
   forward-peaked phase function needs no extra segments. Uniform haze without cookie, shadow or smoke is therefore
-  exact and noise-free. A uniform cone (`SHAPE_UNIFORM_CONE`) has `H = min(y, √(1 − v²))`.
-* **Modulation** (gobos, framing blades, iris, prism cookies, shadow maps, smoke): stratified samples in each segment
-  (one per segment with a history, two in the first frame; gobo and blade detail add samples per segment from the
-  gate-plane length the ray crosses and the pixels it covers, up to 24 per beam) measure `cookie × shadow × σ(x) / σ_h ×
-  (exact profile / table profile)` — the last factor corrects the chord approximation and adds the iris. The sample
-  positions are interleaved gradient noise over the half-resolution grid advanced by the golden ratio per frame (an
-  R1 sequence per pixel), so the temporal accumulation converges evenly. The cookie is filtered by the larger of the
-  segment's and the pixel's footprint in gate units (no aliasing of gobo detail far away).
+  exact and noise-free. A uniform cone (`SHAPE_UNIFORM_CONE`) has `H = min(y, √(1 − v²))`. A closed **iris** ends the
+  profile at its angle; its soft edge (from `IrisSoftStart` to `IrisAngle`) gets two segments of its own on each side,
+  with the iris factor in the smooth factor, so the edge in the air is as soft as on surfaces.
+* **Modulation** (gobos, framing blades, prism cookies, shadow maps, smoke): stratified samples in each segment (one
+  per segment with a history, two in the first frame; gobo and blade detail add samples per segment from the
+  gate-plane length the ray crosses and the pixels it covers, up to 24 per beam) are placed **like the profile** within
+  the segment — the target `H₀ + ξ · ΔH` is inverted on the table (a piecewise-linear first guess through the segment's
+  Simpson nodes, then three bracketed Newton steps; a converged step is kept) — and measure `cookie × shadow × σ(x)`,
+  weighted by `exact profile / table profile × m` (the first factor corrects the chord approximation and adds the iris).
+  The segment's light is its exact integral times the **weighted mean** of these modulations (a ratio estimator), so a
+  modulation that is uniform over the segment — an open gobo, a shadow map with nothing in the beam — adds no noise at
+  all, and radial gobo patterns (discs, rings) in the air match the integral (within 1 %; uniform samples in y were off
+  by up to 40 %). The sample positions are interleaved gradient noise over the half-resolution grid advanced by the
+  golden ratio per frame (an R1 sequence per pixel), so the temporal accumulation converges evenly. The cookie is
+  filtered by the larger of the segment's and the pixel's footprint in gate units (no aliasing of gobo detail far
+  away).
 * **Near field** (within `z_near` of the lens): the lens is an extended source. The shaft has the radius
   `(R⁴ + (z tan θ_c)⁴)^¼` (the lens radius at the lens, the point-source cone beyond, flux conserved): a point at
   distance ρ from the axis sees the profile at `atan(s ρ, z)`, `s = ζ / (R⁴ + ζ⁴)^¼`, `ζ = z tan θ_c`, with
-  illuminance `I(θ) · s² / (z² + s² ρ²)`; 4-point Gauss–Legendre on 1–3 pieces of the ray. A camera inside the beam
-  (looking up it or across it) therefore sees a finite, smooth result.
+  illuminance `I(θ) · s² / (z² + s² ρ²)`; 4-point Gauss–Legendre on 1–3 pieces of the ray gives the envelope. With
+  modulation, stratified samples along the crossing (four per piece, more for gobo and blade detail; one lattice offset
+  per pixel and frame, so the history converges instead of aliasing at fixed nodes) give the weighted mean modulation
+  that scales the envelope. A camera inside the beam (looking up it or across it) therefore sees a finite, smooth
+  result.
+* **Thin beams** (`widenBeam`): the half-resolution rays are two internal pixels apart, so a beam narrower than that —
+  a narrow beam seen from afar, the start of a beam at its lens, the pixel beams of LED bars — would be hit by one ray
+  and missed by the next: broken, dotted, stair-stepped shafts that vanish towards the source. Per ray and facet, the
+  shaft radius at the ray's closest approach to the axis (the cut-off radius; the lens near the lens) is compared with
+  1.5 sample spacings there. Seen from the side, the facet is widened for that ray by the factor k that reaches it —
+  every angle (beam, field, cut-off, iris, lens radius, gobo and blade gate coordinates) × k and the intensity / k² —
+  which keeps the flux and so the light summed across the shaft on screen. Seen end-on (the ray runs inside the cone,
+  so the beam is not thin for it), the angles stay and only the lens radius is raised: the near field keeps the flux,
+  the beam beyond the lens is unchanged and the lens a viewer looks into is spread over the samples around it. The two
+  blend between the cone's half-angle and twice it. A resolved beam is untouched.
+
+  | Seven-pixel bars (4°/6°, 2 cm lenses) seen from 22 m at 480 × 270, before | now |
+  |---|---|
+  | ![before](images/beams-thin-before.png) | ![after](images/beams-thin-after.png) |
 
 **Tiles** (`beam_cull.comp`): the half-resolution image is split into 16 × 16 tiles (32 × 32 internal pixels); one
 256-thread work group per tile reduces the tile's farthest depth and tests every beam's cone — the convex hull of the
 lens disc and the cap at the light's range (or 2 km), by its support function — against the tile's four side planes
-and its far depth, and writes one bit per beam into the tile's mask. A 16-word header counts the tile-beam pairs, the
+(of the tile grown by 4 internal pixels, which covers the thin-beam widening) and its far depth, and writes one bit
+per beam into the tile's mask. A 16-word header counts the tile-beam pairs, the
 busiest tile and the tiles with beams; it is copied to a host-visible buffer and read when the frame slot comes round
 again (no wait) for the statistics and the load balancing.
 
@@ -523,7 +552,9 @@ the nearest pixel of the block on even and the farthest on odd blocks (checkerbo
 have samples. For each bit of its tile's mask the pass integrates every facet of the beam and writes **L** (the
 estimate) and the noise-free envelope **B** (the same integral without modulation, with a reference σ) plus two depths:
 the sample's view depth and its *validity* depth — when every beam the ray crossed ended in front of the surface, the
-value holds for any surface behind that point (stored negated).
+value holds for any surface behind that point (stored negated). Over the background a ray reaches every beam's range
+(up to 2 km; the froxel volume ends at 500 m), and the depths stored in the half-float images are limited to 30 000 m
+so the temporal pass can reproject the sky (a larger value would overflow to infinity).
 
 **Temporal accumulation** (`beam_temporal.comp`, with `TemporalAccumulation`): only the **modulation ratio ρ = L / B**
 is accumulated. The history is reprojected with the previous view-projection at the sample's depth (rejected when the
@@ -552,6 +583,12 @@ few milliseconds. lavapipe's timestamps do not capture its asynchronous compute 
 **Lens glow.** `IRenderWorld.SetInstanceEmission(instance, luminance, axis, halfAngle)` makes the lens geometry emit
 the beam's peak candela / lens area along its axis (Candela.Engine's RenderSync sets it for every lit beam part);
 bloom adds the glare.
+
+**Review notes.** The adversarial review of the beams fixed: radial gobo patterns in the far field (a converged Newton
+step of the profile inversion was bisected away, ±10 %; before the profile-distributed samples ±40 %); beams thinner
+than a sample (vanishing towards the source, dotted pixel bars); the background depth overflowing the half-float
+images (no history over the sky on GPUs that round to infinity); noise of shadowed beams with nothing in them; the
+flame atlas size. The regression tests are in `BeamReviewTests`.
 
 ## Indirect light
 
@@ -607,7 +644,8 @@ the frame slot. When the slot comes round again (no wait) the renderer adapts
 (minus the compensation). Without a measurement yet, the camera EV is used. `PreviewSettings.Metering`:
 
 * **`Stage`** (default): the 85th to 99th percentile — the lit part of a stage picture (pools, beams, lenses; the
-  hottest 1 % does not count) — placed **1.5 stops above** middle grey (`VulkanRenderer.StageMeteringStops`): light
+  hottest 1 % does not count) — placed **1.5 stops below** middle grey (`VulkanRenderer.StageMeteringStops` added to
+  the EV100 of that reading): light
   pools stay below white, beams in haze stay visible and the dark venue is not lifted to grey. An evenly lit view comes
   out about 1.5 stops darker than with `Average`. `candela render --auto-exposure` uses it.
 * **`Average`**: the 50th to 95th percentile at middle grey (an evenly lit room or product view).
@@ -661,7 +699,7 @@ background is not coloured.
 
 ## Accuracy and test coverage
 
-`tests/Candela.Rendering.Vulkan.Tests` (120 tests, about 1.5 minutes on lavapipe once the SPIR-V cache is warm;
+`tests/Candela.Rendering.Vulkan.Tests` (152 tests, about 1.5 minutes on lavapipe once the SPIR-V cache is warm;
 `xunit.runner.json` limits parallelism to two tests because lavapipe renders on the CPU) runs every test with the
 validation layer and synchronization validation and asserts **zero validation errors**, including leak reports at
 shutdown. Tests are skipped with a message when no Vulkan device exists. Images are 160 × 120 … 320 × 240.
@@ -681,6 +719,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `CookieTests` | goldens `cookie-gobo` (orientation, rotation), `cookie-blades`, `cookie-prism` (3 facets, flux 1/N each), `cookie-iris`; frost widens the beam and blurs the gobo; blade insertion and rotation positions; the flux on the floor equals the light meter's integral (1 %) and frost and prism keep it (2 %) |
 | `VolumetricTests` | single scattering in uniform haze vs the numerical integral of σ·HG·I·e^(−σr)/r²·e^(−σl) within 5 % (froxels with and without temporal accumulation, and a volumetric beam); goldens `volumetric-beam` (side view), `volumetric-smoke` (density blob), `volumetric-flame`; an optically thick flame shows the blackbody luminance (5 %) and chromaticity (0.01); looking up a beam from inside it (volumetric beams, the same beams in the froxels, narrow and wide) within 5 % of the integral; uniform smoke through the density volume scatters like haze of the same coefficient (5 %, froxels and beams); haze in a shadow stays dark (froxels and beams); the froxel history follows a trucking or panning camera (beam within 0.75 px of the converged image) |
 | `BeamTests` | the table matches the line integral of the profile (five family / exponent cases); single scattering of a 6° spot (100 000 cd, 6°/9°) and a 40° wash (40°/60°) against `BeamReference` — a 200 000-step double-precision integral with the same near-field model — within 5 % (with and without temporal accumulation; measured 0.1 % and 1 %); a half-open gobo in the air and a plate shadowing the beam (5 %); edge profiles of a Spot 20°/26° and a Fresnel 20°/40° across the beam within 5 % of the peak and the 50 % / 10 % crossings within a pixel; a panning gobo beam does not smear (centroid within 0.75 px of a still image, brightness 0.9–1.1); 300 and 1000 beams report statistics and degrade quality above the budget, finite and validation-clean; golden `beams-stage` (gobo, cool spot, wash under a truss, prism, large-lens beam with lens glow); stage metering exposes the lit part below white; instance emission (uniform and directional) shows the lens luminance and its colour, bloom glare, non-finite input is ignored; two flame grids glow each with its own temperature (`BlackbodyRadiator`, 5 %) |
+| `BeamReviewTests` | radial gobos (a disc of 0.25 and of 0.7 of the gate, a ring 0.5–0.9) in the far field of a 6° point-source beam match the integral (4 %; measured ≤ 1.2 %); a 4° beam seen from 30 m, horizontal and diagonal, keeps its light summed across the shaft up to its lens (6 %; measured ≤ 1.6 %); the soft edge of a half-closed iris in the air (2 % of the axis value + 3 %); the eye inside a 40° wash, across and towards the source (5 %); the eye 20 m down a 6° beam looking back past and into the lens (centre 5 %, 16 × 16 pixels around the lens 5 %); a shadowed beam with nothing in it equals the unshadowed one in a single frame (0.05 % of the peak); temporal accumulation settles a gobo beam over the background (frame-to-frame change below half that of single frames); a flame atlas beyond its budget skips grids with a warning |
 | `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % (Full and Colorless) |
 | `PostTests` | golden `bloom`; the bloom image has the HDR image's energy (3 %), a halo appears and the source gives up light; auto exposure (average metering) converges to the trimmed-mean measurement (0.2 stop), follows a 4× brighter scene by 2 stops (adapting over time) and adds compensation; resolution scale 0.5 renders a quarter of the pixels, keeps the display size and picking (< 1 cm), clamps to [0.5, 1] |
 | `IndirectTests` | a red wall bleeds onto a white floor: red/green rises by more than 30 % against `Indirect = Off`, and the added luminance matches a CPU integral of the wall's reflected light (RSM within 12 %, ray-traced GI within 20 %, both measured on lavapipe); a red floor bleeds onto a white wall (RSM 5 %, ray-traced 10 %); fallbacks |

@@ -261,7 +261,7 @@ the range used is printed. A scene without a floor (MVR exports often contain on
 temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure defaults to an
 incident-light reading of the lit floor (`--ev auto`); `--ev` sets EV100, `--auto-exposure` lets the renderer adapt
 with its default **stage metering** (`ExposureMetering.Stage`: the lit part of the image — the 85th to 99th percentile
-of the luminance — placed 1.5 stops above middle grey, so light pools stay below white, beams in haze stay visible
+of the luminance — placed 1.5 stops below middle grey, so light pools stay below white, beams in haze stay visible
 and the dark venue stays dark; see docs/rendering.md, auto exposure).
 `render stages/Фокина.mvr --out f.png --width 480 --height 270` takes about 6 s on lavapipe.
 

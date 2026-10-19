@@ -167,9 +167,9 @@ public enum ExposureMetering
     /// <summary>
     /// Stage looks (the default): a dark venue with bright beams, pools and lenses. Meters the lit part of the image
     /// (mean log luminance between the 85th and 99th percentile, so the hottest 1 % — lenses, specular glints — does
-    /// not count) and places it one and a half stops above middle grey: light pools stay below white, beams in haze
-    /// stay visible and the dark venue is not lifted to grey. In an evenly lit view it exposes about 1.5 stops darker
-    /// than <see cref="Average"/>.
+    /// not count) and places it one and a half stops below middle grey (the EV100 is 1.5 above that part's reading):
+    /// light pools stay below white, beams in haze stay visible and the dark venue is not lifted to grey. In an evenly
+    /// lit view it exposes about 1.5 stops darker than <see cref="Average"/>.
     /// </summary>
     Stage,
 }

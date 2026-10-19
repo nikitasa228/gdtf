@@ -2,8 +2,8 @@
 #extension GL_GOOGLE_include_directive : require
 // Auto exposure, step 2 (one work group): the mean log2 luminance of the pixels between two percentiles of the
 // histogram. Average metering (draw.mode = METERING_AVERAGE): the 50th to 95th percentile (the dark venue and the
-// brightest highlights do not drive the exposure). Stage metering (METERING_STAGE): the 70th to 99th percentile, the lit
-// part of a dark stage without its hottest lenses; the renderer places it above middle grey. The CPU reads the
+// brightest highlights do not drive the exposure). Stage metering (METERING_STAGE): the 85th to 99th percentile, the lit
+// part of a dark stage without its hottest lenses; the renderer places it 1.5 stops below middle grey. The CPU reads the
 // result back a few frames later and adapts the exposure over time.
 
 #include "common.glsl"

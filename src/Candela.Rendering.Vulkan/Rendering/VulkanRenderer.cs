@@ -94,8 +94,9 @@ public sealed unsafe class VulkanRenderer : IRenderer
     public const float ExposureAdaptationSpeed = 1.5f;
 
     /// <summary>
-    /// Stops above middle grey at which <see cref="ExposureMetering.Stage"/> places the metered lit part of the image
-    /// (the 85th to 99th percentile of the luminance, exposure.comp): light pools well below white, beams in haze visible.
+    /// Stops below middle grey at which <see cref="ExposureMetering.Stage"/> places the metered lit part of the image
+    /// (the 85th to 99th percentile of the luminance, exposure.comp): the EV100 is this much higher than the reading of
+    /// that part, so light pools stay well below white and beams in haze stay visible.
     /// </summary>
     public const float StageMeteringStops = 1.5f;
 
