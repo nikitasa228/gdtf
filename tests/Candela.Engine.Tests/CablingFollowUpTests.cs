@@ -237,4 +237,27 @@ public sealed class CablingFollowUpTests
         Assert.Contains(tube, p => MathF.Abs(p.X) < 1f && p.Z < 0.6f + 0.0081f);
         Assert.Empty(world.Violations);
     }
+    [Fact]
+    public void Consoles_and_power_sources_are_drawn_at_the_device_catalogue_sizes()
+    {
+        using var engine = TestEnvironment.CreateEngine("device-sizes");
+        var desk = SceneBuilder.Console(engine.Scene, new Vector3(2, 3, 0));
+        var distro = new Entity("Distro") { Local = new Transform(new Vector3(-4, 1, 0.5f)) };
+        distro.Add(DeviceCatalog.Find("distro-32-true1")!.CreateComponent());
+        engine.Scene.Add(distro);
+        var world = new RecordingRenderWorld();
+        var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        engine.Tick(1.0 / 30);
+
+        Assert.True(sync.TryGetWorldBounds(desk.Id, out var deskBounds));
+        Assert.Equal(DeviceCatalog.ConsoleSize.X, deskBounds.Size.X, 4);
+        Assert.Equal(DeviceCatalog.ConsoleSize.Y, deskBounds.Size.Y, 4);
+        Assert.Equal(DeviceCatalog.ConsoleSize.Z, deskBounds.Size.Z, 4);
+        Assert.Equal(0f, deskBounds.Min.Z, 4); // standing on its origin
+        Assert.True(sync.TryGetWorldBounds(distro.Id, out var boxBounds));
+        Assert.Equal(DeviceCatalog.PowerSourceSize.X, boxBounds.Size.X, 4);
+        Assert.Equal(DeviceCatalog.PowerSourceSize.Y, boxBounds.Size.Y, 4);
+        Assert.Equal(DeviceCatalog.PowerSourceSize.Z, boxBounds.Size.Z, 4);
+        Assert.Equal(0.5f, boxBounds.Min.Z, 4);
+    }
 }
