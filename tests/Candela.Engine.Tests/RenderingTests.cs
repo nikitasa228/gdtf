@@ -53,6 +53,33 @@ public sealed class RenderingTests
     }
 
     [SkippableFact]
+    public void Cli_render_of_fokina_with_default_auto_exposure_keeps_pools_visible_and_the_venue_dark()
+    {
+        using (CreateRendererOrSkip())
+        {
+            // only probes for a device; the CLI creates its own renderer
+        }
+        string dir = TestEnvironment.NewTempDirectory("cli-render-auto");
+        string png = Path.Combine(dir, "fokina-auto.png");
+        var output = new StringWriter();
+        var error = new StringWriter();
+        int code = Cli.Program.Run(
+            ["render", TestEnvironment.Fokina, "--out", png, "--width", "480", "--height", "270",
+                "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root],
+            output, error);
+        Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
+        Assert.Contains("auto exposure", output.ToString(), StringComparison.Ordinal);
+        File.Copy(png, Path.Combine(OutputDirectory, "fokina-cli-auto.png"), overwrite: true);
+
+        Assert.True(ImageImporter.TryDecode(File.ReadAllBytes(png), out var image, out var problem), problem);
+        var (mean, bright) = Luminance(image!);
+        // stage metering places the lit band below white: the pools stay visible, the dark venue stays dark
+        Assert.True(mean > 0.02, $"the image is (nearly) black: mean luminance {mean:0.000}");
+        Assert.True(bright > 0.02, $"no lit pools: {bright:P1} bright pixels");
+        Assert.True(bright < 0.5, $"the venue is lit up like the stage: {bright:P1} bright pixels");
+    }
+
+    [SkippableFact]
     public void Cli_render_of_fokina_produces_a_lit_stage()
     {
         using (CreateRendererOrSkip())
@@ -77,7 +104,9 @@ public sealed class RenderingTests
                 "--library",
                 TestEnvironment.Root,
                 "--frames",
-                "4"],
+                "4",
+                "--ev",
+                "floor"],
             output, error);
         Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
         string text = output.ToString();
