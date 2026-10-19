@@ -315,4 +315,33 @@ public sealed class CablingFollowUpTests
         // the connection between two generic devices comes back as a cable plugged into the devices' ports
         Assert.Contains(other.NetworkSolution.Cables, c => c.Endpoints.Count(ep => ep.IsUsable && (ep.EntityId == splitter.Id || ep.EntityId == node.Id)) == 2);
     }
+    [Fact]
+    public void The_work_light_is_not_scattered_by_haze_while_stage_light_is()
+    {
+        using var engine = TestEnvironment.CreateEngine("work-light-haze");
+        var head = SceneBuilder.Fixture(engine.Scene, SceneBuilder.MacViper, "Basic", new Vector3(0, 0, 6));
+        SceneBuilder.Floor(engine.Scene);
+        var world = new RecordingRenderWorld();
+        var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        sync.WorkLight = WorkLightMode.On;
+        var fixture = head.Get<FixtureComponent>()!;
+        fixture.ManualAttributes["Dimmer"] = 1f;
+        fixture.NotifyChanged();
+        for (int i = 0; i < 10; i++) engine.Tick(1.0 / 30);
+
+        Assert.True(sync.IsWorkLightOn);
+        var stage = world.Lights.Where(l => l.FixtureId == head.Id).ToArray();
+        Assert.NotEmpty(stage);
+        Assert.All(stage, l => Assert.False(l.NoVolumetricScattering)); // fixture beams glow in haze
+        var work = world.Lights.Where(l => l.FixtureId == Guid.Empty).ToArray();
+        Assert.Equal(WorkLightRig.LightCount, work.Length);
+        Assert.All(work, l => Assert.True(l.NoVolumetricScattering)); // the work light only lights surfaces
+        Assert.Equal(work, sync.WorkLights.ToArray());
+
+        // the rig itself, whatever the bounds
+        Span<SpotLight> rig = stackalloc SpotLight[WorkLightRig.LightCount];
+        WorkLightRig.Write(Aabb.Empty, rig);
+        foreach (var l in rig) Assert.True(l.NoVolumetricScattering);
+        Assert.False(default(SpotLight).NoVolumetricScattering); // lights that do not set it scatter as before
+    }
 }
