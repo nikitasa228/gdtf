@@ -44,6 +44,9 @@ internal sealed unsafe partial class ViewportPanel
     private string _cableLabel = "";
     private float _cableLabelLength = float.NaN;
     private readonly CableToolLabels _cableLabels = new();
+    private readonly List<Guid> _devices = new();
+    private long _devicesVersion = -1;
+    private Engine.StageEngine? _devicesEngine;
 
     /// <summary>The cable tool's target under the mouse (last frame; tests).</summary>
     internal CableTarget CableTarget => _cableTarget;
@@ -153,6 +156,12 @@ internal sealed unsafe partial class ViewportPanel
             : null;
         if (entity is not null && entity.Get<CableComponent>() is null && DeviceOf(engine, entity) is { } device)
             return CableTarget.Device(device.Id, hit.Position);
+        // A ray through a gap of a device (between a yoke and its head, under a slim batten) still means the device,
+        // not the floor or the background far behind it.
+        var ray = Camera.RayThrough(mouse - _imageMin, _imageSize);
+        if ((entity is null || entity.Get<CableComponent>() is null) &&
+            DeviceAlongRay(engine, ray, Vector3.Distance(ray.Origin, hit.Position)) is var (near, entry))
+            return CableTarget.Device(near, entry);
         if (CableUnder(mouse, includeSegments: true, skipPlugged: true) is { } onCable)
             return onCable;
         if (entity is not null)
@@ -163,6 +172,44 @@ internal sealed unsafe partial class ViewportPanel
         }
 
         return CableTarget.Surface(hit.Position, hit.Normal, Guid.Empty);
+    }
+
+    /// <summary>
+    /// The device whose bounding box the ray enters first, nearer than <paramref name="limit"/> metres (the surface the
+    /// ray hits), with the entry point; null when there is none. The device list is rebuilt when the scene changes.
+    /// </summary>
+    private (Guid Device, Vector3 Entry)? DeviceAlongRay(Engine.StageEngine engine, Ray ray, float limit)
+    {
+        var session = _ctx.Session;
+        if (session.Content is not { } content || !float.IsFinite(ray.Direction.X))
+            return null;
+        var scene = session.Scene;
+        if (_devicesVersion != scene.Version || !ReferenceEquals(_devicesEngine, engine))
+        {
+            _devicesVersion = scene.Version;
+            _devicesEngine = engine;
+            _devices.Clear();
+            foreach (var e in scene.All())
+            {
+                if (e.IsVisibleInHierarchy && CablePorts.IsDevice(engine, e))
+                    _devices.Add(e.Id);
+            }
+        }
+
+        Guid best = Guid.Empty;
+        float bestT = float.IsFinite(limit) ? limit : float.MaxValue;
+        foreach (var id in _devices)
+        {
+            if (!content.TryGetBounds(id, out var box) || box.IsEmpty || box.Contains(ray.Origin))
+                continue;
+            if (box.Intersect(ray) is { } t && t < bestT)
+            {
+                bestT = t;
+                best = id;
+            }
+        }
+
+        return best == Guid.Empty ? null : (best, ray.At(bestT));
     }
 
     /// <summary>The device an entity belongs to (itself, or the fixture a picked part belongs to), or null.</summary>
@@ -410,15 +457,18 @@ internal sealed unsafe partial class ViewportPanel
         }
 
         int count = engine.Network.Ports.GetPorts(device).Count;
-        foreach (var c in _hoverPorts)
+        // Usable ports come first in the list: drawn last, so they stay on top where dots overlap.
+        for (int i = _hoverPorts.Count - 1; i >= 0; i--)
         {
+            var c = _hoverPorts[i];
             var world = CablePorts.WorldPosition(device, c.Port, c.Index, count);
             if (!Camera.WorldToScreen(world, _imageSize, out var s))
                 continue;
             s += _imageMin;
+            // Green: fits; amber: fits with an adapter; grey: in use or the wrong direction; red: does not fit.
             var fill = c.Usable
                 ? c.Check.Match == ConnectorMatch.NeedsAdapter ? Theme.Warning : Theme.Rgb(0x34D399)
-                : c.Occupant is not null ? Theme.Rgb(0x8E9196) : Theme.Error;
+                : c.Occupant is not null || c.WrongDirection ? Theme.Rgb(0x8E9196) : Theme.Error;
             drawList.AddCircleFilled(s, 4.5f * scale, Theme.U32(fill), 14);
             drawList.AddCircle(s, 4.5f * scale, Theme.U32(Theme.Rgb(0x16171A)), 14, 1.2f * scale);
         }

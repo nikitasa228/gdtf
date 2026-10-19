@@ -364,7 +364,7 @@ internal static class CableLoc
         (CableStr.LockConsoleCable, "Locked: driven by console '{0}' ({1} · cable {2}, universe {3}).",
             "Заблокировано: прибором управляет пульт «{0}» ({1} · кабель {2}, юниверс {3})."),
 
-        (CableStr.LegendInScene, "{0} × · {1} m · {2} kg", "{0} шт. · {1} м · {2} кг"),
+        (CableStr.LegendInScene, "{0} pcs · {1} m · {2} kg", "{0} шт. · {1} м · {2} кг"),
         (CableStr.LegendOthers, "Other cable types", "Другие типы кабелей"),
 
         (CableStr.SettingsEditing, "Editing", "Правка"),
@@ -438,6 +438,23 @@ internal static class CableLoc
         ArgumentNullException.ThrowIfNull(type);
         return Loc.Language == "ru" && RussianCables.TryGetValue(type.Id, out var ru) ? ru : type.DisplayName;
     }
+
+    /// <summary>
+    /// The name of a connector in the UI language: the generic terminations ("Loose end", "Terminal block", "Fixed
+    /// cable") are translated; connector models keep their catalogue name.
+    /// </summary>
+    public static string ConnectorName(ConnectorInfo connector)
+    {
+        ArgumentNullException.ThrowIfNull(connector);
+        return Loc.Language == "ru" && RussianConnectors.TryGetValue(connector.Id, out var ru) ? ru : connector.DisplayName;
+    }
+
+    private static readonly Dictionary<string, string> RussianConnectors = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Loose End"] = "Свободный конец",
+        ["Terminal Block"] = "Клеммная колодка",
+        ["Fixed Cable"] = "Несъёмный кабель",
+    };
 
     /// <summary>The name of a device preset in the UI language.</summary>
     public static string DeviceName(DevicePreset preset)

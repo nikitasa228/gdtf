@@ -92,7 +92,7 @@ internal static class PortPicker
         string extra = port.Universe is { } u
             ? port.UniverseCount > 1 ? $" · U{u}–{u + port.UniverseCount - 1}" : $" · U{u}"
             : port.BreakerA is { } breaker ? $" · {breaker:0} {StageUnits.Current.Ampere}" : "";
-        return $"{port.Connector.DisplayName} · {direction}{extra}";
+        return $"{CableLoc.ConnectorName(port.Connector)} · {direction}{extra}";
     }
 
     /// <summary>What keeps a port from being chosen (or the adapter it needs), with the full reason for the tooltip.</summary>

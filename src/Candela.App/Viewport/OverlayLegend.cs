@@ -291,12 +291,20 @@ internal sealed class OverlayLegend
         ConnectorIcons.Draw(dl, icon, swatch, type.ConnectorA.IllustrationKey);
         ImGui.Dummy(new Vector2(swatch, swatch));
         ImGui.SameLine();
+        float textX = ImGui.GetCursorPosX();
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.WithAlpha(Theme.Text, alpha));
         ImGui.TextUnformatted(name);
         ImGui.PopStyleColor();
         if (detail is not null)
         {
+            // Beside the name when it fits, else on its own line under the name.
             ImGui.SameLine();
+            if (ImGui.GetContentRegionAvail().X < ImGui.CalcTextSize(detail).X)
+            {
+                ImGui.NewLine();
+                ImGui.SetCursorPosX(textX);
+            }
+
             ImGui.TextDisabled(detail);
         }
     }
