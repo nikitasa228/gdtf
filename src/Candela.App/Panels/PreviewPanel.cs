@@ -25,6 +25,8 @@ internal sealed class PreviewPanel : Panel
     private static readonly string[] ShadowResolutionLabels = { "512", "1024", "2048", "4096" };
     private static readonly int[] SliceCounts = { 64, 96, 128, 192, 256 };
     private static readonly string[] SliceLabels = { "64", "96", "128", "192", "256" };
+    private static readonly int[] BeamCounts = { 0, 256, 1024, 4096, 8192 };
+    private static readonly string[] BeamLabels = { "0", "256", "1024", "4096", "8192" };
     private static readonly StageStr[] IndirectModes = { StageStr.PreviewIndirectOff, StageStr.PreviewIndirectRsm, StageStr.PreviewIndirectRayTraced };
 
     private readonly StagePanelContext _stage;
@@ -119,8 +121,7 @@ internal sealed class PreviewPanel : Panel
             }
 
             PropertyGrid.Row(StageLoc.Get(StageStr.PreviewRaymarchedBeams));
-            int beams = p.MaxRaymarchedBeams;
-            if (ImGui.SliderInt("##beams", ref beams, 0, 64))
+            if (Choice("##beams", BeamLabels, BeamCounts, p.MaxRaymarchedBeams, out int beams))
             {
                 p.MaxRaymarchedBeams = beams;
                 edited = true;
@@ -178,6 +179,28 @@ internal sealed class PreviewPanel : Panel
                 edited = true;
             }
 
+            ImGui.BeginDisabled(!p.AutoExposure);
+            PropertyGrid.Row(StageLoc.Get(StageStr.PreviewMetering));
+            bool stage = p.Metering == ExposureMetering.Stage;
+            if (ImGui.BeginCombo("##metering", StageLoc.Get(stage ? StageStr.PreviewMeteringStage : StageStr.PreviewMeteringAverage)))
+            {
+                if (ImGui.Selectable(StageLoc.Get(StageStr.PreviewMeteringStage), stage) && !stage)
+                {
+                    p.Metering = ExposureMetering.Stage;
+                    edited = true;
+                }
+
+                if (ImGui.Selectable(StageLoc.Get(StageStr.PreviewMeteringAverage), !stage) && stage)
+                {
+                    p.Metering = ExposureMetering.Average;
+                    edited = true;
+                }
+
+                ImGui.EndCombo();
+            }
+
+            ImGui.EndDisabled();
+
             PropertyGrid.Row(Loc.Get(Str.PreviewExposure));
             float trim = p.ExposureCompensation;
             if (ImGui.SliderFloat("##ev", ref trim, -6f, 6f, "%+.1f EV"))
@@ -216,7 +239,7 @@ internal sealed class PreviewPanel : Panel
         foreach (var key in new[]
                  {
                      StageStr.PreviewShadowResolution, StageStr.PreviewShadowedLights, StageStr.PreviewSlices, StageStr.PreviewRaymarchedBeams,
-                     StageStr.PreviewTemporal, StageStr.PreviewBloomIntensity, StageStr.PreviewCameraEv, StageStr.PreviewHaze,
+                     StageStr.PreviewTemporal, StageStr.PreviewMetering, StageStr.PreviewBloomIntensity, StageStr.PreviewCameraEv, StageStr.PreviewHaze,
                      StageStr.PreviewHazeAnisotropy, StageStr.PreviewAmbient, StageStr.PreviewGrid, StageStr.PreviewGridSpacing,
                  })
             yield return StageLoc.Get(key);

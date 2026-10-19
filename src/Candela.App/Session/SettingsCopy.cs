@@ -10,6 +10,9 @@ namespace Candela.App.Session;
 /// </summary>
 internal static class SettingsCopy
 {
+    /// <summary>Most volumetric beams the renderer integrates per pixel (<see cref="PreviewSettings.MaxRaymarchedBeams"/>).</summary>
+    public const int MaxVolumetricBeams = 8192;
+
     /// <summary>Copies every value of <paramref name="from"/> into <paramref name="to"/>.</summary>
     public static void Copy(PreviewSettings from, PreviewSettings to)
     {
@@ -30,6 +33,7 @@ internal static class SettingsCopy
         to.BloomIntensity = from.BloomIntensity;
         to.ToneMapper = from.ToneMapper;
         to.AutoExposure = from.AutoExposure;
+        to.Metering = from.Metering;
         to.ExposureCompensation = from.ExposureCompensation;
     }
 
@@ -83,13 +87,15 @@ internal static class SettingsCopy
         s.ShadowMapResolution = Math.Clamp(s.ShadowMapResolution, 256, 8192);
         s.MaxShadowedLights = Math.Clamp(s.MaxShadowedLights, 0, 256);
         s.VolumetricSlices = Math.Clamp(s.VolumetricSlices, 16, 256);
-        s.MaxRaymarchedBeams = Math.Clamp(s.MaxRaymarchedBeams, 0, 128);
+        s.MaxRaymarchedBeams = Math.Clamp(s.MaxRaymarchedBeams, 0, MaxVolumetricBeams);
         s.BloomIntensity = Finite(s.BloomIntensity, 0.04f, 0f, 1f);
         s.ExposureCompensation = Finite(s.ExposureCompensation, 0f, -10f, 10f);
         if (!Enum.IsDefined(s.Indirect))
             s.Indirect = IndirectLighting.ReflectiveShadowMaps;
         if (!Enum.IsDefined(s.ToneMapper))
             s.ToneMapper = ToneMapper.AgX;
+        if (!Enum.IsDefined(s.Metering))
+            s.Metering = ExposureMetering.Stage;
         return s;
     }
 

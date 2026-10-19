@@ -69,6 +69,18 @@ public sealed partial class PresetsAndOverlayTests
     }
 
     [Fact]
+    public void Sanitizing_keeps_the_renderer_s_volumetric_beam_budget_and_metering()
+    {
+        var defaults = SettingsCopy.Sanitized(new PreviewSettings());
+        Assert.Equal(new PreviewSettings().MaxRaymarchedBeams, defaults.MaxRaymarchedBeams); // 4096, not cut to a ray-march budget
+        Assert.Equal(ExposureMetering.Stage, defaults.Metering);
+        var huge = SettingsCopy.Sanitized(new PreviewSettings { MaxRaymarchedBeams = 1_000_000, Metering = (ExposureMetering)99 });
+        Assert.Equal(SettingsCopy.MaxVolumetricBeams, huge.MaxRaymarchedBeams);
+        Assert.Equal(ExposureMetering.Stage, huge.Metering);
+        Assert.Equal(ExposureMetering.Average, SettingsCopy.Sanitized(new PreviewSettings { Metering = ExposureMetering.Average }).Metering);
+    }
+
+    [Fact]
     public void Settings_copies_cover_every_property()
     {
         var preview = new PreviewSettings
@@ -86,12 +98,13 @@ public sealed partial class PresetsAndOverlayTests
             BloomIntensity = 0.2f,
             ToneMapper = ToneMapper.Aces,
             AutoExposure = true,
+            Metering = ExposureMetering.Average,
             ExposureCompensation = -2f,
         };
         var copy = new PreviewSettings();
         SettingsCopy.Copy(preview, copy);
         Assert.Equal(CandelaJson.Serialize(preview), CandelaJson.Serialize(copy));
-        Assert.Equal(14, typeof(PreviewSettings).GetProperties().Length);
+        Assert.Equal(15, typeof(PreviewSettings).GetProperties().Length);
 
         var final = new FinalRenderSettings
         {

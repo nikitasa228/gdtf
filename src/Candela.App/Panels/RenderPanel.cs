@@ -469,7 +469,7 @@ internal sealed unsafe class RenderPanel : Panel
         q.MaxShadowedLights = 256;
         q.Volumetrics = true;
         q.VolumetricSlices = 256;
-        q.MaxRaymarchedBeams = Math.Max(q.MaxRaymarchedBeams, 64);
+        q.MaxRaymarchedBeams = SettingsCopy.MaxVolumetricBeams;
         q.TemporalAccumulation = true;
         if (q.Indirect == IndirectLighting.Off)
             q.Indirect = IndirectLighting.ReflectiveShadowMaps;
