@@ -288,8 +288,8 @@ file name in any case. Each tile shows the fixture's **3D thumbnail** with its n
 window) hands the file to the engine, which reads it completely first: a file that is not a GDTF archive, has no
 readable `description.xml` or defines no DMX mode is refused, and the message says why (*"The file was not added to
 the fixture library. 'x.gdtf' is not a readable GDTF file: …"*), so the library never lists a type that cannot be
-placed. An accepted file — or one the library already has — is **selected**: the Library panel comes forward on the
-Fixtures tab, a category or search that would hide it is cleared, the grid scrolls its tile into view and frames it
+placed. An accepted file — or one the library already has, which the status bar then says instead of claiming it was
+added — is **selected**: the Library panel comes forward on the Fixtures tab, a category or search that would hide it is cleared, the grid scrolls its tile into view and frames it
 in orange (an older revision selects its model's tile, the newest). The panel follows the engine's
 `FixtureLibraryChanged` event, so the grid, the category counts, the Devices section and the hover facts are rebuilt
 whenever GDTF files reach the library — imported ones, the GDTFs embedded in an opened or imported MVR, the GDTF copies
@@ -935,7 +935,9 @@ are localised); changes of the view settings count as unsaved changes but are no
   arguments: a fixture, file or folder name with `%s` or `%n` in it (or a translated "17 %") would print stack garbage
   or crash the process. Every text the editor shows goes through `SafeText` (`Disabled`, `Colored`, `Wrapped`,
   `Bullet`, `Tooltip` — all `TextUnformatted`) or `TextUnformatted` itself; a test scans the sources so the format
-  variants stay unused, and the only format strings left are the editor's own number formats of sliders. Names in
+  variants stay unused — it reads the list of format functions (every function with a `fmt` parameter, `TextAligned`
+  and the two-argument `TreeNode` included) from the binding itself, so a function added by a binding update is
+  checked too —, and the only format strings left are the editor's own number formats of sliders. Names in
   widget labels and combo previews (files and folders in the file browser, recent files, issue messages, DMX modes and
   channel sets, preset, recording, device, connector and network adapter names) go through `SafeText.Label`, which
   breaks a "##" with a hair space so ImGui does not cut the name off as an ID suffix.
@@ -1068,7 +1070,9 @@ changes). Allocations happen on user actions (edits, opening menus and dialogs, 
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 600 tests, under three minutes) covers everything that does not need a window:
+`tests/Candela.App.Tests` (xUnit, about 600 tests, under three minutes; the end-to-end runs whose checks do not depend
+on lit pixels use Colorless shading, since on lavapipe the lit preview of a dark rig — with the Auto work light's
+shadowed key — takes about twice the frame time) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
 the view cube (projection, hit testing, snapping to the six views, neighbour arrows, no allocations), navigation
 styles, selection rules (including box selection of enclosed objects only), edit operations and undo grouping, gizmo
@@ -1145,7 +1149,11 @@ served, warnings and the last malformed packet; a real Art-Net / OSC port confli
 re-rendered in English after a language switch; the recorder's capture description), the timecode test in
 `PanelReviewTests` (the sender of an ArtTimeCode — 127.0.0.1 and its port — and of a playing recording by name, in both
 languages), `MvrWallsFollowUpTests` (walls and floors exported to MVR and opened again with kind, size and material, no
-box models), `SafeTextTests` (no printf-style ImGui call in the sources; `SafeText.Label` keeps names with "##" whole;
+box models), `ViewportBoundsReviewTests` (on Фокина with the heads moved by DMX, every entity's box, the scene box, the
+framing points and the outline of nested groups are exactly what the renderer was sent — the bookkeeping of the former
+`TrackedRenderWorld`, kept as a recording world in the test), `EditorFollowUpReviewTests` (an opened MVR or project shown
+by the Preview and Render panels and the legends in both languages is not an unsaved change), `SafeTextTests` (no
+printf-style ImGui call in the sources; `SafeText.Label` keeps names with "##" whole;
 properties, cable links, the recorder, the file browser and the helpers render names, labels and paths with
 `%s %n %%` literally, read back through Dear ImGui's text log) and `SafeTextEndToEndTests` (the real editor under
 `xvfb-run`: a project in a folder `Stage %s %n %%` with such names opened, a fixture selected, a GDTF of that name
