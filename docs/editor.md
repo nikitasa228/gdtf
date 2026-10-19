@@ -374,7 +374,7 @@ universe) and **Send Art-Net test** (below). The tabs:
 
 ![Внешняя связь, русский интерфейс, 150 %](images/editor-external-control-ru.png)
 
-*External Control in Russian at 150 % while the test show runs.*
+*External Control in Russian at 150 % while the test show runs: universe activity and the slot values of universe 1.*
 
 The protocol settings are stored in `external-control.json` in the config folder (enabled protocols, ports, options,
 merge mode, test target); the network interface and the Art-Net universe offset are the ones of *Settings → Network*.

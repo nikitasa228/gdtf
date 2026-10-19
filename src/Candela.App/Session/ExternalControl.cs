@@ -491,7 +491,7 @@ internal sealed class ExternalControl : IDisposable
         ArgumentNullException.ThrowIfNull(engine);
         if (engine.Recorder.IsRecording)
             return;
-        string name = string.Create(CultureInfo.InvariantCulture, $"Recording {DateTime.Now:yyyy-MM-dd HH-mm-ss}");
+        string name = StageLoc.Format(StageStr.ExtRecordingName, DateTime.Now);
         engine.Recorder.Start(engine.Time, name);
         Report(StageLoc.Get(StageStr.ExtRecordingStarted), error: false);
     }
