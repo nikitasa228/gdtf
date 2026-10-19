@@ -316,26 +316,26 @@ public static class DeviceCatalog
 
     private static DevicePreset Mains(string id, string name, string shortName, string description, int phases,
         (string Port, string Connector, float Breaker, int Phase) outlet) => new()
-    {
-        Id = id,
-        Group = DeviceGroup.Mains,
-        Kind = DevicePresetKind.PowerSource,
-        Name = name,
-        ShortName = shortName,
-        Description = description,
-        IconKey = "mains",
-        SizeM = PowerSourceSize,
-        Factory = () => new PowerSourceComponent
         {
-            VoltageV = 230f,
-            FrequencyHz = 50f,
-            Phases = phases,
-            Outlets = new List<PowerOutlet>
+            Id = id,
+            Group = DeviceGroup.Mains,
+            Kind = DevicePresetKind.PowerSource,
+            Name = name,
+            ShortName = shortName,
+            Description = description,
+            IconKey = "mains",
+            SizeM = PowerSourceSize,
+            Factory = () => new PowerSourceComponent
+            {
+                VoltageV = 230f,
+                FrequencyHz = 50f,
+                Phases = phases,
+                Outlets = new List<PowerOutlet>
             {
                 new() { PortName = outlet.Port, Connector = outlet.Connector, BreakerA = outlet.Breaker, Phase = outlet.Phase },
             },
-        },
-    };
+            },
+        };
 
     private static DevicePreset Distro(string id, string name, int phases, string description, (string, string, float, int)[] outlets) => new()
     {

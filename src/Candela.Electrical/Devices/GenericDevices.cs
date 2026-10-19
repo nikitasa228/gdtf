@@ -108,7 +108,13 @@ public static class GenericDevices
     /// <summary>Mains networks of a universal (100–240 V) power supply.</summary>
     public static readonly IReadOnlyList<string> UniversalMains =
     [
-        "100 V - 50 Hz", "100 V - 60 Hz", "110/120 V - 60 Hz", "110/120 V - 50 Hz", "220/230 V - 50 Hz", "220/230 V - 60 Hz", "240/245 V - 50 Hz",
+        "100 V - 50 Hz",
+        "100 V - 60 Hz",
+        "110/120 V - 60 Hz",
+        "110/120 V - 50 Hz",
+        "220/230 V - 50 Hz",
+        "220/230 V - 60 Hz",
+        "240/245 V - 50 Hz",
     ];
 
     private static readonly IReadOnlyList<string> EuropeanMains = ["220/230 V - 50 Hz", "220/230 V - 60 Hz", "240/245 V - 50 Hz"];

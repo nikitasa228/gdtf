@@ -1,7 +1,7 @@
 using Candela.App.Editing;
 using Candela.App.Panels;
-using Candela.App.Settings;
 using Candela.App.Session;
+using Candela.App.Settings;
 using Candela.App.Ui;
 using Candela.Core.Settings;
 using Candela.Electrical;
