@@ -179,7 +179,7 @@ public sealed class DmxInputHub
                 var now = _clock();
                 foreach (var (n, u) in _universes)
                 {
-                    ExpireSources(u, now, notify: false);
+                    ExpireSources(u, now, n); // the observers already registered hear about a timeout found here
                     if (u.Sources.Count == 0) continue;
                     if (u.Dirty) Merge(u);
                     observer.OnUniverse(n, u.Merged, live: true, now);
@@ -272,7 +272,7 @@ public sealed class DmxInputHub
     /// Drops the sources of <paramref name="u"/> that timed out; observers are told (at the moment the last of them timed
     /// out) when <paramref name="universe"/> is given.
     /// </summary>
-    private void ExpireSources(UniverseState u, DateTime now, int universe = 0, bool notify = true)
+    private void ExpireSources(UniverseState u, DateTime now, int universe = 0)
     {
         List<DmxSourceId>? dead = null;
         DateTime expiredAt = default;
@@ -286,7 +286,7 @@ public sealed class DmxInputHub
         if (dead is null) return;
         foreach (var id in dead) u.Sources.Remove(id);
         u.Dirty = true;
-        if (notify && universe > 0 && _observers.Length > 0) Notify(universe, u, expiredAt);
+        if (universe > 0 && _observers.Length > 0) Notify(universe, u, expiredAt);
     }
 
     private void Merge(UniverseState u)
