@@ -12,14 +12,23 @@ public sealed partial class StageEngine
 
     private AutosaveService? _autosave;
     private AutosaveOptions? _autosaveOptions;
+    private AutosaveOptions? _autosaveTemplate;
+    private bool _autosaveEnabled = true;
     private RecoverableSession? _recovered;
     private long _autosavedVersion = -1;
     private long _assetEdits;
     private long _autosavedAssetEdits = -1;
     private string? _autosavedSettings;
+    private long _autosavedSettingsVersion = -1;
 
     /// <summary>The autosave session of the open project, or null when autosave is off (see <see cref="EnableAutosave"/>).</summary>
     public AutosaveService? Autosave => _autosave;
+
+    /// <summary>True when autosave is set up (<see cref="EnableAutosave"/>) and not paused by <see cref="ConfigureAutosave"/>.</summary>
+    public bool IsAutosaveEnabled => _autosaveOptions is not null && _autosaveEnabled;
+
+    /// <summary>The autosave interval in use (or last used), or null when autosave was never set up.</summary>
+    public TimeSpan? AutosaveInterval => _autosaveOptions?.Interval ?? _autosaveTemplate?.Interval;
 
     /// <summary>
     /// Saves the project to <see cref="ProjectPath"/>. Fails (with an issue) when the scene has never been saved: the
@@ -63,6 +72,7 @@ public sealed partial class StageEngine
             _autosavedVersion = _scene.Version;
             _autosavedAssetEdits = _assetEdits;
             _autosavedSettings = AutosaveSettingsKey();
+            _autosavedSettingsVersion = SettingsVersion;
             _ = _autosave.MarkSaved();
         }
         else if (_recovered is not null)
@@ -93,9 +103,57 @@ public sealed partial class StageEngine
         ArgumentNullException.ThrowIfNull(options);
         ObjectDisposedException.ThrowIf(_disposed, this);
         CloseAutosaveSession(complete: false);
+        _autosaveTemplate = options;
+        _autosaveEnabled = true;
         _autosaveOptions = options.Interval > TimeSpan.Zero ? options : null;
         StartAutosaveSession();
     }
+
+    /// <summary>
+    /// Changes the autosave interval and pauses or resumes autosave <b>without</b> ending the running session: its files,
+    /// lock and <see cref="AutosaveService.SessionKey"/> stay, so changing the setting never leaves a session behind that
+    /// would be offered as a crash at the next start. Projects opened later use the same values. When autosave was never
+    /// set up (or was turned off with <see cref="DisableAutosave"/>), enabling it starts a session with the options last
+    /// given to <see cref="EnableAutosave"/> (else the defaults). A non-positive <paramref name="interval"/> pauses
+    /// autosave and keeps the previous interval.
+    /// </summary>
+    /// <param name="enabled">False pauses autosave (the session stays open; explicit saves still work).</param>
+    /// <param name="interval">Time between autosaves.</param>
+    public void ConfigureAutosave(bool enabled, TimeSpan interval)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        bool validInterval = interval > TimeSpan.Zero;
+        if (!validInterval) enabled = false;
+        if (_autosaveOptions is null)
+        {
+            var template = _autosaveTemplate ?? AutosaveOptions.Default;
+            // a session started here is a new one: the engine resumes a recovered session by itself (Recover)
+            _autosaveTemplate = CopyOptions(template, validInterval ? interval : template.Interval, resume: null);
+            if (!enabled || _autosaveTemplate.Interval <= TimeSpan.Zero) return;
+            _autosaveEnabled = true;
+            _autosaveOptions = _autosaveTemplate;
+            StartAutosaveSession();
+            return;
+        }
+        if (validInterval && interval != _autosaveOptions.Interval)
+        {
+            _autosaveOptions = CopyOptions(_autosaveOptions, interval, _autosaveOptions.Resume);
+            _autosaveTemplate = _autosaveOptions;
+            if (_autosave is not null) _autosave.Interval = interval;
+        }
+        _autosaveEnabled = enabled;
+        if (_autosave is not null) _autosave.Enabled = enabled;
+    }
+
+    private static AutosaveOptions CopyOptions(AutosaveOptions options, TimeSpan interval, RecoverableSession? resume) => new()
+    {
+        Directory = options.Directory,
+        Interval = interval,
+        KeepCount = options.KeepCount,
+        CompressionLevel = options.CompressionLevel,
+        TimeProvider = options.TimeProvider,
+        Resume = resume,
+    };
 
     /// <summary>
     /// Stops autosaving. <paramref name="completeSession"/> (a clean exit or close) deletes the session's recovery files;
@@ -205,7 +263,7 @@ public sealed partial class StageEngine
             if (Library.FindByFileName(name) is not null || _project.FindGdtf(name) is not { } bytes) continue;
             if (ExtractGdtf(name, bytes, issues) is { } file) paths.Add(file);
         }
-        if (paths.Count > 0 && Library.AddFiles(paths) > 0) ReloadFixtureTypes();
+        AddGdtfsToLibrary(paths, FixtureLibraryChangeSource.Project);
     }
 
     private ProjectSaveOptions SaveOptions() => new() { GdtfProvider = LibraryGdtf };
@@ -246,19 +304,12 @@ public sealed partial class StageEngine
         _autosavedVersion = _scene.Version;
         _autosavedAssetEdits = _assetEdits;
         _autosavedSettings = AutosaveSettingsKey();
+        _autosavedSettingsVersion = SettingsVersion;
         if (_recovered is { } resume && (resume.ProjectId == Guid.Empty || resume.ProjectId == _project.Id))
-            options = new AutosaveOptions
-            {
-                Directory = options.Directory,
-                Interval = options.Interval,
-                KeepCount = options.KeepCount,
-                CompressionLevel = options.CompressionLevel,
-                TimeProvider = options.TimeProvider,
-                Resume = resume,
-            };
+            options = CopyOptions(options, options.Interval, resume);
         try
         {
-            _autosave = new AutosaveService(_project.Id, CaptureAutosave, options);
+            _autosave = new AutosaveService(_project.Id, CaptureAutosave, options) { Enabled = _autosaveEnabled };
             _autosave.Failed += e => Issues.Report(new Issue(IssueSeverity.Warning, IssueCategory.Program, EngineIssueCodes.SaveFailed,
                 $"Autosave failed: {e.Message}"));
         }
@@ -295,9 +346,11 @@ public sealed partial class StageEngine
     private ProjectSnapshot? CaptureAutosave()
     {
         string settings = AutosaveSettingsKey();
-        if (_scene.Version == _autosavedVersion && _assetEdits == _autosavedAssetEdits && settings == _autosavedSettings) return null;
+        if (_scene.Version == _autosavedVersion && _assetEdits == _autosavedAssetEdits && SettingsVersion == _autosavedSettingsVersion
+            && settings == _autosavedSettings) return null;
         _autosavedVersion = _scene.Version;
         _autosavedAssetEdits = _assetEdits;
+        _autosavedSettingsVersion = SettingsVersion;
         _autosavedSettings = settings;
         WriteSettingsSections();
         return ProjectSnapshot.Capture(_project, SaveOptions());

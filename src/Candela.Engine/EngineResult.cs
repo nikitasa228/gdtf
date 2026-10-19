@@ -1,4 +1,5 @@
 using Candela.Core.Diagnostics;
+using Candela.Gdtf;
 
 namespace Candela.Engine;
 
@@ -14,6 +15,12 @@ namespace Candela.Engine;
 /// <param name="Entities">Entities created by the operation (import, open), for selection and undo.</param>
 public sealed record EngineResult(bool Success, string Summary, IReadOnlyList<Issue> Issues, IReadOnlyList<Guid> Entities)
 {
+    /// <summary>
+    /// The fixture-library entry the operation added or found (import of a <c>.gdtf</c> file), so the editor can select
+    /// it in the library; null for other operations.
+    /// </summary>
+    public FixtureLibraryEntry? LibraryEntry { get; init; }
+
     /// <summary>A successful result without issues or entities.</summary>
     public static EngineResult Ok(string summary) => new(true, summary, Array.Empty<Issue>(), Array.Empty<Guid>());
 
@@ -78,4 +85,7 @@ public static class EngineIssueCodes
 
     /// <summary>Fixtures that stood in for a missing model were switched to its GDTF, which the library now has.</summary>
     public const string SubstituteReplaced = "engine.substitute-replaced";
+
+    /// <summary>An imported GDTF file was read with warnings (unknown values, dangling references; defaults used).</summary>
+    public const string GdtfWarnings = "engine.gdtf-warnings";
 }
