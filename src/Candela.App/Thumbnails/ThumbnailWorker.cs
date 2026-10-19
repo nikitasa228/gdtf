@@ -175,9 +175,11 @@ internal sealed class ThumbnailWorker : IDisposable
                         _ => RenderFixture(request, ref renderer, ref thumbnails),
                     };
                 }
-                catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+                catch (Exception e) when (e is not (StackOverflowException or AccessViolationException))
                 {
-                    // One bad file never stops the others: the panel shows an icon for it.
+                    // One bad file never stops the others: the panel shows an icon for it. An image too large to decode
+                    // (OutOfMemoryException of its pixel buffer) is such a file too — on this thread it would otherwise
+                    // end the whole program.
                     _log.Warn("Library", $"No picture for '{request.Entry?.FileName ?? request.Path}': {e.Message}");
                 }
 
@@ -193,8 +195,16 @@ internal sealed class ThumbnailWorker : IDisposable
         }
         finally
         {
-            thumbnails?.Dispose();
-            renderer?.Dispose();
+            try
+            {
+                thumbnails?.Dispose();
+                renderer?.Dispose();
+            }
+            catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+            {
+                // An exception leaving this thread would end the program; the device is gone with the process anyway.
+                _log.Warn("Library", $"The thumbnail renderer could not be released: {e.Message}");
+            }
         }
     }
 

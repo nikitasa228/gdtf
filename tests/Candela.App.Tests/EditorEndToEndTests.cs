@@ -143,6 +143,30 @@ public sealed class EditorEndToEndTests : IDisposable
         Assert.True(EditorProcess.LoadPng(placed).Width == 1600);
     }
 
+    [SkippableFact]
+    public void Dragging_the_grown_hover_card_places_the_fixture_it_shows()
+    {
+        // Two columns of tiles at the default size: the third tile (row 2, column 1) grows a card upward over the first
+        // row; pressing on the card's picture — above the first tile — and dragging must place the third fixture.
+        var latest = EngineTestSupport.Library.Entries.Where(e => EngineTestSupport.Library.IsLatestRevision(e)).ToList();
+        string shown = latest[2].FileName, underneath = latest[0].FileName;
+        string script = _dir.Write("card.json", $$"""
+            { "actions": [
+                { "type": "wait", "frames": 4 },
+                { "type": "move", "x": 70, "y": 560 },
+                { "type": "wait", "frames": 30 },
+                { "type": "move", "x": 90, "y": 420 },
+                { "type": "wait", "frames": 3 },
+                { "type": "drag", "x": 90, "y": 420, "toX": 760, "toY": 560, "steps": 14 },
+                { "type": "wait", "frames": 3 }
+            ] }
+            """);
+        var run = EditorProcess.Run(_dir, new[] { "--screenshot", _dir.File("end.png"), "--script", script });
+        Assert.True(run.ExitCode == ExitCodes.Ok, run.Output);
+        Assert.Contains($"Placed '{shown}'", run.Output);
+        Assert.DoesNotContain($"Placed '{underneath}'", run.Output);
+    }
+
     private static string Json(string path) => path.Replace("\\", "/");
 
     /// <summary>Everything that must survive saving and reopening, sorted (ids, hierarchy, transforms, fixture data).</summary>

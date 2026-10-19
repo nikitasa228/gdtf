@@ -150,7 +150,7 @@ internal sealed partial class Workspace
     private void ShowExport() => _browser.Show(FileBrowserMode.Save, Loc.Get(Str.BrowserExportTitle), new[] { Named(MvrFilter, Str.BrowserMvr) },
         StartFolder(), SuggestedName() + ".mvr", ExportMvr);
 
-    private string? StartFolder() => _ctx.Session.FilePath is { } p ? Path.GetDirectoryName(p) : null;
+    private string? StartFolder() => (_ctx.Session.FilePath ?? _ctx.Session.SourcePath) is { } p ? Path.GetDirectoryName(p) : null;
 
     private static FileFilter Named(FileFilter f, Str name) => new(Loc.Get(name), f.Patterns.ToArray());
 

@@ -36,28 +36,39 @@ internal sealed class FixtureInfoCache
     public static readonly Aabb DefaultBounds = new(new Vector3(-0.2f, -0.18f, -0.55f), new Vector3(0.2f, 0.18f, 0f));
 
     private readonly FixtureLibrary _library;
-    private readonly ConcurrentDictionary<string, Task<FixtureInfo>> _tasks = new(StringComparer.Ordinal);
+    // Keyed by the entry object (a library entry is immutable; a changed file gives a new entry), so the per-frame
+    // lookups of the hover card and the drop preview do not allocate.
+    private readonly ConcurrentDictionary<FixtureLibraryEntry, Task<FixtureInfo>> _tasks = new(ReferenceEqualityComparer.Instance);
+    private readonly Func<FixtureLibraryEntry, Task<FixtureInfo>> _start;
 
     /// <summary>Creates a cache over <paramref name="library"/>.</summary>
     public FixtureInfoCache(FixtureLibrary library)
     {
         _library = library ?? throw new ArgumentNullException(nameof(library));
+        _start = entry => Task.Run(() => Read(_library, entry));
     }
 
     /// <summary>The information of <paramref name="entry"/>, or null while it is being read (the read starts now).</summary>
     public FixtureInfo? Get(FixtureLibraryEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        var task = _tasks.GetOrAdd(Key(entry), _ => Task.Run(() => Read(_library, entry)));
-        return task.IsCompletedSuccessfully ? task.Result : null;
+        var task = _tasks.GetOrAdd(entry, _start);
+        return task.IsCompletedSuccessfully ? task.Result : task.IsFaulted ? Unreadable(task) : null;
     }
 
     /// <summary>The information of <paramref name="entry"/>, waiting for it (tests, and a drop that needs the modes now).</summary>
     public FixtureInfo GetNow(FixtureLibraryEntry entry, TimeSpan timeout)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        var task = _tasks.GetOrAdd(Key(entry), _ => Task.Run(() => Read(_library, entry)));
-        return task.Wait(timeout) ? task.Result : new FixtureInfo(Array.Empty<FixtureModeInfo>(), DefaultBounds, "timeout");
+        var task = _tasks.GetOrAdd(entry, _start);
+        try
+        {
+            return task.Wait(timeout) ? task.Result : new FixtureInfo(Array.Empty<FixtureModeInfo>(), DefaultBounds, "timeout");
+        }
+        catch (AggregateException)
+        {
+            return Unreadable(task);
+        }
     }
 
     /// <summary>Reads a fixture type now (on the calling thread). Never throws for content problems.</summary>
@@ -70,9 +81,9 @@ internal sealed class FixtureInfoCache
         {
             type = library.GetFixtureType(entry);
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or FormatException or ArgumentException
-                                       or InvalidOperationException or System.Xml.XmlException)
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
         {
+            // Any damage of one file (also one the reader did not foresee) only makes that fixture type unreadable.
             return new FixtureInfo(Array.Empty<FixtureModeInfo>(), DefaultBounds, e.Message);
         }
 
@@ -88,8 +99,9 @@ internal sealed class FixtureInfoCache
                 if (bounds.IsEmpty)
                     bounds = RestBounds(profile);
             }
-            catch (Exception e) when (e is FixtureProfileException or ArgumentException or InvalidOperationException or IndexOutOfRangeException)
+            catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
             {
+                // A mode that does not compile is left out; the others stay placeable.
                 error ??= e.Message;
             }
         }
@@ -113,5 +125,7 @@ internal sealed class FixtureInfoCache
         return finite && !bounds.IsEmpty && bounds.Size.Length() < 20f ? bounds : Aabb.Empty;
     }
 
-    private static string Key(FixtureLibraryEntry entry) => $"{entry.FilePath}|{entry.LastWriteTimeUtc.Ticks}";
+    private static FixtureInfo Unreadable(Task<FixtureInfo> task) =>
+        new(Array.Empty<FixtureModeInfo>(), DefaultBounds, task.Exception?.GetBaseException().Message ?? "The fixture type could not be read.");
+
 }

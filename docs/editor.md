@@ -225,7 +225,10 @@ New / Open replace the engine's project, so panels keep their references to the 
   to the **Issues panel** (brought to the front when there are errors). Content problems never throw; an unexpected
   exception is reported as a program error and the editor goes on.
 * **Unsaved changes.** New, Open, recovering a session and closing the window ask *"Save the changes to “Show”
-  first?"* — **Save** (then continue; a scene without a file asks for one first), **Don't Save**, **Cancel**.
+  first?"* — **Save** (then continue; a scene without a file asks for one first; a failed save stops there),
+  **Don't Save**, **Cancel**. Enter answers Save and Escape Cancel only once the question is on screen: the key press
+  that asked it (Enter confirming a file in the file browser) never answers it unseen. Closing the window while another
+  dialog is open (file browser, message, question) waits until that dialog is closed.
 * **Title.** The window title is `Candela — <scene name>` with a `•` while there are unsaved changes.
 * **Dropped files.** Files dragged from a file manager onto the window (GLFW drop callback) are opened or imported:
   a single `.candela`/`.mvr` opens directly when the stage is empty and unchanged, otherwise the editor asks **Open**
@@ -233,10 +236,15 @@ New / Open replace the engine's project, so panels keep their references to the 
   under the cursor (a model stands on it, an image lies on it — see [Library](#library)); several files are imported
   side by side; `.gdtf` files go into the fixture library; anything else is reported as not importable.
 * **Engine tick.** Every frame `Update` ticks the engine (DMX input, fixture motors, smoke, fire, sound, lights, render
-  binding); the issue analysis (patch, power, rigging, assets) runs again half a second after the last edit, so a
+  binding) — also while the window is minimised (ten times a second, without drawing); the issue analysis (patch, power, rigging, assets) runs again half a second after the last edit, so a
   gizmo drag does not re-check the scene every frame. Clicking an issue selects and frames the objects it names.
 * **Autosave and recovery.** The engine autosaves the open project at the interval of *Settings → Files* (only when
-  something changed; a save removes the session's autosaves; a clean exit deletes them). At start-up the editor lists
+  something changed; a save removes the session's autosaves; a clean exit deletes them). Changing the interval, or
+  turning autosave off and on, adjusts the running autosave session instead of starting another one (which would leave
+  the first session's files behind as a "crashed" session). Only a clean exit — the window closed after the
+  unsaved-changes question — deletes the recovery files: when the editor stops abnormally (an exception outside the
+  frame loop, 120 failed frames in a row) unsaved changes are autosaved once more and the files stay for the
+  recovery prompt. A *Save As* that fails leaves the scene's name as it was. At start-up the editor lists
   sessions of runs that did not end cleanly — scene, time of the last autosave, its file (or *never saved*) — with
   **Recover** (opens the newest readable autosave; Save writes back to the original file), **Delete** (asks once
   more) and **Decide Later** (they are offered again at the next start).
@@ -266,7 +274,8 @@ modes, weight and power.*
 * **Hover preview.** Resting on a tile for a moment grows it upward (0.18 s, ease-out) into a card twice its size — it
   hangs down from the top when there is no room above — showing the fixture **turning** (24 frames around it,
   rendered coarse-to-fine in the background and cross-faded, so a whole turn is visible early) and a line of facts.
-* **Drag into a viewport** places the fixture: while dragging, the viewport shows a **ghost** — the fixture's box (from
+* **Drag into a viewport** places the fixture — dragged from its tile or from its grown hover card (the card is the
+  drag source where it covers other tiles, so the fixture it shows is the one placed): while dragging, the viewport shows a **ghost** — the fixture's box (from
   its GDTF geometry) mounted on the surface under the cursor, a footprint ring and *"Robin T1 · Mode 1 · 38 ch · 1.001"*.
   The surface is the renderer's pick of the last frame (position and normal); where nothing is drawn, the ground
   plane; looking above the horizon, the plane through the camera's target. GDTF fixtures hang, so on a **floor** the
@@ -403,8 +412,12 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
   100, 1000 … occurrences), and appears once in the Issues panel (at most 200 different program messages; the panel's
   clear button really empties the list and lets them be reported again). The log file holds the current run and stops
   at 16 MB; the previous run is kept as `candela-app.previous.log`.
-* Swapchain loss, resize and minimise are handled (the loop idles while minimised); GPU objects of closed viewports
-  are released after the frames that used them.
+* Swapchain loss, resize and minimise are handled (the loop idles while minimised, still ticking the engine for DMX
+  and autosave); GPU objects of closed viewports are released after the frames that used them.
+* Background work never ends the program: a fixture type whose GDTF cannot be read (for any reason) gets no modes
+  and is placed unpatched; a picture the thumbnail thread cannot make (an image too large to decode included) becomes
+  an icon; a failure while drawing the busy overlay lets the waiting file operation run without it instead of blocking
+  every later one.
 * Without a Vulkan device the editor explains what to install, in a small OpenGL window (or on standard error in
   headless runs) and exits with code 3:
 
@@ -551,7 +564,12 @@ the picture; the thumbnail worker rendering stills, orbit frames and image previ
 fixtures, models and images on floors, ceilings and walls; floors and walls from a drag, resizing with the opposite side
 fixed, snapping, handles), `LibraryTests` (auto-patch to the next free address without straddling universes, placing a
 fixture with its default mode and changing the mode, the model library file, image resizing, the library search and
-category filter). `EditorEndToEndTests` start the real editor under `xvfb-run` with scripted input: open the Фокина
+category filter). `SessionSafetyTests` (changing or switching off the autosave interval during a run leaves no
+"crashed" session behind after a clean exit; a run that does not end cleanly keeps its recovery files and they recover
+the unsaved work; the engine's own frames never mark an opened rig modified and allocate nothing; a failed Save As keeps
+the scene name; Enter or Escape pressed in the frame a question opens does not answer it) and `LibraryRobustnessTests`
+(unreadable GDTF files give fixture types without modes that are placed unpatched instead of throwing; a model library of
+thousands of entries loads in linear time). `EditorEndToEndTests` start the real editor under `xvfb-run` with scripted input: open the Фокина
 scene, click a fixture, check that the Properties panel names it and that the viewport shows the orange outline, save
 it as `.candela`, reopen it and compare the scene (entities, transforms, components, patch) with the original; and
 build a stage — draw a floor and a wall, drag a fixture from the Library onto the floor, drop an image onto the

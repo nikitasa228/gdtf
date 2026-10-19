@@ -84,12 +84,14 @@ internal sealed class ModelLibrary
             using var doc = JsonDocument.Parse(File.ReadAllText(_path), new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
             if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
                 return;
+            // Duplicates are found with a set (a file of thousands of entries is read in linear time).
+            var seen = new HashSet<string>(PathComparer);
             foreach (var item in items.EnumerateArray())
             {
                 if (item.ValueKind != JsonValueKind.Object || !item.TryGetProperty("path", out var p) || p.ValueKind != JsonValueKind.String)
                     continue;
                 string path = p.GetString() ?? "";
-                if (KindOf(path) is not { } kind || _items.Any(i => SamePath(i.Path, path)))
+                if (KindOf(path) is not { } kind || !seen.Add(path))
                     continue;
                 var added = item.TryGetProperty("added", out var a) && a.ValueKind == JsonValueKind.String && a.TryGetDateTime(out var d)
                     ? d.ToUniversalTime()
@@ -186,6 +188,8 @@ internal sealed class ModelLibrary
         }
     }
 
-    private static bool SamePath(string a, string b) =>
-        string.Equals(a, b, OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+    private static StringComparer PathComparer =>
+        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
+    private static bool SamePath(string a, string b) => PathComparer.Equals(a, b);
 }

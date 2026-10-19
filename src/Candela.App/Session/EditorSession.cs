@@ -65,6 +65,9 @@ internal sealed class EditorSession : IDisposable
     private double _lastChangeAt;
     private double _clock;
     private int _autosaveMinutes = -1;
+    private bool _endedCleanly;
+    private string? _displaySource;
+    private string _displayFileName = "";
     private bool _disposed;
 
     /// <summary>Creates a session with a new, empty scene and its stage engine.</summary>
@@ -125,7 +128,16 @@ internal sealed class EditorSession : IDisposable
             string name = Scene.Name;
             if (!IsDefaultName(name))
                 return name;
-            return SourcePath is { Length: > 0 } path ? Path.GetFileNameWithoutExtension(path) : Loc.Get(Str.Untitled);
+            if (SourcePath is not { Length: > 0 } path)
+                return Loc.Get(Str.Untitled);
+            // Read every frame by the title bar: the file name is taken once per source file.
+            if (!ReferenceEquals(path, _displaySource))
+            {
+                _displaySource = path;
+                _displayFileName = Path.GetFileNameWithoutExtension(path);
+            }
+
+            return _displayFileName;
         }
     }
 
@@ -236,12 +248,18 @@ internal sealed class EditorSession : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (!path.EndsWith(StageEngine.ProjectExtension, StringComparison.OrdinalIgnoreCase))
             path += StageEngine.ProjectExtension;
-        // A scene saved for the first time takes the file's name instead of "Untitled".
-        if (FilePath is null && IsDefaultName(Scene.Name))
+        // A scene saved for the first time takes the file's name instead of "Untitled" (not when the save fails).
+        string previousName = Scene.Name;
+        if (FilePath is null && IsDefaultName(previousName))
             Scene.Name = Path.GetFileNameWithoutExtension(path);
         var result = EngineOrThrow.SaveAs(path);
         if (!result.Success)
+        {
+            if (!string.Equals(Scene.Name, previousName, StringComparison.Ordinal))
+                Scene.Name = previousName;
             return Failed(result);
+        }
+
         SourcePath = EngineOrThrow.ProjectPath ?? Path.GetFullPath(path);
         _previewBaseline = Scene.Version;
         _log.Info("Session", result.Summary);
@@ -384,22 +402,41 @@ internal sealed class EditorSession : IDisposable
     }
 
     /// <summary>
-    /// Ends the session: autosave stops and — this being a clean exit — the session's recovery files are deleted; the
-    /// render binding and the engine are released.
+    /// Marks the end of the run as clean (the window was closed after the unsaved-changes question was answered):
+    /// <see cref="Dispose"/> then deletes the session's recovery files. Without it — the frame loop gave up, an exception
+    /// ended the program — they are kept (after a last autosave of unsaved changes) and offered at the next start.
+    /// </summary>
+    public void EndCleanly() => _endedCleanly = true;
+
+    /// <summary>
+    /// Ends the session: autosave stops; after <see cref="EndCleanly"/> the session's recovery files are deleted,
+    /// otherwise unsaved changes are autosaved one last time and the files stay for recovery. The render binding and the
+    /// engine are released.
     /// </summary>
     public void Dispose()
     {
         if (_disposed)
             return;
         _disposed = true;
-        _content?.Dispose();
+        try
+        {
+            _content?.Dispose();
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            // The render binding of a failing renderer must not keep the recovery data below from being written.
+            _log.Warn("Session", $"The render binding could not be released: {e.Message}");
+        }
+
         _content = null;
         if (Engine is { } engine)
         {
             engine.SceneReplaced -= OnEngineSceneReplaced;
+            if (!_endedCleanly)
+                SaveRecoveryNow(engine);
             try
             {
-                engine.DisableAutosave();
+                engine.DisableAutosave(completeSession: _endedCleanly);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {
@@ -431,33 +468,75 @@ internal sealed class EditorSession : IDisposable
         SceneReplaced?.Invoke();
     }
 
+    /// <summary>
+    /// Follows the autosave interval of the settings. The engine's autosave session is started once; later changes of
+    /// the interval (or turning autosave off and on) adjust the running session instead of starting a new one, which
+    /// would leave the old session's files behind to be offered as a crashed session at the next start. Projects opened
+    /// later get a session of their own from the engine; it is brought to the setting here too. Allocation-free while
+    /// nothing changes.
+    /// </summary>
     private void ApplyAutosaveSetting()
     {
         int minutes = _options.Autosave && !_options.PreviewStage ? Math.Clamp(_settings.Settings.AutosaveMinutes, 0, 24 * 60) : 0;
-        if (minutes == _autosaveMinutes)
-            return;
-        _autosaveMinutes = minutes;
         var engine = EngineOrThrow;
-        try
+        if (minutes != _autosaveMinutes)
         {
-            if (minutes <= 0)
+            bool first = _autosaveMinutes < 0;
+            _autosaveMinutes = minutes;
+            if (minutes > 0 && engine.Autosave is null)
             {
-                // Turned off: the running session's files are kept until a save or a clean exit.
-                engine.DisableAutosave(completeSession: false);
-                _log.Info("Autosave", "Autosave is off.");
-                return;
+                try
+                {
+                    engine.EnableAutosave(new AutosaveOptions
+                    {
+                        Directory = _options.AutosaveDirectory,
+                        Interval = TimeSpan.FromMinutes(minutes),
+                    });
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+                {
+                    _log.Warn("Autosave", $"Autosave could not be set up: {e.Message}");
+                }
             }
 
-            engine.EnableAutosave(new AutosaveOptions
-            {
-                Directory = _options.AutosaveDirectory,
-                Interval = TimeSpan.FromMinutes(minutes),
-            });
-            _log.Info("Autosave", string.Create(CultureInfo.InvariantCulture, $"Autosave every {minutes} min."));
+            if (minutes > 0)
+                _log.Info("Autosave", string.Create(CultureInfo.InvariantCulture, $"Autosave every {minutes} min."));
+            else if (first || engine.Autosave is not null)
+                _log.Info("Autosave", "Autosave is off.");
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+
+        if (engine.Autosave is { } service)
         {
-            _log.Warn("Autosave", $"Autosave could not be set up: {e.Message}");
+            bool enabled = minutes > 0;
+            if (service.Enabled != enabled)
+                service.Enabled = enabled;
+            if (enabled)
+            {
+                var interval = TimeSpan.FromMinutes(minutes);
+                if (service.Interval != interval)
+                    service.Interval = interval;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The run is ending without a clean exit: unsaved changes are autosaved now (waiting a few seconds for the write),
+    /// so the recovery offered at the next start holds the latest state rather than the one of the last interval.
+    /// </summary>
+    private void SaveRecoveryNow(StageEngine engine)
+    {
+        if (engine.Autosave is not { } service || !engine.IsModified)
+            return;
+        try
+        {
+            if (!service.SaveNowAsync().Wait(TimeSpan.FromSeconds(10)))
+                _log.Warn("Autosave", "The last autosave did not finish in time; the previous one is kept for recovery.");
+            else
+                _log.Info("Autosave", $"Unsaved changes were autosaved for recovery ({service.FilePath}).");
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            _log.Warn("Autosave", $"The last autosave failed: {e.Message}");
         }
     }
 

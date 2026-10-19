@@ -73,6 +73,7 @@ internal sealed class SessionDialogs
     private Action<RecoverableSession>? _onDelete;
     private int _selected;
     private int _confirmDelete = -1;
+    private int _framesShown;
     private bool _closeBusy;
     private float _spin;
 
@@ -259,11 +260,15 @@ internal sealed class SessionDialogs
         if (!ImGui.BeginPopupModal(_windowTitle, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
             return;
         var kind = _kind;
+        // Enter / Escape answer only once the question has been on screen: the press that asked it (Enter confirming a
+        // file in the browser, a menu chosen with the keyboard) would otherwise answer it in the same frame, unseen.
+        bool keys = _framesShown > 0;
+        _framesShown++;
         Action? after = kind switch
         {
-            SessionDialogKind.Unsaved => DrawUnsaved(scale),
-            SessionDialogKind.OpenOrImport => DrawOpenOrImport(scale),
-            _ => DrawRecovery(scale),
+            SessionDialogKind.Unsaved => DrawUnsaved(scale, keys),
+            SessionDialogKind.OpenOrImport => DrawOpenOrImport(scale, keys),
+            _ => DrawRecovery(scale, keys),
         };
         if (_kind == SessionDialogKind.None)
             ImGui.CloseCurrentPopup();
@@ -271,18 +276,18 @@ internal sealed class SessionDialogs
         after?.Invoke();
     }
 
-    private Action? DrawUnsaved(float scale)
+    private Action? DrawUnsaved(float scale, bool keys)
     {
         Message(Icons.TriangleAlert, Theme.Warning, _subject, scale);
         var size = new Vector2(130, 0) * scale;
         UnsavedChoice? choice = null;
-        if (Accent(Labels.With(Icons.Save, Str.UnsavedSave), size) || ImGui.IsKeyPressed(ImGuiKey.Enter, false))
+        if (Accent(Labels.With(Icons.Save, Str.UnsavedSave), size) || keys && ImGui.IsKeyPressed(ImGuiKey.Enter, false))
             choice = UnsavedChoice.Save;
         ImGui.SameLine();
         if (ImGui.Button(Loc.Get(Str.UnsavedDiscard), size))
             choice = UnsavedChoice.Discard;
         ImGui.SameLine();
-        if (ImGui.Button(Loc.Get(Str.MsgCancel), size) || ImGui.IsKeyPressed(ImGuiKey.Escape, false))
+        if (ImGui.Button(Loc.Get(Str.MsgCancel), size) || keys && ImGui.IsKeyPressed(ImGuiKey.Escape, false))
             choice = UnsavedChoice.Cancel;
         if (choice is not { } c)
             return null;
@@ -291,18 +296,18 @@ internal sealed class SessionDialogs
         return () => callback?.Invoke(c);
     }
 
-    private Action? DrawOpenOrImport(float scale)
+    private Action? DrawOpenOrImport(float scale, bool keys)
     {
         Message(Icons.Theater, Theme.Note, _subject, scale);
         var size = new Vector2(130, 0) * scale;
         DropChoice? choice = null;
-        if (Accent(Labels.With(Icons.FolderOpen, Str.DropOpen), size) || ImGui.IsKeyPressed(ImGuiKey.Enter, false))
+        if (Accent(Labels.With(Icons.FolderOpen, Str.DropOpen), size) || keys && ImGui.IsKeyPressed(ImGuiKey.Enter, false))
             choice = DropChoice.Open;
         ImGui.SameLine();
         if (ImGui.Button(Labels.With(Icons.FileInput, Str.DropImport), size))
             choice = DropChoice.Import;
         ImGui.SameLine();
-        if (ImGui.Button(Loc.Get(Str.MsgCancel), size) || ImGui.IsKeyPressed(ImGuiKey.Escape, false))
+        if (ImGui.Button(Loc.Get(Str.MsgCancel), size) || keys && ImGui.IsKeyPressed(ImGuiKey.Escape, false))
             choice = DropChoice.Cancel;
         if (choice is not { } c)
             return null;
@@ -311,7 +316,7 @@ internal sealed class SessionDialogs
         return () => callback?.Invoke(c);
     }
 
-    private Action? DrawRecovery(float scale)
+    private Action? DrawRecovery(float scale, bool keys)
     {
         Message(Icons.History, Theme.Warning, Loc.Get(Str.RecoveryText), scale);
         const ImGuiTableFlags tableFlags = ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.SizingStretchProp |
@@ -393,7 +398,7 @@ internal sealed class SessionDialogs
         if (confirming)
             ImGui.PopStyleColor();
         ImGui.SameLine();
-        if ((ImGui.Button(Loc.Get(Str.RecoveryLater), size) || ImGui.IsKeyPressed(ImGuiKey.Escape, false)) && after is null)
+        if ((ImGui.Button(Loc.Get(Str.RecoveryLater), size) || keys && ImGui.IsKeyPressed(ImGuiKey.Escape, false)) && after is null)
             Close();
         return after;
     }
@@ -434,5 +439,6 @@ internal sealed class SessionDialogs
         _onDelete = null;
         _selected = 0;
         _confirmDelete = -1;
+        _framesShown = 0;
     }
 }

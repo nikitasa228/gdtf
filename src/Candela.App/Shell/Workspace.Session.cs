@@ -88,6 +88,10 @@ internal sealed partial class Workspace
         {
             _sessionDialogs.HideBusy();
             UiGuard.CloseAllPopups();
+            // The overlay could not be drawn: the waiting operation runs without it rather than never (every later file
+            // operation would otherwise be refused as "still running").
+            if (_pendingOperation is { } op)
+                op.Shown = true;
         }
     }
 
@@ -306,7 +310,9 @@ internal sealed partial class Workspace
     {
         if (_closeConfirmed || !_ctx.Session.IsModified)
             return true;
-        if (_pendingOperation is null && !_sessionDialogs.IsOpen)
+        // While another dialog has the user's attention (a file browser, a message, a session question) the request is
+        // ignored: a second modal opened over it would close it and leave its owner waiting for an answer.
+        if (_pendingOperation is null && !ModalOpen())
         {
             WithUnsavedCheck(() =>
             {

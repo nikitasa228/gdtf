@@ -95,6 +95,9 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
     private string _countText = "";
     private int _countValue = -1;
     private string _countLanguage = "";
+    private string _pendingText = "";
+    private int _pendingValue = -1;
+    private string _pendingLanguage = "";
     private bool _disposed;
 
     /// <summary>Creates the panel; <paramref name="models"/> is the user's model library (loaded by the caller).</summary>
@@ -260,7 +263,7 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
         if (_worker is { Pending: > 0 } w)
         {
             ImGui.SameLine();
-            ImGui.TextColored(Theme.TextMuted, $"· {Loc.Format(Str.LibThumbnailsPending, w.Pending)}");
+            ImGui.TextColored(Theme.TextMuted, PendingText(w.Pending));
         }
 
         if (engine is null || engine.Library.Count == 0)
@@ -392,8 +395,30 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
 
         UpdateHover(hovered, hoveredMin, hoveredMax, cardOwnsMouse);
         if (_hover is FixtureLibraryEntry hoverEntry && _hoverGrow > 0f)
+        {
+            CardDragSource(hoverEntry, stillSize);
             DrawFixtureCard(drawList, hoverEntry, stillSize, scale, framebuffer);
+        }
+
         ImGui.EndChild();
+    }
+
+    /// <summary>
+    /// The grown hover card is an item of its own over the tiles it covers, so pressing on the card and dragging takes
+    /// the fixture the card shows — not the tile that happens to lie under the card's picture. Added without layout
+    /// (no scroll extent changes); the tiles allow overlap, so the card wins the mouse where it covers them.
+    /// </summary>
+    private unsafe void CardDragSource(FixtureLibraryEntry entry, int stillSize)
+    {
+        if (_hoverGrow <= 0.05f || !CardRect(out var min, out var max))
+            return;
+        var bb = new ImRect(min, max);
+        uint id = ImGui.GetID("##hover-card");
+        if (!ImGuiP.ItemAdd(bb, id))
+            return;
+        bool hovered, held;
+        ImGuiP.ButtonBehavior(bb, id, &hovered, &held, ImGuiButtonFlags.None);
+        DragSource(entry, null, stillSize);
     }
 
     private void UpdateHover(object? hovered, Vector2 min, Vector2 max, bool cardOwnsMouse)
@@ -440,6 +465,11 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
         float tileWidth = _hoverTileMax.X - _hoverTileMin.X;
         float width = MathF.Min(tileWidth * 2.1f, windowMax.X - windowMin.X - 8f);
         float textBlock = ImGui.GetTextLineHeightWithSpacing() * 3.4f;
+        // A short grid gets a smaller picture, so the whole card — the line of facts at its bottom included — stays
+        // inside the grid instead of being cut off; the card never becomes smaller than the tile it grows from.
+        float roomForPicture = windowMax.Y - windowMin.Y - 8f - textBlock;
+        if (width > roomForPicture)
+            width = MathF.Max(MathF.Min(width, tileWidth), roomForPicture);
         float height = width + textBlock;
         float centerX = (_hoverTileMin.X + _hoverTileMax.X) * 0.5f;
         float left = Math.Clamp(centerX - width * 0.5f, windowMin.X + 4f, MathF.Max(windowMin.X + 4f, windowMax.X - 4f - width));
@@ -863,6 +893,19 @@ internal sealed unsafe class LibraryPanel : Panel, IDisposable
         }
 
         return _countText;
+    }
+
+    private string PendingText(int pending)
+    {
+        // Shown every frame while pictures are being made: rebuilt only when the number changes.
+        if (pending != _pendingValue || !ReferenceEquals(_pendingLanguage, Loc.Language))
+        {
+            _pendingValue = pending;
+            _pendingLanguage = Loc.Language;
+            _pendingText = "· " + Loc.Format(Str.LibThumbnailsPending, pending);
+        }
+
+        return _pendingText;
     }
 
     private static int Bucket(int pixels)

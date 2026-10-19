@@ -47,6 +47,7 @@ internal sealed class EditorApplication : IDisposable
     private bool _quitRequested;
     private float _appliedDpi;
     private float _frameDelta;
+    private double _minimizedAt = -1;
     private Action? _drawWorkspace;
 
     /// <summary>Creates the application for the given command line.</summary>
@@ -63,6 +64,10 @@ internal sealed class EditorApplication : IDisposable
         if (startup != ExitCodes.Ok)
             return startup;
         Loop();
+        // Only a run that ended normally (the window closed after the unsaved-changes question) deletes the recovery
+        // files; a run the frame loop gave up on keeps them for the next start.
+        if (_exitCode == ExitCodes.Ok)
+            _session?.EndCleanly();
         return _exitCode;
     }
 
@@ -185,11 +190,14 @@ internal sealed class EditorApplication : IDisposable
 
             if (window.IsMinimized && !screenshotMode)
             {
-                // Minimised: nothing to draw; wake up regularly so autosave and protocols keep running.
+                // Minimised: nothing to draw; wake up regularly so autosave, DMX input and the simulation keep running.
                 GLFW.WaitEventsTimeout(0.1);
                 _settings!.Update(_timer.Elapsed);
+                UpdateWhileMinimized();
                 continue;
             }
+
+            _minimizedAt = -1;
 
             _timer.Tick();
             bool capture = screenshotMode && (frame == targetFrames - 1 || _script?.WantsScreenshot(frame) == true);
@@ -223,6 +231,26 @@ internal sealed class EditorApplication : IDisposable
                 _exitCode = ExitCodes.Failure;
                 break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Ticks the session while the window is minimised (no UI, no rendering): the engine keeps evaluating DMX and
+    /// autosaving. Failures are logged like frame failures but never end the run.
+    /// </summary>
+    private void UpdateWhileMinimized()
+    {
+        double now = _timer.Elapsed;
+        double dt = _minimizedAt < 0 ? 0 : Math.Clamp(now - _minimizedAt, 0, FrameTimer.MaxDeltaTime);
+        _minimizedAt = now;
+        try
+        {
+            _session?.Update(dt);
+        }
+        catch (Exception e) when (!IsFatal(e))
+        {
+            if (_failures.Record(e) == ErrorLogKind.Full)
+                _log.Error("Frame", "Updating the session while minimised failed", e);
         }
     }
 
