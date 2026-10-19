@@ -94,7 +94,8 @@ public sealed partial class ExternalControlFollowUpTests : IDisposable
             NetworkInterface = "eth0 192.168.1.20",
             UniverseCount = 4,
             WarningTexts = new[] { ProtocolText.Create(ProtocolMessages.ArtNetStreamTableFull, 1024) },
-        } with { Warnings = new[] { "More than 1024 Art-Net streams (sender, port, universe) are active; new ones are ignored." } };
+        } with
+        { Warnings = new[] { "More than 1024 Art-Net streams (sender, port, universe) are active; new ones are ignored." } };
         var artNet = ProtocolRegistry.Find(ProtocolIds.ArtNet);
         var view = ExternalControlPanel.StatusView.Build(running, artNet);
         Assert.Equal("Listening on UDP 6454 (all interfaces); announcing 4 universe(s) as node 'Candela'", view.Message);
