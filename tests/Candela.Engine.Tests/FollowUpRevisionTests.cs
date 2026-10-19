@@ -1,4 +1,5 @@
 using System.Numerics;
+using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Rendering;
 
@@ -59,6 +60,164 @@ public sealed class FollowUpRevisionTests
 
         // and a head pointing elsewhere does not move the rig either
         Assert.Equal(travelling, RigAfter(-60f, settleFirst: true, "work-light-other-tilt"));
+    }
+}
+
+/// <summary>Event-driven render flags with the outline of selected groups' content, undoable removals and scene changes.</summary>
+public sealed class FlagRevisionTests
+{
+    private const double Frame = 1.0 / 30.0;
+    private const InstanceFlags EntityFlags = InstanceFlags.Selected | InstanceFlags.Hidden | InstanceFlags.CableHighlight;
+
+    private static void AssertFlagsMatchScene(StageEngine engine, RecordingRenderWorld world, RenderSync sync, string step)
+    {
+        var scene = engine.Scene;
+        var layers = scene.Layers.ToDictionary(l => l.Id, l => l.Visible);
+        var cableEnds = new HashSet<Guid>();
+        foreach (var (entity, cable) in scene.Query<CableComponent>())
+        {
+            cableEnds.Add(entity.Id);
+            foreach (var end in cable.Endpoints)
+                if (end is not null && end.EntityId != Guid.Empty) cableEnds.Add(end.EntityId);
+        }
+        foreach (var instance in world.Instances.Values)
+        {
+            Assert.True(sync.TryGetEntity(instance.PickId, out var id));
+            var e = scene.Find(id);
+            Assert.True(e is not null, $"{step}: an instance of a removed entity is still drawn");
+            bool selected = engine.Selection.Contains(id);
+            if (sync.OutlineSelectedDescendants)
+                for (var p = e!.Parent; p is not null && !selected; p = p.Parent) selected = engine.Selection.Contains(p.Id);
+            var expected = selected ? InstanceFlags.Selected : InstanceFlags.None;
+            if (!e!.IsVisibleInHierarchy || (layers.TryGetValue(e.LayerId, out bool visible) && !visible)) expected |= InstanceFlags.Hidden;
+            if (cableEnds.Contains(id)) expected |= InstanceFlags.CableHighlight;
+            Assert.True(expected == (instance.Flags & EntityFlags), $"{step}: {e.Name}: expected {expected}, drawn {instance.Flags & EntityFlags}");
+        }
+    }
+
+    [Fact]
+    public void Flags_with_outlined_group_content_follow_random_edits_undo_and_outline_toggles()
+    {
+        using var engine = TestEnvironment.CreateEngine("flags-outline");
+        var scene = engine.Scene;
+        var groups = new List<Entity>();
+        for (int g = 0; g < 3; g++)
+        {
+            var group = new Entity($"Group {g}");
+            scene.Add(group, g == 2 ? groups[0] : null); // group 2 nests in group 0
+            groups.Add(group);
+        }
+        var items = new List<Entity>();
+        for (int i = 0; i < 8; i++)
+        {
+            var wall = new Entity($"Wall {i}") { Local = new Core.Math.Transform(new Vector3(i * 2.5f, 0, 0)) };
+            wall.Add(new WallComponent { Width = 2f, Height = 3f, Thickness = 0.2f });
+            scene.Add(wall, groups[i % 3]);
+            items.Add(wall);
+        }
+        var head = SceneBuilder.Fixture(scene, SceneBuilder.MacViper, "Basic", new Vector3(0, 0, 6));
+        scene.Reparent(head, groups[2]);
+        items.Add(head);
+        var layer = new Layer { Name = "L" };
+        scene.Layers.Add(layer);
+        var world = new RecordingRenderWorld();
+        var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        sync.OutlineSelectedDescendants = true;
+        engine.Tick(0);
+        AssertFlagsMatchScene(engine, world, sync, "start");
+
+        var all = new List<Entity>(items);
+        all.AddRange(groups);
+        var random = new Random(4321);
+        for (int step = 0; step < 200; step++)
+        {
+            var target = all[random.Next(all.Count)];
+            switch (random.Next(10))
+            {
+                case 0:
+                    if (target.Scene is not null) target.Visible = !target.Visible;
+                    break;
+                case 1:
+                    engine.Selection.Set(all.Where(e => e.Scene is not null && random.Next(5) == 0).Select(e => e.Id));
+                    break;
+                case 2:
+                    // remove a selected subtree undoably (the selection keeps or drops it), then maybe bring it back
+                    if (target.Scene is not null && target != groups[0])
+                    {
+                        engine.Undo.Execute(new Core.Editing.RemoveEntityCommand(scene, target));
+                        if (random.Next(2) == 0) engine.Undo.Undo();
+                    }
+                    break;
+                case 3:
+                    if (engine.Undo.CanUndo) engine.Undo.Undo();
+                    break;
+                case 4:
+                    if (engine.Undo.CanRedo) engine.Undo.Redo();
+                    break;
+                case 5:
+                    sync.OutlineSelectedDescendants = !sync.OutlineSelectedDescendants;
+                    break;
+                case 6 when target.Scene is not null && !groups.Contains(target):
+                    var parent = groups[random.Next(groups.Count)];
+                    if (parent.Scene is not null) scene.Reparent(target, parent);
+                    break;
+                case 7:
+                    if (target.Scene is not null) target.LayerId = random.Next(2) == 0 ? layer.Id : scene.DefaultLayer.Id;
+                    break;
+                case 8:
+                    layer.Visible = !layer.Visible;
+                    break;
+                default:
+                    engine.Selection.Add(target.Id);
+                    break;
+            }
+            engine.Tick(Frame);
+            AssertFlagsMatchScene(engine, world, sync, $"step {step}");
+        }
+        Assert.Empty(world.Violations);
+    }
+}
+
+/// <summary>The library event covers every way GDTF files enter the library.</summary>
+public sealed class LibraryEventRevisionTests
+{
+    private static StageEngine EngineWithEmptyLibrary(string name) => new(new StageEngineOptions
+    {
+        Library = new Gdtf.FixtureLibrary(TestEnvironment.Library.Specs),
+        CacheDirectory = TestEnvironment.NewTempDirectory(name + "-cache"),
+        DmxParallelism = 2,
+        SimulationParallelism = 2,
+    });
+
+    [Fact]
+    public void Gdtfs_that_arrive_with_an_mvr_or_a_project_raise_the_library_event_with_their_source()
+    {
+        string project = Path.Combine(TestEnvironment.NewTempDirectory("library-event"), "fokina.candela");
+        using (var engine = EngineWithEmptyLibrary("library-event-mvr"))
+        {
+            var changes = new List<FixtureLibraryChange>();
+            engine.FixtureLibraryChanged += changes.Add;
+            Assert.True(engine.Open(TestEnvironment.Fokina).Success);
+            var change = Assert.Single(changes);
+            Assert.Equal(FixtureLibraryChangeSource.Mvr, change.Source);
+            Assert.NotEmpty(change.Added);
+            Assert.Equal(engine.Library.Count, change.Added.Count);
+            Assert.All(change.Added, e => Assert.Same(e, engine.Library.FindByFileName(e.FileName)));
+            Assert.True(engine.SaveAs(project).Success);
+
+            // nothing new the second time
+            Assert.True(engine.Open(TestEnvironment.Fokina).Success);
+            Assert.Single(changes);
+        }
+        using (var engine = EngineWithEmptyLibrary("library-event-project"))
+        {
+            var changes = new List<FixtureLibraryChange>();
+            engine.FixtureLibraryChanged += changes.Add;
+            Assert.True(engine.Open(project).Success);
+            var change = Assert.Single(changes);
+            Assert.Equal(FixtureLibraryChangeSource.Project, change.Source);
+            Assert.Equal(engine.Library.Count, change.Added.Count);
+        }
     }
 }
 
