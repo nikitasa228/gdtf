@@ -114,6 +114,12 @@ public sealed class CliTests
         Assert.True(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "floor", "--ev", "auto"]).AutoExposure);
         Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "bright"]));
         Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "party"]));
+
+        // the work light: never in a render unless asked
+        Assert.Equal(WorkLightMode.Off, defaults.WorkLight);
+        Assert.Equal(WorkLightMode.Auto, RenderOptions.Parse(["show.mvr", "--out", "x.png", "--work-light", "auto"]).WorkLight);
+        Assert.Equal(WorkLightMode.On, RenderOptions.Parse(["show.mvr", "--out", "x.png", "--work-light", "ON"]).WorkLight);
+        Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--work-light", "dim"]));
     }
 
     [Fact]

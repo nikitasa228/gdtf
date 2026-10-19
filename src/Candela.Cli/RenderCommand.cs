@@ -51,6 +51,12 @@ internal sealed class RenderOptions
     public bool Floor { get; private set; } = true;
 
     /// <summary>
+    /// The work light (<c>--work-light off|auto|on</c>, default off): a dim neutral key and ambient light for scenes
+    /// whose fixtures are dark. A render never gets it unless asked.
+    /// </summary>
+    public WorkLightMode WorkLight { get; private set; } = WorkLightMode.Off;
+
+    /// <summary>
     /// The renderer adapts the exposure to the picture like an eye or a camera on a stage (default; <c>--ev auto</c>,
     /// <c>--auto-exposure</c>). A stage picture is mostly dark air and set with bright beams and pools, which a reading
     /// of the floor alone says little about. False with a fixed exposure: <c>--ev N</c> or <c>--ev floor</c>.
@@ -180,6 +186,15 @@ internal sealed class RenderOptions
                         var v => throw new UsageException($"Unknown floor '{v}' (auto, none)."),
                     };
                     break;
+                case "--work-light":
+                    o.WorkLight = CliArgs.Value(args, ref i, name).ToLowerInvariant() switch
+                    {
+                        "off" => WorkLightMode.Off,
+                        "auto" => WorkLightMode.Auto,
+                        "on" => WorkLightMode.On,
+                        var v => throw new UsageException($"Unknown work light '{v}' (off, auto, on)."),
+                    };
+                    break;
                 case "--device":
                     o.Device = CliArgs.Value(args, ref i, name);
                     break;
@@ -298,6 +313,7 @@ internal static class RenderCommand
         var sync = engine.AttachRenderWorld(renderer.World);
         sync.LoadFixtureModelsInBackground = false;
         sync.HazeOverride = options.Haze;
+        sync.WorkLight = options.WorkLight;
 
         int ticks = Math.Max(1, (int)Math.Ceiling(options.Time / TickSeconds));
         double step = options.Time > 0 ? options.Time / ticks : 0;
@@ -306,8 +322,8 @@ internal static class RenderCommand
         sync.CompletePendingLoads(TimeSpan.FromMinutes(5));
         double simulateMs = watch.Elapsed.TotalMilliseconds;
         output.WriteLine($"Scene:    {sync.InstanceCount} instances, {engine.Lights.Length} lights " +
-                         $"({engine.LightCollector.FixtureLightCount} beams, {engine.LightCollector.FlameLightCount / 2} flame samples), " +
-                         $"simulated {CliArgs.F(engine.Time)} s");
+                         $"({engine.LightCollector.FixtureLightCount} beams, {engine.LightCollector.FlameLightCount / 2} flame samples)" +
+                         $"{(sync.IsWorkLightOn ? $" + work light ({WorkLightRig.LightCount} lights)" : "")}, simulated {CliArgs.F(engine.Time)} s");
 
         watch.Restart();
         var camera = CreateCamera(engine, options);
