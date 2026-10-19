@@ -310,6 +310,67 @@ public class ProceduralMeshTests
     }
 
     [Fact]
+    public void ASaggingSpanLiesOnTheSurfaceUnderItInsteadOfSinkingThroughIt()
+    {
+        // 6 m level span 2 cm above a floor at z = 0 with 20 % slack: unsupported it sags about 1.9 m
+        var points = new[] { new Vector3(0, 0, 0.02f), new Vector3(6, 0, 0.02f) };
+        const float radius = 0.005f;
+        CableSupportHeight floor = (x, y, maxHeight) => maxHeight >= -0.02f ? 0f : float.NegativeInfinity;
+        var free = CableTubeMesh.SamplePath(points, 1.2f, 0.05f);
+        Assert.True(free.Min(p => p.Z) < -1.5f);
+
+        var lying = CableTubeMesh.SamplePath(points, 1.2f, 0.05f, floor, radius);
+        Assert.All(lying, p => Assert.True(p.Z >= radius - 1e-6f, $"path point at z = {p.Z}"));
+        var mesh = CableTubeMesh.Create(points, new CableTubeOptions { Radius = radius, SlackFactor = 1.2f, MaxSampleSpacing = 0.05f, Support = floor });
+        mesh.Validate();
+        Assert.True(mesh.ComputeBounds().Min.Z >= -1e-5f, $"tube reaches z = {mesh.ComputeBounds().Min.Z}");
+        Assert.Equal(points[0], lying[0]);
+        Assert.Equal(points[1], lying[^1]);
+    }
+
+    [Fact]
+    public void ASurfaceAboveTheSpansChordDoesNotLiftIt()
+    {
+        // a cable running under a platform at 1 m sags freely; one draped from 3 m over a 1 m platform lies on it
+        CableSupportHeight platform = (x, y, maxHeight) => x is >= 2f and <= 4f && maxHeight >= 0.98f ? 1f : float.NegativeInfinity;
+        var under = CableTubeMesh.SamplePath(new[] { new Vector3(0, 0, 0.5f), new Vector3(6, 0, 0.5f) }, 1.05f, 0.05f, platform, 0.004f);
+        var reference = CableTubeMesh.SamplePath(new[] { new Vector3(0, 0, 0.5f), new Vector3(6, 0, 0.5f) }, 1.05f, 0.05f);
+        Assert.Equal(reference, under);
+
+        var over = CableTubeMesh.SamplePath(new[] { new Vector3(0, 0, 3f), new Vector3(6, 0, 3f) }, 1.5f, 0.05f, platform, 0.004f);
+        Assert.All(over.Where(p => p.X is >= 2f and <= 4f), p => Assert.True(p.Z >= 1.004f - 1e-5f, $"z = {p.Z} over the platform"));
+        Assert.Contains(over, p => p.X is >= 2.5f and <= 3.5f && MathF.Abs(p.Z - 1.004f) < 1e-4f); // it does touch the platform
+    }
+
+    [Fact]
+    public void EachSpanOfACableTreeCanHaveItsOwnSlack()
+    {
+        // A─B lies along a truss (straight), B─C hangs free (sags)
+        var a = new CableNode { Position = new Vector3(0, 0, 6) };
+        var b = new CableNode { Position = new Vector3(4, 0, 6) };
+        var c = new CableNode { Position = new Vector3(8, 0, 6) };
+        var cable = new CableComponent { Nodes = { a, b, c }, Segments = { new(a.Id, b.Id), new(b.Id, c.Id) }, SlackFactor = 1.1f };
+        var options = new CableTubeOptions
+        {
+            Radius = 0.004f,
+            RadialSegments = 6,
+            SlackFactor = 1.1f,
+            MaxSampleSpacing = 0.1f,
+            SpanSlack = (x, y) => (x == a && y == b) || (x == b && y == a) ? 1f : 1.1f,
+        };
+        var mesh = CableTubeMesh.Create(cable, options: options);
+        mesh.Validate();
+        var straightPart = mesh.Positions.Where(p => p.X < 3.9f).ToArray();
+        var hangingPart = mesh.Positions.Where(p => p.X > 4.1f).ToArray();
+        Assert.All(straightPart, p => Assert.InRange(p.Z, 6f - 0.0041f, 6f + 0.0041f));
+        Assert.True(hangingPart.Min(p => p.Z) < 6f - 0.5f);
+
+        // per-span slack values: missing or invalid ones draw the span straight
+        var path = CableTubeMesh.SamplePath(new[] { Vector3.Zero, new Vector3(4, 0, 0), new Vector3(8, 0, 0) }, new[] { float.NaN }, 0.1f);
+        Assert.Equal(3, path.Length);
+    }
+
+    [Fact]
     public void DegenerateCableInputYieldsAnEmptyMesh()
     {
         Assert.Equal(0, CableTubeMesh.Create(Array.Empty<Vector3>()).VertexCount);

@@ -7,9 +7,11 @@ namespace Candela.Assets;
 /// <summary>
 /// The surfaces a cable can rest on (floors, the ground): the height in metres (world Z) of the highest supporting
 /// surface at the horizontal position (<paramref name="x"/>, <paramref name="y"/>) that is not above
-/// <paramref name="maxHeight"/> (the lower end of the span being drawn; implementations allow a small tolerance so a
-/// point lying exactly on a surface is supported by it), or <see cref="float.NegativeInfinity"/> when nothing supports
-/// the cable there. A cable never sinks below it: a sagging span lies on the surface instead.
+/// <paramref name="maxHeight"/>, or <see cref="float.NegativeInfinity"/> when nothing supports the cable there.
+/// <paramref name="maxHeight"/> is the height of the span's straight chord at that point (at a node, the node itself), so
+/// a surface above the cable's route (a platform the cable runs under) is ignored while one the cable would sag through
+/// is found. Implementations allow a small tolerance so a point lying exactly on a surface is supported by it.
+/// A cable never sinks below the surface: a sagging span lies on it instead.
 /// </summary>
 public delegate float CableSupportHeight(float x, float y, float maxHeight);
 
@@ -48,7 +50,7 @@ public sealed record CableTubeOptions
     /// <summary>
     /// The surfaces the cable rests on, or null for none. Every point of the drawn path — nodes and the samples of a
     /// sagging span — is kept at least <see cref="Radius"/> above the supporting surface under it (the highest one not
-    /// above the lower end of its span), so a cable on a floor lies on it instead of sagging through it.
+    /// above the span's straight chord there), so a cable on a floor lies on it instead of sagging through it.
     /// </summary>
     public CableSupportHeight? Support { get; init; }
 }
@@ -236,15 +238,14 @@ public static class CableTubeMesh
             }
             float k = CatenaryParameter(slack);
             float sag = CatenarySag(straight, slack) * fraction;
-            float bottom = MathF.Min(a.Z, c.Z);
             int samples = System.Math.Clamp((int)MathF.Ceiling(straight / spacing), 2, 512);
             float coshK = MathF.Cosh(k);
             for (int s = 1; s <= samples; s++)
             {
                 float t = s / (float)samples;
                 float shape = (coshK - MathF.Cosh(k * (2 * t - 1))) / (coshK - 1);
-                var p = Vector3.Lerp(a, c, t) - Vector3.UnitZ * (sag * shape);
-                result.Add(Rest(p, s == samples ? c.Z : bottom, support, lift));
+                var chord = Vector3.Lerp(a, c, t);
+                result.Add(Rest(chord - Vector3.UnitZ * (sag * shape), s == samples ? c.Z : chord.Z, support, lift));
             }
         }
         // a cable lying on a surface makes runs of equal points where several samples rest at one spot: keep one
@@ -260,7 +261,7 @@ public static class CableTubeMesh
 
     /// <summary>
     /// <paramref name="p"/> raised, when needed, to <paramref name="clearance"/> above the surface that supports it (the
-    /// highest one not above <paramref name="maxHeight"/>).
+    /// highest one not above <paramref name="maxHeight"/>, the chord of its span there).
     /// </summary>
     private static Vector3 Rest(Vector3 p, float maxHeight, CableSupportHeight? support, float clearance)
     {
