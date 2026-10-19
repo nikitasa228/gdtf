@@ -91,7 +91,9 @@ record, a layer, the scene settings or a component — are read into Core's `Unk
 layer, settings or component and written back unchanged on save (the tolerant reader collects them for the scene and
 the entity records it reads element by element; layers, settings and components keep them through Core's JSON
 extension data). Components of types this version does not know are kept from loading and written back unchanged to
-the entities that still exist (`ProjectData.UnknownComponents`).
+the entities that still exist (`ProjectData.UnknownComponents`). Data of newer versions may nest as deep as the readers
+allow (`CandelaJson.MaxDepth`, 256 levels): every path that copies it back into a file (scene, kept components, kept
+asset records, repaired components) parses with the same limit, so what loads also saves.
 
 ### 1.3 `settings.json`
 
@@ -278,7 +280,8 @@ main thread. Assets are not decoded during loading (models and images decode laz
   with **different** bytes (in the project, or in the fixture library when `TargetGdtfProvider` is given) is renamed
   `Name (2).gdtf` and the imported fixtures are pointed to it (`project.merge-gdtf-renamed`) — including fixtures whose
   name differs from the stored copy's only in case, which would otherwise bind to this project's different file.
-* **Layers** are matched by id, then by name (`MergeLayersByName`); missing ones are added.
+* **Layers** are matched by id, then by name (`MergeLayersByName`); missing ones are added (with their properties of
+  newer versions, like the entities).
 * Console fixture ids are kept as authored; `RenumberFixtureIds` moves colliding ones above the highest id in use.
   Overlapping DMX addresses are left to the patch checks.
 * The copy is made by Core's `EntityCloner` (`ExternalReferenceHandling.Clear`, the merge's layer and asset tables as
