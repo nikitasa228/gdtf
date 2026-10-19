@@ -67,6 +67,40 @@ public sealed class DmxEvaluationEngineTests
     }
 
     [Fact]
+    public void An_mvr_fixture_with_a_gel_colour_and_no_colour_system_renders_in_that_colour()
+    {
+        // a dimmer-only profile with an MVR <Color> (Lee 106 Primary Red), written and read back as MVR
+        const string ellipsoidal = "ACME@ACME_ELLIPSOIDAL_300_D2550(E-300_D2550)@ACME_ELLIPSOIDAL_300_D2550(E-300_D2550).gdtf";
+        var red = new CieColor(0.69f, 0.30f, 9f);
+        string path = Path.Combine(TestEnvironment.NewTempDirectory("gel"), "gel.mvr");
+        using (var writer = TestEnvironment.CreateEngine("gel-export"))
+        {
+            var e = SceneBuilder.Fixture(writer.Scene, ellipsoidal, null, new Vector3(0f, 0f, 5f), 1, 1);
+            e.Get<FixtureComponent>()!.Color = red;
+            var exported = writer.ExportMvr(path);
+            Assert.True(exported.Success, exported.Summary);
+        }
+
+        using var engine = TestEnvironment.CreateEngine("gel-open");
+        var opened = engine.Open(path);
+        Assert.True(opened.Success, opened.Summary);
+        var (entity, fixture) = engine.Scene.Query<FixtureComponent>().Single();
+        Assert.NotNull(fixture.Color);
+        Assert.Equal(red.X, fixture.Color!.Value.X, 1e-4f);
+        Assert.Equal(1, StageLooks.ApplyOpenWhite(engine, new OpenWhiteOptions { Undoable = false }));
+        var world = new RecordingRenderWorld();
+        engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        engine.Tick(0);
+        engine.Tick(1.0 / 30);
+
+        Assert.False(engine.Dmx.GetState(entity.Id)!.Beams[0].Beam.HasColorSystem);
+        var light = world.Lights.Single(l => l.FixtureId == entity.Id);
+        var xyz = ColorSpaces.Rec2020ToXyz(light.Color);
+        var xy = new Vector2(xyz.X, xyz.Y) / (xyz.X + xyz.Y + xyz.Z);
+        Assert.True(xy.X > 0.6f && xy.Y < 0.36f, $"light colour {xy}");
+    }
+
+    [Fact]
     public void Rivale_beam_shaper_is_drawn_as_an_elongated_beam()
     {
         using var engine = TestEnvironment.CreateEngine("rivale-shaper");
