@@ -659,7 +659,7 @@ internal static class StageLoc
         (StageStr.FactIpRating, "IP rating", "Степень защиты IP"),
         (StageStr.FactSupply, "Supply", "Питание"),
         (StageStr.FactBattery, "battery", "аккумулятор"),
-        (StageStr.FactPanTiltRange, "Pan / tilt range", "Диапазон панорамы / наклона"),
+        (StageStr.FactPanTiltRange, "Pan / tilt range", "Панорама / наклон"),
         (StageStr.FactOperatingTemperature, "Operating temperature", "Рабочая температура"),
         (StageStr.FactFeatures, "Features", "Возможности"),
         (StageStr.FactControl, "Control", "Управление"),
