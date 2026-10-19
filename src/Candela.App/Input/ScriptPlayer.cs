@@ -49,6 +49,12 @@ internal interface IScriptTarget
 
     /// <summary>The main window (for marking the cursor as inside it).</summary>
     Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr MainWindow { get; }
+
+    /// <summary>
+    /// The screen point (Dear ImGui coordinates) of a world point or of an entity's drawn centre in the active viewport,
+    /// or null when it is not visible there.
+    /// </summary>
+    Vector2? ScreenPointOf(Vector3? world, string entityName);
 }
 
 /// <summary>
@@ -123,6 +129,13 @@ internal sealed class ScriptPlayer
         {
             case StepKind.MousePos:
                 io.AddMousePosEvent(origin.X + step.Position.X, origin.Y + step.Position.Y);
+                break;
+            case StepKind.MouseScene:
+                if (target.ScreenPointOf(step.Action!.World, step.Action.Entity) is not { } p)
+                    throw new InvalidOperationException(step.Action.Entity.Length > 0
+                        ? $"'{step.Action.Entity}' is not visible in the active viewport"
+                        : $"the world point {step.Action.World} is not visible in the active viewport");
+                io.AddMousePosEvent(p.X, p.Y);
                 break;
             case StepKind.MouseButton:
                 io.AddMouseButtonEvent(step.Button, step.Down);
@@ -199,15 +212,17 @@ internal sealed class ScriptPlayer
     {
         var pos = new Vector2(a.X, a.Y);
         var mods = ParseModifiers(a.Modifiers);
+        // A scene point (world position or entity) is turned into a screen point when the action runs.
+        var mouse = a.HasScenePoint ? Step.MouseAt(a) : Step.Mouse(pos);
         switch (a.Type)
         {
             case ScriptActionType.Wait:
                 return frame + a.Frames;
             case ScriptActionType.Move:
-                At(schedule, frame).Add(Step.Mouse(pos));
+                At(schedule, frame).Add(mouse);
                 return frame + 1;
             case ScriptActionType.Click:
-                At(schedule, frame).Add(Step.Mouse(pos));
+                At(schedule, frame).Add(mouse);
                 At(schedule, frame).Add(Step.Mods(mods));
                 At(schedule, frame + 1).Add(Step.ButtonEvent(a.Button, true));
                 At(schedule, frame + 2).Add(Step.ButtonEvent(a.Button, false));
@@ -236,7 +251,7 @@ internal sealed class ScriptPlayer
                 }
 
             case ScriptActionType.Press:
-                At(schedule, frame).Add(Step.Mouse(pos));
+                At(schedule, frame).Add(mouse);
                 At(schedule, frame).Add(Step.Mods(mods));
                 At(schedule, frame + 1).Add(Step.ButtonEvent(a.Button, true));
                 return frame + 2;
@@ -245,7 +260,7 @@ internal sealed class ScriptPlayer
                 At(schedule, frame + 1).Add(Step.Mods(KeyModifiers.None));
                 return frame + 2;
             case ScriptActionType.Scroll:
-                At(schedule, frame).Add(Step.Mouse(pos));
+                At(schedule, frame).Add(mouse);
                 At(schedule, frame + 1).Add(Step.WheelEvent(a.Delta));
                 return frame + 2;
             case ScriptActionType.Key:
@@ -303,6 +318,7 @@ internal sealed class ScriptPlayer
     private enum StepKind
     {
         MousePos,
+        MouseScene,
         MouseButton,
         Wheel,
         Modifiers,
@@ -323,6 +339,7 @@ internal sealed class ScriptPlayer
         public ScriptAction? Action { get; init; }
 
         public static Step Mouse(Vector2 p) => new(StepKind.MousePos) { Position = p, Text = "" };
+        public static Step MouseAt(ScriptAction a) => new(StepKind.MouseScene) { Action = a, Text = "" };
         public static Step ButtonEvent(int b, bool down) => new(StepKind.MouseButton) { Button = b, Down = down, Text = "" };
         public static Step WheelEvent(float amount) => new(StepKind.Wheel) { Amount = amount, Text = "" };
         public static Step Mods(KeyModifiers m) => new(StepKind.Modifiers) { Modifiers = m, Text = "" };

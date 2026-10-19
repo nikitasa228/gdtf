@@ -768,6 +768,25 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     }
 
     /// <inheritdoc/>
+    public Vector2? ScreenPointOf(Vector3? world, string entityName)
+    {
+        var viewport = ActiveViewport;
+        Vector3 point;
+        if (world is { } w)
+        {
+            point = w;
+        }
+        else
+        {
+            var entity = _ctx.Session.Scene.All().FirstOrDefault(e => string.Equals(e.Name, entityName, StringComparison.OrdinalIgnoreCase))
+                         ?? throw new KeyNotFoundException($"no entity named {entityName}");
+            point = _ctx.Session.Content is { } content && content.TryGetBounds(entity.Id, out var bounds) && !bounds.IsEmpty ? bounds.Center : entity.WorldPosition;
+        }
+
+        return viewport.ScreenOf(point);
+    }
+
+    /// <inheritdoc/>
     public void SetSetting(string name, string value)
     {
         var s = _ctx.Settings.Settings;

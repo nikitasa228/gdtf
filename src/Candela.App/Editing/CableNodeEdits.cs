@@ -58,7 +58,7 @@ internal static class CableNodeEdits
     /// Commits a drag as one undo step: the node goes back to <paramref name="before"/> and a command moves it to its
     /// current place. Returns false when the node did not move.
     /// </summary>
-    public static bool CommitMove(UndoStack undo, CableComponent cable, CableNode node, (Vector3 Position, CableAnchor? Anchor) before)
+    public static bool CommitMove(UndoStack undo, CableComponent cable, CableNode node, (Vector3 Position, CableAnchor? Anchor) before, bool breakMerge = true)
     {
         ArgumentNullException.ThrowIfNull(undo);
         ArgumentNullException.ThrowIfNull(cable);
@@ -77,18 +77,22 @@ internal static class CableNodeEdits
                 n.Anchor = after.Anchor;
             }
         }, CableLoc.English_(CableStr.NodeMoved)));
-        undo.BreakMerge();
+        if (breakMerge)
+            undo.BreakMerge();
         return true;
     }
 
-    /// <summary>Moves a node to <paramref name="world"/> as one undo step (numeric entry, tests).</summary>
-    public static bool Move(SceneModel scene, UndoStack undo, CableNodeRef reference, Vector3 world)
+    /// <summary>
+    /// Moves a node to <paramref name="world"/> as one undo step (numeric entry, tests); with
+    /// <paramref name="breakMerge"/> false consecutive moves of the node merge into one step (a drag on a field).
+    /// </summary>
+    public static bool Move(SceneModel scene, UndoStack undo, CableNodeRef reference, Vector3 world, bool breakMerge = true)
     {
         if (Resolve(scene, reference) is not var (entity, cable, node))
             return false;
         var before = Capture(node);
         Apply(scene, entity, node, world);
-        return CommitMove(undo, cable, node, before);
+        return CommitMove(undo, cable, node, before, breakMerge);
     }
 
     /// <summary>

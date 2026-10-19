@@ -41,6 +41,7 @@ internal sealed class StagePanelContext
             context.Tools.Stage, context.Settings.Settings)
         {
             SettingsChanged = () => context.Settings.RequestSave(context.Timer.Elapsed),
+            SelectedCableNode = () => context.Tools.CableNode,
         };
     }
 
@@ -72,6 +73,9 @@ internal sealed class StagePanelContext
 
     /// <summary>Called when a user setting was changed by a panel (the editor saves the settings file).</summary>
     public Action? SettingsChanged { get; set; }
+
+    /// <summary>The selected cable point (the viewports' node selection), or null.</summary>
+    public Func<Editing.CableNodeRef?>? SelectedCableNode { get; set; }
 }
 
 /// <summary>

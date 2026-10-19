@@ -6,6 +6,7 @@ using Candela.Core.Diagnostics;
 using Candela.Core.Editing;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
+using Candela.Electrical;
 using Candela.Engine;
 using Hexa.NET.ImGui;
 
@@ -152,7 +153,7 @@ internal sealed class FixtureInspectorView
         if (feed is null)
             return StageLoc.Get(StageStr.LockConsole);
         string console = _stage.Scene.Find(feed.ConsoleEntityId)?.Name ?? "?";
-        return StageLoc.Format(StageStr.LockConsoleNamed, console, feed.ConsolePort, feed.FirstUniverse, feed.ChainIndex);
+        return CableLoc.Format(CableStr.LockConsoleCable, console, feed.ConsolePort, feed.ChainIndex, feed.FirstUniverse);
     }
 
     private string LockReasonDmx(Entity entity)
@@ -441,6 +442,7 @@ internal sealed class FixtureInspectorView
         {
             PropertyGrid.Row(StageLoc.Get(StageStr.PatchRange));
             ImGui.TextUnformatted(PatchRangeText(entity));
+            CablingRows(engine, entity);
         }
 
         PropertyGrid.End();
@@ -497,6 +499,73 @@ internal sealed class FixtureInspectorView
         return true;
     }
 
+    private object? _cablingOf;
+    private Guid _cablingFor;
+    private string _cablingLanguage = "";
+    private string _dataText = "";
+    private string _powerText = "";
+    private Guid? _dataCable;
+    private Guid? _powerCable;
+
+    /// <summary>
+    /// The fixture's cabling under its patch: where its DMX comes from ("'Desk' DMX A · cable 3 · U1": the console, its
+    /// output, the fixture's place on the line and the universe that arrives) and where its power comes from (the
+    /// source, outlet, phase and voltage). A click opens the cable's link window.
+    /// </summary>
+    private void CablingRows(StageEngine engine, Entity entity)
+    {
+        NetworkSolution solution;
+        try
+        {
+            solution = engine.NetworkSolution;
+        }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(solution, _cablingOf) || _cablingFor != entity.Id || _cablingLanguage != Loc.Language)
+        {
+            _cablingOf = solution;
+            _cablingFor = entity.Id;
+            _cablingLanguage = Loc.Language;
+            var feed = solution.DataFeedOf(entity.Id);
+            _dataCable = feed?.CableEntityId;
+            _dataText = feed is null
+                ? CableLoc.Get(CableStr.PatchDataNone)
+                : CableLoc.Format(CableStr.PatchDataLine, _stage.Scene.Find(feed.ConsoleEntityId)?.Name ?? "?", feed.ConsolePort, feed.ChainIndex,
+                    feed.UniverseCount > 1 ? $"{feed.FirstUniverse}–{feed.FirstUniverse + feed.UniverseCount - 1}" : feed.FirstUniverse.ToString(CultureInfo.InvariantCulture));
+            var power = solution.PowerFeedOf(entity.Id);
+            _powerCable = power?.CableEntityId;
+            _powerText = power is null
+                ? CableLoc.Get(CableStr.PatchPowerNone)
+                : CableLoc.Format(CableStr.PatchPowerLine, _stage.Scene.Find(power.SourceEntityId)?.Name ?? "?", power.OutletPort, power.Phase,
+                    power.VoltageV.ToString("0", CultureInfo.InvariantCulture)) + "##power-feed";
+            _dataText += "##data-feed";
+        }
+
+        PropertyGrid.Row(CableLoc.Get(CableStr.PatchData));
+        CablingLink(_dataText, _dataCable);
+        PropertyGrid.Row(CableLoc.Get(CableStr.PatchPower));
+        CablingLink(_powerText, _powerCable);
+    }
+
+    private void CablingLink(string text, Guid? cable)
+    {
+        if (cable is not { } id)
+        {
+            ImGui.TextDisabled(text[..text.IndexOf("##", StringComparison.Ordinal)]);
+            return;
+        }
+
+        ImGui.PushStyleColor(ImGuiCol.Text, Theme.Accent);
+        if (ImGui.Selectable(text))
+            _stage.Tools.RequestCableLink(id);
+        ImGui.PopStyleColor();
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(StageLoc.Get(StageStr.PropsCableLinkHint));
+    }
+
     private string PatchRangeText(Entity entity)
     {
         var patch = _stage.Tools.External.Patch;
@@ -523,7 +592,8 @@ internal sealed class FixtureInspectorView
             _issues.Clear();
             foreach (var issue in current)
             {
-                if (issue.Category == IssueCategory.Patch && issue.Entities.Contains(entity.Id))
+                // Patch problems and the data problems of the fixture's cabling (universe mismatch, no signal, Y-split …).
+                if (issue.Category is IssueCategory.Patch or IssueCategory.Data && issue.Entities.Contains(entity.Id))
                     _issues.Add(issue);
                 if (_issues.Count >= 4)
                     break;

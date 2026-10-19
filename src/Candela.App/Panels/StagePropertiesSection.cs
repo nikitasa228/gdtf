@@ -16,6 +16,7 @@ internal sealed class StagePropertiesSection
     private readonly FixtureInspectorView _fixture;
     private readonly SurfaceInspectorView _surface;
     private readonly DeviceFactsView _device;
+    private readonly ConnectionInspectorView _connections;
 
     /// <summary>Creates the section.</summary>
     public StagePropertiesSection(StagePanelContext stage)
@@ -24,7 +25,11 @@ internal sealed class StagePropertiesSection
         _fixture = new FixtureInspectorView(stage);
         _surface = new SurfaceInspectorView(stage);
         _device = new DeviceFactsView(stage);
+        _connections = new ConnectionInspectorView(stage, stage.SelectedCableNode);
     }
+
+    /// <summary>The cable / console / power source view (tests).</summary>
+    internal ConnectionInspectorView Connections => _connections;
 
     /// <summary>The fixture view (tests).</summary>
     internal FixtureInspectorView Fixture => _fixture;
@@ -36,6 +41,8 @@ internal sealed class StagePropertiesSection
     public void Draw(Entity entity, float labelWidth)
     {
         ArgumentNullException.ThrowIfNull(entity);
+        if (ConnectionInspectorView.Applies(entity) && _stage.Engine is { } cabling)
+            _connections.Draw(cabling, entity, labelWidth);
         if (entity.Get<FixtureComponent>() is { } fixture)
             _fixture.Draw(entity, fixture, labelWidth);
         else if (DeviceFactsView.HasPorts(entity) && _stage.Engine is { } engine)

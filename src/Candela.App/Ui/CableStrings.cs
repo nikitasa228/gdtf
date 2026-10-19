@@ -99,6 +99,7 @@ internal enum CableStr
     // Properties: cable, console, power source, data/power rows
     PropsCable,
     PropsCableType,
+    PropsCableLabel,
     PropsCableLength,
     PropsCableWeight,
     PropsCableSlack,
@@ -322,6 +323,7 @@ internal static class CableLoc
 
         (CableStr.PropsCable, "Cable", "Кабель"),
         (CableStr.PropsCableType, "Type", "Тип"),
+        (CableStr.PropsCableLabel, "Label", "Метка"),
         (CableStr.PropsCableLength, "Length", "Длина"),
         (CableStr.PropsCableWeight, "Weight", "Вес"),
         (CableStr.PropsCableSlack, "Slack", "Запас"),
