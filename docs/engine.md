@@ -82,12 +82,12 @@ profile did not change keep their state. Changing an asset's import options mark
 
 **Stand-in GDTFs (substitutes).** When the library has no file of a model an MVR asks for, the MVR importer draws it
 with a similar model of the same manufacturer (`mvr.gdtf-substitute`; Фокина's MagicBlade R as an Ayrton MagicPanel
-602). The importer keeps the mode of the requested name, which belongs to the missing model and may be far wider (the
-MagicBlade's 44-channel "Extended" became the panel's 160-channel "Extended": 73 overlap errors on Фокина). After the
-import the engine gives each stand-in type the mode that best fits its patch spacing (`SubstituteModes.Choose`: the
-requested mode when it fits, else the largest that fits, else the smallest; note `engine.substitute-mode`) and records
-every stand-in in `EngineSettings.Substitutes` (requested GDTF and mode, stand-in file, spacing; saved with the
-project). The patch judges stand-ins by that record (`PatchIssueProvider.Substitutions`): one `patch.substitute-gdtf`
+602). The importer gives each stand-in type the mode that best fits its patch spacing — the requested mode when it
+fits, else the largest that fits, else the smallest (`mvr.substitute-mode`, docs/mvr.md; the MagicBlade's 44-channel
+"Extended" would otherwise have become the panel's 160-channel "Extended": 73 overlap errors on Фокина) — with the
+same rule as `SubstituteModes.Choose`, which the DMX engine and the patch use for fixtures whose `GdtfSpec` is still a
+stub name. After the import the engine records every stand-in in `EngineSettings.Substitutes` (requested GDTF and
+mode, stand-in file, spacing; saved with the project). The patch judges stand-ins by that record (`PatchIssueProvider.Substitutions`): one `patch.substitute-gdtf`
 warning per type with all its fixtures, and overlaps or slots past 512 that only the stand-in's larger footprint causes
 are one warning per type, not errors. When the real GDTF arrives (library reload, `.gdtf` import), the stand-ins switch
 to it in the requested mode (else the mode that fits the spacing) and leave the record (`engine.substitute-replaced`).
@@ -323,7 +323,6 @@ adds the light plot).
 | `engine.settings-invalid` | warning | a project's `engine`/`view` section could not be read |
 | `engine.library-missing` | warning/error | no library folder, or it cannot be scanned |
 | `engine.field-clamped` | warning | a fixture's field angle was wider than the renderer's 170° cone and was clamped |
-| `engine.substitute-mode` | note | an MVR import's stand-in GDTF uses another of its modes, to fit the patch spacing |
 | `engine.substitute-replaced` | note | fixtures that stood in for a missing model now use its GDTF, which the library has |
 
 Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (electrical), `asset.*` (asset store),

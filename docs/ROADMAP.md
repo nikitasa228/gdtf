@@ -27,8 +27,9 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       expectations in the Mvr and Gdtf tests (Engine tests and the drop-in check need no change)
 - [x] MVR import (layers, fixtures, scene objects, trusses, supports, groups, addresses, embedded GDTF/3D) and export;
       `stages/Фокина.mvr` loads with all 91 fixtures (5 GDTF specs; 4 resolved to same-brand substitutes, reported as
-      issues, until the real files are added; the MagicBlade R stand-in's wider mode overlaps the patch; with the
-      real footprints the patch is clean, checked with stand-ins of the real names and modes) — docs/mvr.md
+      issues, until the real files are added; each stand-in takes its mode that fits the patch spacing, so the patch
+      has no errors; with the real footprints the patch is clean too, checked with stand-ins of the real names and
+      modes) — docs/mvr.md
 - [x] Photometry: CIE colour science, CCT, emitter mixing, CMY/gels, beam distribution, cd/lux, light meter,
       acoustics, blackbody (docs/photometry.md)
 - [x] DMX: universes, patch, attribute evaluation → physical fixture state, motor dynamics, encoder, DmxEngine

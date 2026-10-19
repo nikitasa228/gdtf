@@ -205,13 +205,23 @@ library entry and path, match kind and score, the embedded bytes and whether the
 `FixtureType`, the object count, and the mode resolutions. `ReadBytes()` returns the bytes of the GDTF in use.
 
 **Modes.** The requested `GDTFMode` is looked up exactly, then ignoring case, spaces and punctuation. If the GDTF lacks
-it, which is common with substitutes, the closest mode is chosen by name similarity (weight 0.4) and by how well its
-first-break footprint matches the **patch spacing** (weight 0.6). The patch spacing is the most frequent gap between
-consecutive start addresses of fixtures of that spec and mode in one universe. The choice is reported as
-`mvr.mode-unknown`.
+it, the closest mode is chosen by name similarity (weight 0.4) and by how well its first-break footprint matches the
+**patch spacing** (weight 0.6). The patch spacing here is the most frequent gap between consecutive start addresses of
+fixtures of that spec and mode in one universe. The choice is reported as `mvr.mode-unknown`.
 
-When a substitute's mode, or a closest mode, needs more channels than the patch spacing leaves, the fixtures' DMX
-ranges overlap. This is reported as `mvr.mode-footprint`.
+A **substitute** (a similar model standing in for one the library lacks) is treated differently, because the requested
+mode name belongs to the missing model: a stand-in mode of that name may be far wider than the real one. When the
+fixtures of the spec and mode are patched at least two to a universe, the stand-in takes the requested mode only if its
+first-break footprint fits the spacing — here the *smallest* gap between two start addresses in one universe, the most
+channels the real mode can use without overlapping — and otherwise its most complete mode that fits (largest
+footprint; GDTF order breaks ties), or its smallest mode when none fits. A replaced mode of the requested name is a
+`mvr.substitute-mode` note, a missing one a `mvr.mode-unknown` warning that names the spacing. This is the same rule as
+`Candela.Dmx.SubstituteModes.Choose`, which the engine uses for stand-ins it resolves itself; `SubstituteModeTests`
+checks that both pick the same mode for every library fixture type, mode name and a range of spacings. Without a
+spacing (one fixture per universe) the mode is matched by name as above.
+
+When a mode still needs more channels than the patch spacing leaves (a closest mode, or a stand-in none of whose modes
+fits), the fixtures' DMX ranges overlap. This is reported as `mvr.mode-footprint`.
 
 ### `stages/Фокина.mvr`
 
@@ -221,7 +231,7 @@ substitutes:
 
 | GDTFSpec (objects) | Resolved library file | Match | Mode |
 |---|---|---|---|
-| `Ayrton@MagicBlade R.gdtf` (28) | `Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf` | substitute | Extended → Extended (160 ch, patch spacing 44: overlap reported) |
+| `Ayrton@MagicBlade R.gdtf` (28) | `Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf` | substitute | Extended → Standard (20 ch, patch spacing 44; the panel's own Extended has 160) |
 | `Ayrton@Zonda 3 Wash.gdtf` (28) | `Ayrton@Zonda_3_FX@V1.81_Corrected_Factory_Tilt.gdtf` | substitute | Basic → Basic (26 ch, spacing 26) |
 | `Ayrton @Rivale Profile.gdtf` (27) | `Ayrton@Rivale_Wash@V1.8_Correct_Gobo_Value.gdtf` | substitute | Standard → Standard_540 (38 ch, spacing 42) |
 | `Martin@Atomic 3000 LED.gdtf` (4) | `Martin_Professional@VDO_Atomic_Bold@20260620.gdtf` | substitute | Mode 1 → 3 Channel (3 ch, spacing 3) |
@@ -231,17 +241,17 @@ Every fixture ends up with a library GDTF that has real geometry and DMX modes. 
 
 * four `mvr.gdtf-substitute` warnings;
 * one `mvr.gdtf-stub` note;
-* two `mvr.mode-unknown` warnings (Atomic `Mode 1`, Rivale `Standard`);
-* one `mvr.mode-footprint` warning (MagicBlade R);
+* two `mvr.mode-unknown` warnings (Atomic `Mode 1`, Rivale `Standard`), each naming the stand-in mode that fits the
+  patch spacing;
+* one `mvr.substitute-mode` note (MagicBlade R: the MagicPanel 602's 160-channel `Extended` would overlap the
+  44-channel patch, so its 20-channel `Standard` is used);
 * one note for Depence's unknown `<FixtureTypeId>` element.
 
-There are no import errors. The substitutes are not good enough for the show, though: as imported, the MagicPanel 602
-stand-in's 160-channel `Extended` mode overlaps the 44-channel MagicBlade patch (73 `patch.overlap` and 4
-`patch.out-of-range` errors, all caused by it), and the other stand-ins have the wrong optics and photometry. The
-engine (`StageEngine.Open`/`Import`, docs/engine.md) therefore gives every stand-in type the mode that fits its patch
-spacing — the MagicPanel's 20-channel `Standard` for the 44-channel spacing, `engine.substitute-mode` — and records the
-stand-ins, so the patch reports one `patch.substitute-gdtf` warning per type and no patch errors (`candela validate`
-exits 0), and switches them to the real GDTFs once the library has them.
+There are no import errors and no stand-in overlaps the patch (before the importer chose stand-in modes by spacing, the
+MagicPanel's `Extended` caused 73 `patch.overlap` and 4 `patch.out-of-range` errors). The substitutes are still not
+good enough for the show: their bodies, optics and photometry are the stand-ins'. The engine (`StageEngine.Open`/
+`Import`, docs/engine.md) records the stand-ins, so the patch reports one `patch.substitute-gdtf` warning per type and
+no patch errors (`candela validate` exits 0), and switches them to the real GDTFs once the library has them.
 
 #### What the scene expects, and where the real GDTFs are
 
@@ -436,6 +446,7 @@ Writing the result again gives the same bytes.
 * **Not implemented.** MVR-xchange, the network protocol for live scene exchange that accompanies MVR 1.6. Elements
   of newer MVR versions are kept as unknown elements but not interpreted.
 * **Substitutes.** A substitute GDTF is a best effort by name within the brand. The UI should show it as a substitute.
-  `mvr.mode-footprint` flags patches the substitute does not fit. The importer keeps a stand-in mode of the requested
-  name even when it is far wider than the patch spacing; `Candela.Engine` corrects it after the import
-  (`SubstituteModes.Choose` in Candela.Dmx), so a caller of `MvrImporter` alone still gets the wide mode.
+  Its mode fits the patch spacing, but its DMX layout is still the stand-in's, so a console's cues for the real model
+  drive the wrong attributes. `mvr.mode-footprint` flags patches none of the substitute's modes fits. The mode rule
+  exists twice (`ModeMatcher.FitToSpacing` here, `SubstituteModes.Choose` in Candela.Dmx) because Candela.Mvr may not
+  reference Candela.Dmx; a test keeps them in agreement.

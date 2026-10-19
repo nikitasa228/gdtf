@@ -96,7 +96,9 @@ Compilation (`FixtureProfile.Builder`):
    chain, so each pixel's functions depend on that pixel's master) with the master range at the master's resolution.
 6. **Relations** (`Multiply`, `Override`) resolved to channel instances, again per reference chain, and ordered so
    that every master is evaluated before its followers (chains such as grand master → pixel dimmer → pixel colour;
-   relations closing a cycle are dropped with a warning). A dimmer's `Override` of a level (dimmer, additive colour,
+   of each cycle one edge is dropped with a warning — an `Override` edge before a `Multiply` one, so BeamZ Nereid's
+   pixel dimmers, which their W channel "overrides" while they multiply it, keep dimming — and followers downstream of
+   a cycle keep their relations). A dimmer's `Override` of a level (dimmer, additive colour,
    RGB, HSB/CIE brightness) is read as `Multiply` — a virtual dimmer written with the wrong type; replacing the colour
    by the dimmer level would make the colour channels inoperative (warning "… Override relation(s) of a dimmer over a
    level read as Multiply").
@@ -389,8 +391,10 @@ Steady-state frames allocate nothing; idle fixtures cost nothing.
 `ReloadProfiles()` re-resolves every fixture at the next `Update` after the library or the profile cache changed (a
 GDTF added, a substitute replaced by the real file) without resetting anything: a fixture whose profile changed gets
 a new state that continues the old one's motor positions, rotations and clock (`FixtureState.ContinueFrom`, matched
-by attribute and instance), so moving heads neither jump nor travel again; a fixture resolving for the first time
-starts where its DMX puts it.
+by channel name and instance, else attribute and instance, else attribute and its rank among the motorised channels
+of that attribute — modes and files that name their geometry differently, such as Zonda 3 FX's "YOKE Std" and
+"YOKE Ext", or a stand-in replaced by the real GDTF), so moving heads neither jump nor travel again; a fixture
+resolving for the first time starts where its DMX puts it.
 
 ## Performance
 
