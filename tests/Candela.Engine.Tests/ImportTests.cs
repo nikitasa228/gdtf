@@ -251,7 +251,7 @@ public sealed class ImportTests
         string script = Path.Combine(folder, "rejecting-worker.sh");
         // candela import-worker <input> <output-dir> …: the reason goes to <output-dir>/error.txt, exit code 4
         File.WriteAllText(script, "#!/bin/sh\nprintf 'The file has no geometry the importer understands.' > \"$3/error.txt\"\nexit 4\n");
-        File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         using var engine = new StageEngine(new StageEngineOptions
         {
             Library = TestEnvironment.Library,
