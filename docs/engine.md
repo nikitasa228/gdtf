@@ -378,7 +378,9 @@ meters the final image (stage metering); a sequence keeps the first frame's expo
 every 10 s and a line per frame (samples, time, EV). Ctrl+C stops after the work in flight and writes the image of
 the samples done (exit code 130; nothing is written before the first sample). `--mode`, `--overlay` and `--grid` do
 not apply to `--final`, and the final-only options need it (usage errors). A GPU without ray queries gets the reason
-and exit code 3; the real-time `render` works there. `render stages/Фокина.mvr --look demo --final --seconds 60
+and exit code 3; the real-time `render` works there. So does a size whose path-tracer images would take more than half
+of the GPU's memory (about 100 bytes per pixel: 16 384² is refused on a 16 GB device), with the hint to render a
+smaller image. `render stages/Фокина.mvr --look demo --final --seconds 60
 --width 480 --height 270` reaches about 10 samples on lavapipe.
 
 **artnet-test** sends `ArtNetTestPattern` (pan/tilt sweep, colour chase, dimmer wave, zoom) with ArtSync and
