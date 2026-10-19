@@ -505,8 +505,11 @@ and `RenderJobTests` (the plan, a frame and a timecode sequence rendered on a he
 pixel by pixel).
 
 Limitations: final path tracing and EXR output wait for the path tracer; the recorder samples the input once per editor
-frame; status texts of the protocols come from `Candela.Protocols` in English; the cable editor that a cable link opens
-comes with phase B3.
+frame; status texts of the protocols and the issue messages of the engine (patch, MVR import) come in English; the
+timecode's source names the protocol, not the sender's address (the Art-Net receiver does not report it); changes of
+the preview, render and legend settings are saved with the project but do not count as unsaved changes, and they are
+not undo steps (the engine's modified flag covers the stage only); the cable editor that a cable link opens comes with
+phase B3.
 
 ## Robustness
 
