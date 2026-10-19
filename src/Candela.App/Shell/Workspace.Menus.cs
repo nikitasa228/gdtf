@@ -176,7 +176,7 @@ internal sealed partial class Workspace
                 for (int i = 0; i < recent.Count; i++)
                 {
                     string path = recent[i];
-                    if (_menu.Item($"{Icons.File}  {Path.GetFileName(path)}##{i}", "", false, true, path))
+                    if (_menu.Item($"{Icons.File}  {SafeText.Label(Path.GetFileName(path))}##{i}", "", false, true, path))
                         OpenPath(path);
                 }
 

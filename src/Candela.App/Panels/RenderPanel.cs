@@ -261,7 +261,7 @@ internal sealed unsafe class RenderPanel : Panel
             ImGui.Selectable("EXR", false);
             ImGui.EndDisabled();
             if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-                ImGui.SetTooltip(StageLoc.Get(StageStr.RenderExrHint));
+                SafeText.Tooltip(StageLoc.Get(StageStr.RenderExrHint));
             ImGui.EndCombo();
         }
 
@@ -314,7 +314,7 @@ internal sealed unsafe class RenderPanel : Panel
         }
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(PlanText(s));
+            SafeText.Tooltip(PlanText(s));
         PropertyGrid.Row(Loc.Get(Str.PreviewToneMapper));
         int tone = Math.Clamp((int)s.ToneMapper, 0, ToneMappers.Length - 1);
         if (ImGui.Combo("##tone", ref tone, ToneMappers, ToneMappers.Length))
@@ -371,12 +371,12 @@ internal sealed unsafe class RenderPanel : Panel
             fixed (byte* start = _start)
                 ImGui.InputText("##start", start, (nuint)_start.Length, ImGuiInputTextFlags.CharsNoBlank);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(StageLoc.Get(StageStr.RenderRangeHint));
+                SafeText.Tooltip(StageLoc.Get(StageStr.RenderRangeHint));
             PropertyGrid.Row(Loc.Get(Str.RenderRangeEnd));
             fixed (byte* end = _end)
                 ImGui.InputText("##end", end, (nuint)_end.Length, ImGuiInputTextFlags.CharsNoBlank);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(StageLoc.Get(StageStr.RenderRangeHint));
+                SafeText.Tooltip(StageLoc.Get(StageStr.RenderRangeHint));
             PropertyGrid.Row(Loc.Get(Str.RenderFrameRate));
             float fps = (float)s.FrameRate;
             if (ImGui.DragFloat("##fps", ref fps, 0.1f, 1f, 120f, StageUnits.Current.FormatFramesPerSecond))
@@ -389,7 +389,7 @@ internal sealed unsafe class RenderPanel : Panel
         }
 
         if (_rangeError is not null)
-            ImGui.TextColored(Theme.Error, _rangeError);
+            SafeText.Colored(Theme.Error, _rangeError);
         return edited;
     }
 

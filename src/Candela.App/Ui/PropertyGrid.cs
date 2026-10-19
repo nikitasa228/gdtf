@@ -62,7 +62,7 @@ internal static class PropertyGrid
         float labelWidth = label.Length == 0 ? 0f : ImGui.CalcTextSize(label).X;
         s_currentWidest = MathF.Max(s_currentWidest, labelWidth);
         if (ImGui.IsItemHovered() && labelWidth > ImGui.GetColumnWidth())
-            ImGui.SetTooltip(label);
+            SafeText.Tooltip(label);
         ImGui.TableNextColumn();
         ImGui.SetNextItemWidth(-1);
     }

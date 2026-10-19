@@ -302,7 +302,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         if (ImGui.Button(Icons.FileInput + "##import-gdtf"))
             _host.ShowGdtfImport();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.FileImportGdtf).TrimEnd('…'));
+            SafeText.Tooltip(Loc.Get(Str.FileImportGdtf).TrimEnd('…'));
         ImGui.Spacing();
 
         RefreshFixtureList();
@@ -317,16 +317,16 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
             if (Chip(CategoryNames[i], _category == i, ref x, avail, style))
                 _category = i;
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(Loc.Format(Str.LibCount, _categoryCounts[i]));
+                SafeText.Tooltip(Loc.Format(Str.LibCount, _categoryCounts[i]));
         }
 
         ImGui.NewLine();
         ImGui.Separator();
-        ImGui.TextDisabled(CountText(_filtered.Count));
+        SafeText.Disabled(CountText(_filtered.Count));
         if (_worker is { Pending: > 0 } w)
         {
             ImGui.SameLine();
-            ImGui.TextColored(Theme.TextMuted, PendingText(w.Pending));
+            SafeText.Colored(Theme.TextMuted, PendingText(w.Pending));
         }
 
         if (engine is null || engine.Library.Count == 0)
@@ -690,7 +690,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         if (ImGui.Button(importLabel))
             _host.ShowModelImport();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.LibImportTooltip));
+            SafeText.Tooltip(Loc.Get(Str.LibImportTooltip));
         ImGui.Separator();
 
         if (_filteredModelVersion != _models.Version || _filteredModelSearch != _modelSearch)
@@ -706,7 +706,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
             }
         }
 
-        ImGui.TextDisabled(Loc.Format(Str.LibModelCount, _filteredModels.Count));
+        SafeText.Disabled(Loc.Format(Str.LibModelCount, _filteredModels.Count));
         if (_models.Items.Count == 0)
         {
             EmptyState(Icons.Package, Loc.Get(Str.LibModelsEmpty));
@@ -757,7 +757,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
                         ImGui.InvisibleButton("##model", new Vector2(tile, tileHeight));
                         bool hovered = ImGui.IsItemHovered();
                         if (hovered)
-                            ImGui.SetTooltip(item.Path);
+                            SafeText.Tooltip(item.Path);
                         if (ImGui.BeginPopupContextItem("##model-menu"))
                         {
                             if (ImGui.MenuItem(Labels.With(Icons.Trash, Str.LibRemove)))
@@ -849,7 +849,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
 
         ImGui.BeginGroup();
         ImGui.TextUnformatted(item.Name);
-        ImGui.TextDisabled(item.Device is null ? Loc.Get(Str.LibDragHint) : CableLoc.Get(CableStr.DevicesDragHint));
+        SafeText.Disabled(item.Device is null ? Loc.Get(Str.LibDragHint) : CableLoc.Get(CableStr.DevicesDragHint));
         ImGui.EndGroup();
         ImGui.EndDragDropSource();
     }
@@ -1068,10 +1068,10 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         float total = iconSize.Y * 2 + textSize.Y;
         var start = ImGui.GetCursorPos();
         ImGui.SetCursorPos(new Vector2(start.X + (avail.X - iconSize.X) * 0.5f, start.Y + MathF.Max(8f, (avail.Y - total) * 0.4f)));
-        ImGui.TextDisabled(icon);
+        SafeText.Disabled(icon);
         ImGui.SetCursorPosX(start.X + MathF.Max(0f, (avail.X - wrap) * 0.5f));
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + wrap);
-        ImGui.TextDisabled(text);
+        SafeText.Disabled(text);
         ImGui.PopTextWrapPos();
     }
 

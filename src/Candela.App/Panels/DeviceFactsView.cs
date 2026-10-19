@@ -85,7 +85,7 @@ internal sealed class DeviceFactsView
         for (int i = 0; i < _facts.Ports.Count; i++)
         {
             var row = _facts.Ports[i];
-            _cableLabels[i] = row.CableText is { } text ? StageIcons.Plug + "  " + text + "##cable" : "";
+            _cableLabels[i] = row.CableText is { } text ? StageIcons.Plug + "  " + SafeText.Label(text) + "##cable" : "";
             _iconTooltips[i] = row.Port.ConnectorText is { Length: > 0 } t && t != row.Port.Connector.DisplayName
                 ? row.Port.Connector.DisplayName + "\n" + t
                 : row.Port.Connector.DisplayName;
@@ -105,7 +105,7 @@ internal sealed class DeviceFactsView
         {
             ImGui.PushTextWrapPos(0f);
             ImGui.TextUnformatted(facts.Title);
-            ImGui.TextDisabled(facts.Subtitle);
+            SafeText.Disabled(facts.Subtitle);
             ImGui.PopTextWrapPos();
             if (facts.Note is { } note)
             {
@@ -134,13 +134,13 @@ internal sealed class DeviceFactsView
                     PropertyGrid.Row(StageLoc.Get(row.Label));
                     ImGui.PushTextWrapPos(0f);
                     if (row.Source == Gdtf.SpecSource.Estimated)
-                        ImGui.TextColored(Theme.TextMuted, row.Value);
+                        SafeText.Colored(Theme.TextMuted, row.Value);
                     else
                         ImGui.TextUnformatted(row.Value);
                     ImGui.PopTextWrapPos();
                     // Where the value comes from: the GDTF file, derived from it, a datasheet, or an estimate.
                     if (DeviceFacts.SourceText(row.Source) is { } source && ImGui.IsItemHovered())
-                        ImGui.SetTooltip(StageLoc.Get(source));
+                        SafeText.Tooltip(StageLoc.Get(source));
                 }
 
                 PropertyGrid.End();
@@ -186,7 +186,7 @@ internal sealed class DeviceFactsView
             ConnectorIcons.Draw(ImGui.GetWindowDrawList(), p, icon, row.Port.Connector.IllustrationKey);
             ImGui.Dummy(new Vector2(icon));
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(_iconTooltips[i]);
+                SafeText.Tooltip(_iconTooltips[i]);
             ImGui.SameLine(0f, style.ItemSpacing.X * 1.5f);
             ImGui.BeginGroup();
             ImGui.TextUnformatted(row.Title);
@@ -206,11 +206,11 @@ internal sealed class DeviceFactsView
                     OpenCable(cable);
                 ImGui.PopStyleColor();
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip(StageLoc.Get(StageStr.PropsCableLinkHint));
+                    SafeText.Tooltip(StageLoc.Get(StageStr.PropsCableLinkHint));
             }
             else
             {
-                ImGui.TextDisabled(_notConnected);
+                SafeText.Disabled(_notConnected);
             }
 
             ImGui.EndGroup();

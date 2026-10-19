@@ -245,7 +245,7 @@ internal sealed class SessionDialogs
         ImGui.SameLine(0, 12f * scale);
         ImGui.BeginGroup();
         ImGui.TextUnformatted(_busyText);
-        ImGui.TextColored(Theme.TextMuted, Loc.Get(Str.BusyPleaseWait));
+        SafeText.Colored(Theme.TextMuted, Loc.Get(Str.BusyPleaseWait));
         ImGui.EndGroup();
         ImGui.EndPopup();
     }
@@ -336,7 +336,7 @@ internal sealed class SessionDialogs
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 string name = string.IsNullOrWhiteSpace(s.SceneName) ? Loc.Get(Str.Untitled) : s.SceneName!;
-                if (ImGui.Selectable($"{Icons.File}  {name}##recover{i}", _selected == i, ImGuiSelectableFlags.SpanAllColumns))
+                if (ImGui.Selectable($"{Icons.File}  {SafeText.Label(name)}##recover{i}", _selected == i, ImGuiSelectableFlags.SpanAllColumns))
                 {
                     _selected = i;
                     _confirmDelete = -1;
@@ -349,11 +349,11 @@ internal sealed class SessionDialogs
                 {
                     ImGui.TextUnformatted(Path.GetFileName(path));
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip(path);
+                        SafeText.Tooltip(path);
                 }
                 else
                 {
-                    ImGui.TextColored(Theme.TextMuted, Loc.Get(Str.RecoveryNeverSaved));
+                    SafeText.Colored(Theme.TextMuted, Loc.Get(Str.RecoveryNeverSaved));
                 }
             }
 
@@ -405,7 +405,7 @@ internal sealed class SessionDialogs
 
     private static void Message(string icon, Vector4 color, string text, float scale)
     {
-        ImGui.TextColored(color, icon);
+        SafeText.Colored(color, icon);
         ImGui.SameLine();
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + 560 * scale);
         ImGui.TextUnformatted(text);

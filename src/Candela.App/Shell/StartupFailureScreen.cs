@@ -114,10 +114,10 @@ internal static class StartupFailureScreen
             ImGui.PopStyleColor();
             ImGui.Separator();
             ImGui.Spacing();
-            ImGui.TextWrapped(text);
+            SafeText.Wrapped(text);
             ImGui.Spacing();
             ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-            ImGui.TextWrapped(detail);
+            SafeText.Wrapped(detail);
             ImGui.PopStyleColor();
             float buttonWidth = 120f * ImGui.GetStyle().FontScaleDpi;
             ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - buttonWidth - ImGui.GetStyle().WindowPadding.X,

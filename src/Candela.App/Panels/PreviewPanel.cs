@@ -264,7 +264,7 @@ internal sealed class PreviewPanel : Panel
 
                 ImGui.EndDisabled();
                 if (unavailable && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-                    ImGui.SetTooltip(StageLoc.Get(StageStr.PreviewNoRayTracing));
+                    SafeText.Tooltip(StageLoc.Get(StageStr.PreviewNoRayTracing));
             }
 
             ImGui.EndCombo();
@@ -295,7 +295,7 @@ internal sealed class PreviewPanel : Panel
 
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PreviewMeterHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PreviewMeterHint));
     }
 
     private void StageSettings(Scene scene)
@@ -307,7 +307,7 @@ internal sealed class PreviewPanel : Panel
             _stage.Undo.Execute(SceneSetting(scene, "haze", s => s.BaseHazeScattering, (s, v) => s.BaseHazeScattering = v, Math.Clamp(haze, 0f, 1f)));
         EndDrag();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PreviewHazeHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PreviewHazeHint));
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewHazeAnisotropy));
         float g = settings.HazeAnisotropy;
         if (ImGui.SliderFloat("##anisotropy", ref g, 0f, 0.95f, "%.2f"))
@@ -334,7 +334,7 @@ internal sealed class PreviewPanel : Panel
         if (ImGui.Checkbox("##grid", ref _gridOn))
             _stage.Tools.ApplyGridToViewports(_gridOn);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PreviewGridHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PreviewGridHint));
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewGridSpacing));
         float spacing = settings.GridSpacing;
         if (ImGui.DragFloat("##grid-spacing", ref spacing, 0.01f, 0.05f, 10f, StageUnits.Current.FormatMetres))

@@ -199,13 +199,13 @@ internal sealed class FixtureInspectorView
         dl.AddRect(p, p + new Vector2(swatch), Theme.U32(Theme.WithAlpha(color, 0.9f)), 4f, ImDrawFlags.None, 1.5f);
         ImGui.Dummy(new Vector2(swatch));
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.LiveSwatchHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.LiveSwatchHint));
         ImGui.SameLine();
         ImGui.BeginGroup();
         ImGui.PushTextWrapPos(0f);
         ImGui.TextUnformatted(_liveLine1);
-        ImGui.TextDisabled(_liveLine2);
-        ImGui.TextDisabled(_liveLine3);
+        SafeText.Disabled(_liveLine2);
+        SafeText.Disabled(_liveLine3);
         ImGui.PopTextWrapPos();
         ImGui.EndGroup();
     }
@@ -262,7 +262,7 @@ internal sealed class FixtureInspectorView
             if (ImGui.Button(StageLoc.With(Icons.RotateCcw, StageStr.PropsResetManual)))
                 ResetManual(entity);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(StageLoc.Get(StageStr.PropsResetManualHint));
+                SafeText.Tooltip(StageLoc.Get(StageStr.PropsResetManualHint));
         }
     }
 
@@ -289,11 +289,11 @@ internal sealed class FixtureInspectorView
         if (c.Choices is { } choices)
         {
             int index = unknown ? -1 : c.ChoiceIndex(value);
-            if (ImGui.BeginCombo(c.Id, index >= 0 ? choices[index] : "—"))
+            if (ImGui.BeginCombo(c.Id, index >= 0 ? SafeText.Label(choices[index]) : "—"))
             {
                 for (int i = 0; i < choices.Length; i++)
                 {
-                    if (ImGui.Selectable(choices[i], i == index) && i != index)
+                    if (ImGui.Selectable(SafeText.Label(choices[i]), i == index) && i != index)
                     {
                         value = c.ChoiceValues![i];
                         changed = true;
@@ -406,19 +406,19 @@ internal sealed class FixtureInspectorView
 
         PropertyGrid.Row(StageLoc.Get(StageStr.PatchMode));
         string mode = profile?.Mode.Name ?? fixture.GdtfMode ?? "—";
-        if (ImGui.BeginCombo("##mode", mode))
+        if (ImGui.BeginCombo("##mode", SafeText.Label(mode)))
         {
             if (profile is not null)
             {
                 foreach (var m in profile.FixtureType.DmxModes)
                 {
-                    if (ImGui.Selectable(m.Name, m.Name == profile.Mode.Name) && m.Name != profile.Mode.Name)
+                    if (ImGui.Selectable(SafeText.Label(m.Name), m.Name == profile.Mode.Name) && m.Name != profile.Mode.Name)
                         SetMode(entity, fixture, m.Name);
                 }
             }
             else
             {
-                ImGui.TextDisabled(StageLoc.Get(StageStr.PatchNoModes));
+                SafeText.Disabled(StageLoc.Get(StageStr.PatchNoModes));
             }
 
             ImGui.EndCombo();
@@ -435,13 +435,13 @@ internal sealed class FixtureInspectorView
             ImGui.InputInt("##universe", ref _patchUniverse[b], 1, 10);
             bool done = ImGui.IsItemDeactivatedAfterEdit();
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(StageLoc.Get(StageStr.PatchUniverse));
+                SafeText.Tooltip(StageLoc.Get(StageStr.PatchUniverse));
             ImGui.SameLine(0f, style.ItemInnerSpacing.X);
             ImGui.SetNextItemWidth(half);
             ImGui.InputInt("##address", ref _patchAddress[b], 1, 10);
             done |= ImGui.IsItemDeactivatedAfterEdit();
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(StageLoc.Get(StageStr.PatchAddressHint));
+                SafeText.Tooltip(StageLoc.Get(StageStr.PatchAddressHint));
             if (done)
                 ApplyAddress(entity, fixture, b, profile?.Breaks.Count > b ? profile.Breaks[b].Break : b + 1);
             ImGui.PopID();
@@ -572,11 +572,11 @@ internal sealed class FixtureInspectorView
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.Accent);
-        if (ImGui.Selectable(text))
+        if (ImGui.Selectable(SafeText.Label(text)))
             _stage.Tools.RequestCableLink(id);
         ImGui.PopStyleColor();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.PropsCableLinkHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.PropsCableLinkHint));
     }
 
     private string PatchRangeText(Entity entity)

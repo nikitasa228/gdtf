@@ -723,13 +723,13 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         }
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(_labels.ShadingTooltip);
+            SafeText.Tooltip(_labels.ShadingTooltip);
         ImGui.SameLine();
         bool persp = Camera.Projection == ProjectionKind.Perspective;
         if (ImGui.Button(compact ? ToolbarLabels.ProjectionIconId : persp ? _labels.Perspective : _labels.Orthographic))
             Camera.ToggleProjection();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(persp ? _labels.PerspectiveTooltip : _labels.OrthographicTooltip);
+            SafeText.Tooltip(persp ? _labels.PerspectiveTooltip : _labels.OrthographicTooltip);
         ImGui.SameLine();
         int overlay = (int)View.Overlay;
         if (ImGui.BeginCombo("##overlay", compact ? _labels.OverlayIcon[overlay] : _labels.OverlayFull[overlay], ImGuiComboFlags.WidthFitPreview))
@@ -741,7 +741,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         }
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(_labels.OverlayTooltip);
+            SafeText.Tooltip(_labels.OverlayTooltip);
         ImGui.SameLine();
         if (ToolButton(ToolbarLabels.GridId, Str.ViewportGrid, View.ShowGrid))
             View.ShowGrid = !View.ShowGrid;
@@ -786,7 +786,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         if (active)
             ImGui.PopStyleColor(2);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(tooltip));
+            SafeText.Tooltip(Loc.Get(tooltip));
         return clicked;
     }
 
@@ -880,7 +880,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         }
 
         if (target is { } tip)
-            ImGui.SetTooltip(FaceLabel(tip));
+            SafeText.Tooltip(FaceLabel(tip));
         return inArea;
     }
 

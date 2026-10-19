@@ -105,7 +105,7 @@ internal sealed class GradientEditor
             dl.AddLine(new Vector2(x, origin.Y), new Vector2(x, barMax.Y + 1f), color, 2f * scale);
             dl.AddLine(new Vector2(x, origin.Y + 1f), new Vector2(x + dir * handle * 0.8f, origin.Y + 1f), color, 2f * scale);
             if (hot && hovered)
-                ImGui.SetTooltip(FormatValue(v) + " " + _unit);
+                SafeText.Tooltip(FormatValue(v) + " " + _unit);
             if (hot && ImGui.IsMouseClicked(ImGuiMouseButton.Left) && _dragRange == 0)
                 _dragRange = which;
         }
@@ -167,7 +167,7 @@ internal sealed class GradientEditor
         }
 
         if (hovered && hoveredStop >= 0 && _dragStop < 0)
-            ImGui.SetTooltip(FormatValue(gradient.Stops[hoveredStop].Value) + " " + _unit);
+            SafeText.Tooltip(FormatValue(gradient.Stops[hoveredStop].Value) + " " + _unit);
 
         if (_dragStop >= 0 || _dragRange != 0)
         {
@@ -190,7 +190,7 @@ internal sealed class GradientEditor
                         changed = true;
                     }
 
-                    ImGui.SetTooltip(FormatValue(v) + " " + _unit);
+                    SafeText.Tooltip(FormatValue(v) + " " + _unit);
                     if (ImGui.IsKeyPressed(ImGuiKey.Delete) && gradient.Stops.Count > 2)
                     {
                         gradient.Stops.RemoveAt(_dragStop);
@@ -202,7 +202,7 @@ internal sealed class GradientEditor
                 else if (_dragRange != 0)
                 {
                     changed |= SetRange(gradient, _dragRange == 1, v);
-                    ImGui.SetTooltip(FormatValue(_dragRange == 1 ? gradient.RangeMin : gradient.RangeMax) + " " + _unit);
+                    SafeText.Tooltip(FormatValue(_dragRange == 1 ? gradient.RangeMin : gradient.RangeMax) + " " + _unit);
                 }
             }
         }

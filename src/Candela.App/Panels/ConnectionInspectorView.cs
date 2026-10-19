@@ -122,7 +122,7 @@ internal sealed class ConnectionInspectorView
             PropertyGrid.Row(CableLoc.Get(CableStr.PropsCableType));
             var catalog = engine.Network.Catalog;
             var type = catalog.Find(cable.CableTypeId);
-            if (ImGui.BeginCombo("##type", type is null ? cable.CableTypeId : CableLoc.CableName(type), ImGuiComboFlags.HeightLarge))
+            if (ImGui.BeginCombo("##type", SafeText.Label(type is null ? cable.CableTypeId : CableLoc.CableName(type)), ImGuiComboFlags.HeightLarge))
             {
                 var style = ImGui.GetStyle();
                 if (CableTypeMenu.Draw(catalog, cable.CableTypeId, style.FontScaleMain * style.FontScaleDpi) is { } chosen &&
@@ -174,7 +174,7 @@ internal sealed class ConnectionInspectorView
             for (int i = 0; i < texts.Ends.Length; i++)
             {
                 ImGui.PushID(i);
-                if (ImGui.Selectable(texts.Ends[i].Text, false) && _stage.Scene.Find(texts.Ends[i].Device) is not null)
+                if (ImGui.Selectable(SafeText.Label(texts.Ends[i].Text), false) && _stage.Scene.Find(texts.Ends[i].Device) is not null)
                     _stage.Selection.Set(texts.Ends[i].Device);
                 ImGui.PopID();
             }
@@ -546,11 +546,11 @@ internal sealed class ConnectionInspectorView
                     SafeText.Tooltip(load.Text);
                 ImGui.TableNextColumn();
                 ImGui.SetNextItemWidth(-1f);
-                if (ImGui.BeginCombo("##connector", outlet.Connector))
+                if (ImGui.BeginCombo("##connector", SafeText.Label(outlet.Connector)))
                 {
                     foreach (var connector in PowerConnectors)
                     {
-                        if (ImGui.Selectable(connector, string.Equals(connector, outlet.Connector, StringComparison.OrdinalIgnoreCase)) && connector != outlet.Connector)
+                        if (ImGui.Selectable(SafeText.Label(connector), string.Equals(connector, outlet.Connector, StringComparison.OrdinalIgnoreCase)) && connector != outlet.Connector)
                             EditOutlet(source, i, o => o.Connector = connector, "Outlet connector");
                     }
 

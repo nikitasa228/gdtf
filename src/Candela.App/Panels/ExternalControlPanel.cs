@@ -155,13 +155,13 @@ internal sealed unsafe class ExternalControlPanel : Panel
         var style = ImGui.GetStyle();
         float right = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X;
         ImGui.PushFont(ImGui.GetFont(), ImGui.GetStyle().FontSizeBase * 1.35f);
-        ImGui.TextColored(model.LastTimecode is null ? Theme.TextMuted : Theme.Accent, _timecodeText);
+        SafeText.Colored(model.LastTimecode is null ? Theme.TextMuted : Theme.Accent, _timecodeText);
         ImGui.PopFont();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.ExtTimecodeHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.ExtTimecodeHint));
         ImGui.SameLine();
         ImGui.AlignTextToFramePadding();
-        ImGui.TextDisabled(_timecodeDetail);
+        SafeText.Disabled(_timecodeDetail);
 
         // Right side: merge mode and the test pattern.
         float testWidth = ImGui.CalcTextSize(StageLoc.Get(StageStr.ExtTestPatternStop)).X + ImGui.GetFrameHeight() + 2f * style.FramePadding.X;
@@ -182,7 +182,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         }
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(StageStr.ExtMergeHint));
+            SafeText.Tooltip(StageLoc.Get(StageStr.ExtMergeHint));
         ImGui.SameLine();
         bool running = model.TestPatternRunning;
         if (running)
@@ -203,7 +203,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         if (running)
             ImGui.PopStyleColor(2);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Format(StageStr.ExtTestPatternHint, model.Settings.TestTarget, model.TestFramesSent));
+            SafeText.Tooltip(StageLoc.Format(StageStr.ExtTestPatternHint, model.Settings.TestTarget, model.TestFramesSent));
     }
 
     private void RefreshTimecode(ExternalControl model)
@@ -274,7 +274,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                         model.SetEnabled(engine, _stage.Settings, d.Id, enabled);
                     ImGui.EndDisabled();
                     if (!d.CanStart && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-                        ImGui.SetTooltip(d.SupportReason);
+                        SafeText.Tooltip(d.SupportReason);
                     ImGui.TableNextColumn();
                     StateDot(status?.State ?? ProtocolState.Stopped, d.CanStart);
                     ImGui.SameLine();
@@ -283,7 +283,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                     ImGui.TableNextColumn();
                     SupportBadge(d.SupportLevel);
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip(d.SupportReason);
+                        SafeText.Tooltip(d.SupportReason);
                     ImGui.TableNextColumn();
                     if (i < _rowStatus.Length)
                     {
@@ -346,7 +346,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         ImGui.SameLine();
         SupportBadge(d.SupportLevel);
         ImGui.PushTextWrapPos(0f);
-        ImGui.TextDisabled(StageLoc.ProtocolDescription(d));
+        SafeText.Disabled(StageLoc.ProtocolDescription(d));
         ImGui.PopTextWrapPos();
         if (d.SupportLevel is not ProtocolSupportLevel.Implemented)
         {
@@ -437,7 +437,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
                 }
 
                 PropertyGrid.Row(StageLoc.Get(StageStr.ExtOscPatterns));
-                ImGui.TextDisabled(OscPatterns);
+                SafeText.Disabled(OscPatterns);
                 break;
             case ProtocolIds.EtcEos:
                 changed |= InterfaceRow();
@@ -570,7 +570,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         string current = _stage.Settings.NetworkInterface ?? "";
         string preview = current.Length == 0 ? StageLoc.Get(StageStr.ExtAllInterfaces) : current;
         bool changed = false;
-        if (ImGui.BeginCombo("##interface", preview))
+        if (ImGui.BeginCombo("##interface", SafeText.Label(preview)))
         {
             if (ImGui.IsWindowAppearing())
                 _interfaces = ProtocolManager.GetNetworkInterfaces();
@@ -584,7 +584,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             {
                 string address = nic.Address.ToString();
                 string label = $"{nic.Name} — {address}{(nic.IsUp ? "" : " (down)")}";
-                if (ImGui.Selectable(label, current == address || current == nic.Name) && current != address)
+                if (ImGui.Selectable(SafeText.Label(label), current == address || current == nic.Name) && current != address)
                 {
                     _stage.Settings.NetworkInterface = address;
                     changed = true;
@@ -655,15 +655,15 @@ internal sealed unsafe class ExternalControlPanel : Panel
         PropertyGrid.Row(StageLoc.Get(StageStr.ExtSerialPort));
         bool changed = false;
         string preview = settings.EnttecSerialPort.Length == 0 ? StageLoc.Get(StageStr.ExtNoSerialPort) : settings.EnttecSerialPort;
-        if (ImGui.BeginCombo("##serial", preview))
+        if (ImGui.BeginCombo("##serial", SafeText.Label(preview)))
         {
             if (ImGui.IsWindowAppearing())
                 _serialPorts = ProtocolManager.GetSerialPorts();
             if (_serialPorts is not { Count: > 0 })
-                ImGui.TextDisabled(StageLoc.Get(StageStr.ExtNoSerialPorts));
+                SafeText.Disabled(StageLoc.Get(StageStr.ExtNoSerialPorts));
             foreach (string port in _serialPorts ?? Array.Empty<string>())
             {
-                if (ImGui.Selectable(port, port == settings.EnttecSerialPort) && port != settings.EnttecSerialPort)
+                if (ImGui.Selectable(SafeText.Label(port), port == settings.EnttecSerialPort) && port != settings.EnttecSerialPort)
                 {
                     settings.EnttecSerialPort = port;
                     changed = true;
@@ -685,7 +685,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         PropertyGrid.Row(StageLoc.Get(StageStr.ExtNodes));
         if (nodes.Count == 0)
         {
-            ImGui.TextDisabled("—");
+            SafeText.Disabled("—");
             return;
         }
 
@@ -714,7 +714,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         int columns = Math.Clamp((int)((ImGui.GetContentRegionAvail().X + style.ItemSpacing.X) / (cell + 2f)), 4, 32);
         int count = model.GridUniverses;
         var dl = ImGui.GetWindowDrawList();
-        ImGui.TextDisabled(StageLoc.Get(StageStr.ExtUniversesHint));
+        SafeText.Disabled(StageLoc.Get(StageStr.ExtUniversesHint));
         for (int u = 1; u <= count; u++)
         {
             if ((u - 1) % columns != 0)
@@ -737,7 +737,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             var size = ImGui.CalcTextSize(number);
             dl.AddText(p + (new Vector2(cell, cell * 0.8f) - size) * 0.5f, Theme.U32(active ? new Vector4(0f, 0f, 0f, 0.9f) : Theme.TextMuted), number);
             if (hovered)
-                ImGui.SetTooltip(StageLoc.Format(StageStr.ExtUniverseTooltip, u, rate, active ? StageLoc.Get(StageStr.ExtLive) : "—",
+                SafeText.Tooltip(StageLoc.Format(StageStr.ExtUniverseTooltip, u, rate, active ? StageLoc.Get(StageStr.ExtLive) : "—",
                     patched ? StageLoc.Get(StageStr.ExtPatched) : StageLoc.Get(StageStr.ExtNotPatched)));
         }
 
@@ -752,7 +752,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         ImGui.Spacing();
         ImGui.TextUnformatted(StageLoc.Format(StageStr.ExtSlotsTitle, universe));
         ImGui.SameLine();
-        ImGui.TextDisabled(live ? StageLoc.Get(StageStr.ExtLive) : StageLoc.Get(StageStr.ExtNoData));
+        SafeText.Disabled(live ? StageLoc.Get(StageStr.ExtLive) : StageLoc.Get(StageStr.ExtNoData));
         var style = ImGui.GetStyle();
         float cell = MathF.Max(ImGui.CalcTextSize("255").X + 6f, ImGui.GetTextLineHeight() * 1.6f);
         int columns = Math.Clamp((int)(ImGui.GetContentRegionAvail().X / cell), 8, 32);
@@ -788,7 +788,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
 
         ImGui.Dummy(new Vector2(columns * cell, (511 / columns + 1) * rowHeight));
         if (hoveredSlot >= 0 && ImGui.IsWindowHovered())
-            ImGui.SetTooltip(SlotTooltip(model, universe, hoveredSlot + 1, slots[hoveredSlot]));
+            SafeText.Tooltip(SlotTooltip(model, universe, hoveredSlot + 1, slots[hoveredSlot]));
         ImGui.EndChild();
         _ = style;
     }
@@ -816,7 +816,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
         var sources = model.Sources;
         if (sources.Count == 0)
         {
-            ImGui.TextDisabled(StageLoc.Get(StageStr.ExtNoSources));
+            SafeText.Disabled(StageLoc.Get(StageStr.ExtNoSources));
             return;
         }
 
@@ -913,7 +913,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             return;
         }
 
-        ImGui.SeparatorText(recording.Name);
+        ImGui.SeparatorText(SafeText.Label(recording.Name));
         var player = engine.Player;
         bool playing = player is not null && ReferenceEquals(player.Recording, recording) && !player.IsAtEnd;
         if (ImGui.Button(playing ? StageLoc.With(StageIcons.Stop, StageStr.ExtStopPlayback) : StageLoc.With(StageIcons.Play, StageStr.ExtPlay)))
@@ -999,7 +999,7 @@ internal sealed unsafe class ExternalControlPanel : Panel
             ProtocolSupportLevel.Planned => (StageLoc.Get(StageStr.SupportPlanned), Theme.TextMuted),
             _ => (StageLoc.Get(StageStr.SupportVendorSdk), Theme.Warning),
         };
-        ImGui.TextColored(color, text);
+        SafeText.Colored(color, text);
     }
 
     private static string StateText(ProtocolState state) => StageLoc.Get(state switch

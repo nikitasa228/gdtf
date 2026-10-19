@@ -161,7 +161,7 @@ internal sealed class OverlayLegend
         if (ImGui.Button(_expanded ? Icons.ChevronDown + "##legend-more" : Icons.ChevronRight + "##legend-more", new Vector2(button, 0f)))
             _expanded = !_expanded;
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(StageLoc.Get(_expanded ? StageStr.LegendLess : StageStr.LegendMore));
+            SafeText.Tooltip(StageLoc.Get(_expanded ? StageStr.LegendLess : StageStr.LegendMore));
 
         presets.Draw();
         if (editor.Draw(gradient))

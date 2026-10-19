@@ -206,7 +206,7 @@ internal sealed unsafe class DockWorkspace
             return;
         }
 
-        ImGui.TextDisabled(Loc.Get(Str.TabStyle));
+        SafeText.Disabled(Loc.Get(Str.TabStyle));
         var style = _styles.StyleOf(_menuNode);
         if (ImGui.RadioButton(Labels.With(Icons.PanelTop, Str.TabStyleTop), style == TabStyle.TopTabs))
             SetStyle(node, TabStyle.TopTabs);
@@ -216,7 +216,7 @@ internal sealed unsafe class DockWorkspace
         ImGui.TextUnformatted(Loc.Get(Str.TabStyleHint));
         ImGui.PopStyleColor();
         ImGui.Separator();
-        ImGui.TextDisabled(Loc.Get(Str.DockPanelsInGroup));
+        SafeText.Disabled(Loc.Get(Str.DockPanelsInGroup));
         CollectNodePanels(node, panels, _columnPanels);
         var visibleWindow = node.VisibleWindow;
         foreach (var p in _columnPanels)
@@ -329,7 +329,7 @@ internal sealed unsafe class DockWorkspace
             RequestMenu(node, panel);
         ImGui.PopStyleColor();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip(Loc.Get(Str.TabStyle));
+            SafeText.Tooltip(Loc.Get(Str.TabStyle));
         ImGuiP.DockNodeEndAmendTabBar();
     }
 
@@ -367,7 +367,7 @@ internal sealed unsafe class DockWorkspace
             }
 
             if (hovered)
-                ImGui.SetTooltip(p.Title);
+                SafeText.Tooltip(p.Title);
             if (selected || hovered)
                 drawList.AddRectFilled(pos, pos + new Vector2(cell, cell), Theme.U32(selected ? Theme.Rgb(0x2A2C31) : Theme.Rgb(0x24262A)));
             if (selected)
@@ -384,7 +384,7 @@ internal sealed unsafe class DockWorkspace
             RequestMenu(node, current);
         bool menuHovered = ImGui.IsItemHovered();
         if (menuHovered)
-            ImGui.SetTooltip(Loc.Get(Str.TabStyle));
+            SafeText.Tooltip(Loc.Get(Str.TabStyle));
         var glyph = Icons.EllipsisVertical;
         var glyphSize = ImGui.CalcTextSize(glyph);
         drawList.AddText(buttonPos + (new Vector2(cell, cell) - glyphSize) * 0.5f, Theme.U32(menuHovered ? Theme.Text : Theme.TextMuted), glyph);
