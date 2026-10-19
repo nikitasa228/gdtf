@@ -244,18 +244,22 @@ float invertProfile(Light light, TableRow row, float v, float profileScale, floa
         y = (first ? y0 : y0 + 0.5 * dy) + 0.5 * dy * clamp(s, 0.0, 1.0);
     }
 
+    // A converged iterate (err exactly 0 in single precision, or a step below the resolution of y) stays where it is:
+    // the bounds are inclusive, so it is never mistaken for a step out of the bracket and bisected away.
     float lo = y0;
     float hi = y1;
     for (int it = 0; it < 3; ++it)
     {
         float err = profileIntegral(light, row, v, y) - target;
+        if (err == 0.0)
+            break;
         if (err > 0.0)
             hi = y;
         else
             lo = y;
         float f = shapeProfile(light, profileScale * sqrt(v * v + y * y));
         float next = f > 1e-6 ? y - err / f : 0.5 * (lo + hi);
-        y = next > lo && next < hi ? next : 0.5 * (lo + hi);
+        y = next >= lo && next <= hi ? next : 0.5 * (lo + hi);
     }
 
     return y;
@@ -429,8 +433,7 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
                 float ratio = approx > 1e-4 ? clamp(exact / approx, 0.0, 4.0) : 1.0;
                 float shadow = shadowHard(slot, X, vec3(0.0));
                 float pixelGate = ray.pixelSize * max(ray.originDepth + tj / ray.stretch, 0.0) / max(rj, 1e-3) * light.gateScale;
-                float resid = (profileIntegral(light, row, v, yj) - h0) / dH - xi;
-                vec3 c = vec3(1.0, 0.5 + 10.0 * resid, abs(resid) * 10.0);
+                vec3 c = facetCookie(light, k, facets, omega, max(footprint, pixelGate));
                 // The smooth factor at the sample (linear in the segment) over its profile-weighted mean.
                 float mj = mix(m0, m1, clamp((yj - y0) / dy, 0.0, 1.0));
                 modulation += c * (sigma * ratio * shadow * smokeLight * mj);
