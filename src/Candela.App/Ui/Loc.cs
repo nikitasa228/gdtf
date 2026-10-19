@@ -473,6 +473,22 @@ internal static class Loc
         (Str.LookOpenWhite, "Open White (All Fixtures)", "Открытый белый (все приборы)"),
         (Str.BusyOpenWhite, "Setting every fixture to open white…", "Все приборы в открытый белый…"),
         (Str.MsgOpenWhite, "{0} fixtures in open white", "Открытый белый: приборов — {0}"),
+        (Str.ViewWorkLight, "Work Light", "Рабочий свет"),
+        (Str.WorkLightOff, "Off", "Выкл."),
+        (Str.WorkLightAuto, "Auto", "Авто"),
+        (Str.WorkLightOn, "On", "Вкл."),
+        (Str.WorkLightOffHint, "Only the light of the fixtures", "Только свет приборов"),
+        (Str.WorkLightAutoHint, "While no fixture emits light", "Пока ни один прибор не светит"),
+        (Str.WorkLightOnHint, "Always, on top of the fixtures' light", "Всегда, вместе со светом приборов"),
+        (Str.WorkLightHint,
+            "A dim neutral light that shows the set while the rig is dark. It is not stage light: the light meter, the lux overlay and final renders leave it out.",
+            "Слабый нейтральный свет, чтобы видеть декорации, пока приборы не светят. Это не свет сцены: замер, оверлей освещённости и финальный рендер его не учитывают."),
+        (Str.CmdWorkLightOff, "Work Light Off", "Рабочий свет: выкл."),
+        (Str.CmdWorkLightAuto, "Work Light Auto", "Рабочий свет: авто"),
+        (Str.CmdWorkLightOn, "Work Light On", "Рабочий свет: вкл."),
+        (Str.MsgWorkLight, "Work light: {0}", "Рабочий свет: {0}"),
+        (Str.LibImportedSelected, "Added {0} to the fixture library", "{0} добавлен в библиотеку приборов"),
+        (Str.LibImportRefused, "'{0}' was not added to the fixture library: {1}", "«{0}» не добавлен в библиотеку приборов: {1}"),
         // (end of engine integration strings)
 
 

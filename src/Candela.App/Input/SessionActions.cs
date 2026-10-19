@@ -14,10 +14,22 @@ internal static class SessionActions
     /// <summary>Tools → Open White: every fixture at full in open white, moving heads aimed at the stage (one undo step).</summary>
     public const string OpenWhite = "look.openWhite";
 
+    /// <summary>View → Work Light → Off: the preview shows the fixtures' light only.</summary>
+    public const string WorkLightOff = "view.workLightOff";
+
+    /// <summary>View → Work Light → Auto: a dim work light while no fixture emits (the default).</summary>
+    public const string WorkLightAuto = "view.workLightAuto";
+
+    /// <summary>View → Work Light → On: the work light always, on top of the fixtures' light.</summary>
+    public const string WorkLightOn = "view.workLightOn";
+
     /// <summary>Default chords of the session actions (merged into the default set with the other app actions).</summary>
     public static void AddDefaults(KeyBindingSet set)
     {
         ArgumentNullException.ThrowIfNull(set);
+        foreach (var id in new[] { WorkLightOff, WorkLightAuto, WorkLightOn })
+            if (!set.Bindings.ContainsKey(id))
+                set.Set(id);
         if (!set.Bindings.ContainsKey(PauseSimulation))
             set.Set(PauseSimulation, new KeyChord("P", KeyModifiers.Alt));
         if (!set.Bindings.ContainsKey(ImportGdtf))

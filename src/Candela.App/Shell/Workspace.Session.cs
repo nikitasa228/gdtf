@@ -38,6 +38,7 @@ internal sealed partial class Workspace
     private bool _recoveryChecked;
     private bool _frameScenePending;
     private bool _framedOnce;
+    private ViewportPanel? _savedCameraViewport;
     private Vector2 _lastDropPosition;
     private int _frameSceneAttempts;
 
@@ -70,6 +71,20 @@ internal sealed partial class Workspace
             () => session.SimulationPaused);
         Command(SessionActions.ImportGdtf, Str.FileImportGdtf, Icons.Lightbulb, () => ShowImport(ImportKind.Gdtf));
         Command(SessionActions.OpenWhite, Str.LookOpenWhite, Icons.Sun, ApplyOpenWhite, () => session.Engine is not null && session.FixtureCount() > 0);
+        Command(SessionActions.WorkLightOff, Str.CmdWorkLightOff, Icons.Lightbulb, () => SetWorkLight(WorkLightMode.Off),
+            () => session.Engine is not null, () => session.Engine?.View.WorkLight == WorkLightMode.Off);
+        Command(SessionActions.WorkLightAuto, Str.CmdWorkLightAuto, Icons.Lightbulb, () => SetWorkLight(WorkLightMode.Auto),
+            () => session.Engine is not null, () => session.Engine?.View.WorkLight == WorkLightMode.Auto);
+        Command(SessionActions.WorkLightOn, Str.CmdWorkLightOn, Icons.Lightbulb, () => SetWorkLight(WorkLightMode.On),
+            () => session.Engine is not null, () => session.Engine?.View.WorkLight == WorkLightMode.On);
+    }
+
+    /// <summary>View → Work Light: the preview's work light (stored with the project; an unsaved change).</summary>
+    private void SetWorkLight(WorkLightMode mode)
+    {
+        if (_ctx.Session.Engine is not { } engine || !ViewSettingsEdits.SetWorkLight(engine, mode))
+            return;
+        SetStatus(Loc.Format(Str.MsgWorkLight, Loc.Get(WorkLightCombo.Label(mode))));
     }
 
     /// <summary>Releases the drop target and the scene subscription.</summary>
@@ -223,7 +238,11 @@ internal sealed partial class Workspace
             return;
         }
 
-        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), session.Save, result =>
+        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), () =>
+        {
+            StoreCamera();
+            return session.Save();
+        }, result =>
         {
             if (result.Succeeded)
             {
@@ -244,7 +263,11 @@ internal sealed partial class Workspace
     internal void SaveAs(string path, Action? then = null)
     {
         var session = _ctx.Session;
-        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), () => session.SaveAs(path), result =>
+        RunBusy(Loc.Format(Str.BusySaving, Path.GetFileName(path)), () =>
+        {
+            StoreCamera();
+            return session.SaveAs(path);
+        }, result =>
         {
             if (!result.Succeeded)
                 return;
@@ -280,6 +303,16 @@ internal sealed partial class Workspace
     /// <summary>File → Export → MVR.</summary>
     internal void ExportMvr(string path) =>
         RunBusy(Loc.Format(Str.BusyExporting, Path.GetFileName(path)), () => _ctx.Session.Export(path, ExportKind.Mvr));
+
+    /// <summary>
+    /// Stores the active viewport's camera in the project's view settings before a save, so the project opens with the
+    /// view it was saved with (the change is reported to the engine, and the save that follows stores it).
+    /// </summary>
+    private void StoreCamera()
+    {
+        if (_ctx.Session.Engine is { } engine && !_ctx.Session.IsPreviewStage)
+            ViewSettingsEdits.StoreCamera(engine, ActiveViewport.Camera);
+    }
 
     private string SuggestedName()
     {
@@ -476,6 +509,10 @@ internal sealed partial class Workspace
         if (!_framedOnce)
         {
             _framedOnce = true;
+            // A project saved with a camera opens with that view in the active viewport; the others are framed.
+            _savedCameraViewport = _ctx.Session.Engine?.View.Camera is { } saved && ActiveViewport.ShowSavedCamera(saved)
+                ? ActiveViewport
+                : null;
             FrameOpenViewports(onlyUntouched: false);
         }
 
@@ -485,6 +522,7 @@ internal sealed partial class Workspace
             FrameOpenViewports(onlyUntouched: true);
             _frameScenePending = false;
             _framedOnce = false;
+            _savedCameraViewport = null;
         }
     }
 
@@ -492,7 +530,7 @@ internal sealed partial class Workspace
     {
         foreach (var v in _viewports)
         {
-            if (!v.IsOpen || (onlyUntouched && v.CameraMovedSinceFraming))
+            if (!v.IsOpen || ReferenceEquals(v, _savedCameraViewport) || (onlyUntouched && v.CameraMovedSinceFraming))
                 continue;
             v.FrameScene();
         }

@@ -417,6 +417,20 @@ internal enum Str
     LookOpenWhite,
     BusyOpenWhite,
     MsgOpenWhite,
+    ViewWorkLight,
+    WorkLightOff,
+    WorkLightAuto,
+    WorkLightOn,
+    WorkLightOffHint,
+    WorkLightAutoHint,
+    WorkLightOnHint,
+    WorkLightHint,
+    CmdWorkLightOff,
+    CmdWorkLightAuto,
+    CmdWorkLightOn,
+    MsgWorkLight,
+    LibImportedSelected,
+    LibImportRefused,
     // (end of engine integration strings)
 
 

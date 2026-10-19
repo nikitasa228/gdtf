@@ -477,23 +477,27 @@ internal sealed class EditorSession : IDisposable
     }
 
     /// <summary>
-    /// Follows the autosave interval of the settings. The engine's autosave session is started once; later changes of
-    /// the interval (or turning autosave off and on) adjust the running session instead of starting a new one, which
-    /// would leave the old session's files behind to be offered as a crashed session at the next start. Projects opened
-    /// later get a session of their own from the engine; it is brought to the setting here too. Allocation-free while
-    /// nothing changes.
+    /// Follows the autosave interval of the settings. The engine's autosave is set up once, with this session's folder
+    /// (<see cref="StageEngine.EnableAutosave"/>); later changes of the interval, or turning autosave off and on, go to
+    /// <see cref="StageEngine.ConfigureAutosave"/>, which adjusts the running session instead of starting a new one (that
+    /// would leave the old session's files behind to be offered as a crashed session at the next start) and carries the
+    /// values over to projects opened later. Allocation-free while nothing changes.
     /// </summary>
     private void ApplyAutosaveSetting()
     {
         int minutes = _options.Autosave && !_options.PreviewStage ? Math.Clamp(_settings.Settings.AutosaveMinutes, 0, 24 * 60) : 0;
+        if (minutes == _autosaveMinutes)
+            return;
+        bool first = _autosaveMinutes < 0;
+        bool wasOn = _autosaveMinutes > 0;
+        _autosaveMinutes = minutes;
         var engine = EngineOrThrow;
-        if (minutes != _autosaveMinutes)
+        try
         {
-            bool first = _autosaveMinutes < 0;
-            _autosaveMinutes = minutes;
-            if (minutes > 0 && engine.Autosave is null)
+            if (engine.AutosaveInterval is null)
             {
-                try
+                // Never set up: the first session needs this editor's folder (ConfigureAutosave would use the defaults).
+                if (minutes > 0)
                 {
                     engine.EnableAutosave(new AutosaveOptions
                     {
@@ -501,30 +505,22 @@ internal sealed class EditorSession : IDisposable
                         Interval = TimeSpan.FromMinutes(minutes),
                     });
                 }
-                catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
-                {
-                    _log.Warn("Autosave", $"Autosave could not be set up: {e.Message}");
-                }
             }
-
-            if (minutes > 0)
-                _log.Info("Autosave", string.Create(CultureInfo.InvariantCulture, $"Autosave every {minutes} min."));
-            else if (first || engine.Autosave is not null)
-                _log.Info("Autosave", "Autosave is off.");
-        }
-
-        if (engine.Autosave is { } service)
-        {
-            bool enabled = minutes > 0;
-            if (service.Enabled != enabled)
-                service.Enabled = enabled;
-            if (enabled)
+            else
             {
-                var interval = TimeSpan.FromMinutes(minutes);
-                if (service.Interval != interval)
-                    service.Interval = interval;
+                // Off keeps the session (and its interval) paused; on resumes it with the new interval.
+                engine.ConfigureAutosave(minutes > 0, minutes > 0 ? TimeSpan.FromMinutes(minutes) : TimeSpan.Zero);
             }
         }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            _log.Warn("Autosave", $"Autosave could not be set up: {e.Message}");
+        }
+
+        if (minutes > 0)
+            _log.Info("Autosave", string.Create(CultureInfo.InvariantCulture, $"Autosave every {minutes} min."));
+        else if (first || wasOn)
+            _log.Info("Autosave", "Autosave is off.");
     }
 
     /// <summary>

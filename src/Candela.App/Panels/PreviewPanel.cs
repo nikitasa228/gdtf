@@ -240,7 +240,7 @@ internal sealed class PreviewPanel : Panel
                  {
                      StageStr.PreviewShadowResolution, StageStr.PreviewShadowedLights, StageStr.PreviewSlices, StageStr.PreviewRaymarchedBeams,
                      StageStr.PreviewTemporal, StageStr.PreviewMetering, StageStr.PreviewBloomIntensity, StageStr.PreviewCameraEv, StageStr.PreviewHaze,
-                     StageStr.PreviewHazeAnisotropy, StageStr.PreviewAmbient, StageStr.PreviewGrid, StageStr.PreviewGridSpacing,
+                     StageStr.PreviewHazeAnisotropy, StageStr.PreviewAmbient, StageStr.PreviewWorkLight, StageStr.PreviewGrid, StageStr.PreviewGridSpacing,
                  })
             yield return StageLoc.Get(key);
     }
@@ -318,6 +318,15 @@ internal sealed class PreviewPanel : Panel
         if (ImGui.SliderFloat("##ambient", ref ambient, 0f, 5f, StageUnits.Current.FormatLuminance, ImGuiSliderFlags.Logarithmic))
             _stage.Undo.Execute(SceneSetting(scene, "ambient", s => s.AmbientLuminance, (s, v) => s.AmbientLuminance = v, Math.Clamp(ambient, 0f, 100f)));
         EndDrag();
+
+        PropertyGrid.Row(StageLoc.Get(StageStr.PreviewWorkLight));
+        var engine = _stage.Engine;
+        ImGui.BeginDisabled(engine is null);
+        if (WorkLightCombo.Draw("##work-light", engine?.View.WorkLight ?? WorkLightMode.Auto, out var workLight) && engine is not null)
+            ViewSettingsEdits.SetWorkLight(engine, workLight);
+        ImGui.EndDisabled();
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            SafeText.Tooltip(Loc.Get(Str.WorkLightHint));
 
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewGrid));
         if (_stage.Tools.ActiveViewport is { } viewport && !ImGui.IsAnyItemActive())

@@ -401,6 +401,9 @@ internal enum StageStr
     ExtTimecodeFromArtNet,
     ExtTimecodeFromRecording,
     ExtTestTargetInterface,
+    PreviewWorkLight,
+    RenderWorkLight,
+    RenderWorkLightHint,
 }
 
 /// <summary>
@@ -913,5 +916,10 @@ internal static class StageLoc
         (StageStr.ExtTimecodeFromArtNet, "Art-Net", "Art-Net"),
         (StageStr.ExtTimecodeFromRecording, "DMX recording", "запись DMX"),
         (StageStr.ExtTestTargetInterface, "{0} (this computer on the selected network interface)", "{0} (этот компьютер на выбранном сетевом интерфейсе)"),
+        (StageStr.PreviewWorkLight, "Work light", "Рабочий свет"),
+        (StageStr.RenderWorkLight, "Work light", "Рабочий свет"),
+        (StageStr.RenderWorkLightHint,
+            "A final render shows the fixtures' light only. Auto adds the dim work light while no fixture emits, On always (not saved with the preset).",
+            "Финальный рендер показывает только свет приборов. «Авто» добавляет слабый рабочий свет, пока ни один прибор не светит, «Вкл.» — всегда (не сохраняется в пресете)."),
     };
 }

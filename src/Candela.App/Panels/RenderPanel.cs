@@ -7,6 +7,7 @@ using Candela.App.Session;
 using Candela.App.Shell;
 using Candela.App.Ui;
 using Candela.Dmx.Input;
+using Candela.Engine;
 using Candela.Rendering;
 using Hexa.NET.ImGui;
 
@@ -44,6 +45,7 @@ internal sealed unsafe class RenderPanel : Panel
     private PresetCombo<FinalRenderSettings>? _presets;
     private long _shownVersion = -1;
     private bool _range;
+    private WorkLightMode _workLight = WorkLightMode.Off;
     private string _planText = "";
     private (int W, int H, int Spp, string Lang) _planKey;
     private string? _rangeError;
@@ -76,6 +78,16 @@ internal sealed unsafe class RenderPanel : Panel
     {
         get => _range;
         set => _range = value;
+    }
+
+    /// <summary>
+    /// The work light of the next render (<see cref="RenderRequest.WorkLight"/>): <see cref="WorkLightMode.Off"/> unless
+    /// the user asks for it in this panel; kept for the session, not with the preset.
+    /// </summary>
+    internal WorkLightMode WorkLight
+    {
+        get => _workLight;
+        set => _workLight = Enum.IsDefined(value) ? value : WorkLightMode.Off;
     }
 
     /// <inheritdoc/>
@@ -168,7 +180,11 @@ internal sealed unsafe class RenderPanel : Panel
                      Str.RenderRangeEnd, Str.RenderFrameRate,
                  })
             yield return Loc.Get(key);
-        foreach (var key in new[] { StageStr.RenderFolder, StageStr.RenderFileName, StageStr.RenderVolumeBounces, StageStr.RenderDenoise, StageStr.RenderRecording })
+        foreach (var key in new[]
+                 {
+                     StageStr.RenderFolder, StageStr.RenderFileName, StageStr.RenderVolumeBounces, StageStr.RenderDenoise, StageStr.RenderRecording,
+                     StageStr.RenderWorkLight,
+                 })
             yield return StageLoc.Get(key);
     }
 
@@ -306,6 +322,13 @@ internal sealed unsafe class RenderPanel : Panel
             s.ToneMapper = (ToneMapper)tone;
             edited = true;
         }
+
+        // Asked per render: a final picture shows the stage light only unless the work light is chosen here.
+        PropertyGrid.Row(StageLoc.Get(StageStr.RenderWorkLight));
+        if (WorkLightCombo.Draw("##render-work-light", _workLight, out var workLight))
+            _workLight = workLight;
+        if (ImGui.IsItemHovered())
+            SafeText.Tooltip(StageLoc.Get(StageStr.RenderWorkLightHint));
 
         PropertyGrid.Row("");
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
@@ -456,7 +479,10 @@ internal sealed unsafe class RenderPanel : Panel
         };
         var quality = HighQuality(_stage.Tools.Preview.Live, s);
         var (ss, passes) = RenderJobRunner.Plan(s.Width, s.Height, s.SamplesPerPixel);
-        return new RenderRequest(camera, view, quality, s.Width, s.Height, ss, passes, ResolveOutput(s.OutputPath), range);
+        return new RenderRequest(camera, view, quality, s.Width, s.Height, ss, passes, ResolveOutput(s.OutputPath), range)
+        {
+            WorkLight = _workLight,
+        };
     }
 
     /// <summary>The real-time settings used for a final frame: the preview look at the highest quality.</summary>
