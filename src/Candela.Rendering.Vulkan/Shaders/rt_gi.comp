@@ -11,38 +11,16 @@
 // frame's result reprojected to this surface (exponential moving average, rejected where the depth disagrees).
 // draw.mode = number of GI lights in raymarchList after the ray-marched beams; draw.width = history weight.
 
+#define RT_GEOMETRY_SET SET_PASS
+#define RT_GEOMETRY_BINDING BINDING_PASS_BUFFER
 #include "lighting.glsl"
+#include "rt_geometry.glsl"
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 layout(set = SET_PASS, binding = BINDING_PASS_STORAGE0, rgba16f) uniform writeonly image2D outIndirect;
 layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler2D historyIndirect;
 layout(set = SET_PASS, binding = BINDING_PASS_TLAS) uniform accelerationStructureEXT sceneTlas;
-
-// Per instance (8 uints at instance * 8): vertex address (2), index address (2), first sub-mesh entry, sub-mesh
-// count, 2 unused; sub-mesh entries (2 uints): first index, material slot.
-layout(set = SET_PASS, binding = BINDING_PASS_BUFFER, scalar) readonly buffer RtGeometryBuffer
-{
-    uint rtData[];
-};
-
-struct RtVertex
-{
-    vec3 position;
-    vec3 normal;
-    vec2 uv;
-    vec4 tangent;
-};
-
-layout(buffer_reference, scalar, buffer_reference_align = 4) readonly buffer RtVertices
-{
-    RtVertex v[];
-};
-
-layout(buffer_reference, scalar, buffer_reference_align = 4) readonly buffer RtIndices
-{
-    uint i[];
-};
 
 const uint RT_RAYS = 4u;
 const float RT_MAX_DISTANCE = 100.0;
@@ -59,28 +37,13 @@ vec3 cosineDirection(vec3 N, float u1, float u2)
 // Reflected + emitted luminance (cd/m2, Rec.2020) at a ray hit.
 vec3 shadeHit(uint instance, uint geometry, uint primitive, vec2 bary, vec3 rayDir, uint giLights)
 {
-    uint header = instance * 8u;
-    uvec2 vaddr = uvec2(rtData[header], rtData[header + 1u]);
-    uvec2 iaddr = uvec2(rtData[header + 2u], rtData[header + 3u]);
-    uint subMesh = rtData[header + 4u] + 2u * geometry;
-    uint firstIndex = rtData[subMesh];
-    uint slot = rtData[subMesh + 1u];
-    RtIndices indices = RtIndices(iaddr);
-    RtVertices vertices = RtVertices(vaddr);
-    uint i0 = indices.i[firstIndex + 3u * primitive];
-    uint i1 = indices.i[firstIndex + 3u * primitive + 1u];
-    uint i2 = indices.i[firstIndex + 3u * primitive + 2u];
-    RtVertex a = vertices.v[i0];
-    RtVertex b = vertices.v[i1];
-    RtVertex c = vertices.v[i2];
-    vec3 w = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
-    Instance inst = instances[instance];
-    vec3 P = (inst.world * vec4(a.position * w.x + b.position * w.y + c.position * w.z, 1.0)).xyz;
-    vec3 N = normalize(mat3(inst.normalMatrix) * (a.normal * w.x + b.normal * w.y + c.normal * w.z));
+    RtSurface surface = rtFetchSurface(instance, geometry, primitive, bary);
+    vec3 P = surface.position;
+    vec3 N = surface.normal;
     if (dot(N, rayDir) > 0.0)
         N = -N;
-    vec2 uv = a.uv * w.x + b.uv * w.y + c.uv * w.z;
-    Material m = materials[slot < inst.materialSlotCount ? materialSlots[inst.materialSlotOffset + slot] : 0u];
+    vec2 uv = surface.uv;
+    Material m = materials[surface.material];
     vec3 albedo = m.baseColor.rgb;
     if ((m.flags & MATERIAL_BASE_COLOR_TEXTURE) != 0u)
         albedo = rec709ToRec2020(textureLod(textures[nonuniformEXT(m.baseColorTexture)], uv * m.uvScale, 0.0).rgb * m.baseColorFactor709.rgb);

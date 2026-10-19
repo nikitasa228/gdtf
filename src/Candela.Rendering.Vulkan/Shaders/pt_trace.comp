@@ -1,0 +1,1061 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+#extension GL_EXT_ray_query : require
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference_uvec2 : require
+// Final render: one sample per pixel of an unbiased photometric path tracer (rows draw.materialIndex + gl_GlobalInvocationID.y,
+// sample index draw.instanceIndex), added to the accumulation images. Everything is in cd/m2 (luminance, linear Rec.2020).
+//
+// Surfaces: the energy-conserving BRDF of brdf.glsl (GGX + Fresnel-weighted Lambert, metal/rough, normal maps,
+// emission), thin-walled transmission (glass, gels: straight through, tinted, weighted by 1 - F), alpha mask/blend
+// (stochastic pass-through). Next-event estimation picks one spot light per vertex by weighted reservoir sampling over
+// the lights whose cone contains the point (candidates come from ray queries against the light-volume boxes), with
+// the unshadowed contribution as weight; MIS (power heuristic) against BSDF sampling for lights with a lens.
+//
+// Lights: the spot light's photometric distribution I(theta) x cookie (gobo, blades, prism, iris, frost) is evaluated
+// from its centre c, exactly as in the real-time renderer; the lens (SourceRadius) is an area-preserving polygon in
+// front of it that casts soft shadows and is what rays see:  L(y -> x) = I(theta_c(x)) |x - y|^2 / (A cos theta_y |x - c|^2),
+// so next-event estimation through a random lens point gives I(theta_c)/|x - c|^2 times the visibility of that point.
+//
+// Media: uniform haze (inside the media box), the smoke density grid (scattering, albedo 1) and the flame grids
+// (absorption kappa, blackbody emission kappa x L_bb(T)) with the Henyey-Greenstein phase function. Single scattering
+// of the spot lights is estimated on every ray segment by equi-angular sampling inside the light's cone (one light per
+// segment, reservoir-sampled by the analytic in-scattering of an isotropic point light); free-flight (delta tracking)
+// scattering continues the path for multiple scattering; segments that may not scatter any more use ratio tracking.
+// Flame emission is what rays see (counted on segments the camera sees directly); the light flames cast on the scene
+// comes from the engine's flame light samples (spot lights), as in the real-time renderer.
+
+#define RT_GEOMETRY_SET SET_PASS
+#define RT_GEOMETRY_BINDING BINDING_PT_GEOMETRY
+#include "lighting.glsl"
+#include "brdf.glsl"
+#include "volume.glsl"
+#include "pt_common.glsl"
+#include "rt_geometry.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+// rgb = sum of the radiance samples (cd/m2), a = number of samples
+layout(set = SET_PASS, binding = BINDING_PT_ACCUM, rgba32f) uniform image2D ptAccum;
+// rgb = sum of the first surface's albedo, a = sum of the squared sample luminance (variance of the denoiser)
+layout(set = SET_PASS, binding = BINDING_PT_AUX, rgba32f) uniform image2D ptAux;
+// xyz = sum of the first surface's world normal, w = sum of its view depth
+layout(set = SET_PASS, binding = BINDING_PT_GUIDE, rgba32f) uniform image2D ptGuide;
+layout(set = SET_PASS, binding = BINDING_PT_TLAS) uniform accelerationStructureEXT ptTlas;
+layout(set = SET_PASS, binding = BINDING_PT_LIGHTS, scalar) readonly buffer PtLightBuffer
+{
+    Light ptLights[];
+};
+
+const float PT_FAR = 1.0e7;
+const int PT_MAX_ITERATIONS = 96;      // scattering events + pass-through events per path
+const int PT_MAX_LAYERS = 16;          // alpha / transmissive surfaces crossed by one ray
+const int PT_MAX_COLLISIONS = 512;     // tentative collisions of one tracking loop
+const float PT_WEIGHT_FLOOR = 1e-3;    // smallest BRDF x cos of a light-selection weight (1/sr)
+const float PT_BACKGROUND_DEPTH = 1.0e5;
+
+const uint HIT_NONE = 0u;
+const uint HIT_SURFACE = 1u;
+const uint HIT_DISC = 2u;
+const uint HIT_BLOCKED = 3u;
+
+const uint PREV_CAMERA = 0u;
+const uint PREV_SURFACE = 1u;
+const uint PREV_MEDIUM = 2u;
+
+struct PtHit
+{
+    uint kind;
+    float t;
+    uint instance;
+    uint geometry;
+    uint primitive;
+    vec2 bary;
+    uint light;
+};
+
+// Reflection part of a surface (diffuse + specular) and its thin-walled transmission.
+struct PtBsdf
+{
+    SurfaceBrdf brdf;
+    float transmission;   // fraction of the non-reflected light transmitted (transmission x (1 - metallic))
+    vec3 tint;            // colour of the transmitted light
+};
+
+// ================================================================================================ media
+
+float hazeAt(vec3 P)
+{
+    return (params.flags & PT_FLAG_HAZE) != 0u && all(greaterThanEqual(P, params.mediaMin.xyz)) && all(lessThanEqual(P, params.mediaMax.xyz))
+        ? params.mediaMax.w : 0.0;
+}
+
+float smokeAt(vec3 P)
+{
+    vec3 uvw;
+    if ((params.flags & PT_FLAG_SMOKE) == 0u || !boxCoordinates(P, frame.smokeMin, frame.smokeMax, uvw))
+        return 0.0;
+    return min(max(textureLod(smokeTexture, uvw, 0.0).r, 0.0) * frame.media.z, params.majorants.x);
+}
+
+// Flame absorption (1/m) at P and the blackbody luminance of its temperature (cd/m2, Rec.2020).
+float flameAt(vec3 P, out vec3 blackbody)
+{
+    blackbody = vec3(0.0);
+    if ((params.flags & PT_FLAG_FLAME) == 0u)
+        return 0.0;
+    float kelvin = flameTemperatureAt(P);
+    if (kelvin <= frame.flameLut.x)
+        return 0.0;
+    blackbody = blackbodyLuminance(kelvin);
+    return params.majorants.y;
+}
+
+vec2 hazeInterval(vec3 o, vec3 d, float tEnd)
+{
+    if ((params.flags & PT_FLAG_HAZE) == 0u)
+        return vec2(1.0, 0.0);
+    vec2 h = rayBox(o, d, params.mediaMin.xyz, params.mediaMax.xyz);
+    return vec2(max(h.x, 0.0), min(h.y, tEnd));
+}
+
+// Hull of the parts of [0, tEnd] inside the smoke and flame boxes, and the majorant of their coefficients there.
+vec2 heterogeneousInterval(vec3 o, vec3 d, float tEnd, out float majorant)
+{
+    majorant = 0.0;
+    vec2 r = vec2(1.0, 0.0);
+    if ((params.flags & PT_FLAG_SMOKE) != 0u)
+    {
+        vec2 s = rayBox(o, d, frame.smokeMin.xyz, frame.smokeMax.xyz);
+        s = vec2(max(s.x, 0.0), min(s.y, tEnd));
+        if (s.x < s.y)
+        {
+            r = s;
+            majorant += params.majorants.x;
+        }
+    }
+
+    if ((params.flags & PT_FLAG_FLAME) != 0u)
+    {
+        vec2 f = rayBox(o, d, frame.flameMin.xyz, frame.flameMax.xyz);
+        f = vec2(max(f.x, 0.0), min(f.y, tEnd));
+        if (f.x < f.y)
+        {
+            r = r.x < r.y ? vec2(min(r.x, f.x), max(r.y, f.y)) : f;
+            majorant += params.majorants.y;
+        }
+    }
+
+    return majorant > 0.0 ? r : vec2(1.0, 0.0);
+}
+
+// Transmittance of the haze over [0, t] of a ray whose haze interval is h.
+float hazeTransmittance(vec2 h, float t)
+{
+    return h.x < h.y ? exp(-params.mediaMax.w * clamp(t - h.x, 0.0, h.y - h.x)) : 1.0;
+}
+
+// Ratio-tracking estimate of the transmittance over [0, tEnd]. With `emit`, the flame emission seen along the way
+// (weighted by beta and the transmittance up to it) is added to `radiance` (next-flight estimator).
+float trackTransmittance(vec3 o, vec3 d, float tEnd, inout uint rng, vec3 beta, inout vec3 radiance, bool emit)
+{
+    vec2 h = hazeInterval(o, d, tEnd);
+    float majorant;
+    vec2 s = heterogeneousInterval(o, d, tEnd, majorant);
+    float T = 1.0;
+    if (s.x < s.y)
+    {
+        float t = s.x;
+        for (int i = 0; i < PT_MAX_COLLISIONS; ++i)
+        {
+            t -= log(1.0 - rand(rng)) / majorant;
+            if (t >= s.y)
+                break;
+            vec3 x = o + t * d;
+            vec3 blackbody;
+            float absorption = flameAt(x, blackbody);
+            if (emit && absorption > 0.0)
+                radiance += beta * (T * hazeTransmittance(h, t) * absorption / majorant) * blackbody;
+            T *= max(1.0 - (smokeAt(x) + absorption) / majorant, 0.0);
+            if (T <= 0.0)
+                return 0.0;
+        }
+    }
+
+    return T * hazeTransmittance(h, tEnd);
+}
+
+// Free-flight sampling (delta tracking) of a real scattering event on [0, tEnd): its distance, or -1 when the ray
+// reaches tEnd. Flames absorb on the way (beta is weighted by 1 - sigma_a / majorant at every tentative collision, the
+// expected-value form of absorption) and, with `emit`, add their emission to `radiance`.
+float freeFlight(vec3 o, vec3 d, float tEnd, inout uint rng, inout vec3 beta, inout vec3 radiance, bool emit)
+{
+    vec2 h = hazeInterval(o, d, tEnd);
+    float hetMajorant;
+    vec2 s = heterogeneousInterval(o, d, tEnd, hetMajorant);
+    bool haze = h.x < h.y && params.mediaMax.w > 0.0;
+    bool het = s.x < s.y;
+    if (!haze && !het)
+        return -1.0;
+    if (!het)
+    {
+        // homogeneous haze: exact exponential sampling
+        float t = h.x - log(1.0 - rand(rng)) / params.mediaMax.w;
+        return t < h.y ? t : -1.0;
+    }
+
+    float a = haze ? min(h.x, s.x) : s.x;
+    float b = haze ? max(h.y, s.y) : s.y;
+    float majorant = (haze ? params.mediaMax.w : 0.0) + hetMajorant;
+    float t = a;
+    for (int i = 0; i < PT_MAX_COLLISIONS; ++i)
+    {
+        t -= log(1.0 - rand(rng)) / majorant;
+        if (t >= b)
+            return -1.0;
+        vec3 x = o + t * d;
+        float scattering = hazeAt(x) + smokeAt(x);
+        vec3 blackbody;
+        float absorption = flameAt(x, blackbody);
+        if (absorption > 0.0)
+        {
+            if (emit)
+                radiance += beta * (absorption / majorant) * blackbody;
+            beta *= 1.0 - absorption / majorant;
+        }
+
+        float rest = majorant - absorption;
+        if (rest > 0.0 && rand(rng) * rest < scattering)
+            return t;
+    }
+
+    return -1.0;
+}
+
+// The part of [0, tEnd] where light can scatter (haze box and smoke box).
+vec2 scatteringInterval(vec3 o, vec3 d, float tEnd)
+{
+    vec2 r = hazeInterval(o, d, tEnd);
+    if ((params.flags & PT_FLAG_SMOKE) != 0u)
+    {
+        vec2 s = rayBox(o, d, frame.smokeMin.xyz, frame.smokeMax.xyz);
+        s = vec2(max(s.x, 0.0), min(s.y, tEnd));
+        if (s.x < s.y)
+            r = r.x < r.y ? vec2(min(r.x, s.x), max(r.y, s.y)) : s;
+    }
+
+    return r;
+}
+
+// ================================================================================================ surfaces
+
+float alphaAt(Material m, vec2 uv)
+{
+    float alpha = m.baseColor.a;
+    if ((m.flags & MATERIAL_BASE_COLOR_TEXTURE) != 0u)
+        alpha = textureLod(textures[nonuniformEXT(m.baseColorTexture)], uv * m.uvScale, 0.0).a * m.baseColorFactor709.a;
+    return alpha;
+}
+
+vec3 albedoAt(Material m, vec2 uv)
+{
+    if ((m.flags & MATERIAL_BASE_COLOR_TEXTURE) != 0u)
+        return rec709ToRec2020(textureLod(textures[nonuniformEXT(m.baseColorTexture)], uv * m.uvScale, 0.0).rgb * m.baseColorFactor709.rgb);
+    return m.baseColor.rgb;
+}
+
+// Coverage of a hit for alpha: 1 = surface, 0 = hole (mask below the cut-off), else the blend alpha.
+float coverageOf(Material m, vec2 uv)
+{
+    if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) == 0u)
+        return 1.0;
+    float alpha = alphaAt(m, uv);
+    if ((m.flags & MATERIAL_ALPHA_MASK) != 0u)
+        return alpha >= m.alphaCutoff ? 1.0 : 0.0;
+    return clamp(alpha, 0.0, 1.0);
+}
+
+// Fresnel reflectance (Schlick, the BRDF's F0 and F90) at the cosine of incidence.
+vec3 surfaceFresnel(SurfaceBrdf s, float cosTheta)
+{
+    vec3 f0 = mix(vec3(s.f0), s.albedo, s.metallic);
+    float f90 = clamp(50.0 * dot(f0, vec3(0.3333)), 0.0, 1.0);
+    return fresnelSchlick(f0, f90, clamp(cosTheta, 0.0, 1.0));
+}
+
+// Closest surface or lens along the ray in [0, tMax]; alpha holes and blended surfaces are crossed stochastically.
+PtHit traceSurface(vec3 o, vec3 d, float tMax, inout uint rng)
+{
+    PtHit hit;
+    hit.kind = HIT_NONE;
+    hit.t = tMax;
+    hit.instance = 0u;
+    hit.geometry = 0u;
+    hit.primitive = 0u;
+    hit.bary = vec2(0.0);
+    hit.light = 0u;
+    float tMin = 0.0;
+    for (int layer = 0; layer < PT_MAX_LAYERS; ++layer)
+    {
+        rayQueryEXT q;
+        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_SCENE | PT_MASK_DISC, o, tMin, d, tMax);
+        while (rayQueryProceedEXT(q))
+        {
+            if (rayQueryGetIntersectionTypeEXT(q, false) == gl_RayQueryCandidateIntersectionTriangleEXT)
+            {
+                // a lens (non-opaque): seen from the front only (light leaves along the axis)
+                uint light = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false)) / PT_DISC_SEGMENTS;
+                if (light < params.lightCount && dot(d, ptLights[light].direction) < 0.0)
+                    rayQueryConfirmIntersectionEXT(q);
+            }
+        }
+
+        if (rayQueryGetIntersectionTypeEXT(q, true) != gl_RayQueryCommittedIntersectionTriangleEXT)
+            return hit;
+        float t = rayQueryGetIntersectionTEXT(q, true);
+        uint custom = uint(rayQueryGetIntersectionInstanceCustomIndexEXT(q, true));
+        uint primitive = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, true));
+        if (custom == PT_CUSTOM_DISC)
+        {
+            hit.kind = HIT_DISC;
+            hit.t = t;
+            hit.light = primitive / PT_DISC_SEGMENTS;
+            return hit;
+        }
+
+        uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(q, true));
+        vec2 bary = rayQueryGetIntersectionBarycentricsEXT(q, true);
+        Material m = materials[rtMaterialIndex(custom, geometry)];
+        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
+        {
+            RtSurface s = rtFetchSurface(custom, geometry, primitive, bary);
+            float coverage = coverageOf(m, s.uv);
+            if (coverage < 1.0 && rand(rng) >= coverage)
+            {
+                tMin = t + max(1e-4, 1e-5 * t);
+                continue;
+            }
+        }
+
+        hit.kind = HIT_SURFACE;
+        hit.t = t;
+        hit.instance = custom;
+        hit.geometry = geometry;
+        hit.primitive = primitive;
+        hit.bary = bary;
+        return hit;
+    }
+
+    hit.kind = HIT_BLOCKED;
+    return hit;
+}
+
+// Transmittance of the surfaces between o and o + tMax d: opaque surfaces block, alpha holes pass, blended surfaces
+// pass 1 - alpha, transmissive surfaces pass their thin-walled transmission (1 - F) x transmission x tint.
+vec3 surfaceTransmittance(vec3 o, vec3 d, float tMax)
+{
+    vec3 T = vec3(1.0);
+    float tMin = 0.0;
+    if (!(tMax > 0.0))
+        return T;
+    for (int layer = 0; layer < PT_MAX_LAYERS; ++layer)
+    {
+        rayQueryEXT q;
+        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsOpaqueEXT, PT_MASK_SCENE, o, tMin, d, tMax);
+        while (rayQueryProceedEXT(q))
+        {
+        }
+
+        if (rayQueryGetIntersectionTypeEXT(q, true) != gl_RayQueryCommittedIntersectionTriangleEXT)
+            return T;
+        float t = rayQueryGetIntersectionTEXT(q, true);
+        uint instance = uint(rayQueryGetIntersectionInstanceCustomIndexEXT(q, true));
+        uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(q, true));
+        Material m = materials[rtMaterialIndex(instance, geometry)];
+        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND | MATERIAL_TRANSMISSIVE)) == 0u)
+            return vec3(0.0);
+        uint primitive = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, true));
+        RtSurface s = rtFetchSurface(instance, geometry, primitive, rayQueryGetIntersectionBarycentricsEXT(q, true));
+        float coverage = coverageOf(m, s.uv);
+        vec3 pass = vec3(1.0 - coverage);
+        if ((m.flags & MATERIAL_TRANSMISSIVE) != 0u && coverage > 0.0)
+        {
+            float metallic = clamp(m.metallic, 0.0, 1.0);
+            vec3 albedo = albedoAt(m, s.uv);
+            SurfaceBrdf brdf = SurfaceBrdf(albedo, metallic, m.roughness, m.f0);
+            vec3 F = surfaceFresnel(brdf, abs(dot(s.geometricNormal, d)));
+            pass += coverage * (1.0 - F) * (m.transmission * (1.0 - metallic)) * albedo;
+        }
+
+        T *= pass;
+        if (max(T.r, max(T.g, T.b)) <= 0.0)
+            return vec3(0.0);
+        tMin = t + max(1e-4, 1e-5 * t);
+    }
+
+    return vec3(0.0);
+}
+
+// ================================================================================================ lights
+
+// Intensity (cd per channel) of light l towards P, from its centre (profile, cookie, prism), and the squared
+// distance (clamped to 1 cm).
+vec3 lightIntensityAt(Light l, vec3 P, out float d2)
+{
+    vec3 toP = P - l.position;
+    d2 = max(dot(toP, toP), MIN_LIGHT_DISTANCE * MIN_LIGHT_DISTANCE);
+    vec3 dir = toP * inversesqrt(d2);
+    if (dot(dir, l.direction) < l.cosCutoff)
+        return vec3(0.0);
+    return l.intensity * lightCookieProfile(l, dir, 0.0);
+}
+
+float lensArea(Light l)
+{
+    return PI * l.sourceRadius * l.sourceRadius;
+}
+
+// A uniformly distributed point of the lens polygon of light l (area-preserving regular polygon in front of the lens).
+vec3 sampleLens(Light l, vec3 u)
+{
+    float n = float(PT_DISC_SEGMENTS);
+    float k = min(floor(u.z * n), n - 1.0);
+    float r = l.sourceRadius * params.geometry.z;
+    vec3 c = l.position + l.direction * params.geometry.y;
+    float phi0 = 2.0 * PI * k / n;
+    float phi1 = 2.0 * PI * (k + 1.0) / n;
+    vec3 a = c + r * (cos(phi0) * l.right + sin(phi0) * l.up);
+    vec3 b = c + r * (cos(phi1) * l.right + sin(phi1) * l.up);
+    float su = sqrt(u.x);
+    float b0 = 1.0 - su;
+    float b1 = u.y * su;
+    return b0 * c + b1 * a + (1.0 - b0 - b1) * b;
+}
+
+// Light-selection weight of light l for a surface point: luminance of its unshadowed contribution (intensity / d^2
+// x BRDF x cos), with a floor on the BRDF part so every light that reaches the point keeps a non-zero weight.
+float surfaceLightWeight(Light l, vec3 P, vec3 N, vec3 V, PtBsdf b)
+{
+    float d2;
+    vec3 I = lightIntensityAt(l, P, d2);
+    float lum = luminanceRec2020(I);
+    if (!(lum > 0.0))
+        return 0.0;
+    vec3 L = normalize(l.position - P);
+    float cosN = dot(N, L);
+    float reflected = 0.0;
+    if (cosN > 0.0)
+    {
+        vec3 fd, fs;
+        evaluateBrdf(b.brdf, N, V, L, fd, fs);
+        reflected = luminanceRec2020(fd * (1.0 - b.transmission) + fs) * cosN;
+    }
+
+    return lum / d2 * max(reflected, PT_WEIGHT_FLOOR);
+}
+
+// Parametric interval of the ray o + t d (t in range) inside the cone of light l (apex at its centre, half-angle
+// acos(cosCutoff)); the whole range for cones wider than about 84 degrees. Conservative (may be wider).
+vec2 coneInterval(Light l, vec3 o, vec3 d, vec2 range)
+{
+    float c = l.cosCutoff;
+    if (c < 0.1)
+        return range;
+    vec3 a = l.direction;
+    vec3 v = o - l.position;
+    float dv = dot(d, a);
+    float vv = dot(v, a);
+    float c2 = c * c;
+    float A = dv * dv - c2;
+    float B = 2.0 * (dv * vv - c2 * dot(d, v));
+    float C = vv * vv - c2 * dot(v, v);
+    vec2 r = vec2(-1e30, 1e30);
+    if (abs(A) < 1e-7)
+    {
+        if (abs(B) < 1e-12)
+            return C >= 0.0 ? range : vec2(1.0, 0.0);
+        float t = -C / B;
+        r = B > 0.0 ? vec2(t, 1e30) : vec2(-1e30, t);
+    }
+    else
+    {
+        float disc = B * B - 4.0 * A * C;
+        if (disc < 0.0)
+        {
+            if (A < 0.0)
+                return vec2(1.0, 0.0);
+        }
+        else
+        {
+            float sq = sqrt(disc);
+            float q = -0.5 * (B + (B >= 0.0 ? sq : -sq));
+            float r0 = q / A;
+            float r1 = abs(q) > 1e-30 ? C / q : r0;
+            float lo = min(r0, r1);
+            float hi = max(r0, r1);
+            if (A < 0.0)
+                r = vec2(lo, hi);
+            else
+                r = dv > 0.0 ? vec2(hi, 1e30) : vec2(-1e30, lo); // the nappe in front of the light
+        }
+    }
+
+    // in front of the apex: vv + t dv >= 0
+    if (abs(dv) > 1e-9)
+    {
+        float t = -vv / dv;
+        if (dv > 0.0)
+            r.x = max(r.x, t);
+        else
+            r.y = min(r.y, t);
+    }
+    else if (vv < 0.0)
+    {
+        return vec2(1.0, 0.0);
+    }
+
+    r = vec2(max(r.x, range.x), min(r.y, range.y));
+    return any(isnan(r)) ? range : r;
+}
+
+// Light-selection weight of light l for the in-scattering along a ray segment: the analytic single scattering of an
+// isotropic point light of its peak intensity over the part of the segment inside its cone, I / D x (angle subtended),
+// times the phase function at the closest approach. `cone` returns that part.
+float segmentLightWeight(Light l, vec3 o, vec3 d, vec2 range, out vec2 cone)
+{
+    cone = coneInterval(l, o, d, range);
+    if (!(cone.x < cone.y))
+        return 0.0;
+    vec3 v = l.position - o;
+    float tc = dot(v, d);
+    float D = max(length(v - tc * d), 1e-4);
+    float angle = atan((cone.y - tc) / D) - atan((cone.x - tc) / D);
+    float facets = float(max(l.prismFacets, 1u));
+    float peak = luminanceRec2020(l.intensity) * facets;
+    vec3 xm = o + clamp(tc, cone.x, cone.y) * d;
+    vec3 toX = xm - l.position;
+    float len = length(toX);
+    float phase = henyeyGreenstein(len > 1e-6 ? dot(toX / len, d) : 1.0, params.majorants.z);
+    return peak * angle / D * phase;
+}
+
+// ================================================================================================ BSDF
+
+float ggxAlpha(SurfaceBrdf s)
+{
+    return max(s.roughness * s.roughness, 0.002);
+}
+
+// Probability density (solid angle) of sampling L from the visible normals of GGX.
+float ggxVndfPdf(vec3 N, vec3 V, vec3 L, float alpha)
+{
+    vec3 H = normalize(V + L);
+    float NdotH = clamp(dot(N, H), 0.0, 1.0);
+    float NdotV = clamp(abs(dot(N, V)), 1e-4, 1.0);
+    float a2 = alpha * alpha;
+    float G1 = 2.0 * NdotV / (NdotV + sqrt(a2 + (1.0 - a2) * NdotV * NdotV));
+    return distributionGgx(NdotH, alpha) * G1 / (4.0 * NdotV);
+}
+
+// Heitz 2018: a visible normal of GGX (local frame, z = normal) for the view direction Ve.
+vec3 sampleGgxVndf(vec3 Ve, float alpha, vec2 u)
+{
+    vec3 Vh = normalize(vec3(alpha * Ve.x, alpha * Ve.y, max(Ve.z, 1e-4)));
+    float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+    vec3 T1 = lensq > 0.0 ? vec3(-Vh.y, Vh.x, 0.0) * inversesqrt(lensq) : vec3(1.0, 0.0, 0.0);
+    vec3 T2 = cross(Vh, T1);
+    float r = sqrt(u.x);
+    float phi = 2.0 * PI * u.y;
+    float t1 = r * cos(phi);
+    float t2 = r * sin(phi);
+    float s = 0.5 * (1.0 + Vh.z);
+    t2 = (1.0 - s) * sqrt(max(1.0 - t1 * t1, 0.0)) + s * t2;
+    vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(1.0 - t1 * t1 - t2 * t2, 0.0)) * Vh;
+    return normalize(vec3(alpha * Nh.x, alpha * Nh.y, max(Nh.z, 0.0)));
+}
+
+// Reflection BSDF (1/sr) for directions on the side of V: diffuse (less what is transmitted) + specular.
+vec3 bsdfEval(PtBsdf b, vec3 N, vec3 V, vec3 L)
+{
+    vec3 fd, fs;
+    evaluateBrdf(b.brdf, N, V, L, fd, fs);
+    return fd * (1.0 - b.transmission) + fs;
+}
+
+// Lobe probabilities (specular, diffuse, transmission) from their albedo estimates at the view angle; transmission
+// weight Ft = (1 - F) x transmission x tint.
+void lobeProbabilities(PtBsdf b, float NdotV, out float pSpecular, out float pDiffuse, out float pTransmission, out vec3 Ft)
+{
+    vec3 F = surfaceFresnel(b.brdf, NdotV);
+    float ws = luminanceRec2020(F);
+    float wd = luminanceRec2020((1.0 - F) * (1.0 - b.brdf.metallic) * b.brdf.albedo) * (1.0 - b.transmission);
+    Ft = (1.0 - F) * b.transmission * b.tint;
+    float wt = luminanceRec2020(Ft);
+    float sum = ws + wd + wt;
+    if (!(sum > 0.0))
+    {
+        pSpecular = 0.5;
+        pDiffuse = 0.5;
+        pTransmission = 0.0;
+        return;
+    }
+
+    pSpecular = ws / sum;
+    pDiffuse = wd / sum;
+    pTransmission = wt / sum;
+}
+
+float bsdfPdf(PtBsdf b, vec3 N, vec3 V, vec3 L, float pSpecular, float pDiffuse)
+{
+    float NdotL = dot(N, L);
+    if (NdotL <= 0.0)
+        return 0.0;
+    return pDiffuse * NdotL * INV_PI + pSpecular * ggxVndfPdf(N, V, L, ggxAlpha(b.brdf));
+}
+
+// ================================================================================================ next-event estimation
+
+// Direct light of one spot light at a surface point (reservoir-sampled among the lights whose cone contains it),
+// MIS-weighted against BSDF sampling for lights with a lens. sumW returns the total selection weight (for the MIS
+// weight of a lens hit by the BSDF sample from this vertex).
+vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out float sumW)
+{
+    sumW = 0.0;
+    if ((params.flags & PT_FLAG_LIGHTS) == 0u)
+        return vec3(0.0);
+    uint chosen = 0xFFFFFFFFu;
+    float chosenW = 0.0;
+    rayQueryEXT q;
+    rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_LIGHT_VOLUME, P, 0.0, vec3(0.0, 0.0, 1.0), 1e-4);
+    while (rayQueryProceedEXT(q))
+    {
+        if (rayQueryGetIntersectionTypeEXT(q, false) != gl_RayQueryCandidateIntersectionAABBEXT)
+            continue;
+        uint i = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false));
+        if (i >= params.lightCount)
+            continue;
+        float w = surfaceLightWeight(ptLights[i], P, N, V, b);
+        if (!(w > 0.0))
+            continue;
+        sumW += w;
+        if (rand(rng) * sumW < w)
+        {
+            chosen = i;
+            chosenW = w;
+        }
+    }
+
+    if (chosen == 0xFFFFFFFFu)
+        return vec3(0.0);
+    Light l = ptLights[chosen];
+    float pSelect = chosenW / sumW;
+    float u0 = rand(rng), u1 = rand(rng), u2 = rand(rng);
+    bool lens = l.sourceRadius > 0.0;
+    vec3 y = lens ? sampleLens(l, vec3(u0, u1, u2)) : l.position;
+    vec3 toY = y - P;
+    float dist = length(toY);
+    if (!(dist > 1e-6))
+        return vec3(0.0);
+    vec3 L = toY / dist;
+    float cosN = dot(N, L);
+    if (cosN <= 0.0 || dot(Ng, L) <= 0.0)
+        return vec3(0.0);
+    float cosY = dot(-L, l.direction);
+    if (lens && cosY <= 0.0)
+        return vec3(0.0);
+    float dc2;
+    vec3 I = lightIntensityAt(l, P, dc2);
+    if (!(luminanceRec2020(I) > 0.0))
+        return vec3(0.0);
+    vec3 f = bsdfEval(b, N, V, L);
+    vec3 contribution = f * (cosN / (dc2 * pSelect)) * I;
+    if (!(luminanceRec2020(contribution) > 0.0))
+        return vec3(0.0);
+
+    float clearance = min(params.geometry.x, 0.5 * dist);
+    vec3 origin = offsetRay(P, Ng);
+    vec3 T = surfaceTransmittance(origin, L, dist - clearance);
+    if (max(T.r, max(T.g, T.b)) <= 0.0)
+        return vec3(0.0);
+    vec3 none = vec3(0.0);
+    T *= trackTransmittance(origin, L, dist, rng, vec3(0.0), none, false);
+
+    float weight = 1.0;
+    if (lens)
+    {
+        float pSpecular, pDiffuse, pTransmission;
+        vec3 Ft;
+        lobeProbabilities(b, clamp(abs(dot(N, V)), 1e-4, 1.0), pSpecular, pDiffuse, pTransmission, Ft);
+        float pBsdf = bsdfPdf(b, N, V, L, pSpecular, pDiffuse);
+        float pLight = pSelect * dist * dist / (lensArea(l) * cosY);
+        weight = pLight * pLight / (pLight * pLight + pBsdf * pBsdf);
+    }
+
+    return contribution * T * weight;
+}
+
+// Single scattering of one spot light on the ray segment [0, tEnd] (equi-angular sampling inside its cone).
+vec3 segmentNee(vec3 o, vec3 d, float tEnd, inout uint rng)
+{
+    if ((params.flags & PT_FLAG_LIGHTS) == 0u)
+        return vec3(0.0);
+    vec2 m = scatteringInterval(o, d, tEnd);
+    if (!(m.x < m.y))
+        return vec3(0.0);
+    uint chosen = 0xFFFFFFFFu;
+    float chosenW = 0.0;
+    float sumW = 0.0;
+    vec2 chosenCone = vec2(0.0);
+    rayQueryEXT q;
+    rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_LIGHT_VOLUME, o, m.x, d, m.y);
+    while (rayQueryProceedEXT(q))
+    {
+        if (rayQueryGetIntersectionTypeEXT(q, false) != gl_RayQueryCandidateIntersectionAABBEXT)
+            continue;
+        uint i = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false));
+        if (i >= params.lightCount)
+            continue;
+        vec2 cone;
+        float w = segmentLightWeight(ptLights[i], o, d, m, cone);
+        if (!(w > 0.0))
+            continue;
+        sumW += w;
+        if (rand(rng) * sumW < w)
+        {
+            chosen = i;
+            chosenW = w;
+            chosenCone = cone;
+        }
+    }
+
+    if (chosen == 0xFFFFFFFFu)
+        return vec3(0.0);
+    Light l = ptLights[chosen];
+    float pSelect = chosenW / sumW;
+
+    // equi-angular distance inside the cone: pdf proportional to 1 / (D^2 + (t - tc)^2)
+    vec3 v = l.position - o;
+    float tc = dot(v, d);
+    float D = max(length(v - tc * d), 1e-4);
+    float th0 = atan((chosenCone.x - tc) / D);
+    float th1 = atan((chosenCone.y - tc) / D);
+    if (!(th1 > th0))
+        return vec3(0.0);
+    float t = tc + D * tan(mix(th0, th1, rand(rng)));
+    t = clamp(t, chosenCone.x, chosenCone.y);
+    float pdfT = D / ((th1 - th0) * (D * D + (t - tc) * (t - tc)));
+    vec3 x = o + t * d;
+    float scattering = hazeAt(x) + smokeAt(x);
+    if (!(scattering > 0.0))
+        return vec3(0.0);
+    float dc2;
+    vec3 I = lightIntensityAt(l, x, dc2);
+    if (!(luminanceRec2020(I) > 0.0))
+        return vec3(0.0);
+
+    float u0 = rand(rng), u1 = rand(rng), u2 = rand(rng);
+    bool lens = l.sourceRadius > 0.0;
+    vec3 y = lens ? sampleLens(l, vec3(u0, u1, u2)) : l.position;
+    vec3 toY = y - x;
+    float dist = length(toY);
+    if (!(dist > 1e-6))
+        return vec3(0.0);
+    vec3 Ly = toY / dist;
+    if (lens && dot(-Ly, l.direction) <= 0.0)
+        return vec3(0.0);
+    // the light propagates along -Ly and is scattered towards the viewer (-d)
+    float phase = henyeyGreenstein(dot(Ly, d), params.majorants.z);
+    vec3 none = vec3(0.0);
+    float viewT = trackTransmittance(o, d, t, rng, vec3(0.0), none, false);
+    if (!(viewT > 0.0))
+        return vec3(0.0);
+    vec3 lightT = surfaceTransmittance(x, Ly, dist - min(params.geometry.x, 0.5 * dist));
+    if (max(lightT.r, max(lightT.g, lightT.b)) <= 0.0)
+        return vec3(0.0);
+    lightT *= trackTransmittance(x, Ly, dist, rng, vec3(0.0), none, false);
+    return I * (viewT * scattering * phase / (dc2 * pdfT * pSelect)) * lightT;
+}
+
+// ================================================================================================ path
+
+vec3 clampContribution(vec3 c, bool scattered)
+{
+    float limit = params.background.w;
+    if (!scattered || !(limit > 0.0))
+        return c;
+    float lum = luminanceRec2020(c);
+    return lum > limit ? c * (limit / lum) : c;
+}
+
+void main()
+{
+    uvec2 pixel = uvec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + draw.materialIndex);
+    if (pixel.x >= params.width || pixel.y >= params.height)
+        return;
+    uint rng = rngSeed(pixel, draw.instanceIndex, params.seed);
+
+    // camera ray through a random point of the pixel (box filter), from the near plane
+    vec2 uv = (vec2(pixel) + vec2(rand(rng), rand(rng))) / vec2(float(params.width), float(params.height));
+    vec3 o, d;
+    viewRay(uv, o, d);
+    o = worldFromDepth(uv, 1.0);
+
+    vec3 radiance = vec3(0.0);
+    vec3 beta = vec3(1.0);
+    bool visible = true;               // nothing has scattered yet: the camera sees what the ray reaches
+    uint surfaceBounces = 0u;
+    uint volumeVertices = 0u;
+    uint prevKind = PREV_CAMERA;
+    vec3 prevP = o;                    // receiver of the light reaching the current ray (camera or last scattering vertex)
+    vec3 prevN = vec3(0.0, 0.0, 1.0);
+    vec3 prevV = -d;
+    PtBsdf prevBsdf;
+    prevBsdf.brdf = SurfaceBrdf(vec3(0.0), 0.0, 1.0, 0.0);
+    prevBsdf.transmission = 0.0;
+    prevBsdf.tint = vec3(0.0);
+    float prevSumW = 0.0;
+    float prevPdf = 0.0;
+
+    vec3 aovAlbedo = vec3(0.0);
+    vec3 aovNormal = vec3(0.0);
+    float aovDepth = PT_BACKGROUND_DEPTH;
+    bool aovDone = false;
+    bool media = (params.flags & (PT_FLAG_HAZE | PT_FLAG_SMOKE | PT_FLAG_FLAME)) != 0u;
+
+    for (int iteration = 0; iteration < PT_MAX_ITERATIONS; ++iteration)
+    {
+        PtHit hit = traceSurface(o, d, PT_FAR, rng);
+        float tEnd = hit.kind == HIT_NONE ? PT_FAR : hit.t;
+        bool scattered = surfaceBounces + volumeVertices > 0u;
+
+        if (!aovDone)
+        {
+            aovDone = true;
+            if (hit.kind == HIT_SURFACE)
+            {
+                RtSurface s = rtFetchSurface(hit.instance, hit.geometry, hit.primitive, hit.bary);
+                Material m = materials[s.material];
+                aovAlbedo = albedoAt(m, s.uv);
+                vec3 n = dot(s.geometricNormal, d) > 0.0 ? -s.normal : s.normal;
+                aovNormal = n;
+                aovDepth = dot(s.position - frame.cameraPosition.xyz, frame.cameraForward.xyz);
+            }
+            else if (hit.kind == HIT_DISC)
+            {
+                aovAlbedo = vec3(1.0);
+                aovNormal = -d;
+                aovDepth = dot(o + hit.t * d - frame.cameraPosition.xyz, frame.cameraForward.xyz);
+            }
+        }
+
+        if (media)
+        {
+            bool mayScatter = volumeVertices < params.maxVolumeBounces;
+            if (mayScatter)
+                radiance += clampContribution(beta * segmentNee(o, d, tEnd, rng), scattered);
+            if (mayScatter)
+            {
+                float ts = freeFlight(o, d, tEnd, rng, beta, radiance, visible);
+                if (ts >= 0.0)
+                {
+                    vec3 x = o + ts * d;
+                    volumeVertices++;
+                    visible = false;
+                    prevKind = PREV_MEDIUM;
+                    prevP = x;
+                    o = x;
+                    d = sampleHenyeyGreenstein(d, params.majorants.z, vec2(rand(rng), rand(rng)));
+                    if (surfaceBounces + volumeVertices > 3u)
+                    {
+                        float survive = min(max(beta.r, max(beta.g, beta.b)), 0.95);
+                        if (!(rand(rng) < survive))
+                            break;
+                        beta /= survive;
+                    }
+
+                    continue;
+                }
+            }
+            else
+            {
+                beta *= trackTransmittance(o, d, tEnd, rng, beta, radiance, visible);
+            }
+
+            if (max(beta.r, max(beta.g, beta.b)) <= 0.0)
+                break;
+        }
+
+        if (hit.kind == HIT_NONE)
+        {
+            radiance += clampContribution(beta * params.background.rgb, scattered);
+            break;
+        }
+
+        if (hit.kind == HIT_BLOCKED)
+            break;
+
+        if (hit.kind == HIT_DISC)
+        {
+            // A lens seen by the camera or by a BSDF sample (lights after a medium vertex are the equi-angular
+            // estimator's).
+            if (prevKind != PREV_MEDIUM)
+            {
+                Light l = ptLights[hit.light];
+                vec3 y = o + hit.t * d;
+                float cosY = dot(-d, l.direction);
+                float dc2;
+                vec3 I = lightIntensityAt(l, prevP, dc2);
+                vec3 toPrev = prevP - y;
+                float dy2 = dot(toPrev, toPrev);
+                if (cosY > 0.0 && luminanceRec2020(I) > 0.0)
+                {
+                    float area = lensArea(l);
+                    vec3 Le = I * (dy2 / (area * cosY * dc2));
+                    float weight = 1.0;
+                    if (prevKind == PREV_SURFACE && prevSumW > 0.0)
+                    {
+                        float pSelect = surfaceLightWeight(l, prevP, prevN, prevV, prevBsdf) / prevSumW;
+                        float pLight = pSelect * dy2 / (area * cosY);
+                        weight = prevPdf * prevPdf / (prevPdf * prevPdf + pLight * pLight);
+                    }
+
+                    radiance += clampContribution(beta * Le * weight, scattered);
+                }
+            }
+
+            break;
+        }
+
+        // ---- surface
+        RtSurface s = rtFetchSurface(hit.instance, hit.geometry, hit.primitive, hit.bary);
+        Material m = materials[s.material];
+        vec3 P = o + hit.t * d;
+        vec3 Ng = s.geometricNormal;
+        if (dot(Ng, d) > 0.0)
+            Ng = -Ng;
+        vec3 N = s.normal;
+        if (dot(N, Ng) < 0.0)
+            N = -N;
+        vec2 uv = s.uv * m.uvScale;
+        if ((m.flags & MATERIAL_NORMAL_TEXTURE) != 0u)
+        {
+            vec3 T = s.tangent.xyz - N * dot(N, s.tangent.xyz);
+            float tl = length(T);
+            if (tl > 1e-6)
+            {
+                T /= tl;
+                vec3 B = cross(N, T) * (s.tangent.w < 0.0 ? -1.0 : 1.0);
+                vec3 tn = textureLod(textures[nonuniformEXT(m.normalTexture)], uv, 0.0).xyz * 2.0 - 1.0;
+                vec3 mapped = normalize(T * tn.x + B * tn.y + N * max(tn.z, 1e-3));
+                if (dot(mapped, Ng) > 0.05)
+                    N = mapped;
+            }
+        }
+
+        vec3 V = -d;
+        vec3 albedo = albedoAt(m, s.uv);
+        if ((m.flags & MATERIAL_UNLIT) != 0u)
+        {
+            // display-referred base colour (as in the real-time view), seen directly only
+            if (visible)
+                radiance += beta * albedo * params.majorants.w;
+            break;
+        }
+
+        vec3 emission = m.emissive;
+        if ((m.flags & MATERIAL_EMISSIVE_TEXTURE) != 0u)
+            emission = rec709ToRec2020(textureLod(textures[nonuniformEXT(m.emissiveTexture)], uv, 0.0).rgb * m.emissive709);
+        radiance += clampContribution(beta * emission, scattered);
+
+        float metallic = clamp(m.metallic, 0.0, 1.0);
+        float roughness = clamp(m.roughness, 0.02, 1.0);
+        if ((m.flags & MATERIAL_METALLIC_ROUGHNESS_TEXTURE) != 0u)
+        {
+            vec4 mr = textureLod(textures[nonuniformEXT(m.metallicRoughnessTexture)], uv, 0.0);
+            roughness = clamp(roughness * mr.g, 0.02, 1.0);
+            metallic = clamp(metallic * mr.b, 0.0, 1.0);
+        }
+
+        PtBsdf b;
+        b.brdf = SurfaceBrdf(albedo, metallic, roughness, m.f0);
+        b.transmission = (m.flags & MATERIAL_TRANSMISSIVE) != 0u ? clamp(m.transmission, 0.0, 1.0) * (1.0 - metallic) : 0.0;
+        b.tint = albedo;
+
+        float NdotV = clamp(abs(dot(N, V)), 1e-4, 1.0);
+        float pSpecular, pDiffuse, pTransmission;
+        vec3 Ft;
+        lobeProbabilities(b, NdotV, pSpecular, pDiffuse, pTransmission, Ft);
+        float u = rand(rng);
+        if (u < pTransmission)
+        {
+            // thin-walled transmission: straight through, a pass-through event (not a scattering vertex)
+            beta *= Ft / pTransmission;
+            o = offsetRay(P, -Ng);
+            continue;
+        }
+
+        if (surfaceBounces >= params.maxBounces)
+            break;
+
+        float sumW;
+        radiance += clampContribution(beta * surfaceNee(P, Ng, N, V, b, rng, sumW), scattered);
+
+        // continue with a reflection sample
+        vec3 L;
+        vec2 u2 = vec2(rand(rng), rand(rng));
+        if (u - pTransmission < pSpecular)
+        {
+            vec3 t, bt;
+            basis(N, t, bt);
+            vec3 Ve = vec3(dot(V, t), dot(V, bt), dot(V, N));
+            vec3 h = sampleGgxVndf(Ve, ggxAlpha(b.brdf), u2);
+            vec3 H = normalize(t * h.x + bt * h.y + N * h.z);
+            L = reflect(-V, H);
+        }
+        else
+        {
+            L = sampleCosine(N, u2);
+        }
+
+        float NdotL = dot(N, L);
+        if (NdotL <= 0.0 || dot(Ng, L) <= 0.0)
+            break;
+        float pdf = bsdfPdf(b, N, V, L, pSpecular, pDiffuse);
+        if (!(pdf > 0.0))
+            break;
+        beta *= bsdfEval(b, N, V, L) * (NdotL / pdf);
+
+        surfaceBounces++;
+        visible = false;
+        prevKind = PREV_SURFACE;
+        prevP = P;
+        prevN = N;
+        prevV = V;
+        prevBsdf = b;
+        prevSumW = sumW;
+        prevPdf = pdf;
+        o = offsetRay(P, Ng);
+        d = L;
+
+        if (surfaceBounces + volumeVertices > 3u)
+        {
+            float survive = min(max(beta.r, max(beta.g, beta.b)), 0.95);
+            if (!(rand(rng) < survive))
+                break;
+            beta /= survive;
+        }
+
+        if (!isFiniteVec(beta) || max(beta.r, max(beta.g, beta.b)) <= 0.0)
+            break;
+    }
+
+    if (!isFiniteVec(radiance))
+        radiance = vec3(0.0);
+    radiance = max(radiance, vec3(0.0));
+
+    ivec2 p = ivec2(pixel);
+    float lum = luminanceRec2020(radiance);
+    imageStore(ptAccum, p, imageLoad(ptAccum, p) + vec4(radiance, 1.0));
+    imageStore(ptAux, p, imageLoad(ptAux, p) + vec4(aovAlbedo, lum * lum));
+    imageStore(ptGuide, p, imageLoad(ptGuide, p) + vec4(aovNormal, aovDepth));
+}

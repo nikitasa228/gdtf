@@ -57,6 +57,59 @@ internal static class ShaderConstants
     public const uint BindingPassTlas = 6;
     public const uint BindingPassBuffer = 7;
 
+    // Set 2 of the path tracer's pipelines (PathTracer): accumulation images, its acceleration structure, light
+    // snapshot, parameters and the exposure histogram.
+    public const uint BindingPtAccum = 0;
+    public const uint BindingPtAux = 1;
+    public const uint BindingPtGuide = 2;
+    public const uint BindingPtOutput = 3;
+    public const uint BindingPtTlas = 4;
+    public const uint BindingPtGeometry = 5;
+    public const uint BindingPtLights = 6;
+    public const uint BindingPtParams = 7;
+    public const uint BindingPtHistogram = 8;
+    public const uint BindingPtInput = 9;
+    public const uint PtBindingCount = 10;
+
+    /// <summary>Cull-mask bit of the path tracer's light discs (the emitting lens of each spot light).</summary>
+    public const uint PtMaskDisc = 0x02;
+
+    /// <summary>Cull-mask bit of the path tracer's light volumes (bounding boxes of each light's cone, light selection).</summary>
+    public const uint PtMaskLightVolume = 0x04;
+
+    /// <summary>Instance custom index of the light-disc instance.</summary>
+    public const uint PtCustomDisc = 0xFFFFFF;
+
+    /// <summary>Instance custom index of the light-volume instance.</summary>
+    public const uint PtCustomVolume = 0xFFFFFE;
+
+    /// <summary>Triangles of each light's lens polygon (area-preserving regular polygon).</summary>
+    public const uint PtDiscSegments = 16;
+
+    /// <summary>pt_display.comp (draw.instanceIndex): the source image holds the mean (denoised), not sum + count.</summary>
+    public const uint PtDisplayMean = 1u << 0;
+
+    /// <summary>pt_display.comp (draw.instanceIndex): only add the pixels to the luminance histogram.</summary>
+    public const uint PtDisplayHistogram = 1u << 1;
+
+    /// <summary>pt_denoise.comp (draw.mode): resolve sum + count into mean + variance (the denoiser's first input).</summary>
+    public const uint PtDenoiseResolve = 0;
+
+    /// <summary>pt_denoise.comp (draw.mode): one à-trous iteration with taps draw.materialIndex pixels apart.</summary>
+    public const uint PtDenoiseIterate = 1;
+
+    /// <summary>PtParams.flags: the scene has spot lights to sample.</summary>
+    public const uint PtFlagLights = 1u << 0;
+
+    /// <summary>PtParams.flags: uniform haze inside the media box.</summary>
+    public const uint PtFlagHaze = 1u << 1;
+
+    /// <summary>PtParams.flags: smoke density grid.</summary>
+    public const uint PtFlagSmoke = 1u << 2;
+
+    /// <summary>PtParams.flags: flame temperature grids.</summary>
+    public const uint PtFlagFlame = 1u << 3;
+
     // Clustered light assignment: 16 × 9 screen tiles × 24 logarithmic depth slices.
     public const uint ClusterCountX = 16;
     public const uint ClusterCountY = 9;
@@ -222,6 +275,30 @@ internal static class ShaderConstants
         ("BINDING_PASS_SAMPLED2", I(BindingPassSampled2)),
         ("BINDING_PASS_TLAS", I(BindingPassTlas)),
         ("BINDING_PASS_BUFFER", I(BindingPassBuffer)),
+        ("BINDING_PT_ACCUM", I(BindingPtAccum)),
+        ("BINDING_PT_AUX", I(BindingPtAux)),
+        ("BINDING_PT_GUIDE", I(BindingPtGuide)),
+        ("BINDING_PT_OUTPUT", I(BindingPtOutput)),
+        ("BINDING_PT_TLAS", I(BindingPtTlas)),
+        ("BINDING_PT_GEOMETRY", I(BindingPtGeometry)),
+        ("BINDING_PT_LIGHTS", I(BindingPtLights)),
+        ("BINDING_PT_PARAMS", I(BindingPtParams)),
+        ("BINDING_PT_HISTOGRAM", I(BindingPtHistogram)),
+        ("BINDING_PT_INPUT", I(BindingPtInput)),
+        ("PT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
+        ("PT_MASK_DISC", I(PtMaskDisc) + "u"),
+        ("PT_MASK_LIGHT_VOLUME", I(PtMaskLightVolume) + "u"),
+        ("PT_CUSTOM_DISC", I(PtCustomDisc) + "u"),
+        ("PT_CUSTOM_VOLUME", I(PtCustomVolume) + "u"),
+        ("PT_DISC_SEGMENTS", I(PtDiscSegments) + "u"),
+        ("PT_DISPLAY_MEAN", I(PtDisplayMean) + "u"),
+        ("PT_DISPLAY_HISTOGRAM", I(PtDisplayHistogram) + "u"),
+        ("PT_DENOISE_RESOLVE", I(PtDenoiseResolve) + "u"),
+        ("PT_DENOISE_ITERATE", I(PtDenoiseIterate) + "u"),
+        ("PT_FLAG_LIGHTS", I(PtFlagLights) + "u"),
+        ("PT_FLAG_HAZE", I(PtFlagHaze) + "u"),
+        ("PT_FLAG_SMOKE", I(PtFlagSmoke) + "u"),
+        ("PT_FLAG_FLAME", I(PtFlagFlame) + "u"),
         ("CLUSTER_COUNT_X", I(ClusterCountX)),
         ("CLUSTER_COUNT_Y", I(ClusterCountY)),
         ("CLUSTER_COUNT_Z", I(ClusterCountZ)),
