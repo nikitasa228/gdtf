@@ -237,7 +237,8 @@ public sealed partial class SafeTextTests : IDisposable
     [InlineData("Spot 1", "Spot 1")]
     [InlineData("a##b", "a# #b")]
     [InlineData("###hidden id", "# # #hidden id")]
-    [InlineData("ends with ##", "ends with # #")]
+    [InlineData("ends with ##", "ends with # # ")]
+    [InlineData("C#", "C# ")]
     [InlineData("%s %n %% #1 # 2", "%s %n %% #1 # 2")]
     [InlineData("", "")]
     public void Labels_keep_the_whole_name_visible(string name, string expected)
@@ -253,6 +254,24 @@ public sealed partial class SafeTextTests : IDisposable
     {
         string name = "Fixture " + Nasty;
         Assert.Same(name, SafeText.Label(name));
+    }
+
+    [Fact]
+    public void A_name_ending_in_a_hash_keeps_it_in_front_of_an_id_suffix()
+    {
+        // Callers append their own "##id": a name's last '#' would turn that into "###id", which hides the '#'.
+        using var ui = new HeadlessImGui(new Vector2(700, 300));
+        string text = Capture(ui, () => Window("hash", new Vector2(600, 240), () =>
+        {
+            ImGui.Selectable(SafeText.Label("Folder C#") + "##row3");
+            ImGui.Selectable($"{SafeText.Label("Cable ##2#")}##cable");
+            ImGui.Selectable(SafeText.Label("#") + "##only");
+        }));
+        Assert.Contains("Folder C#", text, StringComparison.Ordinal);
+        Assert.Contains("Cable #\u200A#2#", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("##", SafeText.Label("C#") + "x", StringComparison.Ordinal);
+        // A lone "#" is drawn too (the hair space after it is whitespace to the pattern).
+        Assert.Matches(@"(?m)^\s*#\s*$", text);
     }
 
     [Fact]

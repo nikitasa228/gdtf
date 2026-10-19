@@ -66,14 +66,16 @@ internal static class SafeText
 
     /// <summary>
     /// <paramref name="text"/> made safe to use as (the visible part of) a widget label: every "##" gets a hair space
-    /// between its two '#', so ImGui shows the whole name instead of treating the rest as a hidden ID. Returns the same
-    /// string (no allocation) when there is no "##"; append your own "##id" after it.
+    /// between its two '#', so ImGui shows the whole name instead of treating the rest as a hidden ID, and a '#' at the
+    /// end gets one after it, so the "##id" a caller appends does not become "###id" (which would hide that '#'). Returns
+    /// the same string (no allocation) when there is neither; append your own "##id" after it.
     /// </summary>
     public static string Label(string? text)
     {
         if (string.IsNullOrEmpty(text))
             return "";
-        if (!text.Contains("##", StringComparison.Ordinal))
+        bool hashAtEnd = text[^1] == '#';
+        if (!hashAtEnd && !text.Contains("##", StringComparison.Ordinal))
             return text;
         // Between every two adjacent '#' ("###" included), so no "##" is left anywhere.
         var builder = new System.Text.StringBuilder(text.Length + 8);
@@ -84,6 +86,8 @@ internal static class SafeText
             builder.Append(text[i]);
         }
 
+        if (hashAtEnd)
+            builder.Append(HairSpace);
         return builder.ToString();
     }
 }

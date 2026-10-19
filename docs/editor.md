@@ -940,7 +940,8 @@ are localised); changes of the view settings count as unsaved changes but are no
   checked too —, and the only format strings left are the editor's own number formats of sliders. Names in
   widget labels and combo previews (files and folders in the file browser, recent files, issue messages, DMX modes and
   channel sets, preset, recording, device, connector and network adapter names) go through `SafeText.Label`, which
-  breaks a "##" with a hair space so ImGui does not cut the name off as an ID suffix.
+  breaks a "##" with a hair space so ImGui does not cut the name off as an ID suffix (and puts one after a final '#',
+  so a folder called `Music C#` does not lose its '#' to the "##id" the row appends).
 
 ![File browser with printf conversions in the names](images/editor-safe-text.png)
 
