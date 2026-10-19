@@ -317,9 +317,30 @@ public sealed class MvrExportTextureRenderTests
             var output = new StringWriter();
             var error = new StringWriter();
             int code = Cli.Program.Run(
-                ["render", scene, "--out", png, "--width", "96", "--height", "96", "--frames", "1", "--mode", "full", "--floor", "none",
-                    "--work-light", "on", "--camera", "2.2,-2.6,2.0", "--target", "0.5,0.5,0.5",
-                    "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root],
+                ["render",
+                    scene,
+                    "--out",
+                    png,
+                    "--width",
+                    "96",
+                    "--height",
+                    "96",
+                    "--frames",
+                    "1",
+                    "--mode",
+                    "full",
+                    "--floor",
+                    "none",
+                    "--work-light",
+                    "on",
+                    "--camera",
+                    "2.2,-2.6,2.0",
+                    "--target",
+                    "0.5,0.5,0.5",
+                    "--cache",
+                    Path.Combine(dir, "cache"),
+                    "--library",
+                    TestEnvironment.Root],
                 output, error);
             Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
             return png;

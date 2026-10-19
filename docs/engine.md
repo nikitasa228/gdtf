@@ -76,7 +76,7 @@ false only when nothing happened (the open scene is then unchanged).
 | `Open(path)` | `.candela` through `Candela.Project` (tolerant loading; load issues reported; the `engine`/`view` sections restored, a section that no longer parses gives `engine.settings-invalid` and the defaults); `.mvr` through `Candela.Mvr` as a new, unsaved project. |
 | `Save()`, `SaveAs(path)` | Atomic `.candela` write with the scene, every asset (original bytes), copies of the GDTF files the fixtures use (from the library or the project's own copies), the thumbnail (`Project.Thumbnail`) and the `engine`/`view` sections. `Save()` without a path fails with "Save as". |
 | `Import(path, EngineImportOptions)` | `.mvr` merged under a new group (undoable); `.candela` merged under a group through `ProjectMerge` (new ids, references remapped, undoable); 3D models (OBJ, FBX, DAE, 3DS, STL, PLY, glTF/GLB) as a `MeshComponent` entity at `Placement`; images (PNG, JPEG, TGA, BMP, PSD, GIF, HDR) as an `ImageComponent` reference drawing or poster sized to the image's aspect; `.gdtf` read completely first (`GdtfReader`) and added to the fixture library only when it is a readable fixture type with at least one DMX mode — a broken file is refused with `engine.import-failed` (category Fixture) and never becomes a library entry; warnings of the reader become one `engine.gdtf-warnings` note. The result carries the new (or already present) entry in `EngineResult.LibraryEntry` and `FixtureLibraryChanged` is raised, so the editor can select it. SketchUp files are refused with advice. |
-| `ExportMvr(path)` | MVR 1.6 with the library's GDTF files and the models as GLB (`Candela.Mvr`). Generic devices (`GenericDevices`: splitters, nodes, dimmer packs) are written as ordinary MVR fixtures with their GDTF embedded and marked in Candela's `UserData` block (`MvrExportOptions.IsCandelaDevice = GenericDevices.IsGeneric`), so opening the file in Candela gives the same devices back (by their own file names, without stub reports) while other programs see valid fixtures. |
+| `ExportMvr(path, EngineExportOptions)` | MVR 1.6 with the library's GDTF files and the models as GLB with their textures (`Candela.Mvr`; see "MVR export" below). Stand-ins are written as the models and modes the scene asks for unless `WriteStandIns` is set. Generic devices (`GenericDevices`: splitters, nodes, dimmer packs) are written as ordinary MVR fixtures with their GDTF embedded and marked in Candela's `UserData` block (`MvrExportOptions.IsCandelaDevice = GenericDevices.IsGeneric`), so opening the file in Candela gives the same devices back (by their own file names, without stub reports) while other programs see valid fixtures. |
 
 **GDTF files that are not in the library.** Complete GDTFs embedded in an MVR, and the GDTF copies of a project, are
 extracted to `{cache}/gdtf/{content hash}/` and added to the library when the library has no file of that name, so a
@@ -100,8 +100,33 @@ are one warning per type, not errors. When the real GDTF arrives (library reload
 to it in the requested mode (else the mode that fits the spacing) and leave the record (`engine.substitute-replaced`).
 `SubstitutionOf(entityId)` says what a fixture stands in for.
 
-**MVR models** become model assets with the MVR conventions as import options (3DS millimetres Z-up, glTF metres Y-up);
-the MVR module's managed decode is reused (and cached), so opening an MVR never needs the native importer.
+**MVR models** become model assets with the MVR conventions as import options (3DS millimetres Z-up, glTF metres Y-up).
+For 3DS the MVR module's managed decode is reused (and cached), so opening an MVR never needs the native importer;
+glTF/GLB decode in the asset store's managed glTF reader on first use, which keeps their textures (embedded images and
+image files become `asset:{id}/…` keys), so a textured model of an MVR renders with its texture.
+
+**MVR export.** `ExportMvr(path, options)` writes what the scene holds, and every change it cannot avoid is an issue of
+the result, in `Issues`, and named in the summary line the editor logs (`… Changes: <message> | <message> …`, up to
+three messages per issue code and how many more):
+
+* **Stand-ins.** A fixture in `EngineSettings.Substitutes` that still uses its stand-in (`SubstitutionOf`) is written
+  with the requested `GDTFSpec` and `GDTFMode` (`MvrExportOptions.StandInOf`). The GDTF embedded for it is the one the
+  source MVR embedded for that model (Depence's stub, byte for byte): an MVR open or import keeps those files in
+  memory and in `{cache}/mvr-requested-gdtf/`, so an export after saving the project and opening it again on the same
+  machine still embeds them. Without it (another machine), the file names the model without embedding a GDTF and
+  says so (`mvr.export-resource-missing`, one per model), so other programs take it from their own library. A stub
+  the library had the *exact* model of was resolved to the library's complete GDTF of that same model; it is written
+  under the library file's name with the source's mode (Фокина's four Zonda 3 FX). `EngineExportOptions.WriteStandIns`
+  (off by default, "Write stand-ins") writes the stand-ins as they are drawn instead, with one
+  `mvr.substitute-exported` warning per fixture.
+* **Textures.** Models are written as GLB with their base-colour, metallic-roughness, normal, occlusion and emissive
+  textures: `AssetStore.TryGetTextureFile` gives the imported PNG/JPEG file (other formats, generated maps and built-in
+  procedural textures re-encoded as PNG), and keys the store does not serve are encoded from the engine's image source.
+  A texture that cannot be supplied is reported (`mvr.export-resource-missing`).
+* **Layers.** Children on another layer than their parent are written under a GroupObject of their own layer that
+  repeats the parent (`mvr.layer-split` note); Candela joins them again on import, so layer counts, parents and sibling
+  order survive export and reopen (docs/mvr.md).
+* **Content MVR cannot hold** (images, cameras, consoles, …) is listed as `mvr.not-representable` notes.
 
 ### Import worker (native-crash isolation)
 
@@ -420,7 +445,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (108 tests, ≈ 1.5 min; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (130 tests, ≈ 1.5 min; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
@@ -433,6 +458,15 @@ a device):
   light per lit beam — every fixture lit, the pixel-mapped MagicBlade stand-in included, except a pure strobe between
   flashes — with no field wider than 4 × its beam and nothing clamped; identical results for identical input
   sequences; export → reopen keeps ids, specs and addresses.
+* **MVR export fidelity** (`MvrExportFidelityTests`): Фокина exported without edits names the source's `GDTFSpec` and
+  `GDTFMode` for all 91 fixtures — the stand-ins' requested models with the source's stub files byte for byte, the
+  Zonda 3 FX stubs as the library's complete GDTF of the same model — and reopens to the same specs, modes, patch and
+  stand-in records; "Write stand-ins" is off by default and reports one `mvr.substitute-exported` warning per stand-in
+  (in the result, in `Issues` and in the summary); the stubs survive save → reopen with the same cache and are named but
+  not embedded (one warning per model) with another cache; a textured OBJ exports to a GLB with the image and reopens
+  with the same texture pixels, and the CLI renders the exported MVR like the project it came from (Vulkan); the
+  audit's project (Фокина opened, imported twice, a crate: Default 237 / Light 39) keeps its layer counts, parents,
+  child order, specs and modes through export and reopen; every lossy change is in `Issues` and the summary line.
 * **Demo look**: on Фокина the same look twice, strobes dark and everything else at full, ≥ 30 mirror pairs with the
   same colour and mirrored beams, ≥ 5 colours with white and ≥ 3 saturated ones, low heads fanning up, over the
   audience, across the stage and crossing, overhead heads down, Rivale stand-ins at their narrowest zoom, gobos on
