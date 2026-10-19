@@ -238,6 +238,11 @@ public static class MvrImporter
                 {
                     resolution = new MvrModeResolution(requested, requested, null, inferred, false, count);
                 }
+                else if (r.MatchKind == FixtureMatchKind.Substitute &&
+                         ModeMatcher.PatchSpacing(_modeAddresses.GetValueOrDefault(key) ?? new List<int>()) is { } substituteSpacing)
+                {
+                    resolution = ResolveSubstituteMode(key.Spec, r, requested, substituteSpacing, inferred, count);
+                }
                 else
                 {
                     var (mode, exact) = ModeMatcher.Match(r.FixtureType, requested, inferred);
@@ -267,6 +272,50 @@ public static class MvrImporter
                 list.Add(resolution);
             }
             foreach (var (spec, list) in modesBySpec) _gdtfs[spec].Modes = list;
+        }
+
+        /// <summary>
+        /// The mode of a substitute GDTF (a similar model standing in for one the library lacks) for fixtures patched
+        /// <paramref name="spacing"/> channels apart: the requested mode name belongs to the missing model, so the
+        /// stand-in's mode of that name is kept only when it fits the spacing; otherwise its most complete mode that fits
+        /// (<see cref="ModeMatcher.FitToSpacing"/>), so that the stand-in does not overlap its neighbours in the patch.
+        /// </summary>
+        private MvrModeResolution ResolveSubstituteMode(string spec, MvrGdtfReference r, string? requested, int spacing, int? inferred, int count)
+        {
+            var type = r.FixtureType!;
+            var named = ModeMatcher.MatchName(type, requested);
+            var mode = ModeMatcher.FitToSpacing(type, named, spacing);
+            if (mode is null) return new MvrModeResolution(requested, requested, null, inferred, false, count);
+            int footprint = ModeMatcher.FirstBreakFootprint(mode);
+            bool exact = named is not null && ReferenceEquals(mode, named);
+            var users = _specUsers[spec].Take(64).ToArray();
+            string fit = footprint <= spacing
+                ? string.Create(CultureInfo.InvariantCulture, $"the most complete of its modes that fits the {spacing}-channel patch spacing")
+                : string.Create(CultureInfo.InvariantCulture, $"its smallest mode, as none fits the {spacing}-channel patch spacing");
+            if (named is not null && !exact)
+            {
+                _sink.Add(IssueSeverity.Note, IssueCategory.Patch, MvrIssueCodes.SubstituteMode,
+                    string.Create(CultureInfo.InvariantCulture,
+                        $"'{spec}' fixtures are patched {spacing} channels apart; the stand-in '{r.FileName}' uses its mode '{mode.Name}' ({footprint} channels, {fit}) instead of its mode of the requested name, '{named.Name}' ({ModeMatcher.FirstBreakFootprint(named)} channels)."),
+                    users);
+            }
+            else if (named is null)
+            {
+                string message = requested is null
+                    ? string.Create(CultureInfo.InvariantCulture,
+                        $"'{spec}' has fixtures without a DMX mode; '{mode.Name}' ({footprint} channels, {fit}) of the stand-in '{r.FileName}' is used.")
+                    : string.Create(CultureInfo.InvariantCulture,
+                        $"'{r.FileName}' has no DMX mode '{requested}' (asked for by '{spec}'); its mode '{mode.Name}' ({footprint} channels, {fit}) is used.");
+                _sink.Add(requested is null ? IssueSeverity.Note : IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.ModeUnknown, message, users);
+            }
+            if (footprint > spacing)
+            {
+                _sink.Add(IssueSeverity.Warning, IssueCategory.Patch, MvrIssueCodes.ModeFootprint,
+                    string.Create(CultureInfo.InvariantCulture,
+                        $"'{spec}' fixtures are patched {spacing} channels apart, but mode '{mode.Name}' of the substitute '{r.FileName}' uses {footprint} channels; their DMX ranges overlap until the real GDTF is added or the patch is changed."),
+                    users);
+            }
+            return new MvrModeResolution(requested, mode.Name, footprint, inferred, exact, count);
         }
 
         // ------------------------------------------------------------ layers

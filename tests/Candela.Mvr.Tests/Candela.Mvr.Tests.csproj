@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="../../src/Candela.Mvr/Candela.Mvr.csproj" />
+    <!-- only to check that the importer's substitute mode choice agrees with Candela.Dmx.SubstituteModes -->
+    <ProjectReference Include="../../src/Candela.Dmx/Candela.Dmx.csproj" />
   </ItemGroup>
 </Project>

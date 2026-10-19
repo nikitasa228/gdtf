@@ -144,9 +144,9 @@ public sealed partial class StageEngine
         ReplaceProject(new ProjectData(result.Scene));
         var extra = new List<Issue>();
         RegisterMvr(result, extra);
-        var remoded = ApplyMvrSubstitutes(result, extra);
+        RecordMvrSubstitutes(result);
         IsModified = false;
-        var issues = Sorted(result.Issues.Where(i => !Superseded(i, remoded)).Concat(extra));
+        var issues = Sorted(result.Issues.Concat(extra));
         Report(issues);
         RefreshIssues();
         int fixtures = result.AllEntities().Count(e => e.Has<FixtureComponent>());
@@ -172,11 +172,11 @@ public sealed partial class StageEngine
         });
         var extra = new List<Issue>();
         RegisterMvr(result, extra);
-        var remoded = ApplyMvrSubstitutes(result, extra);
+        RecordMvrSubstitutes(result);
         var roots = result.RootEntities.ToList();
         if (roots.Count > 0) Undo.Execute(new ImportedEntitiesCommand(_scene, roots, $"Import {Path.GetFileName(path)}"));
         Selection.Set(roots.Select(r => r.Id));
-        var issues = Sorted(result.Issues.Where(i => !Superseded(i, remoded)).Concat(extra));
+        var issues = Sorted(result.Issues.Concat(extra));
         Report(issues);
         RefreshIssues();
         int fixtures = result.AllEntities().Count(e => e.Has<FixtureComponent>());

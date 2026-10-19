@@ -77,6 +77,12 @@ public static class MvrIssueCodes
     /// </summary>
     public const string ModeFootprint = "mvr.mode-footprint";
 
+    /// <summary>
+    /// A substitute GDTF has a mode of the requested name, but it is wider than the patch spacing of the fixtures (the
+    /// name belongs to the missing model): the stand-in's most complete mode that fits is used instead.
+    /// </summary>
+    public const string SubstituteMode = "mvr.substitute-mode";
+
     /// <summary>A 3D file could not be decoded.</summary>
     public const string GeometryUnreadable = "mvr.geometry-unreadable";
 

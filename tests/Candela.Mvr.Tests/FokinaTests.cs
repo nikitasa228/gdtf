@@ -140,24 +140,33 @@ public sealed class FokinaTests
         var substitute = result.Issues.First(i => i.Code == MvrIssueCodes.GdtfSubstitute);
         Assert.Equal(28, substitute.Entities.Count);
 
-        // Modes missing from a substitute are matched by name and patch spacing and reported.
+        // A substitute takes its most complete mode that fits the patch spacing; modes it lacks by name are reported.
         var atomic = result.Gdtfs.Single(g => g.SpecName.StartsWith("Martin", StringComparison.Ordinal)).Modes.Single();
         Assert.False(atomic.Exact);
         Assert.Equal(3, atomic.InferredFootprint);
         Assert.Equal(3, atomic.Footprint);
+        var rivale = result.Gdtfs.Single(g => g.SpecName.Contains("Rivale", StringComparison.Ordinal)).Modes.Single();
+        Assert.Equal("Standard_540", rivale.Resolved);
+        Assert.Equal(42, rivale.InferredFootprint);
+        Assert.True(rivale.Footprint <= 42);
         Assert.Contains(result.Issues, i => i.Code == MvrIssueCodes.ModeUnknown && i.Message.Contains("Mode 1", StringComparison.Ordinal));
         Assert.Contains(result.Issues, i => i.Code == MvrIssueCodes.ModeUnknown && i.Message.Contains("'Standard'", StringComparison.Ordinal));
         Assert.Equal(2, result.Issues.Count(i => i.Code == MvrIssueCodes.ModeUnknown));
 
-        // The MagicBlade R substitute keeps its 'Extended' mode name, but that mode is far wider than the 44-channel
-        // spacing of the MagicBlade patch: the overlap is reported (only the substitute causes it).
-        var overlap = Assert.Single(result.Issues, i => i.Code == MvrIssueCodes.ModeFootprint);
-        Assert.Contains("MagicBlade R", overlap.Message, StringComparison.Ordinal);
-        Assert.Equal(28, overlap.Entities.Count);
+        // The MagicPanel 602 standing in for the MagicBlade R has an 'Extended' mode too, but with 160 channels it would
+        // overlap the 44-channel MagicBlade patch: its 20-channel 'Standard' is used instead, as a note, and no stand-in
+        // overlaps the patch any more.
+        Assert.DoesNotContain(result.Issues, i => i.Code == MvrIssueCodes.ModeFootprint);
+        var remoded = Assert.Single(result.Issues, i => i.Code == MvrIssueCodes.SubstituteMode);
+        Assert.Equal(Core.Diagnostics.IssueSeverity.Note, remoded.Severity);
+        Assert.Contains("'Extended' (160 channels)", remoded.Message, StringComparison.Ordinal);
+        Assert.Equal(28, remoded.Entities.Count);
         var blade = result.Gdtfs.Single(g => g.SpecName.Contains("MagicBlade", StringComparison.Ordinal)).Modes.Single();
-        Assert.True(blade.Exact);
+        Assert.False(blade.Exact);
+        Assert.Equal("Extended", blade.Requested);
+        Assert.Equal("Standard", blade.Resolved);
         Assert.Equal(44, blade.InferredFootprint);
-        Assert.True(blade.Footprint > blade.InferredFootprint);
+        Assert.Equal(20, blade.Footprint);
     }
 
     [Fact]
@@ -176,7 +185,7 @@ public sealed class FokinaTests
         Assert.Equal(741, fc.Addresses[0].Absolute);
         Assert.Equal(121, fc.FixtureId);
         Assert.Equal("121", fc.UnitNumber);
-        Assert.Equal("Extended", fc.GdtfMode);
+        Assert.Equal("Standard", fc.GdtfMode); // the stand-in's mode that fits the 44-channel MagicBlade patch
         Assert.Equal("Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf", fc.GdtfSpec);
         Assert.Equal(new CieColor(0.312712f, 0.329008f, 100f), fc.Color);
         Assert.False(fc.CastShadow);

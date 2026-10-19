@@ -42,14 +42,13 @@ public sealed partial class StageEngine
     private FixtureSubstitution? SubstitutionOf(Entity entity, FixtureComponent fixture) => SubstitutionOf(entity.Id);
 
     /// <summary>
-    /// After an MVR import: every fixture type the importer drew with a similar model (a substitute) takes the stand-in's
-    /// mode that best fits the type's patch spacing — the importer keeps a mode of the same name, which belongs to the
-    /// missing model and may be far wider (MagicBlade R "Extended", 44 channels, drawn as a MagicPanel 602 "Extended" with
-    /// 160) — and is recorded in <see cref="EngineSettings.Substitutes"/>. Returns the fixtures whose mode changed.
+    /// After an MVR import: records every fixture the importer drew with a similar model (a substitute) in
+    /// <see cref="EngineSettings.Substitutes"/>, with the patch spacing of its type, so the patch judges it as a stand-in
+    /// and <see cref="ReloadFixtureTypes"/> switches it to the real GDTF once the library has it. The importer has already
+    /// given each stand-in type the mode that best fits its patch spacing (<c>mvr.substitute-mode</c>).
     /// </summary>
-    private HashSet<Guid> ApplyMvrSubstitutes(MvrImportResult result, List<Issue> issues)
+    private void RecordMvrSubstitutes(MvrImportResult result)
     {
-        var remoded = new HashSet<Guid>();
         var bySpec = new Dictionary<string, List<(MvrDeviceObject Device, Entity Entity, FixtureComponent Fixture)>>(StringComparer.OrdinalIgnoreCase);
         foreach (var obj in result.Document.AllObjects())
         {
@@ -61,28 +60,13 @@ public sealed partial class StageEngine
 
         foreach (var gdtf in result.Gdtfs)
         {
-            if (gdtf.MatchKind != FixtureMatchKind.Substitute || gdtf.FixtureType is not { } standIn) continue;
+            if (gdtf.MatchKind != FixtureMatchKind.Substitute || gdtf.FixtureType is null) continue;
             if (!bySpec.TryGetValue(gdtf.SpecName.Trim(), out var members)) continue;
             foreach (var group in members.Where(m => string.Equals(m.Fixture.GdtfSpec, gdtf.FileName, StringComparison.OrdinalIgnoreCase))
                          .GroupBy(m => (m.Device.GdtfMode ?? "").Trim(), StringComparer.OrdinalIgnoreCase))
             {
                 var fixtures = group.ToList();
                 int? spacing = PatchSpacing.Infer(fixtures.SelectMany(m => m.Fixture.Addresses.OrderBy(a => a.Break).Take(1)));
-                string? imported = fixtures[0].Fixture.GdtfMode;
-                var mode = SubstituteModes.Choose(standIn, imported, spacing);
-                if (mode is not null && !string.Equals(mode.Name, imported, StringComparison.Ordinal))
-                {
-                    foreach (var m in fixtures)
-                    {
-                        m.Fixture.GdtfMode = mode.Name;
-                        remoded.Add(m.Entity.Id);
-                    }
-                    var old = imported is null ? null : standIn.FindMode(imported);
-                    issues.Add(new Issue(IssueSeverity.Note, IssueCategory.Patch, EngineIssueCodes.SubstituteMode,
-                        string.Create(CultureInfo.InvariantCulture,
-                            $"{fixtures.Count} '{gdtf.SpecName}' fixture(s) are patched {spacing} channels apart; the stand-in '{gdtf.FileName}' uses its mode '{mode.Name}' ({SubstituteModes.Footprint(mode)} channels) to fit, instead of '{imported}'{(old is null ? "" : $" ({SubstituteModes.Footprint(old)} channels)")}."),
-                        fixtures.Select(m => m.Entity.Id).ToArray()));
-                }
                 foreach (var m in fixtures)
                 {
                     Settings.Substitutes.RemoveAll(s => s.EntityId == m.Entity.Id);
@@ -97,15 +81,7 @@ public sealed partial class StageEngine
                 }
             }
         }
-        return remoded;
     }
-
-    /// <summary>
-    /// True for an MVR import issue that no longer holds after <see cref="ApplyMvrSubstitutes"/>: the importer's
-    /// "the substitute's mode overlaps the patch" for fixtures that now use a fitting mode.
-    /// </summary>
-    private static bool Superseded(Issue issue, HashSet<Guid> remoded) =>
-        issue.Code == MvrIssueCodes.ModeFootprint && issue.Entities.Count > 0 && issue.Entities.All(remoded.Contains);
 
     /// <summary>
     /// After GDTF files were added to the library: every stand-in whose requested model the library now has exactly is

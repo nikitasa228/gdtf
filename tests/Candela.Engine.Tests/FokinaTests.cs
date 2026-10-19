@@ -47,7 +47,8 @@ public sealed class FokinaTests
             Assert.Equal(FokinaFixtureTypes.MagicBladeR.Spec, engine.SubstitutionOf(blade.Entity.Id)!.RequestedSpec);
             Assert.Equal("Extended", engine.SubstitutionOf(blade.Entity.Id)!.RequestedMode);
             Assert.Equal(44, engine.SubstitutionOf(blade.Entity.Id)!.PatchSpacing);
-            Assert.Contains(result.Issues, i => i.Code == EngineIssueCodes.SubstituteMode);
+            // the importer already chose the fitting mode (a note), so no overlap warning is left
+            Assert.Contains(result.Issues, i => i.Code == MvrIssueCodes.SubstituteMode);
             Assert.DoesNotContain(result.Issues, i => i.Code == MvrIssueCodes.ModeFootprint);
         }
         // the real Zonda 3 FX fixtures are not stand-ins, although the Zonda 3 Wash stand-in is the same file
