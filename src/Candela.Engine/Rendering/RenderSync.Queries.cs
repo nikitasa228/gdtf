@@ -49,6 +49,12 @@ public sealed partial class RenderSync
     /// <summary>True when the last <see cref="Update"/> sent the work light.</summary>
     public bool IsWorkLightOn { get; private set; }
 
+    /// <summary>
+    /// The content the work light was last placed around (world space, m; empty before it was first needed): the visible
+    /// instances with fixtures at their own placement, so pan and tilt never move the rig (see <see cref="WorkLightRig.Write"/>).
+    /// </summary>
+    public Aabb WorkLightContent { get; private set; } = Aabb.Empty;
+
     /// <summary>The work-light rig of the last update that sent it (empty while it is off).</summary>
     public ReadOnlySpan<SpotLight> WorkLights => IsWorkLightOn ? _workLights : ReadOnlySpan<SpotLight>.Empty;
 
@@ -117,6 +123,30 @@ public sealed partial class RenderSync
         }
     }
 
+    /// <summary>
+    /// Where the work light is placed around, m: the bounds of every visible instance like <see cref="VisibleWorldBounds"/>,
+    /// except that the parts of a fixture are taken at the fixture's own placement instead of their current pan/tilt pose.
+    /// Where the heads point (DMX, motors still travelling when the rig was placed) therefore never moves the rig: the same
+    /// scene always gets the same work light, whatever happened before.
+    /// </summary>
+    private Aabb WorkLightBounds()
+    {
+        var bounds = Aabb.Empty;
+        foreach (var v in _entities.Values)
+        {
+            if ((v.Flags & InstanceFlags.Hidden) != 0 || v.Instances.Count == 0) continue;
+            var placement = v.Entity.WorldMatrix;
+            foreach (var r in v.Instances)
+            {
+                if (r.Bounds.IsEmpty) continue;
+                var box = r.Part >= 0 ? r.Bounds.Transform(r.Local * placement) : WorldBoundsOf(r);
+                if (!IsFinite(box) || box.Size.Length() > MaxContentExtent) continue;
+                bounds.Include(box);
+            }
+        }
+        return bounds;
+    }
+
     private static bool Include(EntityVisual v, ref Aabb bounds, bool includeHidden)
     {
         if (!includeHidden && (v.Flags & InstanceFlags.Hidden) != 0) return false;
@@ -159,7 +189,8 @@ public sealed partial class RenderSync
 
     /// <summary>
     /// Sends the frame's stage lights, plus the work light when <see cref="WorkLight"/> asks for it. The rig is placed
-    /// around <see cref="VisibleWorldBounds"/> and recomputed only when the scene or the set of drawn entities changed.
+    /// around the drawn content with fixtures at their own placement (<see cref="WorkLightBounds"/>, independent of pan and
+    /// tilt) and recomputed only when the scene or the set of drawn entities changed.
     /// </summary>
     private void SendLights()
     {
@@ -175,7 +206,8 @@ public sealed partial class RenderSync
         {
             _rigSceneVersion = _scene.Version;
             _rigStructureVersion = _structureVersion;
-            WorkLightRig.Write(VisibleWorldBounds(), _workLights);
+            WorkLightContent = WorkLightBounds();
+            WorkLightRig.Write(WorkLightContent, _workLights);
         }
         int count = stage.Length + _workLights.Length;
         if (_lightBuffer.Length < count) _lightBuffer = new SpotLight[Math.Max(count, 2 * _lightBuffer.Length)];

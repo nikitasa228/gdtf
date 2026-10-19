@@ -249,7 +249,8 @@ public sealed class RenderSyncFollowUpTests
         var key = world.Lights[0];
         Assert.True(key.CastShadows);
         Assert.Equal(1, world.Lights.Count(l => l.CastShadows));
-        var centre = sync.VisibleWorldBounds().Center;
+        var centre = sync.WorkLightContent.Center;
+        Assert.True(sync.VisibleWorldBounds().Contains(centre));
         Assert.Equal(WorkLightRig.KeyIlluminance, key.PeakCandela / Vector3.DistanceSquared(key.Position, centre), 2);
         Assert.True(Vector3.Dot(Vector3.Normalize(centre - key.Position), key.Direction) > 0.999f);
         Assert.True(key.Position.Y < centre.Y && key.Position.Z > centre.Z, "the key comes from the audience side, above");

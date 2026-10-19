@@ -313,6 +313,10 @@ internal static class RenderCommand
         var sync = engine.AttachRenderWorld(renderer.World);
         sync.LoadFixtureModelsInBackground = false;
         sync.HazeOverride = options.Haze;
+        // the binding leaves the work light out while the view shows the lux overlay (it measures stage light only): the
+        // view is the picture rendered here, not the overlay saved with a project (the CLI never saves the project)
+        engine.View.View ??= new ViewOptions();
+        engine.View.View.Overlay = options.Overlay;
         sync.WorkLight = options.WorkLight;
 
         int ticks = Math.Max(1, (int)Math.Ceiling(options.Time / TickSeconds));
