@@ -332,12 +332,17 @@ internal sealed unsafe partial class ViewportPanel
         DrawSizeLabel(drawList, mouse, scale, width, height);
     }
 
-    /// <summary>The tool's one-line help, centred under the toolbar (wrapped in narrow views).</summary>
+    /// <summary>
+    /// The tool's help, centred at the bottom of the view above the statistics line (the top corners hold the toolbar
+    /// and the view cube); wrapped in narrow views.
+    /// </summary>
     private void DrawToolHint(ImDrawListPtr drawList, float scale, string hint)
     {
-        float wrap = MathF.Max(120f * scale, _imageSize.X - 40f * scale);
+        float wrap = MathF.Max(120f * scale, MathF.Min(_imageSize.X - 40f * scale, 620f * scale));
         var size = ImGui.CalcTextSize(hint, false, wrap);
-        var pos = new Vector2(_imageMin.X + (_imageSize.X - size.X) * 0.5f, MathF.Max(_toolbarBottom, _imageMin.Y) + 10f * scale);
+        float statsHeight = ShowStats ? ImGui.GetTextLineHeight() + 20f * scale : 8f * scale;
+        float top = _imageMin.Y + _imageSize.Y - statsHeight - size.Y - 16f * scale;
+        var pos = new Vector2(_imageMin.X + (_imageSize.X - size.X) * 0.5f, MathF.Max(top, MathF.Max(_toolbarBottom, _imageMin.Y) + 10f * scale));
         drawList.AddRectFilled(pos - new Vector2(10f, 5f) * scale, pos + size + new Vector2(10f, 5f) * scale,
             Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, 0.85f)), 5f * scale);
         drawList.AddText(ImGui.GetFont(), ImGui.GetFontSize(), pos, Theme.U32(Theme.WithAlpha(Theme.Text, 0.9f)), hint, wrap);

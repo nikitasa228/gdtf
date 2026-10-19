@@ -114,13 +114,16 @@ internal sealed class EditorSession : IDisposable
     /// <summary>True when the scene, its assets or its settings changed since it was opened or saved.</summary>
     public bool IsModified => _options.PreviewStage ? Scene.Version != _previewBaseline : EngineOrThrow.IsModified;
 
-    /// <summary>Name for the title bar: the scene's name, else the file name.</summary>
+    /// <summary>
+    /// Name for the title bar and dialogs: the scene's name; for a scene still called "Untitled" the file name, else
+    /// "Untitled" in the current language.
+    /// </summary>
     public string DisplayName
     {
         get
         {
             string name = Scene.Name;
-            if (!string.IsNullOrWhiteSpace(name))
+            if (!IsDefaultName(name))
                 return name;
             return SourcePath is { Length: > 0 } path ? Path.GetFileNameWithoutExtension(path) : Loc.Get(Str.Untitled);
         }
