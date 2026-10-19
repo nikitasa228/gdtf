@@ -736,7 +736,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `SwapchainTests` | headless surface: acquire/present, resize, minimise, misuse errors, ImGui handoff state |
 | `PathTracerPhotometryTests` | path tracer: 10 000 cd (50°/80° wash) at 5 m onto a white Lambertian floor — the centre within 3 % of ρE/π, 30° off axis within 5 % |
 | `PathTracerFurnaceTests` | white furnace (surroundings of 1 cd/m²): a Lambertian sphere of albedo 1 shows exactly the background (0.999–1.005); white plastic, rough white metal and a mirror lose a little at grazing angles but never exceed it (brightest 4 × 4 block ≤ 1.03); a 4 m cube of scattering-only smoke of optical depth 4 and a room-sized haze, with up to 64 scattering events, vanish (3 %) |
-| `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %); smoke through the density grid scatters like haze of the same coefficient (4 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01) |
+| `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %; measured 2 %, the bilinear gobo edge); smoke through the density grid scatters like haze of the same coefficient (4 %; measured 1.7 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01) |
 | `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %); a plate in a beam shadows the floor only while it has `CastShadow`, and not at all for a light without `CastShadows` (3 %) |
 | `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; a device without ray query says "not supported on this GPU" |
 | `PathTracerSceneTests` | the procedural stage in haze: finite and validation-clean, 16 samples at 240 × 180 within 2 minutes; writes `pt-stage-final.png` next to the real-time view |
@@ -896,11 +896,14 @@ same; the path tracer adds what the real-time view leaves out: light scattered m
 around the beams and over the stage) and light bounced between surfaces. (The MVR's fixtures do not cast shadows —
 `CastShadow` is off in the file — so neither view shadows their light.)
 
-| Real time (ray-traced GI) | Path traced, 256 samples, denoised |
+| Real time (ray-traced GI) | Path traced, 512 samples, denoised |
 |---|---|
 | ![real time](images/render-final-stage-realtime.png) | ![path traced](images/render-final-stage.png) |
 
-The procedural test scene in haze of 0.05 1/m (`PathTracerSceneTests` renders it at 240 × 180 with 16 samples).
+The procedural test scene at 480 × 360 in haze of 0.05 1/m, the same camera and EV. On its 5 m to the floor each beam
+loses about a fifth of its light to the haze; the real-time view shows that light as the visible beam and stops there,
+while the path tracer follows it on, to the walls, the floor and back into the haze — together with the light bounced
+off the pools, it lights the room. (`PathTracerSceneTests` renders the scene at 240 × 180 with 16 samples.)
 
 ### API
 
@@ -949,9 +952,10 @@ at all.
 
 **Many lights.** Each path vertex picks one light by weighted reservoir sampling over the lights that can reach it:
 a ray query against an acceleration structure of the lights' cone boxes (procedural AABBs, clipped to the media box)
-returns the candidates whose cone contains the point. The weight is the luminance of the unshadowed contribution
-(`I/d²` × BRDF × cos, the BRDF part floored so every reaching light keeps a chance), so a pool of one wash under 300
-other lights is sampled almost only from that wash. Lenses hit by BSDF samples (a mirror, a glossy floor) are weighted
+returns the candidates whose cone contains the point. The weight is the size (mean of the colour channels, so deep
+blue and red lights are not under-sampled) of the unshadowed contribution (`I/d²` × BRDF × cos, the BRDF part floored
+so every reaching light keeps a chance), so a pool of one wash under 300 other lights is sampled almost only from that
+wash. Lenses hit by BSDF samples (a mirror, a glossy floor) are weighted
 against the light selection by the power heuristic (multiple importance sampling).
 
 ### Surfaces
@@ -973,14 +977,18 @@ the camera and the smoke and flame grids, grown by 30 m and clamped to ±10 km),
 albedo 1) and the flame temperature grids (absorption κ = 2 /m at full flame, blackbody emission κ·L_bb(T) from the
 real-time LUT), all with the Henyey–Greenstein phase function of `AtmosphereState.Anisotropy`:
 
-* **Single scattering of the spot lights** is estimated on every ray segment: one light chosen by the analytic
-  in-scattering of an isotropic point light of its peak intensity along the part of the segment inside its cone
-  (prism facets and the phase function at the closest approach included), then **equi-angular sampling** (Kulla &
-  Fajardo 2012) of a point inside the cone, its light `I(θ)·cookie/d²` through a lens point, the haze and smoke
-  transmittance towards it (ratio tracking) and its visibility. This is the estimator the real-time beams approximate,
-  and in the single-scattering limit the two agree (`PathTracerMediaTests`: a 6° spot and a 40° wash seen from the
-  side within 3 % of the double-precision integral of `BeamReference` and within 6 % of the real-time beam; measured
-  1.4 % below and 0.7 % above the integral, the real-time beams 1.9 % and 2.9 % above it).
+* **Single scattering of the spot lights** is estimated on every ray segment. The candidates are the lights whose cone
+  box the segment crosses (one ray query); each is weighted by the analytic in-scattering of an isotropic point light
+  of its peak intensity along the part of the segment inside its cone — `I/D` times the Henyey–Greenstein phase
+  integrated over the angle that part subtends (Simpson's rule; prism facets included) — and four lights are drawn in
+  proportion to it on the segments the camera sees (one on later segments). For each, **equi-angular sampling**
+  (Kulla & Fajardo 2012) picks a point inside the cone, with the angle drawn from an 8-bin piecewise-constant fit of the
+  phase function (strongly forward-scattering haze — beams aimed at the camera — is sampled where it scatters), and
+  adds its light `I(θ)·cookie/d²` through a lens point, the haze and smoke transmittance towards it (ratio tracking) and
+  its visibility. This is the estimator the real-time beams approximate, and in the single-scattering limit the two
+  agree (`PathTracerMediaTests`: a 6° spot and a 40° wash seen from the side within 3 % of the double-precision
+  integral of `BeamReference` and within 6 % of the real-time beam; measured 0.1 % above and 1.3 % below the integral,
+  the real-time beams 2.9 % and 1.9 % above it).
 * **Multiple scattering**: free-flight sampling (delta tracking against the majorant of haze + smoke + flame on the
   segment) continues the path from a real scattering event in a direction drawn from the phase function, up to
   `MaxVolumeBounces` events; segments that may not scatter any more use ratio tracking. A haze or smoke that only
@@ -1027,10 +1035,10 @@ the values back into cd/m²), `raw.*` (with `--denoise`), `albedo.*`, `N.*` (wor
 
 ### Performance
 
-On lavapipe (CPU, 4 threads) `Фокина.mvr` with the demo look takes about 6 s per sample at 480 × 270 and about 25 s
-at 960 × 540 (1291 beams in haze; most of the time is the equi-angular estimate of the beams on every segment and
-the tracking through the hazers' smoke). A desktop GPU with hardware ray tracing is two to three orders of magnitude
-faster.
+On lavapipe (CPU, 4 threads) `Фокина.mvr` with the demo look takes about 6.5 s per sample at 480 × 270 and about 25 s
+at 960 × 540 (1291 beams in haze; most of the time is finding and weighing the beams a camera ray crosses — the light
+selection of the in-scattering estimate), the procedural scene 0.3 s per sample at 480 × 360. A desktop GPU with
+hardware ray tracing is two to three orders of magnitude faster.
 
 ## Known limitations
 
