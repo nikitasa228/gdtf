@@ -19,23 +19,28 @@
 #define VPL_ACCESS readonly
 #endif
 
+// Clustered light lists: one bit per light (light i = bit i % 32 of mask word i / 32) for every cluster, so a list
+// holds every one of the frame.clusterListedLights listed lights that reaches the cluster. Each cluster's record in
+// clusterMasks[] is clusterSummaryWords() summary words (bit w set = mask word w is not zero, so sparse lists skip
+// the empty words) followed by the mask words; lights are visited in ascending index order (deterministic sums).
 layout(set = SET_VIEW, binding = BINDING_CLUSTERS, scalar) CLUSTER_ACCESS buffer ClusterBuffer
 {
-    uvec2 clusters[]; // x = first index in clusterLights, y = light count
+    uvec2 clusters[]; // x = lights in the cluster's list, y = 1 when an unlisted light (beyond the limit) reaches it
 };
 
-layout(set = SET_VIEW, binding = BINDING_CLUSTER_LIGHTS, scalar) CLUSTER_ACCESS buffer ClusterLightBuffer
+layout(set = SET_VIEW, binding = BINDING_CLUSTER_MASKS, scalar) CLUSTER_ACCESS buffer ClusterMaskBuffer
 {
-    uint clusterLights[];
+    uint clusterMasks[];
 };
 
 #ifdef CLUSTER_BUFFERS_WRITABLE
+// Statistics of the light assignment (cleared every frame, read back by the CPU a frame or two later).
 layout(set = SET_VIEW, binding = BINDING_CLUSTER_COUNTER, scalar) buffer ClusterCounterBuffer
 {
-    uint clusterIndexCount;      // indices requested by all clusters (may exceed the capacity)
-    uint clusterOverflow;        // clusters whose list was truncated
+    uint clusterLightPairs;      // sum over the clusters of the lights in their lists
+    uint clusterOverflow;        // clusters reached by an unlisted light (beyond the limit; missing there)
+    uint clusterMaxLights;       // most lights in one cluster
     uint clusterPad0;
-    uint clusterPad1;
 };
 #endif
 
@@ -127,6 +132,65 @@ uint clusterIndexUv(vec2 uv, float viewDepth)
 uint clusterIndex(vec2 fragCoord, float viewDepth)
 {
     return clusterIndexUv(fragCoord * frame.renderSize.zw, viewDepth);
+}
+
+// Summary words of a cluster record (one bit per mask word).
+uint clusterSummaryWords()
+{
+    return (frame.clusterMaskWords + 31u) / 32u;
+}
+
+// Words of one cluster record in clusterMasks[] (summary words, then mask words).
+uint clusterRecordWords()
+{
+    return clusterSummaryWords() + frame.clusterMaskWords;
+}
+
+// Iteration over the lights of a cluster's list in ascending index order:
+//     ClusterCursor c = clusterCursor(cluster); uint index;
+//     while (nextClusterLight(c, index)) { ... lights[index] ... }
+struct ClusterCursor
+{
+    uint base;          // first word of the cluster's record
+    uint summaryWords;
+    uint summaryIndex;  // summary word being consumed
+    uint summary;       // its bits not visited yet
+    uint word;          // mask word being consumed
+    uint bits;          // its bits not visited yet
+};
+
+ClusterCursor clusterCursor(uint cluster)
+{
+    ClusterCursor c;
+    c.summaryWords = frame.lightCount > 0u ? clusterSummaryWords() : 0u;
+    c.base = cluster * clusterRecordWords();
+    c.summaryIndex = 0u;
+    c.summary = c.summaryWords > 0u ? clusterMasks[c.base] : 0u;
+    c.word = 0u;
+    c.bits = 0u;
+    return c;
+}
+
+bool nextClusterLight(inout ClusterCursor c, out uint index)
+{
+    while (c.bits == 0u)
+    {
+        while (c.summary == 0u)
+        {
+            if (++c.summaryIndex >= c.summaryWords)
+            {
+                index = 0u;
+                return false;
+            }
+            c.summary = clusterMasks[c.base + c.summaryIndex];
+        }
+        c.word = c.summaryIndex * 32u + uint(findLSB(c.summary));
+        c.summary &= c.summary - 1u;
+        c.bits = c.word < frame.clusterMaskWords ? clusterMasks[c.base + c.summaryWords + c.word] : 0u;
+    }
+    index = c.word * 32u + uint(findLSB(c.bits));
+    c.bits &= c.bits - 1u;
+    return true;
 }
 
 // World position of a normalised screen position (uv, origin top-left) at reverse-Z depth d.

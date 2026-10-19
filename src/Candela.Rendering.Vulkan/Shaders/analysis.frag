@@ -5,7 +5,8 @@
 //  OVERLAY_LUX:   illuminance E (lx, photopic) = sum over lights of I0 x profile x cookie x shadow x max(cos, 0) / d^2
 //                 (no albedo) - the luminance of the summed Rec.2020 illuminance, since light colours have luminance 1.
 //  OVERLAY_NOISE: free-field sound pressure level (dB) of the noise sources (or the noise field) at the surface.
-// The lux overlay is what a light meter reads in clear air (CLEAR_AIR: no haze extinction), like LightMeter.
+// The lux overlay is what a light meter reads in clear air (CLEAR_AIR: no haze extinction), like LightMeter. The
+// cluster's light list is a bit mask over every listed light (view.glsl), so overlapping beams are never truncated.
 
 #define CLEAR_AIR 1
 #include "lighting.glsl"
@@ -36,11 +37,12 @@ void main()
     float pixelSize = pixelWorldSize(viewDepth);
     float noise = interleavedGradientNoise(gl_FragCoord.xy);
     float lux = 0.0;
-    uvec2 cluster = frame.lightCount > 0u ? clusters[clusterIndex(gl_FragCoord.xy, viewDepth)] : uvec2(0u);
-    for (uint i = 0u; i < cluster.y; ++i)
+    ClusterCursor lightsHere = clusterCursor(clusterIndex(gl_FragCoord.xy, viewDepth));
+    uint index;
+    while (nextClusterLight(lightsHere, index))
     {
         vec3 L;
-        lux += luminanceRec2020(surfaceIlluminance(clusterLights[cluster.x + i], P, N, pixelSize, noise, L));
+        lux += luminanceRec2020(surfaceIlluminance(index, P, N, pixelSize, noise, L));
     }
 
     outValue = lux;

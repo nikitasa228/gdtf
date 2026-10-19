@@ -128,6 +128,7 @@ internal enum Str
     ViewportStats,
     ViewportFps,
     ViewportFrameTime,
+    ViewportLightListOverflow,
     ViewportNoRenderer,
     ViewportPreviewNote,
 

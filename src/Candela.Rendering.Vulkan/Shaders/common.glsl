@@ -167,7 +167,7 @@ struct FrameData
     float gridMajorEvery;    // cells per major line
     float gridFadeDistance;  // metres; 0 = no distance fade
     float rangeEpsilon;      // exposed value at which a light's contribution counts as negligible
-    uint clusterIndexCapacity;
+    uint clusterMaskWords;   // light mask words per cluster (one bit per listed light), see view.glsl
     vec4 headlight;          // Colorless: unit direction towards the key light (world space)
     mat4 previousViewProjection; // the target's previous frame (temporal reprojection)
     vec4 displaySize;        // display image: width, height, 1/width, 1/height
@@ -204,7 +204,7 @@ struct FrameData
     float beamHistoryWeight; // weight of the accumulated beam modulation ratio (0 = none)
     float beamQuality;       // 0.25 .. 1: scales the segments and cookie samples per beam crossing (load shedding)
     float beamSigmaRef;      // scattering coefficient (1/m) of the beam envelope image (temporal ratio reference)
-    float beamPad0;
+    uint clusterListedLights; // lights the cluster masks list (lights[0 .. clusterListedLights)); the rest are not drawn
 };
 
 layout(set = SET_VIEW, binding = BINDING_FRAME, scalar) uniform FrameBlock

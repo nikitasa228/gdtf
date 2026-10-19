@@ -23,6 +23,12 @@ internal struct LastFrameInfo
 
     /// <summary>Whether the frame computed the bloom pyramid.</summary>
     public bool Bloom;
+
+    /// <summary>Lights of the frame's light assignment (0 when the view needed no lights).</summary>
+    public int Lights;
+
+    /// <summary>Lights the frame's cluster masks listed (the rest were beyond the renderer's limit).</summary>
+    public int ListedLights;
 }
 
 /// <summary>
@@ -51,6 +57,9 @@ internal struct LastFrameInfo
 public sealed unsafe class VulkanRenderTarget : IRenderTarget
 {
     private const int MaxPassSets = 32;
+
+    /// <summary>Record words per cluster the mask buffer starts with (room for 64 lights without growing).</summary>
+    private const uint InitialClusterRecordWords = 3;
 
     /// <summary>Renders a feature's resources survive without being used.</summary>
     internal const int KeepUnusedRenders = 60;
@@ -100,10 +109,17 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
                 MemoryUsage.GpuOnly, "view constants");
             Clusters = GpuBuffer.Create(_context, ShaderConstants.ClusterCount * 8ul, BufferUsageFlags.StorageBufferBit, MemoryUsage.GpuOnly,
                 "clusters");
-            ClusterCounter = GpuBuffer.Create(_context, (ulong)sizeof(GpuClusterCounter), BufferUsageFlags.StorageBufferBit | BufferUsageFlags.TransferDstBit,
-                MemoryUsage.GpuOnly, "cluster counter");
-            ClusterIndexCapacity = ShaderConstants.ClusterCount * 16;
-            ClusterLights = CreateClusterLights(ClusterIndexCapacity);
+            ClusterCounter = GpuBuffer.Create(_context, (ulong)sizeof(GpuClusterCounter),
+                BufferUsageFlags.StorageBufferBit | BufferUsageFlags.TransferDstBit | BufferUsageFlags.TransferSrcBit, MemoryUsage.GpuOnly,
+                "cluster statistics");
+            for (int i = 0; i < ClusterStatsReadback.Length; i++)
+            {
+                ClusterStatsReadback[i] = GpuBuffer.Create(_context, (ulong)sizeof(GpuClusterCounter), BufferUsageFlags.TransferDstBit,
+                    MemoryUsage.Readback, "cluster statistics read-back");
+            }
+
+            ClusterMaskCapacity = ShaderConstants.ClusterCount * InitialClusterRecordWords;
+            ClusterMasks = CreateClusterMasks(ClusterMaskCapacity);
             LightViews = new SceneBuffer<GpuLightView>(_context, BufferUsageFlags.StorageBufferBit, "light views", 64);
             Lists = new SceneBuffer<uint>(_context, BufferUsageFlags.StorageBufferBit, "view light lists", 64);
             BeamLines = new SceneBuffer<LineVertex>(_context, BufferUsageFlags.VertexBufferBit, "beam outlines", 64);
@@ -247,9 +263,26 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
     internal GpuBuffer Clusters { get; } = null!;
 
-    internal GpuBuffer ClusterLights { get; private set; } = null!;
+    /// <summary>The clusters' light masks (per cluster: summary words, then one bit per listed light), see view.glsl.</summary>
+    internal GpuBuffer ClusterMasks { get; private set; } = null!;
 
+    /// <summary>Statistics of the light assignment (<see cref="GpuClusterCounter"/>), cleared every frame.</summary>
     internal GpuBuffer ClusterCounter { get; } = null!;
+
+    /// <summary>Host-visible copies of <see cref="ClusterCounter"/>, one per frame slot.</summary>
+    internal GpuBuffer?[] ClusterStatsReadback { get; } = new GpuBuffer?[VulkanContext.FramesInFlight];
+
+    /// <summary>Frame number that wrote each cluster statistics read-back buffer (0 = none).</summary>
+    internal ulong[] ClusterStatsFrame { get; } = new ulong[VulkanContext.FramesInFlight];
+
+    /// <summary>Lights and listed lights of the frame that wrote each cluster statistics read-back buffer.</summary>
+    internal (int Lights, int Listed)[] ClusterStatsLights { get; } = new (int, int)[VulkanContext.FramesInFlight];
+
+    /// <inheritdoc/>
+    public LightListDiagnostics LightLists { get; internal set; }
+
+    /// <summary>The overflow was reported to the log (a warning when it starts, a note when it ends).</summary>
+    internal bool LightListOverflowLogged;
 
     /// <summary>Per-light view data (shadow tile, ray-marched flag, VPL range).</summary>
     internal SceneBuffer<GpuLightView> LightViews { get; } = null!;
@@ -260,8 +293,14 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     /// <summary>Beam outline line segments of the current frame.</summary>
     internal SceneBuffer<LineVertex> BeamLines { get; } = null!;
 
-    /// <summary>Entries in <see cref="ClusterLights"/>.</summary>
-    internal uint ClusterIndexCapacity { get; private set; }
+    /// <summary>32-bit words in <see cref="ClusterMasks"/>.</summary>
+    internal uint ClusterMaskCapacity { get; private set; }
+
+    /// <summary>Mask words per cluster of the current frame (⌈listed lights / 32⌉; 0 without lights).</summary>
+    internal uint ClusterMaskWords { get; private set; }
+
+    /// <summary>Lights the current frame lists (the world's lights up to the renderer's limit).</summary>
+    internal int ClusterListedLights { get; private set; }
 
     internal DescriptorSet ViewSet { get; private set; }
 
@@ -338,21 +377,31 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     }
 
     /// <summary>
-    /// Makes the cluster index buffer large enough for <paramref name="lightCount"/> lights: every cluster can hold
-    /// min(lights, MAX_LIGHTS_PER_CLUSTER) entries, so the light lists never overflow the buffer (at most
-    /// 3456 × 512 × 4 bytes ≈ 7 MB per view). Replacing the buffer rebuilds the view set.
+    /// Sets this frame's cluster mask layout for <paramref name="lightCount"/> lights, of which the first
+    /// min(lights, <paramref name="maxListed"/>) are listed, and makes the mask buffer large enough: every cluster holds
+    /// one bit per listed light (plus one summary bit per mask word), so a cluster's list never truncates however many
+    /// beams overlap there — 3456 clusters × ⌈lights / 32⌉ words, ≈ 0.6 MB for 1300 lights, 28 MB at the
+    /// 65 536-light limit. The buffer grows by at least half its size at a time and is replaced (with the view set)
+    /// only then.
     /// </summary>
-    internal void EnsureClusterCapacity(int lightCount)
+    internal void EnsureClusterCapacity(int lightCount, int maxListed)
     {
-        uint perCluster = (uint)Math.Clamp(lightCount, 16, (int)ShaderConstants.MaxLightsPerCluster);
-        uint needed = ShaderConstants.ClusterCount * perCluster;
-        if (needed <= ClusterIndexCapacity)
+        int listed = Math.Clamp(Math.Min(lightCount, maxListed), 0, ShaderConstants.MaxClusteredLights);
+        uint words = (uint)(listed + 31) / 32;
+        ClusterListedLights = listed;
+        ClusterMaskWords = words;
+        uint needed = ShaderConstants.ClusterCount * Math.Max(ClusterRecordWords(words), InitialClusterRecordWords);
+        if (needed <= ClusterMaskCapacity)
             return;
-        uint capacity = Math.Min(Math.Max(needed, ClusterIndexCapacity * 2), ShaderConstants.ClusterCount * ShaderConstants.MaxLightsPerCluster);
-        _context.DeferDispose(ClusterLights);
-        ClusterLights = CreateClusterLights(capacity);
-        ClusterIndexCapacity = capacity;
+        uint limit = ShaderConstants.ClusterCount * ClusterRecordWords(ShaderConstants.MaxClusterMaskWords);
+        uint capacity = Math.Min(Math.Max(needed, ClusterMaskCapacity + ClusterMaskCapacity / 2), limit);
+        _context.DeferDispose(ClusterMasks);
+        ClusterMasks = CreateClusterMasks(capacity);
+        ClusterMaskCapacity = capacity;
     }
+
+    /// <summary>Words of one cluster's record: the summary words (one bit per mask word) and the mask words.</summary>
+    internal static uint ClusterRecordWords(uint maskWords) => (maskWords + 31) / 32 + maskWords;
 
     /// <summary>Creates, resizes or releases the per-view resources for this frame's requirements.</summary>
     internal void Prepare(in ViewRequirements r)
@@ -489,7 +538,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         sig.Begin();
         sig.Add(FrameUniform.Handle.Handle);
         sig.Add(Clusters.Handle.Handle);
-        sig.Add(ClusterLights.Handle.Handle);
+        sig.Add(ClusterMasks.Handle.Handle);
         sig.Add(ClusterCounter.Handle.Handle);
         sig.Add(Hdr.View.Handle);
         sig.Add(LightViews.Buffer.Handle.Handle);
@@ -543,7 +592,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         var image = DescriptorType.CombinedImageSampler;
         w.Buffer(set, ShaderConstants.BindingFrame, DescriptorType.UniformBuffer, FrameUniform.Handle, 0, FrameUniform.Size);
         w.Buffer(set, ShaderConstants.BindingClusters, storage, Clusters.Handle);
-        w.Buffer(set, ShaderConstants.BindingClusterLights, storage, ClusterLights.Handle);
+        w.Buffer(set, ShaderConstants.BindingClusterMasks, storage, ClusterMasks.Handle);
         w.Buffer(set, ShaderConstants.BindingClusterCounter, storage, ClusterCounter.Handle);
         w.Image(set, ShaderConstants.BindingHdr, image, shared.LinearClamp, Hdr.View, read);
         w.Buffer(set, ShaderConstants.BindingLightViews, storage, LightViews.Buffer.Handle);
@@ -694,8 +743,13 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
         _context.DeferDispose(FrameUniform);
         _context.DeferDispose(Clusters);
-        _context.DeferDispose(ClusterLights);
+        _context.DeferDispose(ClusterMasks);
         _context.DeferDispose(ClusterCounter);
+        foreach (var b in ClusterStatsReadback)
+        {
+            if (b is not null)
+                _context.DeferDispose(b);
+        }
         _context.DeferDispose(LightViews);
         _context.DeferDispose(Lists);
         _context.DeferDispose(BeamLines);
@@ -732,8 +786,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         return (Math.Clamp(width, 1, max), Math.Clamp(height, 1, max));
     }
 
-    private GpuBuffer CreateClusterLights(uint capacity) =>
-        GpuBuffer.Create(_context, capacity * 4ul, BufferUsageFlags.StorageBufferBit, MemoryUsage.GpuOnly, "cluster light lists");
+    private GpuBuffer CreateClusterMasks(uint words) =>
+        GpuBuffer.Create(_context, words * 4ul, BufferUsageFlags.StorageBufferBit, MemoryUsage.GpuOnly, "cluster light masks");
 
     private void CreateSceneImages()
     {
@@ -1006,8 +1060,13 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         BloomLevels = 0;
         FrameUniform?.Dispose();
         Clusters?.Dispose();
-        ClusterLights?.Dispose();
+        ClusterMasks?.Dispose();
         ClusterCounter?.Dispose();
+        for (int i = 0; i < ClusterStatsReadback.Length; i++)
+        {
+            ClusterStatsReadback[i]?.Dispose();
+            ClusterStatsReadback[i] = null;
+        }
         LightViews?.Dispose();
         Lists?.Dispose();
         BeamLines?.Dispose();

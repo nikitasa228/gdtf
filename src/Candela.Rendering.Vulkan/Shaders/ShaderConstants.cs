@@ -18,7 +18,7 @@ internal static class ShaderConstants
     public const int SetView = 1;
     public const uint BindingFrame = 0;
     public const uint BindingClusters = 1;
-    public const uint BindingClusterLights = 2;
+    public const uint BindingClusterMasks = 2;
     public const uint BindingClusterCounter = 3;
     public const uint BindingHdr = 4;
     public const uint BindingLightViews = 5;
@@ -116,7 +116,18 @@ internal static class ShaderConstants
     public const uint ClusterCountZ = 24;
     public const uint ClusterCount = ClusterCountX * ClusterCountY * ClusterCountZ;
     public const uint ClusterThreads = 64;
-    public const uint MaxLightsPerCluster = 512;
+
+    /// <summary>
+    /// Most lights the clustered light lists can hold (one bit per light and cluster): 2048 mask words, 28 MB per view
+    /// at the limit. Lights beyond the list capacity are not drawn and are reported as an overflow.
+    /// </summary>
+    public const int MaxClusteredLights = 65536;
+
+    /// <summary>Mask words per cluster at <see cref="MaxClusteredLights"/>.</summary>
+    public const uint MaxClusterMaskWords = MaxClusteredLights / 32;
+
+    /// <summary>Summary words per cluster at <see cref="MaxClusteredLights"/> (one bit per non-empty mask word).</summary>
+    public const uint MaxClusterSummaryWords = MaxClusterMaskWords / 32;
 
     // Bindless texture slots of the default textures.
     public const uint TextureWhite = 0;
@@ -240,7 +251,7 @@ internal static class ShaderConstants
         ("SET_VIEW", I(SetView)),
         ("BINDING_FRAME", I(BindingFrame)),
         ("BINDING_CLUSTERS", I(BindingClusters)),
-        ("BINDING_CLUSTER_LIGHTS", I(BindingClusterLights)),
+        ("BINDING_CLUSTER_MASKS", I(BindingClusterMasks)),
         ("BINDING_CLUSTER_COUNTER", I(BindingClusterCounter)),
         ("BINDING_HDR", I(BindingHdr)),
         ("BINDING_LIGHT_VIEWS", I(BindingLightViews)),
@@ -304,7 +315,7 @@ internal static class ShaderConstants
         ("CLUSTER_COUNT_Y", I(ClusterCountY)),
         ("CLUSTER_COUNT_Z", I(ClusterCountZ)),
         ("CLUSTER_THREADS", I(ClusterThreads)),
-        ("MAX_LIGHTS_PER_CLUSTER", I(MaxLightsPerCluster)),
+        ("MAX_CLUSTER_SUMMARY_WORDS", I(MaxClusterSummaryWords)),
         ("TEXTURE_WHITE", I(TextureWhite)),
         ("TEXTURE_BLACK", I(TextureBlack)),
         ("TEXTURE_FLAT_NORMAL", I(TextureFlatNormal)),
