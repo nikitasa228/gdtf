@@ -67,7 +67,7 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
             catch (Exception e) when (e is IOException or InvalidOperationException or UnauthorizedAccessException
                                            or ObjectDisposedException or TimeoutException)
             {
-                ReportFault($"EntTec widget on {transport.Name}: write failed ({e.Message}).");
+                ReportFault(ProtocolText.Create(ProtocolMessages.EnttecWriteFailed, transport.Name, e.Message), ProtocolErrorCode.DeviceDisconnected);
                 return false;
             }
         }
@@ -80,11 +80,13 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
         if (portName.Length == 0)
         {
             var ports = SerialPortEnttecTransport.GetPortNames();
-            throw new ProtocolStartException("Choose the serial port of the EntTec DMX USB Pro" +
-                                             (ports.Count > 0 ? $" (available: {string.Join(", ", ports)})." : " (no serial ports found)."));
+            throw new ProtocolStartException(ports.Count > 0
+                    ? ProtocolText.Create(ProtocolMessages.EnttecNoPort, string.Join(", ", ports))
+                    : ProtocolText.Create(ProtocolMessages.EnttecNoPortNone),
+                ProtocolErrorCode.InvalidSettings);
         }
         if (options.EnttecUniverse < 1)
-            throw new ProtocolStartException($"EntTec universe {options.EnttecUniverse} is invalid; universes start at 1.");
+            throw new ProtocolStartException(ProtocolText.Create(ProtocolMessages.EnttecInvalidUniverse, options.EnttecUniverse), ProtocolErrorCode.InvalidSettings);
 
         IEnttecTransport? transport = null;
         try
@@ -95,8 +97,7 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
         {
             transport?.Dispose();
-            throw new ProtocolStartException($"Cannot open the EntTec widget on {portName}: {e.Message} " +
-                                             "(is it plugged in, and not used by another program?)", e);
+            throw new ProtocolStartException(ProtocolText.Create(ProtocolMessages.EnttecOpenFailed, portName, e.Message), ProtocolErrorCode.DeviceNotFound, e);
         }
         catch
         {
@@ -124,13 +125,13 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
         }
         catch (IOException e)
         {
-            throw new ProtocolStartException($"The EntTec widget on {portName} does not accept commands: {e.Message}", e);
+            throw new ProtocolStartException(ProtocolText.Create(ProtocolMessages.EnttecNotResponding, portName, e.Message), ProtocolErrorCode.DeviceNotResponding, e);
         }
 
         _running = true;
         _thread = new Thread(() => ReadLoop(transport)) { IsBackground = true, Name = "Candela EntTec DMX USB Pro reader" };
         _thread.Start();
-        return $"Receiving DMX from {transport.Name} into universe {_universe}";
+        return Running(ProtocolText.Create(ProtocolMessages.EnttecReceiving, transport.Name, _universe), transport.Name, null, 1);
     }
 
     /// <inheritdoc />
@@ -239,8 +240,9 @@ public sealed class EnttecDmxUsbPro : ExternalProtocolBase
                 {
                     _running = false;
                     ReportFault(e is IOException or UnauthorizedAccessException or InvalidOperationException or ObjectDisposedException
-                        ? $"EntTec widget on {transport.Name} disconnected: {e.Message}"
-                        : $"EntTec widget on {transport.Name} failed: {e.GetType().Name}: {e.Message}");
+                        ? ProtocolText.Create(ProtocolMessages.EnttecDisconnected, transport.Name, e.Message)
+                        : ProtocolText.Create(ProtocolMessages.EnttecFailed, transport.Name, e.GetType().Name, e.Message),
+                        ProtocolErrorCode.DeviceDisconnected);
                 }
                 break;
             }

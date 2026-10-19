@@ -22,8 +22,7 @@ public sealed class OscReceiver : OscReceiverBase
     /// <summary>Most (sender, universe) buffers held at once; messages for further ones are ignored (with a warning).</summary>
     public const int MaxHeldUniverses = 1024;
 
-    private static readonly string HeldTableFullWarning =
-        $"OSC already holds {MaxHeldUniverses} universes; messages for further universes are ignored.";
+    private static readonly ProtocolText HeldTableFullWarning = ProtocolText.Create(ProtocolMessages.OscHeldTableFull, MaxHeldUniverses);
 
     private readonly DmxInputHub _hub;
     private readonly object _gate = new();
@@ -64,7 +63,7 @@ public sealed class OscReceiver : OscReceiverBase
         foreach (var text in options.OscPatterns)
         {
             if (OscDmxPattern.TryParse(text, out var p, out var error)) patterns.Add(p!);
-            else AddWarning($"OSC pattern ignored: {error}.");
+            else AddWarning(ProtocolText.Create(ProtocolMessages.OscPatternIgnored, error));
         }
         lock (_gate)
         {
@@ -75,6 +74,19 @@ public sealed class OscReceiver : OscReceiverBase
         }
         _keepAlive?.Dispose();
         _keepAlive = Time.CreateTimer(_ => KeepAlive(), null, KeepAliveInterval, KeepAliveInterval);
+    }
+
+    /// <summary>
+    /// The universes the patterns write to when none of them takes the universe from the message (<c>{universe}</c>);
+    /// with such a pattern any universe can be written and the count is that of the universes held so far.
+    /// </summary>
+    protected override int UniverseCountOf(ProtocolOptions options)
+    {
+        lock (_gate)
+        {
+            if (_patterns.Any(p => p.HasUniverse)) return _held.Count;
+            return _patterns.Select(p => p.DefaultUniverse).Distinct().Count();
+        }
     }
 
     /// <inheritdoc />
@@ -165,7 +177,7 @@ public sealed class OscReceiver : OscReceiverBase
         catch (Exception e)
         {
             // A timer callback must never crash the process.
-            AddWarning($"OSC keep-alive failed: {e.Message}");
+            AddWarning(ProtocolText.Create(ProtocolMessages.OscKeepAliveFailed, e.Message));
         }
     }
 

@@ -54,6 +54,9 @@ public sealed class OscDmxPattern
     /// <summary>Value scaling.</summary>
     public OscValueScale Scale { get; }
 
+    /// <summary>True when the address contains <c>{universe}</c> (the message chooses the universe); otherwise <see cref="DefaultUniverse"/> is used.</summary>
+    public bool HasUniverse => Array.IndexOf(_kinds, UniverseSegment) >= 0;
+
     /// <summary>True when the address contains <c>{channel}</c>; otherwise values start at slot 1.</summary>
     public bool HasChannel => Array.IndexOf(_kinds, ChannelSegment) >= 0;
 

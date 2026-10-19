@@ -129,11 +129,27 @@ public sealed class ProtocolStartException : Exception
     public ProtocolStartException(string message)
         : base(message)
     {
+        Text = ProtocolText.Literal(message);
     }
 
     /// <summary>Creates the exception with a user-facing message and the underlying cause.</summary>
     public ProtocolStartException(string message, Exception innerException)
         : base(message, innerException)
     {
+        Text = ProtocolText.Literal(message);
     }
+
+    /// <summary>Creates the exception with a localisable message (<see cref="Exception.Message"/> is its English text).</summary>
+    public ProtocolStartException(ProtocolText text, ProtocolErrorCode code, Exception? innerException = null)
+        : base((text ?? throw new ArgumentNullException(nameof(text))).English, innerException)
+    {
+        Text = text;
+        Code = code;
+    }
+
+    /// <summary>The message as a localisable text.</summary>
+    public ProtocolText Text { get; }
+
+    /// <summary>Why the protocol could not start (<see cref="ProtocolErrorCode.StartFailed"/> when not more specific).</summary>
+    public ProtocolErrorCode Code { get; } = ProtocolErrorCode.StartFailed;
 }

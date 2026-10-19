@@ -205,7 +205,7 @@ public sealed class PlannedProtocol : ExternalProtocolBase
 
     /// <inheritdoc />
     protected override string OnStart(ProtocolOptions options) =>
-        throw new ProtocolStartException($"{DisplayName} is not available: {SupportReason}");
+        throw new ProtocolStartException(ProtocolText.Create(ProtocolMessages.Unavailable, DisplayName, SupportReason), ProtocolErrorCode.Unavailable);
 
     /// <inheritdoc />
     protected override void OnStop()
