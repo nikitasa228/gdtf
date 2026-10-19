@@ -864,9 +864,11 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         var vk = _context.Vk;
         vk.CmdBindPipeline(cmd, PipelineBindPoint.Compute, _tracer.Denoise);
         uint groupsX = ((uint)_width + 7) / 8, groupsY = ((uint)_height + 7) / 8;
-        b.Use(_accum, ImageUse.StorageComputeRead);
-        b.Use(_aux, ImageUse.StorageComputeRead);
-        b.Use(_guide, ImageUse.StorageComputeRead);
+        // Storage reads are declared as read-write: the tracker then orders them after the earlier storage writes of the
+        // same (compute) stage, which a read-only use would consider visible already.
+        b.Use(_accum, ImageUse.StorageCompute);
+        b.Use(_aux, ImageUse.StorageCompute);
+        b.Use(_guide, ImageUse.StorageCompute);
         b.Use(_ping, ImageUse.StorageCompute, discard: true);
         b.Flush();
         BindPassSet(cmd, _resolveSet);
@@ -877,7 +879,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         {
             bool toPong = ReferenceEquals(current, _ping);
             var target = toPong ? _pong : _ping;
-            b.Use(current, ImageUse.StorageComputeRead);
+            b.Use(current, ImageUse.StorageCompute);
             b.Use(target, ImageUse.StorageCompute, discard: true);
             b.Flush();
             BindPassSet(cmd, toPong ? _pingToPong : _pongToPing);
@@ -926,11 +928,14 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             _exposure = ExposureMeter.ExposureFor(log2, _metering, _compensation);
     }
 
-    /// <summary>The images a display set reads: the accumulation and the set's input (the source or a placeholder).</summary>
+    /// <summary>
+    /// The images a display set reads: the accumulation and the set's input (the source or a placeholder), declared as
+    /// read-write so they are ordered after earlier storage writes of the same stage.
+    /// </summary>
     private void DeclareDisplayReads(BarrierBatch b, GpuImage source)
     {
-        b.Use(_accum, ImageUse.StorageComputeRead);
-        b.Use(ReferenceEquals(source, _pong) ? _pong : _ping, ImageUse.StorageComputeRead);
+        b.Use(_accum, ImageUse.StorageCompute);
+        b.Use(ReferenceEquals(source, _pong) ? _pong : _ping, ImageUse.StorageCompute);
     }
 
     private ImageData ReadHdr(GpuImage source, bool mean, float exposure)
