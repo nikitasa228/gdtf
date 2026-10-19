@@ -38,7 +38,6 @@ internal sealed unsafe partial class ViewportPanel
     private readonly Vector2[] _boxCorners = new Vector2[8];
     private readonly bool[] _boxVisible = new bool[8];
     private NodeDrag _nodeDrag;
-    private bool _nodeGizmoVisible;
     private Matrix4x4 _nodeGizmoMatrix;
     private IReadOnlyList<PortCandidate>? _hoverPorts;
     private (Guid Device, long Version, int Draft, string Type) _hoverPortsKey;
@@ -693,7 +692,6 @@ internal sealed unsafe partial class ViewportPanel
             return false;
         }
 
-        _nodeGizmoVisible = true;
         ImGuizmo.SetDrawlist(drawList);
         ImGuizmo.SetRect(_imageMin.X, _imageMin.Y, _imageSize.X, _imageSize.Y);
         ImGuizmo.SetOrthographic(Camera.Projection == ProjectionKind.Orthographic);
@@ -729,7 +727,6 @@ internal sealed unsafe partial class ViewportPanel
 
     private void EndNodeGizmo()
     {
-        _nodeGizmoVisible = false;
         if (!_nodeDrag.Active || !_nodeDrag.Gizmo)
             return;
         var drag = _nodeDrag;

@@ -57,6 +57,15 @@ internal sealed class FixtureInspectorView
     /// <summary>The control model (tests).</summary>
     internal FixtureControls Controls => _controls;
 
+    /// <summary>The lock line under the manual controls as last drawn (tests).</summary>
+    internal string LockText => _lockText;
+
+    /// <summary>The data row of the patch (where the fixture's DMX comes from) as last drawn (tests).</summary>
+    internal string DataText => _dataPlain;
+
+    /// <summary>The power row of the patch (where the fixture's power comes from) as last drawn (tests).</summary>
+    internal string PowerText => _powerPlain;
+
     /// <summary>Draws the fixture sections for <paramref name="entity"/>.</summary>
     public void Draw(Entity entity, FixtureComponent fixture, float labelWidth)
     {
