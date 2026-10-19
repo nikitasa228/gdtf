@@ -14,8 +14,9 @@ namespace Candela.App.Tests;
 /// Regression tests of the cabling review: the panels show cable lengths of the scene as it is after a device that
 /// cables are plugged into moved; renaming a console output or an outlet keeps its cables plugged (one undo step);
 /// a branching cable point is not deleted; an unknown cable type is named in the tool's message; the cable link
-/// window brings the Properties panel into view after selecting a device; the port picker opens towards the inside
-/// of the window; a three-phase supply feeds a distro whose single-phase loads are spread over L1–L3.
+/// window brings the Properties panel into view after selecting a device and keeps room for branch arcs only when a
+/// branch needs it; the port picker opens towards the inside of the window and is pushed back inside when it hangs
+/// over an edge; a three-phase supply feeds a distro whose single-phase loads are spread over L1–L3.
 /// </summary>
 [Collection(UiStateCollection.Name)]
 public sealed class CablingReviewTests
@@ -165,6 +166,44 @@ public sealed class CablingReviewTests
         var (position, pivot) = PopupPlacement.AtPoint(new Vector2(x, y), 14f, Vector2.Zero, new Vector2(1600f, 900f));
         Assert.Equal(new Vector2(px, py), position);
         Assert.Equal(new Vector2(pivotX, pivotY), pivot);
+    }
+
+    [Fact]
+    public void An_open_port_picker_hanging_over_an_edge_is_pushed_back_inside_the_window()
+    {
+        var area = (Pos: new Vector2(0f, 20f), Size: new Vector2(1600f, 860f));
+        // A 7-port picker at 150 % opened under a click low in the window: it would reach below the window.
+        Assert.Equal(new Vector2(500f, 300f), PopupPlacement.Inside(new Vector2(500f, 380f), new Vector2(520f, 580f), area.Pos, area.Size));
+        // Over the right and the top edge.
+        Assert.Equal(new Vector2(1080f, 20f), PopupPlacement.Inside(new Vector2(1300f, -40f), new Vector2(520f, 300f), area.Pos, area.Size));
+        // Inside: unchanged; larger than the window: its top left corner stays in it; not finite: the corner.
+        Assert.Equal(new Vector2(200f, 200f), PopupPlacement.Inside(new Vector2(200f, 200f), new Vector2(300f, 300f), area.Pos, area.Size));
+        Assert.Equal(new Vector2(0f, 20f), PopupPlacement.Inside(new Vector2(50f, 60f), new Vector2(2000f, 1000f), area.Pos, area.Size));
+        Assert.Equal(area.Pos, PopupPlacement.Inside(new Vector2(float.NaN, 0f), new Vector2(10f, 10f), area.Pos, area.Size));
+    }
+
+    [Fact]
+    public void A_plain_chain_needs_no_room_for_branch_arcs_in_the_link_window()
+    {
+        Loc.SetLanguage("en");
+        using var dir = new TempDir();
+        using var s = new CablingScene(dir);
+        var tool = s.Tool;
+        tool.CableTypeId = CableCatalog.Ids.DmxXlr5;
+        tool.Click(CablingScene.DeviceAt(s.Console));
+        tool.ChoosePort("DMX A");
+        tool.Click(CablingScene.Ground(-2f, -2f));
+        tool.Click(CablingScene.DeviceAt(s.Spots[0]));
+        tool.Click(CablingScene.DeviceAt(s.Spots[1]));
+        tool.Cancel();
+        var first = s.Cables()[0];
+        Assert.False(CableLinkModel.Build(s.Engine, first.Entity.Id)!.HasBranches);
+        // A branch from the floor run to the third fixture: its cable skips a card, drawn as an arc.
+        var segment = first.Cable.Segments[1];
+        tool.Click(CableTarget.Segment(first.Entity.Id, segment.FromNode, segment.ToNode, new Vector3(-2f, -1f, 2.5f)));
+        Assert.Equal(CableClickOutcome.Connected, tool.Click(CablingScene.DeviceAt(s.Spots[2])));
+        tool.Cancel();
+        Assert.True(CableLinkModel.Build(s.Engine, first.Entity.Id)!.HasBranches);
     }
 
     [Fact]

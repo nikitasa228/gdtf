@@ -93,6 +93,8 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [x] Duplicated fixtures re-patched to free addresses (setting: ask / next free / keep); Escape cancels wall and
       floor drags
 - [ ] Cables lying on floors drawn without sag (renderer: per-span slack; requested from the engine)
+- [ ] Engine: renew `StageEngine.NetworkSolution` when entities that cable points are fixed to move (the editor's
+      panels re-solve per scene version meanwhile, `CablingNetwork`)
 
 ## M5 — Atmosphere, fire, overlays
 - [~] Smoke/haze fluid simulation (GPU, CPU reference): HAZE/FOG emitters from DMX, FAN airflow, obstacles,

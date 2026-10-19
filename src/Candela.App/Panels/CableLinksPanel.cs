@@ -194,8 +194,12 @@ internal sealed class CableLinksPanel : Panel
         float hintH = ImGui.GetTextLineHeightWithSpacing();
         var avail = ImGui.GetContentRegionAvail();
         // The strip takes the room the panel has and scrolls (both ways) when the cards need more: a strip taller
-        // than the panel would be cut off, since the panel window itself does not scroll.
-        if (!ImGui.BeginChild("##strip", new Vector2(0f, MathF.Max(avail.Y - hintH, 2f * line)), ImGuiChildFlags.None,
+        // than the panel would be cut off, since the panel window itself does not scroll. The hint under it is shown
+        // only when the cards fit above it.
+        var style = ImGui.GetStyle();
+        float needed = top + cardH + line + 2f * style.WindowPadding.Y + (contentW > avail.X ? style.ScrollbarSize : 0f);
+        bool hint = avail.Y - hintH >= needed;
+        if (!ImGui.BeginChild("##strip", new Vector2(0f, MathF.Max(hint ? avail.Y - hintH : avail.Y, 2f * line)), ImGuiChildFlags.None,
                 ImGuiWindowFlags.HorizontalScrollbar))
         {
             ImGui.EndChild();
@@ -297,7 +301,10 @@ internal sealed class CableLinksPanel : Panel
         ImGui.SetCursorScreenPos(origin + new Vector2(0f, cardH + line));
         ImGui.Dummy(new Vector2(contentW, 1f));
         ImGui.EndChild();
-        SafeText.Disabled(CableLoc.Get(CableStr.LinksClickHint));
+        if (hint)
+            SafeText.Disabled(CableLoc.Get(CableStr.LinksClickHint));
+        else if (ImGui.IsItemHovered())
+            SafeText.Tooltip(CableLoc.Get(CableStr.LinksClickHint));
     }
 
     /// <summary>Card texts fitted to the card width, rebuilt when the model or the UI scale changes.</summary>

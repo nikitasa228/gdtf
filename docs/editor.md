@@ -403,7 +403,11 @@ The picker opens next to the cursor and lists every port of the device for the c
 connector drawing, name, connector, direction, universe or breaker, and why a port cannot be used — *in use: DMX 2*,
 *does not fit: a power cable cannot be plugged into a DMX512 port*, *adapter: XLR 3-pin to 5-pin adapter needed*, *the
 cable's other end is in an output too*. Usable ports come first (exact connector matches before adapters, then by the
-direction the cable needs, then in device order). Escape or a click outside closes it.
+direction the cable needs, then in device order). Escape or a click outside closes it. The picker belongs to the
+viewport that was clicked (with four views open the other three leave it alone, and the cable can be finished in
+another view); it opens beside the cursor towards the inside of the window and is pushed back inside when it would hang
+over an edge (a device with many ports, a click low in the window, a large UI scale), so it never turns into a
+separate OS window. A cable type the catalogue does not know is named in the status bar instead of starting a cable.
 
 ![Выбор разъёма, русский интерфейс, 150 %](images/editor-port-picker-ru.png)
 
@@ -413,8 +417,9 @@ Selecting a cable (any tool) shows its nodes as handles. A **click** selects a n
 position, what it is fixed to, or the port it is plugged into — and the **Move gizmo** moves it along the three axes; a
 **drag** on a handle moves it in the view plane (snapping rounds it like objects). A node fixed to an object keeps its
 anchor and gets a new offset on it. Every move is one undo step; Escape drops the node selection, **Delete** removes the
-node (a route point joins its neighbours, an end point goes with its segment and plug, a branching node stays; a cable
-left with one node is deleted).
+node (a route point joins its neighbours, an end point goes with its segment and plug, a branching node stays — the
+status bar says so; a cable left with one node is deleted). **Escape during a drag** puts the node back where the drag
+started, without an undo step.
 
 ### Cable link window
 
@@ -426,8 +431,12 @@ address and the port the line enters, and between them the cables with their pla
 The **Cable Links** panel (bottom group, Window menu) shows the line a cable belongs to as a strip of cards: for a data
 cable the console output it comes from (or the node, splitter, …) and every device in signal order, for a power cable
 the outlet, its phase and voltage and the devices it feeds. The selected cable is highlighted, branches and free ends are
-counted. A click on a **device card** selects the device (the Properties panel shows it, the window keeps the line), a
-click on a **cable** follows that cable; the buttons in the header select the cable itself or show the cable overlay.
+counted. A click on a **device card** selects the device and brings the Properties panel into view (it is opened when
+closed and its tab brought forward — unless it shares the link window's dock group, which would hide the strip); the
+window keeps the line. A click on a **cable** follows that cable; the buttons in the header select the cable itself or
+show the cable overlay. The source, the device count and the buttons share one header line, the space above the cards
+is kept only for the arcs of branches, and the strip scrolls in both directions when the panel is too low for it (a
+large UI scale in the bottom dock).
 It opens when a cable is clicked in a viewport, when *Show cable links* is pressed in a cable's properties, and when the
 data or power row of a fixture's patch is clicked (`StageToolState.CableLinkRequested`); it follows the selected cable.
 
@@ -456,7 +465,14 @@ data or power row of a fixture's patch is clicked (`StageToolState.CableLinkRequ
   input protocol (Art-Net, sACN … from External Control, with a button to switch that input on), how many fixtures are
   cabled to it, and its outputs (name, signal, first universe, universe count; add / remove). A **power source** shows
   voltage, frequency, phases, the total load per phase, and its outlets (name, connector, breaker, phase; add / remove)
-  with the load on each outlet against its breaker — overloaded outlets in red.
+  with the load on each outlet against its breaker — overloaded outlets in red. **Renaming** an output or an outlet
+  takes the plugs of the cables in it along (one undo step, *Rename console output* / *Rename outlet*), so the cables
+  stay plugged; removing one leaves its cable hanging free.
+* **Lengths follow the scene.** Cable lengths, weights and loads in the Properties panel, the cable link window, the
+  connector rows and the cable legend are those of the scene as it is now: when a fixture, truss or wall that cable
+  points are fixed to moves, the panels re-solve the network once for the new scene version (`CablingNetwork`, about a
+  millisecond for the 91-fixture Фокина rig with a cable to every fixture) — the engine's own solution is only renewed
+  when the scene's structure changes.
 
 ### Copies and Escape
 
@@ -466,8 +482,8 @@ data or power row of a fixture's patch is clicked (`StageToolState.CableLinkRequ
   overlapping copy to the next free addresses (`AutoPatch`, one search over all copies, so they follow one another) as
   one undo step. The preference is stored in `editor-preferences.json` in the config folder.
 * **Escape** cancels a wall or floor being drawn or resized (the shape is dropped, a resize goes back to the size it had)
-  without clearing the selection, finishes a cable being drawn, or drops a selected cable node — before it clears the
-  selection.
+  and a cable node being dragged (it goes back) without clearing the selection, finishes a cable being drawn, or drops a
+  selected cable node — before it clears the selection.
 
 ## Menus
 
