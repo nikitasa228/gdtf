@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using System.Numerics;
 using Candela.Core.Diagnostics;
 using Candela.Gdtf;
 using Candela.Project;
@@ -215,9 +214,12 @@ public sealed class EngineFollowUpTests
         Assert.Throws<ArgumentNullException>(() => engine.Settings = null!);
         SceneBuilder.Floor(engine.Scene, 4f);
         Assert.True(engine.IsModified);
-        Assert.True(engine.Open(TestEnvironment.Fokina).Success);
+        string path = Path.Combine(TestEnvironment.NewTempDirectory("settings-open"), "a.candela");
+        Assert.True(engine.SaveAs(path).Success);
+        engine.New("B");
         Assert.False(engine.IsModified);
-        _ = new Vector3(0);
+        Assert.True(engine.Open(path).Success);
+        Assert.False(engine.IsModified);
     }
 
     private static void WriteGdtf(string path, string description)
