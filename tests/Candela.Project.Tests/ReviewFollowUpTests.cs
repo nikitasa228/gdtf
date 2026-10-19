@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization.Metadata;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Core.Serialization;
@@ -185,5 +186,54 @@ public sealed class ReviewFollowUpTests
         var copy = SceneSerializer.FromJson(SceneSerializer.ToJson(scene), null);
         copy.Remove(copy.Find(group.Id)!);
         return copy;
+    }
+
+    /// <summary>The options the removed <c>ProjectJson</c> wrote <c>scene.json</c> with (kept here to prove byte compatibility).</summary>
+    private static JsonSerializerOptions FormerProjectJsonOptions()
+    {
+        var options = new JsonSerializerOptions(CandelaJson.Options)
+        {
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver
+            {
+                Modifiers =
+                {
+                    static info =>
+                    {
+                        if (info.Kind != JsonTypeInfoKind.Object || info.CreateObject is null || info.Type.IsAbstract) return;
+                        object sample;
+                        try
+                        {
+                            sample = info.CreateObject();
+                        }
+                        catch (Exception e) when (e is InvalidOperationException or NotSupportedException or MissingMethodException)
+                        {
+                            return;
+                        }
+                        foreach (var property in info.Properties)
+                        {
+                            if (property.Get is null) continue;
+                            var type = property.PropertyType;
+                            if (type.IsValueType && Nullable.GetUnderlyingType(type) is null) continue;
+                            if (property.Get(sample) is not null) property.ShouldSerialize = static (_, _) => true;
+                        }
+                    },
+                },
+            },
+        };
+        options.MakeReadOnly();
+        return options;
+    }
+
+    [Fact]
+    public void Scene_files_are_byte_identical_to_the_ones_the_former_project_options_wrote()
+    {
+        var project = TestData.RichProject();
+        foreach (var e in project.Scene.All())
+            foreach (var c in e.Components)
+                if (c is ConsoleComponent console) console.ProtocolId = null; // a null that differs from the default
+        var file = SceneSerializer.ToFile(project.Scene);
+        var former = JsonSerializer.SerializeToUtf8Bytes(file, FormerProjectJsonOptions());
+        var now = JsonSerializer.SerializeToUtf8Bytes(file, CandelaJson.Options);
+        Assert.Equal(Encoding.UTF8.GetString(former), Encoding.UTF8.GetString(now));
     }
 }
