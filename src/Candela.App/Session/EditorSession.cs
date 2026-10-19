@@ -284,11 +284,25 @@ internal sealed class EditorSession : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (!File.Exists(path))
             return SessionResult.Failed(Loc.Format(Str.MsgFileMissing, path));
-        _ = kind; // the engine decides by the file's content type; the kind only chose the file dialog's filter
+        // The engine decides by the file's content type; the kind only chose the file dialog's filter.
+        bool gdtf = kind == ImportKind.Gdtf || path.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase);
         var result = EngineOrThrow.Import(path, options);
         if (!result.Success)
-            return Failed(result);
+        {
+            if (!gdtf)
+                return Failed(result);
+            // A GDTF the engine refused (unreadable, no DMX mode): its reason, under a line in the UI language.
+            _log.Warn("Session", result.Summary);
+            return SessionResult.Failed(Loc.Format(Str.LibImportRefused, result.Summary));
+        }
+
         _log.Info("Session", result.Summary);
+        if (result.LibraryEntry is { } entry)
+        {
+            string name = string.IsNullOrWhiteSpace(entry.Manufacturer) ? entry.ModelName : $"{entry.Manufacturer} {entry.ModelName}";
+            return Done(Loc.Format(Str.LibImportedSelected, name), result) with { LibraryEntry = entry };
+        }
+
         return Done(Loc.Format(Str.MsgImported, Path.GetFileName(path)), result);
     }
 

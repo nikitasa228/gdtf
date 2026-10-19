@@ -30,6 +30,12 @@ internal readonly record struct SessionResult(SessionOutcome Outcome, string Mes
     /// <summary>Entities the operation created (an imported model or image, a merged group).</summary>
     public IReadOnlyList<Guid> Entities { get; init; } = Array.Empty<Guid>();
 
+    /// <summary>
+    /// The fixture-library entry an imported <c>.gdtf</c> file became (or was already), for selecting it in the Library
+    /// panel; null for every other operation.
+    /// </summary>
+    public Candela.Gdtf.FixtureLibraryEntry? LibraryEntry { get; init; }
+
     /// <summary>A successful result.</summary>
     public static SessionResult Done(string message) => new(SessionOutcome.Done, message);
 

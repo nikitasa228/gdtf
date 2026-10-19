@@ -293,11 +293,22 @@ internal sealed partial class Workspace
         {
             if (!result.Succeeded)
                 return;
+            if (result.LibraryEntry is { } entry)
+                ShowInLibrary(entry);
             if (kind is ImportKind.Model or ImportKind.Image)
                 _library.RememberModel(path);
             if (kind == ImportKind.Image && result.Entities.Count == 1)
                 ShowImagePopup(result.Entities[0], at);
         });
+    }
+
+    /// <summary>Brings the Library panel forward with a fixture type selected (a GDTF file was just imported).</summary>
+    private void ShowInLibrary(Candela.Gdtf.FixtureLibraryEntry entry)
+    {
+        _library.Select(entry);
+        if (!_library.IsOpen)
+            _library.IsOpen = true;
+        FocusPanel(_library);
     }
 
     /// <summary>File → Export → MVR.</summary>
@@ -423,13 +434,17 @@ internal sealed partial class Workspace
     {
         int imported = 0, failed = 0;
         SessionResult last = default;
+        Candela.Gdtf.FixtureLibraryEntry? libraryEntry = null;
+        var reasons = new List<string>();
         var offset = Vector3.Zero;
         foreach (var file in files)
         {
             if (Directory.Exists(file) || !CanImport(file))
             {
                 failed++;
-                _ctx.Session.ReportProgramNote("app.drop-unsupported", Loc.Format(Str.MsgDropUnsupported, Path.GetFileName(file)));
+                string unsupported = Loc.Format(Str.MsgDropUnsupported, Path.GetFileName(file));
+                reasons.Add(unsupported);
+                _ctx.Session.ReportProgramNote("app.drop-unsupported", unsupported);
                 continue;
             }
 
@@ -442,6 +457,7 @@ internal sealed partial class Workspace
             if (last.Succeeded)
             {
                 imported++;
+                libraryEntry = last.LibraryEntry ?? libraryEntry;
                 // Several models dropped at once are placed side by side instead of inside each other.
                 offset += new Vector3(1.5f, 0f, 0f);
                 if (kind is ImportKind.Model or ImportKind.Image)
@@ -450,13 +466,25 @@ internal sealed partial class Workspace
             else
             {
                 failed++;
+                // The engine's reason (a refused GDTF says why it was refused).
+                reasons.Add($"{Path.GetFileName(file)}: {last.Message}");
             }
         }
 
+        // The last fixture type a dropped GDTF brought in is selected in the Library panel.
+        if (libraryEntry is not null)
+            ShowInLibrary(libraryEntry);
         if (files.Count == 1)
             return failed == 0 ? last : last.Message is { Length: > 0 } ? last : SessionResult.Failed(Loc.Format(Str.MsgDropUnsupported, Path.GetFileName(files[0])));
         string summary = Loc.Format(Str.MsgDropSummary, files.Count, imported, failed);
-        return imported > 0 ? SessionResult.Done(summary) : SessionResult.Failed(summary);
+        if (imported > 0 && failed > 0)
+        {
+            // Some files came in: the status bar says so, and a message lists the files that did not, with the reasons.
+            _messages.Show(MessageKind.Warning, Loc.Get(Str.FileImport), summary + "\n\n" + string.Join("\n", reasons));
+            return SessionResult.Done(summary);
+        }
+
+        return imported > 0 ? SessionResult.Done(summary) : SessionResult.Failed(summary + "\n\n" + string.Join("\n", reasons));
     }
 
     /// <summary>True for files Candela opens as a scene (projects, MVR).</summary>
