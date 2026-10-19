@@ -3,8 +3,7 @@ using System.Numerics;
 using Candela.App.Ui;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
-using Candela.Dmx.Evaluation;
-using Candela.Dmx.Profiles;
+using Candela.Dmx;
 using Candela.Engine;
 using Candela.Gdtf;
 

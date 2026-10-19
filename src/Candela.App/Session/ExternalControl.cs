@@ -6,9 +6,8 @@ using Candela.Core.Serialization;
 using Candela.Core.Settings;
 using Candela.Dmx.Input;
 using Candela.Engine;
-using Candela.Engine.Fixtures;
-using Candela.Engine.Recording;
 using Candela.Protocols;
+using Candela.Protocols.ArtNet;
 
 namespace Candela.App.Session;
 
@@ -190,6 +189,9 @@ internal sealed class ExternalControl : IDisposable
     /// <summary>The last error of the test console, or null.</summary>
     public string? TestPatternError => _testConsole?.LastError;
 
+    /// <summary>The patch of the scene as of the last poll (who uses which slots), or null.</summary>
+    public Candela.Dmx.Patch? Patch { get; private set; }
+
     /// <summary>Number of universes the activity grid shows.</summary>
     public int GridUniverses { get; private set; } = MinimumGridUniverses;
 
@@ -361,10 +363,12 @@ internal sealed class ExternalControl : IDisposable
             _patchVersion = version;
             try
             {
-                _patchedUniverses = new HashSet<int>(engine.Dmx.BuildPatch().Universes);
+                Patch = engine.Dmx.BuildPatch();
+                _patchedUniverses = new HashSet<int>(Patch.Universes);
             }
             catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
             {
+                Patch = null;
                 _patchedUniverses = new HashSet<int>();
             }
         }

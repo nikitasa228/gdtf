@@ -52,6 +52,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private readonly ConsolePanel _console;
     private readonly RenderPanel _render;
     private readonly PreviewPanel _preview;
+    private readonly ExternalControlPanel _external;
     private ViewportPanel? _activeViewport;
     private readonly FittedText _statusFit = new();
     private IReadOnlyList<string>? _savedLayouts;
@@ -121,6 +122,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _render = Add(new RenderPanel(_ctx, Report));
         _issues = Add(new IssuesPanel(_ctx, FrameSelectionInActiveViewport));
         _console = Add(new ConsolePanel(_ctx));
+        _external = Add(new ExternalControlPanel(_ctx));
+        _ctx.Tools.Stage.Browser = _browser;
         RegisterCommands();
         RestoreStartupLayout();
         _activeViewport = _viewports[0];
@@ -171,6 +174,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
         foreach (var viewport in _viewports)
             viewport.ProcessPicks(_ctx.Gpu.Renderer);
+        _ctx.Tools.Stage.Update(_ctx.Session.Engine, _ctx.Gpu.Renderer, _ctx.Settings.Settings, _ctx.Settings.ReadOnly, _ctx.Timer.Elapsed, _ctx.Gpu.Context.DeferDispose);
+        _ctx.Session.EngineClockHeld = _ctx.Tools.Stage.Render.HoldsEngineClock;
     }
 
     /// <summary>
@@ -264,6 +269,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         Loc.LanguageChanged -= _onLanguageChanged;
         foreach (var viewport in _viewports)
             viewport.ReleaseTarget();
+        _ctx.Tools.Stage.Dispose();
     }
 
     // ---- IViewportHost -------------------------------------------------------------------------------------------
@@ -504,6 +510,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         plan.Right.Add(_render.DockName);
         plan.Bottom.Add(_issues.DockName);
         plan.Bottom.Add(_console.DockName);
+        plan.Bottom.Add(_external.DockName);
         int count = fourViewports ? 4 : 1;
         for (int i = 0; i < count; i++)
             plan.Center.Add(_viewports[i].DockName);

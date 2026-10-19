@@ -390,6 +390,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         bool overOverlay = DrawToolbar();
         overOverlay |= DrawViewCube(drawList, hovered);
         DrawStats(drawList);
+        overOverlay |= OverlayLegend.Draw(_ctx, this, _imageMin, avail, _host.IsActive(this));
         HandleInput(hovered, overOverlay);
         DrawBoxSelection(drawList);
     }

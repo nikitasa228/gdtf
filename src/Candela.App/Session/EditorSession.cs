@@ -71,6 +71,12 @@ internal sealed class EditorSession : IDisposable
     /// <summary>The stage engine of the open scene, or null while the editor runs without one (engine-backed panels then show an empty state).</summary>
     public Candela.Engine.StageEngine? Engine { get; private set; }
 
+    /// <summary>
+    /// True while something else drives the engine clock (a render job rendering a timecode range ticks the engine at
+    /// the sequence's frame rate): <see cref="Update"/> must then not tick the engine with wall-clock time.
+    /// </summary>
+    public bool EngineClockHeld { get; set; }
+
     /// <summary>True when the scene changed since it was opened or saved.</summary>
     public bool IsModified => Scene.Version != _savedVersion;
 

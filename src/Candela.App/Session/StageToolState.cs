@@ -38,7 +38,10 @@ internal sealed class StagePanelContext
         ArgumentNullException.ThrowIfNull(context);
         var session = context.Session;
         return new StagePanelContext(() => session.Engine, () => session.Scene, () => session.Selection, () => session.Undo,
-            context.Tools.Stage, context.Settings.Settings);
+            context.Tools.Stage, context.Settings.Settings)
+        {
+            SettingsChanged = () => context.Settings.RequestSave(context.Timer.Elapsed),
+        };
     }
 
     /// <summary>A context around an engine and its own scene, selection and undo history (tests, tools).</summary>
@@ -68,7 +71,7 @@ internal sealed class StagePanelContext
     public AppSettings Settings { get; }
 
     /// <summary>Called when a user setting was changed by a panel (the editor saves the settings file).</summary>
-    public Action? SettingsChanged { get; init; }
+    public Action? SettingsChanged { get; set; }
 }
 
 /// <summary>

@@ -147,11 +147,12 @@ internal sealed class OverlayLegend
         StageStr title, StageStr hint)
     {
         var gradient = binding.Live;
+        float right = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X;
         ImGui.AlignTextToFramePadding();
         ImGui.TextUnformatted(StageLoc.With(icon, title));
         ImGui.SameLine();
         float button = ImGui.GetFrameHeight();
-        ImGui.SetCursorPosX(ImGui.GetWindowContentRegionMax().X - button);
+        ImGui.SetCursorPosX(right - button);
         if (ImGui.Button(_expanded ? Icons.ChevronDown + "##legend-more" : Icons.ChevronRight + "##legend-more", new Vector2(button, 0f)))
             _expanded = !_expanded;
         if (ImGui.IsItemHovered())

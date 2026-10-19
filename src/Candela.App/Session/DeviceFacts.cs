@@ -5,10 +5,9 @@ using Candela.App.Ui;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Electrical;
-using Candela.Electrical.Network;
 using Candela.Engine;
 using Candela.Gdtf;
-using DmxProfile = Candela.Dmx.Profiles.FixtureProfile;
+using DmxProfile = Candela.Dmx.FixtureProfile;
 using ElectricalProfile = Candela.Electrical.FixtureProfile;
 
 namespace Candela.App.Session;
