@@ -197,9 +197,9 @@ public sealed class PathTracerSessionTests
     }
 
     /// <summary>
-    /// Every pixel gets exactly one sample per pass, whatever the width: the first band of rows is sized from a pixel
-    /// budget (262 144 / 1000 = 262 rows here, not a multiple of the 8-row workgroup), and the rows a band's last
-    /// workgroup overhangs must not be traced twice.
+    /// Every pixel gets exactly one sample per pass, whatever the width: the bands of rows are sized from a pixel budget
+    /// (65 536 / 1000 → 64 rows, 65 536 / 1100 → 56 rows here), so the last band of the 300 rows (44 or 20 rows) is not a
+    /// multiple of the 8-row workgroup, and the rows its last workgroup overhangs must not be traced (twice).
     /// </summary>
     [SkippableFact]
     public void EveryPixelGetsOneSamplePerPassWhateverTheBandSize()

@@ -707,7 +707,7 @@ background is not coloured.
 
 ## Accuracy and test coverage
 
-`tests/Candela.Rendering.Vulkan.Tests` (191 tests, about 1.5 minutes on lavapipe once the SPIR-V cache is warm;
+`tests/Candela.Rendering.Vulkan.Tests` (215 tests, about 2.5 minutes on lavapipe once the SPIR-V cache is warm;
 `xunit.runner.json` limits parallelism to two tests because lavapipe renders on the CPU) runs every test with the
 validation layer and synchronization validation and asserts **zero validation errors**, including leak reports at
 shutdown. Tests are skipped with a message when no Vulkan device exists. Images are 160 × 120 … 320 × 240.
@@ -734,13 +734,16 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `RobustnessTests` | NaN / out-of-range settings, lights and atmosphere grids (empty, short, beyond the 3D image limit, NaN, infinite, null) in every view and overlay; 1000 shadow-casting lights with every feature (256 tiles, ≤ 256 VPLs); 2 Mcd into the camera through dense haze stays below the half-float limit and finite |
 | `MemoryTests` | alignment, free-list reuse and coalescing, granularity, dedicated allocations |
 | `SwapchainTests` | headless surface: acquire/present, resize, minimise, misuse errors, ImGui handoff state |
-| `PathTracerPhotometryTests` | path tracer: 10 000 cd (50°/80° wash) at 5 m onto a white Lambertian floor — the centre within 3 % of ρE/π, 30° off axis within 5 % |
-| `PathTracerFurnaceTests` | white furnace (surroundings of 1 cd/m²): a Lambertian sphere of albedo 1 shows exactly the background (0.999–1.005); white plastic, rough white metal and a mirror lose a little at grazing angles but never exceed it (brightest 4 × 4 block ≤ 1.03); a 4 m cube of scattering-only smoke of optical depth 4 and a room-sized haze, with up to 64 scattering events, vanish (3 %) |
-| `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %; measured 2 %, the bilinear gobo edge); smoke through the density grid scatters like haze of the same coefficient (4 %; measured 1.7 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01) |
+| `PathTracerPhotometryTests` | path tracer: 10 000 cd (50°/80° wash) at 5 m onto a white Lambertian floor — the centre within 3 % of ρE/π, 30° off axis within 5 %; microscopic lenses (0, 10⁻²⁵, 10⁻⁹ m) light like a point; a lens seen from its beam (on axis and 10° off) has the luminance I(θ)/(A cos θ_y) (1 %); a weak glow lens a millimetre in front of a strong lens does not hide it (the camera sees the sum, 1 %; a glossy floor under both gets the sum of each alone, 3 %); a translucent white floor (transmission ½ and 0.9) reflects (1 − t)·ρE/π (4 %) |
+| `PathTracerLensTests` | soft lights (35 cm lenses) over a Lambertian and a glossy metal floor: the lens integral of the BRDF over both lens polygons (3 % / 5 %: the multiple importance sampling and its light-selection weights); the glossy reflection of a soft light is not dimmed by a wall without `CastShadow` (3 %) and blocked by a casting one; behind see-through screens it is dimmed by their transmittance — a half-transparent shadow caster (1 − α)² (5 %), clear glass that casts shadows (1 − F)² (4 %), screens without `CastShadow` or in front of a light without shadows not at all (4 %) |
+| `PathTracerBeamProbeTests` | a camera inside a narrow beam aimed at it (strongly forward-scattering haze, rays passing close to the light) and a prism splitting a beam into facets, against the numerical integral of σ·HG·I/d²·T over the view rays |
+| `PathTracerEmitterTests` | an emissive panel lights a white floor with the illuminance of its luminance and form factor (found by BSDF samples only) |
+| `PathTracerFurnaceTests` | white furnace (surroundings of 1 cd/m²): a Lambertian sphere of albedo 1 shows exactly the background (0.999–1.005); white plastic, rough white metal, a mirror, a white translucent screen and clear glass lose a little at grazing angles but never exceed it (brightest 4 × 4 block ≤ 1.03); a 4 m cube of scattering-only smoke of optical depth 4 and a room-sized haze, with up to 64 scattering events, vanish (3 %) |
+| `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %; measured 2 %, the bilinear gobo edge); smoke through the density grid scatters like haze of the same coefficient (4 %; measured 1.7 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01); 20 m of thin smoke in a grid whose majorant is set by one very dense cell dims a panel behind it by e^−0.5 (3 %, with and without a volume bounce) |
 | `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %); a plate in a beam shadows the floor only while it has `CastShadow`, and not at all for a light without `CastShadows` (3 %) |
-| `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; a device without ray query says "not supported on this GPU" |
+| `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; every result read before the first sample is a black image of the right size (denoised one included); every pixel gets exactly one sample per pass whatever the band size; advancing inside the caller's frames gives the same image as alone, keeps the time limit and allocates nothing in steady frames; a device without ray query says "not supported on this GPU" |
 | `PathTracerSceneTests` | the procedural stage in haze: finite and validation-clean, 16 samples at 240 × 180 within 2 minutes; writes `pt-stage-final.png` next to the real-time view |
-| `OpenExrTests` | bit-exact round trips for every compression and sample type (37 × 21: not a multiple of the 16-line ZIP blocks; long names), ZIP compresses smooth images, RGBA + layers, chromaticities and white luminance, damaged and tiled files rejected with `InvalidDataException`; the files were checked with the official OpenEXR library |
+| `OpenExrTests` | bit-exact round trips for every compression and sample type (37 × 21: not a multiple of the 16-line ZIP blocks; long names), ZIP compresses smooth images, RGBA + layers, chromaticities and white luminance, HALF channels hold no infinities or NaN (clamped to ±65 504), damaged and tiled files rejected with `InvalidDataException`; the files were checked with the official OpenEXR library |
 
 Regenerate golden images after an intentional visual change with
 `CANDELA_UPDATE_GOLDEN=1 dotnet test tests/Candela.Rendering.Vulkan.Tests` (optionally `--filter` a class) and inspect
@@ -922,11 +925,14 @@ off the pools, it lights the room. (`PathTracerSceneTests` renders the scene at 
   and the normal + view depth the denoiser uses. The camera, the settings and the **lights are fixed when the render
   starts** (a snapshot of the world's lights); geometry, materials and media are read as they are when samples are
   taken. Main thread only, like the renderer.
-* **Scheduling**: a pass is one sample for every pixel, split into bands of rows. The cost per row is measured and a
-  dispatch is planned to stay below 0.25 s (`MaxDispatchSeconds`; drivers reset a GPU that is stuck for about 2 s),
-  a submission below 0.5 s. `Advance` called while the caller records a frame adds one dispatch to that frame and
-  returns (the editor's frame loop); otherwise it submits and waits itself. With a time limit every submission ends at
-  a pass boundary, where the time is checked.
+* **Scheduling**: a pass is one sample for every pixel, split into bands of whole 8-row workgroups (the last band of
+  a pass may be shorter; the rows its last workgroup overhangs are not traced, so every pixel gets exactly one sample
+  per pass). The first bands hold about 64 000 pixels; then the cost per row is measured and a dispatch is planned to
+  stay below 0.25 s (`MaxDispatchSeconds`; drivers reset a GPU that is stuck for about 2 s), a submission below
+  0.5 s. `Advance` called while the caller records a frame adds one dispatch to that frame and returns (the editor's
+  frame loop; such frames allocate no managed memory, and the rendering time counted for a time limit is the
+  wall-clock time from one such call to the next, at most 0.5 s each); otherwise it submits and waits itself. With a
+  time limit every submission ends at a pass boundary, where the time is checked.
 * **Memory**: five RGBA32F images and one RGBA8 image of the output size (accumulation, albedo, normal + depth, two
   denoiser buffers, display: 84 bytes per pixel, 174 MB at 1920 × 1080), the light snapshot (one `GpuLight`, a box
   and a 16-gon per light, two small acceleration structures over them) and a TLAS; the BLAS per mesh, the geometry
@@ -945,7 +951,11 @@ lens (`SourceRadius`) is an area-preserving regular 16-gon 5 mm in front of the 
 so a camera or a mirror sees the lens with the luminance that carries exactly the light's intensity, and next-event
 estimation through a uniformly chosen lens point `y` gives `I(θ_c)/|x − c|²` times the visibility of `y` — soft
 shadows the size of the lens. Shadow rays stop `LensClearance` (0.1 m, the real-time shadow near plane) before the
-lens, so the fixture's own housing never shadows its beam. As in the real-time view only instances with
+lens, so the fixture's own housing never shadows its beam — and camera and BSDF rays likewise see a lens through the
+surfaces within that clearance in front of it (a lens mesh or a front rim that stands out of the fixture). Lenses are
+**emitters, not occluders**: a ray adds the lens's luminance and goes on behind it, so the overlapping lenses of a
+fixture's beams add up (on Фокина's panels a weak Glow beam's lens lies a millimetre in front of the cells' lenses
+and used to hide them) and shadow rays pass lenses too. Lenses below 10 µm (`MinLensRadius`) are points. As in the real-time view only instances with
 `InstanceFlags.CastShadow` block light (a separate cull-mask bit of the TLAS, `RayTracingScene.ShadowCasterMask`), and
 lights without `CastShadows` — fixtures whose `CastShadow` is off, the engine's flame light samples — are not shadowed
 at all.
@@ -955,8 +965,16 @@ a ray query against an acceleration structure of the lights' cone boxes (procedu
 returns the candidates whose cone contains the point. The weight is the size (mean of the colour channels, so deep
 blue and red lights are not under-sampled) of the unshadowed contribution (`I/d²` × BRDF × cos, the BRDF part floored
 so every reaching light keeps a chance), so a pool of one wash under 300 other lights is sampled almost only from that
-wash. Lenses hit by BSDF samples (a mirror, a glossy floor) are weighted
-against the light selection by the power heuristic (multiple importance sampling).
+wash. Each light's box is reported once per query (`NO_DUPLICATE_ANY_HIT` on the box geometry), so no light is
+weighted twice. Lenses hit by BSDF samples (a mirror, a glossy floor) are weighted against the light selection by
+the power heuristic (multiple importance sampling). The two estimators must see the same light, so where the shadow
+ray does not account for what stops or dims a BSDF sample — a surface without `CastShadow`, a light without
+`CastShadows` — next-event estimation takes the light alone (weight 1) and a BSDF sample that still reaches the lens
+through such a transmissive surface counts 0, while half-transparent and transmissive shadow casters, whose
+transmittance is in the shadow ray, are shared; a BSDF share below 10⁻⁴ of the light's is left to next-event
+estimation too (`PathTracerLensTests`: a glossy floor under overlapping soft lights within 5 % of the lens integral,
+and its reflection of a soft light behind non-casting walls, half-transparent and glass screens within 5 % of the
+transmittance — before the fixes a half-transparent shadow caster let 12 % too much through).
 
 ### Surfaces
 
@@ -965,7 +983,9 @@ Lambert weighted by 1 − F; metal/rough; normal maps; emission), sampled by lob
 cosine-weighted diffuse — with probabilities from the lobes' albedos at the view angle. Thin-walled **transmission**
 (glass, gels, `MaterialData.Transmission`) is a third lobe straight through the surface with weight
 (1 − F) · transmission · tint; shadow rays through it are tinted the same way, so a red gel colours the light under it
-(test: within 5 % of (1 − F)² · colour² seen through it). Alpha-masked and blended surfaces are crossed
+(test: within 5 % of (1 − F)² · colour² seen through it). Next-event estimation runs at every surface vertex whichever
+lobe the path goes on with, so a translucent screen reflects its whole share 1 − t of the direct light (it reflected
+only (1 − t)·(1 − p_transmission) of it before: half at t = ½, a tenth at t = 0.9). Alpha-masked and blended surfaces are crossed
 stochastically (and pass 1 − α of the light to shadow rays). Emissive surfaces (LED walls, screens) emit their
 luminance and light the scene through the paths that hit them. Reference drawings show their display-referred base
 colour to the camera only, as in the real-time view. Russian roulette after the third scattering vertex, by the path throughput.
@@ -991,7 +1011,11 @@ real-time LUT), all with the Henyey–Greenstein phase function of `AtmosphereSt
   the real-time beams 2.9 % and 1.9 % above it).
 * **Multiple scattering**: free-flight sampling (delta tracking against the majorant of haze + smoke + flame on the
   segment) continues the path from a real scattering event in a direction drawn from the phase function, up to
-  `MaxVolumeBounces` events; segments that may not scatter any more use ratio tracking. A haze or smoke that only
+  `MaxVolumeBounces` events; segments that may not scatter any more use ratio tracking (with Russian roulette below a
+  transmittance of 0.02). The smoke majorant is the grid's densest cell, so thin smoke in a grid with a dense cell (a
+  fog nozzle) takes majorant × length tentative collisions; the loops stop only where the ray leaves the media (a
+  safety bound of 16 384 collisions — 512 before, which let light through the rest of a long ray:
+  `SparseDenseSmokeDimsTheViewAlongItsWholeLength`, 88 instead of 61 cd/m² through 20 m of smoke). A haze or smoke that only
   scatters is invisible in a white furnace (energy is conserved), and each order of scattering adds less light than
   the one before.
 * **Flames** absorb (expected-value absorption, `beta *= 1 − σa/σ̄` at each tentative collision) and emit; their
@@ -1021,7 +1045,10 @@ real-time meter. There is no bloom in the final render.
 
 `OpenExr` (`Diagnostics/OpenExr.cs`) writes and reads single-part scanline OpenEXR 2 images (no compression, ZIPS or
 ZIP with the format's byte reordering and predictor through `ZLibStream`; HALF, FLOAT, UINT channels; layer names;
-`chromaticities` and `whiteLuminance` attributes) — files the official OpenEXR library reads. `candela render --final
+`chromaticities` and `whiteLuminance` attributes) — files the official OpenEXR library reads (checked again in the
+review with its Python bindings: every compression, FLOAT, HALF and UINT channels, layers and attributes bit-exact).
+HALF channels hold ±65 504 at most (a brighter value, e.g. a lens, is written as 65 504, NaN as 0), so the CLI writes the
+result as FLOAT. `candela render --final
 --exr` writes R, G, B, A (float, linear Rec.2020, scaled by the PNG's exposure; `whiteLuminance` = 1 / exposure turns
 the values back into cd/m²), `raw.*` (with `--denoise`), `albedo.*`, `N.*` (world normal) and `Z` (view depth, m).
 
@@ -1073,6 +1100,13 @@ hardware ray tracing is two to three orders of magnitude faster.
 * Single graphics+compute queue; uploads and rendering share it (no async compute/transfer yet).
 * **Path tracer**:
   * The lights are a snapshot taken when the render starts (a sequence starts one render per frame).
+  * Lenses of two beams that coincide (same position and direction, a few µm apart at most) are seen as one by camera
+    and BSDF rays (each still lights the scene fully through next-event estimation); Фокина has none.
+  * The work light (`--work-light on`) is drawn like any light: its lenses (0.5 m and 1 m discs, 2.5 scene radii
+    away) are visible and its ambient lights scatter in haze; the real-time view shows neither.
+  * Tracking cost grows with the smoke grid's densest cell (one global majorant, no macro-cell grid); multiple
+    scattering in haze leaves speckles at a few samples (one light sample per segment after the first scattering
+    event) — `--clamp` or more samples.
   * Emissive surfaces (LED walls, screens) are found by the paths that hit them, not by next-event estimation: small,
     bright emitters converge slowly. Lens glow set with `SetInstanceEmission` is not used; the lens polygons are what
     rays see of a fixture.
