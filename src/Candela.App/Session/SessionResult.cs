@@ -27,6 +27,9 @@ internal readonly record struct SessionResult(SessionOutcome Outcome, string Mes
     /// <summary>Warnings the operation found (listed in the issues panel).</summary>
     public int Warnings { get; init; }
 
+    /// <summary>Entities the operation created (an imported model or image, a merged group).</summary>
+    public IReadOnlyList<Guid> Entities { get; init; } = Array.Empty<Guid>();
+
     /// <summary>A successful result.</summary>
     public static SessionResult Done(string message) => new(SessionOutcome.Done, message);
 

@@ -486,7 +486,7 @@ internal sealed class EditorSession : IDisposable
 
         if (errors > 0 || warnings > 0)
             message += " · " + Loc.Format(Str.MsgIssueCounts, errors, warnings);
-        return SessionResult.Done(message) with { Errors = errors, Warnings = warnings };
+        return SessionResult.Done(message) with { Errors = errors, Warnings = warnings, Entities = result.Entities };
     }
 
     private SessionResult Failed(EngineResult result)

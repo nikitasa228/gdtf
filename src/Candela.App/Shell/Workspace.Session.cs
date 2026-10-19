@@ -38,6 +38,7 @@ internal sealed partial class Workspace
     private bool _recoveryChecked;
     private bool _frameScenePending;
     private bool _framedOnce;
+    private Vector2 _lastDropPosition;
     private int _frameSceneAttempts;
 
     /// <summary>The session dialogs (tests and scripts).</summary>
@@ -249,7 +250,10 @@ internal sealed partial class Workspace
         });
     }
 
-    /// <summary>Imports a file into the scene (models and images at <paramref name="placement"/>, default the origin).</summary>
+    /// <summary>
+    /// Imports a file into the scene (models and images at <paramref name="placement"/>, default the origin). An image
+    /// comes in as a reference drawing; the popup that follows offers to make it a poster.
+    /// </summary>
     internal void ImportFile(string path, ImportKind kind, Transform? placement = null)
     {
         var options = new EngineImportOptions
@@ -257,10 +261,15 @@ internal sealed partial class Workspace
             Placement = placement ?? Transform.Identity,
             ImageMode = ImageMode.Reference,
         };
+        var at = ImGui.GetIO().MousePos;
         RunBusy(Loc.Format(Str.BusyImporting, Path.GetFileName(path)), () => _ctx.Session.Import(path, kind, options), result =>
         {
-            if (result.Succeeded && kind is ImportKind.Model or ImportKind.Image)
+            if (!result.Succeeded)
+                return;
+            if (kind is ImportKind.Model or ImportKind.Image)
                 _library.RememberModel(path);
+            if (kind == ImportKind.Image && result.Entities.Count == 1)
+                ShowImagePopup(result.Entities[0], at);
         });
     }
 
@@ -335,6 +344,7 @@ internal sealed partial class Workspace
 
     private void HandleDrop(FileDrop drop)
     {
+        _lastDropPosition = drop.Position;
         var screen = ImGui.GetMainViewport().Pos + drop.Position;
         var target = ViewportAt(screen);
         var files = drop.Paths.Where(p => !string.IsNullOrWhiteSpace(p)).Select(Path.GetFullPath).Distinct(StringComparer.Ordinal).ToList();
@@ -388,6 +398,8 @@ internal sealed partial class Workspace
             var at = PlacementFor(kind, hit);
             at.Position += offset;
             last = _ctx.Session.Import(file, kind, new EngineImportOptions { Placement = at });
+            if (last.Succeeded && files.Count == 1 && kind == ImportKind.Image && last.Entities.Count == 1)
+                ShowImagePopup(last.Entities[0], ImGui.GetMainViewport().Pos + _lastDropPosition);
             if (last.Succeeded)
             {
                 imported++;

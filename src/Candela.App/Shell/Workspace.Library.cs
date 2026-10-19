@@ -5,6 +5,7 @@ using Candela.App.Panels;
 using Candela.App.Session;
 using Candela.App.Ui;
 using Candela.Core.Settings;
+using Candela.Core.Editing;
 using Candela.Core.SceneGraph.Components;
 using Candela.Gdtf;
 using Hexa.NET.ImGui;
@@ -19,6 +20,7 @@ internal sealed partial class Workspace : ILibraryHost
 {
     private const string PlacementPopupId = "###placement";
     private Guid _placedFixture;
+    private Guid _placedImage;
     private FixtureLibraryEntry? _placedEntry;
     private Vector2 _placedAt;
     private bool _openPlacementPopup;
@@ -108,6 +110,7 @@ internal sealed partial class Workspace : ILibraryHost
             if (info is { Modes.Count: > 1 })
             {
                 _placedFixture = entity.Id;
+                _placedImage = Guid.Empty;
                 _placedEntry = entry;
                 _placedAt = screen;
                 _openPlacementPopup = true;
@@ -123,7 +126,17 @@ internal sealed partial class Workspace : ILibraryHost
         }
     }
 
-    /// <summary>Draws the popup that lets the user pick the DMX mode of a fixture just dropped.</summary>
+    /// <summary>Opens the popup that lets the user choose between reference drawing and poster for an image just placed.</summary>
+    private void ShowImagePopup(Guid image, Vector2 screen)
+    {
+        _placedImage = image;
+        _placedFixture = Guid.Empty;
+        _placedEntry = null;
+        _placedAt = screen;
+        _openPlacementPopup = true;
+    }
+
+    /// <summary>Draws the popup that lets the user pick the DMX mode of a fixture (or the kind of an image) just dropped.</summary>
     private void DrawPlacementPopupGuarded()
     {
         if (_drawPlacementPopup is not null && !_guard.Run("placement popup", _drawPlacementPopup))
@@ -142,6 +155,13 @@ internal sealed partial class Workspace : ILibraryHost
         if (!ImGui.BeginPopup(PlacementPopupId, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings))
             return;
         var session = _ctx.Session;
+        if (_placedImage != Guid.Empty)
+        {
+            DrawImagePlacement(session);
+            ImGui.EndPopup();
+            return;
+        }
+
         var entity = session.Scene.Find(_placedFixture);
         var fixture = entity?.Get<FixtureComponent>();
         var info = _placedEntry is { } entry ? _library.FixtureInfo?.Get(entry) : null;
@@ -179,6 +199,35 @@ internal sealed partial class Workspace : ILibraryHost
         if (ImGui.Button(Loc.Get(Str.MsgOk), new Vector2(110f * scale, 0f)) || ImGui.IsKeyPressed(ImGuiKey.Enter, false))
             ImGui.CloseCurrentPopup();
         ImGui.EndPopup();
+    }
+
+    private void DrawImagePlacement(EditorSession session)
+    {
+        var entity = session.Scene.Find(_placedImage);
+        if (entity?.Get<ImageComponent>() is not { } image)
+        {
+            ImGui.CloseCurrentPopup();
+            return;
+        }
+
+        ImGui.TextColored(Theme.Accent, $"{Icons.Image}  {entity.Name}");
+        ImGui.Separator();
+        ImGui.TextDisabled(Loc.Get(Str.PlaceImageMode));
+        if (ImGui.RadioButton(Loc.Get(Str.PlaceReference), image.Mode == ImageMode.Reference) && image.Mode != ImageMode.Reference)
+            session.Undo.Execute(ModifyComponentCommand.Create(image, i => i.Mode = ImageMode.Reference, Loc.English_(Str.PlaceReference)));
+        if (ImGui.RadioButton(Loc.Get(Str.PlacePoster), image.Mode == ImageMode.Poster) && image.Mode != ImageMode.Poster)
+        {
+            // A poster is a printed surface: opaque, lit by the stage light.
+            session.Undo.Execute(ModifyComponentCommand.Create(image, i =>
+            {
+                i.Mode = ImageMode.Poster;
+                i.Opacity = 1f;
+            }, Loc.English_(Str.PlacePoster)));
+        }
+
+        ImGui.Spacing();
+        if (ImGui.Button(Loc.Get(Str.MsgOk), new Vector2(110f * _frameScale, 0f)) || ImGui.IsKeyPressed(ImGuiKey.Enter, false))
+            ImGui.CloseCurrentPopup();
     }
 
     /// <summary>The fixture whose mode popup is open (tests and scripts), or empty.</summary>
