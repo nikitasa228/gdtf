@@ -469,7 +469,9 @@ internal static class Loc
         (Str.MsgWallCreated, "Wall {0} × {1} m", "Стена {0} × {1} м"),
         (Str.MsgFloorCreated, "Floor {0} × {1} m", "Пол {0} × {1} м"),
         (Str.WallSize, "{0} × {1} m", "{0} × {1} м"),
+        (Str.LibFileMissing, "file missing", "файл не найден"),
         // (end of engine integration strings)
+
 
         (Str.MaterialPaintedWallWhite, "Painted wall, white", "Окрашенная стена, белая"),
         (Str.MaterialPaintedWallBlack, "Painted wall, black", "Окрашенная стена, чёрная"),

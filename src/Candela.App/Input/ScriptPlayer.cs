@@ -38,6 +38,12 @@ internal interface IScriptTarget
     /// <summary>Resizes the main window (screen pixels) or sets its state ("minimize", "restore", "maximize").</summary>
     void SetMainWindow(int width, int height, string state);
 
+    /// <summary>Opens a scene or project (asks about unsaved changes like File → Open).</summary>
+    void OpenFile(string path);
+
+    /// <summary>Drops files onto the main window at <paramref name="position"/> (main-window pixels), like a file manager.</summary>
+    void DropFiles(IReadOnlyList<string> paths, Vector2 position);
+
     /// <summary>The main window (for marking the cursor as inside it).</summary>
     Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr MainWindow { get; }
 }
@@ -173,6 +179,12 @@ internal sealed class ScriptPlayer
                 break;
             case ScriptActionType.Window:
                 target.SetMainWindow((int)a.Width, (int)a.Height, a.Value);
+                break;
+            case ScriptActionType.Open:
+                target.OpenFile(Path.GetFullPath(a.Text));
+                break;
+            case ScriptActionType.Drop:
+                target.DropFiles((a.Names.Count > 0 ? a.Names : new[] { a.Text }).Select(Path.GetFullPath).ToList(), new Vector2(a.X, a.Y));
                 break;
         }
     }

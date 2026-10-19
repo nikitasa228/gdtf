@@ -1,0 +1,154 @@
+using Candela.Core.Geometry;
+using Hexa.NET.ImGui;
+using Hexa.NET.ImGui.Backends.Vulkan;
+
+namespace Candela.App.Thumbnails;
+
+/// <summary>
+/// A small RGBA8 picture shown by Dear ImGui (a library thumbnail, a frame of a hover preview). The pixels are handed to
+/// Dear ImGui as a registered user texture; the renderer backend creates and uploads the GPU image the first time it is
+/// drawn, so creating one never touches the GPU directly. Released through <see cref="UiTextures.Release"/>.
+/// </summary>
+internal sealed unsafe class UiTexture
+{
+    internal UiTexture(ImTextureData* data, int width, int height)
+    {
+        Data = data;
+        Width = width;
+        Height = height;
+    }
+
+    /// <summary>Width in pixels.</summary>
+    public int Width { get; }
+
+    /// <summary>Height in pixels.</summary>
+    public int Height { get; }
+
+    /// <summary>The reference for <c>ImGui.Image</c> / <c>ImDrawList.AddImage</c> (valid until released).</summary>
+    public ImTextureRef Ref => new(Data, default);
+
+    /// <summary>True once released (must not be drawn any more).</summary>
+    public bool IsReleased => Data == null;
+
+    internal ImTextureData* Data { get; set; }
+}
+
+/// <summary>
+/// Creates and releases <see cref="UiTexture"/>s. Textures are registered with Dear ImGui 1.92's texture system
+/// (<c>RegisterUserTexture</c>): the Vulkan backend uploads them during the next frame and destroys them only after the
+/// frames that may still sample them have finished (<c>UnusedFrames</c>), so releasing one in the middle of a frame is
+/// safe. Without a renderer that manages textures (headless tests) <see cref="IsAvailable"/> is false and nothing is
+/// created. Main thread only.
+/// </summary>
+internal sealed unsafe class UiTextures : IDisposable
+{
+    private readonly List<nint> _live = new();
+    private readonly List<nint> _releasing = new();
+    private bool _disposed;
+
+    /// <summary>True when the current Dear ImGui backend can create user textures.</summary>
+    public static bool IsAvailable =>
+        !ImGui.GetCurrentContext().IsNull && (ImGui.GetIO().BackendFlags & ImGuiBackendFlags.RendererHasTextures) != 0;
+
+    /// <summary>Number of textures alive (created, not yet destroyed).</summary>
+    public int Count => _live.Count;
+
+    /// <summary>
+    /// A texture with the pixels of <paramref name="image"/> (RGBA8), or null when no texture can be created (headless,
+    /// another pixel format, an empty or oversized image).
+    /// </summary>
+    public UiTexture? Create(ImageData image)
+    {
+        ArgumentNullException.ThrowIfNull(image);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!IsAvailable || image.Format != PixelFormat.Rgba8 || image.Width <= 0 || image.Height <= 0 || image.Width > 4096 || image.Height > 4096 ||
+            image.Pixels.Length < (long)image.Width * image.Height * 4)
+            return null;
+        ImTextureDataPtr tex = ImGui.ImTextureData();
+        tex.Create(ImTextureFormat.Rgba32, image.Width, image.Height);
+        byte* pixels = (byte*)tex.GetPixels();
+        if (pixels == null)
+        {
+            ImGui.Destroy(tex);
+            return null;
+        }
+
+        fixed (byte* source = image.Pixels)
+            Buffer.MemoryCopy(source, pixels, (long)image.Width * image.Height * 4, (long)image.Width * image.Height * 4);
+        tex.UseColors = true;
+        tex.Status = ImTextureStatus.WantCreate;
+        ImGuiP.RegisterUserTexture(tex);
+        _live.Add((nint)tex.Handle);
+        return new UiTexture(tex.Handle, image.Width, image.Height);
+    }
+
+    /// <summary>Releases a texture: the backend destroys it once no frame in flight uses it.</summary>
+    public void Release(UiTexture? texture)
+    {
+        if (texture is null || texture.IsReleased)
+            return;
+        var data = texture.Data;
+        texture.Data = null;
+        _live.Remove((nint)data);
+        if (_disposed)
+            return;
+        if (data->Status == ImTextureStatus.WantCreate || data->Status == ImTextureStatus.Destroyed)
+        {
+            // Never uploaded (or already gone): nothing on the GPU to wait for.
+            Free(data);
+            return;
+        }
+
+        data->Status = ImTextureStatus.WantDestroy;
+        _releasing.Add((nint)data);
+    }
+
+    /// <summary>
+    /// Per-frame housekeeping (UI thread, any time): frees the textures the backend has destroyed. The CPU copy of the
+    /// pixels is kept while a texture lives (a backend that recreates its device objects uploads it again).
+    /// </summary>
+    public void Update()
+    {
+        for (int i = _releasing.Count - 1; i >= 0; i--)
+        {
+            var data = (ImTextureData*)_releasing[i];
+            if (data->Status != ImTextureStatus.Destroyed)
+                continue;
+            _releasing.RemoveAt(i);
+            Free(data);
+        }
+    }
+
+    /// <summary>
+    /// Destroys every texture now (the GPU must be idle and the backend alive: called before the Dear ImGui backend shuts
+    /// down).
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+        _disposed = true;
+        foreach (var handle in _live.Concat(_releasing))
+        {
+            var data = (ImTextureData*)handle;
+            if (data->Status is ImTextureStatus.Ok or ImTextureStatus.WantUpdates or ImTextureStatus.WantDestroy && data->TexID != new ImTextureID(0UL))
+            {
+                data->Status = ImTextureStatus.WantDestroy;
+                data->UnusedFrames = int.MaxValue / 2;
+                ImGuiImplVulkan.UpdateTexture(data);
+            }
+
+            Free(data);
+        }
+
+        _live.Clear();
+        _releasing.Clear();
+    }
+
+    private static void Free(ImTextureData* data)
+    {
+        if (data->RefCount > 0)
+            ImGuiP.UnregisterUserTexture(data);
+        ImGui.Destroy(data);
+    }
+}

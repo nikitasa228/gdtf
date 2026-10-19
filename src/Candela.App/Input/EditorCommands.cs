@@ -72,6 +72,7 @@ internal static class AppActions
         Add(ToggleSpace, new KeyChord("X", KeyModifiers.Alt));
         Add(Shortcuts, new KeyChord("F1"));
         Add(Exit, new KeyChord("Q", c));
+        SessionActions.AddDefaults(set);
     }
 }
 

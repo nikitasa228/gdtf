@@ -2,11 +2,13 @@ using System.Globalization;
 using System.Numerics;
 using Candela.App.Docking;
 using Candela.App.Editing;
+using Candela.App.Panels;
 using Candela.App.Shell;
 using Candela.App.Ui;
 using Candela.Core.Editing;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
+using Candela.Gdtf;
 using Candela.Rendering;
 using Candela.Rendering.Vulkan;
 using Hexa.NET.ImGui;
@@ -66,6 +68,18 @@ internal interface IViewportHost
 
     /// <summary>Opens and focuses the real-time quality settings of the viewports (the Preview panel).</summary>
     void ShowViewportSettings();
+
+    /// <summary>The library item being dragged (null when none).</summary>
+    LibraryItem? DraggedLibraryItem { get; }
+
+    /// <summary>Modes and size of a fixture type (null while they are being read).</summary>
+    FixtureInfo? FixtureInfoOf(FixtureLibraryEntry entry);
+
+    /// <summary>One line describing where a dragged item would go ("Robin T1 · Mode 1 · 1.001").</summary>
+    string DropLabel(LibraryItem item);
+
+    /// <summary>Places a library item dropped on <paramref name="hit"/> (<paramref name="screen"/>: where the mouse was released).</summary>
+    void PlaceLibraryItem(LibraryItem item, SurfaceHit hit, Vector2 screen);
 }
 
 /// <summary>
@@ -76,7 +90,7 @@ internal interface IViewportHost
 /// view cube that snaps to the six orthographic views; click / Shift+click / box selection through the renderer's pick
 /// buffer; and ImGuizmo move / rotate gizmos with snapping, every drag one undo step.
 /// </summary>
-internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
+internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
 {
     private const float ToolbarAlpha = 0.82f;
     private readonly WorkspaceContext _ctx;
@@ -392,6 +406,7 @@ internal sealed unsafe class ViewportPanel : Panel, IViewportVisibility
         DrawStats(drawList);
         HandleInput(hovered, overOverlay);
         DrawBoxSelection(drawList);
+        HandleLibraryDrop(drawList);
     }
 
     private void EnsureTarget(Vector2 size)
