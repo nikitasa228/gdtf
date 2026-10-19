@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- A GUI program on Windows (no console window; the editor attaches to the console it was started from for
-         `--help`, usage errors and `--screenshot`); the same as Exe elsewhere. -->
+    <!-- A GUI program on Windows (no console window; the editor attaches to the console it was started from to print
+         its usage, command-line errors and headless screenshot runs); the same as Exe elsewhere. -->
     <OutputType>WinExe</OutputType>
     <!-- The editor is started as `candela-app`. -->
     <AssemblyName>candela-app</AssemblyName>

@@ -129,6 +129,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         RegisterCommands();
         InitializeSession();
         InitializeCabling();
+        InitializeInstall();
         RestoreStartupLayout();
         _activeViewport = _viewports[0];
         _onLanguageChanged = () => _title = "";
@@ -206,6 +207,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             _about.IsOpen = false;
         if (!_guard.Run("keyboard shortcuts", _drawShortcuts))
             _shortcuts.IsOpen = false;
+        DrawLibrarySetup();
         if (!_guard.Run("file dialog", _drawBrowser))
         {
             _browser.Cancel();
@@ -289,6 +291,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         Loc.LanguageChanged -= _onLanguageChanged;
         DisposeCabling();
         DisposeSession();
+        DisposeInstall();
         _library.Dispose();
         foreach (var viewport in _viewports)
             viewport.ReleaseTarget();
@@ -851,23 +854,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
     private void OpenDocsFolder()
     {
-        string? docs = null;
-        foreach (var start in new[] { AppContext.BaseDirectory, Environment.CurrentDirectory })
-        {
-            for (var dir = new DirectoryInfo(start); dir is not null; dir = dir.Parent)
-            {
-                string candidate = Path.Combine(dir.FullName, "docs");
-                if (File.Exists(Path.Combine(candidate, "editor.md")))
-                {
-                    docs = candidate;
-                    break;
-                }
-            }
-
-            if (docs is not null)
-                break;
-        }
-
+        // The installed copy's docs folder, else the repository's (InstallLayout's lookup order).
+        string? docs = _ctx.Session.Layout.DocsFolder;
         if (docs is null)
         {
             _messages.Show(MessageKind.Warning, Loc.Get(Str.HelpDocs), Loc.Get(Str.StatusDocsMissing));

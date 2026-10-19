@@ -64,6 +64,7 @@ internal sealed class EditorApplication : IDisposable
         int startup = Start();
         if (startup != ExitCodes.Ok)
             return startup;
+        Started = true;
         Loop();
         // Only a run that ended normally (the window closed after the unsaved-changes question) deletes the recovery
         // files; a run the frame loop gave up on keeps them for the next start.
@@ -71,6 +72,12 @@ internal sealed class EditorApplication : IDisposable
             _session?.EndCleanly();
         return _exitCode;
     }
+
+    /// <summary>True once start-up finished (window, GPU, UI and session ready) and the frame loop began.</summary>
+    public bool Started { get; private set; }
+
+    /// <summary>Why the run ended with <see cref="ExitCodes.Failure"/> (for the crash report), or null.</summary>
+    public string? FailureReason { get; private set; }
 
     /// <summary>Requests the loop to end after the current frame.</summary>
     public void RequestQuit() => _quitRequested = true;
@@ -117,6 +124,7 @@ internal sealed class EditorApplication : IDisposable
         if (!GlfwPlatform.Initialize(_log, out string glfwError))
         {
             _log.Error("Startup", glfwError);
+            FailureReason = glfwError;
             return ExitCodes.Failure;
         }
 
@@ -124,8 +132,11 @@ internal sealed class EditorApplication : IDisposable
         if (_window is null)
         {
             _log.Error("Startup", "The main window could not be created.");
+            FailureReason = "The main window could not be created.";
             return ExitCodes.Failure;
         }
+
+        WindowIcon.Apply(_window, _log);
 
         try
         {
@@ -222,7 +233,11 @@ internal sealed class EditorApplication : IDisposable
             if (frame >= targetFrames)
             {
                 if (!WriteCapture(_options.ScreenshotPath!))
+                {
                     _exitCode = ExitCodes.Failure;
+                    FailureReason = "The screenshot could not be written.";
+                }
+
                 break;
             }
 
@@ -230,6 +245,7 @@ internal sealed class EditorApplication : IDisposable
             {
                 _log.Error("Screenshot", "No frame could be presented for the screenshot.");
                 _exitCode = ExitCodes.Failure;
+                FailureReason = "No frame could be presented for the screenshot.";
                 break;
             }
         }
@@ -281,6 +297,7 @@ internal sealed class EditorApplication : IDisposable
             {
                 _log.Error("Frame", "Too many consecutive frame failures; the editor stops.");
                 _exitCode = ExitCodes.Failure;
+                FailureReason = $"Too many consecutive frame failures; the last one: {e.GetType().Name}: {e.Message}";
                 _quitRequested = true;
             }
 
