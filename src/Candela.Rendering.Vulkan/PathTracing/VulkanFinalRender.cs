@@ -33,7 +33,12 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
 
     /// <summary>Longest gap between two in-frame <see cref="Advance(TimeSpan, CancellationToken)"/> calls counted as rendering time, s.</summary>
     private const double MaxInFrameSeconds = 0.5;
-    private const int InitialPixelsPerDispatch = 1 << 18;
+
+    /// <summary>
+    /// Pixels of the first dispatches, before a cost is measured (and of every dispatch added to the caller's frames,
+    /// which are not timed): small enough that a heavy scene on a slow device stays well below a driver's reset timeout.
+    /// </summary>
+    private const int InitialPixelsPerDispatch = 1 << 16;
 
     private readonly VulkanRenderer _renderer;
     private readonly VulkanContext _context;
