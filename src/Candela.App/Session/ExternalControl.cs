@@ -147,6 +147,9 @@ internal sealed class ExternalControl : IDisposable
     private readonly bool[] _patchedSlots = new bool[DmxInputHub.SlotCount];
     private (Candela.Dmx.Patch? Patch, int Universe) _patchedSlotsOf;
     private string? _settingsPath;
+    private Func<string>? _messageSource;
+    private string? _message;
+    private string _messageLanguage = "";
     private bool _disposed;
 
     /// <summary>Creates the model with default settings (call <see cref="Load"/> to read the user's file).</summary>
@@ -161,8 +164,25 @@ internal sealed class ExternalControl : IDisposable
     /// <summary>False in headless runs: settings are not written.</summary>
     public bool CanSave { get; set; } = true;
 
-    /// <summary>The last message of an operation (error or confirmation), or null.</summary>
-    public string? Message { get; private set; }
+    /// <summary>
+    /// The last message of an operation (error or confirmation) in the current UI language, or null. The model keeps how
+    /// to build it, so a message reported before the language changed is shown in the new language.
+    /// </summary>
+    public string? Message
+    {
+        get
+        {
+            if (_messageSource is null)
+                return null;
+            if (!string.Equals(_messageLanguage, Loc.Language, StringComparison.Ordinal))
+            {
+                _messageLanguage = Loc.Language;
+                _message = _messageSource();
+            }
+
+            return _message;
+        }
+    }
 
     /// <summary>True when <see cref="Message"/> reports a problem.</summary>
     public bool MessageIsError { get; private set; }
@@ -363,7 +383,8 @@ internal sealed class ExternalControl : IDisposable
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or NotSupportedException)
         {
             Settings = new ExternalControlSettings();
-            Report(StageLoc.Format(StageStr.ExtSettingsDamaged, _settingsPath, e.Message), error: true);
+            string damaged = _settingsPath;
+            Report(() => StageLoc.Format(StageStr.ExtSettingsDamaged, damaged, e.Message), error: true);
         }
     }
 
@@ -382,7 +403,7 @@ internal sealed class ExternalControl : IDisposable
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            Report(StageLoc.Format(StageStr.ExtSettingsNotSaved, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtSettingsNotSaved, e.Message), error: true);
             return false;
         }
     }
@@ -414,7 +435,7 @@ internal sealed class ExternalControl : IDisposable
             return;
         if (enabled && !descriptor.CanStart)
         {
-            Report(StageLoc.Format(StageStr.ExtCannotStart, descriptor.DisplayName, descriptor.SupportReason), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtCannotStart, descriptor.DisplayName, StageLoc.ProtocolSupportReason(descriptor)), error: true);
             return;
         }
 
@@ -446,14 +467,14 @@ internal sealed class ExternalControl : IDisposable
                 if (status.State == ProtocolState.Error && Settings.Enabled.Contains(status.ProtocolId))
                 {
                     var descriptor = ProtocolRegistry.Find(status.ProtocolId);
-                    Report(StageLoc.Format(StageStr.ExtStartFailed, descriptor?.DisplayName ?? status.ProtocolId,
+                    Report(() => StageLoc.Format(StageStr.ExtStartFailed, descriptor?.DisplayName ?? status.ProtocolId,
                         ProtocolTexts.Localize(status.ErrorText ?? status.Text, descriptor)), error: true);
                 }
             }
         }
         catch (Exception e) when (e is ProtocolStartException or ArgumentException or InvalidOperationException)
         {
-            Report(e.Message, error: true);
+            Report(() => e.Message, error: true);
         }
 
         _lastPoll = double.NegativeInfinity;
@@ -586,7 +607,8 @@ internal sealed class ExternalControl : IDisposable
         StopTestPattern();
         if (EffectiveTestTarget(app) is not { } address)
         {
-            Report(StageLoc.Format(StageStr.ExtTestBadTarget, Settings.TestTarget), error: true);
+            string badTarget = Settings.TestTarget;
+            Report(() => StageLoc.Format(StageStr.ExtTestBadTarget, badTarget), error: true);
             return false;
         }
 
@@ -606,15 +628,17 @@ internal sealed class ExternalControl : IDisposable
 
             _testConsole = new ArtNetTestConsole(pattern, new IPEndPoint(address, Settings.ArtNetPort), app.ArtNetUniverseOffset);
             _testConsole.Start();
-            string target = viaInterface ? StageLoc.Format(StageStr.ExtTestTargetInterface, address) : Settings.TestTarget;
-            Report(StageLoc.Format(StageStr.ExtTestStarted, pattern.FixtureCount, ExternalControl.UniverseRanges(pattern.Universes), target),
-                error: false);
+            string testTarget = Settings.TestTarget;
+            string universes = ExternalControl.UniverseRanges(pattern.Universes);
+            int fixtures = pattern.FixtureCount;
+            Report(() => StageLoc.Format(StageStr.ExtTestStarted, fixtures, universes,
+                viaInterface ? StageLoc.Format(StageStr.ExtTestTargetInterface, address) : testTarget), error: false);
             return true;
         }
         catch (Exception e) when (e is System.Net.Sockets.SocketException or InvalidOperationException or ArgumentException or IOException)
         {
             StopTestPattern();
-            Report(StageLoc.Format(StageStr.ExtTestFailed, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtTestFailed, e.Message), error: true);
             return false;
         }
     }
@@ -634,7 +658,7 @@ internal sealed class ExternalControl : IDisposable
             return;
         string name = StageLoc.Format(StageStr.ExtRecordingName, DateTime.Now);
         engine.Recorder.Start(engine.Time, name);
-        Report(StageLoc.Get(StageStr.ExtRecordingStarted), error: false);
+        Report(() => StageLoc.Get(StageStr.ExtRecordingStarted), error: false);
     }
 
     /// <summary>Stops recording; the recording becomes <see cref="Recording"/>.</summary>
@@ -646,13 +670,13 @@ internal sealed class ExternalControl : IDisposable
         var recording = engine.Recorder.Stop();
         if (recording is null || recording.Frames.Count == 0)
         {
-            Report(StageLoc.Get(StageStr.ExtRecordingEmpty), error: true);
+            Report(() => StageLoc.Get(StageStr.ExtRecordingEmpty), error: true);
             return;
         }
 
         Recording = recording;
         RecordingPath = null;
-        Report(StageLoc.Format(StageStr.ExtRecordingStopped, recording.Frames.Count, recording.Duration), error: false);
+        Report(() => StageLoc.Format(StageStr.ExtRecordingStopped, recording.Frames.Count, recording.Duration), error: false);
     }
 
     /// <summary>Plays <see cref="Recording"/> into the hub from <paramref name="startSeconds"/>.</summary>
@@ -691,7 +715,7 @@ internal sealed class ExternalControl : IDisposable
         ArgumentNullException.ThrowIfNull(engine);
         if (Recording?.FindTimecode(timecode) is not { } seconds)
         {
-            Report(StageLoc.Format(StageStr.ExtTimecodeNotFound, timecode), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtTimecodeNotFound, timecode), error: true);
             return false;
         }
 
@@ -710,12 +734,12 @@ internal sealed class ExternalControl : IDisposable
                 path += DmxRecording.Extension;
             Recording.Save(path);
             RecordingPath = path;
-            Report(StageLoc.Format(StageStr.ExtRecordingSaved, path), error: false);
+            Report(() => StageLoc.Format(StageStr.ExtRecordingSaved, path), error: false);
             return true;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
         {
-            Report(StageLoc.Format(StageStr.ExtRecordingSaveFailed, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtRecordingSaveFailed, e.Message), error: true);
             return false;
         }
     }
@@ -728,14 +752,14 @@ internal sealed class ExternalControl : IDisposable
             var recording = DmxRecording.Load(path);
             Recording = recording;
             RecordingPath = path;
-            Report(recording.Issues.Count > 0
+            Report(() => recording.Issues.Count > 0
                 ? StageLoc.Format(StageStr.ExtRecordingLoadedDamaged, recording.Frames.Count, recording.Issues[0].Message)
                 : StageLoc.Format(StageStr.ExtRecordingLoaded, recording.Frames.Count, recording.Duration), error: recording.Issues.Count > 0);
             return true;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or NotSupportedException or ArgumentException)
         {
-            Report(StageLoc.Format(StageStr.ExtRecordingLoadFailed, e.Message), error: true);
+            Report(() => StageLoc.Format(StageStr.ExtRecordingLoadFailed, e.Message), error: true);
             return false;
         }
     }
@@ -764,11 +788,18 @@ internal sealed class ExternalControl : IDisposable
     }
 
     /// <summary>Clears the last message.</summary>
-    public void ClearMessage() => Message = null;
-
-    private void Report(string message, bool error)
+    public void ClearMessage()
     {
-        Message = message;
+        _messageSource = null;
+        _message = null;
+    }
+
+    /// <summary>Shows a message built by <paramref name="message"/> (built again when the UI language changes).</summary>
+    private void Report(Func<string> message, bool error)
+    {
+        _messageSource = message;
+        _messageLanguage = Loc.Language;
+        _message = message();
         MessageIsError = error;
     }
 

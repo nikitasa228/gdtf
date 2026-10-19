@@ -148,6 +148,11 @@ public sealed partial class ExternalControlFollowUpTests : IDisposable
         // The model's message and the details are Russian; the hint says what to do.
         Assert.True(model.MessageIsError);
         Assert.Contains("настроены на один и тот же UDP-порт", model.Message, StringComparison.Ordinal);
+        // A message reported in one language follows a later change of the UI language.
+        Loc.SetLanguage("en");
+        Assert.Contains("are both set to UDP port", model.Message, StringComparison.Ordinal);
+        Assert.Same(model.Message, model.Message); // built once per language, not per frame
+        Loc.SetLanguage("ru");
         var view = ExternalControlPanel.StatusView.Build(status, ProtocolRegistry.Find(status.ProtocolId));
         Assert.Contains($"UDP-порт {port}", view.Error, StringComparison.Ordinal);
         Assert.Contains(ProtocolTexts.ErrorHints[ProtocolErrorCode.PortConflict].Ru, view.Hint, StringComparison.Ordinal);
