@@ -12,6 +12,7 @@ public sealed class BeamProbeTests
     private const float Haze = 0.02f;
     private const float Anisotropy = 0.7f;
     private static readonly Vector3 LightPosition = new(0f, 0f, 4f);
+    private static readonly float Fov = float.Parse(Environment.GetEnvironmentVariable("PROBE_FOV") ?? "20", System.Globalization.CultureInfo.InvariantCulture);
 
     private readonly ITestOutputHelper _output;
 
@@ -146,6 +147,21 @@ public sealed class BeamProbeTests
                         hdr.LuminanceAt(Width / 2 - 1, Height / 2) + hdr.LuminanceAt(Width / 2, Height / 2));
     }
 
+    private float MeanCentre(VulkanRenderer renderer, RenderCamera camera, int frames, PreviewSettings settings)
+    {
+        using var target = renderer.CreateTarget(Width, Height);
+        double sum = 0;
+        for (int i = 0; i < frames; i++)
+        {
+            renderer.Render(target, camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, settings, 1f / 60f);
+            var hdr = renderer.ReadHdr(target);
+            sum += 0.25f * (hdr.LuminanceAt(Width / 2 - 1, Height / 2 - 1) + hdr.LuminanceAt(Width / 2, Height / 2 - 1) +
+                            hdr.LuminanceAt(Width / 2 - 1, Height / 2) + hdr.LuminanceAt(Width / 2, Height / 2));
+        }
+
+        return (float)(sum / frames);
+    }
+
     private double CentreReference(SpotLight light, RenderCamera camera, Func<Vector3, Vector3, int, double>? mod = null)
     {
         double sum = 0;
@@ -215,7 +231,10 @@ public sealed class BeamProbeTests
             // 4. Far-field narrow beam, gobos open in the centre / a ring.
             foreach (var (shape, name) in new (Func<float, float, bool>, string)[]
                      {
+                         ((u, v) => true, "open"),
+                         ((u, v) => u * u + v * v < 0.7f * 0.7f, "disc 0.7"),
                          ((u, v) => u * u + v * v < 0.45f * 0.45f, "centre disc"),
+                         ((u, v) => u * u + v * v < 0.25f * 0.25f, "disc 0.25"),
                          ((u, v) => u * u + v * v > 0.5f * 0.5f && u * u + v * v < 0.9f * 0.9f, "ring"),
                          ((u, v) => ((int)MathF.Floor((v + 1f) * 4f) & 1) == 0, "stripes"),
                      })
@@ -224,7 +243,7 @@ public sealed class BeamProbeTests
                 narrow.SourceRadius = 0f;
                 narrow.Gobo = renderer.World.CreateTexture(GoboFrom(shape), srgb: true);
                 renderer.World.SetLights(new[] { narrow });
-                var cam = RenderCamera.LookAt(new Vector3(0f, -3f, 2f), new Vector3(0f, 0f, 2f), 20f);
+                var cam = RenderCamera.LookAt(new Vector3(0f, -3f, 2f), new Vector3(0f, 0f, 2f), Fov);
                 cam.Ev100 = 2f;
                 var copy = narrow;
                 double Cookie(Vector3 x, Vector3 w, int k)
@@ -235,12 +254,34 @@ public sealed class BeamProbeTests
 
                 double expected = CentreReference(narrow, cam, Cookie);
                 Report($"far gobo {name} 1 frame", Centre(renderer, cam, 1, noTemporal, out _), expected);
+                Report($"far gobo {name} mean of 64 independent frames", MeanCentre(renderer, cam, 64, noTemporal), expected);
+                if (name == "disc 0.25")
+                {
+                    using var rt = renderer.CreateTarget(Width, Height);
+                    var acc = new double[Width];
+                    for (int f = 0; f < 32; f++)
+                    {
+                        renderer.Render(rt, cam, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, noTemporal, 1f / 60f);
+                        var hh = renderer.ReadHdr(rt);
+                        for (int x = 0; x < Width; x++)
+                            acc[x] += hh.LuminanceAt(x, Height / 2) / 32.0;
+                    }
+
+                    var sb = new System.Text.StringBuilder();
+                    for (int x = Width / 2 - 24; x < Width / 2 + 24; x += 2)
+                    {
+                        var (o, d) = BeamReference.PixelRay(cam, Width, Height, x, Height / 2);
+                        sb.Append($"{x}:{acc[x]:0.00}/{General(narrow, o, d, Haze, Anisotropy, 60, Cookie, 20000):0.00} ");
+                    }
+
+                    _output.WriteLine("row " + sb);
+                }
                 Report($"far gobo {name} 32 frames", Centre(renderer, cam, 32, temporal, out _), expected);
 
                 // Same in the near field (lens 8 cm): the crossing 1.5 m below the lens.
                 narrow.SourceRadius = 0.08f;
                 renderer.World.SetLights(new[] { narrow });
-                var camNear = RenderCamera.LookAt(new Vector3(0f, -3f, 2.5f), new Vector3(0f, 0f, 2.5f), 20f);
+                var camNear = RenderCamera.LookAt(new Vector3(0f, -3f, 2.5f), new Vector3(0f, 0f, 2.5f), Fov);
                 camNear.Ev100 = 2f;
                 copy = narrow;
                 double expectedNear = CentreReference(narrow, camNear, Cookie);
@@ -360,6 +401,61 @@ public sealed class BeamProbeTests
             }
 
             TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+}
+
+public sealed class BeamTableProbe
+{
+    private readonly ITestOutputHelper _output;
+
+    public BeamTableProbe(ITestOutputHelper output) => _output = output;
+
+    [Fact]
+    public void Print()
+    {
+        var light = StageScene.Spot(new Vector3(0, 0, 4), Vector3.Zero, 100000f, 6f, 9f, shadows: false, type: BeamType.Spot);
+        LightPacker.Pack(light, 0, out var l);
+        _output.WriteLine($"layer {l.BeamLayer} exponent {l.Exponent} cutoff {l.Cutoff} invHalfBeam {l.InvHalfBeam}");
+        for (double y = 0.1; y <= 1.0001; y += 0.1)
+            _output.WriteLine($"y {y:0.0}: table {BeamScatteringTable.Lookup(l.BeamLayer, 0, y):0.0000} integral {BeamScatteringTable.Integral(0, l.Exponent, 0, y):0.0000}");
+    }
+}
+
+public sealed class BeamDebugProbe
+{
+    private readonly ITestOutputHelper _output;
+
+    public BeamDebugProbe(ITestOutputHelper output) => _output = output;
+
+    [SkippableFact]
+    public void Channels()
+    {
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0.02f, Anisotropy = 0.7f });
+            var narrow = StageScene.Spot(new Vector3(0, 0, 4), Vector3.Zero, 100000f, 6f, 9f, shadows: false, type: BeamType.Spot);
+            narrow.SourceRadius = 0f;
+            var img = new ImageData { Width = 4, Height = 4, Pixels = Enumerable.Repeat((byte)255, 64).ToArray() };
+            narrow.Gobo = renderer.World.CreateTexture(img, srgb: true);
+            renderer.World.SetLights(new[] { narrow });
+            var cam = RenderCamera.LookAt(new Vector3(0f, -3f, 2f), new Vector3(0f, 0f, 2f), 10f);
+            cam.Ev100 = 2f;
+            using var target = renderer.CreateTarget(160, 120);
+            var sum = Vector3.Zero;
+            for (int i = 0; i < 64; i++)
+            {
+                renderer.Render(target, cam, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, new PreviewSettings { TemporalAccumulation = false, Bloom = false }, 1f / 60f);
+                var hdr = renderer.ReadHdr(target);
+                sum += hdr.At(80, 60) / 64f;
+            }
+
+            _output.WriteLine($"channels {sum.X:0.0000} {sum.Y:0.0000} {sum.Z:0.0000}  ratios {sum.Y / sum.X:0.0000} {sum.Z / sum.X:0.0000}");
         }
         finally
         {

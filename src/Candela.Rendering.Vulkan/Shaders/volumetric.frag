@@ -24,7 +24,7 @@ float viewDepthAt(ivec2 p)
 {
     p = clamp(p, ivec2(0), ivec2(frame.renderSize.xy) - 1);
     float depth = texelFetch(sceneDepth, p, 0).r;
-    return depth > 0.0 ? viewDepthOf(worldFromDepth((vec2(p) + 0.5) * frame.renderSize.zw, depth)) : frame.volumeDepth.y;
+    return depth > 0.0 ? viewDepthOf(worldFromDepth((vec2(p) + 0.5) * frame.renderSize.zw, depth)) : BEAM_BACKGROUND_DEPTH;
 }
 
 // Smaller of the two one-sided view-depth differences along one axis: the slope of the surface, not of an edge.
@@ -78,6 +78,7 @@ void main()
     float depth = texelFetch(sceneDepth, ivec2(gl_FragCoord.xy), 0).r;
     float viewDepth = depth > 0.0 ? viewDepthOf(worldFromDepth(uv, depth)) : frame.volumeDepth.y;
     vec4 fog = sampleIntegratedVolume(uv, viewDepth);
-    vec3 beams = frame.beamCount > 0u ? beamLight(viewDepth) : vec3(0.0);
+    // Beams over the background reach their own range (the froxel volume ends at its far depth).
+    vec3 beams = frame.beamCount > 0u ? beamLight(depth > 0.0 ? viewDepth : BEAM_BACKGROUND_DEPTH) : vec3(0.0);
     outColor = vec4(finiteLight(fog.rgb + beams), fog.a);
 }

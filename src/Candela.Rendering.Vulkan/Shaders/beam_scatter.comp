@@ -133,7 +133,14 @@ float shapeProfile(Light light, float theta)
 float viewTransmittance(BeamRay ray, float t)
 {
     if (ray.mediaVolume)
-        return sampleIntegratedVolume(ray.uv, ray.originDepth + t / ray.stretch).a;
+    {
+        // The froxel volume ends at its far depth; beyond it only the uniform haze dims the path.
+        float depth = ray.originDepth + t / ray.stretch;
+        float transmittance = sampleIntegratedVolume(ray.uv, depth).a;
+        float beyond = (depth - frame.volumeDepth.y) * ray.stretch;
+        return beyond > 0.0 && hasFeature(FEATURE_HAZE) ? transmittance * exp(-frame.media.x * beyond) : transmittance;
+    }
+
     return hasFeature(FEATURE_HAZE) ? exp(-frame.media.x * t) : 1.0;
 }
 
@@ -197,6 +204,63 @@ float smoothFactor(BeamRay ray, float phi, float D, float tc, float y, float ySc
            cos(0.5 * u);
 }
 
+// Iris factor of the profile at angle theta (rad) from the facet axis: 1 inside the soft start, 0 beyond the iris
+// (the factor beamProfile applies).
+float irisFactor(Light light, float theta)
+{
+    return theta > light.irisSoftStart ? 1.0 - smoothstep(light.irisSoftStart, light.irisAngle, theta) : 1.0;
+}
+
+// Angle from the facet axis (rad) at table coordinates (v, y): the chord scale x |(v, y)| as an arc.
+float tableAngle(float scale, float v, float y)
+{
+    return 2.0 * asin(min(0.5 * scale * sqrt(v * v + y * y), 1.0));
+}
+
+// Inverse of the cumulative profile along a chord line inside one far-field segment [y0, y1]: the y at which
+// H(v, y) = target (H increases with y). Starts from the piecewise-linear profile through the segment's Simpson
+// nodes (f0, fm, f1) and refines with Newton steps on the table (dH/dy = the table's profile), kept inside a
+// bracket that bisects when a step leaves it. Samples placed this way have the density of the profile itself, so
+// a modulation sample times the segment's integral is unbiased however the profile varies inside the segment.
+float invertProfile(Light light, TableRow row, float v, float profileScale, float y0, float y1, float h0, float h1, float f0, float fm,
+                    float f1, float target)
+{
+    float dy = y1 - y0;
+    float q = h1 > h0 ? clamp((target - h0) / (h1 - h0), 0.0, 1.0) : 0.5;
+    float left = 0.5 * (f0 + fm);
+    float right = 0.5 * (fm + f1);
+    float y = y0 + q * dy;
+    if (left + right > 1e-6)
+    {
+        // Mass to place in half units (each half of the segment has width 1, density fa + (fb - fa) s).
+        float mass = q * (left + right);
+        bool first = mass <= left;
+        float fa = first ? f0 : fm;
+        float fb = first ? fm : f1;
+        float c = first ? mass : mass - left;
+        float a2 = 0.5 * (fb - fa);
+        float root = sqrt(max(fa * fa + 4.0 * a2 * c, 0.0));
+        float s = fa + root > 1e-9 ? 2.0 * c / (fa + root) : 0.5;
+        y = (first ? y0 : y0 + 0.5 * dy) + 0.5 * dy * clamp(s, 0.0, 1.0);
+    }
+
+    float lo = y0;
+    float hi = y1;
+    for (int it = 0; it < 3; ++it)
+    {
+        float err = profileIntegral(light, row, v, y) - target;
+        if (err > 0.0)
+            hi = y;
+        else
+            lo = y;
+        float f = shapeProfile(light, profileScale * sqrt(v * v + y * y));
+        float next = f > 1e-6 ? y - err / f : 0.5 * (lo + hi);
+        y = next > lo && next < hi ? next : 0.5 * (lo + hi);
+    }
+
+    return y;
+}
+
 // Far field of facet k (point source, axis a, half-angle halfAngle), between zNear and the light's range.
 void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, float halfAngle, float zNear, BeamRay ray, bool modulate,
               int samples, float smokeAtLight, inout vec3 sumL, inout float sumB, inout float tEnd)
@@ -236,24 +300,29 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
     float W = cone ? 1.0 : light.cutoff * light.invHalfBeam;
     float scale = 2.0 * sin(0.5 * thetaB) * W;
     float v = sqrt(2.0 * e * e / (1.0 + R)) / scale;
-    float support = 1.0;
-    if (light.irisAngle < 3.9)
-        support = min(support, 2.0 * sin(0.25 * (light.irisSoftStart + light.irisAngle)) / scale);
-    if (v >= support)
+    // The iris: the profile ends at irisAngle and is scaled by its soft edge between irisSoftStart and irisAngle (a
+    // band that gets segments of its own, so the edge in the air is as soft as on surfaces); inside the soft start the
+    // table holds the whole integral.
+    bool iris = light.irisAngle < 3.9;
+    float outer = iris ? min(1.0, 2.0 * sin(0.5 * min(light.irisAngle, PI)) / scale) : 1.0;
+    float inner = iris ? min(outer, 2.0 * sin(0.5 * light.irisSoftStart) / scale) : 1.0;
+    if (v >= outer)
         return;
-    float ySupport = sqrt(support * support - v * v);
+    float yOuter = sqrt(outer * outer - v * v);
+    float yInner = v < inner ? sqrt(inner * inner - v * v) : 0.0;
     float yScale = sqrt(R) / scale;
     float g0 = atan((t0 - tc) / D);
     float g1 = atan((t1 - tc) / D);
-    float ya = max(2.0 * yScale * sin(0.5 * (g0 - phi)), -ySupport);
-    float yb = min(2.0 * yScale * sin(0.5 * (g1 - phi)), ySupport);
+    float ya = max(2.0 * yScale * sin(0.5 * (g0 - phi)), -yOuter);
+    float yb = min(2.0 * yScale * sin(0.5 * (g1 - phi)), yOuter);
     if (!(yb > ya))
         return;
 
     // Segments: the same number for every ray through this beam (from the largest angle a ray can sweep inside it,
-    // twice the half-angle), so the result has no seams where a per-pixel count would change. Cookies with detail get
-    // more modulation samples per segment instead of more segments.
+    // twice the half-angle), so the result has no seams where a per-pixel count would change; two more on each side
+    // of an iris edge band. Cookies with detail get more modulation samples per segment instead of more segments.
     int K = clamp(int(ceil(2.0 * halfAngle / GAMMA_STEP)), 2, max(2, int(float(MAX_SEGMENTS) * frame.beamQuality + 0.5)));
+    const int BAND_SEGMENTS = 2;
     int perSegment = samples;
     if (modulate && (light.flags & (LIGHT_GOBO | LIGHT_BLADES)) != 0u)
     {
@@ -269,80 +338,106 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
     float g = frame.media.y;
     float sigmaH = hasFeature(FEATURE_HAZE) ? frame.media.x : 0.0;
     float rangeSq = lightRangeSquared(light);
-    float dy = (yb - ya) / float(K);
     // Cookie filter: the gate-plane length one modulation sample stands for.
-    float footprint = 0.5 * dy / float(perSegment) * scale * light.gateScale;
+    float footprint = 0.5 * (yb - ya) / float(K * perSegment) * scale * light.gateScale;
     TableRow row = tableRow(layer, v);
     float mChord2 = 2.0 * e * e / (1.0 + R);
     float profileScale = thetaB * W;
 
     // Product integration with the smooth factor m(y) = HG x T_light x T_view x range window x du/dy linear on each
-    // segment: integral of m x profile = dH x ((1 - lambda) m(y0) + lambda m(y1)), lambda = the profile's centroid
-    // in the segment (Simpson's rule on the profile). Second order in the segment length, so the strongly forward-
-    // peaked phase function needs no more segments.
-    float yPrev = ya;
-    float hPrev = profileIntegral(light, row, v, yPrev);
-    float mPrev = smoothFactor(ray, phi, D, tc, yPrev, yScale, g, rangeSq);
-    float fPrev = shapeProfile(light, profileScale * sqrt(v * v + yPrev * yPrev));
+    // segment: integral of m x profile = dH x (the profile-weighted Simpson average of m), i.e. ((1 - lambda) m(y0) +
+    // lambda m(y1)) with lambda the profile's centroid in the segment. Second order in the segment length, so the
+    // strongly forward-peaked phase function needs no more segments. In the iris band the iris factor joins m.
+    // Modulation (cookie x shadow x local scattering x exact/table profile) is sampled at positions distributed like
+    // the profile within each segment (stratified, inverted from the table), so the estimate is unbiased.
     vec3 accL = vec3(0.0);
     float accB = 0.0;
-    for (int i = 0; i < K; ++i)
+    for (int part = 0; part < 3; ++part)
     {
-        float yNext = ya + float(i + 1) * dy;
-        float hNext = profileIntegral(light, row, v, yNext);
-        float mNext = smoothFactor(ray, phi, D, tc, yNext, yScale, g, rangeSq);
-        float fNext = shapeProfile(light, profileScale * sqrt(v * v + yNext * yNext));
-        float yMid = yPrev + 0.5 * dy;
-        float fMid = shapeProfile(light, profileScale * sqrt(v * v + yMid * yMid));
-        float dH = hNext - hPrev;
-        float simpson = fPrev + 4.0 * fMid + fNext;
-        float lambda = simpson > 1e-6 ? (2.0 * fMid + fNext) / simpson : 0.5;
-        float w = max(dH, 0.0) * mix(mPrev, mNext, lambda);
-        hPrev = hNext;
-        mPrev = mNext;
-        fPrev = fNext;
-        yPrev = yNext;
-        if (!(w > 0.0))
+        float lo = part == 0 ? ya : max(ya, part == 1 ? -yInner : yInner);
+        float hi = part == 0 ? min(yb, -yInner) : (part == 1 ? min(yb, yInner) : yb);
+        if (!(hi > lo))
             continue;
-        accB += w;
-        if (!modulate)
+        bool band = part != 1;
+        int segments = band ? BAND_SEGMENTS : K;
+        float dy = (hi - lo) / float(segments);
+        float yPrev = lo;
+        float hPrev = profileIntegral(light, row, v, yPrev);
+        float mPrev = smoothFactor(ray, phi, D, tc, yPrev, yScale, g, rangeSq);
+        float fPrev = shapeProfile(light, profileScale * sqrt(v * v + yPrev * yPrev));
+        float iPrev = band ? irisFactor(light, tableAngle(scale, v, yPrev)) : 1.0;
+        for (int i = 0; i < segments; ++i)
         {
-            accL += vec3(w * sigmaH);
-            continue;
-        }
-
-        vec3 modulation = vec3(0.0);
-        for (int s = 0; s < perSegment; ++s)
-        {
-            float xi = fract(stratum(ray, salt, i) + float(s) / float(perSegment));
-            float yj = ya + (float(i) + xi) * dy;
-            float uj = 2.0 * asin(clamp(yj / (2.0 * yScale), -1.0, 1.0));
-            float gj = phi + uj;
-            float cj = cos(gj);
-            if (cj <= 1e-6)
+            float y0 = yPrev;
+            float h0 = hPrev;
+            float m0 = mPrev;
+            float f0 = fPrev;
+            float i0 = iPrev;
+            float y1 = lo + float(i + 1) * dy;
+            float h1 = profileIntegral(light, row, v, y1);
+            float m1 = smoothFactor(ray, phi, D, tc, y1, yScale, g, rangeSq);
+            float f1 = shapeProfile(light, profileScale * sqrt(v * v + y1 * y1));
+            float i1 = band ? irisFactor(light, tableAngle(scale, v, y1)) : 1.0;
+            float yMid = y0 + 0.5 * dy;
+            float fMid = shapeProfile(light, profileScale * sqrt(v * v + yMid * yMid));
+            float iMid = band ? irisFactor(light, tableAngle(scale, v, yMid)) : 1.0;
+            yPrev = y1;
+            hPrev = h1;
+            mPrev = m1;
+            fPrev = f1;
+            iPrev = i1;
+            float dH = h1 - h0;
+            if (!(dH > 0.0))
                 continue;
-            float tj = tc + D * tan(gj);
-            float rj = D / cj;
-            vec3 X = ray.origin + ray.dir * tj;
-            vec3 omega = n * cj + ray.dir * sin(gj);
-            float smoke = smokeAt(X);
-            float sigma = sigmaH + smoke;
-            if (sigma <= 0.0)
+            float simpson = f0 + 4.0 * fMid + f1;
+            float average = simpson > 1e-6 ? (f0 * i0 * m0 + 2.0 * fMid * iMid * (m0 + m1) + f1 * i1 * m1) / simpson
+                                            : 0.25 * (i0 * m0 + i1 * m1) + 0.25 * iMid * (m0 + m1);
+            float w = dH * average;
+            if (!(w > 0.0))
                 continue;
-            // Smoke along the light path.
-            float smokeLight = hasFeature(FEATURE_SMOKE) ? smokeLightTransmittance(light.position, X, smokeAtLight, smoke) : 1.0;
-            // Exact profile (iris included) against the table's chord approximation at this point.
-            float chord = sqrt(mChord2 + R * 4.0 * sin(0.5 * uj) * sin(0.5 * uj));
-            float exact = beamProfile(light, 2.0 * asin(min(0.5 * chord, 1.0)));
-            float approx = shapeProfile(light, profileScale * sqrt(v * v + yj * yj));
-            float ratio = approx > 1e-4 ? clamp(exact / approx, 0.0, 4.0) : 1.0;
-            float shadow = shadowHard(slot, X, vec3(0.0));
-            float pixelGate = ray.pixelSize * max(ray.originDepth + tj / ray.stretch, 0.0) / max(rj, 1e-3) * light.gateScale;
-            vec3 c = facetCookie(light, k, facets, omega, max(footprint, pixelGate));
-            modulation += c * (sigma * ratio * shadow * smokeLight);
-        }
+            accB += w;
+            if (!modulate)
+            {
+                accL += vec3(w * sigmaH);
+                continue;
+            }
 
-        accL += w * modulation / float(perSegment);
+            vec3 modulation = vec3(0.0);
+            for (int s = 0; s < perSegment; ++s)
+            {
+                float xi = fract(stratum(ray, salt, i + 16 * part) + float(s) / float(perSegment));
+                float yj = invertProfile(light, row, v, profileScale, y0, y1, h0, h1, f0, fMid, f1, h0 + xi * dH);
+                float uj = 2.0 * asin(clamp(yj / (2.0 * yScale), -1.0, 1.0));
+                float gj = phi + uj;
+                float cj = cos(gj);
+                if (cj <= 1e-6)
+                    continue;
+                float tj = tc + D * tan(gj);
+                float rj = D / cj;
+                vec3 X = ray.origin + ray.dir * tj;
+                vec3 omega = n * cj + ray.dir * sin(gj);
+                float smoke = smokeAt(X);
+                float sigma = sigmaH + smoke;
+                if (sigma <= 0.0)
+                    continue;
+                // Smoke along the light path.
+                float smokeLight = hasFeature(FEATURE_SMOKE) ? smokeLightTransmittance(light.position, X, smokeAtLight, smoke) : 1.0;
+                // Exact profile (iris included) against the table's chord approximation at this point.
+                float chord = sqrt(mChord2 + R * 4.0 * sin(0.5 * uj) * sin(0.5 * uj));
+                float exact = beamProfile(light, 2.0 * asin(min(0.5 * chord, 1.0)));
+                float approx = shapeProfile(light, profileScale * sqrt(v * v + yj * yj));
+                float ratio = approx > 1e-4 ? clamp(exact / approx, 0.0, 4.0) : 1.0;
+                float shadow = shadowHard(slot, X, vec3(0.0));
+                float pixelGate = ray.pixelSize * max(ray.originDepth + tj / ray.stretch, 0.0) / max(rj, 1e-3) * light.gateScale;
+                float resid = (profileIntegral(light, row, v, yj) - h0) / dH - xi;
+                vec3 c = vec3(1.0, 0.5 + 10.0 * resid, abs(resid) * 10.0);
+                // The smooth factor at the sample (linear in the segment) over its profile-weighted mean.
+                float mj = mix(m0, m1, clamp((yj - y0) / dy, 0.0, 1.0));
+                modulation += c * (sigma * ratio * shadow * smokeLight * mj);
+            }
+
+            accL += dH * modulation / float(perSegment);
+        }
     }
 
     float factor = scale / (D * sqrt(R));
@@ -350,9 +445,31 @@ void farField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, fl
     sumB += accB * factor;
 }
 
+// Facet-frame coordinates (right, up, axis) of a unit world direction leaving the light.
+vec3 facetFrame(Light light, uint k, uint facets, vec3 omega)
+{
+    return beamToFacet(light, k, facets, vec3(dot(omega, light.right), dot(omega, light.up), dot(omega, light.direction)));
+}
+
+// Direction (unit) in which the near-field light reaches X (light-relative position rel, facet axis a) and the
+// profile's scale s of the radial distance there: the shaft of radius (R^4 + (z tan)^4)^(1/4).
+vec3 nearFieldDirection(vec3 rel, vec3 a, float lens4, float tanHalf, out float z, out float s, out float rho)
+{
+    z = dot(rel, a);
+    vec3 radial = rel - a * z;
+    float zeta = max(z, 0.0) * tanHalf;
+    s = zeta / max(sqrt(sqrt(lens4 + zeta * zeta * zeta * zeta)), 1e-12);
+    rho = length(radial);
+    vec3 scaled = a * z + radial * s;
+    return scaled * inversesqrt(max(dot(scaled, scaled), 1e-24));
+}
+
 // Near field of facet k: the lens disc of radius R as an extended source, blending into the point source.
-void nearField(Light light, uint slot, uint k, uint facets, vec3 a, float halfAngle, float zNear, BeamRay ray, bool modulate,
-               float smokeAtLight, inout vec3 sumL, inout float sumB, inout float tEnd)
+// The envelope (and the light without modulation) is a Gauss-Legendre integral; with modulation (cookie, shadow,
+// smoke) the envelope is shared out by stratified, jittered samples along the crossing (a rotated lattice that moves
+// every frame, so the temporal accumulation converges instead of aliasing at fixed nodes).
+void nearField(Light light, uint slot, uint salt, uint k, uint facets, vec3 a, float halfAngle, float zNear, BeamRay ray, bool modulate,
+               int samples, float smokeAtLight, inout vec3 sumL, inout float sumB, inout float tEnd)
 {
     float lens = light.sourceRadius;
     float offset = beamApexOffset(lens, halfAngle);
@@ -367,7 +484,6 @@ void nearField(Light light, uint slot, uint k, uint facets, vec3 a, float halfAn
     float lens4 = lens * lens * lens * lens;
     int pieces = clamp(int(ceil((t1 - t0) / max(2.0 * lens, 1e-3))), 1, 3);
     float half_ = 0.5 * (t1 - t0) / float(pieces);
-    vec3 accL = vec3(0.0);
     float accB = 0.0;
     for (int piece = 0; piece < pieces; ++piece)
     {
@@ -375,44 +491,80 @@ void nearField(Light light, uint slot, uint k, uint facets, vec3 a, float halfAn
         for (int j = 0; j < 4; ++j)
         {
             float t = centre + GL_X[j] * half_;
-            vec3 X = ray.origin + ray.dir * t;
-            vec3 rel = X - light.position;
-            float z = dot(rel, a);
+            vec3 rel = ray.origin + ray.dir * t - light.position;
+            float z, s, rho;
+            vec3 omega = nearFieldDirection(rel, a, lens4, tanHalf, z, s, rho);
             if (z <= 1e-6)
                 continue;
-            vec3 radial = rel - a * z;
-            float zeta = z * tanHalf;
-            float s = zeta / sqrt(sqrt(lens4 + zeta * zeta * zeta * zeta));
-            vec3 scaled = a * z + radial * s;
-            float r2 = dot(scaled, scaled);
-            vec3 omega = scaled * inversesqrt(r2);
-            float theta = atan(length(radial) * s, z);
-            float f = beamProfile(light, theta);
+            float f = beamProfile(light, atan(rho * s, z));
             if (f <= 0.0)
                 continue;
             float d = length(rel);
             float m = henyeyGreenstein(dot(omega, -ray.dir), g) * lightPathTransmittance(d) * viewTransmittance(ray, t) * rangeWindow(d * d, rangeSq);
-            float w = GL_W[j] * half_ * f * s * s / r2 * m;
-            accB += w;
-            if (!modulate)
-            {
-                accL += vec3(w * sigmaH);
-                continue;
-            }
-
-            float smoke = smokeAt(X);
-            float sigma = sigmaH + smoke;
-            if (sigma <= 0.0)
-                continue;
-            float smokeLight = hasFeature(FEATURE_SMOKE) ? smokeLightTransmittance(light.position, X, smokeAtLight, smoke) : 1.0;
-            float shadow = shadowHard(slot, X, vec3(0.0));
-            float pixelGate = ray.pixelSize * max(ray.originDepth + t / ray.stretch, 0.0) / max(d, 1e-3) * light.gateScale;
-            accL += w * sigma * shadow * smokeLight * facetCookie(light, k, facets, omega, pixelGate);
+            accB += GL_W[j] * half_ * f * s * s / (z * z + s * s * rho * rho) * m;
         }
     }
 
-    sumL += light.intensity * accL;
+    if (!(accB > 0.0))
+        return;
     sumB += accB;
+    if (!modulate)
+    {
+        sumL += light.intensity * (accB * sigmaH);
+        return;
+    }
+
+    // Samples: four per Gauss-Legendre piece (twice that without a history), more for gobo or blade detail along
+    // the crossing (its span in gate units, at most what the pixels resolve).
+    float z0, s0, r0, z1, s1, r1;
+    vec3 w0 = facetFrame(light, k, facets, nearFieldDirection(ray.origin + ray.dir * t0 - light.position, a, lens4, tanHalf, z0, s0, r0));
+    vec3 w1 = facetFrame(light, k, facets, nearFieldDirection(ray.origin + ray.dir * t1 - light.position, a, lens4, tanHalf, z1, s1, r1));
+    float gateSpan = length(w1.xy / max(w1.z, 1e-3) - w0.xy / max(w0.z, 1e-3)) * light.gateScale;
+    int count = 4 * pieces * samples;
+    int cap = max(4, int(float(MAX_COOKIE_SAMPLES) * frame.beamQuality + 0.5));
+    if ((light.flags & (LIGHT_GOBO | LIGHT_BLADES)) != 0u)
+    {
+        int pixels = int(ceil((t1 - t0) / max(ray.pixelSize * max(ray.originDepth + 0.5 * (t0 + t1) / ray.stretch, 1e-3), 1e-6)));
+        count = max(count, samples * min(int(ceil(6.0 * gateSpan)), max(pixels, 2)));
+    }
+
+    count = clamp(count, 4, max(cap, 4 * pieces * samples));
+    float footprint = 0.5 * gateSpan / float(count);
+    float base = stratum(ray, salt, 0);
+    float dt = (t1 - t0) / float(count);
+    vec3 num = vec3(0.0);
+    float den = 0.0;
+    for (int i = 0; i < count; ++i)
+    {
+        float t = t0 + (float(i) + base) * dt;
+        vec3 X = ray.origin + ray.dir * t;
+        vec3 rel = X - light.position;
+        float z, s, rho;
+        vec3 omega = nearFieldDirection(rel, a, lens4, tanHalf, z, s, rho);
+        if (z <= 1e-6)
+            continue;
+        float f = beamProfile(light, atan(rho * s, z));
+        if (f <= 0.0)
+            continue;
+        float d = length(rel);
+        float weight = f * s * s / (z * z + s * s * rho * rho) * henyeyGreenstein(dot(omega, -ray.dir), g) * lightPathTransmittance(d) *
+                       viewTransmittance(ray, t) * rangeWindow(d * d, rangeSq);
+        if (!(weight > 0.0))
+            continue;
+        den += weight;
+        float smoke = smokeAt(X);
+        float sigma = sigmaH + smoke;
+        if (sigma <= 0.0)
+            continue;
+        float smokeLight = hasFeature(FEATURE_SMOKE) ? smokeLightTransmittance(light.position, X, smokeAtLight, smoke) : 1.0;
+        float shadow = shadowHard(slot, X, vec3(0.0));
+        float pixelGate = ray.pixelSize * max(ray.originDepth + t / ray.stretch, 0.0) / max(d, 1e-3) * light.gateScale;
+        num += weight * sigma * shadow * smokeLight * facetCookie(light, k, facets, omega, max(footprint, pixelGate));
+    }
+
+    // Ratio estimator: the deterministic envelope times the weighted mean modulation (exact when the modulation is
+    // uniform, e.g. haze with an unobstructed shadow map); no sample in the lit part: the haze alone.
+    sumL += light.intensity * (den > 0.0 ? accB * num / den : vec3(accB * sigmaH));
 }
 
 void main()
@@ -450,7 +602,7 @@ void main()
     viewRay(ray.uv, ray.origin, ray.dir);
     ray.stretch = 1.0 / max(dot(ray.dir, frame.cameraForward.xyz), 1e-4);
     ray.originDepth = viewDepthOf(ray.origin);
-    float viewDepth = depth > 0.0 ? viewDepthOf(worldFromDepth((vec2(pick) + 0.5) * frame.renderSize.zw, depth)) : frame.volumeDepth.y;
+    float viewDepth = depth > 0.0 ? viewDepthOf(worldFromDepth((vec2(pick) + 0.5) * frame.renderSize.zw, depth)) : BEAM_BACKGROUND_DEPTH;
     ray.tMax = max(viewDepth - ray.originDepth, 0.0) * ray.stretch;
 
     // Interleaved gradient noise over the half-resolution grid (well spread within every 3 x 3 neighbourhood), advanced
@@ -495,7 +647,7 @@ void main()
                 vec3 a = beamFacetAxis(light, k, facets);
                 farField(light, slot, entry, k, facets, a, halfAngle, zNear, ray, modulate, samples, smokeAtLight, sumL, sumB, tEnd);
                 if (zNear > 0.0)
-                    nearField(light, slot, k, facets, a, halfAngle, zNear, ray, modulate, smokeAtLight, sumL, sumB, tEnd);
+                    nearField(light, slot, entry, k, facets, a, halfAngle, zNear, ray, modulate, samples, smokeAtLight, sumL, sumB, tEnd);
             }
 
             L += sumL;

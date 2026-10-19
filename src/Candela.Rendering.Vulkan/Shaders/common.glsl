@@ -228,6 +228,10 @@ layout(push_constant, scalar) uniform DrawConstants
 // white (the tone mapper saturates long before), so the sum of two clamped values in a blend still fits.
 const float HALF_SAFE_MAX = 30000.0;
 
+// View depth (m) the volumetric beams use for the background: beyond the range of every beam (at most 2 km), so a
+// beam into the sky or an open venue is drawn to its end, not cut at the far end of the froxel volume.
+const float BEAM_BACKGROUND_DEPTH = 100000.0;
+
 // NaN -> 0, then clamped to [0, HALF_SAFE_MAX] (+inf -> HALF_SAFE_MAX).
 vec3 finiteLight(vec3 c)
 {
