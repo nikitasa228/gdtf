@@ -126,6 +126,18 @@ internal sealed class TrackedRenderWorld : IRenderWorld
         }
     }
 
+    /// <summary>The flags the renderer was given for the instances drawn with <paramref name="pickId"/> (combined), or null.</summary>
+    internal InstanceFlags? EffectiveFlags(uint pickId)
+    {
+        if (!_byPick.TryGetValue(pickId, out var list) || list.Count == 0)
+            return null;
+        InstanceFlags flags = 0;
+        foreach (var handle in list)
+            if (_instances.TryGetValue(handle, out var state))
+                flags |= Effective(state);
+        return flags;
+    }
+
     /// <summary>True when an instance drawn with <paramref name="pickId"/> exists.</summary>
     public bool HasInstances(uint pickId) => _byPick.TryGetValue(pickId, out var list) && list.Count > 0;
 
