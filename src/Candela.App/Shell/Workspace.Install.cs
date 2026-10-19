@@ -25,7 +25,7 @@ internal sealed partial class Workspace
     private void InitializeInstall()
     {
         _librarySetup = new LibrarySetup(_ctx.Session, _ctx.Settings, _ctx.Log);
-        _librarySetupWindow = new LibrarySetupWindow(_librarySetup, _browser, _dispatcher,
+        _librarySetupWindow = new LibrarySetupWindow(_librarySetup, _ctx.Fonts.Heading, _browser, _dispatcher,
             () => _preferences.ShowLibrarySetup,
             show =>
             {
@@ -64,6 +64,33 @@ internal sealed partial class Workspace
         if (_menu.Item(InstallLoc.With(Icons.Library, InstallStr.SetupMenu), "", false, true, nameof(InstallStr.SetupMenu),
                 InstallLoc.English_(InstallStr.SetupMenu)))
             _librarySetupWindow?.Open();
+    }
+
+    /// <summary>
+    /// Script action <c>setting</c> <c>librarySetup</c>: <c>open</c> / <c>close</c> the window, use the
+    /// <c>default</c> folder, open the <c>sample</c> scene, or any other value: use that folder.
+    /// </summary>
+    private void RunLibrarySetupScript(string value)
+    {
+        var window = LibrarySetupWindow;
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "open":
+                window.Open();
+                break;
+            case "close":
+                window.IsOpen = false;
+                break;
+            case "default":
+                window.UseDefaultFolder();
+                break;
+            case "sample":
+                window.OpenSample();
+                break;
+            default:
+                window.ChooseFolder(value);
+                break;
+        }
     }
 
     private void DisposeInstall()

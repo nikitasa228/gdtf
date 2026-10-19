@@ -80,6 +80,25 @@ def render(size):
     return clipped.resize((size, size), Image.LANCZOS)
 
 
+def wizard_image(width=164, height=314):
+    """The installer's welcome / finish page picture: the icon's drawing on the dark background, larger, upper half."""
+    image = Image.new("RGB", (width, height), BACKGROUND_BOTTOM)
+    draw = ImageDraw.Draw(image)
+    for y in range(height):
+        draw.line([(0, y), (width, y)], fill=lerp(BACKGROUND_TOP, BACKGROUND_BOTTOM, y / (height - 1)))
+    art = render(144)
+    image.paste(art, ((width - 144) // 2, 60), art)
+    return image
+
+
+def header_image(width=150, height=57):
+    """The installer's page header picture (right-aligned, on the white header): the 48 px icon at the right edge."""
+    image = Image.new("RGB", (width, height), (255, 255, 255))
+    art = render(48)
+    image.paste(art, (width - 48 - 6, (height - 48) // 2), art)
+    return image
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
     os.makedirs(out, exist_ok=True)
@@ -89,7 +108,10 @@ def main():
     # Pillow writes each requested size from the image of that size when it is among the appended ones.
     largest.save(os.path.join(out, "candela.ico"), format="ICO", sizes=[(s, s) for s in SIZES],
                  append_images=[images[s] for s in SIZES[:-1]])
-    print("wrote", os.path.join(out, "candela.ico"))
+    # NSIS wants 24-bit BMPs for the Modern UI pictures.
+    wizard_image().save(os.path.join(out, "installer-wizard.bmp"), format="BMP")
+    header_image().save(os.path.join(out, "installer-header.bmp"), format="BMP")
+    print("wrote", os.path.join(out, "candela.ico"), "and the installer pictures")
 
 
 if __name__ == "__main__":

@@ -824,6 +824,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             case "settingssection":
                 _settingsWindow.Open(Enum.Parse<SettingsSection>(value, true));
                 break;
+            case "librarysetup":
+                RunLibrarySetupScript(value);
+                break;
             default:
                 throw new KeyNotFoundException($"unknown setting '{name}'");
         }

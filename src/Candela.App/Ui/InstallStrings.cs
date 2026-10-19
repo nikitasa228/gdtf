@@ -42,7 +42,6 @@ internal enum InstallStr
 
     // Settings → Library
     SettingsAppliedNow,
-    SettingsFolderCount,
 
     // Native message boxes: no Vulkan
     NoVulkanTitle,
@@ -120,7 +119,6 @@ internal static class InstallLoc
 
         (InstallStr.SettingsAppliedNow, "A folder that is added is read at once; removing one takes effect after restarting the editor.",
             "Добавленная папка читается сразу; удаление папки вступит в силу после перезапуска."),
-        (InstallStr.SettingsFolderCount, "{0} .gdtf", "{0} .gdtf"),
 
         (InstallStr.NoVulkanTitle, "Candela cannot start", "Candela не может запуститься"),
         (InstallStr.NoVulkanIntro, "Candela needs a graphics card with a Vulkan 1.3 driver.", "Для Candela нужна видеокарта с драйвером Vulkan 1.3."),

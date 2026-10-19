@@ -117,7 +117,11 @@ internal sealed class EditorApplication : IDisposable
     {
         // Headless verification runs never write the user's settings or workspace.
         _settings = new SettingsStore(_log) { ReadOnly = _options.IsScreenshotMode };
+        bool firstStart = !File.Exists(_settings.FilePath);
         var settings = _settings.Load();
+        // The very first start speaks the language of the operating system (stored with the settings from now on).
+        if (firstStart && !_options.IsScreenshotMode)
+            settings.Language = SystemLanguage.Detect();
         _settings.ApplyRunOverrides(_options.UiScale, _options.Language, _options.Device);
         Loc.SetLanguage(settings.Language);
 

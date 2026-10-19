@@ -21,6 +21,7 @@ namespace Candela.App.Windows;
 internal sealed class LibrarySetupWindow
 {
     private readonly LibrarySetup _setup;
+    private readonly ImFontPtr _heading;
     private readonly FileBrowserDialog _browser;
     private readonly KeyBindingDispatcher _dispatcher;
     private readonly Func<bool> _getShowAtStart;
@@ -40,16 +41,18 @@ internal sealed class LibrarySetupWindow
 
     /// <summary>Creates the window.</summary>
     /// <param name="setup">The setup logic (folder, counting, settings, engine).</param>
+    /// <param name="heading">Font of the welcome line.</param>
     /// <param name="browser">The portable file browser for choosing the folder.</param>
     /// <param name="dispatcher">Shortcut dispatcher (Escape closes the window).</param>
     /// <param name="getShowAtStart">Reads the "show at start-up" preference.</param>
     /// <param name="setShowAtStart">Stores the "show at start-up" preference.</param>
     /// <param name="openScene">Opens a scene like File → Open (the sample scene).</param>
     /// <param name="status">Shows a line in the status bar.</param>
-    public LibrarySetupWindow(LibrarySetup setup, FileBrowserDialog browser, KeyBindingDispatcher dispatcher, Func<bool> getShowAtStart,
+    public LibrarySetupWindow(LibrarySetup setup, ImFontPtr heading, FileBrowserDialog browser, KeyBindingDispatcher dispatcher, Func<bool> getShowAtStart,
         Action<bool> setShowAtStart, Action<string> openScene, Action<string> status)
     {
         _setup = setup ?? throw new ArgumentNullException(nameof(setup));
+        _heading = heading;
         _browser = browser ?? throw new ArgumentNullException(nameof(browser));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         _getShowAtStart = getShowAtStart ?? throw new ArgumentNullException(nameof(getShowAtStart));
@@ -135,7 +138,9 @@ internal sealed class LibrarySetupWindow
     {
         float wrap = 660f * scale;
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + wrap);
+        ImGui.PushFont(_heading, ImGui.GetStyle().FontSizeBase * 1.45f);
         SafeText.Colored(Theme.Accent, InstallLoc.With(Icons.Lightbulb, InstallStr.SetupWelcome));
+        ImGui.PopFont();
         ImGui.Spacing();
         SafeText.Wrapped(InstallLoc.Get(InstallStr.SetupIntro));
         ImGui.Spacing();
