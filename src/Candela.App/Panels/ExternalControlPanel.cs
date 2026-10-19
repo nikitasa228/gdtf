@@ -332,11 +332,10 @@ internal sealed unsafe class ExternalControlPanel : Panel
             double rate = 0;
             foreach (var u in s.Universes)
                 rate += u.PacketsPerSecond;
-            // Packets per second, and the universes receiving data out of those the protocol serves (when it says).
-            _rowRate[i] = s.State is not (ProtocolState.Running or ProtocolState.Warning) ? ""
-                : s.UniverseCount > 0
-                    ? string.Create(CultureInfo.InvariantCulture, $"{rate:0} {StageLoc.Get(StageStr.ExtPacketsPerSecond)} · U{s.Universes.Count}/{s.UniverseCount}")
-                    : string.Create(CultureInfo.InvariantCulture, $"{rate:0} {StageLoc.Get(StageStr.ExtPacketsPerSecond)} · U{s.Universes.Count}");
+            // Packets per second and the universes receiving data (those the protocol serves are in its details).
+            _rowRate[i] = s.State is ProtocolState.Running or ProtocolState.Warning
+                ? string.Create(CultureInfo.InvariantCulture, $"{rate:0} {StageLoc.Get(StageStr.ExtPacketsPerSecond)} · U{s.Universes.Count}")
+                : "";
         }
     }
 

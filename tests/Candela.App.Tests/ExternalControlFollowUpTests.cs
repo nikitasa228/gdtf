@@ -98,7 +98,7 @@ public sealed partial class ExternalControlFollowUpTests : IDisposable
         var artNet = ProtocolRegistry.Find(ProtocolIds.ArtNet);
         var view = ExternalControlPanel.StatusView.Build(running, artNet);
         Assert.Equal("Listening on UDP 6454 (all interfaces); announcing 4 universe(s) as node 'Candela'", view.Message);
-        Assert.Equal("Receiving on 0.0.0.0:6454 · Interface: eth0 192.168.1.20 · Universes: 4", view.Facts);
+        Assert.Equal("Receiving on 0.0.0.0:6454 · Interface: eth0 192.168.1.20 · Universes served: 4", view.Facts);
         Assert.Equal("", view.Error);
         Assert.Equal("", view.Hint);
         Assert.Equal(running.Warnings, view.Warnings);
@@ -106,7 +106,7 @@ public sealed partial class ExternalControlFollowUpTests : IDisposable
 
         Loc.SetLanguage("ru");
         view = ExternalControlPanel.StatusView.Build(running, artNet);
-        Assert.Equal("Приём на 0.0.0.0:6454 · Интерфейс: eth0 192.168.1.20 · Юниверсов: 4", view.Facts);
+        Assert.Equal("Приём на 0.0.0.0:6454 · Интерфейс: eth0 192.168.1.20 · Обслуживается юниверсов: 4", view.Facts);
         Assert.Equal("Активно более 1024 потоков Art-Net (отправитель, порт, юниверс); новые игнорируются.", Assert.Single(view.Warnings));
 
         var failed = ProtocolStatus.NotStarted(ProtocolIds.Osc) with { State = ProtocolState.Error, LastError = "OSC: UDP port 8000 is already in use …" };

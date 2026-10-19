@@ -935,7 +935,7 @@ internal static class StageLoc
         (StageStr.ExtTimecodeFromRecordingNamed, "recording '{0}'", "запись «{0}»"),
         (StageStr.ExtBoundEndpoint, "Receiving on", "Приём на"),
         (StageStr.ExtStatusInterface, "Interface", "Интерфейс"),
-        (StageStr.ExtUniverseCount, "Universes", "Юниверсов"),
+        (StageStr.ExtUniverseCount, "Universes served", "Обслуживается юниверсов"),
         (StageStr.ExtWhatToDo, "What to do", "Что делать"),
         (StageStr.ExtLastBadPacket, "Last malformed packet", "Последний повреждённый пакет"),
         (StageStr.ExtCapturePackets, "every change at packet rate", "каждое изменение с частотой пакетов"),
