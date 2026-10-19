@@ -23,6 +23,7 @@ internal sealed class StageUnits
     {
         Lux = lux;
         Decibel = decibel;
+        FramesPerSecond = framesPerSecond;
         Candela = candela;
         Megacandela = megacandela;
         Lumen = lumen;
@@ -47,6 +48,9 @@ internal sealed class StageUnits
 
     /// <summary>The table of the current UI language.</summary>
     public static StageUnits Current => Loc.Language == "ru" ? Russian : English;
+
+    /// <summary>Frames per second (timecode and image sequences).</summary>
+    public string FramesPerSecond { get; }
 
     /// <summary>Lux (illuminance).</summary>
     public string Lux { get; }

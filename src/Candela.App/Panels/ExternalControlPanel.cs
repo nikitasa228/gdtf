@@ -220,12 +220,13 @@ internal sealed unsafe class ExternalControlPanel : Panel
         _timecodeShown = tc.ReceivedUtc;
         _timecodeText = tc.Timecode.ToString();
         double ago = Math.Max(0, (DateTime.UtcNow - tc.ReceivedUtc).TotalSeconds);
+        string fps = StageUnits.Current.FramesPerSecond;
         string rate = tc.Timecode.Type switch
         {
-            TimecodeType.Film24 => "24 fps",
-            TimecodeType.Ebu25 => "25 fps EBU",
-            TimecodeType.Df2997 => "29.97 fps DF",
-            _ => "30 fps SMPTE",
+            TimecodeType.Film24 => "24 " + fps,
+            TimecodeType.Ebu25 => "25 " + fps + " EBU",
+            TimecodeType.Df2997 => "29.97 " + fps + " DF",
+            _ => "30 " + fps + " SMPTE",
         };
         string source = model.LastTimecodeSource switch
         {
