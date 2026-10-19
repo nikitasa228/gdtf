@@ -563,7 +563,7 @@ internal static class RenderCommand
         var result = options.Final
             ? RenderFinal(engine, renderer, options, plan, camera, output, error, cancellationToken)
             : RenderRealTime(engine, renderer, options, plan, camera, bounds, output, cancellationToken);
-        if (result.Code != Program.ExitOk && result.Written == 0 && !result.Cancelled) return result.Code;
+        if (result.Code != Program.ExitOk) return result.Code;
         double renderMs = watch.Elapsed.TotalMilliseconds;
 
         engine.RefreshIssues();
@@ -586,7 +586,9 @@ internal static class RenderCommand
             output.WriteLine(plan.Count > 1 ? $"Wrote {result.Written} EXR frames: {Path.GetFullPath(plan.PathOf(exr, 0))} …" : $"Wrote {Path.GetFullPath(exr)}");
         if (result.Cancelled)
         {
-            output.WriteLine("Cancelled: the last image holds the samples rendered until then.");
+            output.WriteLine(options.Final
+                ? "Cancelled: the last image holds the samples rendered until then."
+                : $"Cancelled after {result.Written} of {plan.Count} frames.");
             return Program.ExitCancelled;
         }
         return Program.ExitOk;

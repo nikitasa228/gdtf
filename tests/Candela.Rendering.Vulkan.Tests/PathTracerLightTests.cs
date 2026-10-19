@@ -196,6 +196,47 @@ public sealed class PathTracerLightTests
     }
 
     [SkippableFact]
+    public void OnlyShadowCastersBlockLightAndUnshadowedLightsPassEverything()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var view = new TopDownView(48, 36, 4f);
+            FinalRenderSupport.Floor(renderer.World, TopDownView.WhiteLambertian());
+            // A spot 5 m from the floor's centre at 37° from the vertical, and a plate across its beam 1.25 m from the
+            // lens (outside the camera's view of the floor).
+            var light = ProceduralTestScene.Spot(new Vector3(-4f, 0f, 3f), Vector3.Zero, LightColor.White, 20000f, 20f, 30f);
+            var (cx, cy, _) = view.NearestPixel(Vector3.Zero);
+            float open = RenderFloor(renderer, view, new[] { light }, 16).MeanLuminance(cx, cy, 1);
+
+            var mesh = renderer.World.CreateMesh(ProceduralMeshes.Plane(0.8f, 0.8f));
+            var grey = renderer.World.CreateMaterial(new MaterialData { Name = "plate", BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 1f), DoubleSided = true },
+                null);
+            var plate = renderer.World.CreateInstance(mesh, new[] { grey }, Matrix4x4.CreateTranslation(-3f, 0f, 2.25f), InstanceFlags.CastShadow, 3);
+            float shadowed = RenderFloor(renderer, view, new[] { light }, 16).MeanLuminance(cx, cy, 1);
+            // the same plate without CastShadow (the real-time shadow maps leave it out too)
+            renderer.World.UpdateInstance(plate, Matrix4x4.CreateTranslation(-3f, 0f, 2.25f), InstanceFlags.None);
+            float noCaster = RenderFloor(renderer, view, new[] { light }, 16).MeanLuminance(cx, cy, 1);
+            // a light without shadows (like the engine's flame light samples) passes a shadow caster
+            renderer.World.UpdateInstance(plate, Matrix4x4.CreateTranslation(-3f, 0f, 2.25f), InstanceFlags.CastShadow);
+            var unshadowed = light;
+            unshadowed.CastShadows = false;
+            float unshadowedLight = RenderFloor(renderer, view, new[] { unshadowed }, 16).MeanLuminance(cx, cy, 1);
+
+            _output.WriteLine($"open {open:0.00}, shadowed {shadowed:0.00}, no caster {noCaster:0.00}, unshadowed light {unshadowedLight:0.00} cd/m²");
+            Assert.True(open > 1f, $"the floor is not lit: {open}");
+            Assert.InRange(shadowed / open, 0f, 0.02f);
+            Assert.InRange(noCaster / open, 0.97f, 1.03f);
+            Assert.InRange(unshadowedLight / open, 0.97f, 1.03f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void ColouredGelTintsTheLightPassingThroughIt()
     {
         var renderer = FinalRenderSupport.CreateOrSkip();

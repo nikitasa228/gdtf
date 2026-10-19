@@ -737,7 +737,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `PathTracerPhotometryTests` | path tracer: 10 000 cd (50°/80° wash) at 5 m onto a white Lambertian floor — the centre within 3 % of ρE/π, 30° off axis within 5 % |
 | `PathTracerFurnaceTests` | white furnace (surroundings of 1 cd/m²): a Lambertian sphere of albedo 1 shows exactly the background (0.999–1.005); white plastic, rough white metal and a mirror lose a little at grazing angles but never exceed it (brightest 4 × 4 block ≤ 1.03); a 4 m cube of scattering-only smoke of optical depth 4 and a room-sized haze, with up to 64 scattering events, vanish (3 %) |
 | `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %); smoke through the density grid scatters like haze of the same coefficient (4 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01) |
-| `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %) |
+| `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %); a plate in a beam shadows the floor only while it has `CastShadow`, and not at all for a light without `CastShadows` (3 %) |
 | `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; a device without ray query says "not supported on this GPU" |
 | `PathTracerSceneTests` | the procedural stage in haze: finite and validation-clean, 16 samples at 240 × 180 within 2 minutes; writes `pt-stage-final.png` next to the real-time view |
 | `OpenExrTests` | bit-exact round trips for every compression and sample type (37 × 21: not a multiple of the 16-line ZIP blocks; long names), ZIP compresses smooth images, RGBA + layers, chromaticities and white luminance, damaged and tiled files rejected with `InvalidDataException`; the files were checked with the official OpenEXR library |
@@ -882,9 +882,10 @@ real hardware, with the settings that control them.
 `VulkanRenderer.StartFinalRender(camera, settings, options)` (`IRenderer.StartFinalRender`) starts a progressive,
 unbiased photometric path tracer on the same world, materials, textures, lights, cookies and media as the real-time
 view. It runs as compute shaders with Vulkan ray queries. A GPU without ray queries (`SupportsRayTracing` false, or
-`VulkanContextOptions.EnableRayTracing` off) gets a `NotSupportedException` whose message names the device and says the final render needs ray query support
-(`VK_KHR_ray_query`, `VK_KHR_acceleration_structure`) — "not supported on this GPU" — and the real-time view keeps
-working (a device below the descriptor limits of the path tracer's layout is refused the same way).
+`VulkanContextOptions.EnableRayTracing` off) gets a `NotSupportedException` whose message names the device and says
+that the final render needs ray query support (`VK_KHR_ray_query`, `VK_KHR_acceleration_structure`) — "not supported
+on this GPU" — and the real-time view keeps working (a device below the descriptor limits of the path tracer's layout
+is refused the same way).
 
 | Real time (`candela render … --look demo`) | Path traced (`--final --samples 32 --denoise`) |
 |---|---|
@@ -892,7 +893,8 @@ working (a device below the descriptor limits of the path tracer's layout is ref
 
 `Фокина.mvr` at 960 × 540 on lavapipe (demo look, haze from the hazers, 1291 beams). The beams and pools are the
 same; the path tracer adds what the real-time view leaves out: light scattered more than once in the haze (the glow
-around the beams and over the stage), light bounced between surfaces, soft shadows of the lenses.
+around the beams and over the stage) and light bounced between surfaces. (The MVR's fixtures do not cast shadows —
+`CastShadow` is off in the file — so neither view shadows their light.)
 
 | Real time (ray-traced GI) | Path traced, 256 samples, denoised |
 |---|---|
@@ -940,7 +942,10 @@ lens (`SourceRadius`) is an area-preserving regular 16-gon 5 mm in front of the 
 so a camera or a mirror sees the lens with the luminance that carries exactly the light's intensity, and next-event
 estimation through a uniformly chosen lens point `y` gives `I(θ_c)/|x − c|²` times the visibility of `y` — soft
 shadows the size of the lens. Shadow rays stop `LensClearance` (0.1 m, the real-time shadow near plane) before the
-lens, so the fixture's own housing never shadows its beam.
+lens, so the fixture's own housing never shadows its beam. As in the real-time view only instances with
+`InstanceFlags.CastShadow` block light (a separate cull-mask bit of the TLAS, `RayTracingScene.ShadowCasterMask`), and
+lights without `CastShadows` — fixtures whose `CastShadow` is off, the engine's flame light samples — are not shadowed
+at all.
 
 **Many lights.** Each path vertex picks one light by weighted reservoir sampling over the lights that can reach it:
 a ray query against an acceleration structure of the lights' cone boxes (procedural AABBs, clipped to the media box)

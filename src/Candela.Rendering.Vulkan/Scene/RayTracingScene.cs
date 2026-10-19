@@ -15,6 +15,12 @@ internal sealed unsafe class RayTracingScene : IDisposable
     /// <summary>Cull-mask bit of the scene's instances (every ray that should see geometry includes it).</summary>
     public const byte SceneMask = 0x01;
 
+    /// <summary>
+    /// Cull-mask bit of instances that cast shadows (<see cref="InstanceFlags.CastShadow"/>), in addition to
+    /// <see cref="SceneMask"/>: shadow rays of the path tracer test only these, like the real-time shadow maps.
+    /// </summary>
+    public const byte ShadowCasterMask = 0x08;
+
     private readonly VulkanContext _context;
     private readonly VulkanRenderWorld _world;
     private readonly Dictionary<MeshRecord, BottomLevelStructure> _blas = new(ReferenceEqualityComparer.Instance);
@@ -54,7 +60,7 @@ internal sealed unsafe class RayTracingScene : IDisposable
 
     /// <summary>
     /// The traceable instances of the last <see cref="PrepareGeometry"/> (custom index = instance slot, mask
-    /// <see cref="SceneMask"/>).
+    /// <see cref="SceneMask"/>, plus <see cref="ShadowCasterMask"/> for shadow casters).
     /// </summary>
     public ReadOnlySpan<TlasInstance> Instances => _instances.AsSpan(0, InstanceCount);
 
@@ -111,7 +117,8 @@ internal sealed unsafe class RayTracingScene : IDisposable
                 continue;
             if (count == _instances.Length)
                 Array.Resize(ref _instances, _instances.Length * 2);
-            _instances[count++] = TlasInstance.Create(instance.World, (uint)index, SceneMask, blas.Address);
+            byte mask = (instance.Flags & InstanceFlags.CastShadow) != 0 ? (byte)(SceneMask | ShadowCasterMask) : SceneMask;
+            _instances[count++] = TlasInstance.Create(instance.World, (uint)index, mask, blas.Address);
             var mesh = instance.Mesh;
             int header = index * 8;
             ulong vertexAddress = mesh.Geometry!.DeviceAddress;

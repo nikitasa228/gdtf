@@ -16,6 +16,8 @@
 // from its centre c, exactly as in the real-time renderer; the lens (SourceRadius) is an area-preserving polygon in
 // front of it that casts soft shadows and is what rays see:  L(y -> x) = I(theta_c(x)) |x - y|^2 / (A cos theta_y |x - c|^2),
 // so next-event estimation through a random lens point gives I(theta_c)/|x - c|^2 times the visibility of that point.
+// As in the real-time view, only instances with CastShadow block light, and lights without LIGHT_CAST_SHADOWS (flame
+// light samples) are not shadowed at all.
 //
 // Media: uniform haze (inside the media box), the smoke density grid (scattering, albedo 1) and the flame grids
 // (absorption kappa, blackbody emission kappa x L_bb(T)) with the Henyey-Greenstein phase function. Single scattering
@@ -350,8 +352,9 @@ PtHit traceSurface(vec3 o, vec3 d, float tMax, inout uint rng)
     return hit;
 }
 
-// Transmittance of the surfaces between o and o + tMax d: opaque surfaces block, alpha holes pass, blended surfaces
-// pass 1 - alpha, transmissive surfaces pass their thin-walled transmission (1 - F) x transmission x tint.
+// Transmittance of the shadow-casting surfaces (PT_MASK_SHADOW) between o and o + tMax d: opaque surfaces block, alpha
+// holes pass, blended surfaces pass 1 - alpha, transmissive surfaces pass their thin-walled transmission
+// (1 - F) x transmission x tint.
 vec3 surfaceTransmittance(vec3 o, vec3 d, float tMax)
 {
     vec3 T = vec3(1.0);
@@ -361,7 +364,7 @@ vec3 surfaceTransmittance(vec3 o, vec3 d, float tMax)
     for (int layer = 0; layer < PT_MAX_LAYERS; ++layer)
     {
         rayQueryEXT q;
-        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsOpaqueEXT, PT_MASK_SCENE, o, tMin, d, tMax);
+        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsOpaqueEXT, PT_MASK_SHADOW, o, tMin, d, tMax);
         while (rayQueryProceedEXT(q))
         {
         }
@@ -674,7 +677,7 @@ vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out f
 
     float clearance = min(params.geometry.x, 0.5 * dist);
     vec3 origin = offsetRay(P, Ng);
-    vec3 T = surfaceTransmittance(origin, L, dist - clearance);
+    vec3 T = (l.flags & LIGHT_CAST_SHADOWS) != 0u ? surfaceTransmittance(origin, L, dist - clearance) : vec3(1.0);
     if (max(T.r, max(T.g, T.b)) <= 0.0)
         return vec3(0.0);
     vec3 none = vec3(0.0);
@@ -769,7 +772,7 @@ vec3 segmentNee(vec3 o, vec3 d, float tEnd, inout uint rng)
     float viewT = trackTransmittance(o, d, t, rng, vec3(0.0), none, false);
     if (!(viewT > 0.0))
         return vec3(0.0);
-    vec3 lightT = surfaceTransmittance(x, Ly, dist - min(params.geometry.x, 0.5 * dist));
+    vec3 lightT = (l.flags & LIGHT_CAST_SHADOWS) != 0u ? surfaceTransmittance(x, Ly, dist - min(params.geometry.x, 0.5 * dist)) : vec3(1.0);
     if (max(lightT.r, max(lightT.g, lightT.b)) <= 0.0)
         return vec3(0.0);
     lightT *= trackTransmittance(x, Ly, dist, rng, vec3(0.0), none, false);

@@ -286,6 +286,7 @@ internal static class ShaderConstants
         ("BINDING_PT_HISTOGRAM", I(BindingPtHistogram)),
         ("BINDING_PT_INPUT", I(BindingPtInput)),
         ("PT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
+        ("PT_MASK_SHADOW", I(RayTracingScene.ShadowCasterMask) + "u"),
         ("PT_MASK_DISC", I(PtMaskDisc) + "u"),
         ("PT_MASK_LIGHT_VOLUME", I(PtMaskLightVolume) + "u"),
         ("PT_CUSTOM_DISC", I(PtCustomDisc) + "u"),
