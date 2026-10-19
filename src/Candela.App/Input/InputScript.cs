@@ -74,6 +74,9 @@ internal enum ScriptActionType
 
     /// <summary>Drop files (<c>names</c>, or one <c>path</c>) onto the main window at (x, y), like a file manager does.</summary>
     Drop,
+
+    /// <summary>Save the scene as a project (<c>path</c>), like File → Save As with that file chosen.</summary>
+    Save,
 }
 
 /// <summary>One scripted action. Coordinates are pixels of the main window's client area (top-left origin).</summary>
@@ -252,7 +255,7 @@ internal sealed class InputScript
     private static void Validate(ScriptAction a)
     {
         bool needsText = a.Type is ScriptActionType.Key or ScriptActionType.Menu or ScriptActionType.Action or ScriptActionType.Screenshot
-            or ScriptActionType.Layout or ScriptActionType.Setting or ScriptActionType.Open;
+            or ScriptActionType.Layout or ScriptActionType.Setting or ScriptActionType.Open or ScriptActionType.Save;
         if (a.Type == ScriptActionType.Drop && a.Text.Length == 0 && a.Names.Count == 0)
             throw new FormatException("'drop' needs \"path\" or \"names\"");
         if (needsText && a.Text.Length == 0)

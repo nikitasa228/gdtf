@@ -232,6 +232,9 @@ internal sealed partial class Workspace
     private void ShowSaveAs(Action? then) => _browser.Show(FileBrowserMode.Save, Loc.Get(Str.BrowserSaveTitle),
         new[] { Named(ProjectFilter, Str.BrowserCandelaProjects) }, StartFolder(), SuggestedName() + ".candela", path => SaveAs(path, then));
 
+    /// <inheritdoc/>
+    public void SaveFile(string path) => SaveAs(path);
+
     /// <summary>Saves the scene as <paramref name="path"/> (".candela" is added when missing).</summary>
     internal void SaveAs(string path, Action? then = null)
     {
