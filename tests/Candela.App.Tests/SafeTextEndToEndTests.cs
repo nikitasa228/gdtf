@@ -52,6 +52,7 @@ public sealed class SafeTextEndToEndTests : IDisposable
 
         File.WriteAllText(Path.Combine(folder, "Other " + Nasty + ".mvr"), "");
         File.WriteAllText(Path.Combine(folder, "a##b.mvr"), "");
+        Directory.CreateDirectory(Path.Combine(folder, "Music C#"));
         string gdtf = Path.Combine(folder, "Fixture " + Nasty + ".gdtf");
         File.Copy(Directory.EnumerateFiles(EngineTestSupport.Root, "ACME@ACME_AECO_15@*.gdtf").First(), gdtf);
 
@@ -103,6 +104,7 @@ public sealed class SafeTextEndToEndTests : IDisposable
         Assert.Contains($"Show {Nasty}.candela", browser, StringComparison.Ordinal);
         Assert.Contains($"Other {Nasty}.mvr", browser, StringComparison.Ordinal);
         Assert.Contains("a# #b.mvr", browser, StringComparison.Ordinal);
+        Assert.Contains("Music C#", browser, StringComparison.Ordinal); // the row's "##id" does not swallow the final '#'
         string russian = File.ReadAllText(Text("russian"));
         Assert.Contains("DMX " + Nasty, russian, StringComparison.Ordinal);
         foreach (string name in new[] { "selected", "library", "browser", "russian" })
