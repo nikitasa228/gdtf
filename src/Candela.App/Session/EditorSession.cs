@@ -286,6 +286,8 @@ internal sealed class EditorSession : IDisposable
             return SessionResult.Failed(Loc.Format(Str.MsgFileMissing, path));
         // The engine decides by the file's content type; the kind only chose the file dialog's filter.
         bool gdtf = kind == ImportKind.Gdtf || path.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase);
+        // A file the library already has is selected, not added again (the message must not claim it was added).
+        var known = gdtf ? EngineOrThrow.Library.FindByFileName(Path.GetFileName(path)) : null;
         var result = EngineOrThrow.Import(path, options);
         if (!result.Success)
         {
@@ -300,7 +302,8 @@ internal sealed class EditorSession : IDisposable
         if (result.LibraryEntry is { } entry)
         {
             string name = string.IsNullOrWhiteSpace(entry.Manufacturer) ? entry.ModelName : $"{entry.Manufacturer} {entry.ModelName}";
-            return Done(Loc.Format(Str.LibImportedSelected, name), result) with { LibraryEntry = entry };
+            var message = ReferenceEquals(entry, known) ? Str.LibImportAlreadyThere : Str.LibImportedSelected;
+            return Done(Loc.Format(message, name), result) with { LibraryEntry = entry };
         }
 
         return Done(Loc.Format(Str.MsgImported, Path.GetFileName(path)), result);

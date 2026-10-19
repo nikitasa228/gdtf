@@ -489,6 +489,7 @@ internal static class Loc
         (Str.MsgWorkLight, "Work light: {0}", "Рабочий свет: {0}"),
         (Str.LibImportedSelected, "Added {0} to the fixture library", "{0} добавлен в библиотеку приборов"),
         (Str.LibImportRefused, "The file was not added to the fixture library. {0}", "Файл не добавлен в библиотеку приборов. {0}"),
+        (Str.LibImportAlreadyThere, "{0} is already in the fixture library", "{0}: уже есть в библиотеке приборов"),
         // (end of engine integration strings)
 
 

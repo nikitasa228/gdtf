@@ -96,6 +96,12 @@ public sealed class LibraryImportFollowUpTests : IDisposable
         var again = session.Import(path, ImportKind.Gdtf);
         Assert.True(again.Succeeded, again.Message);
         Assert.Same(entry, again.LibraryEntry);
+        // … and the message says it was already there instead of claiming it was added.
+        Assert.EndsWith("is already in the fixture library", again.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain("Added", again.Message, StringComparison.Ordinal);
+        Loc.SetLanguage("ru");
+        Assert.EndsWith("уже есть в библиотеке приборов", session.Import(path, ImportKind.Gdtf).Message, StringComparison.Ordinal);
+        Loc.SetLanguage("en");
         Assert.False(watcher.TakeChanged());
         Assert.Equal(before + 1, engine.Library.Count);
 

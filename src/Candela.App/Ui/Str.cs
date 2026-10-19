@@ -431,6 +431,7 @@ internal enum Str
     MsgWorkLight,
     LibImportedSelected,
     LibImportRefused,
+    LibImportAlreadyThere,
     // (end of engine integration strings)
 
 
