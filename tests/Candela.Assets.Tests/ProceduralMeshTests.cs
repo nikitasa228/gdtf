@@ -342,6 +342,22 @@ public class ProceduralMeshTests
         Assert.Contains(over, p => p.X is >= 2.5f and <= 3.5f && MathF.Abs(p.Z - 1.004f) < 1e-4f); // it does touch the platform
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ACableLeavingARiserDrapesOverItsEdgeWhicheverWayTheSpanRuns(bool reversed)
+    {
+        // a riser 0.6 m high for x < 2, the floor at 0 beyond; the span runs from the riser top down to the floor
+        CableSupportHeight surfaces = (x, y, maxHeight) =>
+            x <= 2f && maxHeight >= 0.58f ? 0.6f : maxHeight >= -0.02f ? 0f : float.NegativeInfinity;
+        var points = new[] { new Vector3(1, 0, 0.62f), new Vector3(5, 0, 0.02f) };
+        if (reversed) Array.Reverse(points);
+        var path = CableTubeMesh.SamplePath(points, 1.1f, 0.05f, surfaces, 0.004f);
+        Assert.All(path, p => Assert.True(p.Z >= (p.X <= 2f ? 0.604f : 0.004f) - 1e-5f, $"({p.X}, {p.Z}) inside a surface"));
+        Assert.Equal(points[0], path[0]);
+        Assert.Equal(points[1], path[^1]);
+    }
+
     [Fact]
     public void EachSpanOfACableTreeCanHaveItsOwnSlack()
     {

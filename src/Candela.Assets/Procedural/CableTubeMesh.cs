@@ -223,6 +223,7 @@ public static class CableTubeMesh
         float spacing = float.IsFinite(maxSampleSpacing) && maxSampleSpacing > 0.001f ? maxSampleSpacing : 0.1f;
 
         var result = new List<Vector3>(clean.Count * 8) { Rest(clean[0], clean[0].Z, support, lift) };
+        var forward = support is null ? null : new List<float>();
         for (int i = 0; i + 1 < clean.Count; i++)
         {
             Vector3 a = clean[i], c = clean[i + 1];
@@ -240,19 +241,56 @@ public static class CableTubeMesh
             float sag = CatenarySag(straight, slack) * fraction;
             int samples = System.Math.Clamp((int)MathF.Ceiling(straight / spacing), 2, 512);
             float coshK = MathF.Cosh(k);
-            for (int s = 1; s <= samples; s++)
+            int first = result.Count;
+            for (int s = 1; s < samples; s++)
             {
                 float t = s / (float)samples;
                 float shape = (coshK - MathF.Cosh(k * (2 * t - 1))) / (coshK - 1);
-                var chord = Vector3.Lerp(a, c, t);
-                result.Add(Rest(chord - Vector3.UnitZ * (sag * shape), s == samples ? c.Z : chord.Z, support, lift));
+                result.Add(Vector3.Lerp(a, c, t) - Vector3.UnitZ * (sag * shape));
             }
+            var end = Rest(c, c.Z, support, lift);
+            if (forward is not null && support is not null) RestSpan(result, first, a, c, end.Z, support, lift, forward);
+            result.Add(end);
         }
         // a cable lying on a surface makes runs of equal points where several samples rest at one spot: keep one
         var path = new List<Vector3>(result.Count) { result[0] };
         for (int i = 1; i < result.Count; i++)
             if (Vector3.DistanceSquared(path[^1], result[i]) >= 1e-12f) path.Add(result[i]);
         return path.ToArray();
+    }
+
+    /// <summary>
+    /// Keeps the inner samples <paramref name="path"/>[<paramref name="first"/>..] of the span from <paramref name="a"/>
+    /// to <paramref name="c"/> on the surfaces they would sag through. A surface supports a sample when it is not above the
+    /// span's straight chord there or the cable's height at the previous sample: the cable cannot pass down through a
+    /// surface it is lying on or above (so a cable leaving a riser drapes over its edge), but a surface over the cable's
+    /// route (a platform it runs under) is left alone. The walk is done from both ends (the start rests on
+    /// <c>path[first − 1]</c>, the end at <paramref name="endZ"/>) and each sample keeps the higher result, so the drawing
+    /// does not depend on the direction the span was stored in.
+    /// </summary>
+    private static void RestSpan(List<Vector3> path, int first, Vector3 a, Vector3 c, float endZ, CableSupportHeight support, float lift,
+        List<float> forward)
+    {
+        int count = path.Count - first;
+        if (count <= 0) return;
+        float span = 1f / (count + 1);
+        forward.Clear();
+        float previous = path[first - 1].Z;
+        for (int s = 0; s < count; s++)
+        {
+            var p = path[first + s];
+            float chord = a.Z + (c.Z - a.Z) * ((s + 1) * span);
+            previous = Rest(p, MathF.Max(chord, previous), support, lift).Z;
+            forward.Add(previous);
+        }
+        float next = endZ;
+        for (int s = count - 1; s >= 0; s--)
+        {
+            var p = path[first + s];
+            float chord = a.Z + (c.Z - a.Z) * ((s + 1) * span);
+            next = Rest(p, MathF.Max(chord, next), support, lift).Z;
+            path[first + s] = new Vector3(p.X, p.Y, MathF.Max(forward[s], next));
+        }
     }
 
     /// <summary>Slack of span <paramref name="i"/>: at least 1, at most 10; missing or invalid values are 1 (straight).</summary>

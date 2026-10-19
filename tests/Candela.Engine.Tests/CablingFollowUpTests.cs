@@ -3,6 +3,7 @@ using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Electrical;
+using Candela.Rendering;
 
 namespace Candela.Engine.Tests;
 
@@ -102,5 +103,138 @@ public sealed class CablingFollowUpTests
         Assert.Equal(10f, engine.NetworkSolution.FindCable(cable.Id)!.Geometry.RoutedLengthM, 3);
         engine.Tick(1.0 / 30);
         Assert.Equal(10f, engine.NetworkSolution.FindCable(cable.Id)!.Geometry.RoutedLengthM, 3);
+    }
+    /// <summary>A cable through free nodes at <paramref name="points"/> (in order), as the cable tool draws one on the ground.</summary>
+    private static Entity FreeCable(Scene scene, string name, float slack, params Vector3[] points)
+    {
+        var entity = new Entity(name);
+        var cable = new CableComponent { CableTypeId = "dmx-xlr5", SlackFactor = slack };
+        foreach (var p in points) cable.Nodes.Add(new CableNode { Position = p });
+        for (int i = 0; i + 1 < cable.Nodes.Count; i++) cable.Segments.Add(new CableSegment(cable.Nodes[i].Id, cable.Nodes[i + 1].Id));
+        entity.Add(cable);
+        scene.Add(entity);
+        return entity;
+    }
+
+    /// <summary>The world-space vertices of the tube RenderSync drew for <paramref name="cable"/>.</summary>
+    private static Vector3[] TubeVertices(RecordingRenderWorld world, RenderSync sync, Entity cable)
+    {
+        uint pick = sync.PickIdOf(cable.Id);
+        Assert.NotEqual(0u, pick);
+        var result = new List<Vector3>();
+        foreach (var instance in world.Instances.Values)
+        {
+            if (instance.PickId != pick) continue;
+            foreach (var p in world.Meshes[instance.Mesh.Value].Positions) result.Add(Vector3.Transform(p, instance.World));
+        }
+        Assert.NotEmpty(result);
+        return result.ToArray();
+    }
+
+    [Fact]
+    public void Cables_lying_on_a_floor_do_not_sag_below_it_and_keep_their_lengths()
+    {
+        using var engine = TestEnvironment.CreateEngine("cable-floor");
+        var scene = engine.Scene;
+        var floor = SceneBuilder.Floor(scene, 30f); // top face at z = 0
+        var riser = new Entity("Riser") { Local = new Transform(new Vector3(8, 0, 0.6f)) };
+        riser.Add(new WallComponent { Kind = WallKind.Floor, Width = 4f, Height = 4f, Thickness = 0.6f });
+        scene.Add(riser);
+        var truss = new Entity("Truss") { Local = new Transform(new Vector3(0, 6, 6)) };
+        truss.Add(new TrussComponent { Length = 8f });
+        scene.Add(truss);
+
+        // free nodes 2 cm above the floor (where the cable tool puts them), lots of slack so a hanging span would sag ~1 m
+        const float slack = 1.2f;
+        var floorRun = FreeCable(scene, "Floor run", slack, new(-10, -6, 0.02f), new(0, -6, 0.02f), new(0, 4, 0.02f), new(5, 4, 0.02f));
+        // a run on the riser, its nodes fixed to it
+        var onRiser = new Entity("On riser");
+        var riserCable = new CableComponent { CableTypeId = "powercon-true1", SlackFactor = slack };
+        var r1 = new CableNode { Anchor = new CableAnchor(riser.Id, new Vector3(-1.5f, -1.5f, 0.02f)) };
+        var r2 = new CableNode { Anchor = new CableAnchor(riser.Id, new Vector3(1.5f, 1.5f, 0.02f)) };
+        var r3 = new CableNode { Position = new Vector3(8, 6, 0.02f) }; // down to the floor beside the riser
+        riserCable.Nodes.AddRange([r1, r2, r3]);
+        riserCable.Segments.AddRange([new(r1.Id, r2.Id), new(r2.Id, r3.Id)]);
+        onRiser.Add(riserCable);
+        scene.Add(onRiser);
+        // a drop from the truss to the floor: it hangs, but never below the floor
+        var drop = new Entity("Drop");
+        var dropCable = new CableComponent { CableTypeId = "dmx-xlr5", SlackFactor = slack };
+        var d1 = new CableNode { Anchor = new CableAnchor(truss.Id, new Vector3(-3, 0, 0)) };
+        var d2 = new CableNode { Anchor = new CableAnchor(truss.Id, new Vector3(3, 0, 0)) };
+        var d3 = new CableNode { Position = new Vector3(3, 10, 0.02f) };
+        dropCable.Nodes.AddRange([d1, d2, d3]);
+        dropCable.Segments.AddRange([new(d1.Id, d2.Id), new(d2.Id, d3.Id)]);
+        drop.Add(dropCable);
+        scene.Add(drop);
+
+        var world = new RecordingRenderWorld();
+        var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        engine.Tick(1.0 / 30);
+        Assert.Empty(world.Violations);
+
+        var run = TubeVertices(world, sync, floorRun);
+        Assert.All(run, p => Assert.True(p.Z >= -1e-4f, $"floor run vertex at z = {p.Z}"));
+        Assert.All(run, p => Assert.True(p.Z <= 0.02f + 0.0041f, $"floor run vertex at z = {p.Z}: the run lies flat")); // no hump either
+
+        var risen = TubeVertices(world, sync, onRiser);
+        Assert.All(risen, p => Assert.True(p.Z >= -1e-4f, $"riser cable vertex at z = {p.Z}"));
+        Assert.All(risen.Where(p => p.X is > 6.01f and < 9.99f && p.Y is > -1.99f and < 1.99f),
+            p => Assert.True(p.Z >= 0.6f - 1e-4f, $"riser cable vertex at z = {p.Z} inside the riser"));
+        Assert.All(risen.Where(p => p.Y < 1.4f), p => Assert.InRange(p.Z, 0.62f - 0.0061f, 0.62f + 0.0061f)); // fixed along the riser: straight
+
+        var hanging = TubeVertices(world, sync, drop);
+        Assert.All(hanging, p => Assert.True(p.Z >= -1e-4f, $"drop vertex at z = {p.Z}"));
+        Assert.All(hanging.Where(p => p.Y < 6.01f && p.Z > 5f), p => Assert.InRange(p.Z, 6f - 0.0041f, 6f + 0.0041f)); // along the truss
+        Assert.Contains(hanging, p => p.Y > 7f && p.Z < 0.02f + 0.0041f); // the free span reaches the floor and lies on it
+
+        // stored lengths are routed length × the cable's slack, whatever the drawing does
+        var solution = engine.NetworkSolution;
+        Assert.Equal(25f * slack, solution.FindCable(floorRun.Id)!.LengthM, 3);
+        foreach (var cable in new[] { floorRun, onRiser, drop })
+        {
+            var geometry = CableGeometry.Compute(scene, cable, cable.Get<CableComponent>()!);
+            Assert.Equal(geometry.RoutedLengthM * slack, solution.FindCable(cable.Id)!.LengthM, 3);
+        }
+
+        // without anything to rest on the same run sags through where the floor was: the support is what keeps it up
+        scene.Remove(floor);
+        sync.CableSupports.GroundHeight = null;
+        engine.Tick(1.0 / 30);
+        Assert.True(TubeVertices(world, sync, floorRun).Min(p => p.Z) < -0.5f);
+        sync.CableSupports.GroundHeight = 0f;
+        engine.Tick(1.0 / 30);
+        Assert.True(TubeVertices(world, sync, floorRun).Min(p => p.Z) >= -1e-4f);
+
+        // lowering the riser redraws the cables on it: the anchored span follows, the span to the floor still rests on it
+        riser.Local = new Transform(new Vector3(8, 0, 0.3f));
+        engine.Tick(1.0 / 30);
+        risen = TubeVertices(world, sync, onRiser);
+        Assert.All(risen.Where(p => p.X is > 6.01f and < 9.99f && p.Y is > -1.99f and < 1.99f),
+            p => Assert.True(p.Z >= 0.3f - 1e-4f, $"riser cable vertex at z = {p.Z} inside the lowered riser"));
+        Assert.Empty(world.Violations);
+    }
+
+    [Fact]
+    public void A_free_run_left_on_a_lowered_floor_drapes_onto_it()
+    {
+        using var engine = TestEnvironment.CreateEngine("cable-floor-moved");
+        var scene = engine.Scene;
+        var deck = new Entity("Deck") { Local = new Transform(new Vector3(0, 0, 1f)) };
+        deck.Add(new WallComponent { Kind = WallKind.Floor, Width = 10f, Height = 10f, Thickness = 0.2f });
+        scene.Add(deck);
+        var cable = FreeCable(scene, "Deck run", 1.1f, new(-4, 0, 1.02f), new(4, 0, 1.02f));
+        var world = new RecordingRenderWorld();
+        var sync = engine.AttachRenderWorld(world, loadFixtureModelsInBackground: false);
+        engine.Tick(1.0 / 30);
+        Assert.All(TubeVertices(world, sync, cable), p => Assert.InRange(p.Z, 1.02f - 0.0041f, 1.02f + 0.0041f)); // flat on the deck
+
+        // the deck is lowered by 40 cm under the cable's free nodes: the span now hangs and lies on the deck, not through it
+        deck.Local = new Transform(new Vector3(0, 0, 0.6f));
+        engine.Tick(1.0 / 30);
+        var tube = TubeVertices(world, sync, cable);
+        Assert.All(tube, p => Assert.True(p.Z >= 0.6f - 1e-4f, $"vertex at z = {p.Z} below the deck"));
+        Assert.Contains(tube, p => MathF.Abs(p.X) < 1f && p.Z < 0.6f + 0.0081f);
+        Assert.Empty(world.Violations);
     }
 }
