@@ -335,9 +335,12 @@ internal sealed unsafe class TopLevelStructure : IDisposable
         {
             if (_structure.Handle != 0)
             {
+                // (locals of this block only: a lambda capturing the method's own locals would allocate its closure
+                // on every build, also when nothing is retired)
                 var old = _structure;
                 var device = context.Device;
-                context.DeferDestroy(() => api.DestroyAccelerationStructure(device, old, null));
+                var retireApi = _device.Api;
+                context.DeferDestroy(() => retireApi.DestroyAccelerationStructure(device, old, null));
                 _structure = default;
             }
 

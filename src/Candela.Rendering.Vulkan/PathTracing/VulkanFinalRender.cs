@@ -841,13 +841,14 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     private void RetirePool()
     {
         _signature.Invalidate();
-        if (_pool.Handle == 0)
-            return;
-        var pool = _pool;
-        var vk = _context.Vk;
-        var device = _context.Device;
-        _context.DeferDestroy(() => vk.DestroyDescriptorPool(device, pool, null));
-        _pool = default;
+        if (_pool.Handle != 0)
+        {
+            var pool = _pool;
+            var vk = _context.Vk;
+            var device = _context.Device;
+            _context.DeferDestroy(() => vk.DestroyDescriptorPool(device, pool, null));
+            _pool = default;
+        }
     }
 
     private void BindPassSet(CommandBuffer cmd, DescriptorSet set) =>
