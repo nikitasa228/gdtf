@@ -95,8 +95,11 @@ public sealed class EditorEndToEndTests : IDisposable
         string project = _dir.File("built.candela");
         string placed = _dir.File("placed.png");
         string picture = Path.Combine(EngineTestSupport.Root, "docs", "images", "editor-view-cube.png");
+        // Colorless shading: nothing here depends on lit pixels, and on a software Vulkan device the lit preview of a dark
+        // rig (the Auto work light with its shadow and haze) costs about twice the frame time.
         string script = _dir.Write("build.json", $$"""
             { "actions": [
+                { "type": "viewport", "viewport": "Viewport1", "shading": "Colorless" },
                 { "type": "wait", "frames": 6 },
                 { "type": "action", "id": "tool.floor" },
                 { "type": "drag", "x": 470, "y": 470, "toX": 1060, "toY": 590, "steps": 8 },
@@ -150,8 +153,11 @@ public sealed class EditorEndToEndTests : IDisposable
         // row; pressing on the card's picture — above the first tile — and dragging must place the third fixture.
         var latest = EngineTestSupport.Library.Entries.Where(e => EngineTestSupport.Library.IsLatestRevision(e)).ToList();
         string shown = latest[2].FileName, underneath = latest[0].FileName;
+        // Colorless shading: nothing here depends on lit pixels, and on a software Vulkan device the lit preview of a dark
+        // rig (the Auto work light with its shadow and haze) costs about twice the frame time.
         string script = _dir.Write("card.json", $$"""
             { "actions": [
+                { "type": "viewport", "viewport": "Viewport1", "shading": "Colorless" },
                 { "type": "wait", "frames": 4 },
                 { "type": "move", "x": 70, "y": 560 },
                 { "type": "wait", "frames": 30 },
