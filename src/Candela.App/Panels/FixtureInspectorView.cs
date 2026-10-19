@@ -439,18 +439,31 @@ internal sealed class FixtureInspectorView
 
     private void ApplyAddress(Entity entity, FixtureComponent fixture, int index, int dmxBreak)
     {
-        int universe = Math.Clamp(_patchUniverse[index], 1, 63999);
-        int address = Math.Clamp(_patchAddress[index], 1, 512);
-        _patchUniverse[index] = universe;
-        _patchAddress[index] = address;
+        _patchUniverse[index] = Math.Clamp(_patchUniverse[index], 1, 63999);
+        _patchAddress[index] = Math.Clamp(_patchAddress[index], 1, 512);
+        PatchTo(entity, fixture, index, dmxBreak, _patchUniverse[index], _patchAddress[index]);
+    }
+
+    /// <summary>
+    /// Patches DMX break <paramref name="index"/> (0-based in the address list; GDTF break number
+    /// <paramref name="dmxBreak"/>) of the fixture to <paramref name="universe"/>.<paramref name="address"/> as one undo
+    /// step; values out of range are clamped, an unchanged address records nothing. Returns true when it changed.
+    /// </summary>
+    internal bool PatchTo(Entity entity, FixtureComponent fixture, int index, int dmxBreak, int universe, int address)
+    {
+        if (index < 0 || index >= _patchUniverse.Length)
+            return false;
+        universe = Math.Clamp(universe, 1, 63999);
+        address = Math.Clamp(address, 1, 512);
         var current = fixture.Addresses ?? new List<DmxAddress>();
         if (index < current.Count && current[index].Universe == universe && current[index].Address == address)
-            return;
+            return false;
         var list = new List<DmxAddress>(current);
         while (list.Count <= index)
             list.Add(new DmxAddress(universe, address, list.Count + 1));
-        list[index] = new DmxAddress(universe, address, dmxBreak);
+        list[index] = new DmxAddress(universe, address, Math.Max(1, dmxBreak));
         _stage.Undo.Execute(ModifyComponentCommand.Create(fixture, f => f.Addresses = list, $"Patch {entity.Name} to {universe}.{address:D3}"));
+        return true;
     }
 
     private string PatchRangeText(Entity entity)
