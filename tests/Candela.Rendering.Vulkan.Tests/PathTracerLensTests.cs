@@ -216,4 +216,102 @@ public sealed class PathTracerLensTests
             TestRenderers.DisposeAndAssertClean(renderer);
         }
     }
+
+    /// <summary>
+    /// The glossy reflection of a soft light seen through see-through screens between the light and the floor (both
+    /// estimators reach the lens, so the multiple importance sampling weights must still add up to one): a half-transparent
+    /// (alpha-blended) shadow-casting screen passes (1 − α) per face, a clear glass that casts shadows passes its
+    /// thin-walled transmission (1 − F) per face, and screens without <see cref="InstanceFlags.CastShadow"/> — half-transparent
+    /// or glass — or before a light without shadows do not change the light (as in the real-time view, where only shadow
+    /// casters dim a light that casts shadows).
+    /// </summary>
+    [SkippableFact]
+    public void SeeThroughScreensDimTheReflectionOfASoftLightByTheirTransmittance()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(8f, renderer.World.CreateMaterial(new MaterialData
+            {
+                Name = "glossy metal",
+                BaseColorFactor = new Vector4(0.9f, 0.9f, 0.9f, 1f),
+                Metallic = 1f,
+                Roughness = 0.3f,
+            }, null));
+            var light = ProceduralTestScene.Spot(new Vector3(-1f, 0f, 1.4f), new Vector3(0.5f, 0f, 0f), LightColor.White, 8000f, 60f, 90f);
+            light.SourceRadius = 0.25f;
+            renderer.World.SetLights(new[] { light });
+            var camera = RenderCamera.LookAt(new Vector3(2f, 0f, 1.4f), new Vector3(0.5f, 0f, 0f), 8f);
+            camera.Ev100 = 10f;
+            const int size = 16;
+
+            float Reflection(string name)
+            {
+                using var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(size, size, 512, bounces: 1),
+                    new FinalRenderOptions { BackgroundLuminance = 0f, Seed = 3 });
+                FinalRenderSupport.Save(render, name);
+                return FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure).MeanLuminance(size / 2, size / 2, 3);
+            }
+
+            float open = Reflection("pt-screen-open");
+            var half = renderer.World.CreateMaterial(new MaterialData
+            {
+                Name = "half-transparent screen",
+                BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 0.5f),
+                Roughness = 1f,
+                Ior = 1f,
+                AlphaMode = AlphaMode.Blend,
+                DoubleSided = true,
+            }, null);
+            var glass = renderer.World.CreateMaterial(new MaterialData
+            {
+                Name = "clear glass",
+                BaseColorFactor = Vector4.One,
+                Roughness = 0.05f,
+                Ior = 1.5f,
+                Transmission = 1f,
+                DoubleSided = true,
+            }, null);
+
+            // a thin screen (two faces) between the light and the floor point, outside the camera's view of it
+            float Behind(MaterialHandle material, InstanceFlags flags, string name)
+            {
+                var screen = scene.Box(new Vector3(0.02f, 2f, 0.9f), new Vector3(-0.5f, 0f, 0.75f), material, flags);
+                float value = Reflection(name);
+                renderer.World.DestroyInstance(screen);
+                return value;
+            }
+
+            float halfCaster = Behind(half, InstanceFlags.CastShadow, "pt-screen-half-caster");
+            float halfNonCaster = Behind(half, InstanceFlags.None, "pt-screen-half-non-caster");
+            float glassCaster = Behind(glass, InstanceFlags.CastShadow, "pt-screen-glass-caster");
+            float glassNonCaster = Behind(glass, InstanceFlags.None, "pt-screen-glass-non-caster");
+            // a light without shadows passes every screen, shadow caster or not
+            light.CastShadows = false;
+            renderer.World.SetLights(new[] { light });
+            float glassUnshadowed = Behind(glass, InstanceFlags.CastShadow, "pt-screen-glass-unshadowed-light");
+
+            // the light crosses the screen's faces at the angle of the floor point's direction to the light centre
+            var toLight = Vector3.Normalize(light.Position - new Vector3(0.5f, 0f, 0f));
+            float cos = MathF.Abs(toLight.X);
+            float fresnel = 0.04f + (1f - 0.04f) * MathF.Pow(1f - cos, 5f);
+            float glassExpected = (1f - fresnel) * (1f - fresnel);
+            _output.WriteLine($"open {open:0.0} cd/m²; half-transparent caster {halfCaster / open:0.000} (expected 0.25), non-caster " +
+                              $"{halfNonCaster / open:0.000} (1); glass caster {glassCaster / open:0.000} (expected {glassExpected:0.000}), " +
+                              $"non-caster {glassNonCaster / open:0.000} (1), caster before a light without shadows {glassUnshadowed / open:0.000} (1)");
+
+            Assert.True(open > 100f, $"the reflection of the lens is bright ({open} cd/m²)");
+            Assert.InRange(halfCaster / open, 0.25 * 0.95, 0.25 * 1.05);
+            Assert.InRange(halfNonCaster / open, 0.96, 1.04);
+            Assert.InRange(glassCaster / open, glassExpected * 0.96, glassExpected * 1.04);
+            Assert.InRange(glassNonCaster / open, 0.96, 1.04);
+            Assert.InRange(glassUnshadowed / open, 0.96, 1.04);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
 }

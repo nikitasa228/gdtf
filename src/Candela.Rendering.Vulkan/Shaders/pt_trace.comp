@@ -406,12 +406,18 @@ vec3 surfaceTransmittance(vec3 o, vec3 d, float tMax)
     return vec3(0.0);
 }
 
-// Whether a BSDF sample leaving o along d reaches the lens point at distance tLens, as the path would trace it: no
-// surface (shadow caster or not) and no other lens in front of it; alpha holes and blended surfaces are crossed
-// stochastically (as traceSurface does) and transmissive surfaces are crossed (the path passes them by its transmission
-// lobe). Next-event estimation only tests the shadow casters, and not the last LensClearance before the lens, so where
-// this is false BSDF sampling cannot find the light and next-event estimation must take it with weight 1.
-bool lensReachable(vec3 o, vec3 d, float tLens, inout uint rng)
+// Whether a BSDF sample leaving o along d reaches the lens point at distance tLens in a way the multiple importance
+// sampling shares with next-event estimation; where it does not, next-event estimation takes the light with weight 1
+// (and a BSDF sample that still reaches the lens counts 0). Next-event estimation sees only the surfaces it accounts for
+// (shadow casters, for a light that casts shadows, short of its last tShadow; their transmittance is in its estimate):
+//  - another lens, or an opaque surface it does not account for, stops the BSDF sample: false;
+//  - an alpha-masked or blended surface it accounts for is crossed (the BSDF sample passes it with the probability next-
+//    event estimation weights the light with), one it does not account for is crossed stochastically as traceSurface
+//    does (the light then counts with weight 1 when the BSDF sample is stopped and shares it otherwise: unbiased);
+//  - a transmissive surface it accounts for is crossed (the path passes it by its transmission lobe, whose expected
+//    weight is the thin-walled transmittance of surfaceTransmittance); one it does not account for gives false, and a
+//    BSDF sample that reaches the lens through such a surface counts 0 (see crossedUnaccounted in main).
+bool lensReachable(vec3 o, vec3 d, float tLens, float tShadow, bool lightShadows, inout uint rng)
 {
     float tMax = tLens - max(1e-4, 1e-4 * tLens);
     float tMin = 0.0;
@@ -439,14 +445,28 @@ bool lensReachable(vec3 o, vec3 d, float tLens, inout uint rng)
         float t = rayQueryGetIntersectionTEXT(q, true);
         uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(q, true));
         Material m = materials[rtMaterialIndex(custom, geometry)];
-        bool pass = (m.flags & MATERIAL_TRANSMISSIVE) != 0u;
+        bool caster = lightShadows && (instances[custom].flags & INSTANCE_FLAG_CAST_SHADOW) != 0u;
+        bool pass = false;
         if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
         {
-            RtSurface s = rtFetchSurface(custom, geometry, uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, true)),
-                                         rayQueryGetIntersectionBarycentricsEXT(q, true));
-            float coverage = coverageOf(m, s.uv);
-            if (coverage < 1.0 && rand(rng) >= coverage)
+            if (caster && t < tShadow)
+            {
                 pass = true;
+            }
+            else
+            {
+                RtSurface s = rtFetchSurface(custom, geometry, uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, true)),
+                                             rayQueryGetIntersectionBarycentricsEXT(q, true));
+                float coverage = coverageOf(m, s.uv);
+                pass = coverage < 1.0 && rand(rng) >= coverage;
+            }
+        }
+
+        if (!pass && (m.flags & MATERIAL_TRANSMISSIVE) != 0u)
+        {
+            if (!caster)
+                return false;
+            pass = true;
         }
 
         if (!pass)
@@ -749,15 +769,17 @@ vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out f
 
     float clearance = min(params.geometry.x, 0.5 * dist);
     vec3 origin = offsetRay(P, Ng);
-    vec3 T = (l.flags & LIGHT_CAST_SHADOWS) != 0u ? surfaceTransmittance(origin, L, dist - clearance) : vec3(1.0);
+    bool lightShadows = (l.flags & LIGHT_CAST_SHADOWS) != 0u;
+    vec3 T = lightShadows ? surfaceTransmittance(origin, L, dist - clearance) : vec3(1.0);
     if (max(T.r, max(T.g, T.b)) <= 0.0)
         return vec3(0.0);
     vec3 none = vec3(0.0);
     T *= trackTransmittance(origin, L, dist, rng, vec3(0.0), none, false);
 
     // MIS against BSDF samples hitting the lens (power heuristic), where BSDF sampling can find it: not where its
-    // share is negligible (the lens hit in main applies the same rule) and not where a surface the shadow ray ignores
-    // (no CastShadow, or within the lens clearance) stops the BSDF sample before the lens.
+    // share is negligible (the lens hit in main applies the same rule) and not where a surface the shadow ray does not
+    // account for (no CastShadow, a light without shadows, or within the lens clearance) stops the BSDF sample before
+    // the lens (lensReachable).
     float weight = 1.0;
     if (lens)
     {
@@ -767,7 +789,7 @@ vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out f
         float pBsdf = bsdfPdf(b, N, V, L, pSpecular, pDiffuse);
         float pLight = pSelect * dist * dist / (lensArea(l) * cosY);
         float b2 = pBsdf * pBsdf, l2 = pLight * pLight;
-        if (b2 > PT_MIS_MIN_SHARE * l2 && lensReachable(origin, L, dist, rng))
+        if (b2 > PT_MIS_MIN_SHARE * l2 && lensReachable(origin, L, dist, dist - clearance, lightShadows, rng))
             weight = l2 / (l2 + b2);
     }
 
@@ -939,6 +961,10 @@ void main()
     prevBsdf.tint = vec3(0.0);
     float prevSumW = 0.0;
     float prevPdf = 0.0;
+    // transmissive surfaces the ray from the last scattering vertex has passed (thin-walled transmission): any, and
+    // any without CastShadow (next-event estimation does not account for them, see lensReachable)
+    bool crossedTransmission = false;
+    bool crossedNonCaster = false;
 
     vec3 aovAlbedo = vec3(0.0);
     vec3 aovNormal = vec3(0.0);
@@ -987,6 +1013,8 @@ void main()
                     visible = false;
                     prevKind = PREV_MEDIUM;
                     prevP = x;
+                    crossedTransmission = false;
+                    crossedNonCaster = false;
                     o = x;
                     d = sampleHenyeyGreenstein(d, params.majorants.z, vec2(rand(rng), rand(rng)));
                     if (surfaceBounces + volumeVertices > 3u)
@@ -1039,11 +1067,13 @@ void main()
                     if (prevKind == PREV_SURFACE && prevSumW > 0.0)
                     {
                         // the power heuristic against next-event estimation from that vertex, with surfaceNee's rule:
-                        // a negligible BSDF share is left to next-event estimation entirely
+                        // a negligible BSDF share is left to next-event estimation entirely, and so is a lens seen
+                        // through a transmissive surface next-event estimation does not account for (lensReachable)
+                        bool unaccounted = crossedNonCaster || (crossedTransmission && (l.flags & LIGHT_CAST_SHADOWS) == 0u);
                         float pSelect = surfaceLightWeight(l, prevP, prevN, prevV, prevBsdf) / prevSumW;
                         float pLight = pSelect * dy2 / (area * cosY);
                         float b2 = prevPdf * prevPdf, l2 = pLight * pLight;
-                        weight = b2 > PT_MIS_MIN_SHARE * l2 ? b2 / (b2 + l2) : 0.0;
+                        weight = !unaccounted && b2 > PT_MIS_MIN_SHARE * l2 ? b2 / (b2 + l2) : 0.0;
                     }
 
                     radiance += clampContribution(beta * Le * weight, scattered);
@@ -1118,6 +1148,9 @@ void main()
             // thin-walled transmission: straight through, a pass-through event (not a scattering vertex)
             beta *= Ft / pTransmission;
             o = offsetRay(P, -Ng);
+            crossedTransmission = true;
+            if ((instances[hit.instance].flags & INSTANCE_FLAG_CAST_SHADOW) == 0u)
+                crossedNonCaster = true;
             continue;
         }
 
@@ -1161,6 +1194,8 @@ void main()
         prevBsdf = b;
         prevSumW = sumW;
         prevPdf = pdf;
+        crossedTransmission = false;
+        crossedNonCaster = false;
         o = offsetRay(P, Ng);
         d = L;
 
