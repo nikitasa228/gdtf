@@ -681,14 +681,21 @@ public sealed partial class FixtureProfile
                     if (Relations[ri].Type == RelationType.Multiply) IsRelationMaster[Relations[ri].Master] = true;
         }
 
-        /// <summary>Followers in evaluation order: every channel after the masters it follows (Kahn's algorithm); relations closing a cycle are dropped.</summary>
+        /// <summary>
+        /// Followers in evaluation order: every channel after the masters it follows (Kahn's algorithm). When the
+        /// remaining followers all wait for each other, a cycle is found by walking from the first waiting follower to
+        /// a master it waits for until a channel repeats, and only the relations closing that cycle (those of its
+        /// lowest-index channel to its master on the cycle) are dropped — followers downstream of a cycle keep theirs.
+        /// </summary>
         private void OrderFollowers()
         {
             int n = Channels.Count;
             var pending = new int[n]; // relations whose master is itself a follower that is not yet ordered
             var dependents = new List<int>?[n];
             var isFollower = new bool[n];
-            for (int c = 0; c < n; c++) isFollower[c] = FollowerRelations[c].Length > 0;
+            int followers = 0;
+            for (int c = 0; c < n; c++)
+                if (isFollower[c] = FollowerRelations[c].Length > 0) followers++;
             for (int c = 0; c < n; c++)
             {
                 foreach (int ri in FollowerRelations[c])
@@ -699,41 +706,76 @@ public sealed partial class FixtureProfile
                     (dependents[m] ??= new List<int>()).Add(c);
                 }
             }
-            var order = new List<int>();
+            var order = new List<int>(followers);
+            var placed = new bool[n];
             var queue = new Queue<int>();
             for (int c = 0; c < n; c++)
                 if (isFollower[c] && pending[c] == 0) queue.Enqueue(c);
-            while (queue.Count > 0)
+            int dropped = 0, scan = 0;
+            while (order.Count < followers)
             {
-                int c = queue.Dequeue();
-                order.Add(c);
-                if (dependents[c] is not { } deps) continue;
+                if (queue.Count == 0)
+                {
+                    while (!isFollower[scan] || placed[scan]) scan++;
+                    var (c, master) = CycleEdge(scan, placed, isFollower);
+                    var keep = new List<int>(FollowerRelations[c].Length);
+                    foreach (int ri in FollowerRelations[c])
+                    {
+                        if (Relations[ri].Master != master)
+                        {
+                            keep.Add(ri);
+                            continue;
+                        }
+                        dropped++;
+                        pending[c]--;
+                        dependents[master]!.Remove(c);
+                    }
+                    FollowerRelations[c] = keep.ToArray();
+                    if (pending[c] == 0) queue.Enqueue(c);
+                    continue;
+                }
+                int next = queue.Dequeue();
+                placed[next] = true;
+                order.Add(next);
+                if (dependents[next] is not { } deps) continue;
                 foreach (int d in deps)
                     if (--pending[d] == 0) queue.Enqueue(d);
             }
-            if (order.Count < Channels.Count(ch => isFollower[ch.Index]))
-            {
-                // the remaining followers sit on cycles: keep only their relations to masters that are already resolved
-                int dropped = 0;
-                var placed = new bool[n];
-                foreach (int c in order) placed[c] = true;
-                for (int c = 0; c < n; c++)
-                {
-                    if (!isFollower[c] || placed[c]) continue;
-                    var keep = new List<int>();
-                    foreach (int ri in FollowerRelations[c])
-                    {
-                        int m = Relations[ri].Master;
-                        if (!isFollower[m] || placed[m]) keep.Add(ri);
-                        else dropped++;
-                    }
-                    FollowerRelations[c] = keep.ToArray();
-                    order.Add(c);
-                    placed[c] = true;
-                }
-                Warnings.Add($"{dropped} relation(s) forming a cycle ignored.");
-            }
+            if (dropped > 0) Warnings.Add($"{dropped} relation(s) closing a cycle of relations ignored.");
             FollowerOrder = order.Where(c => FollowerRelations[c].Length > 0).ToArray();
+        }
+
+        /// <summary>
+        /// A relation edge on a cycle among the followers not yet ordered, starting the walk at <paramref name="start"/>
+        /// (every such follower waits for at least one master that is itself an unordered follower): the cycle's
+        /// lowest-index channel and its master on the cycle.
+        /// </summary>
+        private (int Follower, int Master) CycleEdge(int start, bool[] placed, bool[] isFollower)
+        {
+            var path = new List<int>();
+            var at = new Dictionary<int, int>();
+            int x = start;
+            while (!at.ContainsKey(x))
+            {
+                at[x] = path.Count;
+                path.Add(x);
+                int waitsFor = -1;
+                foreach (int ri in FollowerRelations[x])
+                {
+                    int m = Relations[ri].Master;
+                    if (isFollower[m] && !placed[m])
+                    {
+                        waitsFor = m;
+                        break;
+                    }
+                }
+                x = waitsFor;
+            }
+            // path[at[x]] … path[^1] is the cycle; path[i] follows path[i + 1], and the last follows x
+            int first = at[x], best = first;
+            for (int i = first + 1; i < path.Count; i++)
+                if (path[i] < path[best]) best = i;
+            return (path[best], best + 1 < path.Count ? path[best + 1] : x);
         }
 
         /// <summary>A channel whose attribute is an intensity (Dimmer): its relations scale their followers.</summary>
@@ -1173,11 +1215,15 @@ public sealed partial class FixtureProfile
         {
             var excluded = new List<int>?[Beams.Count];
             var followersOf = new Dictionary<int, List<int>>();
-            foreach (var r in Relations)
+            foreach (int c in FollowerOrder)
             {
-                if (r.Type != RelationType.Multiply) continue;
-                if (!followersOf.TryGetValue(r.Master, out var list)) followersOf[r.Master] = list = new List<int>();
-                if (!list.Contains(r.Follower)) list.Add(r.Follower);
+                foreach (int ri in FollowerRelations[c])
+                {
+                    var r = Relations[ri]; // relations dropped from a cycle do not reach the beam
+                    if (r.Type != RelationType.Multiply) continue;
+                    if (!followersOf.TryGetValue(r.Master, out var list)) followersOf[r.Master] = list = new List<int>();
+                    if (!list.Contains(r.Follower)) list.Add(r.Follower);
+                }
             }
             if (followersOf.Count == 0) return excluded;
 

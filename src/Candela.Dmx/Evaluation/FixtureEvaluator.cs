@@ -99,22 +99,22 @@ public static class FixtureEvaluator
         {
             ref var follower = ref rt[c];
             if (follower.Function < 0) continue;
+            float overrideLevel = float.NaN;
             foreach (int ri in p.FollowerRelations[c])
             {
                 var r = relations[ri];
                 if (follower.Function != r.FollowerFunction) continue;
                 ref var m = ref rt[r.Master];
                 float masterLevel = m.Function >= 0 ? Level(fns[m.Function], m.Target) * m.Relation : m.Relation;
-                if (r.Type == Gdtf.RelationType.Multiply)
-                {
-                    follower.Relation *= masterLevel;
-                }
-                else if (m.Dmx != channels[r.Master].DefaultValue)
-                {
-                    // Override: a master in use (away from its default) replaces the follower's level
-                    follower.Target = masterLevel * fns[follower.Function].LevelScale;
-                    follower.Relation = 1f;
-                }
+                if (r.Type == Gdtf.RelationType.Multiply) follower.Relation *= masterLevel;
+                else if (m.Dmx != channels[r.Master].DefaultValue) overrideLevel = masterLevel; // a master in use (away from its default)
+            }
+            if (!float.IsNaN(overrideLevel))
+            {
+                // Override: the master's level (with its own relations) replaces the follower's level and its multipliers,
+                // whatever order the file lists the relations in
+                follower.Target = overrideLevel * fns[follower.Function].LevelScale;
+                follower.Relation = 1f;
             }
         }
 
