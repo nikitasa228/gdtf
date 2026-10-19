@@ -37,7 +37,8 @@ internal static class ConnectorIcons
         "connector-xlr3", "connector-xlr4", "connector-xlr5", "connector-xlr", "connector-din3", "connector-din5",
         "connector-rj45", "connector-ethercon", "connector-powercon", "connector-powercon-blue", "connector-powercon-grey",
         "connector-true1", "connector-true1-top", "connector-schuko", "connector-iec-c14", "connector-iec-c20",
-        "connector-cee16", "connector-cee32", "connector-cee16-3p", "connector-cee32-3p", "connector-cee63-3p",
+        "connector-cee16", "connector-cee32", "connector-cee16-3p", "connector-cee32-3p", "connector-cee63-3p", "connector-cee125-3p",
+        "connector-powerlock",
         "connector-socapex", "connector-harting16", "connector-bnc", "connector-usb", "connector-dc-jack", "connector-e27",
         "connector-track-adapter", "connector-martin-pde", "connector-martin-dce", "connector-martin-8pin",
         "connector-hybrid-4pin", "connector-pwb-cab", "connector-fixed-cable", "connector-terminal-block",
@@ -112,6 +113,14 @@ internal static class ConnectorIcons
             case "connector-cee32-3p":
             case "connector-cee63-3p":
                 Cee(dl, c, r, line, CeeRed, 5);
+                break;
+            case "connector-cee125-3p":
+                // The 125 A plug: the same red 5-pin face with heavier contacts and a thicker locking ring.
+                Cee(dl, c, r, line, CeeRed, 5);
+                dl.AddCircle(c, r * 0.86f, Edge, 40, line * 2f);
+                break;
+            case "connector-powerlock":
+                Powerlock(dl, c, r, line);
                 break;
             case "connector-socapex":
                 Socapex(dl, c, r, line);
@@ -335,6 +344,26 @@ internal static class ConnectorIcons
             dl.AddCircleFilled(c + new Vector2(0f, -r * 0.44f), r * 0.13f, Copper, 16);
             for (int i = 0; i < 4; i++)
                 dl.AddCircleFilled(Polar(c, r * 0.44f, 72f * (i + 1)), r * 0.09f, Copper, 12);
+        }
+    }
+
+    private static void Powerlock(ImDrawListPtr dl, Vector2 c, float r, float line)
+    {
+        // Five single-pole connectors in their colour code (L1 brown, L2 black, L3 grey, N blue, PE green/yellow).
+        Span<uint> colors = stackalloc uint[]
+        {
+            Theme.U32(Theme.Rgb(0x8B5A2B)), Theme.U32(Theme.Rgb(0x1C1C1E)), Theme.U32(Theme.Rgb(0x8E9196)),
+            Theme.U32(Theme.Rgb(0x2D6CDF)), Green,
+        };
+        float pole = r * 0.30f;
+        for (int i = 0; i < colors.Length; i++)
+        {
+            var p = i < 3 ? c + new Vector2((i - 1) * r * 0.62f, -r * 0.34f) : c + new Vector2((i == 3 ? -0.31f : 0.31f) * r * 1.0f, r * 0.40f);
+            dl.AddCircleFilled(p, pole, colors[i], 24);
+            dl.AddCircle(p, pole, Edge, 24, line);
+            dl.AddCircleFilled(p, pole * 0.38f, Copper, 12);
+            if (i == 4)
+                dl.AddLine(p - new Vector2(pole * 0.7f, 0f), p + new Vector2(pole * 0.7f, 0f), True1Yellow, line * 2f);
         }
     }
 
