@@ -247,6 +247,12 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     /// <summary>The box the haze fills (the scene's bounds grown by <see cref="PathTracerScene.BeamReach"/>), m.</summary>
     public (Vector3 Min, Vector3 Max) MediaBounds => (_mediaMin, _mediaMax);
 
+    /// <summary>
+    /// Most rows per dispatch (a multiple of 8, at least 8): tests split small images into several bands per pass, as
+    /// large images are split by their measured cost.
+    /// </summary>
+    internal int MaxRowsPerDispatch { get; set; } = int.MaxValue;
+
     /// <inheritdoc/>
     public void Advance(TimeSpan budget) => Advance(budget, CancellationToken.None);
 
@@ -436,11 +442,14 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
 
     // ------------------------------------------------------------------------------------------------ rendering
 
+    /// <summary>Rows of the next dispatches: the measured band, within <see cref="MaxRowsPerDispatch"/>.</summary>
+    private int RowsPerDispatch => Math.Min(_rowsPerDispatch, Math.Max(MaxRowsPerDispatch / 8 * 8, 8));
+
     private int PlanDispatches(double remainingSeconds)
     {
         if (!(_secondsPerRow > 0.0))
             return 1;
-        double perDispatch = _secondsPerRow * _rowsPerDispatch;
+        double perDispatch = _secondsPerRow * RowsPerDispatch;
         double target = Math.Min(Math.Max(remainingSeconds, perDispatch), MaxSubmitSeconds);
         return (int)Math.Clamp(Math.Floor(target / perDispatch), 1, 4096);
     }
@@ -480,7 +489,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         {
             DeclareTraceResources(b);
             b.Flush();
-            int count = Math.Min(_rowsPerDispatch, _height - _row);
+            int count = Math.Min(RowsPerDispatch, _height - _row);
             _tracer.Push(cmd, new GpuDrawConstants { InstanceIndex = (uint)_sample, MaterialIndex = (uint)_row });
             vk.CmdDispatch(cmd, ((uint)_width + 7) / 8, ((uint)count + 7) / 8, 1);
             rows += count;
@@ -492,6 +501,9 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
                 _samplesDone = _sample;
                 if (_sample >= _samplesTotal)
                     _complete = true;
+                // With a time limit every submission ends at a pass boundary, where Advance checks the time.
+                if (_timeLimit is not null)
+                    break;
             }
         }
 

@@ -172,6 +172,31 @@ public sealed class PathTracerSessionTests
     }
 
     [SkippableFact]
+    public void TimeLimitStopsAtThePassBoundaryWhenAPassTakesSeveralDispatches()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var camera = BuildRoom(renderer);
+            var options = new FinalRenderOptions { TimeLimit = TimeSpan.FromSeconds(0.5) };
+            using var render = renderer.StartFinalRender(camera, FinalRenderSupport.Settings(48, 160, FinalRenderSettingsMax), options);
+            render.MaxRowsPerDispatch = 8; // 20 bands per pass: submissions end anywhere in a pass unless they stop at its end
+            var watch = Stopwatch.StartNew();
+            while (!render.IsComplete && watch.Elapsed < TimeSpan.FromSeconds(60))
+                render.Advance(TimeSpan.FromSeconds(0.25));
+            Assert.True(render.IsComplete && !render.IsCancelled);
+            // one pass of this image takes milliseconds: the render ends right after the time is up
+            Assert.True(render.Elapsed >= TimeSpan.FromSeconds(0.5) && render.Elapsed < TimeSpan.FromSeconds(1.5), $"elapsed {render.Elapsed}");
+            Assert.InRange(render.SamplesDone, 2, FinalRenderSettingsMax - 1);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void DenoiserLowersTheErrorAndKeepsTheRawResult()
     {
         var renderer = FinalRenderSupport.CreateOrSkip();
