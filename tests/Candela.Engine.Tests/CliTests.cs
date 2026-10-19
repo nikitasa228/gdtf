@@ -84,24 +84,35 @@ public sealed class CliTests
         Assert.Equal("take.cdmx", o.Recording);
         Assert.Equal(2.5, o.Time, 6);
         Assert.Equal(8f, o.Ev100);
+        Assert.False(o.AutoExposure); // a fixed EV
         Assert.False(o.Floor);
 
-        var defaults = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--view", "top", "--ev", "auto"]);
+        // stage looks expose automatically by default (starting from the floor reading)
+        var defaults = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--view", "top"]);
         Assert.Equal(ViewPreset.Top, defaults.View);
         Assert.Null(defaults.Ev100);
         Assert.Equal(RenderLook.OpenWhite, defaults.Look);
         Assert.True(defaults.Floor);
-        Assert.False(defaults.AutoExposure);
-
-        // the demo look exposes automatically unless the exposure is given
+        Assert.True(defaults.AutoExposure);
+        Assert.True(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "auto"]).AutoExposure);
         var demo = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "demo"]);
         Assert.Equal(RenderLook.Demo, demo.Look);
         Assert.True(demo.AutoExposure);
+
+        // fixed exposures: a value, or the incident reading of the floor
         var fixedEv = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "DEMO", "--ev", "7"]);
         Assert.Equal(RenderLook.Demo, fixedEv.Look);
         Assert.False(fixedEv.AutoExposure);
         Assert.Equal(7f, fixedEv.Ev100);
-        Assert.False(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "demo", "--ev", "auto"]).AutoExposure);
+        var floor = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "Floor"]);
+        Assert.False(floor.AutoExposure);
+        Assert.Null(floor.Ev100);
+        // --auto-exposure adapts from a given EV, in either order; the last --ev wins
+        var adapt = RenderOptions.Parse(["show.mvr", "--out", "x.png", "--auto-exposure", "--ev", "9"]);
+        Assert.True(adapt.AutoExposure);
+        Assert.Equal(9f, adapt.Ev100);
+        Assert.True(RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "floor", "--ev", "auto"]).AutoExposure);
+        Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "bright"]));
         Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "party"]));
     }
 

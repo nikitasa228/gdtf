@@ -270,7 +270,7 @@ complements, shutter open).
 candela render <scene.mvr|scene.candela> --out <file.png> [--width W --height H]
                [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov deg]
                [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]
-               [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev <EV100>|auto]
+               [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev auto|floor|<EV100>]
                [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--device <name>]
                [--library <dir>]... [--cache <dir>]
 candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset 0|1] [--scene <file>]
@@ -292,11 +292,15 @@ the picture. `--out` must name a file (a folder is a usage error). `--overlay lu
 (1 … 5000 lx) unless the floor is brighter; then the same colours are stretched up to the brightest floor reading
 (a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
 the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
-temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure defaults to an
-incident-light reading of the lit floor (`--ev auto`); `--ev` sets EV100, `--auto-exposure` lets the renderer adapt.
-The demo look uses auto exposure unless `--ev` is given: its floor — coloured pools and spill — says little about how
-bright its beams in the haze are. `render stages/Фокина.mvr --out f.png --width 480 --height 270` takes about 10 s on
-lavapipe; with `--look demo` (12 frames of auto exposure) about 15 s at 320 × 180 and 55 s at 960 × 540.
+temporary wooden stage floor under its footprint (`--floor none` disables it). The exposure is automatic by default
+(`--ev auto`): a stage picture is mostly dark air with bright beams and pools, which a reading of the floor alone says
+little about, so the renderer adapts to the picture (`PreviewSettings.AutoExposure`, with its default metering),
+starting from an incident-light reading of the lit floor. It renders at least 12 frames, each standing for 0.5 s of
+adaptation (the renderer adapts with a time constant of about 0.7 s; at the 1/30 s of a live frame the exposure would
+stop less than halfway), so the still is fully adapted. `--ev floor` fixes the exposure at the floor reading,
+`--ev <EV100>` at a value, and `--auto-exposure` adapts starting from the `--ev` value. `render stages/Фокина.mvr
+--out f.png --width 640 --height 360` takes about 14 s on lavapipe (12 frames; about 9 s with `--ev floor` and its
+6 frames).
 
 **artnet-test** sends `ArtNetTestPattern` (pan/tilt sweep, colour chase, dimmer wave, zoom) with ArtSync and
 ArtTimeCode to a node, a directed broadcast or `127.0.0.1` — 8 moving heads (12 ch) and 8 RGBW pars per universe, or
@@ -369,7 +373,7 @@ a device):
   the flame light samples, sends a temperature grid above 1000 K to the render world, feeds soot into the smoke and
   dies down when its valve closes.
 * **CLI**: usage errors and missing files give their exit codes; every documented `render` option parses (the demo
-  look with auto exposure unless `--ev`); `info` on the MVR and a GDTF; `validate` exits with 0 on Фокина (no patch
+  look with auto exposure, the default); `info` on the MVR and a GDTF; `validate` exits with 0 on Фокина (no patch
   errors with the fitting stand-in modes, no `data.no-signal` without consoles or data cables) and prints the light
   plot; `import-worker`
   writes a package with the given units or the reason it cannot; `artnet-test` sends ArtDmx packets to a UDP port;
