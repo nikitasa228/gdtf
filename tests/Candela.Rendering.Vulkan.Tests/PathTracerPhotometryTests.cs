@@ -94,6 +94,82 @@ public sealed class PathTracerPhotometryTests
     }
 
     /// <summary>
+    /// A fixture's front (a cover or a lens mesh standing out of the head) 3 cm in front of its lens, inside the
+    /// clearance shadow rays leave out: it shadows nothing, so it hides nothing either — looking into the beam the camera
+    /// sees the lens's luminance through it, the floor gets the analytic illuminance; seen from outside the beam, where
+    /// the lens is dark, the front itself shows (its emission here), not a black lens.
+    /// </summary>
+    [SkippableFact]
+    public void LensBehindTheFixturesFrontStillShines()
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+            const float radius = 0.1f;
+            var position = new Vector3(0f, 0f, Height);
+            var light = ProceduralTestScene.Spot(position, Vector3.Zero, LightColor.White, PeakCandela, BeamDeg, FieldDeg);
+            light.SourceRadius = radius;
+            renderer.World.SetLights(new[] { light });
+            var scene = new StageScene(renderer);
+            var front = renderer.World.CreateMaterial(new MaterialData
+            {
+                Name = "fixture front",
+                BaseColorFactor = new Vector4(0.05f, 0.05f, 0.05f, 1f),
+                EmissiveLuminance = 5f,
+                Roughness = 1f,
+                Ior = 1f,
+            }, null);
+            scene.Box(new Vector3(0.4f, 0.4f, 0.01f), position - new Vector3(0f, 0f, 0.03f), front, InstanceFlags.CastShadow);
+            FinalRenderSupport.Floor(renderer.World, TopDownView.WhiteLambertian());
+            var beam = BeamDistribution.Create(BeamType.Wash, BeamDeg * MathF.PI / 180f, FieldDeg * MathF.PI / 180f);
+
+            // into the beam, from 4.5 m below the lens
+            var eye = new Vector3(0f, 0f, 0.5f);
+            var camera = RenderCamera.LookAt(eye, position, 0.5f);
+            camera.Ev100 = 18f;
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(8, 8, 4),
+                       new FinalRenderOptions { BackgroundLuminance = 0f }))
+            {
+                var lens = position + light.Direction * PathTracerScene.LensOffset;
+                float dy = Vector3.Distance(eye, lens), dc = Vector3.Distance(eye, position);
+                float expected = PeakCandela * dy * dy / (MathF.PI * radius * radius * dc * dc);
+                float measured = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure).MeanLuminance(4, 4, 2);
+                Assert.True(MathF.Abs(measured - expected) / expected < 0.01f, $"lens through the front {measured} cd/m², expected {expected} cd/m²");
+            }
+
+            // the floor under it
+            var view = new TopDownView(40, 30, 8f);
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(view.Width, view.Height, 32),
+                       new FinalRenderOptions { BackgroundLuminance = 0f }))
+            {
+                var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
+                var (cx, cy, centre) = view.NearestPixel(new Vector3(1f, 0f, 0f));
+                float expected = PhotometricTests.FloorLuminance(light, beam.Relative, centre);
+                float measured = hdr.MeanLuminance(cx, cy, 1);
+                Assert.True(MathF.Abs(measured - expected) / expected < 0.03f, $"floor {measured} cd/m², expected {expected} cd/m²");
+            }
+
+            // from the side, 70° off the axis (outside the 80° field): the front, not a dark lens
+            var side = position + 0.6f * new Vector3(MathF.Sin(70f * MathF.PI / 180f), 0f, -MathF.Cos(70f * MathF.PI / 180f));
+            var sideCamera = RenderCamera.LookAt(side, position + new Vector3(0.04f, 0f, -0.03f), 2f);
+            sideCamera.Ev100 = 3f;
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, sideCamera, FinalRenderSupport.Settings(8, 8, 4, bounces: 0),
+                       new FinalRenderOptions { BackgroundLuminance = 0f }))
+            {
+                float measured = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure).MeanLuminance(4, 4, 1);
+                Assert.True(MathF.Abs(measured - 5f) / 5f < 0.02f, $"the fixture's front from the side {measured} cd/m², its emission 5 cd/m²");
+            }
+
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    /// <summary>
     /// Beams of one fixture share its front: a weak glow beam (a GDTF Glow geometry around the cells, as on Фокина's
     /// panels) whose lens lies a millimetre in front of a strong beam's lens must not hide it. Lenses are emitters, not
     /// occluders: looking into both beams the camera sees the sum of their luminances, and the floor under them gets

@@ -69,8 +69,9 @@ const float PT_MIS_MIN_SHARE = 1e-4;
 
 const uint HIT_NONE = 0u;
 const uint HIT_SURFACE = 1u;
-const uint HIT_DISC = 2u;
+const uint HIT_DISC = 2u;        // a lens: the ray goes on behind it
 const uint HIT_BLOCKED = 3u;
+const uint HIT_DISC_END = 4u;    // a lens seen through the fixture's own surfaces in front of it: the path ends there
 
 const uint PREV_CAMERA = 0u;
 const uint PREV_SURFACE = 1u;
@@ -308,8 +309,11 @@ float lensClearance(float tLens)
     return min(params.geometry.x, 0.5 * tLens);
 }
 
+vec3 lightIntensityAt(Light l, vec3 P, out float d2);
+
 // The closest lens (front side) a little behind a surface hit at tSurface: within its clearance, where the fixture's
-// own lens and housing are (they do not shadow its light, so they do not hide its lens either).
+// own lens and housing are (they do not shadow its light, so they do not hide its lens either) — as long as the lens
+// shines towards the ray's origin (a dark lens seen at an angle through the housing is the housing).
 bool lensBehind(vec3 o, vec3 d, float tSurface, uint skipLight, out float tLens, out uint light)
 {
     tLens = 0.0;
@@ -325,7 +329,11 @@ bool lensBehind(vec3 o, vec3 d, float tSurface, uint skipLight, out float tLens,
             uint l = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false)) / PT_DISC_SEGMENTS;
             float t = rayQueryGetIntersectionTEXT(q, false);
             if (l < params.lightCount && l != skipLight && dot(d, ptLights[l].direction) < 0.0 && t - tSurface <= lensClearance(t))
-                rayQueryConfirmIntersectionEXT(q);
+            {
+                float d2;
+                if (luminanceRec2020(lightIntensityAt(ptLights[l], o, d2)) > 0.0)
+                    rayQueryConfirmIntersectionEXT(q);
+            }
         }
     }
 
@@ -396,7 +404,7 @@ PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
         uint light;
         if (lensBehind(o, d, t, skipLight, tLens, light))
         {
-            hit.kind = HIT_DISC;
+            hit.kind = HIT_DISC_END;
             hit.t = tLens;
             hit.light = light;
             return hit;
@@ -1041,7 +1049,7 @@ void main()
                 aovNormal = n;
                 aovDepth = dot(s.position - frame.cameraPosition.xyz, frame.cameraForward.xyz);
             }
-            else if (hit.kind == HIT_DISC)
+            else if (hit.kind == HIT_DISC || hit.kind == HIT_DISC_END)
             {
                 aovAlbedo = vec3(1.0);
                 aovNormal = -d;
@@ -1098,7 +1106,7 @@ void main()
         if (hit.kind == HIT_BLOCKED)
             break;
 
-        if (hit.kind == HIT_DISC)
+        if (hit.kind == HIT_DISC || hit.kind == HIT_DISC_END)
         {
             // A lens seen by the camera or by a BSDF sample (lights after a medium vertex are the equi-angular
             // estimator's).
@@ -1134,7 +1142,10 @@ void main()
 
             // Lenses are emitters, not occluders (overlapping lenses of a fixture's beams add up; shadow rays pass
             // them too): the ray goes on from just behind the lens (a step that also passes lenses in the same plane,
-            // so two coinciding lenses are seen as one), to the next lens or the fixture.
+            // so two coinciding lenses are seen as one), to the next lens or the fixture — unless it reached the lens
+            // through the fixture's own surfaces in front of it.
+            if (hit.kind == HIT_DISC_END)
+                break;
             vec3 y = o + hit.t * d;
             float step = 1e-5 * max(1.0, max(abs(y.x), max(abs(y.y), abs(y.z))));
             o = y + step * d;
