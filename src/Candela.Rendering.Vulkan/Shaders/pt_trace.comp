@@ -21,8 +21,9 @@
 //
 // Media: uniform haze (inside the media box), the smoke density grid (scattering, albedo 1) and the flame grids
 // (absorption kappa, blackbody emission kappa x L_bb(T)) with the Henyey-Greenstein phase function. Single scattering
-// of the spot lights is estimated on every ray segment by equi-angular sampling inside the light's cone (one light per
-// segment, reservoir-sampled by the analytic in-scattering of an isotropic point light); free-flight (delta tracking)
+// of the spot lights is estimated on every ray segment by equi-angular sampling inside the light's cone (lights drawn
+// in proportion to the analytic in-scattering of an isotropic point light: PT_SEGMENT_SAMPLES of them on segments the
+// camera sees, one on the others); free-flight (delta tracking)
 // scattering continues the path for multiple scattering; segments that may not scatter any more use ratio tracking.
 // Flame emission is what rays see (counted on segments the camera sees directly); the light flames cast on the scene
 // comes from the engine's flame light samples (spot lights), as in the real-time renderer.
@@ -55,6 +56,8 @@ const int PT_MAX_LAYERS = 16;          // alpha / transmissive surfaces crossed 
 const int PT_MAX_COLLISIONS = 512;     // tentative collisions of one tracking loop
 const float PT_WEIGHT_FLOOR = 1e-3;    // smallest BRDF x cos of a light-selection weight (1/sr)
 const float PT_BACKGROUND_DEPTH = 1.0e5;
+const uint PT_SEGMENT_SAMPLES = 4u;     // light samples of the in-scattering along a segment the camera sees
+const int PT_PHASE_BINS = 8;           // bins of the phase-function fit of equi-angular sampling
 
 const uint HIT_NONE = 0u;
 const uint HIT_SURFACE = 1u;
@@ -435,13 +438,20 @@ vec3 sampleLens(Light l, vec3 u)
     return b0 * c + b1 * a + (1.0 - b0 - b1) * b;
 }
 
-// Light-selection weight of light l for a surface point: luminance of its unshadowed contribution (intensity / d^2
+// Size of a colour for importance sampling: the mean of its channels, so saturated blue and red lights (small
+// luminance, large values in one channel) are not under-sampled.
+float selectionValue(vec3 c)
+{
+    return (c.r + c.g + c.b) * (1.0 / 3.0);
+}
+
+// Light-selection weight of light l for a surface point: the size of its unshadowed contribution (intensity / d^2
 // x BRDF x cos), with a floor on the BRDF part so every light that reaches the point keeps a non-zero weight.
 float surfaceLightWeight(Light l, vec3 P, vec3 N, vec3 V, PtBsdf b)
 {
     float d2;
     vec3 I = lightIntensityAt(l, P, d2);
-    float lum = luminanceRec2020(I);
+    float lum = selectionValue(I);
     if (!(lum > 0.0))
         return 0.0;
     vec3 L = normalize(l.position - P);
@@ -451,7 +461,7 @@ float surfaceLightWeight(Light l, vec3 P, vec3 N, vec3 V, PtBsdf b)
     {
         vec3 fd, fs;
         evaluateBrdf(b.brdf, N, V, L, fd, fs);
-        reflected = luminanceRec2020(fd * (1.0 - b.transmission) + fs) * cosN;
+        reflected = selectionValue(fd * (1.0 - b.transmission) + fs) * cosN;
     }
 
     return lum / d2 * max(reflected, PT_WEIGHT_FLOOR);
@@ -521,9 +531,17 @@ vec2 coneInterval(Light l, vec3 o, vec3 d, vec2 range)
     return any(isnan(r)) ? range : r;
 }
 
+// Phase function of the in-scattering at equi-angular angle theta along a ray (theta = atan((t - tc) / D), tc the
+// closest approach to the light, D its distance): the light travels along (sin theta d - cos theta n) and leaves
+// towards the viewer (-d), so the scattering cosine is -sin(theta).
+float equiAngularPhase(float theta)
+{
+    return henyeyGreenstein(-sin(theta), params.majorants.z);
+}
+
 // Light-selection weight of light l for the in-scattering along a ray segment: the analytic single scattering of an
-// isotropic point light of its peak intensity over the part of the segment inside its cone, I / D x (angle subtended),
-// times the phase function at the closest approach. `cone` returns that part.
+// isotropic point light of its peak intensity over the part of the segment inside its cone, I / D x integral of the
+// phase function over the angle subtended (Simpson's rule). `cone` returns that part.
 float segmentLightWeight(Light l, vec3 o, vec3 d, vec2 range, out vec2 cone)
 {
     cone = coneInterval(l, o, d, range);
@@ -532,14 +550,13 @@ float segmentLightWeight(Light l, vec3 o, vec3 d, vec2 range, out vec2 cone)
     vec3 v = l.position - o;
     float tc = dot(v, d);
     float D = max(length(v - tc * d), 1e-4);
-    float angle = atan((cone.y - tc) / D) - atan((cone.x - tc) / D);
+    float th0 = atan((cone.x - tc) / D);
+    float th1 = atan((cone.y - tc) / D);
+    if (!(th1 > th0))
+        return 0.0;
+    float phase = (th1 - th0) * (equiAngularPhase(th0) + 4.0 * equiAngularPhase(0.5 * (th0 + th1)) + equiAngularPhase(th1)) * (1.0 / 6.0);
     float facets = float(max(l.prismFacets, 1u));
-    float peak = luminanceRec2020(l.intensity) * facets;
-    vec3 xm = o + clamp(tc, cone.x, cone.y) * d;
-    vec3 toX = xm - l.position;
-    float len = length(toX);
-    float phase = henyeyGreenstein(len > 1e-6 ? dot(toX / len, d) : 1.0, params.majorants.z);
-    return peak * angle / D * phase;
+    return selectionValue(l.intensity) * facets * phase / D;
 }
 
 // ================================================================================================ BSDF
@@ -697,46 +714,12 @@ vec3 surfaceNee(vec3 P, vec3 Ng, vec3 N, vec3 V, PtBsdf b, inout uint rng, out f
     return contribution * T * weight;
 }
 
-// Single scattering of one spot light on the ray segment [0, tEnd] (equi-angular sampling inside its cone).
-vec3 segmentNee(vec3 o, vec3 d, float tEnd, inout uint rng)
+// One equi-angular sample of light l (chosen with probability pSelect) inside the part `cone` of the segment.
+vec3 segmentLightSample(Light l, float pSelect, vec2 chosenCone, vec3 o, vec3 d, inout uint rng)
 {
-    if ((params.flags & PT_FLAG_LIGHTS) == 0u)
-        return vec3(0.0);
-    vec2 m = scatteringInterval(o, d, tEnd);
-    if (!(m.x < m.y))
-        return vec3(0.0);
-    uint chosen = 0xFFFFFFFFu;
-    float chosenW = 0.0;
-    float sumW = 0.0;
-    vec2 chosenCone = vec2(0.0);
-    rayQueryEXT q;
-    rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_LIGHT_VOLUME, o, m.x, d, m.y);
-    while (rayQueryProceedEXT(q))
-    {
-        if (rayQueryGetIntersectionTypeEXT(q, false) != gl_RayQueryCandidateIntersectionAABBEXT)
-            continue;
-        uint i = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false));
-        if (i >= params.lightCount)
-            continue;
-        vec2 cone;
-        float w = segmentLightWeight(ptLights[i], o, d, m, cone);
-        if (!(w > 0.0))
-            continue;
-        sumW += w;
-        if (rand(rng) * sumW < w)
-        {
-            chosen = i;
-            chosenW = w;
-            chosenCone = cone;
-        }
-    }
-
-    if (chosen == 0xFFFFFFFFu)
-        return vec3(0.0);
-    Light l = ptLights[chosen];
-    float pSelect = chosenW / sumW;
-
-    // equi-angular distance inside the cone: pdf proportional to 1 / (D^2 + (t - tc)^2)
+    // Equi-angular distance inside the cone (pdf proportional to 1 / (D^2 + (t - tc)^2)), with the angle drawn from a
+    // piecewise-constant fit of the phase function over PT_PHASE_BINS bins: strongly forward-scattering haze (light
+    // coming towards the viewer) is sampled where it scatters.
     vec3 v = l.position - o;
     float tc = dot(v, d);
     float D = max(length(v - tc * d), 1e-4);
@@ -744,9 +727,30 @@ vec3 segmentNee(vec3 o, vec3 d, float tEnd, inout uint rng)
     float th1 = atan((chosenCone.y - tc) / D);
     if (!(th1 > th0))
         return vec3(0.0);
-    float t = tc + D * tan(mix(th0, th1, rand(rng)));
-    t = clamp(t, chosenCone.x, chosenCone.y);
-    float pdfT = D / ((th1 - th0) * (D * D + (t - tc) * (t - tc)));
+    float binWidth = (th1 - th0) / float(PT_PHASE_BINS);
+    float bins[PT_PHASE_BINS];
+    float binSum = 0.0;
+    for (int i = 0; i < PT_PHASE_BINS; ++i)
+    {
+        bins[i] = equiAngularPhase(th0 + (float(i) + 0.5) * binWidth);
+        binSum += bins[i];
+    }
+
+    if (!(binSum > 0.0))
+        return vec3(0.0);
+    float u = rand(rng) * binSum;
+    int bin = 0;
+    for (; bin < PT_PHASE_BINS - 1; ++bin)
+    {
+        if (u < bins[bin])
+            break;
+        u -= bins[bin];
+    }
+
+    float theta = th0 + (float(bin) + clamp(u / bins[bin], 0.0, 1.0)) * binWidth;
+    float t = clamp(tc + D * tan(theta), chosenCone.x, chosenCone.y);
+    float pdfTheta = bins[bin] / (binSum * binWidth);
+    float pdfT = pdfTheta * D / (D * D + (t - tc) * (t - tc));
     vec3 x = o + t * d;
     float scattering = hazeAt(x) + smokeAt(x);
     if (!(scattering > 0.0))
@@ -777,6 +781,63 @@ vec3 segmentNee(vec3 o, vec3 d, float tEnd, inout uint rng)
         return vec3(0.0);
     lightT *= trackTransmittance(x, Ly, dist, rng, vec3(0.0), none, false);
     return I * (viewT * scattering * phase / (dc2 * pdfT * pSelect)) * lightT;
+}
+
+// Single scattering of the spot lights on the ray segment [0, tEnd]: `samples` lights (at most PT_SEGMENT_SAMPLES),
+// each drawn independently in proportion to its selection weight from one pass over the candidates, each estimated by
+// equi-angular sampling inside its cone; the mean of the estimates.
+vec3 segmentNee(vec3 o, vec3 d, float tEnd, uint samples, inout uint rng)
+{
+    if ((params.flags & PT_FLAG_LIGHTS) == 0u)
+        return vec3(0.0);
+    vec2 m = scatteringInterval(o, d, tEnd);
+    if (!(m.x < m.y))
+        return vec3(0.0);
+    samples = clamp(samples, 1u, PT_SEGMENT_SAMPLES);
+    uint chosen[PT_SEGMENT_SAMPLES];
+    float chosenW[PT_SEGMENT_SAMPLES];
+    vec2 chosenCone[PT_SEGMENT_SAMPLES];
+    for (uint k = 0u; k < PT_SEGMENT_SAMPLES; ++k)
+    {
+        chosen[k] = 0xFFFFFFFFu;
+        chosenW[k] = 0.0;
+        chosenCone[k] = vec2(0.0);
+    }
+
+    float sumW = 0.0;
+    rayQueryEXT q;
+    rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_LIGHT_VOLUME, o, m.x, d, m.y);
+    while (rayQueryProceedEXT(q))
+    {
+        if (rayQueryGetIntersectionTypeEXT(q, false) != gl_RayQueryCandidateIntersectionAABBEXT)
+            continue;
+        uint i = uint(rayQueryGetIntersectionPrimitiveIndexEXT(q, false));
+        if (i >= params.lightCount)
+            continue;
+        vec2 cone;
+        float w = segmentLightWeight(ptLights[i], o, d, m, cone);
+        if (!(w > 0.0))
+            continue;
+        sumW += w;
+        for (uint k = 0u; k < samples; ++k)
+        {
+            if (rand(rng) * sumW < w)
+            {
+                chosen[k] = i;
+                chosenW[k] = w;
+                chosenCone[k] = cone;
+            }
+        }
+    }
+
+    vec3 total = vec3(0.0);
+    for (uint k = 0u; k < samples; ++k)
+    {
+        if (chosen[k] != 0xFFFFFFFFu)
+            total += segmentLightSample(ptLights[chosen[k]], chosenW[k] / sumW, chosenCone[k], o, d, rng);
+    }
+
+    return total / float(samples);
 }
 
 // ================================================================================================ path
@@ -855,7 +916,7 @@ void main()
         {
             bool mayScatter = volumeVertices < params.maxVolumeBounces;
             if (mayScatter)
-                radiance += clampContribution(beta * segmentNee(o, d, tEnd, rng), scattered);
+                radiance += clampContribution(beta * segmentNee(o, d, tEnd, visible ? PT_SEGMENT_SAMPLES : 1u, rng), scattered);
             if (mayScatter)
             {
                 float ts = freeFlight(o, d, tEnd, rng, beta, radiance, visible);

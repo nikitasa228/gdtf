@@ -102,7 +102,7 @@ public sealed class PathTracerMediaTests
             renderer.World.SetLights(new[] { light });
             renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = Haze, Anisotropy = Anisotropy });
             var camera = SideCamera();
-            using var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(Width, Height, 256, 0, 1),
+            using var render = FinalRenderSupport.RenderToCompletion(renderer, camera, FinalRenderSupport.Settings(Width, Height, 1024, 0, 1),
                 new FinalRenderOptions { BackgroundLuminance = 0f });
             var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
             float gate = MathF.Tan(0.5f * light.FieldAngle);
@@ -136,7 +136,7 @@ public sealed class PathTracerMediaTests
             var light = StageScene.Spot(LightPosition, Vector3.Zero, 10000f, 40f, 60f, shadows: false);
             renderer.World.SetLights(new[] { light });
             var camera = SideCamera();
-            var settings = FinalRenderSupport.Settings(Width, Height, 256, 0, 1);
+            var settings = FinalRenderSupport.Settings(Width, Height, 1024, 0, 1);
             var options = new FinalRenderOptions { BackgroundLuminance = 0f };
             const float sigma = 0.05f;
             renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = sigma, Anisotropy = Anisotropy });
