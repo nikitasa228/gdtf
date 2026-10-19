@@ -49,7 +49,9 @@ public enum InstanceFlags
 /// A spot light produced from one beam of a fixture's current state. Photometric: <see cref="PeakCandela"/> is the
 /// on-axis luminous intensity including the dimmer; <see cref="Color"/> is linear Rec.2020 normalised to luminance 1.
 /// The intensity distribution is the generalised Gaussian of Candela.Photometry.BeamDistribution given by
-/// <see cref="BeamAngle"/> (50 %) and <see cref="FieldAngle"/> (10 %), both full angles in radians.
+/// <see cref="BeamAngle"/> (50 %) and <see cref="FieldAngle"/> (10 %), both full angles in radians. Every field's
+/// default (zero / false / invalid handle) is the neutral choice, so producers that do not know a newer field keep
+/// their old behaviour.
 /// </summary>
 public struct SpotLight
 {
@@ -107,6 +109,15 @@ public struct SpotLight
 
     /// <summary>Entity id of the fixture (for picking and the light-meter breakdown).</summary>
     public Guid FixtureId;
+
+    /// <summary>
+    /// True: the light illuminates surfaces only and is not scattered by the participating media — base haze, smoke and
+    /// flame volumes contribute no in-scattered light from it (it is still attenuated like any light). Used for lights
+    /// that are not stage light, such as the editor's work light, which must show the set without glowing in the haze.
+    /// Default false (every fixture beam scatters). Renderers that do not support it draw the light as usual, which is
+    /// a safe fallback: the light is correct on surfaces and only adds some veiling glow in haze.
+    /// </summary>
+    public bool NoVolumetricScattering;
 }
 
 /// <summary>A coloured polyline vertex (cables, gizmo guides, beam outlines). Width in pixels.</summary>

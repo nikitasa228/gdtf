@@ -32,7 +32,7 @@ public sealed partial class NetworkSolver
 
     private sealed partial class SolveRun
     {
-        private DataResult SolveData()
+        private DataResult SolveData(Dictionary<PortRef, (CableState Cable, int Position)> plugged)
         {
             var lines = new List<DataLine>();
             var feeds = new Dictionary<Guid, List<DataFeed>>();
@@ -66,7 +66,7 @@ public sealed partial class NetworkSolver
                     {
                         var f = stack.Pop();
                         bool dmx = f.Signal == SignalKind.Dmx512;
-                        if (!_plugged.TryGetValue(new PortRef(f.Device.Id, f.Output.Name), out var hit)) continue;
+                        if (!plugged.TryGetValue(new PortRef(f.Device.Id, f.Output.Name), out var hit)) continue;
                         var cable = hit.Cable;
                         if (cable.Type is not { IsData: true } type) continue;
                         var from = cable.Info.Endpoints[hit.Position];
@@ -162,7 +162,7 @@ public sealed partial class NetworkSolver
                                     continue;
                                 }
                                 if (!SameDataFamily(o.Signal, f.Signal)) continue;
-                                if (dmx && !splitter && o.Signal == SignalKind.Dmx512 && _plugged.ContainsKey(new PortRef(target.Id, o.Name)))
+                                if (dmx && !splitter && o.Signal == SignalKind.Dmx512 && plugged.ContainsKey(new PortRef(target.Id, o.Name)))
                                 {
                                     if (firstThru is null) firstThru = o;
                                     else secondThru ??= o;
@@ -203,11 +203,11 @@ public sealed partial class NetworkSolver
                 }
                 else if (dataNetwork && fixture.Addresses.Count > 0 && device.Info.Ports.Any(p => p.Signal.CarriesData() && p.Direction != PortDirection.Output))
                 {
-                    var plugged = device.Info.Ports.FirstOrDefault(p => p.Signal.CarriesData() && p.Direction != PortDirection.Output &&
-                                                                         _plugged.ContainsKey(new PortRef(device.Id, p.Name)));
-                    string why = plugged is null
+                    var pluggedInput = device.Info.Ports.FirstOrDefault(p => p.Signal.CarriesData() && p.Direction != PortDirection.Output &&
+                                                                         plugged.ContainsKey(new PortRef(device.Id, p.Name)));
+                    string why = pluggedInput is null
                         ? "no data cable is plugged into its inputs"
-                        : $"the cable on '{plugged.Name}' does not lead back to a console output";
+                        : $"the cable on '{pluggedInput.Name}' does not lead back to a console output";
                     Add(IssueSeverity.Warning, IssueCategory.Data, IssueCodes.DataNoSignal,
                         $"{device.Info.Label} is patched to {fixture.Addresses[0]} but receives no data: {why}.", device.Id);
                 }

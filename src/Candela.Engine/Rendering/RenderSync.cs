@@ -65,9 +65,6 @@ public sealed partial class RenderSync : IDisposable
     /// </summary>
     public const float MaxLensLuminance = 1e9f;
 
-    private static readonly Vector3 ConsoleSize = new(1.2f, 0.7f, 0.25f);
-    private static readonly Vector3 PowerSourceSize = new(0.45f, 0.3f, 0.6f);
-
     private readonly StageEngine _engine;
     private readonly Dictionary<Guid, EntityVisual> _entities = new();
     private readonly Dictionary<uint, Guid> _byPickId = new();
@@ -79,7 +76,13 @@ public sealed partial class RenderSync : IDisposable
     private readonly HashSet<Guid> _moved = new();
     private readonly HashSet<Guid> _selected = new();
     private readonly HashSet<Guid> _cableEnds = new();
-    private readonly Dictionary<Guid, List<Guid>> _cablesByAnchor = new();
+    private readonly CableAnchorIndex _cableAnchors = new();
+    private readonly CableSupportSurfaces _cableSupports = new();
+    private readonly CableSupportHeight _supportHeight;
+    private readonly Func<CableNode, Vector3> _cableNodePosition;
+    private readonly Func<CableNode, CableNode, float> _spanSlack;
+    private float[] _nodeRest = new float[16];
+    private float _cableSlack = 1f;
     private readonly List<LineVertex> _lines = new();
     private readonly List<Guid> _scratch = new();
     private readonly List<Issue> _issues = new();
@@ -94,6 +97,7 @@ public sealed partial class RenderSync : IDisposable
     private readonly List<TextureHandle> _retiredTextures = new();
     private readonly List<(FixtureProfile Profile, int Wheel, int Slot)> _scratchGobos = new();
     private Vector3[] _nodePositions = new Vector3[16];
+    private readonly Dictionary<Guid, int> _nodeIndex = new();
     private MeshHandle _consoleMesh, _powerMesh, _hoistMesh;
     private Aabb _consoleBounds = Aabb.Empty, _powerBounds = Aabb.Empty, _hoistBounds = Aabb.Empty;
     private MaterialHandle _defaultMaterial, _steelMaterial, _hoistMaterial, _greyMaterial;
@@ -117,6 +121,9 @@ public sealed partial class RenderSync : IDisposable
         _engine = engine;
         World = world;
         GoboResolver = ResolveGobo;
+        _supportHeight = _cableSupports.HeightAt;
+        _cableNodePosition = CableNodePosition;
+        _spanSlack = SpanSlack;
         _scene = engine.Scene;
         _scene.Changed += OnSceneChanged;
         engine.SceneReplaced += OnSceneReplaced;
@@ -128,6 +135,14 @@ public sealed partial class RenderSync : IDisposable
 
     /// <summary>The render world kept in sync.</summary>
     public IRenderWorld World { get; }
+
+    /// <summary>
+    /// The surfaces cable tubes lie on: the ground plane (<see cref="CableSupportSurfaces.GroundHeight"/>, Z = 0 m by
+    /// default; set it to null for none) and the scene's floors. A cable never sags through them, and a span between two
+    /// nodes resting on the same surface (or anchored to the same object) is drawn straight; cut lengths are unchanged.
+    /// Changing the ground redraws the cables on the next <see cref="Update"/>.
+    /// </summary>
+    public CableSupportSurfaces CableSupports => _cableSupports;
 
     /// <summary>Resolves gobo wheel slots to textures (cached per slot), for the light collector.</summary>
     public GoboResolver GoboResolver { get; }
@@ -303,12 +318,20 @@ public sealed partial class RenderSync : IDisposable
         {
             case SceneChangeKind.Added or SceneChangeKind.Removed:
                 if (change.Entity is { } e)
-                    foreach (var d in e.SelfAndDescendants()) _rebuild.Add(d.Id);
+                    foreach (var d in e.SelfAndDescendants())
+                    {
+                        _rebuild.Add(d.Id);
+                        if (CableSupportSurfaces.IsSurface(d)) _cableSupports.Invalidate();
+                    }
                 _cablesDirty = true;
                 break;
             case SceneChangeKind.TransformChanged:
                 if (change.Entity is { } m)
-                    foreach (var d in m.SelfAndDescendants()) _moved.Add(d.Id);
+                    foreach (var d in m.SelfAndDescendants())
+                    {
+                        _moved.Add(d.Id);
+                        if (CableSupportSurfaces.IsSurface(d)) _cableSupports.Invalidate();
+                    }
                 break;
             case SceneChangeKind.Reparented:
                 // the subtree moved and may now be below a hidden (or selected) ancestor
@@ -317,6 +340,7 @@ public sealed partial class RenderSync : IDisposable
                     {
                         _moved.Add(d.Id);
                         _flagsDirty.Add(d.Id);
+                        if (CableSupportSurfaces.IsSurface(d)) _cableSupports.Invalidate();
                     }
                 break;
             case SceneChangeKind.VisibilityChanged:
@@ -337,6 +361,7 @@ public sealed partial class RenderSync : IDisposable
             case SceneChangeKind.ComponentAdded or SceneChangeKind.ComponentRemoved or SceneChangeKind.ComponentChanged:
                 if (change.Entity is { } c) _rebuild.Add(c.Id);
                 if (change.Component is CableComponent) _cablesDirty = true;
+                else if (change.Component is WallComponent) _cableSupports.Invalidate(); // a floor (or what used to be one)
                 break;
             case SceneChangeKind.SettingsChanged:
                 _atmosphereDirty = true;
@@ -382,6 +407,7 @@ public sealed partial class RenderSync : IDisposable
         _layersDirty = true;
         _flagsDirty.Clear();
         _cablesDirty = true;
+        _cableSupports.Invalidate();
         _atmosphereDirty = true;
         _smokeStep = _fireStep = -1;
     }
@@ -389,6 +415,14 @@ public sealed partial class RenderSync : IDisposable
     private void ProcessChanges()
     {
         if (_cablesDirty) RebuildCableIndex();
+        _cableSupports.EnsureBuilt(_scene);
+        if (_cableSupports.TakeChanges(out bool everywhere, out var changedMin, out var changedMax))
+        {
+            // the surfaces cables lie on changed (a floor added, moved or resized, the ground): the cables over the
+            // changed area are drawn again on the new ones
+            foreach (var (entity, cable) in _scene.Query<CableComponent>())
+                if (everywhere || CableOverlaps(entity, cable, changedMin, changedMax)) _rebuild.Add(entity.Id);
+        }
         if (_moved.Count > 0 || _rebuild.Count > 0)
         {
             // cables follow the entities their nodes are anchored to (and lose them when they are removed)
@@ -397,7 +431,7 @@ public sealed partial class RenderSync : IDisposable
             _scratch.AddRange(_rebuild);
             foreach (var id in _scratch)
             {
-                if (!_cablesByAnchor.TryGetValue(id, out var cables)) continue;
+                if (!_cableAnchors.TryGetCables(id, out var cables)) continue;
                 foreach (var cable in cables) _rebuild.Add(cable);
                 _linesDirty = true;
             }
@@ -533,11 +567,11 @@ public sealed partial class RenderSync : IDisposable
                     break;
                 case ConsoleComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _consoleMesh, _consoleBounds, _steelMaterial, Matrix4x4.CreateTranslation(0f, 0f, ConsoleSize.Z / 2f), "Console", castShadow: true);
+                    AddStatic(v, _consoleMesh, _consoleBounds, _steelMaterial, Matrix4x4.CreateTranslation(0f, 0f, DeviceCatalog.ConsoleSize.Z / 2f), "Console", castShadow: true);
                     break;
                 case PowerSourceComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _powerMesh, _powerBounds, _greyMaterial, Matrix4x4.CreateTranslation(0f, 0f, PowerSourceSize.Z / 2f), "Power source", castShadow: true);
+                    AddStatic(v, _powerMesh, _powerBounds, _greyMaterial, Matrix4x4.CreateTranslation(0f, 0f, DeviceCatalog.PowerSourceSize.Z / 2f), "Power source", castShadow: true);
                     break;
                 case CableComponent cable:
                     BuildCable(v, cable);
@@ -615,17 +649,22 @@ public sealed partial class RenderSync : IDisposable
         v.Kind = VisualKind.Cable;
         if (cable.Nodes.Count < 2 || cable.Segments.Count == 0) return;
         var entity = v.Entity;
-        var cableWorld = entity.WorldMatrix;
         var type = _engine.Network.Catalog.Find(cable.CableTypeId);
+        int n = WriteCableNodes(entity, cable);
+        // a node lying on a floor (or the ground) rests on it: a span between two such nodes runs flat along the surface
+        if (_nodeRest.Length < n) _nodeRest = new float[Math.Max(n, _nodeRest.Length * 2)];
+        for (int i = 0; i < n; i++) _nodeRest[i] = _cableSupports.RestingHeight(_nodePositions[i]) ?? float.NaN;
+        _cableSlack = float.IsFinite(cable.SlackFactor) ? Math.Max(1f, cable.SlackFactor) : 1f;
         MeshData mesh;
         try
         {
-            mesh = CableTubeMesh.Create(cable, node => CableGeometry.NodeWorldPosition(_scene, cableWorld, node, out _),
-                new CableTubeOptions
-                {
-                    SlackFactor = float.IsFinite(cable.SlackFactor) ? Math.Max(1f, cable.SlackFactor) : 1f,
-                    Radius = type?.IsPower == true ? 0.006f : 0.004f,
-                });
+            mesh = CableTubeMesh.Create(cable, _cableNodePosition, new CableTubeOptions
+            {
+                SlackFactor = _cableSlack,
+                Radius = type?.IsPower == true ? 0.006f : 0.004f,
+                SpanSlack = _spanSlack,
+                Support = _supportHeight,
+            });
         }
         catch (Exception e) when (e is ArgumentException or InvalidDataException)
         {
@@ -645,28 +684,78 @@ public sealed partial class RenderSync : IDisposable
         AddStatic(v, handle, bounds, rubber, Matrix4x4.Identity, "Cable", castShadow: false);
     }
 
+    /// <summary>
+    /// World positions of the cable's nodes into <see cref="_nodePositions"/> (in node order) and node id → index into
+    /// <see cref="_nodeIndex"/> (the first node of a repeated id, as CableGeometry does). Returns the node count.
+    /// </summary>
+    private int WriteCableNodes(Entity entity, CableComponent cable)
+    {
+        if (_nodePositions.Length < cable.Nodes.Count) _nodePositions = new Vector3[Math.Max(cable.Nodes.Count, _nodePositions.Length * 2)];
+        int n = CableGeometry.WriteNodeWorldPositions(_scene, entity, cable, _nodePositions);
+        _nodeIndex.Clear();
+        for (int i = 0; i < n; i++)
+            if (cable.Nodes[i] is { } node) _nodeIndex.TryAdd(node.Id, i);
+        return n;
+    }
+
+    /// <summary>
+    /// True when the horizontal extent of the cable's nodes (where its tube is drawn: sag and resting are vertical)
+    /// meets the rectangle from <paramref name="min"/> to <paramref name="max"/> (world X/Y, metres).
+    /// </summary>
+    private bool CableOverlaps(Entity entity, CableComponent cable, Vector2 min, Vector2 max)
+    {
+        const float Margin = 0.05f; // the tube's radius and the surface queries around a point
+        if (_nodePositions.Length < cable.Nodes.Count) _nodePositions = new Vector3[Math.Max(cable.Nodes.Count, _nodePositions.Length * 2)];
+        int n = CableGeometry.WriteNodeWorldPositions(_scene, entity, cable, _nodePositions);
+        var lo = new Vector2(float.PositiveInfinity);
+        var hi = new Vector2(float.NegativeInfinity);
+        for (int i = 0; i < n; i++)
+        {
+            var p = _nodePositions[i];
+            if (!IsFinite(p)) continue;
+            lo = Vector2.Min(lo, new Vector2(p.X, p.Y));
+            hi = Vector2.Max(hi, new Vector2(p.X, p.Y));
+        }
+        if (!(lo.X <= hi.X)) return true; // no usable position: draw it again to be safe
+        return lo.X - Margin <= max.X && hi.X + Margin >= min.X && lo.Y - Margin <= max.Y && hi.Y + Margin >= min.Y;
+    }
+
+    /// <summary>Position of a node of the cable being built (after <see cref="WriteCableNodes"/>).</summary>
+    private Vector3 CableNodePosition(CableNode node) =>
+        _nodeIndex.TryGetValue(node.Id, out int i) ? _nodePositions[i] : node.Position;
+
+    /// <summary>
+    /// Slack of the span between two nodes of the cable being built: straight (1) when the span is fixed along an object
+    /// (both nodes anchored to the same entity: a truss, a wall, a floor) or lies on a surface (both nodes rest on
+    /// surfaces at the same height), the cable's own slack otherwise. Drawing only; cut lengths keep the cable's slack.
+    /// </summary>
+    private float SpanSlack(CableNode a, CableNode b)
+    {
+        if (a.Anchor is { } anchorA && b.Anchor is { } anchorB && anchorA.EntityId == anchorB.EntityId && anchorA.EntityId != Guid.Empty &&
+            _scene.Find(anchorA.EntityId) is not null)
+            return 1f;
+        if (_nodeIndex.TryGetValue(a.Id, out int ia) && _nodeIndex.TryGetValue(b.Id, out int ib))
+        {
+            float ra = _nodeRest[ia], rb = _nodeRest[ib];
+            if (float.IsFinite(ra) && float.IsFinite(rb) && MathF.Abs(ra - rb) <= CableSupportSurfaces.Tolerance) return 1f;
+        }
+        return _cableSlack;
+    }
+
     private void RebuildCableIndex()
     {
         _cablesDirty = false;
         _linesDirty = true;
-        _cablesByAnchor.Clear();
+        _cableAnchors.Invalidate();
+        _cableAnchors.EnsureBuilt(_scene);
         // the devices that lose or gain the cable highlight get new flags
         foreach (var id in _cableEnds) _flagsDirty.Add(id);
         _cableEnds.Clear();
         foreach (var (entity, cable) in _scene.Query<CableComponent>())
         {
             _cableEnds.Add(entity.Id);
-            foreach (var node in cable.Nodes)
-            {
-                if (node?.Anchor is not { } anchor) continue;
-                if (!_cablesByAnchor.TryGetValue(anchor.EntityId, out var list)) _cablesByAnchor[anchor.EntityId] = list = new List<Guid>();
-                if (!list.Contains(entity.Id)) list.Add(entity.Id);
-            }
             foreach (var end in cable.Endpoints)
                 if (end is not null && end.EntityId != Guid.Empty) _cableEnds.Add(end.EntityId);
-            // a cable entity moved as a whole moves its free nodes
-            if (!_cablesByAnchor.TryGetValue(entity.Id, out var own)) _cablesByAnchor[entity.Id] = own = new List<Guid>();
-            if (!own.Contains(entity.Id)) own.Add(entity.Id);
         }
         foreach (var id in _cableEnds) _flagsDirty.Add(id);
     }
@@ -678,15 +767,13 @@ public sealed partial class RenderSync : IDisposable
         foreach (var (entity, cable) in _scene.Query<CableComponent>())
         {
             if (!entity.IsVisibleInHierarchy || cable.Nodes.Count < 2) continue;
-            if (_nodePositions.Length < cable.Nodes.Count) _nodePositions = new Vector3[Math.Max(cable.Nodes.Count, _nodePositions.Length * 2)];
-            int n = CableGeometry.WriteNodeWorldPositions(_scene, entity, cable, _nodePositions);
+            // node id → position index, so a long cable costs nodes + segments, not nodes × segments
+            WriteCableNodes(entity, cable);
             var (r, g, b) = _engine.Network.Catalog.Find(cable.CableTypeId)?.ColorSrgb ?? (0.8f, 0.8f, 0.8f);
             var color = new Vector4(r, g, b, 1f);
             foreach (var segment in cable.Segments)
             {
-                int a = cable.Nodes.FindIndex(x => x?.Id == segment.FromNode);
-                int c = cable.Nodes.FindIndex(x => x?.Id == segment.ToNode);
-                if (a < 0 || c < 0 || a >= n || c >= n) continue;
+                if (!_nodeIndex.TryGetValue(segment.FromNode, out int a) || !_nodeIndex.TryGetValue(segment.ToNode, out int c)) continue;
                 var p0 = _nodePositions[a];
                 var p1 = _nodePositions[c];
                 if (!IsFinite(p0) || !IsFinite(p1)) continue;
@@ -1115,8 +1202,9 @@ public sealed partial class RenderSync : IDisposable
     private void EnsurePrimitives()
     {
         if (_consoleMesh.IsValid) return;
-        var console = Primitives.Box(ConsoleSize);
-        var power = Primitives.Box(PowerSourceSize);
+        // the boxes the editor places and the cable tool puts the ports on (Candela.Electrical's device catalogue)
+        var console = Primitives.Box(DeviceCatalog.ConsoleSize);
+        var power = Primitives.Box(DeviceCatalog.PowerSourceSize);
         var hoist = Primitives.Cylinder(0.12f, 0.45f);
         _consoleMesh = World.CreateMesh(console);
         _powerMesh = World.CreateMesh(power);

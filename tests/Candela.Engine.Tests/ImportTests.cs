@@ -191,23 +191,83 @@ public sealed class ImportTests
         Assert.Contains(result.Issues, i => i.Code == EngineIssueCodes.ImportInProcess && i.Severity == IssueSeverity.Note);
     }
 
+    /// <summary>
+    /// Imports <paramref name="path"/> through the real worker (<c>candela import-worker</c>) until a run completes. Each
+    /// attempt gets its own, short timeout: under a fully parallel test run merely starting the worker process can take
+    /// long, and a run stopped by the timeout (<see cref="EngineIssueCodes.ImportUnsafe"/>, "longer than") says nothing
+    /// about the file — it is repeated with twice the time. Every other outcome is returned as it is, so the caller
+    /// still tells a rejection from a crash or a timeout.
+    /// </summary>
+    private static EngineResult ImportUntilTheWorkerCompletes(string path, string name, out int attempts)
+    {
+        var timeout = TimeSpan.FromSeconds(15);
+        for (attempts = 1; ; attempts++)
+        {
+            using var engine = new StageEngine(new StageEngineOptions
+            {
+                Library = TestEnvironment.Library,
+                CacheDirectory = TestEnvironment.NewTempDirectory(name + "-cache"),
+                ImportWorkerTimeout = timeout,
+            });
+            var result = engine.Import(path);
+            bool timedOut = !result.Success && result.Issues.Any(i => i.Code == EngineIssueCodes.ImportUnsafe &&
+                                                                       i.Message.Contains("longer than", StringComparison.Ordinal));
+            if (!timedOut || attempts == 4) return result;
+            timeout *= 2; // 15 + 30 + 60 + 120 s at worst, only on a machine too busy to start a process
+        }
+    }
+
     [Fact]
     public void The_worker_rejects_unreadable_files_with_a_reason()
     {
         string folder = TestEnvironment.NewTempDirectory("reject");
         string bad = Path.Combine(folder, "broken.fbx");
         File.WriteAllText(bad, "this is not an FBX file");
-        using var engine = TestEnvironment.CreateEngine("reject");
-        var result = engine.Import(bad);
+        Assert.NotNull(ImportWorker.FindWorker()); // the real worker, not the in-process fallback
+
+        var result = ImportUntilTheWorkerCompletes(bad, "reject", out int attempts);
         Assert.False(result.Success);
         var issue = Assert.Single(result.Issues);
-        Assert.Equal(EngineIssueCodes.ImportFailed, issue.Code);
+        Assert.True(issue.Code == EngineIssueCodes.ImportFailed,
+            $"expected the worker to reject the file with a reason after {attempts} attempt(s), got {issue.Code}: {issue.Message}");
         Assert.DoesNotContain("safely", issue.Message, StringComparison.Ordinal);
+        Assert.Contains("broken.fbx", issue.Message, StringComparison.Ordinal);
+        Assert.True(issue.Message.Length > "'broken.fbx': ".Length + 5, issue.Message); // the importer's reason follows the name
 
+        using var engine = TestEnvironment.CreateEngine("reject");
         var skp = Path.Combine(folder, "venue.skp");
         File.WriteAllBytes(skp, [0xFF, 0xFE, 0xFF, 0x0E, 0x53, 0x00]);
         Assert.Contains("SketchUp", engine.Import(skp).Summary, StringComparison.Ordinal);
         Assert.False(engine.Import(Path.Combine(folder, "missing.obj")).Success);
+    }
+
+    [SkippableFact]
+    public void A_worker_rejection_reaches_the_user_word_for_word_and_is_never_called_unsafe()
+    {
+        // the deterministic half of the test above: a worker that rejects at once, whatever the machine's load
+        Skip.If(OperatingSystem.IsWindows(), "uses a POSIX shell script as the worker");
+        string folder = TestEnvironment.NewTempDirectory("reject-script");
+        string obj = SceneBuilder.WriteCubeObj(folder);
+        string script = Path.Combine(folder, "rejecting-worker.sh");
+        // candela import-worker <input> <output-dir> …: the reason goes to <output-dir>/error.txt, exit code 4
+        File.WriteAllText(script, "#!/bin/sh\nprintf 'The file has no geometry the importer understands.' > \"$3/error.txt\"\nexit 4\n");
+        if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(script, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        using var engine = new StageEngine(new StageEngineOptions
+        {
+            Library = TestEnvironment.Library,
+            CacheDirectory = TestEnvironment.NewTempDirectory("reject-script-cache"),
+            ImportWorkerPath = script,
+            ImportWorkerTimeout = TimeSpan.FromMinutes(1),
+        });
+        int before = engine.Scene.Count;
+        var result = engine.Import(obj);
+        Assert.False(result.Success);
+        var issue = Assert.Single(result.Issues);
+        Assert.Equal(EngineIssueCodes.ImportFailed, issue.Code);
+        Assert.Contains("The file has no geometry the importer understands.", issue.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain("safely", issue.Message, StringComparison.Ordinal);
+        Assert.Equal(before, engine.Scene.Count);
+        Assert.Equal(0, engine.Assets.Count);
     }
 
     [Fact]

@@ -112,6 +112,8 @@ public static class MvrImporter
         private int _geometryBudget = MaxExpandedGeometries;
         private bool _geometryBudgetReported;
         private IReadOnlyDictionary<Guid, CandelaUserData.WallRecord> _walls = new Dictionary<Guid, CandelaUserData.WallRecord>();
+        private IReadOnlyDictionary<Guid, CandelaUserData.DeviceRecord> _candelaDevices = new Dictionary<Guid, CandelaUserData.DeviceRecord>();
+        private readonly Dictionary<string, CandelaUserData.DeviceRecord> _candelaSpecs = new(StringComparer.OrdinalIgnoreCase);
 
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
         {
@@ -165,11 +167,12 @@ public static class MvrImporter
             return new MvrImportResult(_scene, _group, _roots, _assets, _resolver.References, issues, _doc, _byUuid, _layers);
         }
 
-        /// <summary>Candela's own block (walls written by a Candela export, see <see cref="CandelaUserData"/>).</summary>
+        /// <summary>Candela's own block (walls and generic devices written by a Candela export, see <see cref="CandelaUserData"/>).</summary>
         private void ReadCandelaData()
         {
             var problems = new List<Issue>();
             _walls = CandelaUserData.ReadWalls(_doc, problems);
+            _candelaDevices = CandelaUserData.ReadDevices(_doc, problems);
             foreach (var p in problems) _sink.Add(p.Severity, p.Category, p.Code, p.Message);
         }
 
@@ -209,6 +212,8 @@ public static class MvrImporter
                         if (!_specUsers.TryGetValue(spec, out var users)) _specUsers[spec] = users = new List<Guid>();
                         users.Add(id);
                         if (d.Addresses.Count > 0) _patchedSpecs.Add(spec);
+                        // one of Candela's generic devices: its GDTF is resolved by the device's own file name
+                        if (_candelaDevices.TryGetValue(obj.Uuid, out var device)) _candelaSpecs.TryAdd(spec, device);
                         var key = (spec, (d.GdtfMode ?? "").Trim());
                         _modeUsers[key] = _modeUsers.GetValueOrDefault(key) + 1;
                         if (!_modeAddresses.TryGetValue(key, out var list)) _modeAddresses[key] = list = new List<int>();
@@ -232,7 +237,7 @@ public static class MvrImporter
         {
             foreach (var (spec, users) in _specUsers)
             {
-                var r = _resolver.Resolve(spec, users, _patchedSpecs.Contains(spec));
+                var r = _resolver.Resolve(spec, users, _patchedSpecs.Contains(spec), _candelaSpecs.GetValueOrDefault(spec));
                 r.ObjectCount = users.Count;
                 _gdtfs[spec] = r;
             }

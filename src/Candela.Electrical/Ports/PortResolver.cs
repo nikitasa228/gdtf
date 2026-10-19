@@ -11,7 +11,7 @@ namespace Candela.Electrical;
 /// <c>_specs</c> (<c>powerConnectorIn/Out</c>, <c>powerLinkable</c>, <c>dataConnectors</c>, <c>controlSignal</c>,
 /// <c>outputChannels</c>) with the names "Power In", "Power Out", "DMX In", "DMX Out", "Ethernet", "Output n" /
 /// "Dimmer n". Consoles: one port per <c>ConsoleOutput</c>. Power sources: one port per outlet plus a "Mains In"
-/// input through which a distro can itself be fed.
+/// input through which a distro can itself be fed, with a real connector (<see cref="MainsInConnectorOf"/>).
 /// </summary>
 public sealed class PortResolver
 {
@@ -156,16 +156,81 @@ public sealed class PortResolver
                 Phase = Math.Clamp(o.Phase, 1, 3),
             });
         }
+        string inlet = MainsInConnectorOf(source);
         AddUnique(ports, new Port
         {
             Name = MainsInPortName,
             Direction = PortDirection.Input,
             Signal = SignalKind.Power,
-            Connector = ConnectorCatalog.AnyTermination,
+            Connector = ConnectorCatalog.Resolve(inlet),
+            ConnectorText = inlet,
             Role = PortRole.PowerIn,
             Origin = PortOrigin.PowerSource,
         });
         return ports;
+    }
+
+    /// <summary>
+    /// The connector of a source's <see cref="MainsInPortName"/> inlet: <see cref="PowerSourceComponent.MainsInConnector"/>
+    /// when it is set, otherwise derived from the kind of source (sources saved before the property existed, and sources
+    /// built by hand). A supply with a single power outlet is fed in line through the same connector (a wall socket or a
+    /// CEE outlet at the end of an extension). A distro — several outlets — gets the smallest standard inlet above its
+    /// largest outlet (a multicore outlet counts the circuits it puts on one phase): CEE 16/32 A single phase, CEE
+    /// 16/32/63/125 A three phase or Powerlock 400 A, matching the source's <see cref="PowerSourceComponent.Phases"/>
+    /// (a single-phase distro above 32 A gets the three-phase CEE of its rating). So a 32 A three-phase distro with
+    /// 16 A outlets is fed through a CEE 32 A 5-pin inlet, and an outgoing cable no longer mates the inlet as if it were an
+    /// outlet.
+    /// </summary>
+    public static string MainsInConnectorOf(PowerSourceComponent source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        if (!string.IsNullOrWhiteSpace(source.MainsInConnector)) return source.MainsInConnector.Trim();
+        bool threePhase = source.Phases >= 3;
+        int count = 0;
+        float largest = 0f;
+        PowerOutlet? single = null;
+        if (source.Outlets is { } outlets)
+        {
+            foreach (var o in outlets)
+            {
+                if (o is null) continue;
+                count++;
+                single = o;
+                var connector = ConnectorCatalog.Resolve(o.Connector);
+                float breaker = o.BreakerA > 0 && float.IsFinite(o.BreakerA) ? o.BreakerA : connector.RatedCurrentA ?? 16f;
+                if (connector.Domain == ConnectorDomain.Multicore)
+                {
+                    // the circuits of a multicore outlet are spread over the phases of a three-phase source
+                    int circuits = Math.Max(1, connector.Circuits);
+                    breaker *= threePhase ? (circuits + 2) / 3 : circuits;
+                }
+                largest = MathF.Max(largest, breaker);
+            }
+        }
+        if (count == 1 && single is not null)
+        {
+            var own = ConnectorCatalog.Resolve(single.Connector);
+            if (own.IsKnown && !own.IsWildcard && own.Domain == ConnectorDomain.Power) return own.Id;
+            return StandardInlet(largest, threePhase, above: false);
+        }
+        return StandardInlet(largest, threePhase, above: count > 1);
+    }
+
+    /// <summary>
+    /// The smallest standard inlet rated at least <paramref name="currentA"/> (strictly above it when
+    /// <paramref name="above"/>): CEE single phase up to 32 A, then CEE three phase, then Powerlock.
+    /// </summary>
+    private static string StandardInlet(float currentA, bool threePhase, bool above)
+    {
+        ReadOnlySpan<float> ratings = [16f, 32f, 63f, 125f];
+        for (int i = 0; i < ratings.Length; i++)
+        {
+            float r = ratings[i];
+            if (above ? r <= currentA : r < currentA) continue;
+            if (!threePhase && r <= 32f) return r == 16f ? "CEE 16A" : "CEE 32A";
+            return r switch { 16f => "CEE 16A 3P", 32f => "CEE 32A 3P", 63f => "CEE 63A 3P", _ => "CEE 125A 3P" };
+        }
+        return "Powerlock";
     }
 
     // ------------------------------------------------------------------ fixtures

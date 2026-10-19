@@ -41,7 +41,7 @@ while (running)
 | `Input`, `Protocols`, `StartProtocols` | DMX input hub and the protocol manager; `StartProtocols` subscribes to the universes the patch uses. |
 | `Dmx`, `Poses` | DMX evaluation of every fixture; world matrices of every fixture part. |
 | `Simulation` | Smoke, fire and the acoustic field (`StageSimulation`). |
-| `Network`, `Rigging`, `ElectricalProfiles`, `NetworkSolution`, `HasConsoles` | Cable/power/data solver, rigging analyzer, electrical fixture data. |
+| `Network`, `Rigging`, `ElectricalProfiles`, `NetworkSolution`, `HasConsoles` | Cable/power/data solver, rigging analyzer, electrical fixture data. `NetworkSolution` always describes the scene as it is now: solved again after structural edits (cables, consoles, fixtures, power sources, entities added, removed, renamed or reparented) and **renewed when entities that cable nodes are anchored to move** (`TransformChanged` of an anchor, of an ancestor of one, or of a cable entity): `CableAnchorIndex` maps the moved subtree to the cables that move with it and `NetworkSolver.UpdateGeometry` recomputes only those cables' geometry, lengths, weights, Ethernet length checks and (for data cables) run lengths, on the next read; moving anything else keeps the same solution object. Edits of components are classified against what the solution was solved from (`NetworkInputs`, recorded after each full solve): a fixture edit that leaves its GDTF, mode, patch and fixture id alone (a manual attribute on every frame of a slider drag) keeps the solution, and a cable whose nodes, anchors, segments, plugs, type and label are unchanged (a node dragged along, its anchor offset, the slack) only has its own geometry renewed — so neither costs a full solve per frame. Every consumer — the console lock, the issues panel, the cable link window — therefore sees current cable lengths without a workaround of its own. |
 | `Issues`, `RefreshIssues()` | Issue log with the patch, electrical, rigging and engine providers, plus the issues of the last operations. |
 | `Undo`, `Selection` | Undo history and selection of the open scene. |
 | `Settings` (`EngineSettings`), `View` (`ViewSettings`), `MarkSettingsChanged()`, `MarkViewSettingsChanged()`, `SettingsVersion` | Stored with the project in the `engine` and `view` settings sections. Assigning another object, or calling `Mark…Changed()` after changing one in place (the editor's Preview/Render panels, overlay legends, work light, saved camera), makes the project modified (`IsModified`) and is picked up by the next autosave; `SettingsVersion` counts these changes. `New`/`Open` start unmodified. |
@@ -76,7 +76,7 @@ false only when nothing happened (the open scene is then unchanged).
 | `Open(path)` | `.candela` through `Candela.Project` (tolerant loading; load issues reported; the `engine`/`view` sections restored, a section that no longer parses gives `engine.settings-invalid` and the defaults); `.mvr` through `Candela.Mvr` as a new, unsaved project. |
 | `Save()`, `SaveAs(path)` | Atomic `.candela` write with the scene, every asset (original bytes), copies of the GDTF files the fixtures use (from the library or the project's own copies), the thumbnail (`Project.Thumbnail`) and the `engine`/`view` sections. `Save()` without a path fails with "Save as". |
 | `Import(path, EngineImportOptions)` | `.mvr` merged under a new group (undoable); `.candela` merged under a group through `ProjectMerge` (new ids, references remapped, undoable); 3D models (OBJ, FBX, DAE, 3DS, STL, PLY, glTF/GLB) as a `MeshComponent` entity at `Placement`; images (PNG, JPEG, TGA, BMP, PSD, GIF, HDR) as an `ImageComponent` reference drawing or poster sized to the image's aspect; `.gdtf` read completely first (`GdtfReader`) and added to the fixture library only when it is a readable fixture type with at least one DMX mode — a broken file is refused with `engine.import-failed` (category Fixture) and never becomes a library entry; warnings of the reader become one `engine.gdtf-warnings` note. The result carries the new (or already present) entry in `EngineResult.LibraryEntry` and `FixtureLibraryChanged` is raised, so the editor can select it. SketchUp files are refused with advice. |
-| `ExportMvr(path)` | MVR 1.6 with the library's GDTF files and the models as GLB (`Candela.Mvr`). |
+| `ExportMvr(path)` | MVR 1.6 with the library's GDTF files and the models as GLB (`Candela.Mvr`). Generic devices (`GenericDevices`: splitters, nodes, dimmer packs) are written as ordinary MVR fixtures with their GDTF embedded and marked in Candela's `UserData` block (`MvrExportOptions.IsCandelaDevice = GenericDevices.IsGeneric`), so opening the file in Candela gives the same devices back (by their own file names, without stub reports) while other programs see valid fixtures. |
 
 **GDTF files that are not in the library.** Complete GDTFs embedded in an MVR, and the GDTF copies of a project, are
 extracted to `{cache}/gdtf/{content hash}/` and added to the library when the library has no file of that name, so a
@@ -189,8 +189,8 @@ update).
 | Images | `ImagePlaneMesh` + `ImagePlaneMesh.CreateMaterial`; reference drawings unlit (`InstanceFlags.Reference`), posters lit. |
 | Imported models | Decoded through `EngineModels` — on a background task by default (`LoadModelsInBackground`; a native format goes through the import worker, which may take up to its timeout; the objects appear when their model has decoded, `PendingModels` counts the decodes, `CompletePendingLoads` waits for them too); material overrides by slot with built-in materials. Decoded models live in the project's `AssetStore` (`SetDecodedModel`), so the store, the renderer and the light meter share one copy. |
 | Trusses | Their model, or `TrussMesh` in aluminium. |
-| Cables | Tube meshes (`CableTubeMesh`, catenary sag from the slack factor, dark rubber tinted by the type) plus coloured lines (`SetLines`, the cable type's colour) for the cable overlay; rebuilt when an anchor entity moves. |
-| Consoles, power sources, rigging points | Simple primitives (desk, distro box, hoist). |
+| Cables | Tube meshes (`CableTubeMesh`, catenary sag from the slack factor, dark rubber tinted by the type) plus coloured lines (`SetLines`, the cable type's colour) for the cable overlay; rebuilt when an anchor entity moves. **Cables lie on surfaces** (`CableSupports`, a `CableSupportSurfaces`): the ground plane (`GroundHeight`, Z = 0 m by default, where the cable tool puts free nodes; null for none) and the upper faces of floors and ceilings (`WallComponent` Floor/Ceiling, also tilted up to 60°). A span is drawn straight when it is fixed along an object (both nodes anchored to the same entity: truss, wall, floor) or lies on a surface (both nodes rest within 5 cm on surfaces of the same height); other spans sag with the cable's slack but never below the surface under them — a sample is kept a tube radius above the highest surface not above the span's chord or the cable's height at the previous sample, walked from both ends, so a cable leaving a riser drapes over its edge (a taut span too) while one running under a platform is left alone; on a ramp the tube keeps its radius along the surface normal. Moving, adding or editing a floor redraws only the cables whose nodes' horizontal extent meets the floors that changed (`CableSupportSurfaces.TakeChanges`), so dragging or resizing a floor does not redraw every cable on every frame; changing the ground redraws them all. Drawing only: cut lengths stay routed length × slack. |
+| Consoles, power sources, rigging points | Simple primitives: a desk and a distro box of `DeviceCatalog.ConsoleSize` / `PowerSourceSize` (the sizes the Devices section and the cable tool use) standing on their origin, a hoist. |
 | Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, the smoke density grid when the smoke simulation stepped, one temperature grid per flame (its own box and resolution: the first as `FlameTemperature`, the others as `FlameTemperatures`; the grid objects are reused between steps); noise sources every frame. |
 
 **Flags.** `Selected` (selection), `Hidden` (entity or an ancestor hidden, or its layer hidden; a hidden fixture still
@@ -223,7 +223,10 @@ with each fixture's parts at the fixture's own placement instead of their pan/ti
 motors still travelling when the rig was placed) never moves it. It depends only on that box and is recomputed only when
 the scene or the set of drawn entities changes, so the same scene always gets the same work light, whatever happened
 before, and it costs nothing per frame. It is not stage light: `engine.Lights`, the
-light meter and the light plot never include it, and it is left out while the project's view shows the lux overlay. The
+light meter and the light plot never include it, and it is left out while the project's view shows the lux overlay.
+Its lights carry `SpotLight.NoVolumetricScattering = true`, so a renderer that honours the flag lights the set with them
+without making the haze glow (the Vulkan renderer does not read the flag yet; until it does, the work light also
+scatters in haze, as before). The
 editor's preview passes `ViewSettings.WorkLight` (stored with the project, default `Auto`); `candela render
 --work-light auto|on` asks for it in a render. `IsWorkLightOn` and `WorkLights` tell what the last update sent, `WorkLightContent` the box the rig was placed around.
 
@@ -508,6 +511,29 @@ a device):
   again; fixtures named by an MVR stub spec get the same stand-in mode in the looks and the Art-Net test pattern as in
   the DMX engine; an ARRI SkyPanel's 179° field is trimmed to the renderer's 170° cone silently, while an Astera
   LunaBulb, whose beam cone itself is wider, is reported (`engine.field-clamped`).
+* **Cabling follow-ups** (`CablingFollowUpTests`, `GeometryUpdateTests` in the Electrical tests): flying a truss out
+  renews only the cable plugged into the head hung on it (the link between the heads keeps its object, so does a cable
+  that did not move), with lengths, run lengths and console-driven fixtures equal to a fresh solve, also without
+  consoles; moving something no cable is anchored to keeps the same solution; no vertex of a cable tube run over a
+  floor (20 % slack) goes below the floor, the run lies flat, a span fixed along a riser or a truss is straight, a drop
+  from a truss reaches the floor and lies on it, and without the floor and the ground the same run sags 0.5 m below
+  where the floor was; lowering a deck under free nodes drapes the span onto it; stored lengths stay routed × slack;
+  consoles and distros are drawn at `DeviceCatalog.ConsoleSize` / `PowerSourceSize`; every generic device goes through
+  an MVR as a plain fixture with a readable embedded GDTF and its mode, comes back with the same file name and mode,
+  device section and ports and without stub reports, and the connection between two of them comes back as a plugged
+  cable; the work light's lights (and only those) are marked `NoVolumetricScattering`.
+* **Cabling review** (`CablingReviewTests`): anchors two levels down a flown and turned truss and a cable carried by it
+  follow it; undo and redo of a gizmo move renew the solution and the Ethernet length check (and `RefreshIssues`)
+  follow it; five frames of a manual-attribute drag keep the same solution object, a dragged route point renews only
+  its cable, while a patch change, a re-anchored node (which the solution then follows) and a re-plugged end solve
+  again — each compared with a fresh solve; a cable on a 20°, 45° and 58° ramp has no vertex inside it; dragging and
+  resizing a deck redraws the cable on it (draped onto the lowered deck) but not one 20 m away, and a ground change
+  redraws every cable.
+* **Import worker**: `The_worker_rejects_unreadable_files_with_a_reason` runs the real worker with a short per-attempt
+  timeout (15 s, doubled up to three times only when the run was stopped by the timeout — a machine too busy to start
+  a process says nothing about the file) and still requires the completed run to be a rejection with the importer's
+  reason (`engine.import-failed`, never "safely"); `A_worker_rejection_reaches_the_user_word_for_word…` checks the same
+  mapping deterministically with a worker script that rejects at once.
 
 ## Known limitations
 
@@ -521,8 +547,13 @@ a device):
 * `Фокина.mvr` at open white: its 32 `Zonda` pixel beams have GDTF beam type Glow and each receives an eighth of the
   fixture's 465 000 cd (Candela.Dmx), so each is a Lambertian emitter of about 183 klm; in haze they light the air
   evenly and mask the beams of the other fixtures (docs/rendering.md shows the stage with and without them).
-* The work light is made of spot lights (the render contracts have no ambient term): in haze its six wide ambient
-  lights scatter a faint even glow (about a fifth of the brightness of a lit surface at the default haze), and the
-  renderer's lux overlay would count it if a view showed lux while the project's view does not.
+* The work light is made of spot lights marked `SpotLight.NoVolumetricScattering`; the Vulkan renderer does not read
+  that flag yet, so until it does the six wide ambient lights scatter a faint even glow in haze (about a fifth of the
+  brightness of a lit surface at the default haze). The renderer's lux overlay would count the work light if a view
+  showed lux while the project's view does not.
+* Cables rest on the ground plane and on floors/ceilings (`WallComponent`); imported models (an MVR stage deck, a
+  riser modelled as a mesh) are not surfaces for them. A span whose two nodes rest at the same height is drawn at that
+  height: a riser standing between two nodes on the floor is taken for a platform the cable runs under (surfaces are
+  their top faces only), so such a span passes through it.
 * The renderer keeps at most 64 flame grids and 64 M texels in all (the hottest wins where they overlap; grids beyond
   the budget are skipped with a warning).

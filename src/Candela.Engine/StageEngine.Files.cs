@@ -7,6 +7,7 @@ using Candela.Core.Editing;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
+using Candela.Electrical;
 using Candela.Gdtf;
 using Candela.Mvr;
 using Candela.Project;
@@ -131,7 +132,8 @@ public sealed partial class StageEngine
 
     /// <summary>
     /// Writes the scene as an MVR 1.6 file with the GDTF files of its fixtures (from the library) and its 3D models
-    /// (as GLB).
+    /// (as GLB). Candela's generic devices (splitters, nodes, dimmer packs) are marked in Candela's <c>UserData</c>, so
+    /// opening the file in Candela gives the same devices back.
     /// </summary>
     public EngineResult ExportMvr(string path)
     {
@@ -143,6 +145,8 @@ public sealed partial class StageEngine
             {
                 GdtfProvider = MvrExportOptions.GdtfFromLibrary(Library),
                 ModelProvider = Models.GetModelData,
+                // splitters, nodes and dimmer packs come back as Candela's devices (other programs see fixtures)
+                IsCandelaDevice = GenericDevices.IsGeneric,
             };
             var result = MvrWriter.WriteFile(_scene, path, options);
             var issues = Sorted(result.Issues);

@@ -25,7 +25,9 @@ public enum WorkLightMode
 /// shading when no fixture emits — one key light from the audience side (front-left, above; casts shadows) and a soft
 /// ambient made of six very wide lights from ±X, ±Y and ±Z (no shadows), all aimed at the centre of the drawn content.
 /// It is not stage light: the engine's <see cref="StageEngine.Lights"/>, the light meter and the light plot never include
-/// it. The rig depends only on the bounds it is given, so it is deterministic.
+/// it, and its lights are marked <see cref="SpotLight.NoVolumetricScattering"/> so haze and smoke do not glow with it
+/// (a renderer that ignores the flag still lights the surfaces correctly). The rig depends only on the bounds it is
+/// given, so it is deterministic.
 /// </summary>
 /// <remarks>
 /// Levels: <see cref="KeyIlluminance"/> on a surface facing the key at the centre, <see cref="AmbientIlluminance"/> on a
@@ -133,6 +135,7 @@ public static class WorkLightRig
             CastShadows = castShadows,
             BeamType = Candela.Photometry.BeamType.Wash,
             FixtureId = Guid.Empty,
+            NoVolumetricScattering = true, // it lights the set, it must not glow in the haze
         };
     }
 

@@ -75,37 +75,232 @@ public sealed partial class NetworkSolver
         return last is not null && last.SceneId == scene.Id && last.SceneVersion == scene.Version ? last : Solve(scene);
     }
 
+    /// <summary>
+    /// <paramref name="solution"/> with the geometry of some cables computed again: their nodes moved with the entities
+    /// they are anchored to, or the cable entity itself moved, while nothing else about the cabling changed (no cable,
+    /// device, port or patch was added, removed or edited, no entity was reparented). Only those cables' geometry —
+    /// node positions, segment, routed and cut lengths, weight — and what depends on it are recomputed: their geometry
+    /// problems, the Ethernet link length checks and, when one of them is a data cable, the data lines (run lengths
+    /// and <c>data.run-too-long</c>). Devices, ports, plugs and the power network are taken over unchanged. The result
+    /// equals a fresh <see cref="Solve"/> of the scene as it is now (same cables, feeds and issues in the same order)
+    /// and carries the current <c>Scene.Version</c>; the old solution is not changed.
+    /// </summary>
+    /// <remarks>
+    /// Falls back to a full <see cref="Solve"/> when the solution was not made by this solver, belongs to another
+    /// scene, or a named cable is no longer the one it solved (its entity or component was replaced or added since).
+    /// Ids of entities that are not cables are ignored. Linear in the named cables' nodes and segments, plus the data
+    /// network when a data cable is among them.
+    /// </remarks>
+    /// <param name="solution">A solution of <paramref name="scene"/> by this solver.</param>
+    /// <param name="scene">The scene, after the move.</param>
+    /// <param name="cableEntityIds">Entities carrying the cables whose geometry changed.</param>
+    public NetworkSolution UpdateGeometry(NetworkSolution solution, Scene scene, IEnumerable<Guid> cableEntityIds)
+    {
+        ArgumentNullException.ThrowIfNull(solution);
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(cableEntityIds);
+        if (solution.State is not SolveState state || !ReferenceEquals(state.Owner, this) || solution.SceneId != scene.Id) return Solve(scene);
+
+        var indices = new SortedSet<int>();
+        foreach (var id in cableEntityIds)
+        {
+            var entity = scene.Find(id);
+            if (state.CableIndex.TryGetValue(id, out int first))
+            {
+                if (entity is null) return Solve(scene);
+                // the same entity with the same cable components (those of one entity are consecutive), still in the
+                // scene: only their geometry changed
+                int count = 0;
+                foreach (var c in entity.Components)
+                {
+                    if (c is not CableComponent component) continue;
+                    int i = first + count++;
+                    if (i >= state.Cables.Count || !ReferenceEquals(state.Cables[i].Entity, entity) || !ReferenceEquals(state.Cables[i].Component, component))
+                        return Solve(scene);
+                    indices.Add(i);
+                }
+                if (count == 0 || (first + count < state.Cables.Count && ReferenceEquals(state.Cables[first + count].Entity, entity))) return Solve(scene);
+            }
+            else if (entity?.Get<CableComponent>() is not null)
+            {
+                return Solve(scene); // a cable the solution does not know
+            }
+        }
+        if (indices.Count == 0) return solution;
+
+        var updated = new SolveRun(this, scene, state).UpdateGeometry(indices);
+        Volatile.Write(ref _last, updated);
+        return updated;
+    }
+
+    /// <summary>
+    /// What a solve keeps for <see cref="UpdateGeometry"/>: the devices, the cables with their plugs and the results and
+    /// issues of every phase, so a geometry change recomputes only what depends on cable geometry. Never changed after
+    /// the solve; an update builds a new state that shares the unchanged parts.
+    /// </summary>
+    private sealed class SolveState
+    {
+        public required NetworkSolver Owner { get; init; }
+        public required Dictionary<Guid, Device> Devices { get; init; }
+        public required List<Device> DeviceOrder { get; init; }
+        public required List<Issue> DeviceIssues { get; init; }
+        public required List<CableState> Cables { get; init; }
+        public required Dictionary<Guid, int> CableIndex { get; init; }
+        public required Dictionary<PortRef, (CableState Cable, int Position)> Plugged { get; init; }
+        public required DataResult Data { get; init; }
+        public required List<Issue> DataIssues { get; init; }
+        public required PowerResult Power { get; init; }
+        public required List<Issue> PowerIssues { get; init; }
+    }
+
     /// <summary>Per-solve state.</summary>
     private sealed partial class SolveRun
     {
         private readonly NetworkSolver _owner;
         private readonly Scene _scene;
-        private readonly List<Issue> _issues = new();
-        private readonly Dictionary<Guid, Device> _devices = new();
-        private readonly List<Device> _deviceOrder = new();
+        private readonly Dictionary<Guid, Device> _devices;
+        private readonly List<Device> _deviceOrder;
         private readonly List<(Entity Entity, CableComponent Component)> _cableComponents = new();
-        private readonly List<CableState> _cables = new();
-        private readonly Dictionary<PortRef, (CableState Cable, int Position)> _plugged = new(PortRef.Comparer);
+        private readonly List<CableState> _cables;
+        private readonly Dictionary<PortRef, (CableState Cable, int Position)> _plugged;
+        private readonly SolveState? _previous;
+        private readonly List<Issue> _deviceIssues;
+        private List<Issue> _dataIssues = new();
+        private List<Issue> _powerIssues = new();
+
+        /// <summary>Where <see cref="Add"/> writes: the list of the phase (or cable) being solved.</summary>
+        private List<Issue> _sink;
 
         public SolveRun(NetworkSolver owner, Scene scene)
         {
             _owner = owner;
             _scene = scene;
+            _devices = new Dictionary<Guid, Device>();
+            _deviceOrder = new List<Device>();
+            _cables = new List<CableState>();
+            _plugged = new Dictionary<PortRef, (CableState, int)>(PortRef.Comparer);
+            _deviceIssues = new List<Issue>();
+            _sink = _deviceIssues;
+        }
+
+        /// <summary>A run that continues <paramref name="previous"/> (see <see cref="UpdateGeometry"/>).</summary>
+        public SolveRun(NetworkSolver owner, Scene scene, SolveState previous)
+        {
+            _owner = owner;
+            _scene = scene;
+            _previous = previous;
+            _devices = previous.Devices;
+            _deviceOrder = previous.DeviceOrder;
+            _deviceIssues = previous.DeviceIssues;
+            _cables = new List<CableState>(previous.Cables);
+            _plugged = previous.Plugged;
+            _sink = _deviceIssues;
         }
 
         public NetworkSolution Run()
         {
+            _sink = _deviceIssues;
             CollectDevices();
             ResolveCables();
-            var data = SolveData();
+            _sink = _dataIssues;
+            var data = SolveData(_plugged);
+            _sink = _powerIssues;
             var power = SolvePower();
+            return Build(data, power, _plugged);
+        }
 
+        /// <summary>
+        /// Recomputes the geometry of the cables at <paramref name="indices"/> (positions in the cable list) and what
+        /// depends on it; everything else is taken over from the previous solve.
+        /// </summary>
+        public NetworkSolution UpdateGeometry(IEnumerable<int> indices)
+        {
+            var previous = _previous!;
+            bool data = false;
+            var replaced = new Dictionary<CableState, CableState>(ReferenceEqualityComparer.Instance);
+            foreach (int i in indices)
+            {
+                var old = _cables[i];
+                var state = new CableState(old.Entity, old.Component, old.Type, CableGeometry.Compute(_scene, old.Entity, old.Component), old.Label, old.Category)
+                {
+                    HeadIssues = old.HeadIssues,
+                    TailIssues = old.TailIssues,
+                };
+                _sink = state.GeometryIssues;
+                ReportGeometry(state);
+                state.Info = new CableInfo(old.Info.EntityId, old.Info.Name, old.Info.Label, old.Info.TypeId, old.Type, state.Geometry, old.Info.Endpoints)
+                {
+                    UpstreamEndpointIndex = old.Info.UpstreamEndpointIndex,
+                    PeakCurrentA = old.Info.PeakCurrentA,
+                    LoadW = old.Info.LoadW,
+                };
+                _sink = state.LengthIssues;
+                ReportLength(state);
+                _cables[i] = state;
+                replaced[old] = state;
+                data |= old.Type is { IsData: true };
+            }
+
+            var plugged = new Dictionary<PortRef, (CableState Cable, int Position)>(previous.Plugged.Count, PortRef.Comparer);
+            foreach (var (key, value) in previous.Plugged)
+                plugged[key] = replaced.TryGetValue(value.Cable, out var now) ? (now, value.Position) : value;
+
+            var dataResult = previous.Data;
+            _dataIssues = previous.DataIssues;
+            if (data)
+            {
+                // run lengths add up along the lines: the data walk runs again over the new geometry (cheap: no port or
+                // profile is resolved again)
+                _dataIssues = new List<Issue>();
+                _sink = _dataIssues;
+                dataResult = SolveData(plugged);
+            }
+            _powerIssues = previous.PowerIssues;
+            return Build(dataResult, previous.Power, plugged);
+        }
+
+        private NetworkSolution Build(DataResult data, PowerResult power, Dictionary<PortRef, (CableState Cable, int Position)> pluggedStates)
+        {
             var devices = new Dictionary<Guid, DeviceInfo>(_devices.Count);
             foreach (var d in _deviceOrder) devices[d.Id] = d.Info;
-            var plugged = new Dictionary<PortRef, (CableInfo, int)>(_plugged.Count, PortRef.Comparer);
-            foreach (var (key, value) in _plugged) plugged[key] = (value.Cable.Info, value.Cable.Info.Endpoints[value.Position].Index);
+            var plugged = new Dictionary<PortRef, (CableInfo, int)>(pluggedStates.Count, PortRef.Comparer);
+            foreach (var (key, value) in pluggedStates) plugged[key] = (value.Cable.Info, value.Cable.Info.Endpoints[value.Position].Index);
+
+            int count = _deviceIssues.Count + _dataIssues.Count + _powerIssues.Count;
+            foreach (var c in _cables) count += c.HeadIssues.Count + c.GeometryIssues.Count + c.TailIssues.Count + c.LengthIssues.Count;
+            var issues = new List<Issue>(count);
+            issues.AddRange(_deviceIssues);
+            foreach (var c in _cables)
+            {
+                issues.AddRange(c.HeadIssues);
+                issues.AddRange(c.GeometryIssues);
+                issues.AddRange(c.TailIssues);
+                issues.AddRange(c.LengthIssues);
+            }
+            issues.AddRange(_dataIssues);
+            issues.AddRange(_powerIssues);
+
+            var cableIndex = new Dictionary<Guid, int>(_cables.Count);
+            for (int i = 0; i < _cables.Count; i++) cableIndex.TryAdd(_cables[i].Entity.Id, i); // the first cable component of an entity wins
+            var state = new SolveState
+            {
+                Owner = _owner,
+                Devices = _devices,
+                DeviceOrder = _deviceOrder,
+                DeviceIssues = _deviceIssues,
+                Cables = _cables,
+                CableIndex = cableIndex,
+                Plugged = pluggedStates,
+                Data = data,
+                DataIssues = _dataIssues,
+                Power = power,
+                PowerIssues = _powerIssues,
+            };
             return new NetworkSolution(_scene.Id, _scene.Version, devices, _cables.Select(c => c.Info).ToList(), plugged,
-                data.Lines, data.FeedsByDevice, data.ConsoleDriven, power.Sources, power.Feeds, power.Unpowered, _issues);
+                data.Lines, data.FeedsByDevice, data.ConsoleDriven, power.Sources, power.Feeds, power.Unpowered, issues)
+            {
+                State = state,
+            };
         }
 
         // ------------------------------------------------------------------ devices
@@ -168,15 +363,15 @@ public sealed partial class NetworkSolver
                 var geometry = CableGeometry.Compute(_scene, entity, component);
                 string label = string.IsNullOrWhiteSpace(component.Label) ? entity.Name : component.Label!;
                 string category = type is null ? IssueCategory.Scene : type.IsPower ? IssueCategory.Power : IssueCategory.Data;
+                var state = new CableState(entity, component, type, geometry, label, category);
+                _sink = state.HeadIssues;
                 if (type is null)
                     Add(IssueSeverity.Warning, IssueCategory.Scene, IssueCodes.CableUnknownType,
                         $"Cable '{label}' has the unknown type '{component.CableTypeId}'; it is left out of the power and data checks.", entity.Id);
-                foreach (var p in geometry.Problems)
-                    Add(IssueSeverity.Warning, category,
-                        p.Kind == CableGeometryProblemKind.AnchorMissing ? IssueCodes.CableAnchorMissing : IssueCodes.CableInvalidGeometry,
-                        $"Cable '{label}': {p.Message}.", entity.Id);
+                _sink = state.GeometryIssues;
+                ReportGeometry(state);
 
-                var state = new CableState(entity, component, type, geometry, label);
+                _sink = state.TailIssues;
                 var endpoints = new List<CableEndpointInfo>(component.Endpoints.Count);
                 for (int i = 0; i < component.Endpoints.Count; i++)
                 {
@@ -216,11 +411,27 @@ public sealed partial class NetworkSolver
                             $"{type.DisplayName} '{label}' branches to {usable.Count} devices ({Fmt.List(usable.Select(DescribeEnd))}) without a splitter; {what}.",
                             [entity.Id, .. usable.Select(e => e.EntityId).Distinct()]);
                     }
-                    if (type.Signal == SignalKind.Ethernet && type.MaxRunM is { } max && geometry.LengthM > max)
-                        Add(IssueSeverity.Warning, IssueCategory.Data, IssueCodes.DataRunTooLong,
-                            $"Ethernet cable '{label}' is {Fmt.M(geometry.LengthM)} long; an Ethernet link is limited to {Fmt.M(max)}.", entity.Id);
                 }
+                _sink = state.LengthIssues;
+                ReportLength(state);
             }
+        }
+
+        /// <summary>Problems of a cable's node and segment data (anchor missing, invalid positions, loops).</summary>
+        private void ReportGeometry(CableState cable)
+        {
+            foreach (var p in cable.Geometry.Problems)
+                Add(IssueSeverity.Warning, cable.Category,
+                    p.Kind == CableGeometryProblemKind.AnchorMissing ? IssueCodes.CableAnchorMissing : IssueCodes.CableInvalidGeometry,
+                    $"Cable '{cable.Label}': {p.Message}.", cable.Entity.Id);
+        }
+
+        /// <summary>Checks of a single cable's length (an Ethernet link is limited to its type's maximum run).</summary>
+        private void ReportLength(CableState cable)
+        {
+            if (cable.Type is { IsData: true, Signal: SignalKind.Ethernet, MaxRunM: { } max } && cable.Geometry.LengthM > max)
+                Add(IssueSeverity.Warning, IssueCategory.Data, IssueCodes.DataRunTooLong,
+                    $"Ethernet cable '{cable.Label}' is {Fmt.M(cable.Geometry.LengthM)} long; an Ethernet link is limited to {Fmt.M(max)}.", cable.Entity.Id);
         }
 
         private CableEndpointInfo ResolveEndpoint(CableState cable, CableEndpoint ep, int index, string category)
@@ -287,7 +498,7 @@ public sealed partial class NetworkSolver
         // ------------------------------------------------------------------ helpers
 
         private void Add(IssueSeverity severity, string category, string code, string message, params Guid[] entities) =>
-            _issues.Add(new Issue(severity, category, code, message, entities.Distinct().ToArray()));
+            _sink.Add(new Issue(severity, category, code, message, entities.Distinct().ToArray()));
 
         private static string Label(Entity e, FixtureComponent f) => f.FixtureId > 0 ? $"#{f.FixtureId} '{e.Name}'" : $"'{e.Name}'";
     }
@@ -306,15 +517,31 @@ public sealed partial class NetworkSolver
         public string LongLabel => Info.Profile is { } p ? $"{Info.Label} ({p.DisplayName})" : Info.Label;
     }
 
-    /// <summary>A cable during a solve.</summary>
-    private sealed class CableState(Entity entity, CableComponent component, CableType? type, CableGeometry geometry, string label)
+    /// <summary>A cable during a solve, with its issues in report order (kept apart so a geometry update replaces only its own).</summary>
+    private sealed class CableState(Entity entity, CableComponent component, CableType? type, CableGeometry geometry, string label, string category)
     {
         public Entity Entity { get; } = entity;
         public CableComponent Component { get; } = component;
         public CableType? Type { get; } = type;
         public CableGeometry Geometry { get; } = geometry;
         public string Label { get; } = label;
+
+        /// <summary>Issue category of the cable's own problems (power, data, or scene for an unknown type).</summary>
+        public string Category { get; } = category;
+
         public CableInfo Info { get; set; } = null!;
         public List<PowerEdge> PowerEdges { get; } = new();
+
+        /// <summary>Unknown type.</summary>
+        public List<Issue> HeadIssues { get; init; } = new();
+
+        /// <summary>Geometry problems (depend on node positions).</summary>
+        public List<Issue> GeometryIssues { get; } = new();
+
+        /// <summary>Plugs: endpoints, ports, connectors, Y-splits.</summary>
+        public List<Issue> TailIssues { get; init; } = new();
+
+        /// <summary>Length checks of the cable itself (depend on node positions).</summary>
+        public List<Issue> LengthIssues { get; } = new();
     }
 }

@@ -16,7 +16,7 @@ the scene. Units follow [ARCHITECTURE.md](ARCHITECTURE.md): metres, kilograms, w
 | `PortResolver` / `Port` / `PortRef` | Ports of fixtures, consoles and power sources; port picker ranking for the cable tool. |
 | `FixtureProfile`, `IFixtureProfileProvider`, `LibraryFixtureProfileProvider`, `InMemoryFixtureProfileProvider` | Per GDTF + mode: ports, power, power factor, weight, accepted mains, distribution ratings. Cached and thread-safe. |
 | `CableGeometry` | World node positions (anchors follow entities), segment and routed lengths, slack, tree paths, plus an allocation-free position writer for drawing. |
-| `NetworkSolver` → `NetworkSolution` | Data lines, console-driven fixtures, power circuits and feeds, cable currents, issues. `GetOrSolve` caches per `Scene.Version`. |
+| `NetworkSolver` → `NetworkSolution` | Data lines, console-driven fixtures, power circuits and feeds, cable currents, issues. `GetOrSolve` caches per `Scene.Version`; `UpdateGeometry` renews the geometry of cables that moved with their anchors. |
 | `RiggingAnalyzer` → `RiggingSolution` | Truss and rigging-point loads, mounting checks. |
 | `ElectricalIssueProvider`, `RiggingIssueProvider` | Core `IIssueProvider`s for the issues panel. |
 | `PowerReport`, `DataReport`, `CableSchedule`, `CableLinkView` | View models for the UI tables and the cable link window. |
@@ -130,7 +130,17 @@ data input (tested over all 1091 files).
 **Consoles** get one port per `ConsoleOutput`: XLR5 for DMX512, etherCON for Ethernet (also written "Art-Net",
 "sACN", "E1.31"), plus universe and count.
 **Power sources** get one port per outlet (breaker, phase, connector) and a `Mains In` input, so a distro can itself
-be fed from a generator or another distro.
+be fed from a generator or another distro. The inlet has a real connector, `PortResolver.MainsInConnectorOf(source)`:
+`PowerSourceComponent.MainsInConnector` when set (the built-in presets set it: a distro's CEE or Powerlock inlet, a
+supply's own outlet connector), otherwise — sources saved before the field existed, or built by hand — derived from the
+kind of source. A supply with a single power outlet is fed in line through the same connector (a wall socket, a CEE
+outlet at the end of an extension); a distro (several outlets) gets the smallest standard inlet above its largest outlet
+— CEE 16/32 A single phase, CEE 16/32/63/125 A three phase, Powerlock 400 A, following the source's phases; a multicore
+outlet counts the circuits it puts on one phase (a Socapex on a three-phase distro: 2 × 16 A). The derivation gives
+every built-in preset its explicit inlet (tested). So an outgoing cable no longer mates a supply's own inlet as if it
+were an outlet: a TRUE1 cable starting at a 32 A distro mates its six TRUE1 outlets, and the CEE 32 A inlet only with an
+adapter (ranked last by `CompatiblePorts`), while the CEE 32 A feeder mates it; a mismatching feeder plugged into an
+inlet is reported as `cable.adapter-needed` like on any port.
 
 ## Devices for the editor
 
@@ -144,8 +154,8 @@ gives its ports through `PortResolver` (for GDTF devices, through the profile pr
 |---|---|
 | Console | `console-dmx-2`, `-4`, `-8` (outputs "DMX A" … on universes 1 …, XLR5), `console-artnet-16`, `console-sacn-16` (one etherCON "Network" output, universes 1–16) |
 | DataDistribution | `artnet-node-2`, `artnet-node-8`, `dmx-splitter-6`, `dmx-splitter-4-xlr3` (generic GDTF devices) |
-| Mains | `mains-schuko-16`, `mains-cee16`, `mains-cee32` (230 V), `mains-cee32-3p`, `mains-cee63-3p`, `mains-cee125-3p`, `mains-powerlock-400` (one outlet each, plus `Mains In`) |
-| Distro | `distro-16-true1` (4 × TRUE1 10 A), `distro-32-schuko` and `distro-32-true1` (6 outlets 16 A on L1, L2, L3, L1, L2, L3), `distro-63-socapex`, `distro-125`, `distro-powerlock-400` |
+| Mains | `mains-schuko-16`, `mains-cee16`, `mains-cee32` (230 V), `mains-cee32-3p`, `mains-cee63-3p`, `mains-cee125-3p`, `mains-powerlock-400` (one outlet each, plus a `Mains In` with the outlet's connector) |
+| Distro | `distro-16-true1` (4 × TRUE1 10 A, CEE 16 A inlet), `distro-32-schuko` and `distro-32-true1` (6 outlets 16 A on L1, L2, L3, L1, L2, L3, CEE 32 A 5-pin inlet), `distro-63-socapex` (CEE 63 A), `distro-125` (CEE 125 A), `distro-powerlock-400` (Powerlock) |
 | Dimmer | `dimmer-4x10` (generic GDTF dimmer pack, 4 × 10 A) |
 
 `DeviceCatalog.LibraryDevices(library)` adds the power-distribution devices of a fixture library — the newest revision
@@ -346,10 +356,19 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
   the stack. 1000 fixtures with 2000 cables (40 DMX lines, 80 power runs) solve in about 90 ms.
 * **Caching.** `GetOrSolve` returns the cached solution while `Scene.Version` is unchanged. Profiles are cached per
   GDTF + mode and keep no reference to the parsed GDTF.
+* **Moved anchors.** `UpdateGeometry(solution, scene, cableEntityIds)` renews a solution after the named cables moved
+  with their anchors (a truss flown out, a head moved): their node positions, segment and routed lengths, cut length
+  and weight, geometry problems and Ethernet length checks, and — when a data cable is among them — the data lines'
+  run lengths and `data.run-too-long`; devices, ports, plugs and the power network are taken over. The result equals a
+  fresh `Solve` (same cables, feeds and issues in the same order), carries the current `Scene.Version` and becomes the
+  solver's cached solution; the old one is not changed. It falls back to a full solve when the solution is not this
+  solver's, belongs to another scene or a named cable was replaced. Linear in the named cables' nodes and segments
+  (plus the data network for data cables). The engine calls it for the cables `CableAnchorIndex` finds under each moved
+  entity, so `StageEngine.NetworkSolution` always describes the current positions.
 
 ## Tests
 
-`tests/Candela.Electrical.Tests` has 100 tests and runs in about 30 s. It uses the repository's GDTF library and
+`tests/Candela.Electrical.Tests` runs in well under a minute (longer on a cold GDTF cache). It uses the repository's GDTF library and
 `_specs`:
 
 * **Vocabulary.** All `_specs` connector values and all GDTF connector names resolve. The connector rules are checked.
@@ -378,6 +397,12 @@ Messages name the devices as `#FixtureId 'Name'` and carry the numbers, for exam
   "fuse" of the BeamZ Ignite 740 thru, thru sockets typed as inputs, 400 V three-phase sources, a three-phase distro
   on a single-phase feed, a distro on a dead `Mains In` cable, a substitute model, overload values printed next to
   their limits, a fixture hung under a hoist, and two fixtures that bend a truss past its point rating.
+* **Geometry updates** (`GeometryUpdateTests`): a truss move renewed like a fresh solve, only the moved cables measured
+  again, a DMX line moved past its maximum run and back, an Ethernet link stretched past 100 m, a moved cable entity
+  carrying its free nodes, the fallback when the cabling itself changed, and a large rig renewed after a truss move.
+* **Mains inlets** (`MainsInletTests`): every built-in source's inlet connector, the derived default equal to it,
+  derivation over phases, ratings, multicore and odd outlets, an outgoing TRUE1 cable that mates the outlets but not the
+  inlet, and a fed distro with a mating and a mismatching feeder.
 
 ## Assumptions and known gaps
 

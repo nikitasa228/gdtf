@@ -200,6 +200,19 @@ with one dimmer channel and no geometry. For each distinct `GDTFSpec` the import
 4. **Nothing** (`MvrGdtfSource.Unresolved`), reported as a `mvr.gdtf-unresolved` error. The fixture is still created,
    placed and patched, and it keeps the spec and mode as written, so adding the GDTF later resolves it.
 
+**Candela's generic devices** come first: a spec used by an object that Candela's `UserData` block marks as one of its
+generic devices (a `Device` record, see the export) is resolved by the device's own file name from the record — the
+library's file of that name (`MvrGdtfSource.Library`, `ExactFileName`), else the embedded copy under that name
+(`MvrGdtfSource.Embedded`) — without stub, substitute or unresolved reports: the generated GDTFs of splitters and nodes
+have no channels and no model files, which is what those devices are, not a placeholder. `MvrGdtfReference.IsCandelaDevice`
+tells such specs; a renamed embedded copy (another program saved the file again) is stored under the device's name, so
+`FixtureComponent.GdtfSpec` is the device's file again. A record is only trusted while the object still is that device:
+its embedded GDTF must have the `FixtureTypeID` of the record (`type`, or for records without one that of the library's
+device file), and without a readable embedded GDTF the object's spec must still name the device's file. Another program
+that kept Candela's block but put another fixture type on the object therefore keeps its change (the object is imported
+as that fixture, not forced back to the generic device, nor its new GDTF filed under the device's name). When neither
+is usable, or the record is stale, the spec is resolved like any other.
+
 `MvrImportResult.Gdtfs` reports every spec: the source, the file name (stored in `FixtureComponent.GdtfSpec`), the
 library entry and path, match kind and score, the embedded bytes and whether they were a stub, the parsed
 `FixtureType`, the object count, and the mode resolutions. `ReadBytes()` returns the bytes of the GDTF in use.
@@ -350,6 +363,15 @@ files.
   read (damaged JSON, no object, an invalid size or kind) is reported once (`mvr.value-invalid`) and its box is imported
   as a model instead, so nothing is lost; blocks of other providers are ignored, and elements of newer versions of the
   block are kept by the document but not read.
+  The block also marks **Candela's generic devices** (`MvrExportOptions.IsCandelaDevice`, which the engine sets to
+  `Candela.Electrical.GenericDevices.IsGeneric`): one `<Device object="{uuid}" gdtf="{file}" mode="{mode}"
+  type="{FixtureTypeID}"/>` per DMX splitter, Art-Net / sACN node or dimmer pack (`type` is the GDTF fixture type of
+  the embedded file, left out when the file could not be embedded). The object itself stays an ordinary `Fixture` with
+  its GDTF embedded and its `GDTFMode`, so other programs see a valid fixture; Candela's importer resolves it to that
+  device again while it still is that device (see "GDTF resolution"). `CandelaUserData.ReadDevices` reads the records;
+  one without a valid object uuid, whose `gdtf` is not a plain `.gdtf` file name (no folders, no reserved characters,
+  at most 255 characters) or whose `type` is not a uuid is reported once (`mvr.value-invalid`) and the object is
+  imported as the fixture it is. Older readers skip the element.
 * **Geometry children.** Child entities that the importer created for extra geometry are folded back into `Geometry3D`
   entries of their parent, recognised by their derived ids. If such a child's name is not the stem of the file, it is
   written as a `Symbol` of a one-file `Symdef` named after it. Names and ids therefore survive import → export →
@@ -448,6 +470,16 @@ Writing the result again gives the same bytes.
   UV scale, material; no box imported as a model, no asset) and a second round trip; a project texture becomes the
   default material; damaged records are reported once and imported as models; other providers' blocks are ignored;
   exports without walls write no block.
+* **`CandelaDeviceMarkerTests`.** Generic devices marked by `IsCandelaDevice` are written as fixtures with a readable
+  embedded GDTF and their mode plus one `Device` record each (none for other fixtures) and come back under their own
+  file names, with their patch and without stub reports — while the same export without the marker reports the
+  channel-less splitter as a stub; a renamed embedded copy is brought back under the device's file name; a library
+  holding the device supplies its file (`ExactFileName`); damaged records (no object, a path, not a `.gdtf`) are
+  reported once and the objects are still imported as fixtures.
+* **`CandelaDeviceRecordStalenessTests`.** The record carries the device's `FixtureTypeID` (a damaged `type` is
+  reported); an object another program changed into a real fixture (the Briteq BT-FOG1500 of the repository, embedded
+  or only referenced) keeps that fixture, with or without the device in the library; the device renamed and not
+  embedded still resolves from the library.
 
 ## Known gaps
 

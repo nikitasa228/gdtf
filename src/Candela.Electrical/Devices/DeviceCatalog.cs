@@ -112,7 +112,8 @@ public sealed record DevicePreset
 /// The devices the cable tool connects, as offered by the Devices section of the library (<see cref="BuiltIn"/>):
 /// consoles with 2/4/8 DMX outputs and network consoles (Art-Net, sACN) whose etherCON port carries 16 universes; the
 /// generic Art-Net nodes and DMX splitters of <see cref="GenericDevices"/>; mains supplies (Schuko 16 A, CEE 16 A,
-/// CEE 32/63/125 A three phase, Powerlock 400 A); power distros fed through their <c>Mains In</c> (outlets with
+/// CEE 32/63/125 A three phase, Powerlock 400 A); power distros fed through their <c>Mains In</c> (a CEE or Powerlock
+/// inlet, <see cref="PowerSourceComponent.MainsInConnector"/>; outlets with
 /// breakers, single-phase outlets spread over L1–L3); the generic dimmer pack; and — from the user's fixture library —
 /// every device whose <c>_specs</c> record carries distribution ratings (<see cref="LibraryDevices"/>: dimmer packs,
 /// P3 PowerPorts, PSUs, feeders).
@@ -233,22 +234,22 @@ public static class DeviceCatalog
             "A 400 A three-phase tie-in or generator on Powerlock single-pole connectors.", 3, ("Powerlock", "Powerlock", 400f, 1));
 
         // ---- distros
-        yield return Distro("distro-16-true1", "Distro 16 A → 4 × TRUE1", 1,
+        yield return Distro("distro-16-true1", "Distro 16 A → 4 × TRUE1", 1, "CEE 16A",
             "Single-phase distro for a truss: 16 A in, four powerCON TRUE1 outlets on 10 A breakers.",
             Outlets("TRUE1", "powerCON TRUE1", 10f, 4, phases: 1));
-        yield return Distro("distro-32-schuko", "Distro 32 A 3~ → 6 × Schuko", 3,
+        yield return Distro("distro-32-schuko", "Distro 32 A 3~ → 6 × Schuko", 3, "CEE 32A 3P",
             "Three-phase distro: CEE 32 A in, six Schuko outlets on 16 A breakers spread over L1–L3.",
             Outlets("Schuko", "Schuko", 16f, 6, phases: 3));
-        yield return Distro("distro-32-true1", "Distro 32 A 3~ → 6 × TRUE1", 3,
+        yield return Distro("distro-32-true1", "Distro 32 A 3~ → 6 × TRUE1", 3, "CEE 32A 3P",
             "Three-phase distro: CEE 32 A in, six powerCON TRUE1 outlets on 16 A breakers spread over L1–L3.",
             Outlets("TRUE1", "powerCON TRUE1", 16f, 6, phases: 3));
-        yield return Distro("distro-63-socapex", "Distro 63 A 3~ → 2 × Socapex + 3 × CEE 16 A", 3,
+        yield return Distro("distro-63-socapex", "Distro 63 A 3~ → 2 × Socapex + 3 × CEE 16 A", 3, "CEE 63A 3P",
             "Three-phase dimmer-room distro: CEE 63 A in, two Socapex outlets (6 circuits of 16 A each) and three CEE 16 A outlets.",
             [.. Outlets("Socapex", "Socapex", 16f, 2, phases: 1), .. Outlets("CEE 16 A", "CEE 16A", 16f, 3, phases: 3)]);
-        yield return Distro("distro-125", "Distro 125 A 3~ → 2 × CEE 63 A + 2 × CEE 32 A", 3,
+        yield return Distro("distro-125", "Distro 125 A 3~ → 2 × CEE 63 A + 2 × CEE 32 A", 3, "CEE 125A 3P",
             "Main distro: CEE 125 A in, two CEE 63 A and two CEE 32 A three-phase outlets for the next distros.",
             [.. Outlets("CEE 63 A 3~", "CEE 63A 3P", 63f, 2, phases: 1), .. Outlets("CEE 32 A 3~", "CEE 32A 3P", 32f, 2, phases: 1)]);
-        yield return Distro("distro-powerlock-400", "Distro 400 A → 2 × CEE 125 A + 2 × CEE 63 A", 3,
+        yield return Distro("distro-powerlock-400", "Distro 400 A → 2 × CEE 125 A + 2 × CEE 63 A", 3, "Powerlock",
             "Generator distro: Powerlock 400 A in, two CEE 125 A and two CEE 63 A three-phase outlets.",
             [.. Outlets("CEE 125 A 3~", "CEE 125A 3P", 125f, 2, phases: 1), .. Outlets("CEE 63 A 3~", "CEE 63A 3P", 63f, 2, phases: 1)]);
 
@@ -330,6 +331,7 @@ public static class DeviceCatalog
                 VoltageV = 230f,
                 FrequencyHz = 50f,
                 Phases = phases,
+                MainsInConnector = outlet.Connector, // a supply fed in line takes the connector of its outlet
                 Outlets = new List<PowerOutlet>
             {
                 new() { PortName = outlet.Port, Connector = outlet.Connector, BreakerA = outlet.Breaker, Phase = outlet.Phase },
@@ -337,7 +339,7 @@ public static class DeviceCatalog
             },
         };
 
-    private static DevicePreset Distro(string id, string name, int phases, string description, (string, string, float, int)[] outlets) => new()
+    private static DevicePreset Distro(string id, string name, int phases, string inlet, string description, (string, string, float, int)[] outlets) => new()
     {
         Id = id,
         Group = DeviceGroup.Distro,
@@ -349,7 +351,14 @@ public static class DeviceCatalog
         SizeM = PowerSourceSize,
         Factory = () =>
         {
-            var source = new PowerSourceComponent { VoltageV = 230f, FrequencyHz = 50f, Phases = phases, Outlets = new List<PowerOutlet>(outlets.Length) };
+            var source = new PowerSourceComponent
+            {
+                VoltageV = 230f,
+                FrequencyHz = 50f,
+                Phases = phases,
+                MainsInConnector = inlet,
+                Outlets = new List<PowerOutlet>(outlets.Length),
+            };
             foreach (var (port, connector, breaker, phase) in outlets)
                 source.Outlets.Add(new PowerOutlet { PortName = port, Connector = connector, BreakerA = breaker, Phase = phase });
             return source;

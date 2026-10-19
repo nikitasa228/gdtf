@@ -391,8 +391,14 @@ public sealed class NetworkSolution
     /// <summary>Id of the solved scene.</summary>
     public Guid SceneId { get; }
 
-    /// <summary><c>Scene.Version</c> at solve time.</summary>
+    /// <summary>
+    /// <c>Scene.Version</c> when the solution was made: by <see cref="NetworkSolver.Solve"/>, or by
+    /// <see cref="NetworkSolver.UpdateGeometry"/> after cables moved with their anchors.
+    /// </summary>
     public long SceneVersion { get; }
+
+    /// <summary>What the solver keeps to update the solution's cable geometry later (opaque outside the solver).</summary>
+    internal object? State { get; init; }
 
     /// <summary>Fixtures, consoles and power sources by entity id.</summary>
     public IReadOnlyDictionary<Guid, DeviceInfo> Devices { get; }

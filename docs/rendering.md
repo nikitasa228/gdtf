@@ -302,6 +302,11 @@ HDR = (L_o · T_view + L_in-scattered) · exposure
   quadrature (`θ₅₀² + (1.1774σ)²`, `θ₁₀² + (2.1460σ)²`) and the peak drops so the flux (solid-angle integral of the
   profile) is conserved — wider and softer. Frost also blurs the cookie (see [Cookies](#cookies)).
 * Shadows, cookies (gobo, framing blades, prism) and haze extinction multiply this, see the stage-2 sections.
+* **`SpotLight.NoVolumetricScattering`** (contract, default false): a light marked so lights surfaces only and adds no
+  in-scattered light to the base haze, smoke or flame volumes. The engine sets it on the work light
+  (`WorkLightRig`), which must not glow in haze. The Vulkan renderer does not read the field yet and draws such lights
+  like any other (a safe fallback: surfaces are lit correctly, the haze shows some extra glow); honouring it means
+  skipping these lights in the froxel/raymarched in-scattering and the volumetric beam passes.
 
 ### BRDF (energy-conserving, single scattering)
 

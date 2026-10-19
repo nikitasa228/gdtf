@@ -354,6 +354,20 @@ the end caps. With a slack factor s > 1 (cable length ÷ straight length, `Cable
 as a catenary: k = L/2a solves sinh(k)/k = s (Newton), mid-span sag d = L·(cosh k − 1)/(2k) — 5 % slack sags about 14 %
 of the span. Inclined spans sag by d × (horizontal fraction), vertical drops hang straight. Defaults: radius 4 mm,
 8 sides, samples at most 0.1 m apart.
+`CableTubeOptions.SpanSlack(nodeA, nodeB)` gives each span of a tree its own slack (1 = straight: a span fixed along a
+truss or lying on a floor), and `CableTubeOptions.Support` (a `CableSupportHeight(x, y, maxHeight)`: the highest
+surface at (x, y) not above `maxHeight`, or −∞) keeps the cable on the surfaces it lies on: every node and sample is
+kept at least the tube radius above the supporting surface, measured along the surface's normal (on a ramp the centre
+is lifted by radius / cos(slope), the slope taken from the heights a radius away, up to 60°; a steeper change is an
+edge between surfaces), so no tube vertex goes below it. The query height of a
+sample is the higher of the span's straight chord there and the cable's height at the previous sample, and the span is
+walked from both ends (each sample keeps the higher result): a cable cannot pass down through a surface it lies on or
+comes from (a cable leaving a riser drapes over its edge, whichever way the span was stored), while a surface over its
+route (a platform it runs under) is ignored. A straight span (slack 1: a taut cable, a span fixed along an object) is
+sampled the same way and draped over a surface it would cut through on its way (a taut cable leaving a riser); one
+that cuts through nothing stays a single straight piece. `SamplePath(points, spanSlack[], spacing, support, clearance)` exposes
+the same sampling for a polyline. Drawing only — a cable's cut length is measured by `Candela.Electrical`, not from
+this path.
 
 **`Primitives`** — box, cylinder, cone, UV sphere, capsule (centred, axis Z) and arrow (from the origin along +Z) for
 helpers, gizmos and icons; smooth normals on curved surfaces, closed and outward-facing.

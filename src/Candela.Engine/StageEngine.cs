@@ -36,7 +36,11 @@ public sealed partial class StageEngine : IDisposable
     private readonly IReadOnlyList<Issue> _libraryIssues = Array.Empty<Issue>();
     private ProjectData _project;
     private Scene _scene;
-    private NetworkSolution? _consoleNetwork;
+    private readonly CableAnchorIndex _cableAnchors = new();
+    private readonly HashSet<Entity> _movedForNetwork = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<Guid> _movedCables = new();
+    private readonly NetworkInputs _solvedInputs = new();
+    private NetworkSolution? _network;
     private bool _networkDirty = true;
     private bool _hasConsoles;
     private bool _disposed;
@@ -250,13 +254,32 @@ public sealed partial class StageEngine : IDisposable
         }
     }
 
-    /// <summary>The data/power network of the scene (cached until the scene's structure changes).</summary>
+    /// <summary>
+    /// The data/power network of the scene as it is now: solved again after structural edits (cables plugged, routed
+    /// or re-anchored, consoles, power sources, a fixture's GDTF, mode, patch or fixture id, entities added, removed,
+    /// renamed or reparented), and renewed when entities that cable nodes are anchored to — or cable entities
+    /// themselves — moved, or cable nodes were dragged to new positions, so cable geometry, lengths, weights, run
+    /// lengths and the length checks always describe the current positions. A move recomputes only the cables that moved
+    /// with it (<see cref="NetworkSolver.UpdateGeometry"/>), when the solution is next read; moving anything else, or
+    /// editing what the cabling does not depend on (a fixture's manual attributes on every frame of a slider drag), keeps
+    /// the solution as it is.
+    /// </summary>
     public NetworkSolution NetworkSolution
     {
         get
         {
             UpdateNetwork();
-            return _consoleNetwork ??= Network.GetOrSolve(_scene);
+            if (_network is null)
+            {
+                _movedForNetwork.Clear();
+                _network = Network.GetOrSolve(_scene);
+                _solvedInputs.Record(_scene);
+            }
+            else
+            {
+                ApplyCableMoves(_network);
+            }
+            return _network;
         }
     }
 
@@ -394,7 +417,10 @@ public sealed partial class StageEngine : IDisposable
         Time = 0;
         Frame = 0;
         _networkDirty = true;
-        _consoleNetwork = null;
+        _network = null;
+        _movedForNetwork.Clear();
+        _cableAnchors.Invalidate();
+        _solvedInputs.Clear();
         IsModified = false;
         SceneReplaced?.Invoke(scene);
         StartAutosaveSession();
@@ -434,20 +460,54 @@ public sealed partial class StageEngine : IDisposable
     /// output; without consoles, when every universe it is patched in is live.
     /// </summary>
     private bool IsConsoleDriven(Entity entity, FixtureComponent fixture, bool universesLive) =>
-        _hasConsoles && _consoleNetwork is { } network ? network.IsConsoleDriven(entity.Id) : universesLive;
+        _hasConsoles && _network is { } network ? network.IsConsoleDriven(entity.Id) : universesLive;
 
+    /// <summary>After structural edits: whether the scene has consoles, and (with consoles) the solution.</summary>
     private void UpdateNetwork()
     {
         if (!_networkDirty) return;
         _networkDirty = false;
+        _movedForNetwork.Clear();
+        _cableAnchors.Invalidate();
         _hasConsoles = false;
         foreach (var _ in _scene.Query<ConsoleComponent>())
         {
             _hasConsoles = true;
             break;
         }
-        _consoleNetwork = _hasConsoles ? Network.Solve(_scene) : null;
+        _network = _hasConsoles ? Network.Solve(_scene) : null;
+        if (_network is null) _solvedInputs.Clear();
+        else _solvedInputs.Record(_scene);
     }
+
+    /// <summary>
+    /// Renews the geometry of the cables that moved with the entities moved since the solution was made (anchors and
+    /// cable entities, with their subtrees); a move that carries no cable leaves the solution as it is.
+    /// </summary>
+    private void ApplyCableMoves(NetworkSolution network)
+    {
+        if (_movedForNetwork.Count == 0) return;
+        _cableAnchors.EnsureBuilt(_scene);
+        _movedCables.Clear();
+        foreach (var moved in _movedForNetwork)
+            if (ReferenceEquals(moved.Scene, _scene)) _cableAnchors.CollectMoved(moved, _movedCables);
+        _movedForNetwork.Clear();
+        if (_movedCables.Count == 0) return;
+        _network = Network.UpdateGeometry(network, _scene, _movedCables);
+        _movedCables.Clear();
+    }
+
+    /// <summary>
+    /// True when an in-place edit of <paramref name="component"/> leaves the cabling as it was solved: a fixture whose
+    /// GDTF, mode, patch and fixture id are unchanged, or a cable whose nodes, anchors, segments, plugs, type and label
+    /// are unchanged (its nodes may have moved).
+    /// </summary>
+    private bool IsGeometryOnlyEdit(Component component) => component switch
+    {
+        FixtureComponent fixture => _solvedInputs.IsUnchanged(fixture),
+        CableComponent cable => _solvedInputs.HasSameStructure(cable),
+        _ => false,
+    };
 
     /// <summary>An asset was replaced or removed (import options changed …): the project has unsaved changes.</summary>
     private void OnAssetChanged(Guid assetId)
@@ -463,8 +523,20 @@ public sealed partial class StageEngine : IDisposable
         switch (change.Kind)
         {
             case SceneChangeKind.TransformChanged or SceneChangeKind.Reparented:
-                if (change.Entity is { } moved) Poses.MarkMoved(moved);
+                if (change.Entity is { } moved)
+                {
+                    Poses.MarkMoved(moved);
+                    // cables anchored in the moved subtree get their geometry renewed when the solution is next read
+                    if (change.Kind == SceneChangeKind.TransformChanged && !_networkDirty && _network is not null) _movedForNetwork.Add(moved);
+                }
+                // the scene order (which orders lines, cables and issues) may have changed: solve again
                 if (change.Kind == SceneChangeKind.Reparented) _networkDirty = true;
+                break;
+            case SceneChangeKind.Renamed:
+                // device and cable names are part of the solution (labels, messages)
+                if (change.Entity is { } renamed && (renamed.Has<CableComponent>() || renamed.Has<ConsoleComponent>() ||
+                                                     renamed.Has<FixtureComponent>() || renamed.Has<PowerSourceComponent>()))
+                    _networkDirty = true;
                 break;
             case SceneChangeKind.Added or SceneChangeKind.Removed:
                 _networkDirty = true;
@@ -472,7 +544,20 @@ public sealed partial class StageEngine : IDisposable
                     foreach (var e in removed.SelfAndDescendants()) Selection.Remove(e.Id);
                 break;
             case SceneChangeKind.ComponentAdded or SceneChangeKind.ComponentRemoved or SceneChangeKind.ComponentChanged:
-                if (change.Component is CableComponent or ConsoleComponent or FixtureComponent or PowerSourceComponent) _networkDirty = true;
+                if (change.Component is CableComponent or ConsoleComponent or FixtureComponent or PowerSourceComponent)
+                {
+                    if (change.Kind == SceneChangeKind.ComponentChanged && !_networkDirty && _network is not null && change.Entity is { } owner &&
+                        IsGeometryOnlyEdit(change.Component))
+                    {
+                        // a cable node dragged along: only that cable's geometry is renewed (a fixture edit the cabling
+                        // does not depend on, such as a manual attribute, needs nothing)
+                        if (change.Component is CableComponent) _movedForNetwork.Add(owner);
+                    }
+                    else
+                    {
+                        _networkDirty = true;
+                    }
+                }
                 break;
         }
         Simulation.OnSceneChanged(change);
