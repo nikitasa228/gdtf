@@ -77,7 +77,8 @@ internal static class Program
         writer.WriteLine("                 [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov <deg>]");
         writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]");
         writer.WriteLine("                 [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s>] [--ev auto|floor|<EV100>]");
-        writer.WriteLine("                 [--auto-exposure] [--frames N] [--grid] [--device <name>] [--library <dir>]... [--cache <dir>]");
+        writer.WriteLine("                 [--auto-exposure] [--frames N] [--grid] [--floor auto|none] [--work-light off|auto|on]");
+        writer.WriteLine("                 [--device <name>] [--library <dir>]... [--cache <dir>]");
         writer.WriteLine("      Loads the scene through the engine, applies the look, simulates --time seconds (DMX, motors, smoke,");
         writer.WriteLine("      fire), renders it and writes the PNG. Prints issues and timings. Defaults: 1280 x 720, auto view,");
         writer.WriteLine("      full shading, no overlay, the scene's haze, look open-white, time 0, auto exposure (--ev auto: the renderer adapts");
@@ -87,6 +88,8 @@ internal static class Program
         writer.WriteLine("      judging the picture (moving heads in symmetric fans and crossings over the stage and the audience, saturated");
         writer.WriteLine("      colours and white, narrow beams, gobos on some spots, washes colouring the floor, hazers running);");
         writer.WriteLine("      show = the manual values saved with the scene; dmx-file = a DMX recording played from its start.");
+        writer.WriteLine("      --work-light auto adds a dim neutral key and ambient light when no fixture emits, on always; a render");
+        writer.WriteLine("      never gets it unless asked (default off).");
         writer.WriteLine();
         writer.WriteLine("  candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset O]");
         writer.WriteLine("                      [--scene <file>] [--library <dir>]...");

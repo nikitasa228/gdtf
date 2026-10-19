@@ -111,6 +111,7 @@ public static class MvrImporter
         private readonly List<(MvrDeviceObject Object, Entity Entity)> _connectionOwners = new();
         private int _geometryBudget = MaxExpandedGeometries;
         private bool _geometryBudgetReported;
+        private IReadOnlyDictionary<Guid, CandelaUserData.WallRecord> _walls = new Dictionary<Guid, CandelaUserData.WallRecord>();
 
         public ImportSession(MvrDocument doc, MvrImportOptions options, Scene? target)
         {
@@ -138,6 +139,7 @@ public static class MvrImporter
         public MvrImportResult Run()
         {
             foreach (var s in _doc.AuxData.Symdefs) _symdefs.TryAdd(s.Uuid, s);
+            ReadCandelaData();
             Prepass();
             ResolveGdtfs();
             SetUpLayers();
@@ -161,6 +163,14 @@ public static class MvrImporter
             issues.AddRange(_doc.Issues);
             issues.AddRange(_issues);
             return new MvrImportResult(_scene, _group, _roots, _assets, _resolver.References, issues, _doc, _byUuid, _layers);
+        }
+
+        /// <summary>Candela's own block (walls written by a Candela export, see <see cref="CandelaUserData"/>).</summary>
+        private void ReadCandelaData()
+        {
+            var problems = new List<Issue>();
+            _walls = CandelaUserData.ReadWalls(_doc, problems);
+            foreach (var p in problems) _sink.Add(p.Severity, p.Category, p.Code, p.Message);
         }
 
         // ------------------------------------------------------------ pass 1: ids, focus points, GDTF users
@@ -239,7 +249,7 @@ public static class MvrImporter
                     resolution = new MvrModeResolution(requested, requested, null, inferred, false, count);
                 }
                 else if (r.MatchKind == FixtureMatchKind.Substitute &&
-                         ModeMatcher.PatchSpacing(_modeAddresses.GetValueOrDefault(key) ?? new List<int>()) is { } substituteSpacing)
+                         DmxPatchSpacing.Infer(_modeAddresses.GetValueOrDefault(key) ?? new List<int>()) is { } substituteSpacing)
                 {
                     resolution = ResolveSubstituteMode(key.Spec, r, requested, substituteSpacing, inferred, count);
                 }
@@ -247,7 +257,7 @@ public static class MvrImporter
                 {
                     var (mode, exact) = ModeMatcher.Match(r.FixtureType, requested, inferred);
                     resolution = new MvrModeResolution(requested, mode?.Name ?? requested,
-                        mode is null ? null : ModeMatcher.FirstBreakFootprint(mode), inferred, exact, count);
+                        mode?.FirstBreakFootprint, inferred, exact, count);
                     if (!exact && mode is not null)
                     {
                         var users = _specUsers[key.Spec].Take(64).ToArray();
@@ -278,15 +288,15 @@ public static class MvrImporter
         /// The mode of a substitute GDTF (a similar model standing in for one the library lacks) for fixtures patched
         /// <paramref name="spacing"/> channels apart: the requested mode name belongs to the missing model, so the
         /// stand-in's mode of that name is kept only when it fits the spacing; otherwise its most complete mode that fits
-        /// (<see cref="ModeMatcher.FitToSpacing"/>), so that the stand-in does not overlap its neighbours in the patch.
+        /// (<see cref="FixtureType.FitModeToSpacing(DmxMode?, int?)"/>, the rule the DMX engine uses too), so that the stand-in does not overlap its neighbours in the patch.
         /// </summary>
         private MvrModeResolution ResolveSubstituteMode(string spec, MvrGdtfReference r, string? requested, int spacing, int? inferred, int count)
         {
             var type = r.FixtureType!;
             var named = ModeMatcher.MatchName(type, requested);
-            var mode = ModeMatcher.FitToSpacing(type, named, spacing);
+            var mode = type.FitModeToSpacing(named, spacing);
             if (mode is null) return new MvrModeResolution(requested, requested, null, inferred, false, count);
-            int footprint = ModeMatcher.FirstBreakFootprint(mode);
+            int footprint = mode.FirstBreakFootprint;
             bool exact = named is not null && ReferenceEquals(mode, named);
             var users = _specUsers[spec].Take(64).ToArray();
             string fit = footprint <= spacing
@@ -296,7 +306,7 @@ public static class MvrImporter
             {
                 _sink.Add(IssueSeverity.Note, IssueCategory.Patch, MvrIssueCodes.SubstituteMode,
                     string.Create(CultureInfo.InvariantCulture,
-                        $"'{spec}' fixtures are patched {spacing} channels apart; the stand-in '{r.FileName}' uses its mode '{mode.Name}' ({footprint} channels, {fit}) instead of its mode of the requested name, '{named.Name}' ({ModeMatcher.FirstBreakFootprint(named)} channels)."),
+                        $"'{spec}' fixtures are patched {spacing} channels apart; the stand-in '{r.FileName}' uses its mode '{mode.Name}' ({footprint} channels, {fit}) instead of its mode of the requested name, '{named.Name}' ({named.FirstBreakFootprint} channels)."),
                     users);
             }
             else if (named is null)
@@ -337,7 +347,7 @@ public static class MvrImporter
                 return;
             }
 
-            bool added = false;
+            // adding to the layer collection raises LayersChanged by itself
             foreach (var l in _doc.Layers)
             {
                 if (_layerMap.ContainsKey(l.Uuid)) continue;
@@ -347,12 +357,10 @@ public static class MvrImporter
                 {
                     layer = new Layer { Id = l.Uuid == Guid.Empty ? Guid.NewGuid() : l.Uuid, Name = l.Name.Length > 0 ? l.Name : "Layer" };
                     _scene.Layers.Add(layer);
-                    added = true;
                 }
                 _layerMap[l.Uuid] = layer;
                 if (!_layers.Contains(layer)) _layers.Add(layer);
             }
-            if (added) _scene.NotifySettingsChanged();
         }
 
         // ------------------------------------------------------------ pass 2: entities
@@ -430,7 +438,10 @@ public static class MvrImporter
                     }
                     break;
                 case MvrDeviceObject d:
-                    var (direct, rest) = PlanGeometry(d, entity.Id, isTruss: d is MvrTruss);
+                    // a wall, floor or ceiling of a Candela export: the wall again, without the box written for other programs
+                    var wall = d is not (MvrTruss or MvrSupport) && _walls.TryGetValue(d.Uuid, out var record) ? record : null;
+                    var (direct, rest) = PlanGeometry(d, entity.Id, isTruss: d is MvrTruss, skipFile: wall?.GeometryFile);
+                    if (wall is not null) entity.Add((WallComponent)wall.Wall.Clone());
                     children = rest;
                     switch (d)
                     {
@@ -553,10 +564,16 @@ public static class MvrImporter
         /// (<c>direct</c>); anything else becomes child entities. For trusses the first geometry at the origin is the
         /// truss model.
         /// </summary>
-        private (Guid? Direct, List<(Guid Asset, Matrix4x4 Local, string Name)> Children) PlanGeometry(MvrDeviceObject d, Guid owner, bool isTruss)
+        private (Guid? Direct, List<(Guid Asset, Matrix4x4 Local, string Name)> Children) PlanGeometry(MvrDeviceObject d, Guid owner, bool isTruss,
+            string? skipFile = null)
         {
             var flat = new List<(MvrGeometry3D Geometry, Matrix4x4 Local, string Name)>();
-            Flatten(d.Geometries, Matrix4x4.Identity, flat, new HashSet<Guid>(), 0, owner, null);
+            var geometries = skipFile is null
+                ? d.Geometries
+                : d.Geometries.Where(g => !(g is MvrGeometry3D g3 &&
+                                            string.Equals(MvrDocument.NormalizePath(g3.FileName), MvrDocument.NormalizePath(skipFile), StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+            Flatten(geometries, Matrix4x4.Identity, flat, new HashSet<Guid>(), 0, owner, null);
             var items = new List<(Guid Asset, Matrix4x4 Local, string Name)>();
             foreach (var (g, m, name) in flat)
                 if (GetAsset(g.FileName, owner) is { } asset) items.Add((asset.Id, m, name));

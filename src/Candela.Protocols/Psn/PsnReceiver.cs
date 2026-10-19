@@ -85,9 +85,9 @@ public sealed class PsnReceiver : ExternalProtocolBase
     /// <inheritdoc />
     protected override string OnStart(ProtocolOptions options)
     {
-        ProtocolOptions.ValidatePort(options.PsnPort, "PosiStageNet port");
+        ProtocolOptions.ValidatePort(options.PsnPort, "PosiStageNet");
         if (!IPAddress.TryParse(options.PsnMulticastGroup, out var group) || !IsMulticast(group))
-            throw new ProtocolStartException($"PosiStageNet group '{options.PsnMulticastGroup}' is not an IPv4 multicast address.");
+            throw new ProtocolStartException(ProtocolText.Create(ProtocolMessages.PsnInvalidGroup, options.PsnMulticastGroup), ProtocolErrorCode.InvalidSettings);
         var interfaces = NetworkInterfaceCatalog.Enumerate();
         var selected = NetworkInterfaceCatalog.Resolve(options.NetworkInterface, interfaces);
         lock (_gate)
@@ -101,11 +101,18 @@ public sealed class PsnReceiver : ExternalProtocolBase
         _channel = channel;
         bool joined = channel.TryJoinMulticast(group, NetworkInterfaceCatalog.MulticastInterfaces(selected, interfaces), out var error);
         if (!joined)
-            AddWarning($"Could not join PosiStageNet multicast {group}: {error}. Unicast PSN to this computer still works.");
+            AddWarning(ProtocolText.Create(ProtocolMessages.PsnMulticastFailed, group, error));
         channel.Start("Candela PosiStageNet receiver", ProcessPacket, _ => CountBadPacket("internal error while processing a PSN packet", default),
-            e => ReportFault($"PosiStageNet socket failed: {e.Message}"));
-        var where = selected is null ? "all interfaces" : $"{selected.Name} {selected.Address}";
-        return $"Listening on UDP {channel.LocalEndPoint.Port} ({where}){(joined ? $", multicast {group}" : "")}";
+            e => ReportFault(ProtocolText.Create(ProtocolMessages.SocketFailed, "PosiStageNet", e.Message), ProtocolErrorCode.SocketFailed));
+        int port = channel.LocalEndPoint.Port;
+        var text = (joined, selected) switch
+        {
+            (true, null) => ProtocolText.Create(ProtocolMessages.PsnListeningAll, port, group),
+            (true, { } s) => ProtocolText.Create(ProtocolMessages.PsnListening, port, s.Name, s.Address, group),
+            (false, null) => ProtocolText.Create(ProtocolMessages.ListeningAll, port),
+            (false, { } s) => ProtocolText.Create(ProtocolMessages.Listening, port, s.Name, s.Address),
+        };
+        return Running(text, channel.LocalEndPoint.ToString(), selected is null ? null : $"{selected.Name} {selected.Address}", 0);
     }
 
     /// <inheritdoc />
@@ -186,7 +193,7 @@ public sealed class PsnReceiver : ExternalProtocolBase
         {
             // Only when the number of trackers changes, so steady 60 Hz data does not allocate.
             _reportedCount = count;
-            SetMessage($"Listening on UDP {endPoint.Port}; {count} tracker(s)");
+            SetMessage(ProtocolText.Create(ProtocolMessages.PsnTrackers, endPoint.Port, count));
         }
         TrackersUpdated?.Invoke(this, EventArgs.Empty);
     }

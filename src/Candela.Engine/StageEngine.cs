@@ -41,6 +41,8 @@ public sealed partial class StageEngine : IDisposable
     private bool _hasConsoles;
     private bool _disposed;
     private RenderSync? _render;
+    private EngineSettings _settings = new();
+    private ViewSettings _view = new();
 
     /// <summary>
     /// Creates an engine with an empty scene. The fixture library is scanned from <see cref="StageEngineOptions.LibraryFolders"/>
@@ -155,11 +157,64 @@ public sealed partial class StageEngine : IDisposable
     /// <summary>Selected entities.</summary>
     public Selection Selection { get; }
 
-    /// <summary>What is simulated and how (stored with the project).</summary>
-    public EngineSettings Settings { get; set; } = new();
+    /// <summary>
+    /// What is simulated and how (stored with the project's <c>engine</c> section). Assigning another object counts as
+    /// an unsaved change; after changing the object in place call <see cref="MarkSettingsChanged"/>.
+    /// </summary>
+    public EngineSettings Settings
+    {
+        get => _settings;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            if (ReferenceEquals(_settings, value)) return;
+            _settings = value;
+            MarkSettingsChanged();
+        }
+    }
 
-    /// <summary>View settings stored with the project (preview quality, shading, overlay, camera).</summary>
-    public ViewSettings View { get; set; } = new();
+    /// <summary>
+    /// View settings stored with the project's <c>view</c> section (preview quality, final-render settings, shading,
+    /// overlay and its legends, work light, camera). Assigning another object counts as an unsaved change; the editor
+    /// changes the object in place and then calls <see cref="MarkViewSettingsChanged"/>.
+    /// </summary>
+    public ViewSettings View
+    {
+        get => _view;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            if (ReferenceEquals(_view, value)) return;
+            _view = value;
+            MarkViewSettingsChanged();
+        }
+    }
+
+    /// <summary>
+    /// Counts the changes of <see cref="Settings"/> and <see cref="View"/> (assignments and the <c>Mark…Changed</c>
+    /// calls); views compare it to notice a change without comparing the settings themselves.
+    /// </summary>
+    public long SettingsVersion { get; private set; }
+
+    /// <summary>
+    /// Records that <see cref="View"/> was changed in place (Preview/Render panel, overlay legend, work light, saved
+    /// camera …): the project has unsaved changes (<see cref="IsModified"/>) and the next autosave stores them.
+    /// </summary>
+    public void MarkViewSettingsChanged()
+    {
+        IsModified = true;
+        SettingsVersion++;
+    }
+
+    /// <summary>
+    /// Records that <see cref="Settings"/> was changed in place (simulation switches, motor dynamics …): the project has
+    /// unsaved changes and the next autosave stores them.
+    /// </summary>
+    public void MarkSettingsChanged()
+    {
+        IsModified = true;
+        SettingsVersion++;
+    }
 
     /// <summary>Illuminance queries and the light-plot report.</summary>
     public LightMeterService LightMeter { get; }
@@ -215,9 +270,10 @@ public sealed partial class StageEngine : IDisposable
         Time += dt;
         Frame++;
 
-        // recorded DMX enters the hub like any protocol; live input is captured as it was merged
-        Player?.PlayTo(Time);
+        // the recorder captures the hub's input at packet rate on the receive threads; the frame time it is given here is
+        // the earliest time of what arrives from now on (playback submitted below included)
         if (Recorder.IsRecording) Recorder.Capture(Time);
+        Player?.PlayTo(Time);
         _autosave?.Update();
 
         UpdateNetwork();

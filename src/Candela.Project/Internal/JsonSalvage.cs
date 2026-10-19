@@ -35,7 +35,7 @@ internal static class JsonSalvage
         }
         if (element.ValueKind != JsonValueKind.Object) return false;
 
-        var node = source?.DeepClone() ?? JsonNode.Parse(element.GetRawText());
+        var node = source?.DeepClone() ?? JsonNode.Parse(element.GetRawText(), null, ProjectSettings.ReadOptions);
         var current = error;
         string? previous = null;
         for (int attempt = 0; attempt < MaxRepairs; attempt++)

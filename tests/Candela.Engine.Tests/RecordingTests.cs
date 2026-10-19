@@ -21,7 +21,9 @@ public sealed class RecordingTests
 
     private static DmxRecording Record(out List<(double Time, byte[] U1, byte[] U2)> expected)
     {
-        var hub = new DmxInputHub();
+        // a hub clock that stands still: the packets are stamped with the engine frames (the floor of the timeline)
+        var now = new DateTime(2026, 5, 1, 20, 0, 0, DateTimeKind.Utc);
+        var hub = new DmxInputHub(() => now);
         var recorder = new DmxRecorder(hub);
         expected = new();
         recorder.Start(100.0, "Show");
@@ -30,11 +32,12 @@ public sealed class RecordingTests
             double t = 100.0 + f / 30.0;
             var u1 = Universe(f, 1);
             var u2 = Universe(f / 2, 2); // universe 2 changes every other frame
+            // the engine frame at t, then the packets that arrive during it (stamped no earlier than t)
+            recorder.Capture(t);
             hub.Submit(Console, 1, u1);
             if (f < 90) hub.Submit(Console, 2, u2);
             else if (f == 90) hub.Terminate(Console, 2);
             hub.SubmitTimecode(Tc(3600 + f / 30.0));
-            recorder.Capture(t);
             expected.Add((f / 30.0, u1, f < 90 ? u2 : Array.Empty<byte>()));
         }
         Assert.True(recorder.IsRecording);

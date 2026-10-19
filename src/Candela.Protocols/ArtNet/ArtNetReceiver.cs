@@ -37,8 +37,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
     /// <summary>A stream without packets for this long may be forgotten when <see cref="MaxStreams"/> is reached.</summary>
     private static readonly TimeSpan StreamIdleTimeout = TimeSpan.FromSeconds(10);
 
-    private static readonly string StreamTableFullWarning =
-        $"More than {MaxStreams} Art-Net streams (sender, port, universe) are active; new ones are ignored.";
+    private static readonly ProtocolText StreamTableFullWarning = ProtocolText.Create(ProtocolMessages.ArtNetStreamTableFull, MaxStreams);
 
     /// <summary>GoodOutputB of every port: RDM disabled (bit 7), continuous output (6), RDM discovery not running (5),
     /// background discovery disabled (4) — Candela has no RDM responder side.</summary>
@@ -55,6 +54,8 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
     private volatile Runtime? _runtime;
     private long _nextPruneTicks;
     private int _replyCounter;
+    private IPv4Endpoint _timecodeSender;
+    private DmxSourceId? _timecodeSource;
 
     /// <summary>Creates the receiver feeding <paramref name="hub"/>.</summary>
     public ArtNetReceiver(DmxInputHub hub, TimeProvider? timeProvider = null)
@@ -87,10 +88,16 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
     /// <summary>Raised on the receive thread for every valid ArtTimeCode (after the hub has been updated).</summary>
     public event Action<ArtTimeCodePacket>? TimeCodeReceived;
 
+    /// <summary>
+    /// Raised on the receive thread for every valid ArtTimeCode with its sender and arrival time (after the hub has been
+    /// updated; the hub's <see cref="DmxInputHub.LastTimecodeSource"/> names the same sender).
+    /// </summary>
+    public event Action<ArtTimeCodeReceived>? TimeCodeReceivedFrom;
+
     /// <inheritdoc />
     protected override string OnStart(ProtocolOptions options)
     {
-        ProtocolOptions.ValidatePort(options.ArtNetPort, "Art-Net port");
+        ProtocolOptions.ValidatePort(options.ArtNetPort, "Art-Net");
         var interfaces = NetworkInterfaceCatalog.Enumerate();
         var selected = NetworkInterfaceCatalog.Resolve(options.NetworkInterface, interfaces);
         var subscribed = new HashSet<int>(options.SubscribedUniverses.Where(u => u >= 1));
@@ -108,10 +115,14 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             _nextPruneTicks = 0;
             _runtime = rt;
         }
-        channel.Start("Candela Art-Net receiver", ProcessPacket, OnHandlerError, e => ReportFault($"Art-Net socket failed: {e.Message}"));
-        var where = selected is null ? "all interfaces" : $"{selected.Name} {selected.Address}";
-        return $"Listening on UDP {channel.LocalEndPoint.Port} ({where}); announcing {binds.Sum(b => b.PortAddresses.Length)} " +
-               $"universe(s) as node '{options.NodeShortName}'";
+        channel.Start("Candela Art-Net receiver", ProcessPacket, OnHandlerError,
+            e => ReportFault(ProtocolText.Create(ProtocolMessages.SocketFailed, "Art-Net", e.Message), ProtocolErrorCode.SocketFailed));
+        int port = channel.LocalEndPoint.Port;
+        int announced = binds.Sum(b => b.PortAddresses.Length);
+        var text = selected is null
+            ? ProtocolText.Create(ProtocolMessages.ArtNetListeningAll, port, announced, options.NodeShortName)
+            : ProtocolText.Create(ProtocolMessages.ArtNetListening, port, selected.Name, selected.Address, announced, options.NodeShortName);
+        return Running(text, channel.LocalEndPoint.ToString(), selected is null ? null : $"{selected.Name} {selected.Address}", announced);
     }
 
     /// <inheritdoc />
@@ -300,8 +311,20 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
             return;
         }
         CountPacket(now);
-        _hub.SubmitTimecode(tc.ToTimecode());
+        DmxSourceId source;
+        lock (_gate)
+        {
+            // one source id per sender, so steady timecode does not allocate
+            if (_timecodeSender != sender || _timecodeSource is not { } cached)
+            {
+                _timecodeSender = sender;
+                _timecodeSource = cached = new DmxSourceId(SourceProtocol, $"{AddressText(sender.Address)}:{sender.Port}");
+            }
+            source = cached;
+        }
+        _hub.SubmitTimecode(tc.ToTimecode(), source);
         TimeCodeReceived?.Invoke(tc);
+        TimeCodeReceivedFrom?.Invoke(new ArtTimeCodeReceived(tc, sender, now));
     }
 
     private void HandlePoll(Runtime rt, ReadOnlySpan<byte> packet, IPv4Endpoint sender, DateTime now)
@@ -492,15 +515,14 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
     private void OnHandlerError(Exception e) => CountBadPacket("internal error while processing an Art-Net packet", default);
 
     /// <summary>Groups port-addresses into ArtPollReply binds: up to four per bind, sharing Net and SubNet.</summary>
-    internal static List<Bind> BuildBinds(IReadOnlyCollection<int> subscribedUniverses, int offset, out string? warning)
+    internal static List<Bind> BuildBinds(IReadOnlyCollection<int> subscribedUniverses, int offset, out ProtocolText? warning)
     {
         warning = null;
         var addresses = subscribedUniverses.Select(u => u - offset)
             .Where(pa => pa is >= 0 and <= ArtNetProtocol.MaxPortAddress)
             .Distinct().Order().ToList();
         if (addresses.Count < subscribedUniverses.Count)
-            warning = $"{subscribedUniverses.Count - addresses.Count} subscribed universe(s) cannot be expressed as an Art-Net " +
-                      $"port-address with offset {offset} and are not announced.";
+            warning = ProtocolText.Create(ProtocolMessages.ArtNetUnaddressable, subscribedUniverses.Count - addresses.Count, offset);
         if (addresses.Count == 0)
         {
             addresses.Add(Math.Clamp(1 - offset, 0, ArtNetProtocol.MaxPortAddress));
@@ -519,7 +541,7 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         if (current.Count > 0) binds.Add(new Bind(current.ToArray()));
         if (binds.Count > 255)
         {
-            warning = $"Only the first 1020 of {addresses.Count} subscribed universes fit into 255 ArtPollReply binds.";
+            warning = ProtocolText.Create(ProtocolMessages.ArtNetTooManyUniverses, addresses.Count);
             binds.RemoveRange(255, binds.Count - 255);
         }
         return binds;
@@ -587,3 +609,9 @@ public sealed class ArtNetReceiver : ExternalProtocolBase
         public bool HasPending { get; set; }
     }
 }
+
+/// <summary>An ArtTimeCode packet with its sender (see <see cref="ArtNetReceiver.TimeCodeReceivedFrom"/>).</summary>
+/// <param name="Packet">The parsed packet.</param>
+/// <param name="Sender">Who sent it (console, timecode bridge).</param>
+/// <param name="ReceivedUtc">When it arrived (UTC, the receiver's clock).</param>
+public readonly record struct ArtTimeCodeReceived(ArtTimeCodePacket Packet, IPv4Endpoint Sender, DateTime ReceivedUtc);

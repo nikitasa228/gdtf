@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.Geometry;
+using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 using Candela.Dmx;
@@ -17,7 +18,14 @@ namespace Candela.Engine;
 /// <param name="Part">Name of the part: the fixture geometry part (e.g. <c>Head</c>), the model part, or the component.</param>
 /// <param name="World">Current world matrix.</param>
 /// <param name="Flags">Current flags.</param>
-public readonly record struct RenderInstanceInfo(InstanceHandle Handle, string Part, Matrix4x4 World, InstanceFlags Flags);
+public readonly record struct RenderInstanceInfo(InstanceHandle Handle, string Part, Matrix4x4 World, InstanceFlags Flags)
+{
+    /// <summary>
+    /// World-space bounds of the instance, m: the bounds of its mesh placed with <see cref="World"/> (empty when the mesh
+    /// has no vertices).
+    /// </summary>
+    public Aabb WorldBounds { get; init; } = Aabb.Empty;
+}
 
 /// <summary>
 /// Keeps an <see cref="IRenderWorld"/> in sync with the engine's scene: retained meshes, materials and instances are
@@ -49,7 +57,7 @@ public readonly record struct RenderInstanceInfo(InstanceHandle Handle, string P
 /// The grids are reused between steps (no allocation while the flames keep their sizes).</para>
 /// <para>Main thread only. Steady-state frames (nothing edited, fixtures moving) do not allocate.</para>
 /// </remarks>
-public sealed class RenderSync : IDisposable
+public sealed partial class RenderSync : IDisposable
 {
     /// <summary>
     /// Largest lens luminance sent to the renderer, cd/m² (a 1 mm lens of a 10⁶ cd beam stays finite in single precision;
@@ -87,6 +95,7 @@ public sealed class RenderSync : IDisposable
     private readonly List<(FixtureProfile Profile, int Wheel, int Slot)> _scratchGobos = new();
     private Vector3[] _nodePositions = new Vector3[16];
     private MeshHandle _consoleMesh, _powerMesh, _hoistMesh;
+    private Aabb _consoleBounds = Aabb.Empty, _powerBounds = Aabb.Empty, _hoistBounds = Aabb.Empty;
     private MaterialHandle _defaultMaterial, _steelMaterial, _hoistMaterial, _greyMaterial;
     private uint _nextPickId = 1;
     private bool _all = true;
@@ -177,7 +186,7 @@ public sealed class RenderSync : IDisposable
     public IReadOnlyList<RenderInstanceInfo> InstancesOf(Guid entityId)
     {
         if (!_entities.TryGetValue(entityId, out var v)) return Array.Empty<RenderInstanceInfo>();
-        return v.Instances.Select(i => new RenderInstanceInfo(i.Handle, i.Name, i.World, v.Flags)).ToList();
+        return v.Instances.Select(i => new RenderInstanceInfo(i.Handle, i.Name, i.World, v.Flags) { WorldBounds = WorldBoundsOf(i) }).ToList();
     }
 
     /// <summary>
@@ -188,13 +197,14 @@ public sealed class RenderSync : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (_all) RebuildAll();
+        RefreshLayerVisibility();
         if (_decoding.Count > 0) CollectDecodedModels(wait: TimeSpan.Zero);
         ProcessChanges();
         UploadLoadedFixtureTypes();
         UpdateFixtures();
         RefreshFlags();
         UpdateLensGlow();
-        World.SetLights(_engine.Lights);
+        SendLights();
         DestroyRetired();
         if (_linesDirty) UpdateLines();
         UpdateAtmosphere();
@@ -216,6 +226,7 @@ public sealed class RenderSync : IDisposable
         }
         var remaining = deadline - DateTime.UtcNow;
         CollectDecodedModels(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero);
+        RefreshLayerVisibility();
         ProcessChanges();
         UploadLoadedFixtureTypes();
         UpdateFixtures(force: true);
@@ -295,9 +306,29 @@ public sealed class RenderSync : IDisposable
                     foreach (var d in e.SelfAndDescendants()) _rebuild.Add(d.Id);
                 _cablesDirty = true;
                 break;
-            case SceneChangeKind.TransformChanged or SceneChangeKind.Reparented:
+            case SceneChangeKind.TransformChanged:
                 if (change.Entity is { } m)
                     foreach (var d in m.SelfAndDescendants()) _moved.Add(d.Id);
+                break;
+            case SceneChangeKind.Reparented:
+                // the subtree moved and may now be below a hidden (or selected) ancestor
+                if (change.Entity is { } r)
+                    foreach (var d in r.SelfAndDescendants())
+                    {
+                        _moved.Add(d.Id);
+                        _flagsDirty.Add(d.Id);
+                    }
+                break;
+            case SceneChangeKind.VisibilityChanged:
+                if (change.Entity is { } shown)
+                    foreach (var d in shown.SelfAndDescendants()) _flagsDirty.Add(d.Id);
+                break;
+            case SceneChangeKind.LayerChanged:
+                // layer visibility applies to the entity itself (not inherited by its children)
+                if (change.Entity is { } layered) _flagsDirty.Add(layered.Id);
+                break;
+            case SceneChangeKind.LayersChanged:
+                _layersDirty = true;
                 break;
             case SceneChangeKind.ComponentChanged when change.Component is FixtureComponent f && change.Entity is { } fe
                 && _entities.TryGetValue(fe.Id, out var drawn) && !drawn.Instances.Exists(r => r.Part >= 0 && r.CastShadow != f.CastShadow):
@@ -315,8 +346,16 @@ public sealed class RenderSync : IDisposable
 
     private void OnSelectionChanged()
     {
+        // only the entities whose selection changed get new flags (with their subtrees when descendants are outlined)
+        _scratchSelection.Clear();
+        foreach (var id in _engine.Selection.Ids) _scratchSelection.Add(id);
+        foreach (var id in _selected)
+            if (!_scratchSelection.Contains(id)) MarkSelectionChanged(id);
+        foreach (var id in _scratchSelection)
+            if (!_selected.Contains(id)) MarkSelectionChanged(id);
         _selected.Clear();
-        foreach (var id in _engine.Selection.Ids) _selected.Add(id);
+        foreach (var id in _scratchSelection) _selected.Add(id);
+        _scratchSelection.Clear();
     }
 
     private void OnAssetChanged(Guid assetId)
@@ -340,6 +379,8 @@ public sealed class RenderSync : IDisposable
         _rebuild.Clear();
         _moved.Clear();
         foreach (var e in _scene.All()) _rebuild.Add(e.Id);
+        _layersDirty = true;
+        _flagsDirty.Clear();
         _cablesDirty = true;
         _atmosphereDirty = true;
         _smokeStep = _fireStep = -1;
@@ -426,6 +467,7 @@ public sealed class RenderSync : IDisposable
 
     private void Rebuild(Guid id)
     {
+        _structureVersion++;
         if (_entities.Remove(id, out var old)) Destroy(old);
         var entity = _scene.Find(id);
         if (entity is null || entity.Components.Count == 0) return;
@@ -456,18 +498,18 @@ public sealed class RenderSync : IDisposable
             {
                 case WallComponent wall:
                     {
-                        var mesh = OwnMesh(v, WallMesh.Create(wall));
-                        AddStatic(v, mesh, Builtin(wall.MaterialId, wall.UvScale), Matrix4x4.Identity, "Wall", castShadow: true);
+                        var mesh = OwnMesh(v, WallMesh.Create(wall), out var bounds);
+                        AddStatic(v, mesh, bounds, Builtin(wall.MaterialId, wall.UvScale), Matrix4x4.Identity, "Wall", castShadow: true);
                         break;
                     }
                 case ImageComponent image when image.ImageAssetId != Guid.Empty && _engine.Assets.Contains(image.ImageAssetId):
                     {
                         v.AssetIds.Add(image.ImageAssetId);
-                        var mesh = OwnMesh(v, ImagePlaneMesh.Create(image));
+                        var mesh = OwnMesh(v, ImagePlaneMesh.Create(image), out var bounds);
                         var material = World.CreateMaterial(ImagePlaneMesh.CreateMaterial(image), _engine.Images);
                         v.OwnedMaterials.Add(material);
                         bool reference = image.Mode == ImageMode.Reference;
-                        AddStatic(v, mesh, material, Matrix4x4.Identity, "Image", castShadow: !reference, reference);
+                        AddStatic(v, mesh, bounds, material, Matrix4x4.Identity, "Image", castShadow: !reference, reference);
                         break;
                     }
                 case MeshComponent mesh:
@@ -480,19 +522,22 @@ public sealed class RenderSync : IDisposable
                         v.AssetIds.Add(trussModel);
                         if (AddModel(v, trussModel, null, castShadow: true)) break;
                     }
-                    AddStatic(v, OwnMesh(v, TrussMesh.Create(truss)), Builtin(MaterialIds.AluminiumTruss, 1f), Matrix4x4.Identity, "Truss", castShadow: true);
+                    {
+                        var mesh = OwnMesh(v, TrussMesh.Create(truss), out var bounds);
+                        AddStatic(v, mesh, bounds, Builtin(MaterialIds.AluminiumTruss, 1f), Matrix4x4.Identity, "Truss", castShadow: true);
+                    }
                     break;
                 case RiggingPointComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _hoistMesh, _hoistMaterial, Matrix4x4.CreateTranslation(0f, 0f, 0.3f), "Hoist", castShadow: true);
+                    AddStatic(v, _hoistMesh, _hoistBounds, _hoistMaterial, Matrix4x4.CreateTranslation(0f, 0f, 0.3f), "Hoist", castShadow: true);
                     break;
                 case ConsoleComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _consoleMesh, _steelMaterial, Matrix4x4.CreateTranslation(0f, 0f, ConsoleSize.Z / 2f), "Console", castShadow: true);
+                    AddStatic(v, _consoleMesh, _consoleBounds, _steelMaterial, Matrix4x4.CreateTranslation(0f, 0f, ConsoleSize.Z / 2f), "Console", castShadow: true);
                     break;
                 case PowerSourceComponent:
                     EnsurePrimitives();
-                    AddStatic(v, _powerMesh, _greyMaterial, Matrix4x4.CreateTranslation(0f, 0f, PowerSourceSize.Z / 2f), "Power source", castShadow: true);
+                    AddStatic(v, _powerMesh, _powerBounds, _greyMaterial, Matrix4x4.CreateTranslation(0f, 0f, PowerSourceSize.Z / 2f), "Power source", castShadow: true);
                     break;
                 case CableComponent cable:
                     BuildCable(v, cable);
@@ -501,20 +546,21 @@ public sealed class RenderSync : IDisposable
         }
     }
 
-    private void AddStatic(EntityVisual v, MeshHandle mesh, MaterialHandle material, Matrix4x4 local, string name, bool castShadow, bool reference = false)
+    private void AddStatic(EntityVisual v, MeshHandle mesh, in Aabb bounds, MaterialHandle material, Matrix4x4 local, string name, bool castShadow,
+        bool reference = false)
     {
         Span<MaterialHandle> one = stackalloc MaterialHandle[1];
         one[0] = material;
-        AddInstance(v, mesh, one, local, -1, name, castShadow, reference);
+        AddInstance(v, mesh, bounds, one, local, -1, name, castShadow, reference);
     }
 
-    private void AddInstance(EntityVisual v, MeshHandle mesh, ReadOnlySpan<MaterialHandle> materials, Matrix4x4 local, int part, string name,
-        bool castShadow, bool reference = false, Matrix4x4? world = null)
+    private void AddInstance(EntityVisual v, MeshHandle mesh, in Aabb bounds, ReadOnlySpan<MaterialHandle> materials, Matrix4x4 local, int part,
+        string name, bool castShadow, bool reference = false, Matrix4x4? world = null)
     {
         var m = world ?? (v.Kind == VisualKind.Cable ? local : local * v.Entity.WorldMatrix);
         if (!IsFinite(m)) m = Matrix4x4.Identity;
         v.Flags = ComputeFlags(v);
-        var record = new InstanceRecord(default, local, part, m, name, castShadow, reference);
+        var record = new InstanceRecord(default, local, part, m, name, castShadow, reference) { Bounds = bounds };
         var handle = World.CreateInstance(mesh, materials, m, InstanceFlagsOf(v, record), v.PickId);
         v.Instances.Add(record with { Handle = handle });
     }
@@ -560,7 +606,7 @@ public sealed class RenderSync : IDisposable
                 if ((uint)slot < (uint)materials.Length && !string.IsNullOrEmpty(id)) materials[slot] = Builtin(id, 1f);
         }
         for (int i = 0; i < model.Meshes.Length; i++)
-            AddInstance(v, model.Meshes[i], materials, model.Transforms[i], -1, model.Names[i], castShadow);
+            AddInstance(v, model.Meshes[i], model.Bounds[i], materials, model.Transforms[i], -1, model.Names[i], castShadow);
         return model.Meshes.Length > 0;
     }
 
@@ -586,7 +632,7 @@ public sealed class RenderSync : IDisposable
             return;
         }
         if (mesh.Positions.Length == 0 || mesh.Indices.Length == 0) return;
-        var handle = OwnMesh(v, mesh);
+        var handle = OwnMesh(v, mesh, out var bounds);
         var (r, g, b) = type?.ColorSrgb ?? (0.5f, 0.5f, 0.5f);
         var tint = new Vector3(SrgbToLinear(r), SrgbToLinear(g), SrgbToLinear(b));
         var rubber = World.CreateMaterial(new MaterialData
@@ -596,7 +642,7 @@ public sealed class RenderSync : IDisposable
             Roughness = 0.55f,
         }, null);
         v.OwnedMaterials.Add(rubber);
-        AddStatic(v, handle, rubber, Matrix4x4.Identity, "Cable", castShadow: false);
+        AddStatic(v, handle, bounds, rubber, Matrix4x4.Identity, "Cable", castShadow: false);
     }
 
     private void RebuildCableIndex()
@@ -604,6 +650,8 @@ public sealed class RenderSync : IDisposable
         _cablesDirty = false;
         _linesDirty = true;
         _cablesByAnchor.Clear();
+        // the devices that lose or gain the cable highlight get new flags
+        foreach (var id in _cableEnds) _flagsDirty.Add(id);
         _cableEnds.Clear();
         foreach (var (entity, cable) in _scene.Query<CableComponent>())
         {
@@ -620,6 +668,7 @@ public sealed class RenderSync : IDisposable
             if (!_cablesByAnchor.TryGetValue(entity.Id, out var own)) _cablesByAnchor[entity.Id] = own = new List<Guid>();
             if (!own.Contains(entity.Id)) own.Add(entity.Id);
         }
+        foreach (var id in _cableEnds) _flagsDirty.Add(id);
     }
 
     private void UpdateLines()
@@ -733,7 +782,7 @@ public sealed class RenderSync : IDisposable
         foreach (var draw in type.Draws)
         {
             var m = draw.Part < world.Length ? draw.Local * world[draw.Part] : draw.Local * v.Entity.WorldMatrix;
-            AddInstance(v, draw.Mesh, draw.Materials, draw.Local, draw.Part, draw.Name, cast, world: m);
+            AddInstance(v, draw.Mesh, draw.Bounds, draw.Materials, draw.Local, draw.Part, draw.Name, cast, world: m);
         }
         v.HasFixtureInstances = true;
     }
@@ -783,7 +832,8 @@ public sealed class RenderSync : IDisposable
             }
             string name = type.Profile.Geometry.Parts[part].Name;
             for (int i = 0; i < model.Parts.Count; i++)
-                if (res.Meshes[i].IsValid) draws.Add(new FixtureDraw(part, res.Meshes[i], model.Parts[i].Transform, res.Materials, name));
+                if (res.Meshes[i].IsValid)
+                    draws.Add(new FixtureDraw(part, res.Meshes[i], model.Parts[i].Transform, res.Materials, name, model.Parts[i].Mesh.ComputeBounds()));
         }
         type.Draws = draws.ToArray();
     }
@@ -880,18 +930,44 @@ public sealed class RenderSync : IDisposable
 
     // ------------------------------------------------------------------ flags
 
+    /// <summary>
+    /// Sends new flags for the entities whose selection, visibility, layer or cable highlight changed since the last
+    /// update (see <see cref="OnSceneChanged"/>, <see cref="OnSelectionChanged"/>); a change of the layer list re-derives
+    /// every entity. Nothing is scanned while nothing changed.
+    /// </summary>
     private void RefreshFlags()
     {
+        RefreshLayerVisibility();
+        if (_allFlagsDirty)
+        {
+            _allFlagsDirty = false;
+            _flagsDirty.Clear();
+            foreach (var v in _entities.Values) ApplyFlags(v);
+            return;
+        }
+        if (_flagsDirty.Count == 0) return;
+        foreach (var id in _flagsDirty)
+            if (_entities.TryGetValue(id, out var v)) ApplyFlags(v);
+        _flagsDirty.Clear();
+    }
+
+    private void ApplyFlags(EntityVisual v)
+    {
+        var flags = ComputeFlags(v);
+        if (flags == v.Flags) return;
+        if (v.Kind == VisualKind.Cable && (flags & InstanceFlags.Hidden) != (v.Flags & InstanceFlags.Hidden)) _linesDirty = true;
+        v.Flags = flags;
+        foreach (var r in v.Instances) World.UpdateInstance(r.Handle, r.World, InstanceFlagsOf(v, r));
+    }
+
+    /// <summary>Re-reads the layers' visibility after the layer list changed; every entity's flags are then re-derived.</summary>
+    private void RefreshLayerVisibility()
+    {
+        if (!_layersDirty) return;
+        _layersDirty = false;
         _layerVisible.Clear();
         foreach (var layer in _scene.Layers) _layerVisible[layer.Id] = layer.Visible;
-        foreach (var v in _entities.Values)
-        {
-            var flags = ComputeFlags(v);
-            if (flags == v.Flags) continue;
-            if (v.Kind == VisualKind.Cable && (flags & InstanceFlags.Hidden) != (v.Flags & InstanceFlags.Hidden)) _linesDirty = true;
-            v.Flags = flags;
-            foreach (var r in v.Instances) World.UpdateInstance(r.Handle, r.World, InstanceFlagsOf(v, r));
-        }
+        _allFlagsDirty = true;
     }
 
     /// <summary>The entity-level flags (selection, visibility, cable highlight); per-instance flags are added by <see cref="InstanceFlagsOf"/>.</summary>
@@ -899,7 +975,7 @@ public sealed class RenderSync : IDisposable
     {
         var e = v.Entity;
         var flags = InstanceFlags.None;
-        if (_selected.Contains(e.Id)) flags |= InstanceFlags.Selected;
+        if (_selected.Contains(e.Id) || (_outlineDescendants && HasSelectedAncestor(e))) flags |= InstanceFlags.Selected;
         bool layerVisible = !_layerVisible.TryGetValue(e.LayerId, out bool lv) || lv;
         if (!e.IsVisibleInHierarchy || !layerVisible) flags |= InstanceFlags.Hidden;
         if (_cableEnds.Contains(e.Id)) flags |= InstanceFlags.CableHighlight;
@@ -1009,10 +1085,11 @@ public sealed class RenderSync : IDisposable
 
     // ------------------------------------------------------------------ resources
 
-    private MeshHandle OwnMesh(EntityVisual v, MeshData mesh)
+    private MeshHandle OwnMesh(EntityVisual v, MeshData mesh, out Aabb bounds)
     {
         var handle = World.CreateMesh(mesh);
         v.OwnedMeshes.Add(handle);
+        bounds = mesh.ComputeBounds();
         return handle;
     }
 
@@ -1038,9 +1115,15 @@ public sealed class RenderSync : IDisposable
     private void EnsurePrimitives()
     {
         if (_consoleMesh.IsValid) return;
-        _consoleMesh = World.CreateMesh(Primitives.Box(ConsoleSize));
-        _powerMesh = World.CreateMesh(Primitives.Box(PowerSourceSize));
-        _hoistMesh = World.CreateMesh(Primitives.Cylinder(0.12f, 0.45f));
+        var console = Primitives.Box(ConsoleSize);
+        var power = Primitives.Box(PowerSourceSize);
+        var hoist = Primitives.Cylinder(0.12f, 0.45f);
+        _consoleMesh = World.CreateMesh(console);
+        _powerMesh = World.CreateMesh(power);
+        _hoistMesh = World.CreateMesh(hoist);
+        _consoleBounds = console.ComputeBounds();
+        _powerBounds = power.ComputeBounds();
+        _hoistBounds = hoist.ComputeBounds();
         _steelMaterial = Builtin(MaterialIds.SteelBlack, 1f);
         _greyMaterial = World.CreateMaterial(new MaterialData { Name = "Distro", BaseColorFactor = new Vector4(0.25f, 0.25f, 0.27f, 1f), Roughness = 0.5f }, null);
         _hoistMaterial = World.CreateMaterial(new MaterialData { Name = "Hoist", BaseColorFactor = new Vector4(0.45f, 0.04f, 0.03f, 1f), Roughness = 0.45f }, null);
@@ -1123,6 +1206,9 @@ public sealed class RenderSync : IDisposable
 
         /// <summary>Half-angle of the lens glow last sent, rad.</summary>
         public float EmissionHalfAngle;
+
+        /// <summary>Bounds of the instance's mesh in its own space, m (empty for a mesh without vertices).</summary>
+        public Aabb Bounds;
     }
 
     private sealed class EntityVisual(Entity entity, uint pickId)
@@ -1139,7 +1225,7 @@ public sealed class RenderSync : IDisposable
         public bool HasFixtureInstances { get; set; }
     }
 
-    private readonly record struct FixtureDraw(int Part, MeshHandle Mesh, Matrix4x4 Local, MaterialHandle[] Materials, string Name);
+    private readonly record struct FixtureDraw(int Part, MeshHandle Mesh, Matrix4x4 Local, MaterialHandle[] Materials, string Name, Aabb Bounds);
 
     private sealed class FixtureTypeVisual(FixtureProfile profile, string? fileName)
     {
@@ -1164,8 +1250,9 @@ public sealed class RenderSync : IDisposable
 
     private sealed class ModelVisual
     {
-        private ModelVisual(MeshHandle[] meshes, Matrix4x4[] transforms, string[] names, MaterialHandle[] materials, bool ownsMaterials)
+        private ModelVisual(MeshHandle[] meshes, Matrix4x4[] transforms, string[] names, Aabb[] bounds, MaterialHandle[] materials, bool ownsMaterials)
         {
+            Bounds = bounds;
             Meshes = meshes;
             Transforms = transforms;
             Names = names;
@@ -1176,6 +1263,9 @@ public sealed class RenderSync : IDisposable
         public MeshHandle[] Meshes { get; }
         public Matrix4x4[] Transforms { get; }
         public string[] Names { get; }
+
+        /// <summary>Bounds of each mesh in its own space, m.</summary>
+        public Aabb[] Bounds { get; }
         public MaterialHandle[] Materials { get; }
         public bool OwnsMaterials { get; }
 
@@ -1184,16 +1274,18 @@ public sealed class RenderSync : IDisposable
             var meshes = new List<MeshHandle>();
             var transforms = new List<Matrix4x4>();
             var names = new List<string>();
+            var bounds = new List<Aabb>();
             foreach (var part in model.Parts)
             {
                 if (part.Mesh.Positions.Length == 0 || part.Mesh.Indices.Length == 0) continue;
                 meshes.Add(world.CreateMesh(part.Mesh));
+                bounds.Add(part.Mesh.ComputeBounds());
                 transforms.Add(part.Transform);
                 names.Add(string.IsNullOrEmpty(part.Name) ? model.Name : part.Name);
             }
             bool own = model.Materials.Count > 0;
             var materials = own ? model.Materials.Select(m => world.CreateMaterial(m, images)).ToArray() : new[] { fallback };
-            return new ModelVisual(meshes.ToArray(), transforms.ToArray(), names.ToArray(), materials, own);
+            return new ModelVisual(meshes.ToArray(), transforms.ToArray(), names.ToArray(), bounds.ToArray(), materials, own);
         }
 
         public void Destroy(IRenderWorld world)

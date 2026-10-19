@@ -1,4 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Every public member of Core is documented; the compiler keeps it so (CS1591 for undocumented members). -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Candela.Core.Tests" />
   </ItemGroup>

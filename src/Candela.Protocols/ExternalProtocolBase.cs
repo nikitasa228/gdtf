@@ -21,6 +21,7 @@ public abstract class ExternalProtocolBase : IExternalProtocol
     private readonly object _statusLock = new();
     private readonly Dictionary<int, UniverseCounter> _universes = new();
     private readonly List<string> _warnings = new();
+    private readonly List<ProtocolText> _warningTexts = new();
     private long _packets;
     private long _badPackets;
     private long _ignoredPackets;
@@ -28,8 +29,13 @@ public abstract class ExternalProtocolBase : IExternalProtocol
     private string? _lastBadReason;
     private IPv4Endpoint _lastBadSender;
     private ProtocolState _state = ProtocolState.Stopped;
-    private string _message = "Stopped";
-    private string? _lastError;
+    private ProtocolText _text = ProtocolText.Create(ProtocolMessages.Stopped);
+    private ProtocolText? _lastError;
+    private ProtocolErrorCode _errorCode;
+    private ProtocolText? _runningText;
+    private string? _boundEndpoint;
+    private string? _networkInterface;
+    private int _universeCount;
     private bool _disposed;
 
     /// <summary>Creates the protocol from its registry descriptor.</summary>
@@ -104,11 +110,12 @@ public abstract class ExternalProtocolBase : IExternalProtocol
                 }
                 universes.Sort(static (a, b) => a.Universe.CompareTo(b.Universe));
                 long last = Interlocked.Read(ref _lastPacketTicks);
+                bool running = _state is ProtocolState.Running or ProtocolState.Warning;
                 return new ProtocolStatus(
                     Id,
                     _state,
-                    _message,
-                    _lastError,
+                    _text.English,
+                    _lastError?.English,
                     _warnings.ToArray(),
                     Interlocked.Read(ref _packets),
                     Interlocked.Read(ref _badPackets),
@@ -117,7 +124,16 @@ public abstract class ExternalProtocolBase : IExternalProtocol
                     _lastBadReason is null ? null
                     : _lastBadSender == default ? _lastBadReason
                     : $"{_lastBadReason} (from {_lastBadSender.AddressString})",
-                    universes);
+                    universes)
+                {
+                    Text = _text,
+                    ErrorText = _lastError,
+                    ErrorCode = _errorCode,
+                    WarningTexts = _warningTexts.ToArray(),
+                    BoundEndpoint = running ? _boundEndpoint : null,
+                    NetworkInterface = running ? _networkInterface : null,
+                    UniverseCount = running ? _universeCount : 0,
+                };
             }
         }
     }
@@ -132,7 +148,8 @@ public abstract class ExternalProtocolBase : IExternalProtocol
             if (IsRunning || CurrentState == ProtocolState.Error) StopCore();
             if (!Descriptor.CanStart)
             {
-                SetState(ProtocolState.Unavailable, $"{DisplayName} is not available: {SupportReason}", error: null, keepError: false);
+                SetState(ProtocolState.Unavailable, ProtocolText.Create(ProtocolMessages.Unavailable, DisplayName, SupportReason), error: null,
+                    ProtocolErrorCode.Unavailable, keepError: false);
                 return false;
             }
             ResetStatistics();
@@ -141,15 +158,22 @@ public abstract class ExternalProtocolBase : IExternalProtocol
                 string summary = OnStart(options);
                 Options = options;
                 bool warn;
-                lock (_statusLock) warn = _warnings.Count > 0;
-                SetState(warn ? ProtocolState.Warning : ProtocolState.Running, summary, error: null, keepError: false);
+                ProtocolText text;
+                lock (_statusLock)
+                {
+                    warn = _warnings.Count > 0;
+                    text = _runningText is { } described && described.English == summary ? described : ProtocolText.Literal(summary);
+                }
+                SetState(warn ? ProtocolState.Warning : ProtocolState.Running, text, error: null, ProtocolErrorCode.None, keepError: false);
                 return true;
             }
             catch (Exception e)
             {
                 SafeStop();
-                string message = e is ProtocolStartException ? e.Message : $"{DisplayName} failed to start: {e.Message}";
-                SetState(ProtocolState.Error, message, message, keepError: false);
+                var (text, code) = e is ProtocolStartException start
+                    ? (start.Text, start.Code)
+                    : (ProtocolText.Create(ProtocolMessages.StartFailed, DisplayName, e.Message), ProtocolErrorCode.StartFailed);
+                SetState(ProtocolState.Error, text, text, code, keepError: false);
                 return false;
             }
         }
@@ -162,7 +186,7 @@ public abstract class ExternalProtocolBase : IExternalProtocol
         {
             if (CurrentState == ProtocolState.Stopped) return;
             StopCore();
-            SetState(ProtocolState.Stopped, "Stopped", error: null, keepError: true);
+            SetState(ProtocolState.Stopped, ProtocolText.Create(ProtocolMessages.Stopped), error: null, ProtocolErrorCode.None, keepError: true);
         }
     }
 
@@ -189,22 +213,48 @@ public abstract class ExternalProtocolBase : IExternalProtocol
 
     /// <summary>Puts the protocol into <see cref="ProtocolState.Error"/> without starting it (configuration conflicts
     /// detected by <see cref="ProtocolManager"/>).</summary>
-    internal void FailWithoutStarting(string message)
+    internal void FailWithoutStarting(ProtocolText message, ProtocolErrorCode code)
     {
         lock (_lifecycleLock)
         {
             if (IsRunning) StopCore();
-            SetState(ProtocolState.Error, message, message, keepError: false);
+            SetState(ProtocolState.Error, message, message, code, keepError: false);
         }
     }
 
-    /// <summary>Records a non-fatal problem; a running protocol moves to <see cref="ProtocolState.Warning"/>.</summary>
-    protected void AddWarning(string warning)
+    /// <summary>
+    /// Describes the running protocol for its structured status; call from <see cref="OnStart"/> and return the result
+    /// (the English text of <paramref name="text"/>) as its summary.
+    /// </summary>
+    /// <param name="text">The running message as a localisable text.</param>
+    /// <param name="boundEndpoint">Bound UDP endpoint (<c>0.0.0.0:6454</c>) or device name.</param>
+    /// <param name="networkInterface">Selected interface (<c>eth0 192.168.1.20</c>), or null for all interfaces.</param>
+    /// <param name="universeCount">Universes the protocol serves (see <see cref="ProtocolStatus.UniverseCount"/>).</param>
+    protected string Running(ProtocolText text, string? boundEndpoint, string? networkInterface, int universeCount)
     {
+        ArgumentNullException.ThrowIfNull(text);
         lock (_statusLock)
         {
-            if (_warnings.Contains(warning)) return;
-            _warnings.Add(warning);
+            _runningText = text;
+            _boundEndpoint = boundEndpoint;
+            _networkInterface = networkInterface;
+            _universeCount = System.Math.Max(0, universeCount);
+        }
+        return text.English;
+    }
+
+    /// <summary>Records a non-fatal problem; a running protocol moves to <see cref="ProtocolState.Warning"/>.</summary>
+    protected void AddWarning(string warning) => AddWarning(ProtocolText.Literal(warning));
+
+    /// <summary>Records a non-fatal problem as a localisable text; a running protocol moves to <see cref="ProtocolState.Warning"/>.</summary>
+    protected void AddWarning(ProtocolText warning)
+    {
+        ArgumentNullException.ThrowIfNull(warning);
+        lock (_statusLock)
+        {
+            if (_warnings.Contains(warning.English)) return;
+            _warnings.Add(warning.English);
+            _warningTexts.Add(warning);
             if (_state == ProtocolState.Running) _state = ProtocolState.Warning;
         }
         RaiseStatusChanged();
@@ -257,7 +307,14 @@ public abstract class ExternalProtocolBase : IExternalProtocol
     /// Reports a failure detected on a background thread (socket closed by the OS, serial device unplugged). The state
     /// becomes <see cref="ProtocolState.Error"/>; the caller is expected to end its receive loop.
     /// </summary>
-    protected void ReportFault(string message) => SetState(ProtocolState.Error, message, message, keepError: false);
+    protected void ReportFault(string message) => ReportFault(ProtocolText.Literal(message), ProtocolErrorCode.SocketFailed);
+
+    /// <summary>Reports a failure detected on a background thread as a localisable text with its cause (see <see cref="ReportFault(string)"/>).</summary>
+    protected void ReportFault(ProtocolText message, ProtocolErrorCode code)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        SetState(ProtocolState.Error, message, message, code, keepError: false);
+    }
 
     /// <summary>Counts an accepted packet (thread-safe, allocation-free).</summary>
     protected void CountPacket(DateTime nowUtc)
@@ -325,9 +382,13 @@ public abstract class ExternalProtocolBase : IExternalProtocol
     }
 
     /// <summary>Updates the one-line status message without changing the state (e.g. tracker counts).</summary>
-    protected void SetMessage(string message)
+    protected void SetMessage(string message) => SetMessage(ProtocolText.Literal(message));
+
+    /// <summary>Updates the one-line status message as a localisable text without changing the state.</summary>
+    protected void SetMessage(ProtocolText message)
     {
-        lock (_statusLock) _message = message;
+        ArgumentNullException.ThrowIfNull(message);
+        lock (_statusLock) _text = message;
     }
 
     private ProtocolState CurrentState
@@ -353,7 +414,7 @@ public abstract class ExternalProtocolBase : IExternalProtocol
         catch (Exception e)
         {
             // Releasing resources must not fail a stop; remember why for the panel.
-            lock (_statusLock) _lastError = $"{DisplayName} did not stop cleanly: {e.Message}";
+            lock (_statusLock) _lastError = ProtocolText.Create(ProtocolMessages.StopFailed, DisplayName, e.Message);
         }
     }
 
@@ -363,6 +424,11 @@ public abstract class ExternalProtocolBase : IExternalProtocol
         {
             _universes.Clear();
             _warnings.Clear();
+            _warningTexts.Clear();
+            _runningText = null;
+            _boundEndpoint = null;
+            _networkInterface = null;
+            _universeCount = 0;
             _lastBadReason = null;
             _lastBadSender = default;
         }
@@ -372,15 +438,19 @@ public abstract class ExternalProtocolBase : IExternalProtocol
         Interlocked.Exchange(ref _lastPacketTicks, 0);
     }
 
-    private void SetState(ProtocolState state, string message, string? error, bool keepError)
+    private void SetState(ProtocolState state, ProtocolText message, ProtocolText? error, ProtocolErrorCode code, bool keepError)
     {
         bool changed;
         lock (_statusLock)
         {
-            changed = _state != state || _message != message || (!keepError && _lastError != error);
+            changed = _state != state || _text != message || (!keepError && _lastError != error);
             _state = state;
-            _message = message;
-            if (!keepError) _lastError = error;
+            _text = message;
+            if (!keepError)
+            {
+                _lastError = error;
+                _errorCode = code;
+            }
         }
         if (changed) RaiseStatusChanged();
     }

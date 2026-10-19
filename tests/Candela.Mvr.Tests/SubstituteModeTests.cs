@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text;
 using Candela.Core.Diagnostics;
 using Candela.Core.SceneGraph.Components;
-using Candela.Dmx;
 using Candela.Gdtf;
 
 namespace Candela.Mvr.Tests;
@@ -10,7 +9,8 @@ namespace Candela.Mvr.Tests;
 /// <summary>
 /// The DMX mode the importer gives a substitute GDTF (a similar model standing in for one the library lacks): the
 /// stand-in's mode that fits the patch spacing of the fixtures, so callers of <see cref="MvrImporter"/> alone get a
-/// patch without stand-in overlaps — the same choice as <c>Candela.Dmx.SubstituteModes</c>.
+/// patch without stand-in overlaps — the rule of <see cref="FixtureType.FitModeToSpacing(DmxMode?, int?)"/>, which the DMX
+/// engine uses as well.
 /// </summary>
 public sealed class SubstituteModeTests
 {
@@ -91,7 +91,7 @@ public sealed class SubstituteModeTests
     public void When_no_mode_fits_the_smallest_is_used_and_the_overlap_reported()
     {
         var type = TestData.Library.GetFixtureType(TestData.Library.FindByFileName(StandIn)!);
-        int smallest = type.DmxModes.Min(ModeMatcher.FirstBreakFootprint);
+        int smallest = type.DmxModes.Min(m => m.FirstBreakFootprint);
         Assert.True(smallest > 2);
         var result = Import("Extended", 1, 3, 5);
         var mode = Assert.Single(Assert.Single(result.Gdtfs).Modes);
@@ -111,16 +111,17 @@ public sealed class SubstituteModeTests
     [Fact]
     public void Fixtures_in_different_universes_do_not_make_a_spacing()
     {
-        Assert.Null(ModeMatcher.PatchSpacing([1, 513, 1025]));
-        Assert.Equal(44, ModeMatcher.PatchSpacing([89, 1, 45, 45, 600]));
-        Assert.Equal(3, ModeMatcher.PatchSpacing([510, 513, 516]));
+        Assert.Null(DmxPatchSpacing.Infer([1, 513, 1025]));
+        Assert.Equal(44, DmxPatchSpacing.Infer([89, 1, 45, 45, 600]));
+        Assert.Equal(3, DmxPatchSpacing.Infer([510, 513, 516]));
     }
 
     [Fact]
     public void The_importer_and_the_dmx_engine_choose_the_same_stand_in_mode_for_every_library_type()
     {
-        // the engine resolves substitutes with Candela.Dmx.SubstituteModes; the importer cannot reference Candela.Dmx,
-        // so it has its own copy of the rule: both must agree on every real fixture type, mode name and spacing
+        // both resolve stand-ins through FixtureType.FitModeToSpacing; the importer matches the requested name loosely
+        // (case, spaces, punctuation), the DMX engine by FindMode: for every real type, mode name and spacing the result
+        // of the import is the mode the profile cache resolves
         int[] spacings = [1, 3, 4, 8, 12, 16, 20, 26, 32, 42, 44, 64, 100, 200, 512];
         int types = 0, disagreements = 0;
         var examples = new List<string>();
@@ -137,18 +138,12 @@ public sealed class SubstituteModeTests
             }
             if (type.DmxModes.Count == 0) continue;
             types++;
-            foreach (var m in type.DmxModes)
-            {
-                if (ModeMatcher.FirstBreakFootprint(m) == SubstituteModes.Footprint(m)) continue;
-                disagreements++;
-                if (examples.Count < 5) examples.Add($"{entry.FileName} '{m.Name}': footprint {ModeMatcher.FirstBreakFootprint(m)} vs {SubstituteModes.Footprint(m)}");
-            }
             foreach (int s in spacings)
             {
                 foreach (string? requested in type.DmxModes.Select(m => m.Name).Prepend(null).Prepend("No such mode"))
                 {
-                    var mvr = ModeMatcher.FitToSpacing(type, ModeMatcher.MatchName(type, requested), s);
-                    var dmx = SubstituteModes.Choose(type, requested, s);
+                    var mvr = type.FitModeToSpacing(ModeMatcher.MatchName(type, requested), s);
+                    var dmx = type.FitModeToSpacing(requested, s);
                     if (ReferenceEquals(mvr, dmx)) continue;
                     disagreements++;
                     if (examples.Count < 5) examples.Add($"{entry.FileName} '{requested}' at {s}: '{mvr?.Name}' vs '{dmx?.Name}'");

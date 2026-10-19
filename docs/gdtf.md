@@ -126,6 +126,20 @@ equals `_specs/fixtures_index.json` `dmxModes[].channels` for all 7272 modes of 
 addresses pixels or heads through GeometryReference Breaks. The specs extractor reads the offsets as written on the
 template channels, so it does not count those instances.
 
+`DmxMode.FirstBreakFootprint` is the slots of the lowest break that uses any (what one patch address covers; the
+declared channel count for a mode built in code without a layout).
+
+### Stand-in modes
+
+When a GDTF stands in for a model the library lacks (an MVR stub resolved to a similar model of the brand), the
+requested mode name belongs to the missing model, so the stand-in's mode is chosen by the patch instead:
+`FixtureType.FitModeToSpacing(requested, spacing)` keeps the requested mode when its first-break footprint fits the
+spacing, else takes the mode with the largest footprint that fits (GDTF order breaks ties), else the smallest; without a
+spacing, the requested mode, else the first. `DmxPatchSpacing.Infer(absoluteStartAddresses)` gives the spacing: the
+smallest gap between two different start addresses of one universe. This is the only copy of the rule; the MVR importer
+(`mvr.substitute-mode`) and the DMX engine and patch (`FixtureProfileCache.Resolve`, the engine's stand-in record) call
+it, so they always agree (`ModeFittingTests`).
+
 ## Coordinate and axis conventions found
 
 * **Geometry matrices.** GDTF writes `{a,b,c,d}{e,f,g,h}{i,j,k,l}{m,n,o,p}` for column vectors, with the translation in

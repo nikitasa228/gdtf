@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Candela.Core.Diagnostics;
@@ -52,10 +53,17 @@ public static class SceneSerializer
 
     private const string TypeDiscriminator = "$type";
 
+    /// <summary>
+    /// Deepest nesting of objects and arrays <see cref="FromJson(string, ICollection{Issue}?)"/> reads
+    /// (<see cref="CandelaJson.MaxDepth"/>); deeper text is refused with an <see cref="InvalidDataException"/> that says so.
+    /// </summary>
+    public const int MaxDepth = CandelaJson.MaxDepth;
+
     private static readonly JsonDocumentOptions DocumentOptions = new()
     {
         AllowTrailingCommas = true,
         CommentHandling = JsonCommentHandling.Skip,
+        MaxDepth = MaxDepth,
     };
 
     /// <summary>The scene as <c>scene.json</c> text (indented by default).</summary>
@@ -73,12 +81,51 @@ public static class SceneSerializer
     /// <param name="json">The JSON text.</param>
     /// <param name="issues">Receives what was repaired or skipped; null to ignore.</param>
     /// <exception cref="JsonException">The text is not JSON.</exception>
-    /// <exception cref="InvalidDataException">The root is not an object, or the scene was written by a newer format.</exception>
+    /// <exception cref="InvalidDataException">The root is not an object, the text nests objects and arrays more than
+    /// <see cref="MaxDepth"/> levels deep, or the scene was written by a newer format.</exception>
     public static Scene FromJson(string json, ICollection<Issue>? issues)
     {
         ArgumentNullException.ThrowIfNull(json);
-        using var document = JsonDocument.Parse(json, DocumentOptions);
-        return FromFile(ReadFile(document.RootElement, issues), issues);
+        JsonDocument document;
+        try
+        {
+            document = JsonDocument.Parse(json, DocumentOptions);
+        }
+        catch (JsonException e) when (NestsDeeperThanMaxDepth(json))
+        {
+            throw new InvalidDataException(
+                $"scene.json nests objects and arrays more than {MaxDepth} levels deep, which Candela does not read " +
+                "(the file is damaged or was not written by Candela).", e);
+        }
+        using (document)
+            return FromFile(ReadFile(document.RootElement, issues), issues);
+    }
+
+    /// <summary>
+    /// True when <paramref name="json"/> opens more than <see cref="MaxDepth"/> nested objects or arrays. Checked only after
+    /// a parse failed, to tell a too-deep file from a syntax error; the reader is iterative, so any depth is safe.
+    /// </summary>
+    private static bool NestsDeeperThanMaxDepth(string json)
+    {
+        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(json), new JsonReaderOptions
+        {
+            AllowTrailingCommas = true,
+            CommentHandling = JsonCommentHandling.Skip,
+            MaxDepth = int.MaxValue,
+        });
+        try
+        {
+            while (reader.Read())
+            {
+                if (reader.TokenType is JsonTokenType.StartObject or JsonTokenType.StartArray && reader.CurrentDepth >= MaxDepth)
+                    return true;
+            }
+        }
+        catch (JsonException)
+        {
+            // a syntax error before any container that is too deep: the original error stands
+        }
+        return false;
     }
 
     /// <summary>The scene as the serialisable record (entities flat, parents before children).</summary>

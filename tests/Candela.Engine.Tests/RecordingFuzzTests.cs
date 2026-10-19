@@ -13,10 +13,10 @@ public sealed class RecordingFuzzTests
         var slots = new byte[512];
         for (int frame = 0; frame < 40; frame++)
         {
+            recorder.Capture(frame / 25.0);
             for (int s = 0; s < 512; s += 7) slots[s] = (byte)(frame * 5 + s);
             hub.Submit(new DmxSourceId("artnet", "desk"), 1 + frame % 3, slots);
             hub.SubmitTimecode(new Timecode(1, 2, frame / 25, frame % 25, TimecodeType.Ebu25));
-            recorder.Capture(frame / 25.0);
         }
         using var stream = new MemoryStream();
         recorder.Stop()!.Save(stream);

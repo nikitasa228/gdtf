@@ -171,9 +171,10 @@ public static class NetworkInterfaceCatalog
     internal static NetworkInterfaceInfo? Resolve(string? selector, IReadOnlyList<NetworkInterfaceInfo> interfaces)
     {
         if (TryResolve(selector, interfaces, out var match)) return match;
-        var available = interfaces.Count == 0 ? "none found" : string.Join(", ", interfaces.Select(i => $"{i.Name} {i.Address}"));
-        throw new ProtocolStartException(
-            $"Network interface '{selector}' was not found (cable unplugged or adapter disabled?). Available: {available}.");
+        var text = interfaces.Count == 0
+            ? ProtocolText.Create(ProtocolMessages.InterfaceNotFoundNone, selector)
+            : ProtocolText.Create(ProtocolMessages.InterfaceNotFound, selector, string.Join(", ", interfaces.Select(i => $"{i.Name} {i.Address}")));
+        throw new ProtocolStartException(text, ProtocolErrorCode.InterfaceNotFound);
     }
 
     /// <summary>

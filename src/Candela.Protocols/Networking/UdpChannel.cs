@@ -64,7 +64,8 @@ internal sealed class UdpChannel : IDisposable
         catch (SocketException e)
         {
             socket.Dispose();
-            throw new ProtocolStartException(DescribeBindError(protocolName, bindAddress, port, e), e);
+            var (text, code) = DescribeBindError(protocolName, bindAddress, port, e);
+            throw new ProtocolStartException(text, code, e);
         }
         catch (Exception)
         {
@@ -278,13 +279,13 @@ internal sealed class UdpChannel : IDisposable
         }
     }
 
-    private static string DescribeBindError(string protocol, IPAddress address, int port, SocketException e) => e.SocketErrorCode switch
-    {
-        SocketError.AddressAlreadyInUse or SocketError.AccessDenied =>
-            $"{protocol}: UDP port {port} is already in use by another program on this computer (another visualiser, " +
-            "console offline software or node software). Close it, or select a specific network interface.",
-        SocketError.AddressNotAvailable =>
-            $"{protocol}: the address {address} is not assigned to any network interface of this computer.",
-        _ => $"{protocol}: cannot open UDP {address}:{port} ({e.SocketErrorCode}: {e.Message}).",
-    };
+    private static (ProtocolText Text, ProtocolErrorCode Code) DescribeBindError(string protocol, IPAddress address, int port, SocketException e) =>
+        e.SocketErrorCode switch
+        {
+            SocketError.AddressAlreadyInUse or SocketError.AccessDenied =>
+                (ProtocolText.Create(ProtocolMessages.PortInUse, protocol, port), ProtocolErrorCode.PortInUse),
+            SocketError.AddressNotAvailable =>
+                (ProtocolText.Create(ProtocolMessages.AddressNotAvailable, protocol, address), ProtocolErrorCode.AddressNotAvailable),
+            _ => (ProtocolText.Create(ProtocolMessages.BindFailed, protocol, address, port, e.SocketErrorCode, e.Message), ProtocolErrorCode.SocketError),
+        };
 }

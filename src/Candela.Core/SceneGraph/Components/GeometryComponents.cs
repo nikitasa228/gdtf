@@ -157,23 +157,55 @@ public sealed class GroupComponent : Component
 {
 }
 
-/// <summary>Built-in material ids (the material library lives in Candela.Assets).</summary>
+/// <summary>
+/// Built-in material ids (the material library with albedo, roughness and textures lives in Candela.Assets). The ids are
+/// stored in project files (wall materials, material overrides) and never change.
+/// </summary>
 public static class MaterialIds
 {
+    /// <summary>Neutral mid-grey (40 % reflectance) for surfaces without a material.</summary>
     public const string Default = "builtin:default";
+
+    /// <summary>Matte white emulsion paint (reflectance ≈ 0.8).</summary>
     public const string PaintedWallWhite = "builtin:painted-wall-white";
+
+    /// <summary>Matte black theatre paint (reflectance ≈ 0.04).</summary>
     public const string PaintedWallBlack = "builtin:painted-wall-black";
+
+    /// <summary>Fair-faced grey concrete (reflectance ≈ 0.35, textured).</summary>
     public const string Concrete = "builtin:concrete";
+
+    /// <summary>Black vinyl dance floor / painted stage floor with a slight sheen (reflectance ≈ 0.035).</summary>
     public const string StageFloorBlack = "builtin:stage-floor-black";
+
+    /// <summary>White semi-gloss vinyl dance floor (reflectance ≈ 0.75).</summary>
     public const string DanceFloorWhite = "builtin:dance-floor-white";
+
+    /// <summary>Varnished softwood stage boards (textured planks).</summary>
     public const string WoodStage = "builtin:wood-stage";
+
+    /// <summary>Black cotton molton drape, fully matte and double-sided (reflectance ≈ 0.025).</summary>
     public const string MoltonBlack = "builtin:molton-black";
+
+    /// <summary>Mill-finish aluminium (metal) for trusses.</summary>
     public const string AluminiumTruss = "builtin:aluminium-truss";
+
+    /// <summary>Black powder-coated steel for stands, clamps and hardware.</summary>
     public const string SteelBlack = "builtin:steel-black";
+
+    /// <summary>Silvered mirror (metal, minimum roughness).</summary>
     public const string Mirror = "builtin:mirror";
+
+    /// <summary>Clear float glass (transmissive, IOR 1.52).</summary>
     public const string Glass = "builtin:glass";
+
+    /// <summary>A switched-off LED wall (black louvred mask, glossy SMD packages).</summary>
     public const string LedScreenOff = "builtin:led-screen-off";
+
+    /// <summary>White/light-grey seamless cyclorama cloth, double-sided (reflectance ≈ 0.7).</summary>
     public const string Cyclorama = "builtin:cyclorama";
+
+    /// <summary>Anthracite cut-pile venue carpet (reflectance ≈ 0.1, textured).</summary>
     public const string Carpet = "builtin:carpet";
 }
 

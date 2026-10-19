@@ -94,7 +94,7 @@ public sealed class ProtocolManager : IDisposable
                 {
                     p.Stop();
                     _startedWith.Remove(p.Id);
-                    ForceError(p, $"{p.DisplayName} and {other} are both set to UDP port {port}; choose different ports.");
+                    ForceError(p, ProtocolText.Create(ProtocolMessages.PortConflict, p.DisplayName, other, port.Value));
                     continue;
                 }
                 if (port is > 0) usedPorts[port.Value] = p.DisplayName;
@@ -186,9 +186,9 @@ public sealed class ProtocolManager : IDisposable
     private static string Signature(IExternalProtocol protocol, ProtocolOptions options) =>
         protocol is ExternalProtocolBase b ? b.OptionsSignature(options) : JsonSerializer.Serialize(options);
 
-    private static void ForceError(IExternalProtocol protocol, string message)
+    private static void ForceError(IExternalProtocol protocol, ProtocolText message)
     {
-        if (protocol is ExternalProtocolBase b) b.FailWithoutStarting(message);
+        if (protocol is ExternalProtocolBase b) b.FailWithoutStarting(message, ProtocolErrorCode.PortConflict);
     }
 
     private void OnProtocolStatusChanged(object? sender, ProtocolStatusEventArgs e)

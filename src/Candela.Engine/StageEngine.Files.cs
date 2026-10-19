@@ -1,11 +1,13 @@
 using System.Numerics;
 using System.Security.Cryptography;
+using System.Xml;
 using Candela.Assets;
 using Candela.Core.Diagnostics;
 using Candela.Core.Editing;
 using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
+using Candela.Gdtf;
 using Candela.Mvr;
 using Candela.Project;
 
@@ -33,6 +35,24 @@ public sealed record EngineImportOptions
     public string? GroupName { get; init; }
 }
 
+/// <summary>Where GDTF files added to the fixture library came from (see <see cref="StageEngine.FixtureLibraryChanged"/>).</summary>
+public enum FixtureLibraryChangeSource
+{
+    /// <summary>The user imported a <c>.gdtf</c> file (<see cref="StageEngine.Import"/>).</summary>
+    Import,
+
+    /// <summary>GDTF files embedded in an MVR that was opened or imported.</summary>
+    Mvr,
+
+    /// <summary>GDTF copies stored in a Candela project that was opened, recovered or merged.</summary>
+    Project,
+}
+
+/// <summary>GDTF files that were added to the engine's fixture library.</summary>
+/// <param name="Added">The new library entries (at least one).</param>
+/// <param name="Source">Where they came from.</param>
+public sealed record FixtureLibraryChange(IReadOnlyList<FixtureLibraryEntry> Added, FixtureLibraryChangeSource Source);
+
 public sealed partial class StageEngine
 {
     /// <summary>File extension of MVR scenes.</summary>
@@ -41,8 +61,18 @@ public sealed partial class StageEngine
     /// <summary>The project file the scene was opened from or last saved to, or null (new or imported scene).</summary>
     public string? ProjectPath { get; private set; }
 
-    /// <summary>True when the scene changed since it was created, opened or saved.</summary>
+    /// <summary>
+    /// True when the project changed since it was created, opened or saved: the scene, an asset, or the engine/view
+    /// settings (see <see cref="MarkViewSettingsChanged"/>).
+    /// </summary>
     public bool IsModified { get; private set; }
+
+    /// <summary>
+    /// Raised on the main thread after GDTF files were added to <see cref="Library"/> (an imported <c>.gdtf</c>, GDTFs
+    /// embedded in an MVR, a project's GDTF copies), after every fixture was re-resolved; the editor refreshes its library
+    /// panel and selects the entry of an <see cref="FixtureLibraryChangeSource.Import"/>.
+    /// </summary>
+    public event Action<FixtureLibraryChange>? FixtureLibraryChanged;
 
     /// <summary>Replaces the scene with an empty one (assets, settings, undo and selection are cleared).</summary>
     public EngineResult New(string name = "Untitled")
@@ -253,15 +283,68 @@ public sealed partial class StageEngine
         return new EngineResult(true, $"Imported image '{entry.OriginalFileName}' ({size.X:0.##} × {size.Y:0.##} m).", Array.Empty<Issue>(), new[] { entity.Id });
     }
 
+    /// <summary>
+    /// Adds a GDTF file to the fixture library after reading it completely: a file that is not a GDTF archive, has no
+    /// readable <c>description.xml</c> or defines no DMX mode is refused with an issue, so the library never lists an
+    /// entry that cannot be placed. The result carries the new (or already present) entry in
+    /// <see cref="EngineResult.LibraryEntry"/>, and <see cref="FixtureLibraryChanged"/> is raised for a new one.
+    /// </summary>
     private EngineResult ImportGdtf(string path)
     {
         string name = Path.GetFileName(path);
-        if (Library.FindByFileName(name) is not null) return EngineResult.Ok($"'{name}' is already in the fixture library.");
+        if (Library.FindByFileName(name) is { } existing)
+            return EngineResult.Ok($"'{name}' is already in the fixture library.") with { LibraryEntry = existing };
+
+        FixtureType type;
+        try
+        {
+            type = GdtfReader.ReadFile(path);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or XmlException
+            or ArgumentException or NotSupportedException or FormatException or OverflowException or InvalidOperationException)
+        {
+            return Fail(EngineIssueCodes.ImportFailed, $"'{name}' is not a readable GDTF file: {e.Message}", IssueCategory.Fixture);
+        }
+        if (type.DmxModes.Count == 0)
+            return Fail(EngineIssueCodes.ImportFailed, $"'{name}' defines no DMX mode, so its fixture cannot be patched; it was not added to the fixture library.",
+                IssueCategory.Fixture);
+
         int added = Library.AddFiles(new[] { path });
-        if (added == 0) return Fail(EngineIssueCodes.ImportFailed, $"'{name}' could not be added to the fixture library.", IssueCategory.Fixture);
+        var entry = Library.FindByFileName(name);
+        if (added == 0 || entry is null)
+            return Fail(EngineIssueCodes.ImportFailed, $"'{name}' could not be added to the fixture library.", IssueCategory.Fixture);
         ReloadFixtureTypes();
+        var issues = new List<Issue>();
+        if (type.Warnings.Count > 0)
+        {
+            issues.Add(new Issue(IssueSeverity.Note, IssueCategory.Fixture, EngineIssueCodes.GdtfWarnings,
+                $"'{name}' was read with {type.Warnings.Count} warning{(type.Warnings.Count == 1 ? "" : "s")} (defaults used), e.g. {type.Warnings[0]}."));
+        }
+        Report(issues);
         RefreshIssues();
-        return EngineResult.Ok($"Added '{name}' to the fixture library.");
+        FixtureLibraryChanged?.Invoke(new FixtureLibraryChange(new[] { entry }, FixtureLibraryChangeSource.Import));
+        string modes = type.DmxModes.Count == 1 ? "1 mode" : $"{type.DmxModes.Count} modes";
+        var result = new EngineResult(true, $"Added '{name}' ({type.Manufacturer} {type.Name}, {modes}) to the fixture library.", issues, Array.Empty<Guid>());
+        return result with { LibraryEntry = entry };
+    }
+
+    /// <summary>
+    /// Adds GDTF files extracted from an MVR or a project to the library, re-resolves every fixture when any was added and
+    /// raises <see cref="FixtureLibraryChanged"/> with the new entries.
+    /// </summary>
+    private void AddGdtfsToLibrary(List<string> paths, FixtureLibraryChangeSource source)
+    {
+        if (paths.Count == 0 || Library.AddFiles(paths) == 0) return;
+        ReloadFixtureTypes();
+        if (FixtureLibraryChanged is not { } handler) return;
+        var entries = new List<FixtureLibraryEntry>(paths.Count);
+        foreach (var file in paths)
+        {
+            if (Library.FindByFileName(Path.GetFileName(file)) is { } entry
+                && string.Equals(entry.FilePath, Path.GetFullPath(file), StringComparison.Ordinal))
+                entries.Add(entry);
+        }
+        if (entries.Count > 0) handler(new FixtureLibraryChange(entries, source));
     }
 
     /// <summary>
@@ -278,7 +361,7 @@ public sealed partial class StageEngine
             if (Library.FindByFileName(gdtf.FileName) is not null) continue;
             if (ExtractGdtf(gdtf.FileName, bytes, issues) is { } file) paths.Add(file);
         }
-        if (paths.Count > 0 && Library.AddFiles(paths) > 0) ReloadFixtureTypes();
+        AddGdtfsToLibrary(paths, FixtureLibraryChangeSource.Mvr);
 
         foreach (var asset in result.Assets)
         {
