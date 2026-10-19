@@ -40,6 +40,12 @@ internal static class PathTracerScene
     /// <summary>The lens polygon sits this far in front of the light's centre, m (in front of the fixture's lens mesh).</summary>
     public const float LensOffset = 0.005f;
 
+    /// <summary>
+    /// Smallest lens radius the path tracer gives a lens polygon, m: smaller lenses are points (their area would underflow
+    /// in the lens's luminance and sampling densities).
+    /// </summary>
+    public const float MinLensRadius = 1e-5f;
+
     /// <summary>Half-angle above which a light's box is the whole media box (cones wider than this are not bounded tighter).</summary>
     public const float WideConeAngle = 1.4f;
 

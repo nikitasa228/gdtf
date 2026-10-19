@@ -52,4 +52,39 @@ public sealed class PathTracerPhotometryTests
             TestRenderers.DisposeAndAssertClean(renderer);
         }
     }
+
+    /// <summary>
+    /// A lens far too small for float densities (its area underflows) lights the floor like a point light: no
+    /// infinite lens luminance or NaN multiple-importance weight wipes out the samples.
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(0f)]
+    [InlineData(1e-25f)]
+    [InlineData(1e-9f)]
+    public void MicroscopicLensesLightLikeAPoint(float lensRadius)
+    {
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var view = new TopDownView(80, 60, 8f);
+            FinalRenderSupport.Floor(renderer.World, TopDownView.WhiteLambertian());
+            var light = ProceduralTestScene.Spot(new Vector3(0f, 0f, Height), Vector3.Zero, LightColor.White, PeakCandela, BeamDeg, FieldDeg);
+            light.SourceRadius = lensRadius;
+            renderer.World.SetLights(new[] { light });
+            using var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(view.Width, view.Height, 4),
+                new FinalRenderOptions { BackgroundLuminance = 0f });
+            var hdr = FinalRenderSupport.Luminance(render.RawResultHdr(), render.Exposure);
+            var beam = BeamDistribution.Create(BeamType.Wash, BeamDeg * MathF.PI / 180f, FieldDeg * MathF.PI / 180f);
+            var (cx, cy, centre) = view.NearestPixel(Vector3.Zero);
+            float expected = PhotometricTests.FloorLuminance(light, beam.Relative, centre);
+            float measured = hdr.MeanLuminance(cx, cy, 1);
+            Assert.True(MathF.Abs(measured - expected) / expected < 0.03f, $"floor {measured} cd/m², expected {expected} cd/m²");
+            Assert.All(hdr.Rgba, v => Assert.True(float.IsFinite(v)));
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
 }

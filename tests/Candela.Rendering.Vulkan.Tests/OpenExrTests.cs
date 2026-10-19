@@ -49,13 +49,28 @@ public sealed class OpenExrTests
             {
                 float e = type switch
                 {
-                    ExrPixelType.Half => (float)(Half)expected.Values[i],
+                    ExrPixelType.Half => (float)(Half)Math.Clamp(expected.Values[i], -65504f, 65504f), // (no infinities)
                     ExrPixelType.UInt => (float)(uint)Math.Clamp(expected.Values[i], 0f, uint.MaxValue),
                     _ => expected.Values[i],
                 };
                 Assert.Equal(e, actual.Values[i]);
             }
         }
+    }
+
+    /// <summary>
+    /// A half channel cannot hold more than 65504: brighter values (a lens at cd/m² × exposure) keep the largest finite
+    /// half instead of becoming infinite, and NaN becomes 0, so a reader never meets inf or NaN.
+    /// </summary>
+    [Fact]
+    public void HalfChannelsHoldNoInfinitiesOrNaN()
+    {
+        var values = new[] { 1e6f, -1e6f, float.PositiveInfinity, float.NegativeInfinity, float.NaN, 65504f, 70000f, 1.5f };
+        using var stream = new MemoryStream();
+        OpenExr.Write(stream, values.Length, 1, new[] { new ExrChannel("Y", values, ExrPixelType.Half) }, ExrCompression.None);
+        stream.Position = 0;
+        var read = OpenExr.Read(stream).Channel("Y")!.Values;
+        Assert.Equal(new[] { 65504f, -65504f, 65504f, -65504f, 0f, 65504f, 65504f, 1.5f }, read);
     }
 
     [Fact]

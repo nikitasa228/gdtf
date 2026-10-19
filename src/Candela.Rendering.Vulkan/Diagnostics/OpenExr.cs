@@ -25,7 +25,10 @@ public enum ExrPixelType
     /// <summary>32-bit unsigned integer.</summary>
     UInt = 0,
 
-    /// <summary>16-bit float (enough for display-referred and most scene-referred images).</summary>
+    /// <summary>
+    /// 16-bit float (enough for display-referred and most scene-referred images). Values beyond ±65504 are written as
+    /// ±65504 (not as infinity) and NaN as 0; use <see cref="Float"/> for unbounded HDR.
+    /// </summary>
     Half = 1,
 
     /// <summary>32-bit float.</summary>
@@ -86,6 +89,7 @@ public static class OpenExr
     private const int Magic = 20000630;
     private const int LongNamesFlag = 0x400;
     private const int MaxDimension = 1 << 20;
+    private const float HalfMax = 65504f;
 
     /// <summary>
     /// Writes the RGBA float image <paramref name="hdr"/> (linear, e.g. <see cref="IFinalRender.ResultHdr"/>) as channels
@@ -450,7 +454,9 @@ public static class OpenExr
         switch (type)
         {
             case ExrPixelType.Half:
-                BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(at), BitConverter.HalfToUInt16Bits((Half)value));
+                // beyond ±65504 a half is infinite: bright values (a lens, cd/m² × exposure) keep the largest finite half
+                float clamped = float.IsNaN(value) ? 0f : Math.Clamp(value, -HalfMax, HalfMax);
+                BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(at), BitConverter.HalfToUInt16Bits((Half)clamped));
                 return at + 2;
             case ExrPixelType.Float:
                 BinaryPrimitives.WriteSingleLittleEndian(buffer.AsSpan(at), value);

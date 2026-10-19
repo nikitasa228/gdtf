@@ -136,6 +136,13 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         // The lights are fixed for the whole render (their indices address the light geometry).
         _lights = _world.Lights.ToArray();
         _lightCount = _lights.Length;
+        for (int i = 0; i < _lightCount; i++)
+        {
+            // a lens too small for float densities is a point light (no polygon, no lens sampling)
+            if (!(_lights[i].SourceRadius >= PathTracerScene.MinLensRadius))
+                _lights[i].SourceRadius = 0f;
+        }
+
         var cam = CameraFrame.Compute(camera, _width / (float)_height);
         (_mediaMin, _mediaMax) = PathTracerScene.MediaBox(_world, _lights, cam.Eye);
         _frameData = new GpuFrameData
