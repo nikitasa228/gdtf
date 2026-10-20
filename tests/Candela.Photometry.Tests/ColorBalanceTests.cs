@@ -110,4 +110,57 @@ public class ColorBalanceTests
         for (int i = 0; i < 100; i++) ColorMixing.TryBalance(emitters, target, factors);
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
+
+    [Fact]
+    public void Random_engines_reach_every_target_inside_their_gamut_and_refuse_targets_outside()
+    {
+        // deterministic sweep: RGB(+W) engines with random primaries and outputs over two decades, targets anywhere in
+        // the triangle of the primaries (inside → reached exactly with the flux kept; outside → refused)
+        var rng = new Random(20261019);
+        Span<float> factors = stackalloc float[4];
+        int reached = 0, refused = 0;
+        for (int trial = 0; trial < 400; trial++)
+        {
+            var r = new Vector2(0.62f + 0.08f * rng.NextSingle(), 0.28f + 0.05f * rng.NextSingle());
+            var g = new Vector2(0.12f + 0.15f * rng.NextSingle(), 0.62f + 0.12f * rng.NextSingle());
+            var b = new Vector2(0.13f + 0.03f * rng.NextSingle(), 0.03f + 0.05f * rng.NextSingle());
+            float Flux() => MathF.Pow(10f, 1f + 2f * rng.NextSingle());
+            bool white = trial % 2 == 0;
+            Emitter[] emitters = white
+                ?
+                [
+                    new("R", r, Flux()), new("G", g, Flux()), new("B", b, Flux()),
+                    Emitter.FromXy("W", 0.30f + 0.05f * rng.NextSingle(), 0.31f + 0.05f * rng.NextSingle(), Flux()),
+                ]
+                : [new("R", r, Flux()), new("G", g, Flux()), new("B", b, Flux())];
+            // barycentric target: inside when all weights are positive
+            float w0 = rng.NextSingle(), w1 = rng.NextSingle(), w2 = rng.NextSingle();
+            bool inside = trial % 5 != 0;
+            if (!inside) w2 = -0.3f - 0.5f * rng.NextSingle();
+            float sum = w0 + w1 + w2;
+            var target = (r * w0 + g * w1 + b * w2) / sum;
+            if (inside)
+            {
+                // keep away from the edges, where the factors (and the iteration) run off to extremes
+                float m = MathF.Min(w0, MathF.Min(w1, w2)) / sum;
+                if (m < 0.05f) continue;
+            }
+            var f = factors[..emitters.Length];
+            bool ok = ColorMixing.TryBalance(emitters, target, f);
+            if (!inside)
+            {
+                Assert.False(ok, $"trial {trial}: {target} outside the gamut was accepted");
+                refused++;
+                continue;
+            }
+            Assert.True(ok, $"trial {trial}: {target} inside the gamut was refused");
+            var mix = ColorMixing.MixAllFull(Scaled(emitters, f));
+            Assert.True(Vector2.Distance(target, mix.Chromaticity) < 1e-3f, $"trial {trial}: {mix.Chromaticity} for {target}");
+            double total = 0;
+            foreach (var e in emitters) total += e.MaxFlux;
+            Assert.Equal(total, mix.Flux, total * 1e-4);
+            reached++;
+        }
+        Assert.True(reached > 150 && refused > 50, $"{reached} reached, {refused} refused");
+    }
 }

@@ -127,7 +127,10 @@ public static class ColorMixing
     /// them as little as possible: positive factors kᵢ with the least Σ (ln kᵢ)² (a calibration trims every emitter a
     /// little rather than switching one off), then scaled together so the total flux stays Σ MaxFlux. Solved by
     /// minimum-norm Gauss–Newton steps on ln kᵢ against the two chromaticity conditions Σ kᵢ·Fᵢ·(Xᵢ/Yᵢ − X/Y) = 0 and
-    /// Σ kᵢ·Fᵢ·(Zᵢ/Yᵢ − Z/Y) = 0; a handful of iterations for real engines. Allocation-free for up to 16 emitters.
+    /// Σ kᵢ·Fᵢ·(Zᵢ/Yᵢ − Z/Y) = 0; a handful of iterations for real engines. Where that iteration does not settle (it can
+    /// cycle when one emitter's output dwarfs the others'), the factors are the least change Σ (kᵢ − 1)² that meets
+    /// the conditions and keeps the total flux, with every factor at least <see cref="MinBalanceFactor"/> (an active
+    /// set over equality-constrained least squares). Allocation-free for up to 16 emitters.
     /// </summary>
     /// <param name="emitters">The engine's emitters at their nominal full-level flux.</param>
     /// <param name="targetXy">The white (or any chromaticity) the full mix should make.</param>
@@ -176,10 +179,10 @@ public static class ColorMixing
             // together would shrink the residual without reaching the target (two emitters off the line through it)
             double scale = Math.Max(Math.Abs(r1), Math.Abs(r2));
             if (scale <= 1e-10 * flux) break;
-            if (iteration == 199) return false;
+            if (iteration == 199) return TryBalanceLeastChange(emitters, p, q, total, factors);
             // x ← Jᵀ (J Jᵀ)⁻¹ (J x − r): the smallest x that meets the linearised conditions
             double det = j11 * j22 - j12 * j12;
-            if (!(Math.Abs(det) > 1e-300)) return false;
+            if (!(Math.Abs(det) > 1e-300)) return TryBalanceLeastChange(emitters, p, q, total, factors);
             double b1 = jx1 - r1, b2 = jx2 - r2;
             double l1 = (j22 * b1 - j12 * b2) / det, l2 = (j11 * b2 - j12 * b1) / det;
             for (int i = 0; i < n; i++)
@@ -188,7 +191,7 @@ public static class ColorMixing
                 double next = k * p[i] * l1 + k * q[i] * l2;
                 // damped: a step of more than e² in one factor is taken in part, the gamut edge is approached slowly
                 x[i] += Math.Clamp(next - x[i], -2.0, 2.0);
-                if (!double.IsFinite(x[i]) || Math.Abs(x[i]) > 30) return false;
+                if (!double.IsFinite(x[i]) || Math.Abs(x[i]) > 30) return TryBalanceLeastChange(emitters, p, q, total, factors);
             }
         }
 
@@ -197,6 +200,88 @@ public static class ColorMixing
         if (!(mixed > 0)) return false;
         double norm = total / mixed;
         for (int i = 0; i < n; i++) factors[i] = (float)(Math.Exp(x[i]) * norm);
+        return true;
+    }
+
+    /// <summary>Smallest factor <see cref="TryBalance"/> gives an emitter when it falls back to the least change: every emitter stays lit.</summary>
+    public const float MinBalanceFactor = 1e-3f;
+
+    /// <summary>
+    /// The fallback of <see cref="TryBalance"/>: kᵢ ≥ <see cref="MinBalanceFactor"/> with the least Σ (kᵢ − 1)² under the
+    /// linear conditions Σ kᵢ pᵢ = 0, Σ kᵢ qᵢ = 0 (chromaticity, <paramref name="p"/> and <paramref name="q"/> as in
+    /// <see cref="TryBalance"/>) and Σ kᵢ Fᵢ = Σ Fᵢ (flux) — a strictly convex quadratic programme. Its solution is the
+    /// equality-constrained least change of some set of emitters held at the floor, so every such set is tried (at most
+    /// 2¹⁶ small 3 × 3 solves, once per beam while a profile is compiled) and the feasible one with the least change
+    /// kept; false when none is feasible (a target outside the gamut).
+    /// </summary>
+    private static bool TryBalanceLeastChange(ReadOnlySpan<Emitter> emitters, ReadOnlySpan<double> p, ReadOnlySpan<double> q, double total,
+        Span<float> factors)
+    {
+        int n = emitters.Length;
+        Span<double> k = stackalloc double[n];
+        Span<double> best = stackalloc double[n];
+        double bestChange = double.PositiveInfinity;
+        for (int pinned = 0; pinned < 1 << n; pinned++)
+        {
+            // conditions on the free factors: M k = c − (pinned factors' share), M rows p, q, F
+            double c1 = 0, c2 = 0, c3 = total;
+            double a11 = 0, a12 = 0, a13 = 0, a22 = 0, a23 = 0, a33 = 0, m1 = 0, m2 = 0, m3 = 0;
+            int free = 0;
+            for (int i = 0; i < n; i++)
+            {
+                double f = emitters[i].MaxFlux;
+                if ((pinned & (1 << i)) != 0)
+                {
+                    c1 -= MinBalanceFactor * p[i];
+                    c2 -= MinBalanceFactor * q[i];
+                    c3 -= MinBalanceFactor * f;
+                    continue;
+                }
+                free++;
+                a11 += p[i] * p[i];
+                a12 += p[i] * q[i];
+                a13 += p[i] * f;
+                a22 += q[i] * q[i];
+                a23 += q[i] * f;
+                a33 += f * f;
+                m1 += p[i];
+                m2 += q[i];
+                m3 += f;
+            }
+            if (free < 3) continue;
+            // k = 1 + Mᵀ λ with (M Mᵀ) λ = c − M·1 (symmetric 3 × 3, by cofactors)
+            double b1 = c1 - m1, b2 = c2 - m2, b3 = c3 - m3;
+            double d11 = a22 * a33 - a23 * a23, d12 = a13 * a23 - a12 * a33, d13 = a12 * a23 - a13 * a22;
+            double det = a11 * d11 + a12 * d12 + a13 * d13;
+            if (!double.IsFinite(det) || !(Math.Abs(det) > 1e-12 * Math.Abs(a11 * a22 * a33)) || !(Math.Abs(det) > 1e-300)) continue;
+            double d22 = a11 * a33 - a13 * a13, d23 = a12 * a13 - a11 * a23, d33 = a11 * a22 - a12 * a12;
+            double l1 = (d11 * b1 + d12 * b2 + d13 * b3) / det;
+            double l2 = (d12 * b1 + d22 * b2 + d23 * b3) / det;
+            double l3 = (d13 * b1 + d23 * b2 + d33 * b3) / det;
+            double change = 0;
+            bool feasible = true;
+            for (int i = 0; i < n && feasible; i++)
+            {
+                k[i] = (pinned & (1 << i)) != 0 ? MinBalanceFactor : 1.0 + p[i] * l1 + q[i] * l2 + emitters[i].MaxFlux * l3;
+                feasible = double.IsFinite(k[i]) && k[i] >= MinBalanceFactor * (1 - 1e-9);
+                change += (k[i] - 1) * (k[i] - 1);
+            }
+            if (!feasible || !(change < bestChange)) continue;
+            bestChange = change;
+            k.CopyTo(best);
+        }
+        if (double.IsPositiveInfinity(bestChange)) return false;
+
+        // the conditions hold to rounding: check the mix before handing the factors out
+        double r1 = 0, r2 = 0, flux = 0;
+        for (int i = 0; i < n; i++)
+        {
+            r1 += best[i] * p[i];
+            r2 += best[i] * q[i];
+            flux += best[i] * emitters[i].MaxFlux;
+        }
+        if (!(flux > 0) || Math.Max(Math.Abs(r1), Math.Abs(r2)) > 1e-6 * flux) return false;
+        for (int i = 0; i < n; i++) factors[i] = (float)best[i];
         return true;
     }
 
