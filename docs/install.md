@@ -473,6 +473,11 @@ lavapipe in a virtual X server): `candela.exe --help`, `candela.exe info samples
 `candela-app.exe --screenshot` of the first start (the Fixture Library window above), the sample scene opened from that
 window, the per-user folders (`%LOCALAPPDATA%\Candela\cache`, `logs`), the crash report without a display, the
 no-Vulkan message (exit code 3), a silent install into `C:\Program Files\Свет Тест\Candela` (registry entries,
-shortcuts, associations), an upgrade in place and a silent uninstall that leaves nothing behind. Not covered by Wine:
+shortcuts, associations), an upgrade in place and a silent uninstall that leaves nothing behind. The review repeated
+this in a prefix whose user is "Иван Петров" (Cyrillic letters and a space in every per-user folder): a per-user
+upgrade in place that keeps a file the user put into the program folder, an uninstall that leaves only that file and
+the settings, the first-run window's Default folder → files copied in Explorer → **Rescan** → sample scene flow from
+`C:\Program Files\Свет Тест\Candela`, the CLI's import worker (assimp) on a Cyrillic file name, and the message for a
+missing Visual C++ runtime (`WINEDLLOVERRIDES="vcruntime140=d;vcruntime140_1=d"`). Not covered by Wine:
 the Visual C++ redistributable's own setup (a 32-bit bootstrapper; a 64-bit-only prefix cannot run it), Windows
 Firewall, SmartScreen and real GPU drivers.
