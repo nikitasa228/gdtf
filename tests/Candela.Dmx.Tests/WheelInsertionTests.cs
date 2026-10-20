@@ -48,9 +48,19 @@ public partial class WheelInsertionTests(ITestOutputHelper output)
     [GeneratedRegex(@"^\s*(open|removed?|close|closed|off|no ?function|no prism|no gobo|no animation|no effect)\b", RegexOptions.IgnoreCase)]
     private static partial Regex OutName();
 
+    /// <summary>
+    /// Files in which selecting a slot that holds an item, with every other channel at its default, does not show that
+    /// item, and why: another channel the file writes with the same attribute selects a different item at its default.
+    /// </summary>
+    private static readonly Dictionary<string, string> SelectionOverridden = new(StringComparer.Ordinal)
+    {
+        ["BeamZ@LCB_14_C@"] = "each zone's own Color1 channel (default 25, slot 2) colours its beam over the shared 'Effects1' programs",
+        ["BeamZ_Pro@BAC330_LED_ProPAR_RGBW@"] = "'ColorMacro Select' (Color1 on the effects channel, default 128 = slot 18) is active in the 'Static' range too",
+    };
+
     private sealed record ScanResult(
         IReadOnlyDictionary<string, string> InsertedAtDefaults, IReadOnlyList<string> OutFailures, int OutSetsChecked,
-        IReadOnlyList<string> SlotItems, int Files);
+        IReadOnlyList<string> SlotItems, int Files, IReadOnlyList<string> LostSelections, int SelectionsChecked);
 
     private static readonly Lazy<ScanResult> Scan = new(RunScan, LazyThreadSafetyMode.ExecutionAndPublication);
 
@@ -73,7 +83,8 @@ public partial class WheelInsertionTests(ITestOutputHelper output)
         var defaults = new ConcurrentDictionary<string, string>();
         var outFailures = new ConcurrentQueue<string>();
         var slotItems = new ConcurrentQueue<string>();
-        int outChecked = 0, files = 0;
+        var lost = new ConcurrentQueue<string>();
+        int outChecked = 0, files = 0, selectionsChecked = 0;
         var families = new[] { WheelFamily.Gobo, WheelFamily.Prism, WheelFamily.Animation, WheelFamily.BeamShaper };
         Parallel.ForEach(TestData.Library.Entries, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, entry =>
         {
@@ -142,9 +153,39 @@ public partial class WheelInsertionTests(ITestOutputHelper output)
                         }
                     }
                 }
+
+                // every range that selects a slot holding an item shows it, whatever the other channels' defaults say
+                foreach (var f in p.Functions)
+                {
+                    if (f.Wheel < 0 || f.SecondarySelection || f.Class.Kind is not (AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin
+                            or AttributeKind.WheelSelectShake))
+                        continue;
+                    var ch = p.Channels[f.Channel];
+                    if (ch.Beams.Count == 0) continue;
+                    var wheel = p.Wheels[f.Wheel];
+                    foreach (var set in f.Sets)
+                    {
+                        if (set.WheelSlot <= 0 || set.WheelSlot > wheel.SlotCount || wheel.SlotOpen[set.WheelSlot - 1]) continue;
+                        if ((set.Flags & (ChannelSetFlags.WheelOut | ChannelSetFlags.InsertionRamp | ChannelSetFlags.InsertionCycle)) != 0) continue;
+                        buffer.ResetToDefaults();
+                        buffer.SetValue(ch.Index, set.DmxFrom + (set.DmxTo - set.DmxFrom) / 2);
+                        if (f.ModeMaster >= 0) buffer.SetValue(f.ModeMaster, f.ModeFrom);
+                        FixtureEvaluator.Evaluate(state, buffer, 0, null, applyDynamics: false);
+                        if (state.GetChannel(ch.Index).Function != f.Index) continue;
+                        var mechanisms = Mechanisms(state.Beams[ch.Beams[0]], f.Class.Wheel);
+                        if (mechanisms.Length == 0) continue;
+                        Interlocked.Increment(ref selectionsChecked);
+                        var w = mechanisms[Math.Min(Math.Max(f.Class.Number, 1) - 1, mechanisms.Length - 1)];
+                        bool shown = (f.Class.Wheel == WheelFamily.Color ? !w.IsOpen : Inserted(w)) && w.Wheel == f.Wheel &&
+                            (w.Slot == set.WheelSlot || (w.Blend > 0f && w.NextSlot == set.WheelSlot));
+                        if (!shown)
+                            lost.Enqueue($"{entry.FileName} [{mode.Name}] {f.Attribute} '{f.Name}' set '{set.Name}' → slot {set.WheelSlot}: " +
+                                $"wheel {w.Wheel} slot {w.Slot} open {w.IsOpen} insertion {w.Insertion:0.##}");
+                    }
+                }
             }
         });
-        return new ScanResult(defaults, outFailures.ToList(), outChecked, slotItems.ToList(), files);
+        return new ScanResult(defaults, outFailures.ToList(), outChecked, slotItems.ToList(), files, lost.ToList(), selectionsChecked);
     }
 
     /// <summary>A slot that holds something by the file's own description: an image, prism facets, an animation system or a colour filter.</summary>
@@ -176,6 +217,124 @@ public partial class WheelInsertionTests(ITestOutputHelper output)
         foreach (var f in scan.OutFailures.Take(30)) output.WriteLine("FAIL " + f);
         Assert.True(scan.OutSetsChecked > 5000, $"only {scan.OutSetsChecked} ranges checked");
         Assert.Empty(scan.OutFailures);
+    }
+
+    [Fact]
+    public void Across_the_library_selecting_a_slot_that_holds_an_item_shows_it_whatever_the_other_channels_say()
+    {
+        // channels the file gives the same mechanism — a rotation channel with "Prism Rotation Off" written as Prism1, a
+        // second prism channel with the first prism's attribute at "No Effect", an item index written as a wheel index at
+        // DMX 0 — must not take a selected gobo, prism or colour out of the beam or move the wheel off it
+        var scan = Scan.Value;
+        output.WriteLine($"{scan.SelectionsChecked} item selections evaluated");
+        var unexpected = scan.LostSelections
+            .Where(l => !SelectionOverridden.Keys.Any(prefix => l.StartsWith(prefix, StringComparison.Ordinal)))
+            .ToList();
+        foreach (var l in unexpected.Take(30)) output.WriteLine("LOST " + l);
+        Assert.True(scan.SelectionsChecked > 20000, $"only {scan.SelectionsChecked} selections checked");
+        Assert.Empty(unexpected);
+        foreach (var prefix in SelectionOverridden.Keys)
+            Assert.True(scan.LostSelections.Any(l => l.StartsWith(prefix, StringComparison.Ordinal)), $"{prefix} no longer loses a selection");
+    }
+
+    [Fact]
+    public void A_rotation_channel_written_with_the_prism_attribute_neither_takes_the_prism_out_nor_puts_it_in()
+    {
+        // ADJ Focus Hybrid: the "Prism1Pos" channel starts with "Off" / "Prism Rotation Off" (0 … 5) and has "No Rotation"
+        // at 192, both written as Prism1; the prism channel selects the 8-facet prism from 32
+        var p = TestData.Profile("ADJ@Focus_Hybrid", "Basic Mode 19ch Pan540");
+        var buffer = OpenWhite(p);
+        int prism = Channel(p, "Prism1"), pos = p.Channels.First(c => c.Name.EndsWith("_Prism1Pos", StringComparison.Ordinal)).Index;
+        buffer.SetValue(prism, 100);
+        buffer.SetValue(pos, 0);
+        var s = Evaluate(p, buffer);
+        Assert.Equal(8, s.Beams[0].Prisms[0].Facets);
+        buffer.SetValue(pos, 150); // rotating
+        s = Evaluate(p, buffer);
+        Assert.Equal(8, s.Beams[0].Prisms[0].Facets);
+
+        buffer.SetValue(prism, 0); // "No Effect"
+        foreach (uint v in new uint[] { 0, 100, 150, 192 })
+        {
+            buffer.SetValue(pos, v);
+            s = Evaluate(p, buffer);
+            Assert.Equal(0, s.Beams[0].PrismFacets);
+        }
+    }
+
+    [Theory]
+    [InlineData("ADJ@Protege_XS", "Basic", "Body_Prism1", "Body_Prism2")]
+    [InlineData("ADJ@Vizi_Beam_12RX", "13 CH", "Head _Prism1", "Head _Prism2")]
+    public void A_second_prism_channel_at_its_default_does_not_cancel_the_first(string prefix, string mode, string first, string second)
+    {
+        // both channels are written as Prism1 (one selects "Prism 1", the other "Prism 2"); each starts with an out range
+        var p = TestData.Profile(prefix, mode);
+        int a = p.Channels.First(c => c.Name == first).Index, b = p.Channels.First(c => c.Name == second).Index;
+        var buffer = OpenWhite(p);
+        Assert.Equal(0, Evaluate(p, buffer).Beams[0].PrismFacets);
+        buffer.SetValue(a, 100);
+        Assert.True(Evaluate(p, buffer).Beams[0].PrismFacets > 1, "first prism channel");
+        buffer.SetValue(a, 0);
+        buffer.SetValue(b, 100);
+        Assert.True(Evaluate(p, buffer).Beams[0].PrismFacets > 1, "second prism channel");
+    }
+
+    [Fact]
+    public void An_animation_macro_channel_at_no_animation_leaves_an_indexed_animation_wheel_in()
+    {
+        // Robe Robin T1 Profile FS: "AnimationWheel1SelectEffects" defaults to "No animation" (0 … 7) next to the animation
+        // wheel channel, whose "Proportional indexing" ranges put the wheel in
+        var p = TestData.Profile("Robe_Lighting@Robin_T1_Profile_FS", "Mode 1 - RGB");
+        var buffer = OpenWhite(p);
+        int anim = p.Channels.First(c => c.Name == "Head_AnimationWheel1").Index;
+        Assert.False(Inserted(Evaluate(p, buffer).Beams[0].AnimationWheels[0]));
+        buffer.SetValue(anim, 73); // "Proportional indexing center"
+        var w = Evaluate(p, buffer).Beams[0].AnimationWheels[0];
+        Assert.True(Inserted(w), $"slot {w.Slot} insertion {w.Insertion}");
+    }
+
+    [Theory]
+    [InlineData("LIGHT_SKY@F420BSW", "24CH", "Head_Gobo2", "Head_Gobo2Pos", 10u)]
+    [InlineData("Flash@EVENT_WASH_FX_300", "SH1px - 92ch - shapes + pixel engine RGB", "Shape_Gobo1", "Shape_Gobo1Pos", 8u)]
+    public void An_item_index_written_as_a_wheel_index_turns_the_selected_gobo(string prefix, string mode, string select, string index, uint item)
+    {
+        // the index channel ("Gobo 2 Index", "Shape index") is written as Gobo(n)WheelIndex: at its default it would put the
+        // wheel back on its first slot (the open one) and lose the selection
+        var p = TestData.Profile(prefix, mode);
+        int sel = p.Channels.First(c => c.Name == select).Index, idx = p.Channels.First(c => c.Name == index).Index;
+        var buffer = OpenWhite(p);
+        buffer.SetValue(sel, item);
+        var s = Evaluate(p, buffer);
+        int n = Math.Max(p.Functions[s.GetChannel(sel).Function].Class.Number, 1) - 1;
+        var w = s.Beams[p.Channels[sel].Beams[0]].Gobos[n];
+        Assert.True(Inserted(w), $"slot {w.Slot} open {w.IsOpen}");
+        int slot = w.Slot;
+        float rotation0 = w.Rotation;
+
+        Assert.True(DmxEncoder.Encode(buffer, p.Functions[p.Channels[idx].FirstFunction].Attribute, 90f) >= 0);
+        buffer.SetValue(idx, p.Channels[idx].MaxValue / 8);
+        s = Evaluate(p, buffer);
+        w = s.Beams[p.Channels[sel].Beams[0]].Gobos[n];
+        Assert.Equal(slot, w.Slot);
+        Assert.True(Inserted(w));
+        Assert.NotEqual(rotation0, w.Rotation);
+    }
+
+    [Theory]
+    [InlineData("Infinity@Furion_B401_Beam", "Prism1")]
+    [InlineData("Vari-Lite@VL2600_Spot", "Prism1")]
+    public void A_prism_slot_named_as_a_prism_is_a_prism_without_facet_data(string prefix, string attribute)
+    {
+        // Infinity Furion B401: the only slot of each prism wheel is "Prism" (no facets, GDTF's default colour), and the
+        // wheel is first named by a "NO FUNCTION" function; Vari-Lite VL2600: "Prism On"
+        var p = TestData.Profile(prefix);
+        var f = p.Functions.First(fn => fn.Attribute == attribute && fn.Wheel >= 0 && fn.Sets.Any(st => st.WheelSlot > 0 && !p.Wheels[fn.Wheel].SlotOpen[st.WheelSlot - 1]));
+        var set = f.Sets.First(st => st.WheelSlot > 0 && !p.Wheels[f.Wheel].SlotOpen[st.WheelSlot - 1]);
+        Assert.Contains("rism", p.Wheels[f.Wheel].Source.GetSlot(set.WheelSlot)!.Name, StringComparison.Ordinal);
+        var buffer = OpenWhite(p);
+        Assert.Equal(0, Evaluate(p, buffer).Beams[0].PrismFacets);
+        buffer.SetValue(f.Channel, set.DmxFrom + (set.DmxTo - set.DmxFrom) / 2);
+        Assert.True(Evaluate(p, buffer).Beams[0].PrismFacets >= 3);
     }
 
     private static FixtureState Evaluate(FixtureProfile p, FixtureDmxBuffer buffer, double time = 0) => FixtureEvaluator.Evaluate(p, buffer, time);
