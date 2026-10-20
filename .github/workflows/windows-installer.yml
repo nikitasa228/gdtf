@@ -27,6 +27,11 @@ jobs:
       CANDELA_CACHE_DIR: ${{ github.workspace }}\.ci-cache\candela
       CANDELA_CONFIG_DIR: ${{ github.workspace }}\.ci-cache\config
     steps:
+      # Byte-identical sources to the Linux build: no CRLF conversion of text files (shaders, docs, JSON, scripts) by
+      # the Windows runner's default core.autocrlf=true.
+      - name: Keep line endings
+        run: git config --global core.autocrlf false
+
       - name: Check out
         uses: actions/checkout@v4
         with:

@@ -393,7 +393,12 @@ Function InstallVcRuntime
   DetailPrint "$(MsgVcInstalling)"
   SetOutPath "$PLUGINSDIR"
   File "/oname=vc_redist.x64.exe" "${REDIST}"
+  ClearErrors
   ExecWait '"$PLUGINSDIR\vc_redist.x64.exe" /install /quiet /norestart' $2
+  ; The redistributable could not even be started (the exit code is undefined then).
+  ${If} ${Errors}
+    StrCpy $2 "$(MsgVcNotStarted)"
+  ${EndIf}
   ; 0 = installed, 1638 = a newer version is present, 3010 = installed, restart needed later
   ${If} $2 == 0
   ${OrIf} $2 == 1638

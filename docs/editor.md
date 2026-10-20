@@ -1129,7 +1129,7 @@ changes). Allocations happen on user actions (edits, opening menus and dialogs, 
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 600 tests, under three minutes; the end-to-end runs whose checks do not depend
+`tests/Candela.App.Tests` (xUnit, about 630 tests, about five minutes on lavapipe; the end-to-end runs whose checks do not depend
 on lit pixels use Colorless shading, since on lavapipe the lit preview of a dark rig — with the Auto work light's
 shadowed key — takes about twice the frame time) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
