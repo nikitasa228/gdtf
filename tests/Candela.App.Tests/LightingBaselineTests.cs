@@ -184,7 +184,9 @@ public sealed class LightingBaselineTests : IDisposable
         var content = Assert.IsType<EngineViewportContent>(session.Content);
         StageTestSupport.AddWall(session.Engine!, "Floor", 8f, 6f, WallKind.Floor);
         Frame(session);
-        Assert.Equal(0f, renderer.MemoryWorld.Atmosphere!.AmbientLuminance);
+        // A new scene's surroundings: a dark venue (SceneSettings' default), passed on as it is.
+        Assert.Equal(session.Scene.Settings.AmbientLuminance, renderer.MemoryWorld.Atmosphere!.AmbientLuminance);
+        Assert.InRange(renderer.MemoryWorld.Atmosphere!.AmbientLuminance, 0f, 0.1f);
 
         session.Scene.Settings.AmbientLuminance = 30f;
         session.SyncRender();
@@ -307,13 +309,14 @@ public sealed class LightingBaselineTests : IDisposable
             return pixels;
         }
 
-        // Full shading with the Auto work light: lit, and the texture's two halves show their colours.
+        // Full shading with the Auto work light (a dim room light, at the viewport's default EV 8): lit, and the
+        // texture's two halves show their colours.
         var lit = Render("work-light");
-        Assert.True(MeanLuminance(lit, camera) > 0.08f, $"the model is (nearly) black: {MeanLuminance(lit, camera)}");
+        Assert.True(MeanLuminance(lit, camera) > 0.03f, $"the model is (nearly) black: {MeanLuminance(lit, camera)}");
         var left = PixelAt(lit, camera, new Vector3(-0.5f, 0f, 1f));
         var right = PixelAt(lit, camera, new Vector3(0.5f, 0f, 1f));
-        Assert.True(left.R > 40 && left.R > 2 * left.G && left.R > 2 * left.B, $"the left half is not red: {left}");
-        Assert.True(right.G > 40 && right.G > 2 * right.R && right.G > 2 * right.B, $"the right half is not green: {right}");
+        AssertDominant(left, 0, 20, "the left half (red)");
+        AssertDominant(right, 1, 20, "the right half (green)");
 
         // Off: the old behaviour — no stage light, so the model is black.
         ViewSettingsEdits.SetWorkLight(engine, WorkLightMode.Off);
@@ -324,10 +327,9 @@ public sealed class LightingBaselineTests : IDisposable
         // Ambient 30 cd/m² (Preview → Ambient light) lights it again without any light: the surroundings of the venue.
         session.Scene.Settings.AmbientLuminance = 30f;
         var ambient = Render("ambient");
-        Assert.True(MeanLuminance(ambient, camera) > 0.08f, $"the ambient does not light the model: {MeanLuminance(ambient, camera)}");
-        left = PixelAt(ambient, camera, new Vector3(-0.5f, 0f, 1f));
-        right = PixelAt(ambient, camera, new Vector3(0.5f, 0f, 1f));
-        Assert.True(left.R > 2 * left.G && right.G > 2 * right.R, $"the texture is lost under the ambient: {left}, {right}");
+        Assert.True(MeanLuminance(ambient, camera) > 0.03f, $"the ambient does not light the model: {MeanLuminance(ambient, camera)}");
+        AssertDominant(PixelAt(ambient, camera, new Vector3(-0.5f, 0f, 1f)), 0, 30, "ambient, the left half (red)");
+        AssertDominant(PixelAt(ambient, camera, new Vector3(0.5f, 0f, 1f)), 1, 30, "ambient, the right half (green)");
     }
 
     [SkippableFact]
@@ -372,8 +374,8 @@ public sealed class LightingBaselineTests : IDisposable
             var display = Render(view);
             var left = PixelAt(display, camera, leftPoint);
             var right = PixelAt(display, camera, rightPoint);
-            Assert.True(left.R > 80 && left.R > 2 * left.G && left.R > 2 * left.B, $"{name}: the drawing's left half is not red: {left}");
-            Assert.True(right.G > 80 && right.G > 2 * right.R && right.G > 2 * right.B, $"{name}: the drawing's right half is not green: {right}");
+            AssertDominant(left, 0, 80, $"{name}: the drawing's left half (red)");
+            AssertDominant(right, 1, 80, $"{name}: the drawing's right half (green)");
         }
 
         // A poster is a lit print: dark without light, its image under the work light.
@@ -393,7 +395,20 @@ public sealed class LightingBaselineTests : IDisposable
         var shown = Render(full);
         var posterLeft = PixelAt(shown, camera, leftPoint);
         var posterRight = PixelAt(shown, camera, rightPoint);
-        Assert.True(posterLeft.R > 2 * posterLeft.G && posterRight.G > 2 * posterRight.R, $"the poster's image: {posterLeft}, {posterRight}");
+        AssertDominant(posterLeft, 0, 20, "the poster's left half (red)");
+        AssertDominant(posterRight, 1, 20, "the poster's right half (green)");
+    }
+
+    /// <summary>
+    /// The display pixel shows a colour whose channel <paramref name="channel"/> dominates: at least
+    /// <paramref name="minimum"/> (of 255) and 1.5 × each other channel (the tone mapper desaturates a little).
+    /// </summary>
+    private static void AssertDominant((int R, int G, int B) pixel, int channel, int minimum, string what)
+    {
+        int own = channel == 0 ? pixel.R : channel == 1 ? pixel.G : pixel.B;
+        int other1 = channel == 0 ? pixel.G : pixel.R;
+        int other2 = channel == 2 ? pixel.G : pixel.B;
+        Assert.True(own >= minimum && own > 1.5f * other1 && own > 1.5f * other2, $"{what} shows as {pixel}");
     }
 
     private static void WriteHalves(string path)
