@@ -59,6 +59,9 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [ ] Library panel: Fixtures → category sub-tabs; 3D thumbnail per fixture with name, hover → grows upward with a
       rotating 3D preview; custom models tab; drag into the scene
 - [ ] Import custom 3D models with textures (OBJ/FBX/DAE/3DS/glTF/…), images as reference drawings or posters
+      (lighting baseline done: reference drawings show their image unlit in Full, Colorless and renders, posters are
+      lit prints; the Auto work light and the scene's ambient light light a dark set; a floorless MVR gets the
+      engine's stage floor as an undo step — docs/editor.md)
 - [ ] Walls and floors as resizable rectangles; built-in materials applicable to any surface
 - [ ] Properties panel: live state first (pan/tilt/colour/intensity/zoom…, locked when console-driven), then
       manufacturer data from GDTF + specs (manufacturer, weight, power, cd, connectors with illustrations…)
