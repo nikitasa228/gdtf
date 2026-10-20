@@ -175,7 +175,11 @@ Orbiting leaves the snapped view.
 
 *The view cube in a perspective view, and snapped to Top, Front and Right with the neighbour arrows.*
 
-**Statistics** (bottom left): frames per second, frame time and target size; the world axis triad above it.
+**Statistics** (bottom left): frames per second, frame time and target size; the world axis triad above it. When the
+renderer cannot list every light of the view (more lights in the scene than its clustered-light limit of 65 536), a
+warning line in the warning colour sits below the statistics, also when they are hidden — *"N of M lights are not
+drawn (the renderer lists at most K): light and lux read too low here"* — and the log gets the renderer's warning
+(see [rendering.md](rendering.md#frame-and-pass-sequence); `CANDELA_MAX_CLUSTERED_LIGHTS=1` shows it on the preview stage).
 
 **Navigation** follows *Settings → Viewport → Navigation style*. The left button without modifiers always selects.
 

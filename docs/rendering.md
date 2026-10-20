@@ -188,7 +188,7 @@ stale handles are rejected (`ArgumentException`) and double destruction is a no-
 | | 3 | lights SSBO |
 | | 4 | `sampler2D textures[]` — variable count (≤ min(device limit, 16384)), `UPDATE_AFTER_BIND`, `PARTIALLY_BOUND`, indexed with `nonuniformEXT` |
 | 1 (per render target) | 0 | `FrameData` UBO (matrices, previous view-projection, camera, exposure, cluster and froxel parameters, media, feature bits, overlay range, selection colour, …) |
-| | 1, 2, 3 | clusters SSBO (`uvec2 offset, count` per cluster), cluster light-index list, light-list counter |
+| | 1, 2, 3 | clusters SSBO (`uvec2 lights, overflow` per cluster), cluster light masks (summary words + one bit per listed light per cluster), light-assignment statistics |
 | | 4 | HDR image |
 | | 5, 6 | per-view light records (`LightView`: shadow slot, flags, VPL range), shadow slots (`ShadowSlot`: matrices, atlas rectangle, frustum) |
 | | 7, 8 | shadow atlas with a comparison sampler (hardware PCF) and as raw depth (PCSS blocker search, VPLs) |
@@ -259,10 +259,46 @@ lights with their VPL budgets or the GI lights, and the beam outlines — withou
 **Clustered light assignment.** 16 × 9 screen tiles × 24 depth slices, logarithmic in view depth between near and far
 (`slice = log(z) · 24 / log(far/near) − 24 · log(near) / log(far/near)`). For each cluster the compute shader tests
 every light's cone (cut-off angle, range from the range window below) against the cluster's view-space bounds
-(bounding sphere vs cone, plus a box vs range sphere test), writes the indices in light order (deterministic) into a
-compact list with one atomic per cluster, at most 512 lights per cluster. The index buffer is sized so it cannot
-overflow (`clusters × min(lights, 512)`); an overflow counter is kept for diagnostics. 1000+ lights are covered by
-`ManyLightsTests` (validation-clean, and the shaded luminance equals the CPU sum over all 1000 lights within 3 %).
+(bounding sphere vs cone, plus a box vs range sphere test) and writes the cluster's **light mask**: one bit per light
+(light i = bit i % 32 of mask word i / 32), preceded by ⌈words / 32⌉ summary words with one bit per non-empty mask
+word. Thread t of the cluster's work group builds mask words t, t + 64, … (32 cone tests each) and ORs its summary bits
+in shared memory — no global atomics, a deterministic result. The surface shading (`forward.frag`), the lux overlay
+(`analysis.frag`) and the froxel injection walk a cluster's lights with `ClusterCursor` / `nextClusterLight`
+(view.glsl): set summary bits, then the set bits of those mask words, in ascending light order, so a cluster holds
+**every light that reaches it** however many beams overlap there. The lists used to be index lists cut at 512 lights
+per cluster: on Фокина (1295 cells at open white, every beam's range window reaching across the stage) the busiest
+clusters held all 1295 lights, so whole screen tiles of the floor read a fraction of their light — in the lux overlay
+(the audit's 50–100 lx where the light meter says 300–1000 lx) and in Full shading alike (a darker, differently tinted
+rectangle in the middle of the stage).
+
+Mask memory: 3456 clusters × (⌈L/32⌉ + ⌈L/1024⌉) words — 0.6 MB per view for Фокина's 1295 lights, 28 MB at the
+limit of `VulkanRendererOptions.MaxClusteredLights` = 65 536 (default; the environment variable
+`CANDELA_MAX_CLUSTERED_LIGHTS` lowers it, so the warning below can be tried on a small scene). The buffer grows by at
+least half its size when needed (the view set is rebuilt then) and is never truncated. Lights beyond the limit (in
+world order) are **not drawn**: the light planner gives them no shadow tile, volumetric beam or indirect light, and the
+cluster shader only tests them to count the clusters they reach. A dark light (dimmed to zero: range 0) touches no
+cluster, so it is neither listed nor, beyond the limit, reported as missing (a blacked-out fixture raises no warning).
+
+**Light-list statistics.** The statistics block (cluster-light pairs, the busiest cluster, the clusters missing a light
+beyond the limit) is cleared every frame and copied after the light assignment to a host-visible buffer of the frame
+slot, read when the slot comes round again (no waiting). `IRenderTarget.LightLists` (`LightListDiagnostics`: lights,
+listed lights, most lights in one cluster, overflowed clusters, `HasOverflow`) and `RenderStatistics`
+(`MaxLightsInCluster`, `OverflowedClusters`) report them a frame or two late; a view without lights reports nothing
+at once. When a target starts to overflow the renderer logs one warning ("Light lists overflowed: … lights are beyond
+the limit … and are not drawn; … clusters … miss light from them …") and a note when every light fits again — not one
+per frame. The editor shows the warning in the corner of the viewport ("2 of 3 lights are not drawn (the renderer
+lists at most 1): light and lux read too low here", Russian: "Не отрисовано …"), whatever the statistics setting.
+Nothing else truncates a per-view light list: the volumetric beams use tile masks with a bit per beam, and the light
+planner's budgets (`MaxShadowedLights`, `MaxRaymarchedBeams`, the VPL budget) choose which lights get a shadow tile,
+a ray-marched beam or VPLs — the other lights are still drawn (unshadowed, in the froxels).
+
+Measured on Фокина (`candela render stages/Фокина.mvr --look open-white --floor auto --view top`, lavapipe, 800 × 600):
+the lux overlay matches `LightMeterService.HorizontalIlluminanceAt` at 2532 floor pixels of an orthographic top view
+(the pixel's floor point from `Pick`) with a mean error of 0.001 % and a largest error of 0.21 % (the audit's tile-sized
+rectangles are gone in the CLI and the editor); the busiest cluster holds all 1295 lights. Listing every light costs
+time where beams overlap: 12 frames of the lux overlay took 54 s instead of 43 s, Full 6.0 s instead of 5.2 s, Full in
+haze 0.05 /m 61 s instead of 56 s (merging the cells of one fixture into one cone is WP-23's job). 1000+ lights are
+covered by `ManyLightsTests`, 1100–1320 overlapping ones by `LightListTests` and `OverlayTests`.
 
 **Picking.** `Pick(x, y)` copies a 3 × 3 block of depth and pick ids of the last frame: the centre gives the pick id
 and the world position (unprojected with the inverse view-projection of that frame), the neighbours on the same object
@@ -682,7 +718,9 @@ background is not coloured.
   `E = Σ_lights I0 · profile(θ) · cookie · shadow · max(N·L, 0) / d²` (photopic: the luminance of the summed Rec.2020
   illuminance, light colours have luminance 1). Direct light only, no albedo, no indirect light, no haze extinction —
   a light-meter reading at the surface with its normal, equal to `LightMeter.IlluminanceAt` within 1 % where nothing
-  shadows the point.
+  shadows the point — also under 1320 overlapping beams (every light of the cluster is summed, see
+  [Clustered light assignment](#frame-and-pass-sequence)); lights beyond `MaxClusteredLights` are missing, which the
+  target reports and the editor and the log warn about.
 * **Noise** (`NoiseGradient`, default 25 … 80 dB): the **free-field sound pressure level** at the surface,
   `L = 10 · log10 Σ 10^(L_i/10)` with `L_i = L_1m,i − 20 · log10(max(d_i, 0.1 m))` over `SetNoiseSources`
   (= `Acoustics.SplAt` within 0.5 dB), or the `AtmosphereState.NoiseField` grid when one is given (trilinear; outside
@@ -724,6 +762,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `RenderModeTests`, `GoldenImageTests` | the procedural scene in Full / Colorless / Wireframe (both wireframe paths) against `Golden/*.png` at 320 × 240 — symmetric 3 × 3 neighbourhood comparison, mean error ≤ 2/255 and ≤ 0.5 % of pixels off by more than 40/255 |
 | `PhotometricTests` | 10 000 cd at 5 m onto a white Lambertian floor: pool centre 10000/25/π cd/m² within 2 %; 30° off axis `profile(θ)·cos³θ` within 3 %; coloured light keeps luminance and chromaticity; iris and frost; emissive and background luminance |
 | `ManyLightsTests` | 1000 lights, validation-clean, shaded luminance = CPU sum over all lights (3 %) — already in the first frame after the light count grew |
+| `LightListTests` | 1320 overlapping beams in Full shading: the floor luminance = the CPU sum over all of them within 1 % (the lists used to stop at 512), the busiest cluster holds all 1320; 1100 co-located copies of a spot light in haze (froxels only) render like one light carrying their sum (1 % per pixel); a 50-light limit with 100 lights: the lux overlay = the light meter of the 50 listed lights, `LightLists` / `RenderStatistics` report 50 unlisted lights and the overflowed clusters (blocking read and a frame or two later), one warning in the log and one note when every light fits again, nothing for a view without lights; the limit is exact and clamped to 1 … 65 536; 4500 lights (several mask words per thread, five summary words) whose first 2048 point up and whose every third light after that is one of 818 overlapping beams, up to the last one: the lux overlay = the light meter within 1 %, and with a limit of 3000 (inside a mask word) = the light meter of exactly the first 3000 with the rest reported; dark lights beyond the limit are not reported as missing (lit, they are); `CANDELA_MAX_CLUSTERED_LIGHTS` parsing |
 | `ToneMappingTests` | AgX / ACES / Neutral curves, exposure compensation (stops of exposure) |
 | `PickTests` | pick id, position within 1 cm, normal, depth; not-pickable instances |
 | `SceneTests` | incremental updates, stale handles, material updates, sRGB / Rec.709 → Rec.2020 conversions, mip chains, uploads staged in frames without rendering |
@@ -733,7 +772,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `VolumetricTests` | single scattering in uniform haze vs the numerical integral of σ·HG·I·e^(−σr)/r²·e^(−σl) within 5 % (froxels with and without temporal accumulation, and a volumetric beam); goldens `volumetric-beam` (side view), `volumetric-smoke` (density blob), `volumetric-flame`; an optically thick flame shows the blackbody luminance (5 %) and chromaticity (0.01); looking up a beam from inside it (volumetric beams, the same beams in the froxels, narrow and wide) within 5 % of the integral; uniform smoke through the density volume scatters like haze of the same coefficient (5 %, froxels and beams); haze in a shadow stays dark (froxels and beams); the froxel history follows a trucking or panning camera (beam within 0.75 px of the converged image) |
 | `BeamTests` | the table matches the line integral of the profile (five family / exponent cases); single scattering of a 6° spot (100 000 cd, 6°/9°) and a 40° wash (40°/60°) against `BeamReference` — a 200 000-step double-precision integral with the same near-field model — within 5 % (with and without temporal accumulation; measured 0.1 % and 1 %); a half-open gobo in the air and a plate shadowing the beam (5 %); edge profiles of a Spot 20°/26° and a Fresnel 20°/40° across the beam within 5 % of the peak and the 50 % / 10 % crossings within a pixel; a panning gobo beam does not smear (centroid within 0.75 px of a still image, brightness 0.9–1.1); 300 and 1000 beams report statistics and degrade quality above the budget, finite and validation-clean; golden `beams-stage` (gobo, cool spot, wash under a truss, prism, large-lens beam with lens glow); stage metering exposes the lit part below white; instance emission (uniform and directional) shows the lens luminance and its colour, bloom glare, non-finite input is ignored; two flame grids glow each with its own temperature (`BlackbodyRadiator`, 5 %) |
 | `BeamReviewTests` | radial gobos (a disc of 0.25 and of 0.7 of the gate, a ring 0.5–0.9) in the far field of a 6° point-source beam match the integral (4 %; measured ≤ 1.2 %); a 4° beam seen from 30 m, horizontal and diagonal, keeps its light summed across the shaft up to its lens (6 %; measured ≤ 1.6 %); the soft edge of a half-closed iris in the air (2 % of the axis value + 3 %); the eye inside a 40° wash, across and towards the source (5 %); the eye 20 m down a 6° beam (on and off its axis) looking back past and into the lens (centre 5 %, 16 × 16 pixels around the lens 5 %; measured ≤ 1.5 %); a shadowed beam with nothing in it equals the unshadowed one in a single frame (0.05 % of the peak); temporal accumulation settles a gobo beam over the background (frame-to-frame change below half that of single frames); a flame atlas beyond its budget skips grids with a warning |
-| `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % (Full and Colorless) |
+| `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types; and 1320 overlapping beams from above and in perspective, after the cluster masks grew from 12 lights); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % (Full and Colorless) |
 | `PostTests` | golden `bloom`; the bloom image has the HDR image's energy (3 %), a halo appears and the source gives up light; auto exposure (average metering) converges to the trimmed-mean measurement (0.2 stop), follows a 4× brighter scene by 2 stops (adapting over time) and adds compensation; resolution scale 0.5 renders a quarter of the pixels, keeps the display size and picking (< 1 cm), clamps to [0.5, 1] |
 | `IndirectTests` | a red wall bleeds onto a white floor: red/green rises by more than 30 % against `Indirect = Off`, and the added luminance matches a CPU integral of the wall's reflected light (RSM within 12 %, ray-traced GI within 20 %, both measured on lavapipe); a red floor bleeds onto a white wall (RSM 5 %, ray-traced 10 %); fallbacks |
 | `RobustnessTests` | NaN / out-of-range settings, lights and atmosphere grids (empty, short, beyond the 3D image limit, NaN, infinite, null) in every view and overlay; 1000 shadow-casting lights with every feature (256 tiles, ≤ 256 VPLs); 2 Mcd into the camera through dense haze stays below the half-float limit and finite |
@@ -754,9 +793,10 @@ Regenerate golden images after an intentional visual change with
 `CANDELA_UPDATE_GOLDEN=1 dotnet test tests/Candela.Rendering.Vulkan.Tests` (optionally `--filter` a class) and inspect
 them (`bin/.../render-output` holds the actual image of every comparison and the difference images of failed ones).
 Internal test hooks: `VulkanRenderer.ReadHdr` returns the pre-tone-mapping image divided by the exposure (cd/m²),
-`ReadBloom` the bloom image the display transform mixes in, `ReadAnalysis` the lux / dB image; `LastStatistics`
-counts shadowed lights, shadow tiles rendered, volumetric beams (and their tile statistics and quality), froxel lights
-and VPLs.
+`ReadBloom` the bloom image the display transform mixes in, `ReadAnalysis` the lux / dB image, `ReadLightLists` the
+light-list statistics of the last frame (blocking); `LastStatistics` counts shadowed lights, shadow tiles rendered,
+volumetric beams (and their tile statistics and quality), froxel lights, VPLs, the busiest cluster and overflowed
+clusters.
 
 ## Editor integration
 
@@ -866,6 +906,7 @@ real hardware, with the settings that control them.
 |---|---|---|---|
 | Shadow atlas | tiles **re-rendered** × casters in their frusta (cached: a static scene renders no tiles per frame) | (2R)² × 4 B depth, + 8 B with RSM — R = 1024: 16 MiB, 48 MiB with RSM | `ShadowMapResolution`, `MaxShadowedLights` |
 | PCSS | 12 + 16 shadow-map taps per shadowed light per shaded pixel | — | `SourceRadius` (wider penumbrae cost the same taps) |
+| Clustered lights | 3456 clusters × lights (one cone test each) for the assignment; every shaded pixel, lux pixel and froxel evaluates all lights of its cluster — on a dense rig all of them (Фокина: 1295) | 3456 × ⌈lights/32⌉ × 4 B per view (0.6 MB for 1295 lights) | `MaxClusteredLights` (lights beyond it are not drawn, with a warning) |
 | Froxels | (W/8) × (H/8) × slices × lights per cluster (injection) | 3 × 8 B per froxel — 1920 × 1080 at 128 slices ≈ 95 MiB, at 64 ≈ 47 MiB | `VolumetricSlices`, `ResolutionScale`, `TemporalAccumulation` |
 | Volumetric beams | tile culling: tiles × beams (one work group per tile); scattering: Σ over half-resolution pixels of the beams in their tile × segments (2–8, × quality) + modulation samples for cookies, shadows and smoke | 5 half-resolution `RGBA16F` images + tile masks (tiles × ⌈beams/32⌉ words) | `MaxRaymarchedBeams`, `ResolutionScale`, `TemporalAccumulation` (quality adapts to the load) |
 | RSM | 256 VPLs × ¼ of the internal pixels (≈ 130 M VPL evaluations at 1080p) + VPL generation (one 256-thread group per light) | VPL buffer, half-resolution `RGBA16F` | `Indirect`, `MaxShadowedLights` |

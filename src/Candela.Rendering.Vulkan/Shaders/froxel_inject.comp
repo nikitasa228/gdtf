@@ -50,10 +50,10 @@ void main()
         float footprint = frame.renderSize.x / frame.volumeGrid.x * pixelWorldSize(z);
         float g = frame.media.y;
         vec3 scattered = vec3(0.0);
-        uvec2 cluster = clusters[clusterIndexUv(uv, z)];
-        for (uint i = 0u; i < cluster.y; ++i)
+        ClusterCursor lightsHere = clusterCursor(clusterIndexUv(uv, z));
+        uint index;
+        while (nextClusterLight(lightsHere, index))
         {
-            uint index = clusterLights[cluster.x + i];
             LightView lv = lightViews[index];
             if ((lv.flags & LIGHT_VIEW_BEAM) != 0u)
                 continue;

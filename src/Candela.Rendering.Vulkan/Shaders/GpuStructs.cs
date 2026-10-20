@@ -202,7 +202,12 @@ internal struct GpuFrameData
     public float GridMajorEvery;
     public float GridFadeDistance;
     public float RangeEpsilon;
-    public uint ClusterIndexCapacity;
+
+    /// <summary>
+    /// 32-bit light mask words per cluster (one bit per listed light; 0 without lights). Each cluster's record in the
+    /// mask buffer is ⌈words / 32⌉ summary words followed by the mask words.
+    /// </summary>
+    public uint ClusterMaskWords;
     public Vector4 Headlight;
     public Matrix4x4 PreviousViewProjection;
     public Vector4 DisplaySize;
@@ -254,7 +259,8 @@ internal struct GpuFrameData
     /// <summary>Scattering coefficient of the beam envelope image, 1/m.</summary>
     public float BeamSigmaRef;
 
-    public float BeamPad0;
+    /// <summary>Lights the cluster masks list (the first ones of the light buffer; the rest are beyond the renderer's limit).</summary>
+    public uint ClusterListedLights;
 }
 
 /// <summary>Push constants of every draw (32 bytes), see <c>DrawConstants</c> in common.glsl.</summary>
@@ -268,13 +274,22 @@ internal struct GpuDrawConstants
     public Vector4 Color;
 }
 
-/// <summary>Counter block of the clustered light lists (16 bytes), see <c>ClusterCounterBuffer</c> in view.glsl.</summary>
+/// <summary>
+/// Statistics of the clustered light assignment (16 bytes), see <c>ClusterCounterBuffer</c> in view.glsl: cleared before
+/// the light assignment, filled by cluster.comp and copied to the frame slot's read-back buffer.
+/// </summary>
 [StructLayout(LayoutKind.Sequential)]
 internal struct GpuClusterCounter
 {
-    public uint IndexCount;
-    public uint IndexRequired;
+    /// <summary>Cluster-light pairs: the sum over all clusters of the lights in their lists.</summary>
+    public uint LightPairs;
+
+    /// <summary>Clusters reached by at least one unlisted light (beyond the clustered-light limit; it is missing there).</summary>
     public uint OverflowedClusters;
+
+    /// <summary>Most lights in one cluster's list.</summary>
+    public uint MaxLightsInCluster;
+
     public uint Pad;
 }
 

@@ -97,7 +97,8 @@ internal sealed class LightPlanner
         for (int i = 0; i < n; i++)
         {
             target.LightViews[i] = new GpuLightView { ShadowSlot = ShaderConstants.NoShadow };
-            _scores[i] = Score(lights[i], inputs);
+            // Lights beyond the clustered-light limit are not drawn: no shadow tile, beam, VPLs or GI for them either.
+            _scores[i] = i < inputs.ListedLights ? Score(lights[i], inputs) : 0f;
             _sortKeys[i] = -_scores[i];
             _order[i] = i;
         }
@@ -410,4 +411,10 @@ internal struct PlanInputs
     public int MaxRaymarchedBeams;
     public bool BeamOutlines;
     public ulong FrameNumber;
+
+    /// <summary>
+    /// The renderer's clustered-light limit (<see cref="VulkanRendererOptions.MaxClusteredLights"/>): lights from this
+    /// index on are not in the cluster lists, so they score 0 (no shadow tile, volumetric beam, VPLs or GI).
+    /// </summary>
+    public int ListedLights;
 }

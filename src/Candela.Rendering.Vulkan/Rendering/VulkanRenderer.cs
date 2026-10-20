@@ -15,6 +15,27 @@ public sealed class VulkanRendererOptions
     /// fallback path; used by tests to cover it on every device).
     /// </summary>
     public bool ForceEdgeShaderWireframe { get; set; }
+
+    /// <summary>
+    /// Environment variable that lowers the default <see cref="MaxClusteredLights"/> (a positive whole number), so the
+    /// light-list overflow warning of the editor and the CLI can be checked on a small scene.
+    /// </summary>
+    public const string MaxClusteredLightsEnvironmentVariable = "CANDELA_MAX_CLUSTERED_LIGHTS";
+
+    /// <summary>
+    /// Most lights the clustered light lists hold (1 … 65 536; default 65 536, or
+    /// <see cref="MaxClusteredLightsEnvironmentVariable"/>). Every listed light reaches every pixel it lights, however
+    /// many beams overlap there; lights beyond the limit (in world order) are not drawn, the targets report the
+    /// overflow (<see cref="IRenderTarget.LightLists"/>) and the log gets a warning. The light masks take
+    /// ⌈lights / 32⌉ × 4 bytes per cluster (3456 clusters per view).
+    /// </summary>
+    public int MaxClusteredLights { get; set; } = ParseMaxClusteredLights(Environment.GetEnvironmentVariable(MaxClusteredLightsEnvironmentVariable));
+
+    /// <summary>The limit an environment value asks for: a positive whole number up to 65 536; anything else = 65 536.</summary>
+    internal static int ParseMaxClusteredLights(string? value) =>
+        int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int limit) && limit > 0
+            ? Math.Min(limit, ShaderConstants.MaxClusteredLights)
+            : ShaderConstants.MaxClusteredLights;
 }
 
 /// <summary>CPU-side numbers of the most recent <see cref="IRenderer.Render"/> call.</summary>
@@ -33,9 +54,12 @@ public sealed class VulkanRendererOptions
 /// <param name="BeamTiles">Culling tiles of the beam integration.</param>
 /// <param name="BeamTilePairs">Tile-beam pairs after GPU culling (read back from an earlier frame of this target; 0 until available).</param>
 /// <param name="BeamMaxPerTile">Most beams in one tile after GPU culling (earlier frame).</param>
+/// <param name="MaxLightsInCluster">Most lights in one cluster of the light assignment (read back from an earlier frame of this target).</param>
+/// <param name="OverflowedClusters">Clusters missing a light beyond the clustered-light limit (earlier frame; 0 = every light is drawn).</param>
 public readonly record struct RenderStatistics(double CpuMilliseconds, int VisibleInstances, int CulledInstances, int Draws, int Lights,
     int ShadowedLights = 0, int ShadowTilesRendered = 0, int RaymarchedBeams = 0, int VirtualPointLights = 0, int FroxelLights = 0,
-    float BeamCoverage = 0f, float BeamQuality = 1f, int BeamTiles = 0, int BeamTilePairs = 0, int BeamMaxPerTile = 0);
+    float BeamCoverage = 0f, float BeamQuality = 1f, int BeamTiles = 0, int BeamTilePairs = 0, int BeamMaxPerTile = 0,
+    int MaxLightsInCluster = 0, int OverflowedClusters = 0);
 
 /// <summary>Linear HDR read-back of a target (test/diagnostic hook): luminance units, i.e. HDR value / exposure.</summary>
 /// <param name="Width">Width, pixels.</param>
@@ -126,6 +150,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
     private readonly LightPlanner _planner = new();
     private readonly RendererResources _shared;
     private readonly bool _edgeWireframe;
+    private readonly int _maxClusteredLights;
     private ShadowAtlas? _atlas;
     private RayTracingScene? _rayTracing;
     private PathTracer? _pathTracer;
@@ -149,6 +174,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         Context = context;
         _ownsContext = ownsContext;
         _edgeWireframe = options.ForceEdgeShaderWireframe || !context.Capabilities.FillModeNonSolid;
+        _maxClusteredLights = Math.Clamp(options.MaxClusteredLights, 1, ShaderConstants.MaxClusteredLights);
         _barriers = new BarrierBatch(context.Vk);
         try
         {
@@ -304,9 +330,10 @@ public sealed unsafe class VulkanRenderer : IRenderer
             var selection = ColorSpaces.SrgbDecode(new Vector3(view.SelectionColor.X, view.SelectionColor.Y, view.SelectionColor.Z));
             p.WireSelectedColor = new Vector4(selection, 1f);
 
-            // The cluster list capacity goes into the frame data: grow the buffer first.
-            if (decisions.Lights)
-                t.EnsureClusterCapacity(_world.LightCount);
+            // The cluster mask layout goes into the frame data: grow the buffer first. Statistics of an earlier frame of
+            // this slot (busiest cluster, overflow) are picked up now.
+            t.EnsureClusterCapacity(decisions.Lights ? _world.LightCount : 0, _maxClusteredLights);
+            ReadClusterStatistics(t, frame, decisions.Lights);
             BuildFrameData(t, camera, view, decisions, exposure, ref p.Data, out var frustum);
             var forward = new Vector3(p.Data.CameraForward.X, p.Data.CameraForward.Y, p.Data.CameraForward.Z);
             var eye = new Vector3(p.Data.CameraPosition.X, p.Data.CameraPosition.Y, p.Data.CameraPosition.Z);
@@ -352,6 +379,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 MaxRaymarchedBeams = decisions.VolumeLights ? Math.Clamp(settings.MaxRaymarchedBeams, 0, ShaderConstants.MaxBeams) : 0,
                 BeamOutlines = view.ShowBeamOutlines && _world.LightCount > 0,
                 FrameNumber = frame.Number,
+                ListedLights = _maxClusteredLights,
             };
             _planner.Plan(_world, t, decisions.Shadows ? _atlas : null, plan);
             tilesRendered = decisions.Shadows ? _atlas!.PendingRenders.Length : 0;
@@ -445,6 +473,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 Shading = decisions.Shading,
                 Overlay = decisions.Overlay,
                 Bloom = p.BloomActive && t.BloomLevels > 0,
+                Lights = decisions.Lights ? _world.LightCount : 0,
+                ListedLights = decisions.Lights ? t.ClusterListedLights : 0,
             };
         }
         finally
@@ -456,11 +486,12 @@ public sealed unsafe class VulkanRenderer : IRenderer
         int draws = _pass.Draws.Opaque.Length + _pass.Draws.Masked.Length + _pass.Draws.Blended.Length;
         bool beamsDrawn = _pass.BeamsActive;
         var beamGpu = t.LastBeamGpuStats;
+        var lightLists = t.LightLists;
         LastStatistics = new RenderStatistics(Stopwatch.GetElapsedTime(start).TotalMilliseconds, _pass.Draws.VisibleInstances,
             _pass.Draws.CulledInstances, draws, _world.LightCount, _planner.ShadowedLights, tilesRendered, beamsDrawn ? _planner.BeamCount : 0,
             _planner.VplCount, _planner.FroxelLights, beamsDrawn ? _planner.BeamCoverage : 0f, beamsDrawn ? _planner.BeamQuality : 1f,
             beamsDrawn ? (int)(_pass.Data.BeamTilesX * _pass.Data.BeamTilesY) : 0, beamsDrawn ? (int)beamGpu.Pairs : 0,
-            beamsDrawn ? (int)beamGpu.MaxPerTile : 0);
+            beamsDrawn ? (int)beamGpu.MaxPerTile : 0, lightLists.MaxLightsInCluster, lightLists.OverflowedClusters);
     }
 
     /// <summary>
@@ -735,6 +766,36 @@ public sealed unsafe class VulkanRenderer : IRenderer
         return new ReadOnlySpan<float>(readback.MappedPointer, w * h).ToArray();
     }
 
+    /// <summary>
+    /// Test/diagnostic hook: the light-list statistics of the target's last frame, read back now (blocking) instead of
+    /// a frame or two later like <see cref="VulkanRenderTarget.LightLists"/>.
+    /// </summary>
+    internal LightListDiagnostics ReadLightLists(IRenderTarget target)
+    {
+        ThrowIfDisposed();
+        var t = Validate(target);
+        if (!t.Last.Valid)
+            throw new InvalidOperationException("The target has not been rendered yet.");
+        if (t.Last.Lights == 0)
+            return default;
+        ulong size = (ulong)sizeof(GpuClusterCounter);
+        var readback = Readback(size);
+        var cmd = Context.Immediate.Begin();
+        _barriers.CommandBuffer = cmd;
+        _barriers.Use(t.ClusterCounter, BufferUse.TransferSource);
+        _barriers.Use(readback, BufferUse.TransferDestination);
+        _barriers.Flush();
+        var copy = new BufferCopy(0, 0, size);
+        Context.Vk.CmdCopyBuffer(cmd, t.ClusterCounter.Handle, readback.Handle, 1, &copy);
+        _barriers.Use(readback, BufferUse.HostRead);
+        _barriers.Flush();
+        Context.Immediate.SubmitAndWait();
+        Context.Allocator.Invalidate(readback.Allocation, 0, size);
+        var counter = *(GpuClusterCounter*)readback.MappedPointer;
+        return new LightListDiagnostics(t.Last.Lights, t.Last.ListedLights, (int)Math.Min(counter.MaxLightsInCluster, int.MaxValue),
+            (int)Math.Min(counter.OverflowedClusters, ShaderConstants.ClusterCount));
+    }
+
     internal void OnTargetDisposed(VulkanRenderTarget target) => _targets.Remove(target);
 
     internal void OnFinalRenderDisposed(VulkanFinalRender render) => _finalRenders.Remove(render);
@@ -964,7 +1025,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.GridMajorEvery = 10f;
         d.GridFadeDistance = ortho ? 0f : 150f * spacing;
         d.RangeEpsilon = ShaderConstants.LightRangeEpsilon;
-        d.ClusterIndexCapacity = target.ClusterIndexCapacity;
+        d.ClusterMaskWords = dec.Lights ? target.ClusterMaskWords : 0u;
+        d.ClusterListedLights = dec.Lights ? (uint)target.ClusterListedLights : 0u;
         d.Headlight = new Vector4(keyLight, 0f);
         d.PixelFootprint = new Vector4(2f / (MathF.Abs(projection.M22) * rh), orthoHeight / rh, 0f, 0f);
         d.RenderScale = dec.Scale;
@@ -1133,6 +1195,54 @@ public sealed unsafe class VulkanRenderer : IRenderer
         var words = new ReadOnlySpan<uint>(readback.MappedPointer, 4);
         t.LastBeamGpuStats = (words[0], words[1], words[2], t.BeamStatsTiles[slot]);
         t.BeamStatsFrame[slot] = 0;
+    }
+
+    /// <summary>
+    /// Picks up the light-assignment statistics the GPU copied into this frame slot's read-back buffer the last time the
+    /// slot was used (no wait: <see cref="VulkanContext.BeginFrame"/> has waited for the slot's fence) into
+    /// <see cref="VulkanRenderTarget.LightLists"/>, and logs a warning when lights start to be missing from a view (a
+    /// note when they are back). A frame without lights clears the diagnostics and the pending read-backs.
+    /// </summary>
+    private void ReadClusterStatistics(VulkanRenderTarget t, VulkanFrame frame, bool lights)
+    {
+        if (!lights)
+        {
+            Array.Clear(t.ClusterStatsFrame);
+            t.LightLists = default;
+            ReportLightListOverflow(t);
+            return;
+        }
+
+        int slot = frame.SlotIndex;
+        if (t.ClusterStatsReadback[slot] is not { } readback || t.ClusterStatsFrame[slot] == 0 || t.ClusterStatsFrame[slot] >= frame.Number)
+            return;
+        Context.Allocator.Invalidate(readback.Allocation, 0, (ulong)sizeof(GpuClusterCounter));
+        var counter = *(GpuClusterCounter*)readback.MappedPointer;
+        var (count, listed) = t.ClusterStatsLights[slot];
+        t.ClusterStatsFrame[slot] = 0;
+        t.LightLists = new LightListDiagnostics(count, listed, (int)Math.Min(counter.MaxLightsInCluster, int.MaxValue),
+            (int)Math.Min(counter.OverflowedClusters, ShaderConstants.ClusterCount));
+        ReportLightListOverflow(t);
+    }
+
+    /// <summary>Logs the start (warning) and the end (note) of a light-list overflow of a target; nothing in between.</summary>
+    private void ReportLightListOverflow(VulkanRenderTarget t)
+    {
+        var lists = t.LightLists;
+        if (lists.HasOverflow == t.LightListOverflowLogged)
+            return;
+        t.LightListOverflowLogged = lists.HasOverflow;
+        if (lists.HasOverflow)
+        {
+            Context.Log(VulkanLogLevel.Warning,
+                $"Light lists overflowed: {lists.UnlistedLights} of {lists.Lights} lights are beyond the limit of {lists.ListedLights} clustered " +
+                $"lights and are not drawn; {lists.OverflowedClusters} of {ShaderConstants.ClusterCount} clusters of a {t.Width} × {t.Height} " +
+                "view miss light from them, so surfaces, the lux overlay and the volumetric light read too low there.");
+        }
+        else
+        {
+            Context.Log(VulkanLogLevel.Info, $"Light lists of a {t.Width} × {t.Height} view hold every light again.");
+        }
     }
 
     /// <summary>Re-bakes the overlay gradient table of the target when the gradient changed (allocation only then).</summary>

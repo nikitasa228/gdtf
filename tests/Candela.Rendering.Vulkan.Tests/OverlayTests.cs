@@ -64,6 +64,99 @@ public sealed class OverlayTests
         }
     }
 
+    /// <summary>
+    /// 1320 beams overlapping around the origin (a dense rig like Фокина's 1295 cells, where the cluster lists used to be
+    /// cut at 512 lights and floor tiles read a fraction of the light): the lux overlay equals the light meter within
+    /// 1 % at every lit sample point, from above (orthographic) and in perspective (the depth slices), the busiest
+    /// cluster holds all 1320 lights and nothing overflows. The first frame has only a few lights, so the cluster masks
+    /// also grow on the way.
+    /// </summary>
+    [SkippableFact]
+    public void LuxOverlayOfThirteenHundredOverlappingBeamsMatchesTheLightMeter()
+    {
+        const int count = 1320;
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(30f, scene.Lambert(new Vector3(0.5f)), InstanceFlags.None);
+            var rig = new OverlappingBeams(count);
+            Assert.Equal(count, rig.LightsReaching(Vector3.Zero));
+            var options = new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux };
+            var top = new TopDownView(Width, Height, 10f);
+            using var target = renderer.CreateTarget(Width, Height);
+            renderer.World.SetLights(rig.Lights.AsSpan(0, 12));
+            renderer.Render(target, top.Camera, options, new PreviewSettings(), 0f);
+            uint smallCapacity = ((VulkanRenderTarget)target).ClusterMaskCapacity;
+            renderer.World.SetLights(rig.Lights);
+            renderer.Render(target, top.Camera, options, new PreviewSettings(), 0f);
+            var lux = renderer.ReadAnalysis(target);
+            var lists = renderer.ReadLightLists(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+
+            Assert.True(((VulkanRenderTarget)target).ClusterMaskCapacity > smallCapacity, "the cluster masks grew for 1320 lights");
+            Assert.Equal(new LightListDiagnostics(count, count, count, 0), lists);
+            int checkedPoints = 0;
+            for (float y = -4f; y <= 4f; y += 0.53f)
+            {
+                for (float x = -6f; x <= 6f; x += 0.61f)
+                {
+                    var (px, py, point) = top.NearestPixel(new Vector3(x, y, 0f));
+                    checkedPoints += CheckLux(lux[py * Width + px], LightMeter.IlluminanceAt(rig.Reference, point, Vector3.UnitZ), point) ? 1 : 0;
+                }
+            }
+
+            Assert.True(checkedPoints > 200, $"{checkedPoints} lit sample points (orthographic)");
+
+            // Perspective: the same floor seen at an angle, so the overlapping beams spread over many depth slices.
+            var camera = RenderCamera.LookAt(new Vector3(0f, -9f, 6f), new Vector3(0f, 0.5f, 0f), 55f);
+            renderer.Render(target, camera, options, new PreviewSettings(), 0f);
+            lux = renderer.ReadAnalysis(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+            Assert.False(renderer.ReadLightLists(target).HasOverflow);
+            var frame = CameraFrame.Compute(camera, Width / (float)Height);
+            checkedPoints = 0;
+            for (int py = 3; py < Height; py += 7)
+            {
+                for (int px = 3; px < Width; px += 7)
+                {
+                    if (FloorPointOf(frame.InverseViewProjection, px, py) is not { } point || MathF.Abs(point.X) > 14f || MathF.Abs(point.Y) > 14f)
+                        continue;
+                    checkedPoints += CheckLux(lux[py * Width + px], LightMeter.IlluminanceAt(rig.Reference, point, Vector3.UnitZ), point) ? 1 : 0;
+                }
+            }
+
+            Assert.True(checkedPoints > 200, $"{checkedPoints} lit sample points (perspective)");
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+
+        static bool CheckLux(float measured, float expected, Vector3 point)
+        {
+            if (expected < 5f)
+                return false; // only lit points (the 1 % criterion is meaningless at a few lux of tail)
+            Assert.True(MathF.Abs(measured - expected) <= 0.01f * expected,
+                $"({point.X:F2}, {point.Y:F2}): {measured:F1} lx, light meter {expected:F1} lx");
+            return true;
+        }
+    }
+
+    /// <summary>The floor point (Z = 0) seen through the centre of pixel (x, y), or null when the ray misses the floor.</summary>
+    private static Vector3? FloorPointOf(Matrix4x4 inverseViewProjection, int x, int y)
+    {
+        float nx = (x + 0.5f) / Width * 2f - 1f, ny = (y + 0.5f) / Height * 2f - 1f;
+        var a = Vector4.Transform(new Vector4(nx, ny, 1f, 1f), inverseViewProjection);
+        var b = Vector4.Transform(new Vector4(nx, ny, 0.5f, 1f), inverseViewProjection);
+        var pa = new Vector3(a.X, a.Y, a.Z) / a.W;
+        var pb = new Vector3(b.X, b.Y, b.Z) / b.W;
+        if (MathF.Abs(pb.Z - pa.Z) < 1e-9f)
+            return null;
+        float t = -pa.Z / (pb.Z - pa.Z);
+        return t > 0f ? pa + (pb - pa) * t : null;
+    }
+
     [SkippableFact]
     public void LuxOverlayMapsTheGradient()
     {

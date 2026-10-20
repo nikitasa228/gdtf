@@ -1,10 +1,13 @@
 #version 460
 #extension GL_GOOGLE_include_directive : require
 // Clustered light assignment. One work group per cluster (CLUSTER_COUNT_X x _Y screen tiles x _Z logarithmic depth
-// slices); its threads test contiguous chunks of the light list against the cluster's view-space bounds, a prefix
-// sum over the per-thread counts gives every thread its output position, and the cluster's list is written in light
-// order - deterministic output independent of thread scheduling. Lists are compacted into clusterLights[] with one
-// atomic per cluster; overflow (capacity or MAX_LIGHTS_PER_CLUSTER) is counted so the CPU can grow the buffer.
+// slices) writes the cluster's light mask: thread t builds mask words t, t + CLUSTER_THREADS, ... (32 lights each,
+// tested against the cluster's view-space bounds), then the summary words (one bit per non-empty mask word) - no
+// global atomics, and the result does not depend on thread scheduling. A list holds every one of the
+// frame.clusterListedLights listed lights (frame.clusterMaskWords x 32 bits), however many reach the cluster; lights
+// beyond that (more lights than the renderer's clustered-light limit) are only tested, so the clusters that miss one
+// are counted. The statistics block gets the cluster-light pairs, the busiest cluster and the overflowed clusters for
+// the CPU.
 
 #define CLUSTER_BUFFERS_WRITABLE
 #include "scene.glsl"
@@ -13,9 +16,9 @@
 
 layout(local_size_x = CLUSTER_THREADS) in;
 
-shared uint sPrefix[CLUSTER_THREADS];
-shared uint sOffset;
-shared uint sStored;
+shared uint sSummary[MAX_CLUSTER_SUMMARY_WORDS];
+shared uint sCount;
+shared uint sOverflow;
 
 // View-space bounds (camera at the origin looking down -Z) of cluster (x, y, z).
 void clusterBounds(uint index, out vec3 bmin, out vec3 bmax)
@@ -46,12 +49,15 @@ void clusterBounds(uint index, out vec3 bmin, out vec3 bmax)
     }
 }
 
-// Conservative test of a light's cone (cut-off angle, range) against the cluster bounds.
+// Conservative test of a light's cone (cut-off angle, range) against the cluster bounds. A dark light (range 0: its
+// range window is 0 everywhere) touches nothing, so it is neither listed nor, beyond the limit, reported as missing.
 bool lightTouches(Light light, vec3 bmin, vec3 bmax)
 {
+    float rangeSq = lightRangeSquared(light);
+    if (!(rangeSq > 0.0))
+        return false;
     vec3 position = (frame.view * vec4(light.position, 1.0)).xyz;
     vec3 direction = normalize(mat3(frame.view) * light.direction);
-    float rangeSq = lightRangeSquared(light);
     vec3 nearest = clamp(position, bmin, bmax);
     vec3 delta = nearest - position;
     if (dot(delta, delta) > rangeSq)
@@ -74,50 +80,66 @@ void main()
 {
     uint cluster = gl_WorkGroupID.x;
     uint tid = gl_LocalInvocationIndex;
+    uint words = min(frame.clusterMaskWords, uint(MAX_CLUSTER_SUMMARY_WORDS) * 32u);
+    uint summaryWords = (words + 31u) / 32u;
+    uint base = cluster * (summaryWords + words);
+    uint listed = min(min(frame.lightCount, frame.clusterListedLights), words * 32u);
+
+    for (uint s = tid; s < summaryWords; s += CLUSTER_THREADS)
+        sSummary[s] = 0u;
+    if (tid == 0u)
+    {
+        sCount = 0u;
+        sOverflow = 0u;
+    }
+    barrier();
+
     vec3 bmin, bmax;
     clusterBounds(cluster, bmin, bmax);
 
-    uint n = frame.lightCount;
-    uint chunk = (n + CLUSTER_THREADS - 1u) / CLUSTER_THREADS;
-    uint begin = min(tid * chunk, n);
-    uint end = min(begin + chunk, n);
     uint count = 0u;
-    for (uint i = begin; i < end; ++i)
+    for (uint w = tid; w < words; w += CLUSTER_THREADS)
     {
-        if (lightTouches(lights[i], bmin, bmax))
-            ++count;
+        uint first = w * 32u;
+        uint n = first < listed ? min(32u, listed - first) : 0u;
+        uint bits = 0u;
+        for (uint b = 0u; b < n; ++b)
+        {
+            if (lightTouches(lights[first + b], bmin, bmax))
+                bits |= 1u << b;
+        }
+
+        clusterMasks[base + summaryWords + w] = bits;
+        if (bits != 0u)
+        {
+            atomicOr(sSummary[w >> 5u], 1u << (w & 31u));
+            count += uint(bitCount(bits));
+        }
     }
 
-    sPrefix[tid] = count;
+    // Unlisted lights (beyond the clustered-light limit): the cluster misses them; only find out whether one reaches it.
+    bool missed = false;
+    for (uint i = listed + tid; i < frame.lightCount && !missed; i += CLUSTER_THREADS)
+        missed = lightTouches(lights[i], bmin, bmax);
+
+    if (count > 0u)
+        atomicAdd(sCount, count);
+    if (missed)
+        atomicOr(sOverflow, 1u);
     barrier();
+
+    for (uint s = tid; s < summaryWords; s += CLUSTER_THREADS)
+        clusterMasks[base + s] = sSummary[s];
     if (tid == 0u)
     {
-        uint total = 0u;
-        for (uint t = 0u; t < CLUSTER_THREADS; ++t)
+        uint total = sCount;
+        clusters[cluster] = uvec2(total, sOverflow);
+        if (total > 0u)
         {
-            uint c = sPrefix[t];
-            sPrefix[t] = total;
-            total += c;
+            atomicAdd(clusterLightPairs, total);
+            atomicMax(clusterMaxLights, total);
         }
-
-        uint wanted = min(total, MAX_LIGHTS_PER_CLUSTER);
-        uint offset = wanted > 0u ? atomicAdd(clusterIndexCount, wanted) : 0u;
-        uint stored = offset < frame.clusterIndexCapacity ? min(wanted, frame.clusterIndexCapacity - offset) : 0u;
-        if (stored < total)
+        if (sOverflow != 0u)
             atomicAdd(clusterOverflow, 1u);
-        sOffset = offset;
-        sStored = stored;
-        clusters[cluster] = uvec2(offset, stored);
-    }
-
-    barrier();
-    uint dst = sPrefix[tid];
-    for (uint i = begin; i < end && dst < sStored; ++i)
-    {
-        if (lightTouches(lights[i], bmin, bmax))
-        {
-            clusterLights[sOffset + dst] = i;
-            ++dst;
-        }
     }
 }

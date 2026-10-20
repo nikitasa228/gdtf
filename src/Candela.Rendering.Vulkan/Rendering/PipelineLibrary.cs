@@ -380,7 +380,7 @@ internal sealed unsafe class PipelineLibrary : IDisposable
     public static DescriptorType ViewBindingType(uint binding) => binding switch
     {
         ShaderConstants.BindingFrame => DescriptorType.UniformBuffer,
-        ShaderConstants.BindingClusters or ShaderConstants.BindingClusterLights or ShaderConstants.BindingClusterCounter or
+        ShaderConstants.BindingClusters or ShaderConstants.BindingClusterMasks or ShaderConstants.BindingClusterCounter or
             ShaderConstants.BindingLightViews or ShaderConstants.BindingShadowSlots or ShaderConstants.BindingVpls or
             ShaderConstants.BindingFlameLut or ShaderConstants.BindingNoiseSources or ShaderConstants.BindingRaymarchList or
             ShaderConstants.BindingExposure => DescriptorType.StorageBuffer,
