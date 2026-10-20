@@ -239,6 +239,134 @@ public sealed class LightListTests
         }
     }
 
+    /// <summary>
+    /// 4500 lights — more than the 2048 one work group's threads cover with one mask word each, so every thread builds
+    /// several words and a cluster record has five summary words — where the first 2048 lights all point up (no floor
+    /// cluster lists them: its first two summary words stay empty) and every third light after that is one of 818
+    /// beams overlapping around the origin, up to the very last light. The lux overlay equals the light meter of the
+    /// listed lights within 1 %; with a limit of 3000 (inside a mask word) exactly the first 3000 lights are summed and
+    /// the beams beyond them are reported as missing.
+    /// </summary>
+    [SkippableTheory]
+    [InlineData(65536)]
+    [InlineData(3000)]
+    public void LightsBeyondTwoThousandIndicesAreSummedAndALimitInsideAMaskWordIsExact(int limit)
+    {
+        const int count = 4500, firstBeam = 2048;
+        var renderer = CreateOrSkip(null, limit);
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(30f, scene.Lambert(new Vector3(0.5f)), InstanceFlags.None);
+            var beams = new OverlappingBeams((count - firstBeam + 2) / 3, seed: 977);
+            var lights = new SpotLight[count];
+            var reference = new Photometry.SpotLight[count];
+            var random = new Random(31);
+            int beam = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (i >= firstBeam && (i - firstBeam) % 3 == 0)
+                {
+                    lights[i] = beams.Lights[beam];
+                    reference[i] = beams.Reference[beam++];
+                    continue;
+                }
+
+                // Up-lights over the stage: in the view, but they light nothing below them.
+                var position = new Vector3(12f * random.NextSingle() - 6f, 8f * random.NextSingle() - 4f, 3f + 5f * random.NextSingle());
+                lights[i] = StageScene.Spot(position, position + Vector3.UnitZ, 500f + 1500f * random.NextSingle(), 12f, 18f, shadows: false);
+                reference[i] = new Photometry.SpotLight(lights[i].Position, lights[i].Direction, lights[i].PeakCandela,
+                    BeamDistribution.Create(lights[i].BeamType, lights[i].BeamAngle, lights[i].FieldAngle), LightColor.FromRec2020(lights[i].Color));
+            }
+
+            Assert.Equal(beams.Lights.Length, beam);
+            Assert.Equal(count - 1, firstBeam + 3 * (beam - 1)); // the last light is a beam
+            renderer.World.SetLights(lights);
+            var top = new TopDownView(Width, Height, 10f);
+            using var target = renderer.CreateTarget(Width, Height);
+            renderer.Render(target, top.Camera, new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux }, new PreviewSettings(), 0f);
+            var lux = renderer.ReadAnalysis(target);
+            var lists = renderer.ReadLightLists(target);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+
+            int listed = Math.Min(limit, count);
+            Assert.Equal(count, lists.Lights);
+            Assert.Equal(listed, lists.ListedLights);
+            Assert.Equal(listed < count, lists.HasOverflow);
+            int beamsAtOrigin = beams.LightsReaching(Vector3.Zero);
+            if (listed == count)
+                Assert.True(lists.MaxLightsInCluster >= beamsAtOrigin, $"busiest cluster {lists.MaxLightsInCluster}, {beamsAtOrigin} beams reach the origin");
+
+            var drawn = reference.AsSpan(0, listed).ToArray();
+            int lit = 0;
+            for (float y = -4f; y <= 4f; y += 0.61f)
+            {
+                for (float x = -6f; x <= 6f; x += 0.73f)
+                {
+                    var (px, py, point) = top.NearestPixel(new Vector3(x, y, 0f));
+                    float expected = LightMeter.IlluminanceAt(drawn, point, Vector3.UnitZ);
+                    if (expected < 5f)
+                        continue;
+                    lit++;
+                    Assert.True(MathF.Abs(lux[py * Width + px] - expected) <= 0.01f * expected,
+                        $"({x:F2}, {y:F2}): {lux[py * Width + px]:F1} lx, light meter of the first {listed} lights {expected:F1} lx");
+                }
+            }
+
+            Assert.True(lit > 100, $"{lit} lit sample points");
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    /// <summary>
+    /// Dark lights (dimmed to zero) light nothing, so they are neither listed in the clusters nor reported as missing
+    /// when they are beyond the clustered-light limit: a blacked-out fixture beyond the limit raises no warning. Once it
+    /// is lit, it is missing and reported.
+    /// </summary>
+    [SkippableFact]
+    public void DarkLightsBeyondTheLimitAreNotReportedAsMissing()
+    {
+        var renderer = CreateOrSkip(null, maxClusteredLights: 1);
+        try
+        {
+            var scene = new StageScene(renderer);
+            scene.Floor(30f, scene.Lambert(new Vector3(0.5f)), InstanceFlags.None);
+            var lit = StageScene.Spot(new Vector3(0f, 0f, 5f), Vector3.Zero, 2000f, 30f, 40f, shadows: false);
+            var dark = StageScene.Spot(new Vector3(1f, 0.5f, 5f), new Vector3(1f, 0.5f, 0f), 2000f, 30f, 40f, shadows: false);
+            dark.PeakCandela = 0f;
+            var top = new TopDownView(Width, Height, 10f);
+            var lux = new ViewOptions { ShowGrid = false, Overlay = OverlayMode.Lux };
+            var full = new ViewOptions { ShowGrid = false };
+            using var target = renderer.CreateTarget(Width, Height);
+
+            // The dark light sits at the lit one's position too (the same cluster), and inside the view.
+            var darkAtLit = lit;
+            darkAtLit.PeakCandela = 0f;
+            renderer.World.SetLights(new[] { lit, dark, darkAtLit });
+            foreach (var view in new[] { lux, full })
+            {
+                renderer.Render(target, top.Camera, view, new PreviewSettings(), 0f);
+                var lists = renderer.ReadLightLists(target);
+                Assert.Equal(new LightListDiagnostics(3, 1, 1, 0), lists);
+                Assert.False(lists.HasOverflow);
+            }
+
+            // Lit, the second light is missing from the view and reported.
+            dark.PeakCandela = 2000f;
+            renderer.World.SetLights(new[] { lit, dark, darkAtLit });
+            renderer.Render(target, top.Camera, lux, new PreviewSettings(), 0f);
+            Assert.True(renderer.ReadLightLists(target).HasOverflow);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
     /// <summary>The clustered-light limit is exact (not rounded to mask words) and clamped to 1 … 65 536.</summary>
     [SkippableTheory]
     [InlineData(0, 1)]

@@ -49,12 +49,15 @@ void clusterBounds(uint index, out vec3 bmin, out vec3 bmax)
     }
 }
 
-// Conservative test of a light's cone (cut-off angle, range) against the cluster bounds.
+// Conservative test of a light's cone (cut-off angle, range) against the cluster bounds. A dark light (range 0: its
+// range window is 0 everywhere) touches nothing, so it is neither listed nor, beyond the limit, reported as missing.
 bool lightTouches(Light light, vec3 bmin, vec3 bmax)
 {
+    float rangeSq = lightRangeSquared(light);
+    if (!(rangeSq > 0.0))
+        return false;
     vec3 position = (frame.view * vec4(light.position, 1.0)).xyz;
     vec3 direction = normalize(mat3(frame.view) * light.direction);
-    float rangeSq = lightRangeSquared(light);
     vec3 nearest = clamp(position, bmin, bmax);
     vec3 delta = nearest - position;
     if (dot(delta, delta) > rangeSq)

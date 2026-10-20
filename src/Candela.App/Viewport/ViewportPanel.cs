@@ -117,9 +117,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     private Vector2 _pressPosition;
     private string _statsText = "";
     private double _statsUpdatedAt = -1;
-    private string _lightWarning = "";
-    private LightListDiagnostics _lightWarningFor;
-    private string _lightWarningLanguage = "";
+    private readonly LightListWarningLabel _lightWarning = new();
     private string _title = "";
     private string _titleLanguage = "";
     private ViewDirection? _hoveredFace;
@@ -955,24 +953,45 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         var lists = _target?.LightLists ?? default;
         if (!lists.HasOverflow)
             return bottom;
-        if (lists != _lightWarningFor || _lightWarningLanguage != Loc.Language || _lightWarning.Length == 0)
-        {
-            _lightWarningFor = lists;
-            _lightWarningLanguage = Loc.Language;
-            _lightWarning = Icons.TriangleAlert + "  " + LightListWarningText(lists);
-        }
-
-        var size = ImGui.CalcTextSize(_lightWarning);
+        string warning = _lightWarning.For(lists);
+        var size = ImGui.CalcTextSize(warning);
         var pos = new Vector2(_imageMin.X + pad.X, bottom - size.Y);
         drawList.AddRectFilled(pos - new Vector2(6, 3) * scale, pos + size + new Vector2(6, 3) * scale,
             Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, 0.85f)), 4 * scale);
-        drawList.AddText(pos, Theme.U32(Theme.Warning), _lightWarning);
+        drawList.AddText(pos, Theme.U32(Theme.Warning), warning);
         return pos.Y - 9f * scale;
     }
 
     /// <summary>The warning of a view whose light lists overflowed, in the UI language (empty when nothing overflowed).</summary>
     internal static string LightListWarningText(in LightListDiagnostics lists) =>
         lists.HasOverflow ? Loc.Format(Str.ViewportLightListOverflow, lists.UnlistedLights, lists.Lights, lists.ListedLights) : "";
+
+    /// <summary>
+    /// The viewport's light-list warning line (icon + <see cref="LightListWarningText"/>), rebuilt only when the numbers
+    /// in it or the UI language change: the busiest cluster and the overflowed clusters of the diagnostics move with the
+    /// camera every frame, and building the text every frame would allocate in the frame loop.
+    /// </summary>
+    internal sealed class LightListWarningLabel
+    {
+        private string _text = "";
+        private (int Lights, int Listed) _for;
+        private string _language = "";
+
+        /// <summary>The warning line for <paramref name="lists"/> (empty when nothing overflowed).</summary>
+        public string For(in LightListDiagnostics lists)
+        {
+            if (!lists.HasOverflow)
+                return "";
+            if ((lists.Lights, lists.ListedLights) != _for || _language != Loc.Language || _text.Length == 0)
+            {
+                _for = (lists.Lights, lists.ListedLights);
+                _language = Loc.Language;
+                _text = Icons.TriangleAlert + "  " + LightListWarningText(lists);
+            }
+
+            return _text;
+        }
+    }
 
     /// <summary>Toolbar and overlay texts, rebuilt only when the language changes (no per-frame string building).</summary>
     private sealed class ToolbarLabels

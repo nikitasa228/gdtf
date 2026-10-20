@@ -47,6 +47,39 @@ public sealed class LightListWarningTests : IDisposable
         }
     }
 
+    /// <summary>
+    /// The warning line is built once per set of numbers in it: the busiest cluster and the overflowed clusters change
+    /// with the camera every frame, which must neither rebuild the text (no allocation in the frame loop) nor change it.
+    /// </summary>
+    [Fact]
+    public void TheWarningLineIsRebuiltOnlyWhenItsNumbersOrTheLanguageChange()
+    {
+        string language = Loc.Language;
+        try
+        {
+            Loc.SetLanguage("en");
+            var label = new ViewportPanel.LightListWarningLabel();
+            var lists = new LightListDiagnostics(Lights: 1295, ListedLights: 512, MaxLightsInCluster: 512, OverflowedClusters: 40);
+            string first = label.For(lists);
+            Assert.Contains("783 of 1295 lights are not drawn", first, StringComparison.Ordinal);
+            Assert.Same(first, label.For(lists with { MaxLightsInCluster = 300, OverflowedClusters = 7 }));
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            for (int i = 1; i <= 100; i++)
+                _ = label.For(lists with { MaxLightsInCluster = i, OverflowedClusters = i });
+            Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+
+            Assert.Equal("", label.For(lists with { OverflowedClusters = 0 }));
+            string more = label.For(lists with { Lights = 1300 });
+            Assert.Contains("788 of 1300 lights", more, StringComparison.Ordinal);
+            Loc.SetLanguage("ru");
+            Assert.Contains("Не отрисовано 788 из 1300", label.For(lists with { Lights = 1300 }), StringComparison.Ordinal);
+        }
+        finally
+        {
+            Loc.SetLanguage(language);
+        }
+    }
+
     [SkippableFact]
     public void The_viewport_and_the_log_warn_when_lights_are_beyond_the_clustered_limit()
     {
