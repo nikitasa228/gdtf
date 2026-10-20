@@ -938,17 +938,38 @@ public static class FixtureEvaluator
             }
             return;
         }
-        // a selection of a slot overrides an "out" range of another channel on the same mechanism, whichever came first;
-        // a selection that names no slot (a wheel-less prism, an index written as selection: DLW Dream L1400P
-        // "AnimationWheel1" 'Zero' … 'max Index' next to its rotation channel's 'Open') does not
-        bool selectsSlot = selection && (flags & ChannelSetFlags.WheelOut) == 0 && f.Wheel >= 0 && f.UsesSlotPosition;
+        // a selection of a slot holding an item overrides an "out" range — or a selection of an open slot — of another
+        // channel on the same mechanism, whichever came first (CLF Poseidon Wash XS: "Background Color" also written as
+        // Color1, at "ColorMix Activ"); a selection that names no slot (a wheel-less prism, an index written as selection:
+        // DLW Dream L1400P "AnimationWheel1" 'Zero' … 'max Index' next to its rotation channel's 'Open') does not
+        bool selectOut = selection && ((flags & ChannelSetFlags.WheelOut) != 0 || RestsOnOpenSlot(ctx.Profile, f, r.Value, flags));
+        bool selectsSlot = selection && !selectOut && f.Wheel >= 0 && f.UsesSlotPosition;
         if (selectsSlot && w.OutVote && !w.InVote)
         {
             w.Wheel = -1;
             w.Position = float.NaN;
         }
         int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
-        if (f.Wheel >= 0 && f.ImpliesInsertion && !(selection && (flags & ChannelSetFlags.WheelOut) != 0 && w.InVote)) w.Wheel = f.Wheel;
+        // the wheel a selection put in place stays the mechanism's wheel: an index or rotation function naming another
+        // wheel (Vari-Lite VL3600 "Gobo1Pos" on a second copy of the gobo wheel) turns the item, it does not swap wheels
+        if (f.Wheel >= 0 && f.ImpliesInsertion && (selectsSlot || !w.InVote)) w.Wheel = f.Wheel;
+        if (f.IndexesSelectedItem)
+        {
+            // an item index or rotation written as a wheel index or spin: turns the item, and moves the wheel only when
+            // no channel selects a slot
+            if (f.Class.Kind == AttributeKind.WheelSpin)
+            {
+                ref readonly var spin = ref ctx.SpinOf(c);
+                w.Rotation = Turn(spin.Position) * DegToRad;
+                w.RotationSpeed = (float)spin.Velocity * DegToRad;
+            }
+            else
+            {
+                w.Rotation = r.Value * DegToRad;
+                w.RotationSpeed = 0f;
+            }
+            if (w.InVote) return;
+        }
         switch (f.Class.Kind)
         {
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake:
@@ -956,7 +977,7 @@ public static class FixtureEvaluator
                     // a range named "Open", "Off", "Removed" … (WheelOut) takes the mechanism out of the beam — unless
                     // another channel selects a slot of it; a ramp after it moves a single-item mechanism in gradually
                     // (both found while the profile is compiled)
-                    bool isOut = (flags & ChannelSetFlags.WheelOut) != 0;
+                    bool isOut = selectOut;
                     if (isOut && w.InVote) break; // an item another channel selects stays in
                     float insertion = float.NaN;
                     if (isOut)
@@ -1060,6 +1081,21 @@ public static class FixtureEvaluator
                 SetInsertion(ref w, (flags & ChannelSetFlags.WheelOut) != 0 ? 0f : Level(f, r.Value));
                 break;
         }
+    }
+
+    /// <summary>
+    /// True when slot selection <paramref name="f"/> rests exactly on an open slot of its wheel at slot position
+    /// <paramref name="position"/> (not between slots, not on a ramp or cycle, which move a single item instead).
+    /// </summary>
+    private static bool RestsOnOpenSlot(FixtureProfile p, ProfileFunction f, float position, ChannelSetFlags flags)
+    {
+        if (f.Wheel < 0 || !f.UsesSlotPosition || !float.IsFinite(position) ||
+            (flags & (ChannelSetFlags.InsertionRamp | ChannelSetFlags.InsertionCycle)) != 0)
+            return false;
+        float k = MathF.Round(position);
+        if (MathF.Abs(position - k) > 1e-3f || MathF.Abs(k) > 1e6f) return false;
+        var wheel = p.WheelArray[f.Wheel];
+        return wheel.SlotOpenArray[wheel.WrapIndex((int)k - 1)];
     }
 
     /// <summary>

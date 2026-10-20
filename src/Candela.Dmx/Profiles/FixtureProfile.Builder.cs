@@ -48,6 +48,7 @@ public sealed partial class FixtureProfile
         private readonly Dictionary<ChainKey, int> _instanceIndex = new();
         private readonly Dictionary<DmxChannel, List<int>> _instancesOf = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<Wheel, int> _wheelIndex = new(ReferenceEqualityComparer.Instance);
+        private Dictionary<Wheel, WheelFamily>? _wheelFamilies;
         private readonly Dictionary<string, int> _emitterIndex = new(StringComparer.Ordinal);
         private readonly Dictionary<BeamGeometry, BeamSolidAngleTable> _solidAngleCache = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<string, WhiteEfficiencyTable?> _whiteTables = new(StringComparer.Ordinal);
@@ -999,6 +1000,8 @@ public sealed partial class FixtureProfile
         private int WheelIndexOf(Wheel wheel, WheelFamily family)
         {
             if (_wheelIndex.TryGetValue(wheel, out int i)) return i;
+            // a function of no wheel family can name the wheel first (Infinity Furion "NO FUNCTION" before "Prism1")
+            if (family == WheelFamily.None) family = WheelFamilyOf(wheel);
             int n = Math.Max(1, wheel.Slots.Count);
             var transmission = new Vector3[n];
             var facets = new int[n];
@@ -1029,11 +1032,18 @@ public sealed partial class FixtureProfile
                 if (facets[s] == 1) facets[s] = 0;
                 bool media = slot.MediaPath is not null || slot.MediaFileName is not null;
                 bool defaultColour = y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f;
+                // a slot that carries a filter colour is a filter whatever its name ("No Color Pink", x 0.44 y 0.33); a
+                // transmission of 0 is no colour data (CLF LEDBar Pro "No Function": x 0.64 y 0.33 Y 0)
+                bool neutral = defaultColour || !(float.IsFinite(c.X) && float.IsFinite(c.Y)) || !(y > 0.001f) ||
+                    (y >= 0.9f && MathF.Abs(c.X - 0.3127f) < 0.03f && MathF.Abs(c.Y - 0.329f) < 0.03f);
+                // prism slots keep GDTF's default colour too: one named as a prism is a prism even without facets
+                // (Infinity Furion "Prism", Chauvet Rogue R3 "Prism Insert", Vari-Lite VL2600 "Prism On")
+                bool namedItem = family == WheelFamily.Prism && NameParsing.NamesPrism(slot.Name);
                 open[s] = slot.Facets.Count <= 1 && slot.AnimationSystem is null && facets[s] == 0 &&
                     (media
                         ? NameParsing.IsPlainOpenSlotName(slot.Name) || IsOpenMediaName(slot.MediaFileName)
-                        : NameParsing.IsOpenSlotName(slot.Name) || (defaultColourIsOpen && defaultColour) ||
-                            (NameParsing.IsWheelOutName(slot.Name) && !slot.Name.Contains("clos", StringComparison.OrdinalIgnoreCase)));
+                        : NameParsing.IsOpenSlotName(slot.Name) || (defaultColourIsOpen && defaultColour && !namedItem) ||
+                            (NameParsing.IsWheelOutName(slot.Name) && neutral && !slot.Name.Contains("clos", StringComparison.OrdinalIgnoreCase)));
                 // an open slot is a hole: files often store the lamp's own colour there, which is not a filter
                 if (open[s] && y >= 0.9f) transmission[s] = Vector3.One;
                 // a beam-shaper slot without an image is an anamorphic lens that stretches the beam (Ayrton Rivale)
@@ -1043,6 +1053,21 @@ public sealed partial class FixtureProfile
             Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open, stretch, colourXyz));
             _wheelIndex[wheel] = i;
             return i;
+        }
+
+        /// <summary>The wheel family of the first function of the mode with a wheel attribute that names <paramref name="wheel"/>.</summary>
+        private WheelFamily WheelFamilyOf(Wheel wheel)
+        {
+            if (_wheelFamilies is null)
+            {
+                _wheelFamilies = new Dictionary<Wheel, WheelFamily>(ReferenceEqualityComparer.Instance);
+                foreach (var channel in Mode.Channels)
+                    foreach (var lc in channel.LogicalChannels)
+                        foreach (var fn in lc.Functions)
+                            if (fn.Wheel is { } w && Classify(fn.AttributeName ?? "").Wheel is var f && f != WheelFamily.None)
+                                _wheelFamilies.TryAdd(w, f);
+            }
+            return _wheelFamilies.GetValueOrDefault(wheel);
         }
 
         /// <summary>A media file named as an open aperture ("Open", "open_1", "Open-2"): the slot is a hole.</summary>
@@ -1325,9 +1350,9 @@ public sealed partial class FixtureProfile
         }
 
         /// <summary>
-        /// Marks <see cref="ProfileFunction.SecondarySelection"/>: slot selections on a channel that selects no slot of
-        /// their mechanism while another channel reaching the same beams does. One pass over the functions, keyed by
-        /// mechanism (state array and number).
+        /// Marks <see cref="ProfileFunction.SecondarySelection"/> and <see cref="ProfileFunction.IndexesSelectedItem"/>: slot
+        /// selections and whole-wheel indexes or spins on a channel that selects no slot of their mechanism while another
+        /// channel reaching the same beams does. One pass over the functions, keyed by mechanism (state array and number).
         /// </summary>
         private void MarkSecondarySelections()
         {
@@ -1351,12 +1376,20 @@ public sealed partial class FixtureProfile
                 for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
                 {
                     var f = Functions[k];
-                    if (!IsWheelSelection(f.Class.Kind) || !selecting.TryGetValue(MechanismKey(f.Class), out var list) || list.Contains(ch.Index)) continue;
+                    bool select = IsWheelSelection(f.Class.Kind), index = f.Class.Kind is AttributeKind.WheelIndex or AttributeKind.WheelSpin;
+                    if (!(select || index) || !selecting.TryGetValue(MechanismKey(f.Class), out var list) || list.Contains(ch.Index)) continue;
                     foreach (int other in list)
                     {
                         if (!BeamsOverlap(ch.Index, other)) continue;
-                        f.SecondarySelection = true;
-                        f.ImpliesInsertion = false;
+                        if (select)
+                        {
+                            f.SecondarySelection = true;
+                            f.ImpliesInsertion = false;
+                        }
+                        else
+                        {
+                            f.IndexesSelectedItem = true;
+                        }
                         break;
                     }
                 }

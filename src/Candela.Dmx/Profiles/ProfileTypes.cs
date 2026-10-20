@@ -312,6 +312,15 @@ public sealed class ProfileFunction
     internal bool SecondarySelection { get; set; }
 
     /// <summary>
+    /// For whole-wheel index and spin functions on a channel without any slot selection of the mechanism, while another
+    /// channel of the same beams selects its slots: the file wrote the index or rotation of a rotating gobo as a wheel
+    /// index or spin (LIGHT_SKY F420BSW "Gobo2WheelIndex" on the "Gobo2Pos" channel, Flash "Shape index", ADJ Focus Hybrid
+    /// "Gobo1WheelSpin" "Clockwise Gobo Rotation"). While a slot is selected it turns the selected item instead of moving
+    /// the wheel off it (at DMX 0 such a channel would otherwise put every wheel back on its first slot).
+    /// </summary>
+    internal bool IndexesSelectedItem { get; set; }
+
+    /// <summary>
     /// For slot selections on a wheel that holds a single item (one slot, or an open slot and one item: Cameo Oron H2
     /// "Open" + "Animation Wheel"): the 1-based slot of that item, which insertion ramps and cycles move in and out of the
     /// beam; 0 otherwise.

@@ -33,6 +33,7 @@ public partial class WheelInsertionTests(ITestOutputHelper output)
         ["Brighter@Pixel_Strobe"] = "a wheel-less animation channel without an out range",
         ["Chauvet_Professional@Maverick_Storm_4_Profile"] = "the animation wheel channel is 'Min' … 'Max' only (no out range)",
         ["Chauvet_Professional@Maverick_Storm_4_SoloWash"] = "the animation channel is 'Min' … 'Max' only (no out range)",
+        ["Chauvet_Professional@Rogue_R3_Beam"] = "19Ch Mode: the prism channels' only function is 'Prism Insert' from DMX 5, their default",
         ["Cyclops_Lighting@Aquaray_500_SBW"] = "a wheel-less gobo channel whose default is 'Safe', not an out range",
         ["Elation@Fuze_Max_Spot"] = "the default DMX 8 is 'Animation Min to Max'",
         ["Elation@Platinum_FLX"] = "a wheel-less animation channel without an out range",

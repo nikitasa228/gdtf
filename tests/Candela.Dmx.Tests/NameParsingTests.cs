@@ -21,6 +21,9 @@ public class NameParsingTests
     [InlineData("Wheel Slot 0 OFF")]
     [InlineData("Animator OPEN")]
     [InlineData("Empty")]
+    [InlineData("No color")]
+    [InlineData("No Colour")]
+    [InlineData("No Color 1")]
     public void Out_of_beam_names(string name) => Assert.True(NameParsing.IsWheelOutName(name), name);
 
     [Theory]
@@ -38,7 +41,27 @@ public class NameParsingTests
     [InlineData("Strobe off")]
     [InlineData("Animation 1")]
     [InlineData("Beam Shaper")]
+    // Roscolux "No Color …" gels on colour wheels and virtual colour wheels (Astera, Chauvet COLOrado, CLF, Ayrton Zonda)
+    [InlineData("No Colour Blue")]
+    [InlineData("No Color Pink")]
+    [InlineData("NO COLOR STRAW")]
+    [InlineData("No color Blue L144")]
     public void In_beam_or_neutral_names(string? name) => Assert.False(NameParsing.IsWheelOutName(name), name ?? "null");
+
+    [Theory]
+    [InlineData("Prism", true)]
+    [InlineData("Prism 2", true)]
+    [InlineData("Prism Insert", true)]
+    [InlineData("Prism On", true)]
+    [InlineData("Both Prisms", true)]
+    [InlineData("6 facet linear", true)]
+    [InlineData("Open prism", false)]
+    [InlineData("No prism", false)]
+    [InlineData("Prism 1 OPEN", false)]
+    [InlineData("Open", false)]
+    [InlineData("Frost", false)]
+    [InlineData(null, false)]
+    public void Prism_slot_names(string? name, bool prism) => Assert.Equal(prism, NameParsing.NamesPrism(name));
 
     [Theory]
     [InlineData("Open", true)]

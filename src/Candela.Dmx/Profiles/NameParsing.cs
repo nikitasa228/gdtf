@@ -410,12 +410,24 @@ public static class NameParsing
         {
             if (s.StartsWith(prefix, StringComparison.Ordinal)) return true;
         }
+        // "No Color Blue", "No Colour Straw", "No Color Pink" are gels (Roscolux), not the absence of a filter ("No Color 1")
+        if (IsNoColorGel(s)) return false;
         // "No Flower Effect", "No selection" — but "No rotation", "No shake" only stop a movement of a selected item
         if (s.StartsWith("no ", StringComparison.Ordinal) &&
             !ContainsAny(s, "rot", "shake", "spin", "mov", "speed", "strobe", "flash", "fade", "index", "scroll", "random"))
             return true;
         // "Animation Rotation OFF", "Wheel Slot 0 OFF": the mechanism is switched off (but "Shake off" only stops a shake)
         return LastWordIs(s, "off") && !ContainsAny(s, "/", "+", "&", "shake", "strobe", " on");
+    }
+
+    /// <summary>True for a lower-case gel name of the Roscolux "No Color …" series ("no color blue", "no colour straw l144").</summary>
+    private static bool IsNoColorGel(string s)
+    {
+        string? rest = s.StartsWith("no colour", StringComparison.Ordinal) ? s[9..] : s.StartsWith("no color", StringComparison.Ordinal) ? s[8..] : null;
+        if (rest is null || rest.Length == 0 || char.IsLetter(rest[0])) return false; // "no colors", "no colourful"
+        foreach (char c in rest)
+            if (char.IsLetter(c)) return true;
+        return false;
     }
 
     /// <summary>Lower-case beginnings of range names that take a mechanism out of the beam ("Off (no rotation)", "No function").</summary>
@@ -448,6 +460,16 @@ public static class NameParsing
         int start = end;
         while (start > 0 && char.IsLetter(s[start - 1])) start--;
         return s.AsSpan(start, end - start).SequenceEqual(word);
+    }
+
+    /// <summary>
+    /// True when a prism-wheel slot name names a prism ("Prism", "Prism 2", "Prism Insert", "Both Prisms", "6 facet"),
+    /// not an open position ("Open prism", "No prism", "Prism 1 OPEN").
+    /// </summary>
+    internal static bool NamesPrism(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name) || IsOpenSlotName(name) || IsWheelOutName(name)) return false;
+        return name.Contains("prism", StringComparison.OrdinalIgnoreCase) || name.Contains("facet", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
