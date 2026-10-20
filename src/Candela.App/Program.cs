@@ -35,6 +35,9 @@ internal static class Program
         if (options.ConfigDirectory is { Length: > 0 } configDir)
             Environment.SetEnvironmentVariable("CANDELA_CONFIG_DIR", Path.GetFullPath(configDir));
 
+        // The editor's own model imports (when the import worker is unavailable) from a program folder the ANSI code
+        // page cannot spell (a per-user install under C:\Users\Иван\…).
+        Candela.Engine.AssimpProgramFolder.Prepare();
         bool interactive = !options.IsScreenshotMode;
         using var log = new AppLog { ConsoleLevel = options.IsScreenshotMode ? LogLevel.Info : LogLevel.Warning };
         log.OpenFile(AppFolders.LogFile);

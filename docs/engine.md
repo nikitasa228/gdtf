@@ -159,7 +159,11 @@ never in the program folder (read-only under Program Files). `CountGdtfFiles`, `
 (case-insensitive on Windows and macOS) are the small helpers the editor's library window uses; `IsInProgramFolder`
 tells the editor's save dialogs not to start in the program folder (the installed sample scene's folder). A configured
 library folder that does not exist — an unplugged drive, an offline network share — is named in an
-`engine.library-missing` warning at start-up even though the starter fixtures exist.
+`engine.library-missing` warning at start-up even though the starter fixtures exist. `AssimpProgramFolder.Prepare()`
+(called by the import worker and the editor at start-up) loads `assimp.dll` by its bare name when the program folder
+has non-ASCII characters: AssimpNet loads it with `LoadLibraryA` and the full path, which a Windows whose ANSI code
+page cannot spell the folder (a per-user install under `C:\Users\Иван`, Cyrillic folder names on a Western Windows)
+turns into question marks — every OBJ/FBX/COLLADA/3DS import failed there.
 
 The CLI builds its engine with `StageEngineOptions.FromSettings(AppSettings.Load(), --library folders)`, so
 `candela info scene.mvr` sees the same library as the editor; `candela info file.gdtf` reads the specs found the

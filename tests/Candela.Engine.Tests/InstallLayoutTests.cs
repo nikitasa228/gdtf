@@ -318,6 +318,29 @@ public sealed class InstallLayoutTests : IDisposable
     }
 
     [Fact]
+    public void Assimp_is_loaded_by_its_bare_name_only_from_a_windows_folder_the_ansi_code_page_may_not_spell()
+    {
+        // Review regression (seen under Wine with the Western code page): from C:\Program Files\Тест\Candela the import
+        // worker failed with "Assimp is not available: module not found" — AssimpNet loads the library with LoadLibraryA
+        // and the full path of the program folder.
+        string cyrillic = MakeFolder("Программы", "Candela");
+        string ascii = MakeFolder("Programs", "Candela");
+        string empty = MakeFolder("Пусто");
+        File.WriteAllText(Path.Combine(cyrillic, AssimpProgramFolder.LibraryFileName), "");
+        File.WriteAllText(Path.Combine(ascii, AssimpProgramFolder.LibraryFileName), "");
+
+        Assert.True(AssimpProgramFolder.NeedsBareNameLoad(cyrillic, windows: true));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad(cyrillic, windows: false));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad(ascii, windows: true));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad(empty, windows: true)); // development layout: not next to the program
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad("", windows: true));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad("\0bad", windows: true));
+        // nothing to do in this (non-Windows or ASCII) test host
+        if (!OperatingSystem.IsWindows())
+            Assert.False(AssimpProgramFolder.Prepare());
+    }
+
+    [Fact]
     public void Counting_gdtf_files_reads_only_the_folder_itself_and_never_throws()
     {
         string folder = MakeFolder("count");
