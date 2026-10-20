@@ -147,6 +147,68 @@ public sealed class AmbientAndReferenceTests
     }
 
     [SkippableFact]
+    public void The_path_tracer_shows_a_reference_drawing_to_the_camera_only()
+    {
+        // A drawing at 60 % hangs 1 m over a grey floor under a spot. The final render shows the image as the real-time
+        // view does (the base colour as a display value) over 40 % of the floor, and the floor under it is lit as if the
+        // drawing were not there: it neither shadows nor reflects light.
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var world = renderer.World;
+            var floor = TopDownView.WhiteLambertian();
+            floor.BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+            FinalRenderSupport.Floor(world, floor, 8f);
+            world.SetLights([StageSceneLights.Overhead(4000f)]);
+            world.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+            var images = new SceneTests.ImageSource { ["drawing"] = Quadrants() };
+            var plane = world.CreateMesh(ProceduralMeshes.Plane(2f, 2f));
+            var material = world.CreateMaterial(Drawing(0.6f), images);
+            var at = Matrix4x4.CreateTranslation(0f, 0f, 1f);
+            var drawing = world.CreateInstance(plane, new[] { material }, at, InstanceFlags.Reference, 1);
+            const int size = 48;
+            var view = new TopDownView(size, size, 3f);
+            var settings = FinalRenderSupport.Settings(size, size, 64, bounces: 3);
+            var options = new FinalRenderOptions { BackgroundLuminance = 0f };
+
+            HdrImage withDrawing, floorOnly;
+            float exposure;
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, settings, options))
+            {
+                exposure = render.Exposure;
+                withDrawing = FinalRenderSupport.Luminance(render.ResultHdr(), render.Exposure);
+                FinalRenderSupport.Save(render, "pt-reference-drawing");
+            }
+
+            world.UpdateInstance(drawing, at, InstanceFlags.Reference | InstanceFlags.Hidden);
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, settings, options))
+            {
+                Assert.Equal(exposure, render.Exposure);
+                floorOnly = FinalRenderSupport.Luminance(render.ResultHdr(), render.Exposure);
+            }
+
+            for (int q = 0; q < 4; q++)
+            {
+                var (x, y, _) = view.NearestPixel(QuadrantPoints[q] + new Vector3(0f, 0f, 1f));
+                var floorColor = floorOnly.MeanColor(x, y, 2);
+                Assert.True(ColorSpaces.LuminanceRec2020(floorColor) > 1f, $"quadrant {q}: the floor is not lit ({floorColor})");
+                var expected = ColorSpaces.Rec709ToRec2020(QuadrantColors[q]) * 0.6f / exposure + 0.4f * floorColor;
+                var measured = withDrawing.MeanColor(x, y, 2);
+                Assert.True(Vector3.Distance(measured, expected) <= 0.05f * expected.Length(), $"final render, quadrant {q}: {measured} instead of {expected}");
+            }
+
+            // Beside the drawing the floor is the same with and without it (no light reflected from it, no shadow).
+            var (sx, sy, _) = view.NearestPixel(new Vector3(1.3f, 0f, 0f));
+            Assert.InRange(withDrawing.MeanLuminance(sx, sy, 1), floorOnly.MeanLuminance(sx, sy, 1) * 0.95f, floorOnly.MeanLuminance(sx, sy, 1) * 1.05f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void The_ambient_luminance_lights_surfaces_in_the_full_view()
     {
         var renderer = TestRenderers.CreateOrSkip();

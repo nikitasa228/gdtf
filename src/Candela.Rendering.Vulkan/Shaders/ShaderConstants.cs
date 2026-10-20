@@ -71,6 +71,12 @@ internal static class ShaderConstants
     public const uint BindingPtInput = 9;
     public const uint PtBindingCount = 10;
 
+    /// <summary>
+    /// Opacity of reference instances (<see cref="InstanceFlags.Reference"/>) whose material is not alpha-blended (ghost
+    /// geometry), in the real-time view and the path tracer; a blended material (an imported drawing) brings its own.
+    /// </summary>
+    public const float ReferenceOpacity = 0.5f;
+
     /// <summary>Cull-mask bit of the path tracer's light discs (the emitting lens of each spot light).</summary>
     public const uint PtMaskDisc = 0x02;
 
@@ -298,6 +304,9 @@ internal static class ShaderConstants
         ("BINDING_PT_INPUT", I(BindingPtInput)),
         ("PT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
         ("PT_MASK_SHADOW", I(RayTracingScene.ShadowCasterMask) + "u"),
+        ("PT_MASK_REFERENCE", I(RayTracingScene.ReferenceMask) + "u"),
+        ("RT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
+        ("REFERENCE_OPACITY", F(ReferenceOpacity)),
         ("PT_MASK_DISC", I(PtMaskDisc) + "u"),
         ("PT_MASK_LIGHT_VOLUME", I(PtMaskLightVolume) + "u"),
         ("PT_CUSTOM_DISC", I(PtCustomDisc) + "u"),

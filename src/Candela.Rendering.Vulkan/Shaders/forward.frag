@@ -24,10 +24,6 @@ layout(location = 5) flat in uint inMaterial;
 
 layout(location = 0) out vec4 outColor;
 
-// Opacity of reference instances (InstanceFlags.Reference: unlit, semi-transparent) whose material is not alpha-blended
-// (ghost geometry); a blended material, such as an imported reference drawing, brings its own opacity.
-const float REFERENCE_OPACITY = 0.5;
-
 // Joint bilateral upsampling of the reduced-resolution indirect irradiance: the four nearest low-resolution samples,
 // bilinear weights times a view-depth similarity weight (samples on other surfaces do not bleed across edges).
 vec3 indirectIrradiance(float viewDepth)

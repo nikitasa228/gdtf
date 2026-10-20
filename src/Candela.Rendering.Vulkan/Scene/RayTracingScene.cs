@@ -5,10 +5,12 @@ namespace Candela.Rendering.Vulkan;
 /// <summary>
 /// Acceleration structures of the world for ray queries (devices with <see cref="DeviceCapabilities.RayTracing"/>):
 /// one bottom-level structure per mesh (one geometry per sub-mesh, built from the mesh's own vertex/index buffer the
-/// first time the mesh is needed; released when the mesh is destroyed), the instance list of the visible, non-reference
-/// instances, a geometry table that lets the shaders fetch vertices and materials of a hit (buffer device addresses,
-/// sub-mesh → material slot), and the top-level structure over the instances that the ray-traced GI traces. The path
-/// tracer composes its own top-level structure from <see cref="Instances"/> plus its light geometry. Main thread only.
+/// first time the mesh is needed; released when the mesh is destroyed), the instance list of the visible instances, a
+/// geometry table that lets the shaders fetch vertices and materials of a hit (buffer device addresses, sub-mesh →
+/// material slot), and the top-level structure over the instances that the ray-traced GI traces. Reference instances
+/// (<see cref="InstanceFlags.Reference"/>: drawings, ghost geometry) carry only <see cref="ReferenceMask"/>, so only rays
+/// that ask for them (the path tracer's camera rays) see them; they neither occlude nor reflect light. The path tracer
+/// composes its own top-level structure from <see cref="Instances"/> plus its light geometry. Main thread only.
 /// </summary>
 internal sealed unsafe class RayTracingScene : IDisposable
 {
@@ -20,6 +22,12 @@ internal sealed unsafe class RayTracingScene : IDisposable
     /// <see cref="SceneMask"/>: shadow rays of the path tracer test only these, like the real-time shadow maps.
     /// </summary>
     public const byte ShadowCasterMask = 0x08;
+
+    /// <summary>
+    /// Cull-mask bit of reference instances (<see cref="InstanceFlags.Reference"/>), alone: they are shown to the camera
+    /// (the path tracer's camera rays include this bit) and are invisible to every ray that carries light.
+    /// </summary>
+    public const byte ReferenceMask = 0x10;
 
     private readonly VulkanContext _context;
     private readonly VulkanRenderWorld _world;
@@ -60,7 +68,8 @@ internal sealed unsafe class RayTracingScene : IDisposable
 
     /// <summary>
     /// The traceable instances of the last <see cref="PrepareGeometry"/> (custom index = instance slot, mask
-    /// <see cref="SceneMask"/>, plus <see cref="ShadowCasterMask"/> for shadow casters).
+    /// <see cref="SceneMask"/>, plus <see cref="ShadowCasterMask"/> for shadow casters; <see cref="ReferenceMask"/> alone
+    /// for reference instances).
     /// </summary>
     public ReadOnlySpan<TlasInstance> Instances => _instances.AsSpan(0, InstanceCount);
 
@@ -117,7 +126,9 @@ internal sealed unsafe class RayTracingScene : IDisposable
                 continue;
             if (count == _instances.Length)
                 Array.Resize(ref _instances, _instances.Length * 2);
-            byte mask = (instance.Flags & InstanceFlags.CastShadow) != 0 ? (byte)(SceneMask | ShadowCasterMask) : SceneMask;
+            byte mask = (instance.Flags & InstanceFlags.Reference) != 0 ? ReferenceMask
+                : (instance.Flags & InstanceFlags.CastShadow) != 0 ? (byte)(SceneMask | ShadowCasterMask)
+                : SceneMask;
             _instances[count++] = TlasInstance.Create(instance.World, (uint)index, mask, blas.Address);
             var mesh = instance.Mesh;
             int header = index * 8;
@@ -192,7 +203,7 @@ internal sealed unsafe class RayTracingScene : IDisposable
     }
 
     private static bool Traceable(InstanceRecord instance) =>
-        (instance.Flags & (InstanceFlags.Hidden | InstanceFlags.Reference)) == 0 && !instance.Mesh.Destroyed && instance.Mesh.Geometry is not null &&
+        (instance.Flags & InstanceFlags.Hidden) == 0 && !instance.Mesh.Destroyed && instance.Mesh.Geometry is not null &&
         instance.Mesh.IndexCount > 0;
 
     private void ReleaseDestroyedMeshes()

@@ -95,7 +95,7 @@ void main()
     {
         vec3 dir = cosineDirection(N, hashToUnit(seed + 2u * r), hashToUnit(seed ^ (0x68bc21ebu + 2u * r + 1u)));
         rayQueryEXT query;
-        rayQueryInitializeEXT(query, sceneTlas, gl_RayFlagsOpaqueEXT, 0xFFu, origin, 0.0, dir, RT_MAX_DISTANCE);
+        rayQueryInitializeEXT(query, sceneTlas, gl_RayFlagsOpaqueEXT, RT_MASK_SCENE, origin, 0.0, dir, RT_MAX_DISTANCE);
         while (rayQueryProceedEXT(query))
         {
         }

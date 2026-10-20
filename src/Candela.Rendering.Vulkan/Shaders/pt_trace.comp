@@ -349,7 +349,10 @@ bool lensBehind(vec3 o, vec3 d, float tSurface, uint skipLight, out float tLens,
 // Closest surface or lens along the ray in [0, tMax]; alpha holes and blended surfaces are crossed stochastically, and
 // surfaces within a lens's clearance in front of it are crossed (lensBehind), as next-event estimation crosses them.
 // skipLight: the lens the ray has just passed (a ray meets a lens polygon once; numerically it could meet it again).
-PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
+// camera: the ray is seen by the camera (nothing has scattered yet), so it also meets reference instances (drawings,
+// ghost geometry: PT_MASK_REFERENCE), crossed stochastically by their opacity — a blended material's own alpha, any
+// other REFERENCE_OPACITY, as the real-time view blends them.
+PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, bool camera, inout uint rng)
 {
     PtHit hit;
     hit.kind = HIT_NONE;
@@ -363,7 +366,8 @@ PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
     for (int layer = 0; layer < PT_MAX_LAYERS; ++layer)
     {
         rayQueryEXT q;
-        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_SCENE | PT_MASK_DISC, o, tMin, d, tMax);
+        uint mask = PT_MASK_SCENE | PT_MASK_DISC | (camera ? PT_MASK_REFERENCE : 0u);
+        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, mask, o, tMin, d, tMax);
         while (rayQueryProceedEXT(q))
         {
             if (rayQueryGetIntersectionTypeEXT(q, false) == gl_RayQueryCandidateIntersectionTriangleEXT)
@@ -391,10 +395,14 @@ PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
         uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(q, true));
         vec2 bary = rayQueryGetIntersectionBarycentricsEXT(q, true);
         Material m = materials[rtMaterialIndex(custom, geometry)];
-        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
+        bool reference = (instances[custom].flags & INSTANCE_FLAG_REFERENCE) != 0u;
+        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u || reference)
         {
-            RtSurface s = rtFetchSurface(custom, geometry, primitive, bary);
-            float coverage = coverageOf(m, s.uv);
+            float coverage = 1.0;
+            if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
+                coverage = coverageOf(m, rtFetchSurface(custom, geometry, primitive, bary).uv);
+            if (reference && (m.flags & MATERIAL_ALPHA_BLEND) == 0u)
+                coverage *= REFERENCE_OPACITY;
             if (coverage < 1.0 && rand(rng) >= coverage)
             {
                 tMin = t + max(1e-4, 1e-5 * t);
@@ -1035,7 +1043,7 @@ void main()
 
     for (int iteration = 0; iteration < PT_MAX_ITERATIONS; ++iteration)
     {
-        PtHit hit = traceSurface(o, d, PT_FAR, passedLens, rng);
+        PtHit hit = traceSurface(o, d, PT_FAR, passedLens, visible, rng);
         float tEnd = hit.kind == HIT_NONE ? PT_FAR : hit.t;
         bool scattered = surfaceBounces + volumeVertices > 0u;
 
@@ -1188,9 +1196,10 @@ void main()
 
         vec3 V = -d;
         vec3 albedo = albedoAt(m, s.uv);
-        if ((m.flags & MATERIAL_UNLIT) != 0u)
+        if ((m.flags & MATERIAL_UNLIT) != 0u || (instances[hit.instance].flags & INSTANCE_FLAG_REFERENCE) != 0u)
         {
-            // display-referred base colour (as in the real-time view), seen directly only
+            // display-referred base colour (as in the real-time view), seen directly only; reference instances (only
+            // camera rays meet them, see traceSurface) are unlit whatever their material
             if (visible)
                 radiance += beta * albedo * params.majorants.w;
             break;
