@@ -129,7 +129,9 @@ public class ColorBalanceTests
             Emitter[] emitters = white
                 ?
                 [
-                    new("R", r, Flux()), new("G", g, Flux()), new("B", b, Flux()),
+                    new("R", r, Flux()),
+                    new("G", g, Flux()),
+                    new("B", b, Flux()),
                     Emitter.FromXy("W", 0.30f + 0.05f * rng.NextSingle(), 0.31f + 0.05f * rng.NextSingle(), Flux()),
                 ]
                 : [new("R", r, Flux()), new("G", g, Flux()), new("B", b, Flux())];
