@@ -70,4 +70,10 @@ public sealed record SmokeWorkerOptions
 
     /// <summary>Where the measured cost per cell is kept (the process-wide model; tests pass their own).</summary>
     internal SmokeCostModel CostModel { get; init; } = SmokeCostModel.Shared;
+
+    /// <summary>Shortest wall-clock time on a grid before it is coarsened, s.</summary>
+    internal double CoarsenInterval { get; init; } = 2.0;
+
+    /// <summary>Shortest wall-clock time on a grid before it is refined, s (refining is never urgent).</summary>
+    internal double RefineInterval { get; init; } = 5.0;
 }

@@ -97,7 +97,8 @@ public sealed class SmokeFrame
         if (!float.IsFinite(point.X) || !float.IsFinite(point.Y) || !float.IsFinite(point.Z) || !Bounds.Contains(point))
             return 0f;
         var g = (point - _origin) * _invH;
-        return _hasSolids ? SampleSkippingSolids(g) : Trilinear(g.X - 0.5f, g.Y - 0.5f, g.Z - 0.5f);
+        float x = g.X - 0.5f, y = g.Y - 0.5f, z = g.Z - 0.5f;
+        return _hasSolids ? SampleSkippingSolids(x, y, z) : Trilinear(x, y, z);
     }
 
     /// <summary>Copies <see cref="Density"/> into <paramref name="destination"/> (length ≥ <see cref="CellCount"/>).</summary>
@@ -214,17 +215,19 @@ public sealed class SmokeFrame
     }
 
     /// <summary>
-    /// Trilinear interpolation at grid position <paramref name="g"/> that skips solid corners and renormalises the
-    /// remaining weights (0 inside a solid cell or when every corner is solid) — the arithmetic of the simulation's own
-    /// sampling, so both give the same value.
+    /// Trilinear interpolation at sample coordinates (<paramref name="sx"/>, <paramref name="sy"/>, <paramref name="sz"/>)
+    /// that skips solid corners and renormalises the remaining weights (0 inside a solid cell or when every corner is
+    /// solid) — the simulation's own sampling, step by step, so both give the same value (except exactly on an open face
+    /// of the box, where the simulation reads ambient air).
     /// </summary>
-    private float SampleSkippingSolids(Vector3 g)
+    private float SampleSkippingSolids(float sx, float sy, float sz)
     {
         int nx = SizeX, ny = SizeY, nz = SizeZ;
-        int ci = (int)ClampCoord(g.X, nx - 1), cj = (int)ClampCoord(g.Y, ny - 1), ck = (int)ClampCoord(g.Z, nz - 1);
+        float px = sx + 0.5f, py = sy + 0.5f, pz = sz + 0.5f;
+        int ci = (int)ClampCoord(px, nx - 1), cj = (int)ClampCoord(py, ny - 1), ck = (int)ClampCoord(pz, nz - 1);
         if (_solid[ci + nx * (cj + ny * ck)] != 0)
             return 0f;
-        float x = ClampCoord(g.X - 0.5f, nx - 1), y = ClampCoord(g.Y - 0.5f, ny - 1), z = ClampCoord(g.Z - 0.5f, nz - 1);
+        float x = ClampCoord(px - 0.5f, nx - 1), y = ClampCoord(py - 0.5f, ny - 1), z = ClampCoord(pz - 0.5f, nz - 1);
         int i0 = (int)x, j0 = (int)y, k0 = (int)z;
         int di = i0 < nx - 1 ? 1 : 0, dj = j0 < ny - 1 ? nx : 0, dk = k0 < nz - 1 ? nx * ny : 0;
         float fx = x - i0, fy = y - j0, fz = z - k0;

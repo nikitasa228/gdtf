@@ -35,16 +35,16 @@ public sealed class SmokeWorker : IDisposable
     private const int MinCellsPerAxis = 8;
 
     /// <summary>Sub-steps on a new grid that are not measured (just-in-time compilation, cold caches, first projection).</summary>
-    private const int WarmUpSteps = 3;
+    private const int WarmUpSteps = 2;
 
     /// <summary>Measured sub-steps on a grid before the cell size may change again.</summary>
     private const int MeasuredStepsBeforeAdapting = 12;
 
-    /// <summary>Shortest wall-clock time between two coarsenings, s.</summary>
-    private const double CoarsenInterval = 2.0;
+    /// <summary>Measured sub-steps before coarsening a grid whose steps take more than three times the budget.</summary>
+    private const int MeasuredStepsBeforeRescue = 2;
 
-    /// <summary>Shortest wall-clock time on a grid before it is refined, s (refining is never urgent).</summary>
-    private const double RefineInterval = 5.0;
+    /// <summary>Wall-clock time the dropped share is at least averaged over, s (a hiccup in the first second is not 100 %).</summary>
+    private const double MinDroppedWindow = 1.0;
 
     /// <summary>Averaging time of the dropped share of real time, s.</summary>
     private const double DroppedTimeConstant = 3.0;
@@ -398,6 +398,9 @@ public sealed class SmokeWorker : IDisposable
         }
     }
 
+    /// <summary>Makes the worker fail on its thread as an internal error would (tests of the fault handling).</summary>
+    internal void FailForTesting() => EnqueueCommand(new WorkItem { Kind = WorkKind.Fail });
+
     /// <summary>Sets a thread's priority where the operating system allows it (ignored elsewhere).</summary>
     internal static void TrySetPriority(Thread thread, ThreadPriority priority)
     {
@@ -423,6 +426,7 @@ public sealed class SmokeWorker : IDisposable
         AddSmoke,
         Fill,
         Timing,
+        Fail,
     }
 
     private struct WorkItem
@@ -613,6 +617,8 @@ public sealed class SmokeWorker : IDisposable
             case WorkKind.Timing:
                 SetWorkerTiming(item.Timing);
                 break;
+            case WorkKind.Fail:
+                throw new InvalidOperationException("Failure requested by a test.");
         }
     }
 
@@ -630,7 +636,7 @@ public sealed class SmokeWorker : IDisposable
         ComputeLevels();
         int level = Adapting ? InitialLevel() : 0;
         CreateSimulation(level, transferFrom: null);
-        // The frames that arrived while the grid was being built were not the solver falling behind.
+        // The frames that arrived while the grid was being built are dropped, but not counted against the solver.
         _trimNextFrame = true;
     }
 
@@ -725,8 +731,12 @@ public sealed class SmokeWorker : IDisposable
         long now = Stopwatch.GetTimestamp();
         if (_trimNextFrame)
         {
+            // Time that passed while a new simulation was set up: beyond one sub-step it is lost (and counted), but it
+            // does not mean the solver cannot keep up.
             _trimNextFrame = false;
-            deltaTime = Math.Min(deltaTime, simulation.TimeStep);
+            double setup = Math.Max(0, deltaTime - simulation.TimeStep);
+            _dropped += setup;
+            deltaTime -= setup;
         }
 
         int steps = simulation.StepCapped(deltaTime, emitters, RealTimeCap(simulation));
@@ -752,8 +762,8 @@ public sealed class SmokeWorker : IDisposable
 
     /// <summary>
     /// Folds a frame into the dropped share of real time: Σ dropped / Σ wall time, both weighted by
-    /// e^(−age / <see cref="DroppedTimeConstant"/>), with at least one time constant of wall time in the denominator
-    /// (so a single hiccup after a quiet start counts as what it is).
+    /// e^(−age / <see cref="DroppedTimeConstant"/>), with at least <see cref="MinDroppedWindow"/> of wall time in the
+    /// denominator (so a single hiccup right after the start does not count as all of real time).
     /// </summary>
     private void TrackDropped(double dropped, long now)
     {
@@ -765,7 +775,7 @@ public sealed class SmokeWorker : IDisposable
     }
 
     private float DroppedShare() =>
-        (float)Math.Clamp(_droppedWeighted / Math.Max(_wallWeighted, DroppedTimeConstant), 0, 1);
+        (float)Math.Clamp(_droppedWeighted / Math.Max(_wallWeighted, MinDroppedWindow), 0, 1);
 
     private void Measure(SmokeSimulation simulation, double elapsed, int steps)
     {
@@ -780,24 +790,29 @@ public sealed class SmokeWorker : IDisposable
     }
 
     /// <summary>
-    /// Coarsens when the measured step exceeds the budget (to the first level predicted within 80 % of it), refines one
-    /// level when the finer grid is predicted within 75 % of it. Cost is proportional to the cell count.
+    /// Coarsens when the measured step exceeds the budget (to the first level predicted within 80 % of it; after only a
+    /// couple of steps when it takes more than three times the budget), refines one level when the finer grid is
+    /// predicted within 75 % of it. Cost is proportional to the cell count.
     /// </summary>
     private void Adapt()
     {
-        if (!Adapting || _simulation is null || _stepsOnGrid < WarmUpSteps + MeasuredStepsBeforeAdapting || !(_stepSeconds > 0))
+        if (!Adapting || _simulation is null || !(_stepSeconds > 0))
             return;
-        double onGrid = Stopwatch.GetElapsedTime(_gridTimestamp).TotalSeconds;
         double budget = Budget;
         double cost = _stepSeconds;
-        if (cost > budget && _level < MaxLevel && onGrid >= CoarsenInterval)
+        int measured = _stepsOnGrid - WarmUpSteps;
+        bool severe = cost > 3 * budget;
+        if (measured < (severe ? MeasuredStepsBeforeRescue : MeasuredStepsBeforeAdapting))
+            return;
+        double onGrid = Stopwatch.GetElapsedTime(_gridTimestamp).TotalSeconds;
+        if (cost > budget && _level < MaxLevel && (severe || onGrid >= _options.CoarsenInterval))
         {
             int level = _level + 1;
             while (level < MaxLevel && cost * _levelCells[level] / _levelCells[_level] > 0.8 * budget)
                 level++;
             CreateSimulation(level, transferFrom: _simulation);
         }
-        else if (_level > 0 && onGrid >= RefineInterval && cost * _levelCells[_level - 1] / _levelCells[_level] < 0.75 * budget)
+        else if (_level > 0 && onGrid >= _options.RefineInterval && cost * _levelCells[_level - 1] / _levelCells[_level] < 0.75 * budget)
         {
             CreateSimulation(_level - 1, transferFrom: _simulation);
         }
