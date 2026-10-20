@@ -141,6 +141,9 @@ internal sealed class EditorApplication : IDisposable
         }
 
         WindowIcon.Apply(_window, _log);
+        // A window larger than the screen (high-DPI laptops) is maximised; headless runs keep their exact size.
+        if (!_options.IsScreenshotMode)
+            _window.FitToWorkArea();
 
         try
         {

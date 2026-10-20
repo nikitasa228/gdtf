@@ -570,6 +570,33 @@ public sealed partial class InstallExperienceTests : IDisposable
     }
 
     [Fact]
+    public void A_first_window_larger_than_the_screen_is_maximised_and_one_that_sticks_out_is_centred()
+    {
+        // Review regression: 1600 × 900 screen coordinates become 2400 × 1350 pixels at 150 % (a typical Full HD laptop):
+        // the editor opened larger than the screen, its status bar and bottom panels off the screen.
+        var frame = new WindowFrame(8, 31, 8, 8);
+        var laptop = new WorkArea(0, 0, 1920, 1032); // 1080 minus the task bar
+        var big = WindowPlacement.Fit(26, 57, 2400, 1350, frame, laptop);
+        Assert.True(big.Maximize);
+
+        // fits but was placed partly off the screen: centred, client area below the title bar
+        var off = WindowPlacement.Fit(900, 600, 1600, 900, frame, laptop);
+        Assert.False(off.Maximize);
+        Assert.True(off.Move);
+        Assert.Equal((1920 - 1616) / 2 + 8, off.X);
+        Assert.Equal((1032 - 939) / 2 + 31, off.Y);
+
+        // fits where it is: unchanged; a monitor left of the primary one (negative coordinates) works the same
+        var fine = WindowPlacement.Fit(100, 100, 1600, 900, frame, new WorkArea(0, 0, 2560, 1400));
+        Assert.False(fine.Maximize || fine.Move);
+        var left = WindowPlacement.Fit(-1800, 100, 1600, 900, frame, new WorkArea(-1920, 0, 1920, 1040));
+        Assert.False(left.Maximize || left.Move);
+
+        // an unknown work area (no monitor information) changes nothing
+        Assert.Equal(new WindowPlacement(false, false, 5, 6), WindowPlacement.Fit(5, 6, 1600, 900, frame, new WorkArea(0, 0, 0, 0)));
+    }
+
+    [Fact]
     public void A_release_file_version_sorts_after_its_previews()
     {
         // Review regression: the release was 0.1.0.0 and its previews 0.1.0.N, so the installer of the release took the
