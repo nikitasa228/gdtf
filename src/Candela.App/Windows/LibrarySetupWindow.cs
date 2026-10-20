@@ -161,6 +161,8 @@ internal sealed class LibrarySetupWindow
         SafeText.Disabled(InstallLoc.Get(InstallStr.SetupFolderLabel));
         string? folder = _setup.Folder;
         SafeText.Colored(folder is null ? Theme.TextMuted : Theme.Text, FolderText(folder));
+        // The buttons flow onto a second line when they do not fit (the Russian labels are long).
+        float rowRight = ImGui.GetCursorScreenPos().X + ImGui.GetContentRegionAvail().X;
         if (ImGui.Button(InstallLoc.With(Icons.FolderSearch, InstallStr.SetupChoose)))
         {
             string from = folder ?? Path.GetDirectoryName(InstallLayout.DefaultUserLibraryFolder) ?? "";
@@ -168,18 +170,22 @@ internal sealed class LibrarySetupWindow
                 Directory.Exists(from) ? from : null, null, ChooseFolder);
         }
 
-        ImGui.SameLine();
-        if (ImGui.Button(InstallLoc.With(Icons.FolderPlus, InstallStr.SetupUseDefault)))
+        string useDefault = InstallLoc.With(Icons.FolderPlus, InstallStr.SetupUseDefault);
+        SameLineIfFits(useDefault, rowRight);
+        if (ImGui.Button(useDefault))
             UseDefaultFolder();
-        if (folder is not null && _setup.Probe is { Exists: true })
+        // Shown for a folder that exists, and while it is being counted again (no flicker on Rescan).
+        if (folder is not null && (_setup.Probe is { Exists: true } || (_setup.Probing && _setup.Error is null)))
         {
-            ImGui.SameLine();
-            if (ImGui.Button(InstallLoc.With(Icons.FolderOpen, InstallStr.SetupOpenFolder)))
+            string openFolder = InstallLoc.With(Icons.FolderOpen, InstallStr.SetupOpenFolder);
+            SameLineIfFits(openFolder, rowRight);
+            if (ImGui.Button(openFolder))
                 NativeShell.Open(folder);
             // Files copied into the folder in the file manager are read without a restart.
-            ImGui.SameLine();
+            string rescan = InstallLoc.With(Icons.Refresh, InstallStr.SetupRescan);
+            SameLineIfFits(rescan, rowRight);
             ImGui.BeginDisabled(_setup.Probing);
-            if (ImGui.Button(InstallLoc.With(Icons.Refresh, InstallStr.SetupRescan)))
+            if (ImGui.Button(rescan))
                 Rescan();
             ImGui.EndDisabled();
             if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
@@ -220,6 +226,18 @@ internal sealed class LibrarySetupWindow
         if (ImGui.Button(start))
             IsOpen = false;
         ImGui.PopStyleColor(3);
+    }
+
+    /// <summary>
+    /// Keeps the next button (<paramref name="label"/>) on the line of the previous item when it ends before
+    /// <paramref name="rowRight"/> (screen x), else lets it start a new line.
+    /// </summary>
+    private static void SameLineIfFits(string label, float rowRight)
+    {
+        var style = ImGui.GetStyle();
+        float width = ImGui.CalcTextSize(label).X + style.FramePadding.X * 2;
+        if (ImGui.GetItemRectMax().X + style.ItemSpacing.X + width <= rowRight)
+            ImGui.SameLine();
     }
 
     private void DrawStatus()

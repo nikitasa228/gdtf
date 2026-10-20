@@ -402,6 +402,37 @@ public sealed partial class InstallExperienceTests : IDisposable
         ui.Frame(() => window.Draw(1f));
     }
 
+    [Theory]
+    [InlineData("ru")]
+    [InlineData("en")]
+    public void The_folder_buttons_stay_inside_the_setup_window(string language)
+    {
+        // Review regression: with a folder chosen the row holds four buttons; in Russian the last one (Rescan) ran past
+        // the window's right edge and was cut off.
+        string library = Folder("Fixture Library");
+        File.Copy(RepositoryGdtf(Zonda), Path.Combine(library, Zonda));
+        using var session = CreateSession(InstalledLayout());
+        using var setup = new LibrarySetup(session, _settings, _log);
+        var browser = new FileBrowserDialog(_dir.File("recent-places.json"));
+        var dispatcher = new KeyBindingDispatcher(new CommandRegistry(), KeyBindingsService.CreateDefault());
+        var window = new LibrarySetupWindow(setup, default, browser, dispatcher, () => true, _ => { }, _ => { }, _ => { });
+        using var ui = new HeadlessImGui(new Vector2(1600, 900));
+        Loc.SetLanguage(language);
+        window.Open();
+        window.ChooseFolder(library);
+        var deadline = DateTime.UtcNow.AddSeconds(20);
+        while ((setup.Probe is null || setup.Probing) && DateTime.UtcNow < deadline)
+            ui.Frame(() => window.Draw(1f));
+        Assert.Equal(1, setup.Probe?.Direct);
+        for (int i = 0; i < 3; i++)
+            ui.Frame(() => window.Draw(1f));
+
+        var drawn = ImGuiP.FindWindowByName("###LibrarySetup");
+        Assert.False(drawn.IsNull);
+        float inner = drawn.Size.X - 2 * ImGui.GetStyle().WindowPadding.X;
+        Assert.True(drawn.ContentSize.X <= inner + 0.5f, $"content {drawn.ContentSize.X} px wider than the window's {inner} px");
+    }
+
     [Fact]
     public void The_setup_window_opens_the_sample_scene_and_closes()
     {
