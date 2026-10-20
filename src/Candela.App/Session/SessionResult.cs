@@ -8,9 +8,6 @@ internal enum SessionOutcome
 
     /// <summary>The operation was attempted and failed; nothing changed.</summary>
     Failed,
-
-    /// <summary>The operation needs a part of the program that is not in this build (the stage engine).</summary>
-    NotAvailable,
 }
 
 /// <summary>Result of an <see cref="EditorSession"/> operation (open, save, import, export, render…).</summary>
@@ -41,9 +38,6 @@ internal readonly record struct SessionResult(SessionOutcome Outcome, string Mes
 
     /// <summary>A failed result.</summary>
     public static SessionResult Failed(string message) => new(SessionOutcome.Failed, message);
-
-    /// <summary>The operation is not available in this build.</summary>
-    public static SessionResult NotAvailable(string message) => new(SessionOutcome.NotAvailable, message);
 }
 
 /// <summary>What an import brings into the open scene (requirement: another project, a 3D model, an MVR, an image).</summary>

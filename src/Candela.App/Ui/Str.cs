@@ -279,7 +279,6 @@ internal enum Str
     BrowserMvr,
 
     // Messages
-    MsgNotAvailableTitle,
     MsgEngineMissing,
     MsgOk,
     MsgCancel,

@@ -1206,6 +1206,19 @@ properties, cable links, the recorder, the file browser and the helpers render n
 dropped and selected in the Library, the file browser listing such files and the Russian UI — the `uiText` logs
 contain the names literally and nothing crashes).
 
+The path-traced final render (`FinalRenderJobTests`, on the headless Vulkan device — lavapipe has ray queries):
+`Фокина.mvr` with every fixture at open white rendered by the Render panel's job and by `candela render --final` (run in
+its own process, with an empty configuration) with the same camera, exposure and 4 samples per pixel — the PNGs agree
+block by block and in mean brightness, the EXRs have the same layers, `whiteLuminance` and mean luminance; in a small
+hazy room one test per setting: 32 samples per pixel are less than 0.6 times as noisy as 2, four surface bounces light
+the wall that direct light leaves dark, two volume bounces make the air around the beam glow, denoising lowers the noise
+(and the EXR gains the `raw` layer); a long render stepped like editor frames — every sampling frame within 0.6 s on
+lavapipe, the progress image renewed about once a second, *Cancel* ending the job at once with no further work and no
+file — and *Stop and save* writing the samples done; with the memory renderer (no ray queries) the panel's note, the Fast
+plan and a render that falls back and says so; the Render command with the panel's settings (renderer, size, samples,
+bounces, volume bounces, denoising, tone mapper, EXR, work light, exposure) leaving a running render alone; F12 bound to
+it; and the real editor under `xvfb-run` rendering a project's stage twice, once by F12 and once by File → Render.
+
 ## Limitations
 
 * Walls and floors are rectangular boxes (no polygons, no openings); a floor is drawn aligned to the world axes and

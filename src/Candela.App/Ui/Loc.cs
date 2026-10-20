@@ -327,7 +327,6 @@ internal static class Loc
         (Str.BrowserImages, "Images", "Изображения"),
         (Str.BrowserMvr, "MVR scenes", "Сцены MVR"),
 
-        (Str.MsgNotAvailableTitle, "Not Available Yet", "Пока недоступно"),
         (Str.MsgEngineMissing, "{0} needs the stage engine, which is not part of this build yet. Nothing was changed.",
             "Для операции «{0}» нужен движок сцены, которого ещё нет в этой сборке. Ничего не изменено."),
         (Str.MsgOk, "OK", "ОК"),

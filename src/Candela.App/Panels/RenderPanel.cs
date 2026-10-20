@@ -48,6 +48,8 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
     };
 
     private static readonly string[] ToneMappers = { "AgX", "ACES", "Neutral" };
+    private static readonly RenderMode[] Modes = { RenderMode.PathTraced, RenderMode.Fast };
+    private static readonly TimeSpan FolderCheckInterval = TimeSpan.FromSeconds(1);
     private readonly StagePanelContext _stage;
     private readonly Action<SessionResult> _report;
     private readonly byte[] _folder = new byte[1024];
@@ -71,6 +73,11 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
     private (string Device, string Lang) _noteKey;
     private string? _rangeError;
     private string? _folderHint;
+    private string? _folderSource;
+    private string? _folderValue;
+    private long _folderChecked;
+    private string _headlessText = "";
+    private (int W, int H, string Lang) _headlessKey;
     private UiTexture? _preview;
     private int _previewVersion = -1;
     private (int W, int H) _previewSize;
@@ -326,7 +333,7 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
         PropertyGrid.Row(StageLoc.Get(StageStr.RenderMode));
         if (ImGui.BeginCombo("##mode", StageLoc.Get(ModeLabel(_mode))))
         {
-            foreach (var mode in new[] { RenderMode.PathTraced, RenderMode.Fast })
+            foreach (var mode in Modes)
             {
                 if (ImGui.Selectable(StageLoc.Get(ModeLabel(mode)), _mode == mode))
                     _mode = mode;
@@ -587,7 +594,15 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
         }
         else
         {
-            SafeText.Disabled(StageLoc.Format(StageStr.RenderPreviewHeadless, w, h));
+            // No texture (a renderer without user textures, e.g. headless): the size of the picture instead.
+            var key = (w, h, Loc.Language);
+            if (key != _headlessKey || _headlessText.Length == 0)
+            {
+                _headlessKey = key;
+                _headlessText = StageLoc.Format(StageStr.RenderPreviewHeadless, w, h);
+            }
+
+            SafeText.Disabled(_headlessText);
         }
     }
 
@@ -633,20 +648,30 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
             : string.Create(CultureInfo.InvariantCulture, $"{seconds / 60}:{seconds % 60:00}");
     }
 
-    /// <summary>The folder Open folder shows: where the last file was written, else the output folder when it exists.</summary>
+    /// <summary>
+    /// The folder Open folder shows: where the last file was written, else the output folder, when it exists. Drawn every
+    /// frame, so it is worked out again only when the path changes and checked on disk at most once a second.
+    /// </summary>
     internal string? ResultFolder(RenderJobRunner job)
     {
         string? path = job.LastOutput ?? job.OutputPath;
+        string source = path ?? _stage.Tools.FinalRender.Live.OutputPath ?? "";
+        long now = Stopwatch.GetTimestamp();
+        if (ReferenceEquals(source, _folderSource) && Stopwatch.GetElapsedTime(_folderChecked, now) < FolderCheckInterval)
+            return _folderValue;
+        _folderSource = source;
+        _folderChecked = now;
         try
         {
-            path ??= ResolveOutput(_stage.Tools.FinalRender.Live.OutputPath);
-            string? folder = Path.GetDirectoryName(path);
-            return folder is not null && Directory.Exists(folder) ? folder : null;
+            string? folder = Path.GetDirectoryName(path ?? ResolveOutput(source));
+            _folderValue = folder is not null && Directory.Exists(folder) ? folder : null;
         }
-        catch (Exception e) when (e is ArgumentException or NotSupportedException or PathTooLongException or IOException)
+        catch (Exception e) when (e is ArgumentException or NotSupportedException or PathTooLongException or IOException or UnauthorizedAccessException)
         {
-            return null;
+            _folderValue = null;
         }
+
+        return _folderValue;
     }
 
     /// <summary>Opens <paramref name="folder"/> in the file manager; a failure is reported in the status bar.</summary>

@@ -477,10 +477,6 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             case SessionOutcome.Done:
                 SetStatus(result.Message);
                 break;
-            case SessionOutcome.NotAvailable:
-                SetStatus(result.Message);
-                _messages.Show(MessageKind.Warning, Loc.Get(Str.MsgNotAvailableTitle), result.Message);
-                break;
             default:
                 _ctx.Log.Warn("Session", result.Message);
                 _messages.Show(MessageKind.Error, Loc.Get(Str.MsgError), result.Message);
