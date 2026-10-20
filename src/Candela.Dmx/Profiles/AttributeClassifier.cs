@@ -386,6 +386,8 @@ public static class AttributeClassifier
         {
             if (asRest.IsEmpty || Is(asRest, "Insertion")) return new(AttributeKind.AnimationInsertion, asN, WheelFamily.AnimationSystem);
             if (Is(asRest, "Shake")) return new(AttributeKind.WheelShake, asN, WheelFamily.AnimationSystem);
+            // the system ramping in and out of the beam over time (Robe "Ramping from open to full position max … min")
+            if (Is(asRest, "Ramp")) return new(AttributeKind.WheelSelect, asN, WheelFamily.AnimationSystem);
             return Wheel(WheelFamily.AnimationSystem, asN, asRest);
         }
         if (TryNumbered(s, "Gobo", out int goboN, out var goboRest)) return Wheel(WheelFamily.Gobo, goboN, goboRest);
@@ -476,6 +478,8 @@ public static class AttributeClassifier
         return r switch
         {
             _ when Eq(r, "SelectSpin") => new(AttributeKind.WheelSelectSpin, n, family),
+            // "AnimationWheelSpin" (Ayrton Rivale Wash): slot selection with spin, the only spin an animation wheel has
+            _ when Eq(r, "Spin") && family == WheelFamily.Animation => new(AttributeKind.WheelSelectSpin, n, family),
             _ when Eq(r, "SelectShake") => new(AttributeKind.WheelSelectShake, n, family),
             _ when Eq(r, "SelectEffects") => new(AttributeKind.WheelSelect, n, family),
             _ when Eq(r, "WheelIndex") => new(AttributeKind.WheelIndex, n, family),

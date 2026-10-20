@@ -95,11 +95,31 @@ public struct WheelState
     /// <summary>True when the current slot is open (no filter, gobo or prism).</summary>
     public bool IsOpen;
 
-    /// <summary>Insertion 0 … 1 (animation systems; 1 for wheels).</summary>
+    /// <summary>
+    /// Insertion 0 … 1: 0 when the mechanism is out of the beam (an open slot, or a range named "Open", "Off",
+    /// "Removed" …), 1 when a slot is in; in between for animation systems and for ranges that move a single-slot
+    /// mechanism gradually into the beam ("Open" → "Animation In").
+    /// </summary>
     public float Insertion;
 
     /// <summary>Effect rate (effects wheels, built-in effects), Hz or the GDTF physical value.</summary>
     public float Rate;
+
+    /// <summary>True when a channel set <see cref="Insertion"/> to a level this frame (ramp, cycle, animation-system insertion).</summary>
+    internal bool InsertionSet;
+
+    /// <summary>
+    /// True when a range named "Open", "Off", "Removed" … of a channel that selects, indexes or spins the mechanism said
+    /// it is out of the beam this frame. It takes the mechanism out unless another channel selected it (<see cref="InVote"/>).
+    /// </summary>
+    internal bool OutVote;
+
+    /// <summary>
+    /// True when a selection channel put a slot of the mechanism's wheel in place this frame. Such a selection wins over an
+    /// "out" range of another channel addressing the same mechanism (files that give a second prism channel the first
+    /// prism's attribute, with "No Effect" at DMX 0: ADJ Protege XS, Vizi Beam 12RX, LIGHT_SKY IP520).
+    /// </summary>
+    internal bool InVote;
 
     /// <summary>A mechanism that is not used.</summary>
     public static WheelState Unused => UnusedState;
@@ -222,6 +242,13 @@ public sealed class BeamState
     /// <summary>Full field angle (10 % intensity), rad.</summary>
     public float FieldAngle { get; internal set; }
 
+    /// <summary>
+    /// True when <see cref="FieldAngle"/> is derived from the beam angle with the beam type's typical field ratio
+    /// (<see cref="ProfileBeam.FieldRatioEstimated"/>) rather than from the file's field angle: an estimate, which a
+    /// display should mark as such (it can exceed the file's FieldAngle when that is the top of the zoom range).
+    /// </summary>
+    public bool FieldAngleEstimated => Beam.FieldRatioEstimated;
+
     /// <summary>Optical beam type for the intensity distribution.</summary>
     public Photometry.BeamType BeamType => Beam.BeamType;
 
@@ -266,6 +293,17 @@ public sealed class BeamState
 
     /// <summary>Rotation of the whole framing module, rad.</summary>
     public float ShaperRotation { get; internal set; }
+
+    /// <summary>
+    /// Elongation of the beam by an anamorphic beam shaper (long axis / short axis, ≥ 1; 1 = round): the lens of a beam
+    /// shaper slot without an image, scaled by its insertion. <see cref="BeamAngle"/> and <see cref="FieldAngle"/> are the
+    /// short axis; the long axis is <see cref="ShaperStretch"/> times wider, and <see cref="PeakCandela"/> is lower by the
+    /// same factor (the flux is spread over the wider beam).
+    /// </summary>
+    public float ShaperStretch { get; internal set; } = 1f;
+
+    /// <summary>Direction of the stretched (long) axis about the beam axis, rad (the beam shaper's indexing and rotation).</summary>
+    public float ShaperStretchRotation { get; internal set; }
 
     /// <summary>Number of prism facets currently in the beam (product of all inserted prisms; 0 = none).</summary>
     public int PrismFacets
@@ -371,6 +409,35 @@ public sealed class FixtureState
 
     /// <summary>Seed for random effects, so that identical fixtures do not flash in lockstep.</summary>
     public uint Seed { get; set; }
+
+    /// <summary>The gel set with <see cref="SetGel"/> (CIE 1931 x, y and Y = transmission in percent), or null.</summary>
+    public Candela.Core.SceneGraph.Components.CieColor? Gel { get; private set; }
+
+    /// <summary>Per-channel (linear Rec.2020) transmission of <see cref="Gel"/>; (1, 1, 1) without a gel.</summary>
+    internal Vector3 GelTransmission { get; private set; } = Vector3.One;
+
+    /// <summary>
+    /// Puts a gel in front of the fixture's white beams (MVR <c>&lt;Color&gt;</c> of a fixture, <c>FixtureComponent.Color</c>):
+    /// a filter of chromaticity (x, y) passing Y % of the light, applied per channel in linear Rec.2020 like a colour-wheel
+    /// slot (exact for a D65 source; a filter whose Y exceeds what its chromaticity allows is scaled down to a physical
+    /// one). It colours only beams without a colour system of their own (<see cref="ProfileBeam.HasColorSystem"/>):
+    /// conventional and white fixtures. Null, or a colour without a valid chromaticity, removes the gel; a Y of 0 or
+    /// above 100 counts as 100 %. Takes effect at the next evaluation.
+    /// </summary>
+    public void SetGel(Candela.Core.SceneGraph.Components.CieColor? gel)
+    {
+        if (gel is { } g && float.IsFinite(g.X) && float.IsFinite(g.Y) && g.X > 0f && g.Y > 0f && g.X + g.Y < 1f)
+        {
+            float y = float.IsFinite(g.BigY) && g.BigY > 0f ? Math.Min(g.BigY, 100f) / 100f : 1f;
+            Gel = g;
+            GelTransmission = Filters.PhysicalChannelTransmission(LightColor.FromXy(g.X, g.Y), y);
+        }
+        else
+        {
+            Gel = null;
+            GelTransmission = Vector3.One;
+        }
+    }
 
     /// <summary>Time of the last evaluation in seconds (NaN before the first).</summary>
     public double Time { get; internal set; }

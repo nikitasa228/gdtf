@@ -48,9 +48,11 @@ public sealed partial class FixtureProfile
         private readonly Dictionary<ChainKey, int> _instanceIndex = new();
         private readonly Dictionary<DmxChannel, List<int>> _instancesOf = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<Wheel, int> _wheelIndex = new(ReferenceEqualityComparer.Instance);
+        private Dictionary<Wheel, WheelFamily>? _wheelFamilies;
         private readonly Dictionary<string, int> _emitterIndex = new(StringComparer.Ordinal);
         private readonly Dictionary<BeamGeometry, BeamSolidAngleTable> _solidAngleCache = new(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<string, WhiteEfficiencyTable?> _whiteTables = new(StringComparer.Ordinal);
+        private readonly HashSet<string> _whiteWarned = new(StringComparer.Ordinal);
         private bool? _colouredEmitters;
         private int[] _beamFirst = Array.Empty<int>(); // per channel: first beam index affected
         private int[] _beamCount = Array.Empty<int>(); // per channel: number of beams affected (contiguous)
@@ -224,6 +226,7 @@ public sealed partial class FixtureProfile
                     }
                 }
                 pc.FunctionCount = Functions.Count - pc.FirstFunction;
+                InheritSiblingWheels(pc);
                 pc.InitialFunction = pc.FunctionCount == 0 ? -1 : pc.FirstFunction;
                 for (int k = pc.FirstFunction; k < pc.FirstFunction + pc.FunctionCount; k++)
                 {
@@ -232,6 +235,79 @@ public sealed partial class FixtureProfile
                         pc.InitialFunction = k;
                         break;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// A rotation, index, spin or shake function written without its wheel, on the channel of a selection function
+        /// of the same mechanism that names it (Elation Artiste Picasso "AnimationWheel1PosRotate" next to
+        /// "AnimationWheel1"), turns that wheel: the mechanism is in the beam while it rotates. Selection functions inherit
+        /// the wheel only when it has a single slot (an animation disc, a single prism), whose position needs no slot map.
+        /// </summary>
+        private void InheritSiblingWheels(ProfileChannel ch)
+        {
+            int end = ch.FirstFunction + ch.FunctionCount;
+            MarkPlainOpenSets(ch);
+            for (int k = ch.FirstFunction; k < end; k++)
+            {
+                var f = Functions[k];
+                if (f.Class.Wheel == WheelFamily.None) continue;
+                for (int j = ch.FirstFunction; j < end && !f.OnSelectionChannel; j++)
+                {
+                    var g = Functions[j];
+                    f.OnSelectionChannel = j != k && g.Class.Wheel == f.Class.Wheel && g.Class.Number == f.Class.Number &&
+                        (IsWheelSelection(g.Class.Kind) || g.Class.Kind == AttributeKind.AnimationInsertion);
+                }
+                f.ImpliesInsertion = f.Class.Kind is not (AttributeKind.SlotIndex or AttributeKind.SlotRotate or AttributeKind.SlotShake
+                        or AttributeKind.EffectRate) ||
+                    f.Class.Wheel is not (WheelFamily.Prism or WheelFamily.Animation or WheelFamily.AnimationSystem or WheelFamily.BeamShaper) ||
+                    f.OnSelectionChannel || Array.Exists(f.SetArray, s => s.WheelSlot > 0);
+                if (f.Wheel >= 0) continue;
+                for (int j = ch.FirstFunction; j < end; j++)
+                {
+                    var g = Functions[j];
+                    if (g.Wheel < 0 || g.Class.Wheel != f.Class.Wheel || g.Class.Number != f.Class.Number) continue;
+                    if (IsWheelSelection(f.Class.Kind) && Wheels[g.Wheel].SlotCount > 1) break;
+                    f.Wheel = g.Wheel;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A channel whose selection functions have no range that takes the mechanism out, but a range named plainly
+        /// "Open" that selects a slot which is not a hole (PRstage Spot 460 animation wheel: "Open" → "Wheel Slot 1"): the
+        /// file put the open position on a placeholder slot, so that range takes the mechanism out. Where the channel
+        /// does have an out range (ACME Sana: "Close" selects the hole, "Open" the 8-facet prism) the slots decide.
+        /// </summary>
+        private void MarkPlainOpenSets(ProfileChannel ch)
+        {
+            int end = ch.FirstFunction + ch.FunctionCount;
+            bool selection = false;
+            for (int k = ch.FirstFunction; k < end; k++)
+            {
+                var f = Functions[k];
+                if (!IsWheelSelection(f.Class.Kind) || f.Wheel < 0) continue;
+                selection = true;
+                if ((f.NameFlags & ChannelSetFlags.WheelOut) != 0 || Array.Exists(f.SetFlagArray, s => (s & ChannelSetFlags.WheelOut) != 0)) return;
+            }
+            if (!selection) return;
+            for (int k = ch.FirstFunction; k < end; k++)
+            {
+                var f = Functions[k];
+                if (!IsWheelSelection(f.Class.Kind) || f.Wheel < 0) continue;
+                bool changed = false;
+                foreach (var s in f.SetArray)
+                {
+                    if (!NameParsing.IsPlainOpenSlotName(s.Name)) continue;
+                    s.Flags |= ChannelSetFlags.WheelOut;
+                    changed = true;
+                }
+                if (changed)
+                {
+                    f.SetSets(f.SetArray);
+                    Warnings.Add($"{f.Source.FullName}: a range named 'Open' selects a slot that is not open; read as open.");
                 }
             }
         }
@@ -276,6 +352,10 @@ public sealed partial class FixtureProfile
                     : AttributeClass.Ignored;
                 Warnings.Add($"{src.FullName}: Dimmer function on a '{ch.Attribute}' channel read as {(cls.Kind == AttributeKind.Ignored ? "no intensity" : ch.Attribute)}.");
             }
+            // "Gobo Shake 1", "Gobo Shake 2" … written as a whole-wheel shake with a slot per range (ADJ Focus Hybrid
+            // "Gobo1WheelShake"): each range selects its slot and shakes it, as Gobo(n)SelectShake does
+            if (cls.Kind == AttributeKind.WheelShake && src.Wheel is not null && src.ChannelSets.Exists(s => s.WheelSlotIndex > 0))
+                cls = cls with { Kind = AttributeKind.WheelSelectShake };
             float physicalFrom = Finite(src.PhysicalFrom, 0f), physicalTo = Finite(src.PhysicalTo, 1f);
             // GDTF's default physical range 0 … 1 is a placeholder unless channel sets carry the real values
             bool defaultRange = IsDefaultRange(physicalFrom, physicalTo);
@@ -309,6 +389,12 @@ public sealed partial class FixtureProfile
             // "Open/Close", "open / closed": a range that does both, not a state
             if (src.Name.Contains("open", StringComparison.OrdinalIgnoreCase) && src.Name.Contains("clos", StringComparison.OrdinalIgnoreCase))
                 nameFlags = ChannelSetFlags.None;
+            if (src.Wheel is { } wheel) f.Wheel = WheelIndexOf(wheel, cls.Wheel);
+            // a wheel selection function named "Open", "Off", "Removed" … that selects no slot keeps the wheel out of the
+            // beam wherever no named channel set says otherwise (ACME Chiron "Prism1" function "Open")
+            bool selects = IsWheelSelection(cls.Kind) || cls.Kind == AttributeKind.AnimationInsertion;
+            bool selectsSlot = selects && src.ChannelSets.Exists(s => s.WheelSlotIndex > 0);
+            if (selects && !selectsSlot && NameParsing.IsWheelOutName(src.Name)) nameFlags |= ChannelSetFlags.WheelOut;
             f.NameFlags = nameFlags;
 
             // channel sets
@@ -322,6 +408,18 @@ public sealed partial class FixtureProfile
                 var setFlags = string.IsNullOrWhiteSpace(s.Name) ? nameFlags : NameParsing.Flags(s.Name, cls.Kind);
                 if (cls.Kind == AttributeKind.Shutter && (setFlags & ChannelSetFlags.Closed) != 0 && IsStrobeOff(src, s.Name))
                     setFlags = (setFlags & ~ChannelSetFlags.Closed) | ChannelSetFlags.Open;
+                // a green/magenta correction range named "Off", "Idle", "No shift", "No Green Offset" … corrects nothing,
+                // whatever physical value the file gives it (Elation Fuze Max Spot "Idle" at 0 of a 0 … 1 tint)
+                if (cls.Kind == AttributeKind.Tint && NameParsing.IsNeutralTintName(s.Name)) setFlags |= ChannelSetFlags.NoFunction;
+                // a selection range named "Open", "Off", "Removed" … that selects no slot, or an open one, takes the
+                // mechanism out of the beam (Rivale AnimationWheel1 "open", Elation Artiste Picasso "OPEN"); in a rotation,
+                // index or spin function of the mechanism such a range ("No function") leaves the mechanism alone
+                // A set that selects a slot of a wheel with several slots is decided by that slot, not its name (ACME Sana's
+                // prism "Close" selects the hole and "Open" the 8-facet prism); on a single-slot wheel the slot index says
+                // nothing (PRstage Spot 460 "Open" → slot 1, the animation disc)
+                if ((selects || cls.Wheel != WheelFamily.None) && !string.IsNullOrWhiteSpace(s.Name) && NameParsing.IsWheelOutName(s.Name) &&
+                    (s.WheelSlotIndex <= 0 || f.Wheel < 0 || Wheels[f.Wheel].SlotCount <= 1 || IsOpenSlot(f.Wheel, s.WheelSlotIndex)))
+                    setFlags |= ChannelSetFlags.WheelOut;
                 var set = new ProfileChannelSet(s, from, to, pf, pt, setFlags);
                 switch (cls.Kind)
                 {
@@ -343,6 +441,12 @@ public sealed partial class FixtureProfile
             }
             sets.Sort((x, y) => x.DmxFrom.CompareTo(y.DmxFrom));
             if (cls.Kind == AttributeKind.Dimmer) ReconcileDimmerNames(f, sets);
+            if (IsWheelSelection(cls.Kind))
+            {
+                f.RampSlot = f.Wheel >= 0 ? SingleItemSlot(f.Wheel) : 0;
+                if (!selectsSlot && (f.Wheel < 0 || f.RampSlot > 0)) MarkInsertionRamps(sets);
+                MarkInsertionCycles(sets);
+            }
             f.SetSets(sets.ToArray());
 
             float maxAbs = MathF.Max(MathF.Abs(f.PhysicalFrom), MathF.Abs(f.PhysicalTo));
@@ -350,7 +454,6 @@ public sealed partial class FixtureProfile
                 if (s.HasPhysical) maxAbs = MathF.Max(maxAbs, MathF.Max(MathF.Abs(s.PhysicalFrom), MathF.Abs(s.PhysicalTo)));
             f.LevelScale = maxAbs > 1.5f ? (maxAbs <= 100.5f ? 100f : maxAbs) : 1f;
 
-            if (src.Wheel is { } wheel) f.Wheel = WheelIndexOf(wheel);
             if (cls.Kind == AttributeKind.ColorAdd) f.Emitter = EmitterIndexOf(src, cls.Code ?? "");
             if (cls.Kind is AttributeKind.Cto or AttributeKind.Ctb or AttributeKind.Ctc)
             {
@@ -407,6 +510,90 @@ public sealed partial class FixtureProfile
         }
 
         private static bool IsKelvin(float v) => v is >= 1000f and <= 25000f;
+
+        /// <summary>Wheel slot selection attributes (plain, with spin, with shake).</summary>
+        private static bool IsWheelSelection(AttributeKind kind) =>
+            kind is AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake;
+
+        /// <summary>True when 1-based slot <paramref name="slot"/> of profile wheel <paramref name="wheel"/> is open (a hole); false without a wheel.</summary>
+        private bool IsOpenSlot(int wheel, int slot)
+        {
+            if (wheel < 0) return false;
+            var open = Wheels[wheel].SlotOpenArray;
+            return slot >= 1 && slot <= open.Length && open[slot - 1];
+        }
+
+        /// <summary>
+        /// The 1-based slot of the only item on profile wheel <paramref name="wheel"/>: its single slot, or the one slot that
+        /// is not open on a wheel of an open position and one item (Cameo Oron H2 "Open" + "Animation Wheel"); 0 when the
+        /// wheel holds several items or none.
+        /// </summary>
+        private int SingleItemSlot(int wheel)
+        {
+            var open = Wheels[wheel].SlotOpenArray;
+            if (open.Length <= 1) return 1;
+            int item = 0;
+            for (int i = 0; i < open.Length; i++)
+            {
+                if (open[i]) continue;
+                if (item != 0) return 0;
+                item = i + 1;
+            }
+            return item;
+        }
+
+        /// <summary>
+        /// Marks the ranges in which the mechanism keeps moving in and out of the beam ("Ramping from open to full position
+        /// max" … unnamed … "… min": the animation-wheel ramps of Robe fixtures): a named end, the unnamed ranges after it
+        /// and the other named end of the same ramp form one group whose cycle rate runs from fast ("max") to slow.
+        /// </summary>
+        private static void MarkInsertionCycles(List<ProfileChannelSet> sets)
+        {
+            int i = 0;
+            while (i < sets.Count)
+            {
+                if (!NameParsing.TryParseInsertionCycle(sets[i].Name, out float from, out float to, out int end))
+                {
+                    i++;
+                    continue;
+                }
+                int j = i + 1;
+                while (j < sets.Count && string.IsNullOrWhiteSpace(sets[j].Name)) j++;
+                int last = j < sets.Count && NameParsing.TryParseInsertionCycle(sets[j].Name, out float from2, out float to2, out int end2) &&
+                    from2 == from && to2 == to && end2 != 0 && end2 != end
+                    ? j
+                    : j - 1;
+                uint groupFrom = sets[i].DmxFrom, groupTo = sets[last].DmxTo;
+                for (int k = i; k <= last; k++)
+                {
+                    var s = sets[k];
+                    s.Flags = (s.Flags | ChannelSetFlags.InsertionCycle) & ~ChannelSetFlags.WheelOut;
+                    s.CycleFrom = from;
+                    s.CycleTo = to;
+                    s.CycleDmxFrom = groupFrom;
+                    s.CycleDmxTo = groupTo;
+                    s.CycleFastFirst = end >= 0;
+                }
+                i = last + 1;
+            }
+        }
+
+        /// <summary>
+        /// Marks the ranges of a selection function of a single-item wheel (an animation wheel, a one-prism wheel, also
+        /// with an open slot next to the item) that move the mechanism gradually into the beam: a range right after an "out" range that has no name ("Open", "", "Animation
+        /// In": Cameo Oron H2, EK H1), names a transition out of the open state ("Open to Dots": Elation Proteus Hybrid
+        /// Max) or an insertion "in proportion" (ADJ Protege). Insertion runs 0 → 1 across such a range.
+        /// </summary>
+        private static void MarkInsertionRamps(List<ProfileChannelSet> sets)
+        {
+            for (int i = 1; i < sets.Count; i++)
+            {
+                var previous = sets[i - 1];
+                var set = sets[i];
+                if ((previous.Flags & ChannelSetFlags.WheelOut) == 0 || (set.Flags & ChannelSetFlags.WheelOut) != 0) continue;
+                if (set.DmxTo > set.DmxFrom && NameParsing.IsInsertionRampName(set.Name)) set.Flags |= ChannelSetFlags.InsertionRamp;
+            }
+        }
 
         /// <summary>True for GDTF's default physical range 0 … 1 (either direction).</summary>
         private static bool IsDefaultRange(float from, float to) => (from == 0f && to == 1f) || (from == 1f && to == 0f);
@@ -535,7 +722,8 @@ public sealed partial class FixtureProfile
         /// way of describing continuous wheel indexing, e.g. "Blue" −0.5…+0.5) maps linearly across the slot; other slot
         /// sets hold the slot. Between sets the position is interpolated when the slots are adjacent (split colours) and
         /// held otherwise. Going from the last slot to the first continues past the end (position n + 1 is slot 1 again),
-        /// so a wheel turning through "Open" keeps moving in one direction.
+        /// so a wheel turning through "Open" keeps moving in one direction. On a two-slot wheel (Ayrton Rivale's beam
+        /// shaper: "Open", "Beam Shaper") 1 → 2 is the next slot, not a step back across the end.
         /// </summary>
         private static void BuildSlotMap(ProfileFunction f, int slotCount)
         {
@@ -548,7 +736,7 @@ public sealed partial class FixtureProfile
             {
                 int k = s.WheelSlot;
                 if (k <= 0) continue;
-                if (prevK > 0 && slotCount > 1)
+                if (prevK > 0 && slotCount > 2)
                 {
                     if (prevK == slotCount && k == 1) offset += slotCount;
                     else if (prevK == 1 && k == slotCount) offset -= slotCount;
@@ -808,13 +996,28 @@ public sealed partial class FixtureProfile
 
         // ------------------------------------------------------------------ wheels and emitters
 
-        private int WheelIndexOf(Wheel wheel)
+        /// <summary>
+        /// The profile wheel of a GDTF wheel, compiled on first use with the family of the function that uses it first
+        /// (colour, gobo, prism, animation, effects, beam shaper). A slot is open — a hole, no filter, gobo, prism or
+        /// animation — when it has no facets and no animation system and either has no media and an open name or GDTF's
+        /// default colour (D65 at 100 %, which files leave on colour, gobo and prism slots without a filter; not on beam
+        /// shaper or animation slots, whose lens or disc has no colour), or names itself plainly open next to an image of
+        /// the aperture ("Open" with media "G1": CLF Aorun, Cameo AZOR).
+        /// </summary>
+        private int WheelIndexOf(Wheel wheel, WheelFamily family)
         {
             if (_wheelIndex.TryGetValue(wheel, out int i)) return i;
+            // a function of no wheel family can name the wheel first (Infinity Furion "NO FUNCTION" before "Prism1")
+            if (family == WheelFamily.None) family = WheelFamilyOf(wheel);
             int n = Math.Max(1, wheel.Slots.Count);
             var transmission = new Vector3[n];
             var facets = new int[n];
             var open = new bool[n];
+            var stretch = new float[n];
+            Array.Fill(stretch, 1f);
+            var colourXyz = new Vector3[n];
+            Array.Fill(colourXyz, ColorSpaces.XyToXyz(ColorSpaces.D65WhiteXy));
+            bool defaultColourIsOpen = family is not (WheelFamily.BeamShaper or WheelFamily.Animation or WheelFamily.AnimationSystem);
             for (int s = 0; s < n; s++)
             {
                 if (s >= wheel.Slots.Count)
@@ -829,16 +1032,60 @@ public sealed partial class FixtureProfile
                 transmission[s] = float.IsFinite(c.X) && float.IsFinite(c.Y) && c.Y > 0f
                     ? Filters.PhysicalChannelTransmission(LightColor.FromXy(c.X, c.Y), y)
                     : Vector3.One;
-                facets[s] = slot.Facets.Count > 0 ? slot.Facets.Count : NameParsing.ParseFacetCount(slot.Name);
-                open[s] = slot.MediaPath is null && slot.MediaFileName is null && slot.Facets.Count == 0 && slot.AnimationSystem is null &&
-                    (NameParsing.IsOpenSlotName(slot.Name) || (y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f && facets[s] == 0));
+                if (float.IsFinite(c.X) && float.IsFinite(c.Y) && c.Y > 0f && c.X >= 0f && c.X + c.Y <= 1.0001f)
+                    colourXyz[s] = ColorSpaces.XyToXyz(new Vector2(c.X, c.Y));
+                // a single facet is not a prism: it passes the beam on (BeamZ Ignite's "Wheel Slot 1" under "Prism1 OPEN")
+                facets[s] = slot.Facets.Count > 1 ? slot.Facets.Count : slot.Facets.Count == 1 ? 0 : NameParsing.ParseFacetCount(slot.Name);
+                if (facets[s] == 1) facets[s] = 0;
+                bool media = slot.MediaPath is not null || slot.MediaFileName is not null;
+                bool defaultColour = y >= 0.99f && MathF.Abs(c.X - 0.3127f) < 0.01f && MathF.Abs(c.Y - 0.329f) < 0.01f;
+                // a slot that carries a filter colour is a filter whatever its name ("No Color Pink", x 0.44 y 0.33); a
+                // transmission of 0 is no colour data (CLF LEDBar Pro "No Function": x 0.64 y 0.33 Y 0)
+                bool neutral = defaultColour || !(float.IsFinite(c.X) && float.IsFinite(c.Y)) || !(y > 0.001f) ||
+                    (y >= 0.9f && MathF.Abs(c.X - 0.3127f) < 0.03f && MathF.Abs(c.Y - 0.329f) < 0.03f);
+                // prism slots keep GDTF's default colour too: one named as a prism is a prism even without facets
+                // (Infinity Furion "Prism", Chauvet Rogue R3 "Prism Insert", Vari-Lite VL2600 "Prism On")
+                bool namedItem = family == WheelFamily.Prism && NameParsing.NamesPrism(slot.Name);
+                open[s] = slot.Facets.Count <= 1 && slot.AnimationSystem is null && facets[s] == 0 &&
+                    (media
+                        ? NameParsing.IsPlainOpenSlotName(slot.Name) || IsOpenMediaName(slot.MediaFileName)
+                        : NameParsing.IsOpenSlotName(slot.Name) || (defaultColourIsOpen && defaultColour && !namedItem) ||
+                            (NameParsing.IsWheelOutName(slot.Name) && neutral && !slot.Name.Contains("clos", StringComparison.OrdinalIgnoreCase)));
                 // an open slot is a hole: files often store the lamp's own colour there, which is not a filter
                 if (open[s] && y >= 0.9f) transmission[s] = Vector3.One;
+                // a beam-shaper slot without an image is an anamorphic lens that stretches the beam (Ayrton Rivale)
+                if (family == WheelFamily.BeamShaper && !open[s] && !media && facets[s] == 0) stretch[s] = NameParsing.ParseStretch(slot.Name);
             }
             i = Wheels.Count;
-            Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open));
+            Wheels.Add(new ProfileWheel(i, wheel, transmission, facets, open, stretch, colourXyz));
             _wheelIndex[wheel] = i;
             return i;
+        }
+
+        /// <summary>The wheel family of the first function of the mode with a wheel attribute that names <paramref name="wheel"/>.</summary>
+        private WheelFamily WheelFamilyOf(Wheel wheel)
+        {
+            if (_wheelFamilies is null)
+            {
+                _wheelFamilies = new Dictionary<Wheel, WheelFamily>(ReferenceEqualityComparer.Instance);
+                foreach (var channel in Mode.Channels)
+                    foreach (var lc in channel.LogicalChannels)
+                        foreach (var fn in lc.Functions)
+                            if (fn.Wheel is { } w && Classify(fn.AttributeName ?? "").Wheel is var f && f != WheelFamily.None)
+                                _wheelFamilies.TryAdd(w, f);
+            }
+            return _wheelFamilies.GetValueOrDefault(wheel);
+        }
+
+        /// <summary>A media file named as an open aperture ("Open", "open_1", "Open-2"): the slot is a hole.</summary>
+        private static bool IsOpenMediaName(string? media)
+        {
+            if (string.IsNullOrWhiteSpace(media)) return false;
+            var s = media.AsSpan().Trim();
+            if (!s.StartsWith("open", StringComparison.OrdinalIgnoreCase)) return false;
+            foreach (char c in s[4..])
+                if (char.IsLetter(c)) return false;
+            return true;
         }
 
         private int EmitterIndexOf(ChannelFunction src, string code)
@@ -1086,6 +1333,8 @@ public sealed partial class FixtureProfile
                             Beams[b].OwnMechanics = true;
             }
 
+            MarkSecondarySelections();
+            MarkUnaddressedBeams();
             ComputeBeamShares();
             int warningsBefore = Warnings.Count;
             SetupAllBeamPhotometry();
@@ -1107,8 +1356,130 @@ public sealed partial class FixtureProfile
             }
         }
 
+        /// <summary>
+        /// Marks <see cref="ProfileFunction.SecondarySelection"/> and <see cref="ProfileFunction.IndexesSelectedItem"/>: slot
+        /// selections and whole-wheel indexes or spins on a channel that selects no slot of their mechanism while another
+        /// channel reaching the same beams does. One pass over the functions, keyed by mechanism (state array and number).
+        /// </summary>
+        private void MarkSecondarySelections()
+        {
+            Dictionary<(int Group, int Number), List<int>>? selecting = null;
+            foreach (var ch in Channels)
+            {
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                {
+                    var f = Functions[k];
+                    if (!IsWheelSelection(f.Class.Kind) || f.Wheel < 0 || !Array.Exists(f.SetArray, s => s.WheelSlot > 0)) continue;
+                    selecting ??= new();
+                    var key = MechanismKey(f.Class);
+                    if (!selecting.TryGetValue(key, out var list)) selecting[key] = list = new List<int>();
+                    if (list.Count == 0 || list[^1] != ch.Index) list.Add(ch.Index);
+                }
+            }
+            if (selecting is null) return;
+            foreach (var ch in Channels)
+            {
+                if (_beamCount[ch.Index] == 0) continue;
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                {
+                    var f = Functions[k];
+                    bool select = IsWheelSelection(f.Class.Kind), index = f.Class.Kind is AttributeKind.WheelIndex or AttributeKind.WheelSpin;
+                    if (!(select || index) || !selecting.TryGetValue(MechanismKey(f.Class), out var list) || list.Contains(ch.Index)) continue;
+                    foreach (int other in list)
+                    {
+                        if (!BeamsOverlap(ch.Index, other)) continue;
+                        if (select)
+                        {
+                            f.SecondarySelection = true;
+                            f.ImpliesInsertion = false;
+                        }
+                        else
+                        {
+                            f.IndexesSelectedItem = true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            static (int Group, int Number) MechanismKey(AttributeClass c) => (c.Wheel switch
+            {
+                WheelFamily.Animation or WheelFamily.AnimationSystem => (int)WheelFamily.Animation,
+                var w => (int)w,
+            }, Math.Max(c.Number, 1));
+        }
+
+        /// <summary>True when channels <paramref name="a"/> and <paramref name="b"/> reach at least one common beam.</summary>
+        private bool BeamsOverlap(int a, int b)
+        {
+            int a0 = _beamFirst[a], a1 = a0 + _beamCount[a], b0 = _beamFirst[b], b1 = b0 + _beamCount[b];
+            return _beamCount[a] > 0 && _beamCount[b] > 0 && a0 < b1 && b0 < a1;
+        }
+
+        /// <summary>Attributes that give a beam its colour (additive emitters, indirect colour systems).</summary>
+        private static bool IsColourSource(AttributeKind kind) =>
+            kind is AttributeKind.ColorAdd or AttributeKind.ColorRgb or AttributeKind.HsbHue or AttributeKind.HsbSaturation
+                or AttributeKind.HsbBrightness or AttributeKind.CieX or AttributeKind.CieY or AttributeKind.CieBrightness;
+
+        /// <summary>
+        /// An LED ring or cell that other modes of the fixture colour with additive emitter channels, but that no colour
+        /// channel of this mode reaches while the mode does mix other beams' emitters, has no light of its own here: there
+        /// is no white lamp behind it (Ayrton Zonda 3 FX "Basic": the "Liquid Effect" ring, driven by "Zonda Effect"
+        /// RGB channels only in the "+ Liquid" modes). Such beams are <see cref="ProfileBeam.Unaddressed"/> and stay dark;
+        /// a mode without any emitter channel (a one-channel dimmer mode of an RGBW wash) still lights its beams white.
+        /// </summary>
+        private void MarkUnaddressedBeams()
+        {
+            if (Beams.Count < 2 || FixtureType.DmxModes.Count < 2) return;
+            bool modeMixes = false;
+            foreach (var f in Functions)
+                if (f.Class.Kind == AttributeKind.ColorAdd && f.Emitter >= 0) modeMixes = true;
+            if (!modeMixes) return;
+
+            HashSet<GdtfGeometry>? elsewhere = null;
+            foreach (var beam in Beams)
+            {
+                // only decorative glow LEDs (aura, background, liquid-effect rings) are off when no channel addresses them; a
+                // cell with channels of its own (a white strobe cell's dimmer) is addressed, whatever its colour
+                if (beam.Geometry.BeamType != GdtfBeamType.Glow || beam.OwnChannels.Length > 0) continue;
+                bool reached = false;
+                foreach (int c in ChannelsOfBeam(beam))
+                {
+                    var ch = Channels[c];
+                    for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount && !reached; k++)
+                        reached = IsColourSource(Functions[k].Class.Kind);
+                    if (reached) break;
+                }
+                if (reached) continue;
+                if (elsewhere is null)
+                {
+                    elsewhere = new HashSet<GdtfGeometry>(ReferenceEqualityComparer.Instance);
+                    foreach (var mode in FixtureType.DmxModes)
+                    {
+                        if (ReferenceEquals(mode, Mode)) continue;
+                        foreach (var channel in mode.Channels)
+                        {
+                            if (channel.Geometry is not { } g) continue;
+                            foreach (var lc in channel.LogicalChannels)
+                                foreach (var fn in lc.Functions)
+                                    if (AttributeClassifier.Classify(fn.AttributeName ?? "").Kind == AttributeKind.ColorAdd) elsewhere.Add(g);
+                        }
+                    }
+                }
+                var parts = Geometry.Parts;
+                for (int part = beam.PartIndex; part >= 0; part = parts[part].ParentIndex)
+                {
+                    if (!elsewhere.Contains(parts[part].Geometry)) continue;
+                    beam.Unaddressed = true;
+                    Warnings.Add($"Beam '{beam.Name}' is coloured by emitter channels in other modes but by no channel of mode '{Mode.Name}': it stays dark.");
+                    break;
+                }
+            }
+        }
+
         private void SetupAllBeamPhotometry()
         {
+            _whiteWarned.Clear();
             foreach (var beam in Beams)
             {
                 try
@@ -1121,6 +1492,7 @@ public sealed partial class FixtureProfile
                     beam.BeamType = PhotometryBeamType.Wash;
                     beam.NativeBeamAngle = 25f * DegToRad;
                     beam.FieldRatio = 1.82f;
+                    beam.FieldRatioEstimated = true;
                     beam.SolidAngles = new BeamSolidAngleTable(PhotometryBeamType.Wash, beam.NativeBeamAngle, beam.NativeBeamAngle, beam.FieldRatio);
                     beam.ReferenceFlux = 1000f;
                     beam.PhotometrySource = PhotometrySource.Estimated;
@@ -1351,7 +1723,7 @@ public sealed partial class FixtureProfile
             if (!(native > 0f) || !float.IsFinite(native)) native = 25f;
 
             float zoomMin = float.PositiveInfinity, zoomMax = 0f;
-            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false;
+            bool hasCmyOrCto = false, hasColorSub = false, hasColorTemperature = false, hasCtc = false, hasCrossfade = false, colourSystem = false;
             var emitterSet = new SortedSet<int>();
             foreach (int c in ChannelsOfBeam(beam))
             {
@@ -1386,9 +1758,12 @@ public sealed partial class FixtureProfile
                             emitterSet.Add(f.Emitter);
                             break;
                     }
+                    colourSystem |= IsColourSource(f.Class.Kind) || f.Class.Kind is AttributeKind.ColorSub or AttributeKind.ColorMacro ||
+                        f.Class.Wheel == WheelFamily.Color;
                 }
             }
             bool hasZoom = zoomMax > 0f;
+            beam.HasColorSystem = colourSystem;
 
             // field ratio: from the file's field angle unless that is not a field angle — the zoom range written into the
             // Beam's BeamAngle/FieldAngle (Ayrton Rivale Wash 4°/57°, Clay Paky Aleda B-EYE K10 4°/60° …: 53 beams in the
@@ -1406,6 +1781,7 @@ public sealed partial class FixtureProfile
                 else
                     ratio = r;
             }
+            beam.FieldRatioEstimated = float.IsNaN(ratio);
             if (float.IsNaN(ratio))
             {
                 var est = BeamDistribution.Create(beam.BeamType, native * DegToRad, float.NaN);
@@ -1499,7 +1875,9 @@ public sealed partial class FixtureProfile
                     list[i] = new PhotometryEmitter(pe.Name, pe.Chromaticity, beam.ReferenceFlux * MathF.Max(pe.Weight, 1e-6f) / wsum);
                     beam.EmitterSlot[e] = i++;
                 }
+                list = CalibrateWhitePoint(beam, list);
                 beam.Emitters = list;
+                beam.PresetOutput = BuildPresetOutput(beam, list);
                 beam.EmitterFullXyz = new Vector3[Emitters.Count];
                 for (int e = 0; e < Emitters.Count; e++)
                     if (beam.EmitterSlot[e] >= 0)
@@ -1520,6 +1898,128 @@ public sealed partial class FixtureProfile
                 if (!_whiteTables.TryGetValue(key, out var white)) _whiteTables[key] = white = WhiteEfficiencyTable.Create(beam.Emitters);
                 beam.WhiteTable = white;
             }
+        }
+
+        /// <summary>
+        /// Colour wheels on an LED engine that mixes colour are presets, not filters: there is no dichroic in front of the
+        /// emitters, the engine sets them to the preset's colour (Ayrton Zonda 3 FX "Color Preset": "SCARLET" x 0.448,
+        /// y 0.332). Per colour wheel the beam uses, per slot the largest flux the emitters make at the slot's
+        /// chromaticity relative to the beam's reference flux (<see cref="WhiteEfficiencyTable.MaxFlux"/>); NaN for open
+        /// slots and for colours outside the emitters' gamut, which keep the filter model. Null for beams whose emitters
+        /// do not mix colour.
+        /// </summary>
+        private float[]?[]? BuildPresetOutput(ProfileBeam beam, PhotometryEmitter[] list)
+        {
+            bool coloured = false;
+            for (int i = 0; i < list.Length && !coloured; i++)
+                for (int j = i + 1; j < list.Length && !coloured; j++)
+                    coloured = Vector2.Distance(list[i].Chromaticity, list[j].Chromaticity) > 0.1f;
+            if (!coloured || list.Length > 9) return null;
+            float[]?[]? result = null;
+            double[]? a = null, c = null, f = null;
+            double total = 0;
+            foreach (int ch in ChannelsOfBeam(beam))
+            {
+                var channel = Channels[ch];
+                for (int k = channel.FirstFunction; k < channel.FirstFunction + channel.FunctionCount; k++)
+                {
+                    var fn = Functions[k];
+                    if (fn.Class.Wheel != WheelFamily.Color || fn.Wheel < 0) continue;
+                    result ??= new float[]?[Wheels.Count];
+                    if (result[fn.Wheel] is not null) continue;
+                    if (a is null)
+                    {
+                        a = new double[list.Length];
+                        c = new double[list.Length];
+                        f = new double[list.Length];
+                        for (int e = 0; e < list.Length; e++)
+                        {
+                            a[e] = list[e].TristimulusPerLumen.X;
+                            c[e] = list[e].TristimulusPerLumen.Z;
+                            f[e] = list[e].MaxFlux;
+                            total += f[e];
+                        }
+                    }
+                    var wheel = Wheels[fn.Wheel];
+                    var output = new float[wheel.SlotCount];
+                    for (int s = 0; s < output.Length; s++)
+                    {
+                        var xyz = wheel.SlotColorXyzArray[s];
+                        double flux = wheel.SlotOpenArray[s] || !(total > 0) || !(xyz.Y > 0f)
+                            ? 0
+                            : WhiteEfficiencyTable.MaxFlux(a, c!, f!, xyz.X / xyz.Y, xyz.Z / xyz.Y);
+                        output[s] = flux > total * 1e-3 && double.IsFinite(flux) ? (float)(flux / total) : float.NaN;
+                    }
+                    result[fn.Wheel] = output;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>Largest distance of an LED engine's full white from the Planckian locus that is taken as written, Δuv.</summary>
+        private const float MaxWhiteDuv = 0.02f;
+
+        /// <summary>
+        /// Checks the white an LED engine makes with all emitters at full against the fixture's researched colour
+        /// temperature (<c>_specs</c> colorTemperatureK). Emitter outputs taken from a file can be far from photometric
+        /// (Ayrton Zonda 3 FX: RGBW at full mixes to x 0.255, y 0.178, a violet 0.056 below the locus, where the datasheet
+        /// gives 2700–8000 K); a real engine is calibrated to a white. When the full mix is more than
+        /// <see cref="MaxWhiteDuv"/> off the locus or its CCT lies outside the range, the emitter outputs are trimmed as
+        /// little as possible (<see cref="ColorMixing.TryBalance"/>) so that the full mix lands on the locus at the nearest
+        /// CCT of the range, keeping the beam's reference flux and every emitter lit; the beam is marked
+        /// <see cref="ProfileBeam.WhitePointEstimated"/> and a warning names the change. A range of a single colour
+        /// temperature names the white emitter, not the mix: then only a mix off the locus is corrected, near its own CCT.
+        /// Engines with fewer than two differently coloured emitters, or without a researched range, are left alone.
+        /// </summary>
+        private PhotometryEmitter[] CalibrateWhitePoint(ProfileBeam beam, PhotometryEmitter[] list)
+        {
+            beam.WhitePointEstimated = false;
+            beam.WhitePointKelvin = float.NaN;
+            Vector3 sum = default;
+            double total = 0;
+            foreach (var e in list)
+            {
+                sum += e.TristimulusPerLumen * e.MaxFlux;
+                total += e.MaxFlux;
+            }
+            float s = sum.X + sum.Y + sum.Z;
+            if (!(s > 0f) || !(total > 0) || !float.IsFinite(s)) return list;
+            var xy = new Vector2(sum.X / s, sum.Y / s);
+            var cct = Cct.FromXy(xy);
+            if (cct.IsMeaningful) beam.WhitePointKelvin = cct.Kelvin;
+            if (Specs?.ColorTemperatureK is not { } range || !(range.Min >= 1000) || !(range.Max <= 25000) || range.Max < range.Min) return list;
+            bool coloured = false;
+            for (int i = 0; i < list.Length && !coloured; i++)
+                for (int j = i + 1; j < list.Length && !coloured; j++)
+                    coloured = Vector2.Distance(list[i].Chromaticity, list[j].Chromaticity) > 0.1f;
+            if (!coloured) return list;
+            float lo = (float)range.Min, hi = (float)range.Max;
+            bool onLocus = cct.IsMeaningful && float.IsFinite(cct.Kelvin) && MathF.Abs(cct.Duv) <= MaxWhiteDuv;
+            // a single colour temperature (min = max) is the white emitter's or the lamp's, not a calibrated mix of the
+            // coloured emitters (BeamZ RB 90 wW RGB "2200 K", PRstage LED COB 200 RGBW "3200 K"): a full mix on the
+            // Planckian locus is taken as written; one off it goes onto the locus near its own temperature (within a
+            // factor of two of the given one: ADJ Vintage Bar's RGBAL mix at 5409 K, Δuv +0.029, next to 2000 K lamps)
+            bool fixedCct = hi - lo < 1f;
+            if (onLocus && (fixedCct || (cct.Kelvin >= lo / 1.02f && cct.Kelvin <= hi * 1.02f))) return list;
+
+            if (fixedCct)
+            {
+                lo = Math.Max(lo / 2f, 1000f);
+                hi = Math.Min(hi * 2f, 25000f);
+            }
+            float target = cct.IsMeaningful && float.IsFinite(cct.Kelvin) ? Math.Clamp(cct.Kelvin, lo, hi) : (float)range.Max;
+            int n = list.Length;
+            var factors = new float[n];
+            if (n > 16 || !ColorMixing.TryBalance(list, Cct.XyFromCct(target), factors)) return list; // outside the emitters' gamut
+            var calibrated = new PhotometryEmitter[n];
+            for (int i = 0; i < n; i++) calibrated[i] = new PhotometryEmitter(list[i].Name, list[i].Chromaticity, list[i].MaxFlux * factors[i]);
+            beam.WhitePointEstimated = true;
+            beam.WhitePointKelvin = target;
+            string key = string.Create(CultureInfo.InvariantCulture, $"{xy.X:F3},{xy.Y:F3}>{target:F0}");
+            if (_whiteWarned.Add(key))
+                Warnings.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"Emitters at full mix to x {xy.X:F3}, y {xy.Y:F3} ({(cct.IsMeaningful ? $"{cct.Kelvin:F0} K, Δuv {MathF.Round(cct.Duv, 3) + 0f:+0.000;-0.000}" : "no CCT")}), not a white of the datasheet's {range.Min:F0}–{range.Max:F0} K; emitter outputs re-balanced to {target:F0} K (estimate)."));
+            return calibrated;
         }
 
         /// <summary>

@@ -109,12 +109,13 @@ public class LibraryWideTests(ITestOutputHelper output)
         var buffer = new FixtureDmxBuffer(p);
         DmxLooks.OpenWhite(buffer);
         var state = FixtureEvaluator.Evaluate(p, buffer);
-        int dark = state.Beams.Count(b => !(b.PeakCandela > 0f));
+        // a decorative glow ring that no channel of the mode addresses has no light of its own (ProfileBeam.Unaddressed)
+        int dark = state.Beams.Count(b => !(b.PeakCandela > 0f) && !b.Beam.Unaddressed);
         bool excepted = Array.Exists(DarkAtOpenWhite, x => where.StartsWith(x.File, StringComparison.Ordinal) &&
             where.EndsWith($"[{x.Mode}]", StringComparison.Ordinal));
         if (dark > 0 && !excepted)
         {
-            var b = state.Beams.First(x => !(x.PeakCandela > 0f));
+            var b = state.Beams.First(x => !(x.PeakCandela > 0f) && !x.Beam.Unaddressed);
             failures.Enqueue($"{where}: {dark} of {state.Beams.Count} beams dark at open white (first: {b.Name}, dimmer {b.Dimmer}, shutter {b.Shutter}, colour {b.ColorTransmission})");
         }
         if (dark > 0) return false;

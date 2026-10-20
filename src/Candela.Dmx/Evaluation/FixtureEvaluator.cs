@@ -255,7 +255,7 @@ public static class FixtureEvaluator
         var acc = BeamAcc.Create();
         ResetWheels(shared);
         Array.Clear(state.EmitterLevels);
-        var ctx = new ApplyContext(p, fns, rt, state.Motors, time, state.Seed, state.Cache);
+        var ctx = new ApplyContext(p, fns, rt, state.Motors, time, state.Seed, state.Cache, state.GelTransmission);
         foreach (int c in p.SharedBeamChannels) Apply(ref acc, shared, state.EmitterLevels, c, in ctx, ref animating);
         if (single)
         {
@@ -512,7 +512,7 @@ public static class FixtureEvaluator
     private readonly struct ApplyContext
     {
         public ApplyContext(FixtureProfile p, ProfileFunction[] fns, ChannelRuntime[] rt, MotorRuntime[] motors, double time, uint seed,
-            EvaluationCache cache)
+            EvaluationCache cache, Vector3 gel)
         {
             Profile = p;
             Functions = fns;
@@ -521,7 +521,11 @@ public static class FixtureEvaluator
             Time = time;
             Seed = seed;
             Cache = cache;
+            Gel = gel;
         }
+
+        /// <summary>Per-channel transmission of the fixture's gel (<see cref="FixtureState.SetGel"/>), (1, 1, 1) without one.</summary>
+        public Vector3 Gel { get; }
 
         public MotorRuntime[] Motors { get; }
 
@@ -722,7 +726,7 @@ public static class FixtureEvaluator
                 acc.Crossfade = level;
                 break;
             case AttributeKind.Tint:
-                acc.Tint += TintDuv(f, v);
+                if ((flags & ChannelSetFlags.NoFunction) == 0) acc.Tint += TintDuv(f, v);
                 break;
             case AttributeKind.ColorMacro:
                 if (set is not null && (flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction | ChannelSetFlags.Closed)) == 0)
@@ -903,25 +907,110 @@ public static class FixtureEvaluator
             _ => null,
         };
         if (arr is null || arr.Length == 0) return;
+        var flags = r.SetFlags;
         if (n >= arr.Length) n = arr.Length - 1;
         ref var w = ref arr[n];
-        var flags = r.SetFlags;
+        bool selection = f.Class.Kind is AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake;
+        if (selection && f.SecondarySelection)
+        {
+            // a selection attribute on a channel that selects nothing of the mechanism (its rotation channel, a second
+            // prism channel written with the first prism's attribute): the selection channel decides what is in the
+            // beam; a selection with spin still turns the item
+            if (f.Class.Kind == AttributeKind.WheelSelectSpin && (flags & ChannelSetFlags.WheelOut) == 0)
+            {
+                ref readonly var spin = ref ctx.SpinOf(c);
+                w.Rotation = Turn(spin.Position) * DegToRad;
+                w.RotationSpeed = (float)spin.Velocity * DegToRad;
+            }
+            return;
+        }
+        if ((flags & ChannelSetFlags.WheelOut) != 0 && !selection && f.Class.Kind != AttributeKind.AnimationInsertion)
+        {
+            // an item rotation, index or rate function in a range named "No function", "Off" … does nothing to the
+            // mechanism — it does not put it in the beam — unless its channel is the mechanism's selection channel, where
+            // the range takes the mechanism out (Robe Esprite "EffectWheelIndex" / "No function"); a whole-wheel index or
+            // spin positions the wheel, so its "Open" range is the open position (ADJ Hydro Profile "Gobo 1 - 7 Index")
+            if ((f.OnSelectionChannel || f.Class.Kind is AttributeKind.WheelIndex or AttributeKind.WheelSpin or AttributeKind.WheelRandom
+                    or AttributeKind.WheelShake) && !w.InVote)
+            {
+                if (f.Wheel >= 0) w.Wheel = f.Wheel;
+                w.OutVote = true;
+            }
+            return;
+        }
+        // a selection of a slot holding an item overrides an "out" range — or a selection of an open slot — of another
+        // channel on the same mechanism, whichever came first (CLF Poseidon Wash XS: "Background Color" also written as
+        // Color1, at "ColorMix Activ"); a selection that names no slot (a wheel-less prism, an index written as selection:
+        // DLW Dream L1400P "AnimationWheel1" 'Zero' … 'max Index' next to its rotation channel's 'Open') does not
+        bool selectOut = selection && ((flags & ChannelSetFlags.WheelOut) != 0 || RestsOnOpenSlot(ctx.Profile, f, r.Value, flags));
+        bool selectsSlot = selection && !selectOut && f.Wheel >= 0 && f.UsesSlotPosition;
+        if (selectsSlot && w.OutVote && !w.InVote)
+        {
+            w.Wheel = -1;
+            w.Position = float.NaN;
+        }
         int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
-        if (f.Wheel >= 0) w.Wheel = f.Wheel;
+        // the wheel a selection put in place stays the mechanism's wheel: an index or rotation function naming another
+        // wheel (Vari-Lite VL3600 "Gobo1Pos" on a second copy of the gobo wheel) turns the item, it does not swap wheels
+        if (f.Wheel >= 0 && f.ImpliesInsertion && (selectsSlot || !w.InVote)) w.Wheel = f.Wheel;
+        if (f.IndexesSelectedItem)
+        {
+            // an item index or rotation written as a wheel index or spin: turns the item, and moves the wheel only when
+            // no channel selects a slot
+            if (f.Class.Kind == AttributeKind.WheelSpin)
+            {
+                ref readonly var spin = ref ctx.SpinOf(c);
+                w.Rotation = Turn(spin.Position) * DegToRad;
+                w.RotationSpeed = (float)spin.Velocity * DegToRad;
+            }
+            else
+            {
+                w.Rotation = r.Value * DegToRad;
+                w.RotationSpeed = 0f;
+            }
+            if (w.InVote) return;
+        }
         switch (f.Class.Kind)
         {
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake:
-                if (f.Wheel >= 0) w.Position = f.UsesSlotPosition ? r.Value : 1f;
-                else
                 {
-                    // a prism or effect without wheel data: in unless the range says open/off
-                    bool open = (flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction | ChannelSetFlags.Closed)) != 0 ||
-                        (set is not null && NameParsing.IsOpenSlotName(set.Name));
-                    w.Position = float.NaN;
-                    w.IsOpen = open;
-                    w.Facets = open || f.Class.Wheel != WheelFamily.Prism ? 0 : Math.Max(NameParsing.ParseFacetCount(set?.Name ?? f.Name), 3);
-                    w.Insertion = open ? 0f : 1f;
-                    w.Rate = r.Physical;
+                    // a range named "Open", "Off", "Removed" … (WheelOut) takes the mechanism out of the beam — unless
+                    // another channel selects a slot of it; a ramp after it moves a single-item mechanism in gradually
+                    // (both found while the profile is compiled)
+                    bool isOut = selectOut;
+                    if (isOut && w.InVote) break; // an item another channel selects stays in
+                    float insertion = float.NaN;
+                    if (isOut)
+                    {
+                        w.OutVote = true;
+                    }
+                    else if ((flags & ChannelSetFlags.InsertionCycle) != 0 && set is not null)
+                    {
+                        insertion = set.CycleInsertion(r.Dmx, ctx.Time);
+                        animating = true;
+                    }
+                    else if ((flags & ChannelSetFlags.InsertionRamp) != 0 && set is not null && set.DmxTo > set.DmxFrom)
+                    {
+                        insertion = Math.Clamp((float)(r.Dmx - set.DmxFrom) / (set.DmxTo - set.DmxFrom), 0f, 1f);
+                    }
+                    if (f.Wheel >= 0)
+                    {
+                        // a ramp or cycle moves the wheel's single item in and out (not the wheel from slot to slot)
+                        w.Position = f.RampSlot > 0 && (flags & (ChannelSetFlags.InsertionRamp | ChannelSetFlags.InsertionCycle)) != 0
+                            ? f.RampSlot
+                            : f.UsesSlotPosition ? r.Value : 1f;
+                    }
+                    else
+                    {
+                        // a prism or effect without wheel data: in unless the range says it is out
+                        w.Position = float.NaN;
+                        w.IsOpen = isOut;
+                        w.Facets = isOut || f.Class.Wheel != WheelFamily.Prism ? 0 : Math.Max(NameParsing.ParseFacetCount(set?.Name ?? f.Name), 3);
+                        w.Rate = r.Physical;
+                        if (float.IsNaN(insertion) && !isOut) insertion = 1f;
+                    }
+                    if (selectsSlot) w.InVote = true;
+                    if (!float.IsNaN(insertion)) SetInsertion(ref w, insertion);
                 }
                 if (f.Class.Kind == AttributeKind.WheelSelectSpin)
                 {
@@ -989,9 +1078,35 @@ public static class FixtureEvaluator
                 w.Rate = r.Physical;
                 break;
             case AttributeKind.AnimationInsertion:
-                w.Insertion = Level(f, r.Value);
+                SetInsertion(ref w, (flags & ChannelSetFlags.WheelOut) != 0 ? 0f : Level(f, r.Value));
                 break;
         }
+    }
+
+    /// <summary>
+    /// True when slot selection <paramref name="f"/> rests exactly on an open slot of its wheel at slot position
+    /// <paramref name="position"/> (not between slots, not on a ramp or cycle, which move a single item instead).
+    /// </summary>
+    private static bool RestsOnOpenSlot(FixtureProfile p, ProfileFunction f, float position, ChannelSetFlags flags)
+    {
+        if (f.Wheel < 0 || !f.UsesSlotPosition || !float.IsFinite(position) ||
+            (flags & (ChannelSetFlags.InsertionRamp | ChannelSetFlags.InsertionCycle)) != 0)
+            return false;
+        float k = MathF.Round(position);
+        if (MathF.Abs(position - k) > 1e-3f || MathF.Abs(k) > 1e6f) return false;
+        var wheel = p.WheelArray[f.Wheel];
+        return wheel.SlotOpenArray[wheel.WrapIndex((int)k - 1)];
+    }
+
+    /// <summary>
+    /// Sets a mechanism's insertion from a channel that states a level (a ramp, a cycle, an animation-system insertion
+    /// channel); several such channels on one mechanism combine to the smallest insertion.
+    /// </summary>
+    private static void SetInsertion(ref WheelState w, float insertion)
+    {
+        insertion = float.IsFinite(insertion) ? Math.Clamp(insertion, 0f, 1f) : 0f;
+        w.Insertion = w.InsertionSet ? MathF.Min(w.Insertion, insertion) : insertion;
+        w.InsertionSet = true;
     }
 
     private static void ResetWheels(BeamState s)
@@ -1049,8 +1164,17 @@ public static class FixtureEvaluator
             // A wheel named only by a rotation/rate/insertion function (no slot selection channel, or the selection
             // function of this mode has no wheel) rests on its home slot.
             if (w.Wheel >= 0 && !float.IsFinite(w.Position)) w.Position = 1f;
+            // taken out of the beam by an "out" range, and no channel selects it
+            bool outOfBeam = w.OutVote && !w.InVote;
             if (w.Wheel < 0)
             {
+                if (outOfBeam || (w.InsertionSet && !(w.Insertion > 0f)))
+                {
+                    // a wheel-less prism/effect taken out by its range
+                    w.IsOpen = true;
+                    w.Facets = 0;
+                    w.Insertion = 0f;
+                }
                 if (float.IsNaN(w.Position) && w.Insertion > 0f) continue; // wheel-less prism/effect set in ApplyWheel
                 w.Slot = 0;
                 w.NextSlot = 0;
@@ -1077,7 +1201,28 @@ public static class FixtureEvaluator
             w.IsOpen = open0 && (blend == 0f || open1);
             int facets = blend > 0.5f ? wheel.SlotFacetArray[i1] : wheel.SlotFacetArray[i0];
             w.Facets = prisms ? (facets > 0 ? facets : (blend > 0.5f ? open1 : open0) ? 0 : 3) : facets;
-            if (w.Insertion == 0f) w.Insertion = w.IsOpen ? 0f : 1f;
+            if (outOfBeam)
+            {
+                // taken out of the beam by its range ("Open", "Off", "Removed" …), whatever slot the wheel rests on
+                w.IsOpen = true;
+                w.Facets = 0;
+                w.Insertion = 0f;
+            }
+            else if (!w.InsertionSet)
+            {
+                w.Insertion = w.IsOpen ? 0f : 1f;
+            }
+            else if (!(w.Insertion > 0f))
+            {
+                // at insertion 0 (a ramp at its start, an insertion channel at 0): out, whatever slot the wheel rests on
+                w.IsOpen = true;
+                w.Facets = 0;
+                w.Insertion = 0f;
+            }
+            else if (w.IsOpen)
+            {
+                w.Insertion = 0f; // an open slot is a hole however far it is inserted
+            }
             _ = n;
         }
     }
@@ -1184,18 +1329,26 @@ public static class FixtureEvaluator
             // the engine at the new white point instead of the filter's (re-balancing never adds light)
             rgb *= ctx.Cache.Filter(pb, table, acc.C, acc.M, acc.Y, targetKelvin, electronic: pb.ElectronicColor && temperature);
         }
+        var presets = pb.PresetOutput;
         foreach (ref readonly var w in bs.ColorWheels.AsSpan())
         {
-            if (w.Wheel < 0 || w.Slot <= 0) continue;
+            if (w.Wheel < 0 || w.Slot <= 0 || w.IsOpen) continue;
+            if (presets is not null && presets[w.Wheel] is { } preset && TryPreset(p.WheelArray[w.Wheel], preset, in w, rgb, gelSaturation, out var rendered))
+            {
+                rgb = rendered;
+                continue;
+            }
             var t = p.WheelArray[w.Wheel].SlotTransmissionArray;
             var tr = t[w.Slot - 1];
             if (w.Blend > 0f) tr = Vector3.Lerp(tr, t[w.NextSlot - 1], w.Blend);
             rgb *= gelSaturation < 1f ? Vector3.Lerp(Vector3.One, tr, gelSaturation) : tr;
         }
         if (tint != 0f) rgb = ApplyTint(rgb, tint);
+        // a gel in front of a white fixture (MVR <Color>); fixtures with a colour system of their own make their colour
+        if (!pb.HasColorSystem && ctx.Gel != Vector3.One) rgb *= ctx.Gel;
 
         float flux = MathF.Max(ColorSpaces.LuminanceRec2020(rgb), 0f);
-        if (!float.IsFinite(flux)) flux = 0f;
+        if (!float.IsFinite(flux) || pb.Unaddressed) flux = 0f; // an unaddressed LED ring has no light of its own
         float transmission = reference > 0f ? Math.Clamp(flux / reference, 0f, 1f) : 0f;
         bs.ColorTransmission = transmission;
         if (flux > 0f) bs.Color = LightColor.FromRec2020(rgb);
@@ -1205,7 +1358,10 @@ public static class FixtureEvaluator
         float beamAngle = float.IsFinite(acc.Zoom) ? Math.Clamp(acc.Zoom, 0.1f, 179f) * DegToRad : pb.NativeBeamAngle;
         bs.BeamAngle = beamAngle;
         bs.FieldAngle = MathF.Max(beamAngle, MathF.Min(beamAngle * pb.FieldRatio, MaxFieldAngle));
-        float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity;
+        float stretch = ShaperStretch(p, bs, out float stretchRotation);
+        bs.ShaperStretch = stretch;
+        bs.ShaperStretchRotation = stretchRotation;
+        float peak = pb.ReferenceFlux / ctx.Cache.SolidAngle(pb.SolidAngles, beamAngle) * transmission * bs.Intensity / stretch;
         bs.PeakCandela = float.IsFinite(peak) ? peak : 0f;
         bs.Flux = flux * bs.Intensity;
         bs.Focus = float.IsFinite(acc.Focus) ? acc.Focus : 0.5f;
@@ -1213,6 +1369,62 @@ public static class FixtureEvaluator
         bs.Iris = Math.Clamp(acc.Iris, 0f, 1f);
         bs.Frost = Math.Clamp(1f - acc.FrostKeep, 0f, 1f);
         bs.ShaperRotation = acc.ShaperRotation;
+    }
+
+    /// <summary>
+    /// A colour-wheel slot of an LED engine rendered as a preset (see <see cref="ProfileBeam.PresetOutput"/>): the light
+    /// takes the slot's chromaticity, and its luminance is the current mix's times the share of the reference flux the
+    /// emitters make at that colour — dark when the emitters are at 0, the engine's saturated preset at full. A split
+    /// position blends the two slots (an open slot keeps the mix's colour); <paramref name="saturation"/> &lt; 1 (an
+    /// HSB saturation of virtual gels) blends back towards the mix. False when a slot involved is outside the
+    /// emitters' gamut, which leaves the filter model to the caller.
+    /// </summary>
+    private static bool TryPreset(ProfileWheel wheel, float[] output, in WheelState w, Vector3 rgb, float saturation, out Vector3 result)
+    {
+        result = rgb;
+        int i0 = w.Slot - 1, i1 = w.Blend > 0f && w.NextSlot > 0 ? w.NextSlot - 1 : i0;
+        var open = wheel.SlotOpenArray;
+        float o0 = output[i0], o1 = output[i1];
+        if ((!open[i0] && float.IsNaN(o0)) || (!open[i1] && float.IsNaN(o1))) return false;
+        var mix = ColorSpaces.Rec2020ToXyz(rgb);
+        float luminance = mix.Y;
+        if (!(luminance > 0f) || !float.IsFinite(luminance))
+        {
+            result = Vector3.Zero;
+            return true;
+        }
+        var mixUnit = mix / luminance;
+        var xyz = wheel.SlotColorXyzArray;
+        var c0 = open[i0] ? mixUnit : xyz[i0] * o0;
+        var c1 = open[i1] ? mixUnit : xyz[i1] * o1;
+        var preset = (i1 == i0 ? c0 : Vector3.Lerp(c0, c1, w.Blend)) * luminance;
+        if (saturation < 1f) preset = Vector3.Lerp(mix, preset, saturation);
+        result = ColorSpaces.XyzToRec2020(preset);
+        return true;
+    }
+
+    /// <summary>
+    /// Elongation (≥ 1) of the beam by its beam shapers' anamorphic lenses — the slot's stretch scaled by the insertion,
+    /// blended between slots on split positions — and the direction of the long axis (slot indexing/rotation plus the
+    /// wheel angle), rad.
+    /// </summary>
+    private static float ShaperStretch(FixtureProfile p, BeamState bs, out float rotation)
+    {
+        float stretch = 1f;
+        rotation = 0f;
+        foreach (ref readonly var w in bs.BeamShapers.AsSpan())
+        {
+            if (w.Wheel < 0 || w.Slot <= 0 || w.IsOpen || !(w.Insertion > 0f)) continue;
+            var s = p.WheelArray[w.Wheel].SlotStretchArray;
+            float a = s[w.Slot - 1];
+            if (w.Blend > 0f && w.NextSlot > 0) a += (s[w.NextSlot - 1] - a) * w.Blend;
+            a = 1f + (a - 1f) * Math.Clamp(w.Insertion, 0f, 1f);
+            if (!(a > stretch) || !float.IsFinite(a)) continue;
+            stretch = a;
+            float r = (float.IsFinite(w.Rotation) ? w.Rotation : 0f) + (float.IsFinite(w.WheelAngle) ? w.WheelAngle : 0f);
+            rotation = r;
+        }
+        return stretch;
     }
 
     private static float ApplyCurve(float v, DimmerCurve curve) => curve switch

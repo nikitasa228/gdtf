@@ -103,6 +103,7 @@ public sealed class StageLightCollector
                 ApplyGobo(ref light, state.Profile, beam, gobos);
                 ApplyBlades(ref light, beam);
                 ApplyPrism(ref light, state.Profile, beam);
+                ApplyShaperStretch(ref light, beam);
             }
         }
         FixtureLightCount = _count;
@@ -223,6 +224,30 @@ public sealed class StageLightCollector
         }
         float field = float.IsFinite(light.FieldAngle) && light.FieldAngle > 0f ? light.FieldAngle : light.BeamAngle;
         light.PrismSpread = float.IsFinite(field) ? offset * 0.5f * field : 0f;
+    }
+
+    /// <summary>
+    /// Largest elongation drawn for an anamorphic beam shaper: two half-intensity copies of the round beam side by side
+    /// stay one continuous oval up to about 2.2 : 1; beyond that a dip would open between them.
+    /// </summary>
+    public const float MaxDrawnShaperStretch = 2.2f;
+
+    /// <summary>
+    /// An anamorphic beam shaper (<see cref="BeamState.ShaperStretch"/> &gt; 1) drawn with the renderer's prism path: two
+    /// copies of the round beam, each with half of the unstretched peak, offset along the long axis by (stretch − 1) ×
+    /// half the beam angle, which together form an oval stretch times as long as wide with the beam's flux. A beam that
+    /// also passes a real prism keeps the prism (the renderer has one facet pattern per light).
+    /// </summary>
+    private static void ApplyShaperStretch(ref SpotLight light, BeamState beam)
+    {
+        float stretch = beam.ShaperStretch;
+        if (!(stretch > 1.01f) || !float.IsFinite(stretch) || light.PrismFacets > 1) return;
+        float drawn = MathF.Min(stretch, MaxDrawnShaperStretch);
+        light.PeakCandela *= stretch; // the beam's peak is the stretched one; each copy carries half the round beam's peak
+        light.PrismFacets = 2;
+        light.PrismRotation = float.IsFinite(beam.ShaperStretchRotation) ? beam.ShaperStretchRotation : 0f;
+        float beamAngle = float.IsFinite(light.BeamAngle) && light.BeamAngle > 0f ? light.BeamAngle : 0f;
+        light.PrismSpread = (drawn - 1f) * 0.5f * beamAngle;
     }
 
     /// <summary>The field angle kept between the beam angle and <see cref="MaxFieldAngle"/> (sanity clamp), rad.</summary>
