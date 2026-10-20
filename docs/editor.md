@@ -143,8 +143,10 @@ and its bounce), so the stage is never just black. *Preview → Stage → Work l
 between **Off**, **Auto** (default: only while no fixture emits) and **On**; the choice is stored in the project's view
 settings (`ViewSettings.WorkLight`) and applied to the render binding at once. A viewport showing the *Illuminance*
 overlay leaves it out (the lux values are the fixtures' own), and final renders never use it unless the Render panel
-asks for it. *Tools → Open White* (one undo step) brings every fixture up in open white with the moving heads aimed at
-the stage. The command line option `--preview-stage` shows the renderer's procedural test stage instead of the document
+asks for it. The work light is deliberately dim — about a tenth of a lit stage (40 lx key), so at the viewport's
+default EV 8 the set reads as a dark room; *Preview → Meter* or a lower EV brightens the picture. *Off* gives the view
+without it: only the fixtures (and the *Ambient light* of the stage) light the set. *Tools → Open White* (one undo step)
+brings every fixture up in open white with the moving heads aimed at the stage. The command line option `--preview-stage` shows the renderer's procedural test stage instead of the document
 (the phase-A behaviour, kept for tests that need a fixed picture).
 
 ![Фокина with the work light](images/editor-work-light.png)
@@ -233,7 +235,7 @@ New / Open replace the engine's project, so panels keep their references to the 
 | Operation | Behaviour |
 |---|---|
 | **New** (Ctrl+N) | An empty stage named *Untitled*: no objects, the floor grid, the camera back over the stage origin. |
-| **Open** (Ctrl+O, Open Recent, `--open`, a dropped file) | `.candela` projects and `.mvr` scenes. An MVR opens as a new, unsaved project (no file yet: Save asks for one). Every open viewport frames the new stage tightly (each side of the picture touches the outermost object), and again once the fixture models have loaded — unless the camera was moved in between. A recent file that no longer exists is removed from the list. |
+| **Open** (Ctrl+O, Open Recent, `--open`, a dropped file) | `.candela` projects and `.mvr` scenes. An MVR opens as a new, unsaved project (no file yet: Save asks for one). An MVR without a floor (exports often hold only the rig — Фокина) gets a wooden **stage floor** under all of its content, 3 m wider on every side, as the first step of the undo history: the status line says *added a stage floor (Undo removes it)*, and Undo takes it away. It is the engine's `StageFloor`, the same floor as `candela render --floor auto` (docs/engine.md); an MVR with a floor of its own, or a venue model on the ground, gets none, and a project opens as it was saved. Every open viewport frames the new stage tightly (each side of the picture touches the outermost object), and again once the fixture models have loaded — unless the camera was moved in between. A recent file that no longer exists is removed from the list. |
 | **Save / Save As** (Ctrl+S / Ctrl+Shift+S) | Atomic `.candela` write through the engine (scene, assets, copies of the GDTF files used, `engine`/`view` settings). The active viewport's camera is stored with it and comes back when the project is opened. A scene still called *Untitled* takes the file's name. The file goes to the top of the recent list. |
 | **Import** (Ctrl+I, File → Import) | Another Candela project or an MVR (merged under a new group, one undo step), a 3D model (OBJ, FBX, DAE, 3DS, glTF/GLB, STL, PLY — native formats in the engine's isolated import worker), an image (a reference drawing; the popup that follows makes it a poster), a GDTF file (read completely and added to the fixture library; the Library panel comes forward with its tile selected — see [Library](#library); a file the engine refuses says why). Imported models and images are also added to the Library's Models tab. |
 | **Export** | MVR 1.6 with the fixtures' GDTF files, the models as GLB, and the walls, floors and ceilings: other programs see boxes, Candela gets them back as walls with their kind, size and material (Candela's user-data block of the MVR, see [mvr.md](mvr.md)). |
@@ -337,8 +339,10 @@ modes, weight and power.*
 first; a model's companion files — MTL, textures — stay next to it). **Import…** adds files; models and images imported
 into a scene are added too; right-click → *Remove from Library*. Images show a downscaled picture, models a format
 badge. Dragging an item into a viewport imports it there (a model stands on the surface, an image lies on it as a
-reference drawing; the popup that follows switches it to a lit poster). A file that no longer exists is marked
-*file missing*.
+reference drawing; the popup that follows switches it to a lit poster). A **reference drawing** shows its image as it
+is — unlit, at its opacity (60 %), in Full and Colorless shading and in renders, whatever the light — while a
+**poster** is a printed surface lit by the stage like any other (dark until light reaches it). A file that no longer
+exists is marked *file missing*.
 
 ## Walls and floors
 
@@ -817,8 +821,10 @@ temporal accumulation, indirect light (off / reflective shadow maps / ray traced
 mapper, automatic exposure or exposure compensation (EV) and camera exposure (EV100) with **Meter**, which sets the
 exposure from the engine's light meter (incident light at the stage's centre), applied to every viewport. **Stage**
 (scene settings, undoable, saved with the stage): haze density (scattering coefficient, m⁻¹), haze forward scattering,
-ambient light (cd/m²), **work light** (Off / Auto / On, see [Viewports](#viewports); stored in the project's view
-settings, not in the preset), grid and grid spacing.
+ambient light (0 … 100 cd/m²: the luminance of the venue around the stage — house lights, walls — that lights every
+surface evenly in the Full view and in final renders, not the haze; a dark venue is about 0.05, a lit hall 30 or more),
+**work light** (Off / Auto / On, see [Viewports](#viewports); stored in the project's view settings, not in the preset),
+grid and grid spacing.
 
 The **preset drop-down** (also in Render and in the legends) lists *Default* (read-only), *Custom* (the edited values,
 shown as soon as anything differs from the chosen preset) and saved presets; the save button stores the current
@@ -1164,6 +1170,18 @@ properties, cable links, the recorder, the file browser and the helpers render n
 `xvfb-run`: a project in a folder `Stage %s %n %%` with such names opened, a fixture selected, a GDTF of that name
 dropped and selected in the Library, the file browser listing such files and the Russian UI — the `uiText` logs
 contain the names literally and nothing crashes).
+
+The lighting baseline (`LightingBaselineTests`): after opening `stages/Фокина.mvr` the binding's work light is on
+(`Binding.IsWorkLightOn`, the default Auto, the seven rig lights sent) over the added stage floor, which covers all 91
+fixtures with its margin, is drawn, and goes with one Undo (and out of the render world) and comes back with Redo; a
+project saved without it reopens without it and with an empty undo history; an MVR with a floor of its own gets none.
+Work light *Off* sends no light at all for the dark rig, is saved with the project, survives New and reopen (and *On*
+likewise, with the rig). The Ambient row's value reaches the renderer's atmosphere (30 → 30, NaN and negative → 0). On
+lavapipe (headless screenshots, `lighting-baseline-*.png` in the test output): a textured OBJ (red and green halves)
+imported into an empty scene is lit in Full shading by the Auto work light at the default EV 8 with both colours
+visible, black with the work light Off, and lit again in its colours by 30 cd/m² of ambient light without any light; a
+reference drawing shows its red and green halves in Full and Colorless shading without any light, and a poster of the
+same image is dark until the work light is on, then shows its image.
 
 ## Limitations
 

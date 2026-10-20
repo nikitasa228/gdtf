@@ -343,9 +343,13 @@ square) at x = 0 — like every truss its length runs along local X and the enti
 labels fall back to F34 with `IsRecognised = false` so the UI can flag them.
 
 **`ImagePlaneMesh`** — one rectangle in the local XZ plane facing −Y, centred on the origin, with normalised UVs (the
-image stretched once, top-left at top-left). `CreateMaterial` gives a poster a lit satin print (base colour = the image,
-roughness 0.6) and a reference drawing a black surface emitting the image at 100 cd/m², so it reads the same under any
-stage light; opacity < 1 alpha-blends. `SizeForAspect` sizes a plane to the image's aspect ratio.
+image stretched once, top-left at top-left). `CreateMaterial` puts the image in the base colour (`BaseColorTexture`,
+sRGB; `BaseColorFactor` = (1, 1, 1, opacity)) in both modes. A poster is a lit satin print (roughness 0.6), opaque
+unless its opacity is below 1. A reference drawing is always alpha-blended at its opacity (also at 1): the renderer
+draws the instance (`InstanceFlags.Reference`) unlit — the image as a display value, whatever the stage light, the
+exposure or the view mode (Full, Colorless, final render) — and a blended material on a reference instance brings its
+own opacity instead of the fixed 50 % of ghost geometry (docs/rendering.md). `SizeForAspect` sizes a plane to the
+image's aspect ratio.
 
 **`CableTubeMesh`** — a polyline (or a `CableComponent` node/segment tree, split into chains at branch points and
 ends) swept with a circular cross-section using rotation-minimising frames (double reflection, Wang et al. 2008), so
