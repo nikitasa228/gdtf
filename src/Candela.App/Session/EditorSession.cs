@@ -225,19 +225,46 @@ internal sealed class EditorSession : IDisposable
         return result.Success ? SessionResult.Done(Loc.Get(Str.MsgNewScene)) : Failed(result);
     }
 
-    /// <summary>File → Open: a <c>.candela</c> project or an MVR scene replaces the open scene.</summary>
+    /// <summary>
+    /// File → Open: a <c>.candela</c> project or an MVR scene replaces the open scene. An MVR without a floor (exports
+    /// often hold only the rig) gets the engine's stage floor (<see cref="StageFloor"/>, the floor of the CLI's
+    /// <c>--floor auto</c>) as the first step of the undo history, so the light lands on something and Undo removes it.
+    /// </summary>
     public SessionResult Open(string path)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (!File.Exists(path))
             return SessionResult.Failed(Loc.Format(Str.MsgFileMissing, path));
-        var result = EngineOrThrow.Open(path);
+        var engine = EngineOrThrow;
+        var result = engine.Open(path);
         if (!result.Success)
             return Failed(result);
         SourcePath = Path.GetFullPath(path);
         _log.Info("Session", result.Summary);
-        return Done(Loc.Format(Str.MsgOpened, Path.GetFileName(path), FixtureCount()), result);
+        string message = Loc.Format(Str.MsgOpened, Path.GetFileName(path), FixtureCount());
+        if (engine.ProjectPath is null && AddStageFloorIfMissing() is { } floor)
+        {
+            var size = StageFloor.SizeOf(floor);
+            _log.Info("Session", string.Create(CultureInfo.InvariantCulture, $"Added a {size.X:0.#} × {size.Y:0.#} m stage floor (the scene has none)."));
+            message += " · " + Loc.Get(Str.MsgStageFloorAdded);
+        }
+
+        return Done(message, result);
+    }
+
+    /// <summary>
+    /// Adds the engine's stage floor (<see cref="StageFloor.CreateIfMissing"/>) to the scene as one undoable step when
+    /// it has no floor, and returns it; null when the scene has a floor or no content.
+    /// </summary>
+    public Core.SceneGraph.Entity? AddStageFloorIfMissing()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        var engine = EngineOrThrow;
+        var floor = StageFloor.CreateIfMissing(engine.Scene, engine.Models.GetBounds, Loc.Get(Str.StageFloorName));
+        if (floor is not null)
+            Undo.Execute(new AddEntityCommand(engine.Scene, floor));
+        return floor;
     }
 
     /// <summary>File → Save (to the current project file; callers ask for a path first when there is none).</summary>

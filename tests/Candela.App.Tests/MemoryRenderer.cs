@@ -126,9 +126,10 @@ internal sealed class MemoryRenderWorld : IRenderWorld
     {
     }
 
-    public void SetAtmosphere(AtmosphereState atmosphere)
-    {
-    }
+    /// <summary>The atmosphere last sent (the binding reuses one object: read it right after an update).</summary>
+    public AtmosphereState? Atmosphere { get; private set; }
+
+    public void SetAtmosphere(AtmosphereState atmosphere) => Atmosphere = atmosphere;
 
     public void SetNoiseSources(ReadOnlySpan<NoiseSource> sources)
     {

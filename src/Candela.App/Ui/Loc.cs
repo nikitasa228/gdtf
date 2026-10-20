@@ -397,6 +397,8 @@ internal static class Loc
         (Str.MsgNewScene, "New scene", "Новая сцена"),
         (Str.MsgFileMissing, "“{0}” does not exist.", "Файл «{0}» не существует."),
         (Str.MsgOpened, "Opened {0} · {1} fixtures", "Открыт {0} · приборов: {1}"),
+        (Str.MsgStageFloorAdded, "added a stage floor (Undo removes it)", "добавлен пол сцены (отмена уберёт его)"),
+        (Str.StageFloorName, "Stage floor", "Пол сцены"),
         (Str.MsgNeedsSaveAs, "The scene has no file yet; use Save As.", "У сцены ещё нет файла — используйте «Сохранить как»."),
         (Str.MsgSaved, "Saved {0}", "Сохранено: {0}"),
         (Str.MsgImported, "Imported {0}", "Импортировано: {0}"),
