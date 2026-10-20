@@ -105,8 +105,21 @@ public struct WheelState
     /// <summary>Effect rate (effects wheels, built-in effects), Hz or the GDTF physical value.</summary>
     public float Rate;
 
-    /// <summary>True when a channel set <see cref="Insertion"/> explicitly this frame (out, ramp, animation-system insertion).</summary>
+    /// <summary>True when a channel set <see cref="Insertion"/> to a level this frame (ramp, cycle, animation-system insertion).</summary>
     internal bool InsertionSet;
+
+    /// <summary>
+    /// True when a range named "Open", "Off", "Removed" … of a channel that selects, indexes or spins the mechanism said
+    /// it is out of the beam this frame. It takes the mechanism out unless another channel selected it (<see cref="InVote"/>).
+    /// </summary>
+    internal bool OutVote;
+
+    /// <summary>
+    /// True when a selection channel put a slot of the mechanism's wheel in place this frame. Such a selection wins over an
+    /// "out" range of another channel addressing the same mechanism (files that give a second prism channel the first
+    /// prism's attribute, with "No Effect" at DMX 0: ADJ Protege XS, Vizi Beam 12RX, LIGHT_SKY IP520).
+    /// </summary>
+    internal bool InVote;
 
     /// <summary>A mechanism that is not used.</summary>
     public static WheelState Unused => UnusedState;

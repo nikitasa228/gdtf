@@ -910,34 +910,58 @@ public static class FixtureEvaluator
         var flags = r.SetFlags;
         if (n >= arr.Length) n = arr.Length - 1;
         ref var w = ref arr[n];
-        if ((flags & ChannelSetFlags.WheelOut) != 0 && f.Class.Kind is not (AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin
-                or AttributeKind.WheelSelectShake or AttributeKind.AnimationInsertion))
+        bool selection = f.Class.Kind is AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake;
+        if (selection && f.SecondarySelection)
+        {
+            // a selection attribute on a channel that selects nothing of the mechanism (its rotation channel, a second
+            // prism channel written with the first prism's attribute): the selection channel decides what is in the
+            // beam; a selection with spin still turns the item
+            if (f.Class.Kind == AttributeKind.WheelSelectSpin && (flags & ChannelSetFlags.WheelOut) == 0)
+            {
+                ref readonly var spin = ref ctx.SpinOf(c);
+                w.Rotation = Turn(spin.Position) * DegToRad;
+                w.RotationSpeed = (float)spin.Velocity * DegToRad;
+            }
+            return;
+        }
+        if ((flags & ChannelSetFlags.WheelOut) != 0 && !selection && f.Class.Kind != AttributeKind.AnimationInsertion)
         {
             // an item rotation, index or rate function in a range named "No function", "Off" … does nothing to the
             // mechanism — it does not put it in the beam — unless its channel is the mechanism's selection channel, where
             // the range takes the mechanism out (Robe Esprite "EffectWheelIndex" / "No function"); a whole-wheel index or
             // spin positions the wheel, so its "Open" range is the open position (ADJ Hydro Profile "Gobo 1 - 7 Index")
-            if (f.OnSelectionChannel || f.Class.Kind is AttributeKind.WheelIndex or AttributeKind.WheelSpin or AttributeKind.WheelRandom
-                    or AttributeKind.WheelShake)
+            if ((f.OnSelectionChannel || f.Class.Kind is AttributeKind.WheelIndex or AttributeKind.WheelSpin or AttributeKind.WheelRandom
+                    or AttributeKind.WheelShake) && !w.InVote)
             {
                 if (f.Wheel >= 0) w.Wheel = f.Wheel;
-                SetInsertion(ref w, 0f);
+                w.OutVote = true;
             }
             return;
         }
+        // a selection of a slot overrides an "out" range of another channel on the same mechanism, whichever came first;
+        // a selection that names no slot (a wheel-less prism, an index written as selection: DLW Dream L1400P
+        // "AnimationWheel1" 'Zero' … 'max Index' next to its rotation channel's 'Open') does not
+        bool selectsSlot = selection && (flags & ChannelSetFlags.WheelOut) == 0 && f.Wheel >= 0 && f.UsesSlotPosition;
+        if (selectsSlot && w.OutVote && !w.InVote)
+        {
+            w.Wheel = -1;
+            w.Position = float.NaN;
+        }
         int slots = f.Wheel >= 0 ? ctx.Profile.WheelArray[f.Wheel].SlotCount : 1;
-        if (f.Wheel >= 0 && f.ImpliesInsertion) w.Wheel = f.Wheel;
+        if (f.Wheel >= 0 && f.ImpliesInsertion && !(selection && (flags & ChannelSetFlags.WheelOut) != 0 && w.InVote)) w.Wheel = f.Wheel;
         switch (f.Class.Kind)
         {
             case AttributeKind.WheelSelect or AttributeKind.WheelSelectSpin or AttributeKind.WheelSelectShake:
                 {
-                    // a range named "Open", "Off", "Removed" … (WheelOut) takes the mechanism out of the beam; a ramp after
-                    // it moves a single-item mechanism in gradually (both found while the profile is compiled)
+                    // a range named "Open", "Off", "Removed" … (WheelOut) takes the mechanism out of the beam — unless
+                    // another channel selects a slot of it; a ramp after it moves a single-item mechanism in gradually
+                    // (both found while the profile is compiled)
                     bool isOut = (flags & ChannelSetFlags.WheelOut) != 0;
+                    if (isOut && w.InVote) break; // an item another channel selects stays in
                     float insertion = float.NaN;
                     if (isOut)
                     {
-                        insertion = 0f;
+                        w.OutVote = true;
                     }
                     else if ((flags & ChannelSetFlags.InsertionCycle) != 0 && set is not null)
                     {
@@ -962,8 +986,9 @@ public static class FixtureEvaluator
                         w.IsOpen = isOut;
                         w.Facets = isOut || f.Class.Wheel != WheelFamily.Prism ? 0 : Math.Max(NameParsing.ParseFacetCount(set?.Name ?? f.Name), 3);
                         w.Rate = r.Physical;
-                        if (float.IsNaN(insertion)) insertion = 1f;
+                        if (float.IsNaN(insertion) && !isOut) insertion = 1f;
                     }
+                    if (selectsSlot) w.InVote = true;
                     if (!float.IsNaN(insertion)) SetInsertion(ref w, insertion);
                 }
                 if (f.Class.Kind == AttributeKind.WheelSelectSpin)
@@ -1038,7 +1063,7 @@ public static class FixtureEvaluator
     }
 
     /// <summary>
-    /// Sets a mechanism's insertion from a channel that states it (an "out" range, a ramp, an animation-system insertion
+    /// Sets a mechanism's insertion from a channel that states a level (a ramp, a cycle, an animation-system insertion
     /// channel); several such channels on one mechanism combine to the smallest insertion.
     /// </summary>
     private static void SetInsertion(ref WheelState w, float insertion)
@@ -1103,9 +1128,11 @@ public static class FixtureEvaluator
             // A wheel named only by a rotation/rate/insertion function (no slot selection channel, or the selection
             // function of this mode has no wheel) rests on its home slot.
             if (w.Wheel >= 0 && !float.IsFinite(w.Position)) w.Position = 1f;
+            // taken out of the beam by an "out" range, and no channel selects it
+            bool outOfBeam = w.OutVote && !w.InVote;
             if (w.Wheel < 0)
             {
-                if (w.InsertionSet && !(w.Insertion > 0f))
+                if (outOfBeam || (w.InsertionSet && !(w.Insertion > 0f)))
                 {
                     // a wheel-less prism/effect taken out by its range
                     w.IsOpen = true;
@@ -1138,13 +1165,20 @@ public static class FixtureEvaluator
             w.IsOpen = open0 && (blend == 0f || open1);
             int facets = blend > 0.5f ? wheel.SlotFacetArray[i1] : wheel.SlotFacetArray[i0];
             w.Facets = prisms ? (facets > 0 ? facets : (blend > 0.5f ? open1 : open0) ? 0 : 3) : facets;
-            if (!w.InsertionSet)
+            if (outOfBeam)
+            {
+                // taken out of the beam by its range ("Open", "Off", "Removed" …), whatever slot the wheel rests on
+                w.IsOpen = true;
+                w.Facets = 0;
+                w.Insertion = 0f;
+            }
+            else if (!w.InsertionSet)
             {
                 w.Insertion = w.IsOpen ? 0f : 1f;
             }
             else if (!(w.Insertion > 0f))
             {
-                // taken out of the beam by its range ("Open", "Off", "Removed" …), whatever slot the wheel rests on
+                // at insertion 0 (a ramp at its start, an insertion channel at 0): out, whatever slot the wheel rests on
                 w.IsOpen = true;
                 w.Facets = 0;
                 w.Insertion = 0f;

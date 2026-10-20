@@ -303,6 +303,15 @@ public sealed class ProfileFunction
     internal bool ImpliesInsertion { get; set; } = true;
 
     /// <summary>
+    /// For slot selections that select no slot (no channel set names one) on a channel without any slot selection of
+    /// the mechanism, while another channel of the same beams does select its slots: the file gave a rotation or second
+    /// channel the selection attribute (ADJ Focus Hybrid "Prism1Pos" channel: "Prism Rotation Off" and "No Rotation"
+    /// written as Prism1). Such a function neither selects a slot nor takes the mechanism out; a selection with spin
+    /// still turns the selected item.
+    /// </summary>
+    internal bool SecondarySelection { get; set; }
+
+    /// <summary>
     /// For slot selections on a wheel that holds a single item (one slot, or an open slot and one item: Cameo Oron H2
     /// "Open" + "Animation Wheel"): the 1-based slot of that item, which insertion ramps and cycles move in and out of the
     /// beam; 0 otherwise.

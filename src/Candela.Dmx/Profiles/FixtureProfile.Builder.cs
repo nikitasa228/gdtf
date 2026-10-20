@@ -1301,6 +1301,7 @@ public sealed partial class FixtureProfile
                             Beams[b].OwnMechanics = true;
             }
 
+            MarkSecondarySelections();
             MarkUnaddressedBeams();
             ComputeBeamShares();
             int warningsBefore = Warnings.Count;
@@ -1321,6 +1322,58 @@ public sealed partial class FixtureProfile
                 Warnings.Add(string.Create(CultureInfo.InvariantCulture,
                     $"The datasheet peak ({FormatCandela(Specs!.MaxLuminousIntensityCd!.Value)} cd) matches one beam of the file ({FormatCandela(perBeam.FileBeamCd)} cd), not its {Beams.Count} beams together ({FormatCandela(perBeam.FileTotalCd)} cd), and shared between them it would make {perBeam.SharedEfficacy:F1} lm/W: read per beam ({perBeam.Efficacy:F0} lm/W)."));
             }
+        }
+
+        /// <summary>
+        /// Marks <see cref="ProfileFunction.SecondarySelection"/>: slot selections on a channel that selects no slot of
+        /// their mechanism while another channel reaching the same beams does. One pass over the functions, keyed by
+        /// mechanism (state array and number).
+        /// </summary>
+        private void MarkSecondarySelections()
+        {
+            Dictionary<(int Group, int Number), List<int>>? selecting = null;
+            foreach (var ch in Channels)
+            {
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                {
+                    var f = Functions[k];
+                    if (!IsWheelSelection(f.Class.Kind) || f.Wheel < 0 || !Array.Exists(f.SetArray, s => s.WheelSlot > 0)) continue;
+                    selecting ??= new();
+                    var key = MechanismKey(f.Class);
+                    if (!selecting.TryGetValue(key, out var list)) selecting[key] = list = new List<int>();
+                    if (list.Count == 0 || list[^1] != ch.Index) list.Add(ch.Index);
+                }
+            }
+            if (selecting is null) return;
+            foreach (var ch in Channels)
+            {
+                if (_beamCount[ch.Index] == 0) continue;
+                for (int k = ch.FirstFunction; k < ch.FirstFunction + ch.FunctionCount; k++)
+                {
+                    var f = Functions[k];
+                    if (!IsWheelSelection(f.Class.Kind) || !selecting.TryGetValue(MechanismKey(f.Class), out var list) || list.Contains(ch.Index)) continue;
+                    foreach (int other in list)
+                    {
+                        if (!BeamsOverlap(ch.Index, other)) continue;
+                        f.SecondarySelection = true;
+                        f.ImpliesInsertion = false;
+                        break;
+                    }
+                }
+            }
+
+            static (int Group, int Number) MechanismKey(AttributeClass c) => (c.Wheel switch
+            {
+                WheelFamily.Animation or WheelFamily.AnimationSystem => (int)WheelFamily.Animation,
+                var w => (int)w,
+            }, Math.Max(c.Number, 1));
+        }
+
+        /// <summary>True when channels <paramref name="a"/> and <paramref name="b"/> reach at least one common beam.</summary>
+        private bool BeamsOverlap(int a, int b)
+        {
+            int a0 = _beamFirst[a], a1 = a0 + _beamCount[a], b0 = _beamFirst[b], b1 = b0 + _beamCount[b];
+            return _beamCount[a] > 0 && _beamCount[b] > 0 && a0 < b1 && b0 < a1;
         }
 
         /// <summary>Attributes that give a beam its colour (additive emitters, indirect colour systems).</summary>
