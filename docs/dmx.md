@@ -156,7 +156,7 @@ attribute for "out", so files write it as channel-set names and slots, and the p
   (`ChannelSetFlags.InsertionCycle`; the state is animating). `AnimationSystem(n)Ramp` is a selection of the
   animation system.
 * **Defaults**: across the library, GDTF defaults put a gobo, prism, animation wheel or beam shaper into the beam in
-  13 files only, each the file's own choice (the default selects a slot, or the channel has no out range at all;
+  14 files only, each the file's own choice (the default selects a slot, or the channel has no out range at all;
   listed in `WheelInsertionTests`). Colour wheels follow the file's default; effects functions without a wheel are not
   optical.
 * `AnimationWheelSpin` (Ayrton Rivale Wash; the standard names are `AnimationWheel(n)SelectSpin` …) is read as the
