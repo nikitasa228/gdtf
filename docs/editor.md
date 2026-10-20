@@ -808,9 +808,9 @@ another address feeds a second Candela or any Art-Net node. An empty stage gets 
 
 ### Preview
 
-![Preview and Render panels](images/editor-preview-render.png)
+![Preview panel](images/editor-preview-render.png)
 
-*Preview (left) and Render (right) with their preset drop-downs.*
+*The Preview panel with its preset drop-down.*
 
 **Quality**: resolution scale, shadows (map size, lights with shadows), volumetric light (volume slices, sharp beams),
 temporal accumulation, indirect light (off / reflective shadow maps / ray traced). **Image**: bloom (intensity), tone
@@ -827,6 +827,14 @@ values under a name, the bin deletes the chosen preset (the values in use stay; 
 the current values are saved in the project (`settings.json`, section `view`) and come back when it is opened.
 
 ### Render
+
+| While it renders (F12 on a small hazy stage) | The PNG it wrote (320 × 180, 32 samples, denoised) |
+|---|---|
+| ![Render panel while path tracing](images/editor-render-panel.png) | ![Path-traced result](images/editor-render-result.png) |
+
+*The Render panel undocked during a path-traced render — progress bar with frame and samples, the time spent and left,
+Cancel and Stop and save, the progress image under* Result *— and the picture it wrote: three moving heads in haze of
+0.04 m⁻¹, the light scattered in the air and bounced off the floor onto the back wall (lavapipe).*
 
 **Output**: folder (default `Pictures/Candela`), file name and format — *PNG*, or *PNG + EXR*, which also writes the
 linear HDR OpenEXR next to the PNG (`name.exr`; disabled in the Fast mode and on a GPU without ray queries, with that

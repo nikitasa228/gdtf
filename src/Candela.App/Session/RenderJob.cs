@@ -154,6 +154,7 @@ internal sealed class RenderJobRunner : IDisposable
 
     private RenderRequest? _request;
     private StageEngine? _playing;
+    private StageEngine? _stage;
     private IRenderTarget? _target;
     private IRenderer? _targetOwner;
     private float[]? _accumulator;
@@ -331,6 +332,7 @@ internal sealed class RenderJobRunner : IDisposable
         }
 
         _request = request;
+        _stage = engine;
         Mode = request.Mode;
         FellBack = false;
         IsPreparing = false;
@@ -425,7 +427,8 @@ internal sealed class RenderJobRunner : IDisposable
 
     /// <summary>
     /// Renders for about <see cref="Budget"/> (at least one pass or path tracer dispatch) and writes the frames that are
-    /// complete. Call once per editor frame, outside the GPU frame.
+    /// complete. Call once per editor frame, outside the GPU frame, with the stage the job was started with: another
+    /// stage (a document opened or closed meanwhile) cancels the job.
     /// </summary>
     public void Step(StageEngine? engine, IRenderer renderer, double now)
     {
@@ -434,6 +437,13 @@ internal sealed class RenderJobRunner : IDisposable
         if (State != RenderJobState.Running || _request is not { } request)
         {
             ReleaseTargetWhenIdle();
+            return;
+        }
+
+        if (!ReferenceEquals(engine, _stage))
+        {
+            // Another stage was opened (or the stage was closed): the picture asked for no longer exists.
+            Cancel();
             return;
         }
 
@@ -809,6 +819,7 @@ internal sealed class RenderJobRunner : IDisposable
     private void End()
     {
         IsPreparing = false;
+        _stage = null;
         _endedAt = _startedAt != 0 ? Stopwatch.GetTimestamp() : 0;
         try
         {

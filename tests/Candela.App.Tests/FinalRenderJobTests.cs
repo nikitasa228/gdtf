@@ -611,6 +611,35 @@ public sealed class FinalRenderJobTests : IClassFixture<FinalRenderJobTests.BoxS
     }
 
     [Fact]
+    public void Opening_another_stage_cancels_the_running_render()
+    {
+        Loc.SetLanguage("en");
+        using var dir = new TempDir();
+        using var otherDir = new TempDir();
+        using var engine = StageTestSupport.CreateEngine(dir);
+        using var other = StageTestSupport.CreateEngine(otherDir);
+        using var tools = StageTestSupport.CreateTools();
+        var panel = new RenderPanel(StagePanelContext.ForEngine(engine, tools), _ => { }) { Mode = RenderMode.Fast };
+        var s = tools.FinalRender.Live;
+        s.Width = 64;
+        s.Height = 36;
+        s.SamplesPerPixel = 4;
+        s.OutputPath = dir.File("gone.png");
+        Assert.True(panel.StartFromCommand());
+        var renderer = new MemoryRenderer();
+        tools.Render.Step(other, renderer, 0);
+        Assert.Equal(RenderJobState.Cancelled, tools.Render.State);
+        Assert.Empty(renderer.RenderedLights);
+        Assert.False(File.Exists(dir.File("gone.png")));
+
+        // A stage closed (no engine) cancels it too.
+        Assert.True(panel.StartFromCommand());
+        tools.Render.Step(null, renderer, 1);
+        Assert.Equal(RenderJobState.Cancelled, tools.Render.State);
+        Assert.Empty(renderer.RenderedLights);
+    }
+
+    [Fact]
     public void F12_is_the_render_key_and_the_file_menu_has_render()
     {
         var bindings = Candela.Core.Settings.KeyBindingSet.CreateDefault();
