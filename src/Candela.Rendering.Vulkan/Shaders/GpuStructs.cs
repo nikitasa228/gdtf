@@ -320,7 +320,10 @@ internal struct GpuPtParams
     /// <summary>Box the haze fills (xyz), m; w = haze scattering coefficient, 1/m.</summary>
     public Vector4 MediaMax;
 
-    /// <summary>x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 1 / exposure.</summary>
+    /// <summary>
+    /// x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 1 / the camera's
+    /// exposure (fixed for the render; unlit and reference surfaces are display-referred against it).
+    /// </summary>
     public Vector4 Majorants;
 
     /// <summary>rgb = background luminance (Rec.2020, cd/m²), w = firefly clamp (cd/m², 0 = off).</summary>

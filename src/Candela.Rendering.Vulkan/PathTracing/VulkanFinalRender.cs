@@ -694,7 +694,9 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         _frameData.NoiseMax = new Vector4(gpu.Noise.BoxMax, 0f);
         _frameData.NoiseSourceCount = (uint)gpu.NoiseSources.Count;
         _params.MediaMax.W = hazeSigma;
-        _params.Majorants = new Vector4(smokeMajorant, flame ? VulkanRenderer.FlameAbsorption : 0f, g, 1f / MathF.Max(_exposure, 1e-30f));
+        // Unlit and reference surfaces are display-referred against the exposure the render starts with (the camera's),
+        // fixed for every sample: auto exposure metering later must not mix two scales in one pixel.
+        _params.Majorants = new Vector4(smokeMajorant, flame ? VulkanRenderer.FlameAbsorption : 0f, g, 1f / MathF.Max(_cameraExposure, 1e-30f));
         _params.Flags = flags;
         _params.AmbientLuminance = VulkanRenderer.AmbientLuminanceOf(atmosphere);
 
