@@ -93,12 +93,15 @@ public sealed class LightingBaselineTests : IDisposable
         }
 
         Assert.True(content.Binding.TryGetWorldBounds(floor.Id, out _), "the floor is drawn");
+        // The floor is part of the opened scene: the MVR does not count as changed because of it.
+        Assert.False(session.IsModified);
 
-        // One undo step removes it (and the render world drops it); redo brings it back.
+        // One undo step removes it (and the render world drops it; that is a change); redo brings it back.
         Assert.True(session.Undo.CanUndo);
         session.Undo.Undo();
         Assert.Empty(Floors(session.Scene));
         Assert.False(session.Undo.CanUndo);
+        Assert.True(session.IsModified);
         Frame(session);
         Assert.False(content.Binding.TryGetWorldBounds(floor.Id, out _));
         session.Undo.Redo();
@@ -131,6 +134,7 @@ public sealed class LightingBaselineTests : IDisposable
         Assert.Single(Floors(session.Scene));
         Assert.False(session.Undo.CanUndo);
         Assert.Null(session.AddStageFloorIfMissing());
+        Assert.False(session.IsModified);
     }
 
     [Fact]

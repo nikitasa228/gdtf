@@ -183,8 +183,10 @@ public sealed class EditorEndToEndTests : IDisposable
         {
             var p = e.Local.Position;
             var r = e.Local.Rotation;
+            // The stage floor added when the MVR opens is new (a new id) every time the MVR is opened.
+            string id = e.Get<WallComponent>() is { Kind: WallKind.Floor } && e.Name == Loc.Get(Str.StageFloorName) ? "stage-floor" : e.Id.ToString();
             string line = FormattableString.Invariant(
-                $"{e.Id}|{e.Name}|{e.Parent?.Id}|{e.Visible}|{e.Locked}|{p.X:F4},{p.Y:F4},{p.Z:F4}|{r.X:F4},{r.Y:F4},{r.Z:F4},{r.W:F4}");
+                $"{id}|{e.Name}|{e.Parent?.Id}|{e.Visible}|{e.Locked}|{p.X:F4},{p.Y:F4},{p.Z:F4}|{r.X:F4},{r.Y:F4},{r.Z:F4},{r.W:F4}");
             if (e.Get<FixtureComponent>() is { } f)
                 line += FormattableString.Invariant($"|fixture|{f.GdtfSpec}|{f.GdtfMode}|{string.Join(";", f.Addresses)}|{f.FixtureId}|{f.ManualAttributes.Count}");
             list.Add(line);

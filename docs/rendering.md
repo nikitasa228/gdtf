@@ -360,9 +360,18 @@ photometric tests use. Roughness is clamped to [0.02, 1] (α ≥ 0.002 keeps a p
 * **Transparency**: blend materials and `Transmission > 0` are drawn after the opaque pass, premultiplied:
   coverage = alpha · (1 − transmission) scales diffuse and emission, specular reflection is added in full (glass keeps
   its highlights). Tinted transmission and refraction are left to the path tracer.
-* **Unlit materials**: base colour shown display-referred. **`InstanceFlags.Reference`** (imported drawings, ghost
-  geometry): unlit, base colour display-referred, drawn with the transparent pass at 50 % opacity (no shadows cast,
-  not in the indirect light).
+* **Unlit materials**: base colour (texture × factor) shown display-referred. **`InstanceFlags.Reference`** (imported
+  drawings, ghost geometry): unlit, base colour display-referred, drawn with the transparent pass — an alpha-blended
+  material (an imported reference drawing: the image as base colour, `ImagePlaneMesh.CreateMaterial`) at its own alpha,
+  any other material (ghost geometry) at `ShaderConstants.ReferenceOpacity` = 50 % (no shadows cast, not in the
+  indirect light, not seen by the ray-traced GI).
+* **Ambient** (`AtmosphereState.AmbientLuminance`, cd/m², from `SceneSettings.AmbientLuminance` through RenderSync):
+  the luminance of the venue around the modelled scene, a uniform environment that lights every surface of the Full
+  view, unoccluded: L += R_env(v) · L_ambient with R_env the BRDF's directional albedo under a uniform environment
+  (`ambientReflectance` in brdf.glsl: Karis' analytic split-sum fit for the GGX lobe with the BRDF's F0/F90, Lambert
+  weighted by 1 − the specular share), × the material's occlusion map when it has one. A white Lambertian surface (IOR
+  1) has exactly the ambient luminance (the furnace test, within 1 %). It lights surfaces only — not the haze, not the
+  background — and is 0 in the Colorless and Wireframe views; non-finite or negative values count as 0, at most 10⁶.
 * **Background**: `ViewOptions.BackgroundLuminance` cd/m² (a dark venue: 0.02).
 * **Indirect light** (stage 2): `albedo/π · E_indirect` is added to the diffuse term, see
   [Indirect light](#indirect-light).
@@ -743,9 +752,11 @@ background is not coloured.
 * **Beam outlines** (`ShowBeamOutlines`, all views — useful in Colorless and Wireframe): per light 8 lines from the
   lens to the field-angle circle where the beam meets the floor (Z = 0; 10 m when it points up; 0.5–30 m) and that
   circle as 24 segments, in the light's colour, 1.5 px, depth-tested.
-* **Reference drawings** (`InstanceFlags.Reference`): unlit, base colour display-referred at 50 % opacity, no shadows,
-  not ray traced — in the Full and the Colorless view (where they are drawn by the transparent pass over the grey
-  shading); the Wireframe view shows their edges. Like other blended surfaces they are not in the pick buffer.
+* **Reference drawings** (`InstanceFlags.Reference`): unlit, base colour display-referred — an imported drawing's image
+  at its own opacity, ghost geometry at 50 % — no shadows, not in the indirect light — in the Full and the Colorless view
+  (where they are drawn by the transparent pass over the grey shading, as display-linear Rec.709); the Wireframe view
+  shows their edges; the path tracer shows them to camera rays only (see [Surfaces](#surfaces)). Like other blended
+  surfaces they are not in the pick buffer.
 * **Wireframe** and **Colorless** as in stage 1; lines, grid and outlines are always drawn at display resolution.
 
 ## Accuracy and test coverage
@@ -786,6 +797,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %; measured 2 %, the bilinear gobo edge); smoke through the density grid scatters like haze of the same coefficient (4 %; measured 1.7 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01); 20 m of thin smoke in a grid whose majorant is set by one very dense cell dims a panel behind it by e^−0.5 (3 %, with and without a volume bounce) |
 | `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %); a plate in a beam shadows the floor only while it has `CastShadow`, and not at all for a light without `CastShadows` (3 %) |
 | `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; every result read before the first sample is a black image of the right size (denoised one included); every pixel gets exactly one sample per pass whatever the band size; advancing inside the caller's frames gives the same image as alone, keeps the time limit and allocates nothing in steady frames; a device without ray query says "not supported on this GPU" |
+| `AmbientAndReferenceTests` | a reference drawing (four colour quadrants, an alpha-blended material on a `Reference` instance) under a 20 000 cd light and 30 cd/m² of ambient: in Full each quadrant's HDR value is the image's colour × its opacity (0.6, then 1) as a display value (2 %), in Colorless display-linear Rec.709 over the background (0.01), the display pixels in the quadrant's colour; the same material on a normal instance is lit; the path tracer shows the drawing at 60 % over the lit floor, which is lit as without it (no shadow, 5 %) and unchanged beside it; ambient 0 → 30 cd/m²: a grey Lambertian floor 0 → 15 cd/m² (1 %) and a chrome square ≈ 30 in the real-time view, the background and the Colorless view unchanged, through 10 m of haze 15·e^−0.5 (3 %) with the air not lit; NaN and negative ambients light nothing; the path tracer's open floor 15 cd/m² (3 %) with the background not lit; a white Lambertian sphere in 1 cd/m² of ambient has 1 cd/m² in both renderers (1 % / 3 %) |
 | `PathTracerSceneTests` | the procedural stage in haze: finite and validation-clean, 16 samples at 240 × 180 within 2 minutes; writes `pt-stage-final.png` next to the real-time view |
 | `OpenExrTests` | bit-exact round trips for every compression and sample type (37 × 21: not a multiple of the 16-line ZIP blocks; long names), ZIP compresses smooth images, RGBA + layers, chromaticities and white luminance, HALF channels hold no infinities or NaN (clamped to ±65 504), damaged and tiled files rejected with `InvalidDataException`; the files were checked with the official OpenEXR library |
 
@@ -1038,8 +1050,19 @@ cosine-weighted diffuse — with probabilities from the lobes' albedos at the vi
 lobe the path goes on with, so a translucent screen reflects its whole share 1 − t of the direct light (it reflected
 only (1 − t)·(1 − p_transmission) of it before: half at t = ½, a tenth at t = 0.9). Alpha-masked and blended surfaces are crossed
 stochastically (and pass 1 − α of the light to shadow rays). Emissive surfaces (LED walls, screens) emit their
-luminance and light the scene through the paths that hit them. Reference drawings show their display-referred base
-colour to the camera only, as in the real-time view. Russian roulette after the third scattering vertex, by the path throughput.
+luminance and light the scene through the paths that hit them. Unlit materials and reference instances
+(`InstanceFlags.Reference`) show their display-referred base colour to the camera only, as in the real-time view:
+reference instances are in the acceleration structure with their own cull-mask bit (`RayTracingScene.ReferenceMask`,
+alone), which only the camera rays (`traceSurface(…, camera = true)`, before any scattering) include, so they neither
+block nor reflect light (shadow rays, next-event estimation, bounces and the real-time ray-traced GI, which traces
+`RT_MASK_SCENE`, never see them); a camera ray crosses one stochastically by its opacity (a blended material's alpha,
+else 50 %). The display value is converted with the camera's exposure, fixed for the whole render
+(`PtParams.majorants.w`): with a fixed EV a drawing looks as in the real-time view; with auto exposure it is scaled by
+the ratio of the metered to the starting exposure, like everything else. The venue's **ambient light**
+(`AtmosphereState.AmbientLuminance`) is the luminance of the environment for rays that leave a surface and reach
+nothing (on top of `BackgroundLuminance`; not for camera rays nor in the media), so it is shadowed and bounced: an open
+Lambertian floor of albedo ρ has ρ · L_ambient (test: within 3 %), a white Lambertian sphere exactly L_ambient in both
+renderers. Russian roulette after the third scattering vertex, by the path throughput.
 
 ### Media
 

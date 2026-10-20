@@ -83,6 +83,36 @@ public sealed class StageFloorTests
     }
 
     [Fact]
+    public void AddStageFloor_is_one_undo_step_and_part_of_an_opened_scene_when_asked()
+    {
+        using var engine = TestEnvironment.CreateEngine("floor-undo");
+        Assert.True(engine.Open(TestEnvironment.Fokina).Success);
+        Assert.False(engine.IsModified);
+        var floor = engine.AddStageFloor("Stage floor", partOfOpening: true);
+        Assert.NotNull(floor);
+        Assert.Same(floor, Assert.Single(Floors(engine.Scene)));
+        Assert.False(engine.IsModified); // part of the opened scene
+        Assert.True(engine.Undo.CanUndo);
+        Assert.Null(engine.AddStageFloor()); // it has one now
+
+        engine.Undo.Undo();
+        Assert.Empty(Floors(engine.Scene));
+        Assert.True(engine.IsModified); // removing it is a change
+        engine.Undo.Redo();
+        Assert.Same(floor, Assert.Single(Floors(engine.Scene)));
+
+        // Added later (not while opening), it is an unsaved change like any edit.
+        Assert.True(engine.Open(TestEnvironment.Fokina).Success);
+        Assert.NotNull(engine.AddStageFloor());
+        Assert.True(engine.IsModified);
+
+        // An empty scene: nothing to put a floor under, nothing recorded.
+        engine.New();
+        Assert.Null(engine.AddStageFloor(partOfOpening: true));
+        Assert.False(engine.Undo.CanUndo);
+    }
+
+    [Fact]
     public void A_floor_wall_hidden_or_not_counts_and_an_empty_scene_gets_none()
     {
         var empty = new Scene("empty");

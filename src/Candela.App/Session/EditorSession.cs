@@ -229,6 +229,7 @@ internal sealed class EditorSession : IDisposable
     /// File → Open: a <c>.candela</c> project or an MVR scene replaces the open scene. An MVR without a floor (exports
     /// often hold only the rig) gets the engine's stage floor (<see cref="StageFloor"/>, the floor of the CLI's
     /// <c>--floor auto</c>) as the first step of the undo history, so the light lands on something and Undo removes it.
+    /// The floor is part of the opened scene: the MVR does not count as changed because of it.
     /// </summary>
     public SessionResult Open(string path)
     {
@@ -243,7 +244,7 @@ internal sealed class EditorSession : IDisposable
         SourcePath = Path.GetFullPath(path);
         _log.Info("Session", result.Summary);
         string message = Loc.Format(Str.MsgOpened, Path.GetFileName(path), FixtureCount());
-        if (engine.ProjectPath is null && AddStageFloorIfMissing() is { } floor)
+        if (engine.ProjectPath is null && engine.AddStageFloor(Loc.Get(Str.StageFloorName), partOfOpening: true) is { } floor)
         {
             var size = StageFloor.SizeOf(floor);
             _log.Info("Session", string.Create(CultureInfo.InvariantCulture, $"Added a {size.X:0.#} × {size.Y:0.#} m stage floor (the scene has none)."));
@@ -254,17 +255,13 @@ internal sealed class EditorSession : IDisposable
     }
 
     /// <summary>
-    /// Adds the engine's stage floor (<see cref="StageFloor.CreateIfMissing"/>) to the scene as one undoable step when
-    /// it has no floor, and returns it; null when the scene has a floor or no content.
+    /// Adds the engine's stage floor (<see cref="StageEngine.AddStageFloor"/>) to the scene as one undoable step when it
+    /// has no floor, and returns it; null when the scene has a floor or no content. An unsaved change.
     /// </summary>
     public Core.SceneGraph.Entity? AddStageFloorIfMissing()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        var engine = EngineOrThrow;
-        var floor = StageFloor.CreateIfMissing(engine.Scene, engine.Models.GetBounds, Loc.Get(Str.StageFloorName));
-        if (floor is not null)
-            Undo.Execute(new AddEntityCommand(engine.Scene, floor));
-        return floor;
+        return EngineOrThrow.AddStageFloor(Loc.Get(Str.StageFloorName));
     }
 
     /// <summary>File → Save (to the current project file; callers ask for a path first when there is none).</summary>
