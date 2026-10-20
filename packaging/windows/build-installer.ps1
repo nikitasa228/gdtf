@@ -77,7 +77,7 @@ $readyToRun = if ($NoReadyToRun) { 'false' } else { 'true' }
 Write-Host "== Publishing the editor and the command-line tool (self-contained, ReadyToRun: $readyToRun)"
 foreach ($project in @($app, $cli)) {
     Invoke-Checked $dotnet @('publish', $project, '-nologo', '-c', 'Release', '-r', 'win-x64', '--self-contained', 'true',
-        "-p:PublishReadyToRun=$readyToRun", '-p:PublishTrimmed=false', '-o', $publish)
+        "-p:PublishReadyToRun=$readyToRun", '-p:PublishTrimmed=false', '-p:DebugType=portable', '-o', $publish)
 }
 
 $winpack = Join-Path $here 'winpack.py'

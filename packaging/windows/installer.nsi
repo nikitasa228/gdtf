@@ -10,7 +10,7 @@
 ; What it does: installs for all users (Program Files, needs administrator rights) or for the current user only
 ; (%LOCALAPPDATA%\Programs\Candela); Start-menu and desktop shortcuts; .candela projects open in the editor and .mvr
 ; scenes get "Open with Candela"; a Windows Firewall rule lets Art-Net / sACN / OSC / PSN in (UDP, private and domain
-; networks; all-users installs only); the Microsoft Visual C++ 2015-2022 runtime is installed when it is missing or
+; networks; when Setup has administrator rights); the Microsoft Visual C++ 2015-2022 runtime is installed when it is missing or
 ; older than the bundled one (the native UI libraries need it); an older Candela is removed first (upgrade in place,
 ; settings kept). The uninstaller removes exactly the installed files, the shortcuts, the associations and the firewall
 ; rule, and the user's settings, caches and logs only when asked to.
@@ -152,6 +152,17 @@ LicenseLangString ReadmeFile ${LANG_RUSSIAN} "${HERE}/readme-ru.txt"
 
 ; ---------------------------------------------------------------------------------------------------- helpers
 
+; True when Setup runs with administrator rights (MultiUser.nsh found them; with MULTIUSER_EXECUTIONLEVEL Highest an
+; administrator's Setup is elevated in both install modes).
+!macro _UserIsAdmin _a _b _t _f
+  !insertmacro _LOGICLIB_TEMP
+  StrCpy $_LOGICLIB_TEMP $MultiUser.Privileges
+  StrCmp $_LOGICLIB_TEMP "Power" 0 +2
+    StrCpy $_LOGICLIB_TEMP "Admin"
+  StrCmp $_LOGICLIB_TEMP "Admin" `${_t}` `${_f}`
+!macroend
+!define UserIsAdmin `"" UserIsAdmin ""`
+
 ; Fails (asks to close Candela, retry or cancel) while the editor or the command-line tool runs from $INSTDIR: a running
 ; program file cannot be opened for writing.
 !macro CHECK_NOT_RUNNING UN
@@ -228,7 +239,9 @@ Section "!$(SecProgram)" SecProgram
   ; Start menu
   CreateDirectory "$SMPROGRAMS\${PRODUCT}"
   CreateShortcut "$SMPROGRAMS\${PRODUCT}\${PRODUCT}.lnk" "$INSTDIR\${APP_EXE}" "" "$INSTDIR\${APP_EXE}" 0 SW_SHOWNORMAL "" "$(ShortcutEditor)"
-  CreateShortcut "$SMPROGRAMS\${PRODUCT}\$(ShortcutPrompt).lnk" "$SYSDIR\cmd.exe" '/k "$INSTDIR\candela-prompt.cmd"' "$INSTDIR\candela.ico" 0 SW_SHOWNORMAL "" "$(ShortcutPromptDescription)"
+  ; cmd /k strips the outer pair of quotes when the line has special characters (a folder "Light & Sound", "(x86)"):
+  ; the doubled quotes keep the script's path quoted in every case.
+  CreateShortcut "$SMPROGRAMS\${PRODUCT}\$(ShortcutPrompt).lnk" "$SYSDIR\cmd.exe" '/k ""$INSTDIR\candela-prompt.cmd""' "$INSTDIR\candela.ico" 0 SW_SHOWNORMAL "" "$(ShortcutPromptDescription)"
   CreateShortcut "$SMPROGRAMS\${PRODUCT}\$(ShortcutReadme).lnk" "$INSTDIR\$(ReadmeInstalled)"
   CreateShortcut "$SMPROGRAMS\${PRODUCT}\$(ShortcutDocs).lnk" "$INSTDIR\docs"
   CreateShortcut "$SMPROGRAMS\${PRODUCT}\$(ShortcutUninstall).lnk" "$INSTDIR\${UNINSTALLER}"
@@ -288,10 +301,12 @@ Section "$(SecAssocMvr)" SecAssocMvr
   System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, p 0, p 0)'
 SectionEnd
 
-; Selected or not on the firewall page (all-users installs only: a rule needs administrator rights).
+; Selected or not on the firewall page. A rule needs administrator rights: Setup has them for every all-users install,
+; and for a just-for-me install by an administrator (it asks for elevation at the start); a standard user's
+; just-for-me install cannot add one (Windows asks when Candela first receives data).
 Section "-Firewall" SecFirewall
   ${If} $FirewallAllowed == 1
-  ${AndIf} $MultiUser.InstallMode == "AllUsers"
+  ${AndIf} ${UserIsAdmin}
     DetailPrint "$(MsgFirewall)"
     nsExec::ExecToLog 'netsh advfirewall firewall delete rule name="${FIREWALL_RULE}"'
     Pop $0
@@ -323,7 +338,7 @@ Function FirewallPageCreate
   ${EndIf}
   ${NSD_CreateLabel} 0 0 100% 72u "$(FirewallText)"
   Pop $0
-  ${If} $MultiUser.InstallMode == "AllUsers"
+  ${If} ${UserIsAdmin}
     ${NSD_CreateCheckbox} 0 80u 100% 24u "$(FirewallCheckbox)"
     Pop $FirewallCheckbox
     ${If} $FirewallAllowed == 1

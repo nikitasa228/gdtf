@@ -70,7 +70,7 @@ jobs:
       - name: Test
         shell: pwsh
         run: |
-          $projects = 'Core', 'Photometry', 'Gdtf', 'Dmx', 'Protocols', 'Electrical', 'Simulation', 'Mvr', 'Assets', 'Project'
+          $projects = 'Core', 'Photometry', 'Gdtf', 'Dmx', 'Protocols', 'Electrical', 'Simulation', 'Mvr', 'Assets', 'Project', 'Rendering'
           foreach ($p in $projects) {
             dotnet test "tests/Candela.$p.Tests/Candela.$p.Tests.csproj" -c Release --no-build --logger "trx;LogFileName=$p.trx" --results-directory TestResults
             if ($LASTEXITCODE -ne 0) { throw "Candela.$p.Tests failed." }

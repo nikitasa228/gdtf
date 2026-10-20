@@ -57,8 +57,9 @@ Candela-Setup-0.1.0-preview.1-win-x64.exe /S /AllUsers
 Candela-Setup-0.1.0-preview.1-win-x64.exe /S /CurrentUser /D=D:\Программы\Candela
 ```
 
-`/D=` должен быть последним параметром и без кавычек, даже если в пути есть пробелы. В тихом режиме правило
-брандмауэра добавляется (для установки «для всех пользователей»), ярлык на рабочем столе и ассоциации — тоже.
+`/D=` должен быть последним параметром и без кавычек, даже если в пути есть пробелы. В тихом режиме
+добавляются ярлык на рабочем столе, ассоциации файлов и (если программа установки работает с правами
+администратора) правило брандмауэра.
 
 ### Первый запуск: библиотека приборов
 
@@ -104,11 +105,13 @@ Candela может следовать за пультом (grandMA, ETC, ChamSys
 сети как **Art-Net** (UDP 6454) или **sACN** (UDP 5568), данные позиций и шоу — как **PSN** (UDP 56565) и **OSC**
 (UDP 8000, для ETC Eos 8001). Брандмауэр Windows блокирует такие входящие данные, пока их не разрешит правило.
 
-* При установке **для всех пользователей** страница «Управление с пульта» предлагает добавить входящее правило
-  **«Candela (Art-Net, sACN, OSC, PSN)»**: только для `candela-app.exe`, только UDP, только для **частных и
-  доменных** сетей (не для общественных, например Wi-Fi в кафе). Флажок включён по умолчанию; его можно снять.
-* При установке **только для себя** программа установки не может добавить правило (нужны права администратора).
-  Когда Candela впервые получит данные из сети, Windows спросит, разрешить ли доступ, — разрешите для частных сетей.
+* Когда программа установки работает с правами администратора (любая установка «для всех пользователей», а также
+  установка «только для себя» пользователем-администратором), страница «Управление с пульта» предлагает добавить
+  входящее правило **«Candela (Art-Net, sACN, OSC, PSN)»**: только для `candela-app.exe`, только UDP, только для
+  **частных и доменных** сетей (не для общественных, например Wi-Fi в кафе). Флажок включён по умолчанию; его
+  можно снять.
+* Обычный пользователь без прав администратора правило добавить не может. Когда Candela впервые получит данные из
+  сети, Windows спросит, разрешить ли доступ, — разрешите для частных сетей.
 * Проверить или удалить правило: «Брандмауэр Защитника Windows» → «Дополнительные параметры» → «Правила для
   входящих подключений», или в командной строке администратора:
   ```bat
@@ -116,7 +119,9 @@ Candela может следовать за пультом (grandMA, ETC, ChamSys
   ```
   При удалении Candela правило удаляется тоже.
 * Сеть, к которой подключён пульт, должна быть отмечена в Windows как **частная** («Параметры → Сеть и Интернет →
-  свойства сети → Частная сеть»).
+  свойства сети → Частная сеть»). Внимание: сеть, в которой нет выхода в интернет (ноутбук подключён кабелем прямо к
+  пульту или к сплиттеру), Windows часто считает «неопознанной» и **общественной** — правило на неё не действует.
+  Если Candela не видит пульт, проверьте тип сети или разрешите Candela и в общественных сетях, когда Windows спросит.
 
 ### Где хранятся файлы
 
@@ -179,7 +184,7 @@ candela info сцена.mvr --library "D:\GDTF"
 * Программа установки и программа **не подписаны** — отсюда предупреждение SmartScreen.
 * Автоматического обновления нет: новую версию нужно скачать и установить поверх.
 * Полная библиотека приборов не входит в установку (только приборы примера сцены).
-* Правило брандмауэра — только для UDP и только при установке для всех пользователей.
+* Правило брандмауэра — только для UDP и только когда программа установки работает с правами администратора.
 * Несколько копий редактора могут работать одновременно (второго запуска Candela не запрещает): например, двойной
   щелчок по проекту при открытом редакторе откроет второе окно. Настройки у копий общие; раскладку окон сохраняет
   копия, закрытая последней.
@@ -241,8 +246,8 @@ Candela-Setup-0.1.0-preview.1-win-x64.exe /S /AllUsers
 Candela-Setup-0.1.0-preview.1-win-x64.exe /S /CurrentUser /D=D:\Apps\Candela
 ```
 
-`/D=` must come last and must not be quoted, even when the path has spaces. A silent all-users install adds the
-firewall rule, the desktop shortcut and the file associations.
+`/D=` must come last and must not be quoted, even when the path has spaces. A silent install adds the desktop
+shortcut, the file associations and (when Setup runs with administrator rights) the firewall rule.
 
 ### First start: the fixture library
 
@@ -287,11 +292,12 @@ Candela can follow a lighting console (grandMA, ETC, ChamSys, Avolites …) live
 as **Art-Net** (UDP 6454) or **sACN** (UDP 5568), position and show data as **PSN** (UDP 56565) and **OSC** (UDP 8000,
 ETC Eos 8001). Windows Firewall blocks such incoming data until a rule allows it.
 
-* An **all-users** install offers an inbound rule **"Candela (Art-Net, sACN, OSC, PSN)"**: for `candela-app.exe` only,
-  UDP only, on **private and domain** networks only (not on public networks such as a café Wi-Fi). It is ticked by
-  default and can be cleared.
-* A **just-for-me** install cannot add a rule (that needs administrator rights). The first time Candela receives
-  network data Windows asks whether to allow it — allow it for private networks.
+* When Setup runs with administrator rights (every all-users install, and a just-for-me install by an administrator)
+  the **Control from a Lighting Console** page offers an inbound rule **"Candela (Art-Net, sACN, OSC, PSN)"**: for
+  `candela-app.exe` only, UDP only, on **private and domain** networks only (not on public networks such as a café
+  Wi-Fi). It is ticked by default and can be cleared.
+* A standard user without administrator rights cannot add a rule. The first time Candela receives network data
+  Windows asks whether to allow it — allow it for private networks.
 * To check or remove the rule: Windows Defender Firewall → Advanced settings → Inbound Rules, or in an administrator
   command prompt:
   ```bat
@@ -299,7 +305,10 @@ ETC Eos 8001). Windows Firewall blocks such incoming data until a rule allows it
   ```
   Uninstalling Candela removes it.
 * The network the console is on must be a **private** network in Windows (Settings → Network & Internet → the
-  network's properties → Private network).
+  network's properties → Private network). Note: a network without internet access (a laptop cabled straight to the
+  console or a node) is often an "unidentified network", which Windows treats as **public** — the rule does not apply
+  there. If Candela does not see the console, check the network type, or allow Candela on public networks too when
+  Windows asks.
 
 ### Where your files are
 
@@ -360,7 +369,7 @@ the fixture library folder are **never** removed. The Visual C++ runtime stays (
 * Setup and program are **not code-signed** — hence the SmartScreen warning.
 * No automatic updates: download the new version and install it over the old one.
 * The full fixture library is not included (only the sample scene's fixtures).
-* The firewall rule covers UDP only and is added by all-users installs only.
+* The firewall rule covers UDP only and is added only when Setup runs with administrator rights.
 * Several copies of the editor can run at once (Candela does not stop a second start): double-clicking a project while
   the editor is open opens a second window. The copies share the settings; the window layout of the one closed last
   is kept.
@@ -373,8 +382,9 @@ the fixture library folder are **never** removed. The Visual C++ runtime stays (
 ## Building the installer
 
 For developers. The version is set in one place, `Directory.Build.props` (`CandelaVersion` 0.1.0, `CandelaPreview` 1
-→ `0.1.0-preview.1`, file version 0.1.0.1); every assembly, the Windows version resources, the installer and its
-file name follow it.
+→ `0.1.0-preview.1`, file version 0.1.0.1; an empty `CandelaPreview` is the release `0.1.0`, file version 0.1.0.1000,
+so a release sorts after its previews in the installer's upgrade and downgrade checks); every assembly, the Windows
+version resources, the installer and its file name follow it.
 
 **On Linux** (needs the .NET 8 SDK, python3, `makensis` from the `nsis` package, `osslsigncode` and `curl`):
 

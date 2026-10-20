@@ -17,6 +17,8 @@
     candela.exe, the About window, the installer (Candela-Setup-<version>-win-x64.exe) and its Add/Remove Programs entry
     all read it from here (packaging/windows/build-installer.* ask MSBuild for $(Version) and $(FileVersion)).
     A preview build is CandelaVersion-preview.CandelaPreview; an empty CandelaPreview makes a release version.
+    The fourth number of the Windows file version is the preview number (1-999) and 1000 for the release, so a release
+    sorts after its previews: the installer compares it to refuse a silent downgrade and to upgrade in place.
   -->
   <PropertyGroup>
     <CandelaVersion>0.1.0</CandelaVersion>
@@ -25,7 +27,7 @@
     <VersionSuffix Condition="'$(CandelaPreview)' != ''">preview.$(CandelaPreview)</VersionSuffix>
     <AssemblyVersion>$(CandelaVersion).0</AssemblyVersion>
     <FileVersion Condition="'$(CandelaPreview)' != ''">$(CandelaVersion).$(CandelaPreview)</FileVersion>
-    <FileVersion Condition="'$(CandelaPreview)' == ''">$(CandelaVersion).0</FileVersion>
+    <FileVersion Condition="'$(CandelaPreview)' == ''">$(CandelaVersion).1000</FileVersion>
     <Company>Candela contributors</Company>
     <Copyright>© 2026 Candela contributors</Copyright>
     <NeutralLanguage>en</NeutralLanguage>

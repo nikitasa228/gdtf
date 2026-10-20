@@ -570,6 +570,39 @@ public sealed partial class InstallExperienceTests : IDisposable
     }
 
     [Fact]
+    public void A_release_file_version_sorts_after_its_previews()
+    {
+        // Review regression: the release was 0.1.0.0 and its previews 0.1.0.N, so the installer of the release took the
+        // installed preview for a newer version ("A newer version of Candela is installed. Replace it?").
+        Version FileVersion(string preview)
+        {
+            var start = new System.Diagnostics.ProcessStartInfo("dotnet")
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+            };
+            foreach (var arg in new[] { "msbuild", Path.Combine(EngineTestSupport.Root, "src", "Candela.Core", "Candela.Core.csproj"),
+                         "-nologo", "-getProperty:FileVersion", "-p:CandelaVersion=0.4.2", "-p:CandelaPreview=" + preview })
+                start.ArgumentList.Add(arg);
+            using var process = System.Diagnostics.Process.Start(start)!;
+            string output = process.StandardOutput.ReadToEnd();
+            process.StandardError.ReadToEnd();
+            Assert.True(process.WaitForExit(120_000), "msbuild did not finish");
+            Assert.True(process.ExitCode == 0, output);
+            return Version.Parse(output.Trim().Split('\n')[^1].Trim());
+        }
+
+        var first = FileVersion("1");
+        var later = FileVersion("12");
+        var release = FileVersion("");
+        Assert.Equal(new Version(0, 4, 2, 1), first);
+        Assert.True(later > first);
+        Assert.True(release > later, $"{release} must sort after {later}");
+        Assert.Equal(new Version(0, 4, 2), new Version(release.Major, release.Minor, release.Build));
+    }
+
+    [Fact]
     public void The_library_setup_option_is_parsed_and_documented()
     {
         Assert.True(AppOptions.Parse(new[] { "--library-setup" }).LibrarySetup);
