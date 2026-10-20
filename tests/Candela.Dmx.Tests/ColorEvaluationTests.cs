@@ -176,4 +176,49 @@ public class ColorEvaluationTests
         Assert.Null(state.Gel);
         Assert.True(state.Beams[0].Color.ToXy().Y > 0.3f);
     }
+
+    [Theory]
+    [InlineData("BeamZ@RB_90_wW_RGB")] // RGB pixels next to 2200 K warm-white LEDs: the full RGB mix is D65
+    [InlineData("PRstage@LED_COB_200_RGBW")] // a 3200 K white emitter in an RGBW engine whose full mix is 5479 K
+    [InlineData("Portman_Lights@P2_EVO")] // 3000 K
+    public void A_single_datasheet_colour_temperature_does_not_re_balance_a_mix_on_the_locus(string prefix)
+    {
+        // a single colour temperature names the white emitter (or lamp), not the mix: trimming the coloured emitters to
+        // make all-on match it would leave saturated blue at a few per cent of the file's output
+        var entry = TestData.Entry(prefix);
+        var range = entry.Specs!.ColorTemperatureK!.Value;
+        Assert.Equal(range.Min, range.Max);
+        var p = TestData.Profile(prefix);
+        var beam = p.Beams.First(b => b.Emitters.Length >= 2);
+        Assert.False(beam.WhitePointEstimated, string.Join("; ", p.Warnings));
+        Assert.DoesNotContain(p.Warnings, w => w.Contains("re-balanced", StringComparison.Ordinal));
+        var cct = Cct.FromXy(Mix(beam.Emitters));
+        Assert.True(cct.IsMeaningful && MathF.Abs(cct.Duv) <= 0.02f, $"{cct.Kelvin} K Δuv {cct.Duv}");
+        Assert.True(MathF.Abs(cct.Kelvin - (float)range.Max) > 500f, "the mix is not the datasheet's temperature");
+    }
+
+    [Fact]
+    public void A_single_datasheet_colour_temperature_corrects_a_mix_off_the_locus_near_its_own_temperature()
+    {
+        // ADJ Vintage Bar: RGBAL mixes to 5409 K at Δuv +0.029 next to 2000 K lamps; it goes onto the locus within a
+        // factor of two of 2000 K instead of to 2000 K, which would take the blue emitter to nothing
+        var p = TestData.Profile("ADJ@Vintage_Bar");
+        var beam = p.Beams.First(b => b.Emitters.Length >= 2 && b.WhitePointEstimated);
+        Assert.InRange(beam.WhitePointKelvin, 3999f, 4001f);
+        var cct = Cct.FromXy(Mix(beam.Emitters));
+        Assert.InRange(MathF.Abs(cct.Duv), 0f, 0.005f);
+        Assert.Equal(4000f, cct.Kelvin, 40f);
+        Assert.All(beam.Emitters, e => Assert.True(e.MaxFlux > 0.05f * beam.ReferenceFlux / beam.Emitters.Length, $"{e.Name}: {e.MaxFlux} lm"));
+        // the warning prints a plain sign for Δuv
+        Assert.DoesNotContain(p.Warnings, w => w.Contains("-+", StringComparison.Ordinal) || w.Contains("+-", StringComparison.Ordinal));
+    }
+
+    /// <summary>Chromaticity of all emitters at full.</summary>
+    private static Vector2 Mix(IReadOnlyList<Emitter> emitters)
+    {
+        Vector3 sum = default;
+        foreach (var e in emitters) sum += e.TristimulusPerLumen * e.MaxFlux;
+        float t = sum.X + sum.Y + sum.Z;
+        return new Vector2(sum.X / t, sum.Y / t);
+    }
 }

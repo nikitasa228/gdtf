@@ -1960,8 +1960,9 @@ public sealed partial class FixtureProfile
         /// <see cref="MaxWhiteDuv"/> off the locus or its CCT lies outside the range, the emitter outputs are trimmed as
         /// little as possible (<see cref="ColorMixing.TryBalance"/>) so that the full mix lands on the locus at the nearest
         /// CCT of the range, keeping the beam's reference flux and every emitter lit; the beam is marked
-        /// <see cref="ProfileBeam.WhitePointEstimated"/> and a warning names the change. Engines with fewer than two
-        /// differently coloured emitters, or without a researched range, are left alone.
+        /// <see cref="ProfileBeam.WhitePointEstimated"/> and a warning names the change. A range of a single colour
+        /// temperature names the white emitter, not the mix: then only a mix off the locus is corrected, near its own CCT.
+        /// Engines with fewer than two differently coloured emitters, or without a researched range, are left alone.
         /// </summary>
         private PhotometryEmitter[] CalibrateWhitePoint(ProfileBeam beam, PhotometryEmitter[] list)
         {
@@ -1986,10 +1987,20 @@ public sealed partial class FixtureProfile
                     coloured = Vector2.Distance(list[i].Chromaticity, list[j].Chromaticity) > 0.1f;
             if (!coloured) return list;
             float lo = (float)range.Min, hi = (float)range.Max;
-            bool inRange = cct.IsMeaningful && MathF.Abs(cct.Duv) <= MaxWhiteDuv && cct.Kelvin >= lo / 1.02f && cct.Kelvin <= hi * 1.02f;
-            if (inRange) return list;
+            bool onLocus = cct.IsMeaningful && float.IsFinite(cct.Kelvin) && MathF.Abs(cct.Duv) <= MaxWhiteDuv;
+            // a single colour temperature (min = max) is the white emitter's or the lamp's, not a calibrated mix of the
+            // coloured emitters (BeamZ RB 90 wW RGB "2200 K", PRstage LED COB 200 RGBW "3200 K"): a full mix on the
+            // Planckian locus is taken as written; one off it goes onto the locus near its own temperature (within a
+            // factor of two of the given one: ADJ Vintage Bar's RGBAL mix at 5409 K, Δuv +0.029, next to 2000 K lamps)
+            bool fixedCct = hi - lo < 1f;
+            if (onLocus && (fixedCct || (cct.Kelvin >= lo / 1.02f && cct.Kelvin <= hi * 1.02f))) return list;
 
-            float target = cct.IsMeaningful && float.IsFinite(cct.Kelvin) ? Math.Clamp(cct.Kelvin, lo, hi) : hi;
+            if (fixedCct)
+            {
+                lo = Math.Max(lo / 2f, 1000f);
+                hi = Math.Min(hi * 2f, 25000f);
+            }
+            float target = cct.IsMeaningful && float.IsFinite(cct.Kelvin) ? Math.Clamp(cct.Kelvin, lo, hi) : (float)range.Max;
             int n = list.Length;
             var factors = new float[n];
             if (n > 16 || !ColorMixing.TryBalance(list, Cct.XyFromCct(target), factors)) return list; // outside the emitters' gamut
@@ -2000,7 +2011,7 @@ public sealed partial class FixtureProfile
             string key = string.Create(CultureInfo.InvariantCulture, $"{xy.X:F3},{xy.Y:F3}>{target:F0}");
             if (_whiteWarned.Add(key))
                 Warnings.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"Emitters at full mix to x {xy.X:F3}, y {xy.Y:F3} ({(cct.IsMeaningful ? $"{cct.Kelvin:F0} K, Δuv {cct.Duv:+0.000;-0.000}" : "no CCT")}), outside the datasheet's {lo:F0}–{hi:F0} K; emitter outputs re-balanced to {target:F0} K (estimate)."));
+                    $"Emitters at full mix to x {xy.X:F3}, y {xy.Y:F3} ({(cct.IsMeaningful ? $"{cct.Kelvin:F0} K, Δuv {MathF.Round(cct.Duv, 3) + 0f:+0.000;-0.000}" : "no CCT")}), not a white of the datasheet's {range.Min:F0}–{range.Max:F0} K; emitter outputs re-balanced to {target:F0} K (estimate)."));
             return calibrated;
         }
 
