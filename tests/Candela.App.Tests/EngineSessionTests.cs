@@ -218,6 +218,18 @@ public sealed class EngineSessionTests : IDisposable
     }
 
     [Fact]
+    public void The_editor_simulates_smoke_in_real_time_except_while_a_render_job_holds_the_clock()
+    {
+        var simulation = _session.Engine!.Simulation;
+        Assert.True(simulation.RealTime);
+        Assert.False(simulation.IsSmokeBehindRealTime);
+        _session.EngineClockHeld = true;
+        Assert.False(simulation.RealTime);
+        _session.EngineClockHeld = false;
+        Assert.True(simulation.RealTime);
+    }
+
+    [Fact]
     public void Pausing_the_simulation_is_an_engine_setting()
     {
         Assert.False(_session.SimulationPaused);

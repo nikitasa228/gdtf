@@ -61,7 +61,6 @@ public sealed class SmokeWorker : IDisposable
     private readonly object _gate = new();
     private readonly SmokeWorkerOptions _options;
     private readonly SolverTaskScheduler? _scheduler;
-    private readonly Thread _thread;
     private readonly int _parallelism;
     private bool _disposed;
 
@@ -126,9 +125,9 @@ public sealed class SmokeWorker : IDisposable
         if (_parallelism > 1)
             _scheduler = new SolverTaskScheduler(_parallelism - 1, _options.Priority, "Candela smoke solver");
         Enqueue(new WorkItem { Kind = WorkKind.Configure, Settings = settings });
-        _thread = new Thread(Run) { IsBackground = true, Name = "Candela smoke solver" };
-        TrySetPriority(_thread, _options.Priority);
-        _thread.Start();
+        var thread = new Thread(Run) { IsBackground = true, Name = "Candela smoke solver" };
+        TrySetPriority(thread, _options.Priority);
+        thread.Start();
     }
 
     /// <summary>The requested settings (after sanitising) of the last <see cref="Reconfigure"/> or of the constructor.</summary>

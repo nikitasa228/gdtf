@@ -63,7 +63,7 @@ public sealed class StageSimulation : IDisposable
 
     /// <summary>
     /// Creates the simulations; <paramref name="parallelism"/> threads for the smoke solver (−1: all cores, in real time
-    /// all but one); <paramref name="realTime"/> sets <see cref="RealTime"/>.
+    /// half of them); <paramref name="realTime"/> sets <see cref="RealTime"/>.
     /// </summary>
     public StageSimulation(int parallelism = -1, bool realTime = false)
     {

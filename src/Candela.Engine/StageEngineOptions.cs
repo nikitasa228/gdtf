@@ -46,8 +46,8 @@ public sealed record StageEngineOptions
     public int DmxParallelism { get; init; } = Math.Max(1, Environment.ProcessorCount);
 
     /// <summary>
-    /// Threads used by the smoke simulation (−1: all cores; with <see cref="RealTimeSimulation"/> all but one, which stays
-    /// free for the main thread). Results do not depend on it.
+    /// Threads used by the smoke simulation (−1: all cores; with <see cref="RealTimeSimulation"/> half of them, the rest
+    /// staying free for the main thread, rendering and input). Results do not depend on it.
     /// </summary>
     public int SimulationParallelism { get; init; } = -1;
 
