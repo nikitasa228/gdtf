@@ -33,7 +33,9 @@ internal sealed partial class Workspace
         Command(EditorActions.FileSaveAs, Str.FileSaveAs, Icons.Save, ShowSaveAs);
         Command(EditorActions.FileImport, Str.FileImport, Icons.FileInput, () => ShowImport(null));
         Command(EditorActions.FileExport, Str.FileExport, Icons.FileOutput, ShowExport);
-        Command(EditorActions.Render, Str.FileRender, Icons.Clapperboard, () => FocusPanel(_render));
+        // F12 / File → Render: brings the Render panel to the front and starts a render with its current settings (a
+        // running render goes on; the panel shows its progress).
+        Command(EditorActions.Render, Str.FileRender, Icons.Clapperboard, StartRender);
         Command(EditorActions.Settings, Str.FileSettings, Icons.Settings, () => _settingsWindow.Open());
         Command(AppActions.Exit, Str.FileExit, Icons.X, () => _ctx.Window.SetShouldClose(true));
 

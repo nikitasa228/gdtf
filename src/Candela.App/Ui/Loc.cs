@@ -95,7 +95,7 @@ internal static class Loc
         (Str.FileImportImage, "Image…", "Изображение…"),
         (Str.FileExport, "Export", "Экспорт"),
         (Str.FileExportMvr, "MVR Scene…", "Сцена MVR…"),
-        (Str.FileRender, "Render…", "Рендер…"),
+        (Str.FileRender, "Render", "Рендер"),
         (Str.FileSettings, "Settings…", "Настройки…"),
         (Str.FileExit, "Exit", "Выход"),
 
@@ -236,8 +236,6 @@ internal static class Loc
         (Str.RenderBounces, "Light bounces", "Отражений света"),
         (Str.RenderFormat, "Format", "Формат"),
         (Str.RenderStart, "Render", "Сделать рендер"),
-        (Str.RenderNotAvailable, "The path tracer arrives in a later milestone; final renders are not available yet.",
-            "Трассировщик путей появится в следующих этапах; финальный рендер пока недоступен."),
         (Str.RenderFrame, "Single frame", "Один кадр"),
         (Str.RenderRange, "Timecode range", "Диапазон таймкода"),
         (Str.RenderRangeStart, "From (s)", "С (с)"),

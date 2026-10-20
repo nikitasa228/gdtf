@@ -185,7 +185,6 @@ internal enum Str
     RenderBounces,
     RenderFormat,
     RenderStart,
-    RenderNotAvailable,
     RenderFrame,
     RenderRange,
     RenderRangeStart,

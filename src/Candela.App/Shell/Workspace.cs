@@ -67,6 +67,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     private bool _titleModified;
     private readonly StatusTexts _statusTexts = new();
     private readonly Action _onLanguageChanged;
+    private readonly Action<RenderJobRunner> _onRenderStateChanged;
     private Panel? _dockNextPanel;
     private uint _dockNextNode;
     private readonly Action<Panel> _drawPanelContent;
@@ -133,6 +134,8 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _activeViewport = _viewports[0];
         _onLanguageChanged = () => _title = "";
         Loc.LanguageChanged += _onLanguageChanged;
+        _onRenderStateChanged = OnRenderStateChanged;
+        _ctx.Tools.Stage.Render.StateChanged += _onRenderStateChanged;
     }
 
     /// <summary>All panels (viewports first), in Window-menu order.</summary>
@@ -287,9 +290,11 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void Dispose()
     {
         Loc.LanguageChanged -= _onLanguageChanged;
+        _ctx.Tools.Stage.Render.StateChanged -= _onRenderStateChanged;
         DisposeCabling();
         DisposeSession();
         _library.Dispose();
+        _render.Dispose();
         foreach (var viewport in _viewports)
             viewport.ReleaseTarget();
         _ctx.Tools.Stage.Dispose();
@@ -416,6 +421,28 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     {
         panel.IsOpen = true;
         _focusPanel = panel.Id;
+    }
+
+    /// <summary>
+    /// F12 / File → Render: shows the Render panel and starts a render with its current settings (renderer, preset,
+    /// frame or range, work light) from the active viewport's camera. A running render goes on.
+    /// </summary>
+    private void StartRender()
+    {
+        FocusPanel(_render);
+        _render.StartFromCommand();
+    }
+
+    /// <summary>A render ended (written, stopped, cancelled or failed): its message goes to the status bar and the log.</summary>
+    private void OnRenderStateChanged(RenderJobRunner job)
+    {
+        if (job.State == RenderJobState.Running || job.Message is not { } message)
+            return;
+        SetStatus(message);
+        if (job.State == RenderJobState.Failed)
+            _ctx.Log.Warn("Render", message);
+        else
+            _ctx.Log.Info("Render", message);
     }
 
     /// <summary>

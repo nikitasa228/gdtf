@@ -127,8 +127,14 @@ internal sealed class StageToolState : IDisposable
     /// <summary>Protocols, test console and DMX recorder of the external-control panel.</summary>
     public ExternalControl External { get; }
 
-    /// <summary>The final render job (Render panel, File → Render).</summary>
+    /// <summary>The final render job (Render panel, File → Render, F12).</summary>
     public RenderJobRunner Render { get; }
+
+    /// <summary>
+    /// What the editor's renderer supports (recorded every frame by <see cref="Update"/>; null until a renderer exists):
+    /// the Render panel says when the path tracer is unavailable (no ray queries) and the Fast mode is used instead.
+    /// </summary>
+    public RendererInfo? RendererInfo { get; internal set; }
 
     /// <summary>The editor's file dialog (set by the workspace; null in tests).</summary>
     public FileBrowserDialog? Browser { get; set; }
@@ -255,7 +261,10 @@ internal sealed class StageToolState : IDisposable
         External.Update(engine, now);
         Render.DisposeTarget = deferDispose;
         if (renderer is not null)
+        {
+            RendererInfo = renderer.Info;
             Render.Step(engine, renderer, now);
+        }
     }
 
     /// <inheritdoc/>
