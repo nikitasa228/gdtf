@@ -12,9 +12,13 @@ namespace Candela.Mvr;
 /// their ids as uuids and their hierarchy, with local transforms written in millimetres. Fixtures are written with
 /// <c>GDTFSpec</c>, <c>GDTFMode</c>, <c>Addresses</c>, <c>FixtureID</c>, <c>UnitNumber</c>, <c>Color</c>,
 /// <c>CastShadow</c> and <c>Focus</c> (a <c>FocusPoint</c> is created per focused fixture) and their GDTF files are
-/// embedded; trusses, rigging points, meshes and groups become <c>Truss</c>, <c>Support</c>, <c>SceneObject</c> and
-/// <c>GroupObject</c> with models embedded as binary glTF; cables between two devices become MVR 1.6
-/// <c>Connections</c>. Anything MVR cannot hold is listed in <see cref="MvrExportResult.Issues"/>.
+/// embedded; fixtures that stand in for a model the library lacks are written as that model and mode
+/// (<see cref="MvrExportOptions.StandInOf"/>, <see cref="MvrExportOptions.WriteStandIns"/>); trusses, rigging points,
+/// meshes and groups become <c>Truss</c>, <c>Support</c>, <c>SceneObject</c> and <c>GroupObject</c> with models
+/// embedded as binary glTF with their textures; every object stays on its layer (children on another layer than their
+/// parent go under a GroupObject of their layer that repeats the parent, which Candela's importer joins again); cables
+/// between two devices become MVR 1.6 <c>Connections</c>. Anything MVR cannot hold, and every change the export cannot
+/// avoid, is listed in <see cref="MvrExportResult.Issues"/>.
 /// </para>
 /// <para>
 /// Output is deterministic: equal input gives byte-identical archives (stable element order, invariant round-trip

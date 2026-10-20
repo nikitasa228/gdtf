@@ -117,6 +117,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     private Vector2 _pressPosition;
     private string _statsText = "";
     private double _statsUpdatedAt = -1;
+    private readonly LightListWarningLabel _lightWarning = new();
     private string _title = "";
     private string _titleLanguage = "";
     private ViewDirection? _hoveredFace;
@@ -911,6 +912,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         double now = _ctx.Timer.Elapsed;
         float lineHeight = ImGui.GetTextLineHeight();
         float bottom = _imageMin.Y + _imageSize.Y - pad.Y;
+        bottom = DrawLightListWarning(drawList, pad, bottom, scale);
         if (ShowStats)
         {
             if (now - _statsUpdatedAt > 0.25 || _statsText.Length == 0)
@@ -938,6 +940,56 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
             var size = ImGui.CalcTextSize(content.Caption);
             var pos = new Vector2(_imageMin.X + _imageSize.X - size.X - pad.X, _imageMin.Y + _imageSize.Y - size.Y - pad.Y);
             drawList.AddText(pos, Theme.U32(Theme.WithAlpha(Theme.TextMuted, 0.8f)), content.Caption);
+        }
+    }
+
+    /// <summary>
+    /// The renderer could not list every light of this view (more lights in the scene than its clustered-light limit):
+    /// a warning line in the corner of the view, shown whatever the statistics setting, because surfaces and the lux
+    /// overlay read too low there. The renderer also writes it to the log. Returns the new bottom of the corner stack.
+    /// </summary>
+    private float DrawLightListWarning(ImDrawListPtr drawList, Vector2 pad, float bottom, float scale)
+    {
+        var lists = _target?.LightLists ?? default;
+        if (!lists.HasOverflow)
+            return bottom;
+        string warning = _lightWarning.For(lists);
+        var size = ImGui.CalcTextSize(warning);
+        var pos = new Vector2(_imageMin.X + pad.X, bottom - size.Y);
+        drawList.AddRectFilled(pos - new Vector2(6, 3) * scale, pos + size + new Vector2(6, 3) * scale,
+            Theme.U32(Theme.WithAlpha(Theme.OverlayBackground, 0.85f)), 4 * scale);
+        drawList.AddText(pos, Theme.U32(Theme.Warning), warning);
+        return pos.Y - 9f * scale;
+    }
+
+    /// <summary>The warning of a view whose light lists overflowed, in the UI language (empty when nothing overflowed).</summary>
+    internal static string LightListWarningText(in LightListDiagnostics lists) =>
+        lists.HasOverflow ? Loc.Format(Str.ViewportLightListOverflow, lists.UnlistedLights, lists.Lights, lists.ListedLights) : "";
+
+    /// <summary>
+    /// The viewport's light-list warning line (icon + <see cref="LightListWarningText"/>), rebuilt only when the numbers
+    /// in it or the UI language change: the busiest cluster and the overflowed clusters of the diagnostics move with the
+    /// camera every frame, and building the text every frame would allocate in the frame loop.
+    /// </summary>
+    internal sealed class LightListWarningLabel
+    {
+        private string _text = "";
+        private (int Lights, int Listed) _for;
+        private string _language = "";
+
+        /// <summary>The warning line for <paramref name="lists"/> (empty when nothing overflowed).</summary>
+        public string For(in LightListDiagnostics lists)
+        {
+            if (!lists.HasOverflow)
+                return "";
+            if ((lists.Lights, lists.ListedLights) != _for || _language != Loc.Language || _text.Length == 0)
+            {
+                _for = (lists.Lights, lists.ListedLights);
+                _language = Loc.Language;
+                _text = Icons.TriangleAlert + "  " + LightListWarningText(lists);
+            }
+
+            return _text;
         }
     }
 

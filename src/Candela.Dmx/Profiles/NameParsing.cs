@@ -25,6 +25,26 @@ public enum ChannelSetFlags
 
     /// <summary>The range inverts tilt.</summary>
     InvertTilt = 16,
+
+    /// <summary>
+    /// A wheel selection range that takes the wheel, prism, animation or effect out of the beam ("Open", "Off",
+    /// "Removed", "No prism", "Closed" …, selecting no slot or an open one). Set while a profile is compiled.
+    /// </summary>
+    WheelOut = 32,
+
+    /// <summary>
+    /// A wheel selection range that moves a single-slot mechanism (animation wheel, prism) gradually into the beam
+    /// from the "out" range before it: an unnamed range after "Open", "Open to Dots", "Enter in proportion". Insertion
+    /// runs 0 → 1 across the range. Set while a profile is compiled.
+    /// </summary>
+    InsertionRamp = 64,
+
+    /// <summary>
+    /// A wheel selection range in which the mechanism keeps moving in and out of the beam between two insertions
+    /// ("Ramping from open to full position max … min": Robe animation wheels), at a rate that runs across the range.
+    /// Set while a profile is compiled.
+    /// </summary>
+    InsertionCycle = 128,
 }
 
 /// <summary>
@@ -291,13 +311,244 @@ public static class NameParsing
         return int.TryParse(s.AsSpan(j + 1, end - j - 1), NumberStyles.None, CultureInfo.InvariantCulture, out int n) && n is > 0 and < 100 ? n : 0;
     }
 
-    /// <summary>True when the name describes an open/empty wheel position ("Open", "Open/Hole", "Open position", "No prism").</summary>
+    /// <summary>Elongation of a beam-shaper lens when its name gives none ("Beam Shaper", "Oval"): a typical 2:1 anamorphic lens.</summary>
+    public const float DefaultShaperStretch = 2f;
+
+    /// <summary>
+    /// Elongation (long axis / short axis, ≥ 1) of an anamorphic beam-shaper lens named <paramref name="name"/>: a ratio
+    /// written in the name ("2:1", "3x1", "x2.5"), else <see cref="DefaultShaperStretch"/>. Values are kept in 1 … 10.
+    /// </summary>
+    public static float ParseStretch(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return DefaultShaperStretch;
+        var s = name.AsSpan();
+        for (int i = 0; i < s.Length; i++)
+        {
+            if (!char.IsAsciiDigit(s[i]) || (i > 0 && (char.IsAsciiDigit(s[i - 1]) || s[i - 1] == '.'))) continue;
+            int j = i;
+            while (j < s.Length && (char.IsAsciiDigit(s[j]) || s[j] == '.')) j++;
+            if (!float.TryParse(s[i..j], NumberStyles.Float, CultureInfo.InvariantCulture, out float a) || !(a > 0f)) continue;
+            int k = j;
+            while (k < s.Length && s[k] == ' ') k++;
+            // "2:1", "2x1", "2 : 1"
+            if (k < s.Length && (s[k] == ':' || s[k] == 'x' || s[k] == 'X'))
+            {
+                int m = k + 1;
+                while (m < s.Length && s[m] == ' ') m++;
+                int e = m;
+                while (e < s.Length && (char.IsAsciiDigit(s[e]) || s[e] == '.')) e++;
+                if (e > m && float.TryParse(s[m..e], NumberStyles.Float, CultureInfo.InvariantCulture, out float b) && b > 0f)
+                    return Math.Clamp(MathF.Max(a, b) / MathF.Min(a, b), 1f, 10f);
+            }
+            // "x2.5"
+            if (i > 0 && (s[i - 1] == 'x' || s[i - 1] == 'X') && a > 1f) return Math.Clamp(a, 1f, 10f);
+            i = j;
+        }
+        return DefaultShaperStretch;
+    }
+
+    /// <summary>
+    /// True when the name describes an open/empty wheel position ("Open", "Open/Hole", "Open position", "No prism"), also
+    /// with "open" as its last word ("Animator OPEN", "Wheel Slot 0: OPEN", "No Prism(Open)") unless it combines it with
+    /// something else ("Red/Open", "Half open", "Close to Open").
+    /// </summary>
     public static bool IsOpenSlotName(string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) return false;
         string s = name.Trim().ToLowerInvariant();
-        return s.StartsWith("open", StringComparison.Ordinal) || s is "white" or "empty" or "hole" or "no gobo" or "no prism" or "none" ||
-            s.StartsWith("no prism", StringComparison.Ordinal) || s.StartsWith("empty", StringComparison.Ordinal);
+        if (s.StartsWith("open", StringComparison.Ordinal) || s is "white" or "empty" or "hole" or "no gobo" or "no prism" or "none" ||
+            s.StartsWith("no prism", StringComparison.Ordinal) || s.StartsWith("empty", StringComparison.Ordinal))
+            return true;
+        return LastWordIs(s, "open") && !ContainsAny(s, "/", "+", "&", ">", " to ", "half", "clos", "split");
+    }
+
+    /// <summary>
+    /// True when a slot name says the slot is a hole even though the file gives it a media file (an image of an open
+    /// aperture): "Open", "Open/Hole", "Open position", "Open (2)", "Hole", "No gobo" — but not "Open 2" next to a
+    /// gobo image, "Open+Red" or "Open/Close 1", which name a real gobo, a split colour or a shape.
+    /// </summary>
+    public static bool IsPlainOpenSlotName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (s is "hole" or "empty" or "none" or "no gobo" or "no prism" or "white") return true;
+        if (!s.StartsWith("open", StringComparison.Ordinal)) return false;
+        var rest = s.AsSpan(4);
+        int i = 0;
+        while (i < rest.Length)
+        {
+            char c = rest[i];
+            if (char.IsLetter(c))
+            {
+                int j = i;
+                while (j < rest.Length && char.IsLetter(rest[j])) j++;
+                var word = rest[i..j];
+                if (!(word is "hole" or "position" or "slot" or "white")) return false;
+                i = j;
+                continue;
+            }
+            // "(2)" is a second open position; a bare number ("Open 2") is often a mislabelled gobo
+            if (char.IsAsciiDigit(c) && !(i > 0 && rest[i - 1] == '(')) return false;
+            i++;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// True when the name of a wheel selection range or function says the mechanism is out of the beam: an open
+    /// position ("Open", "Open/Hole", "No prism"), "Off", "Removed", "Out", "Closed", "No function", "Idle", "Disabled",
+    /// "None", "Empty". A range that moves from such a state to another ("Open to Dots", "Open > Close") is not out.
+    /// </summary>
+    public static bool IsWheelOutName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (IsTransition(s)) return false;
+        if (IsOpenSlotName(s)) return true;
+        if (s is "off" or "out" or "removed" or "remove" or "idle" or "neutral" or "disable" or "disabled" or "close" or "closed") return true;
+        foreach (string prefix in OutPrefixes)
+        {
+            if (s.StartsWith(prefix, StringComparison.Ordinal)) return true;
+        }
+        // "No Color Blue", "No Colour Straw", "No Color Pink" are gels (Roscolux), not the absence of a filter ("No Color 1")
+        if (IsNoColorGel(s)) return false;
+        // "No Flower Effect", "No selection" — but "No rotation", "No shake" only stop a movement of a selected item
+        if (s.StartsWith("no ", StringComparison.Ordinal) &&
+            !ContainsAny(s, "rot", "shake", "spin", "mov", "speed", "strobe", "flash", "fade", "index", "scroll", "random"))
+            return true;
+        // "Animation Rotation OFF", "Wheel Slot 0 OFF": the mechanism is switched off (but "Shake off" only stops a shake)
+        return LastWordIs(s, "off") && !ContainsAny(s, "/", "+", "&", "shake", "strobe", " on");
+    }
+
+    /// <summary>
+    /// True when a range of a green/magenta (tint) correction names no correction: "Off", "Idle", "No function",
+    /// "No effect", "No shift", "No Green Offset", "Default", "Neutral", "Uncorrected white".
+    /// </summary>
+    public static bool IsNeutralTintName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (IsTransition(s)) return false; // "Neutral to Full Plus Green" is a range of corrections
+        return s is "off" or "idle" or "default" or "neutral" or "center" or "centre" || s.StartsWith("no ", StringComparison.Ordinal) ||
+            s.StartsWith("neutral", StringComparison.Ordinal) || s.StartsWith("uncorrected", StringComparison.Ordinal) ||
+            s.StartsWith("off ", StringComparison.Ordinal) || s.StartsWith("nofunction", StringComparison.Ordinal);
+    }
+
+    /// <summary>True for a lower-case gel name of the Roscolux "No Color …" series ("no color blue", "no colour straw l144").</summary>
+    private static bool IsNoColorGel(string s)
+    {
+        string? rest = s.StartsWith("no colour", StringComparison.Ordinal) ? s[9..] : s.StartsWith("no color", StringComparison.Ordinal) ? s[8..] : null;
+        if (rest is null || rest.Length == 0 || char.IsLetter(rest[0])) return false; // "no colors", "no colourful"
+        foreach (char c in rest)
+            if (char.IsLetter(c)) return true;
+        return false;
+    }
+
+    /// <summary>Lower-case beginnings of range names that take a mechanism out of the beam ("Off (no rotation)", "No function").</summary>
+    private static readonly string[] OutPrefixes =
+    [
+        "off ",
+        "off(",
+        "off-",
+        "removed",
+        "out ",
+        "closed",
+        "close ",
+        "no function",
+        "nofunction",
+        "no feature",
+        "nofeature",
+        "no animation",
+        "no effect",
+        "no gobo",
+        "no shaper",
+        "no beam shaper",
+        "empty",
+    ];
+
+    /// <summary>True when the last word of a lower-case name, ignoring punctuation, is <paramref name="word"/>.</summary>
+    private static bool LastWordIs(string s, string word)
+    {
+        int end = s.Length;
+        while (end > 0 && !char.IsLetterOrDigit(s[end - 1])) end--;
+        int start = end;
+        while (start > 0 && char.IsLetter(s[start - 1])) start--;
+        return s.AsSpan(start, end - start).SequenceEqual(word);
+    }
+
+    /// <summary>
+    /// True when a prism-wheel slot name names a prism ("Prism", "Prism 2", "Prism Insert", "Both Prisms", "6 facet"),
+    /// not an open position ("Open prism", "No prism", "Prism 1 OPEN").
+    /// </summary>
+    internal static bool NamesPrism(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name) || IsOpenSlotName(name) || IsWheelOutName(name)) return false;
+        return name.Contains("prism", StringComparison.OrdinalIgnoreCase) || name.Contains("facet", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// True when a wheel selection range named <paramref name="name"/> that follows an "out" range moves the mechanism
+    /// gradually into the beam: no name (the ramp between "Open" and "Animation In"), a transition out of an open
+    /// state ("Open to Dots", "Open > In"), or an insertion "in proportion".
+    /// </summary>
+    public static bool IsInsertionRampName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return true;
+        string s = name.Trim().ToLowerInvariant();
+        if (s.Contains("proportion", StringComparison.Ordinal) || s.Contains("insertion", StringComparison.Ordinal)) return true;
+        if (!IsTransition(s)) return false;
+        int cut = TransitionIndex(s);
+        return cut > 0 && IsWheelOutName(s[..cut]);
+    }
+
+    /// <summary>
+    /// A range that keeps moving a mechanism between two insertions: "Ramping from open to full position max",
+    /// "Ramp from half position to full position min". <paramref name="from"/> and <paramref name="to"/> are the
+    /// insertions (open 0, half 0.5, full 1); <paramref name="speedEnd"/> is +1 when the name marks the fast end of the
+    /// range ("max"), −1 for the slow end ("min"), 0 when it names neither.
+    /// </summary>
+    public static bool TryParseInsertionCycle(string? name, out float from, out float to, out int speedEnd)
+    {
+        from = to = float.NaN;
+        speedEnd = 0;
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (!s.StartsWith("ramp", StringComparison.Ordinal)) return false;
+        int f = s.IndexOf("from ", StringComparison.Ordinal);
+        if (f < 0) return false;
+        int t = s.IndexOf(" to ", f, StringComparison.Ordinal);
+        if (t < 0) return false;
+        from = InsertionWord(s.AsSpan(f + 5, t - f - 5));
+        to = InsertionWord(s.AsSpan(t + 4));
+        if (float.IsNaN(from) || float.IsNaN(to) || from == to) return false;
+        if (ContainsWord(s, "max")) speedEnd = 1;
+        else if (ContainsWord(s, "min")) speedEnd = -1;
+        return true;
+    }
+
+    /// <summary>Insertion named by the first word of <paramref name="s"/>: open 0, half 0.5, full 1; NaN otherwise.</summary>
+    private static float InsertionWord(ReadOnlySpan<char> s)
+    {
+        s = s.TrimStart();
+        if (s.StartsWith("open", StringComparison.Ordinal)) return 0f;
+        if (s.StartsWith("half", StringComparison.Ordinal)) return 0.5f;
+        if (s.StartsWith("full", StringComparison.Ordinal)) return 1f;
+        return float.NaN;
+    }
+
+    /// <summary>True for "A to B", "A > B", "A -> B", "A → B".</summary>
+    private static bool IsTransition(string s) => TransitionIndex(s) > 0;
+
+    private static int TransitionIndex(string s)
+    {
+        int i = s.IndexOf(" to ", StringComparison.Ordinal);
+        if (i > 0) return i;
+        foreach (string arrow in (ReadOnlySpan<string>)["->", "→", ">"])
+        {
+            i = s.IndexOf(arrow, StringComparison.Ordinal);
+            if (i > 0) return i;
+        }
+        return -1;
     }
 
     private static bool ContainsAny(string s, params string[] words)

@@ -133,7 +133,9 @@ public sealed class RenderingTests
         Assert.True(bright > 0.05, $"no lit floor area: {bright:P1} bright pixels");
         Assert.True(bright < 0.9, $"the image is blown out: {bright:P1} bright pixels");
 
-        // the auto view frames the content: the lit stage spans most of the picture
+        // the auto view frames the content: the lit stage spans a large part of the picture. At open white only the beams'
+        // pools light the floor (about half the width); the whole floor used to glow from the Zonda 3 FX "Basic" liquid-effect
+        // rings, which no channel of that mode addresses and which now stay dark (Candela.Dmx ColorEvaluationTests)
         int minX = image.Width, maxX = -1, minY = image.Height, maxY = -1;
         for (int y = 0; y < image.Height; y++)
         {
@@ -148,7 +150,7 @@ public sealed class RenderingTests
                 maxY = Math.Max(maxY, y);
             }
         }
-        Assert.True(maxX - minX > 0.6 * image.Width, $"the stage spans only x {minX}…{maxX} of {image.Width}");
+        Assert.True(maxX - minX > 0.4 * image.Width, $"the stage spans only x {minX}…{maxX} of {image.Width}");
         Assert.True(maxY - minY > 0.6 * image.Height, $"the stage spans only y {minY}…{maxY} of {image.Height}");
     }
 

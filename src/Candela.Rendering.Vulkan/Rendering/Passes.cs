@@ -168,7 +168,7 @@ internal static unsafe class PassRecording
     }
 
     /// <summary>
-    /// Declares what lighting.glsl reads (lights, cluster lists, per-view light data, shadow atlas) for shaders of the
+    /// Declares what lighting.glsl reads (lights, cluster light masks, per-view light data, shadow atlas) for shaders of the
     /// given kind: fragment (<paramref name="compute"/> false) or compute.
     /// </summary>
     public static void DeclareLightingReads(PassContext context, BarrierBatch barriers, bool compute)
@@ -176,7 +176,7 @@ internal static unsafe class PassRecording
         var use = compute ? BufferUse.ComputeRead : BufferUse.FragmentRead;
         barriers.Use(context.World.LightBuffer, BufferUse.ShaderRead);
         barriers.Use(context.Target.Clusters, use);
-        barriers.Use(context.Target.ClusterLights, use);
+        barriers.Use(context.Target.ClusterMasks, use);
         barriers.Use(context.Target.LightViews.Buffer, BufferUse.ShaderRead);
         barriers.Use(context.Target.Lists.Buffer, BufferUse.ShaderRead);
         if (context.Atlas is { Depth: not null } atlas)
@@ -247,7 +247,10 @@ internal sealed class DepthPrepassPass : RenderPass
 
 /// <summary>
 /// Clustered light assignment (Full view, lux overlay): one work group per cluster of the 16 × 9 × 24 grid tests every
-/// light's cone and range against the cluster's view-space bounds and writes the cluster's light list.
+/// light's cone and range against the cluster's view-space bounds and writes the cluster's light mask (one bit per
+/// listed light, never truncated). The statistics block (cluster-light pairs, busiest cluster, clusters missing a
+/// light beyond the clustered-light limit) is copied to the frame slot's read-back buffer, read when the slot comes
+/// round again.
 /// </summary>
 internal sealed class ClusterAssignPass : RenderPass
 {
@@ -264,13 +267,27 @@ internal sealed class ClusterAssignPass : RenderPass
         barriers.Use(context.World.LightBuffer, BufferUse.ComputeRead);
         barriers.Use(context.Target.ClusterCounter, BufferUse.ComputeWrite);
         barriers.Use(context.Target.Clusters, BufferUse.ComputeWrite);
-        barriers.Use(context.Target.ClusterLights, BufferUse.ComputeWrite);
+        barriers.Use(context.Target.ClusterMasks, BufferUse.ComputeWrite);
     }
 
-    public override void Execute(PassContext context)
+    public override unsafe void Execute(PassContext context)
     {
+        var t = context.Target;
         PassRecording.BindCompute(context, context.Pipelines.ClusterAssign);
         context.Context.Vk.CmdDispatch(context.Cmd, ShaderConstants.ClusterCount, 1, 1);
+
+        int slot = context.Frame.SlotIndex;
+        if (t.ClusterStatsReadback[slot] is not { } readback)
+            return;
+        var barriers = context.Barriers;
+        barriers.Use(t.ClusterCounter, BufferUse.TransferSource);
+        barriers.Use(readback, BufferUse.TransferDestination);
+        barriers.Flush();
+        var copy = new BufferCopy(0, 0, (ulong)sizeof(GpuClusterCounter));
+        context.Context.Vk.CmdCopyBuffer(context.Cmd, t.ClusterCounter.Handle, readback.Handle, 1, &copy);
+        barriers.Use(readback, BufferUse.HostRead);
+        t.ClusterStatsFrame[slot] = context.Frame.Number;
+        t.ClusterStatsLights[slot] = ((int)context.Data.LightCount, t.ClusterListedLights);
     }
 }
 

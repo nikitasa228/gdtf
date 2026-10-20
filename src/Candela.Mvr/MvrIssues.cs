@@ -113,8 +113,20 @@ public static class MvrIssueCodes
     /// <summary>Content was dropped because MVR or Core cannot represent it.</summary>
     public const string NotRepresentable = "mvr.not-representable";
 
-    /// <summary>A GDTF or model the writer needed was not supplied by the caller.</summary>
+    /// <summary>A GDTF, model or texture the writer needed was not supplied by the caller.</summary>
     public const string ExportResourceMissing = "mvr.export-resource-missing";
+
+    /// <summary>
+    /// A fixture that stands in for a model the library lacks was exported with the stand-in's GDTF and mode
+    /// (<see cref="MvrExportOptions.WriteStandIns"/>) instead of the model and mode the scene asks for.
+    /// </summary>
+    public const string SubstituteExported = "mvr.substitute-exported";
+
+    /// <summary>
+    /// Objects whose layer differs from their parent's were written under a GroupObject of their own layer that repeats
+    /// the parent's place (MVR keeps children on their parent's layer); Candela joins the parts again on import.
+    /// </summary>
+    public const string LayerSplit = "mvr.layer-split";
 
     /// <summary>Too many issues; the rest were suppressed.</summary>
     public const string Truncated = "mvr.issues-truncated";

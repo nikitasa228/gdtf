@@ -123,6 +123,44 @@ public sealed class ProfileChannelSet
     /// <summary>True when <paramref name="value"/> lies in the set's DMX range.</summary>
     public bool Contains(uint value) => value >= DmxFrom && value <= DmxTo;
 
+    /// <summary>Fastest in/out cycle of an <see cref="ChannelSetFlags.InsertionCycle"/> range, Hz (one full in-and-out per period).</summary>
+    internal const float CycleFastHz = 0.5f;
+
+    /// <summary>Slowest in/out cycle of an <see cref="ChannelSetFlags.InsertionCycle"/> range, Hz.</summary>
+    internal const float CycleSlowHz = 0.025f;
+
+    /// <summary>For <see cref="ChannelSetFlags.InsertionCycle"/> ranges: the insertions (0 … 1) the mechanism moves between.</summary>
+    internal float CycleFrom { get; set; } = float.NaN;
+
+    /// <inheritdoc cref="CycleFrom"/>
+    internal float CycleTo { get; set; } = float.NaN;
+
+    /// <summary>DMX range of the whole cycle group (the named fast/slow ends and the unnamed range between them).</summary>
+    internal uint CycleDmxFrom { get; set; }
+
+    /// <inheritdoc cref="CycleDmxFrom"/>
+    internal uint CycleDmxTo { get; set; }
+
+    /// <summary>True when the group runs from fast ("max") at its first DMX value to slow at its last.</summary>
+    internal bool CycleFastFirst { get; set; } = true;
+
+    /// <summary>
+    /// Insertion (0 … 1) of an <see cref="ChannelSetFlags.InsertionCycle"/> range at <paramref name="time"/> s for DMX
+    /// <paramref name="dmx"/>: a triangle between <see cref="CycleFrom"/> and <see cref="CycleTo"/> whose rate runs
+    /// logarithmically from <see cref="CycleFastHz"/> to <see cref="CycleSlowHz"/> across the group (deterministic in time).
+    /// </summary>
+    internal float CycleInsertion(uint dmx, double time)
+    {
+        float t = CycleDmxTo > CycleDmxFrom ? Math.Clamp((float)(dmx - Math.Min(dmx, CycleDmxFrom)) / (CycleDmxTo - CycleDmxFrom), 0f, 1f) : 0f;
+        if (!CycleFastFirst) t = 1f - t;
+        double hz = CycleFastHz * Math.Pow(CycleSlowHz / CycleFastHz, t);
+        double phase = time * hz;
+        float frac = (float)(phase - Math.Floor(phase));
+        float tri = 1f - MathF.Abs(2f * frac - 1f);
+        float v = CycleFrom + (CycleTo - CycleFrom) * tri;
+        return float.IsFinite(v) ? Math.Clamp(v, 0f, 1f) : 0f;
+    }
+
     /// <inheritdoc />
     public override string ToString() => $"{Name} [{DmxFrom}…{DmxTo}]";
 }
@@ -248,6 +286,46 @@ public sealed class ProfileFunction
 
     /// <summary>Angular acceleration of a rotation's speed ramp, deg/s² (∞ = instant).</summary>
     internal double SpinAcceleration { get; set; } = double.PositiveInfinity;
+
+    /// <summary>
+    /// For rotation, index and spin functions of a wheel-like mechanism: true when the same channel also selects or
+    /// inserts that mechanism (Robe "EffectWheelIndex" next to the animation wheel's ramps), so that a range of this
+    /// function named "No function" / "Open" takes the mechanism out of the beam instead of merely doing nothing.
+    /// </summary>
+    internal bool OnSelectionChannel { get; set; }
+
+    /// <summary>
+    /// True when the function being active means its mechanism is in the beam (slot selections, whole-wheel index and
+    /// spin, item rotation on the mechanism's selection channel or in a range naming a slot); false for the rotation or
+    /// indexing of a prism, animation disc or beam shaper on a channel of its own, which turns the item only while
+    /// another channel inserts it (ADJ Focus Profile "Prism1Pos" next to a "Prism1" channel at "No Effect").
+    /// </summary>
+    internal bool ImpliesInsertion { get; set; } = true;
+
+    /// <summary>
+    /// For slot selections that select no slot (no channel set names one) on a channel without any slot selection of
+    /// the mechanism, while another channel of the same beams does select its slots: the file gave a rotation or second
+    /// channel the selection attribute (ADJ Focus Hybrid "Prism1Pos" channel: "Prism Rotation Off" and "No Rotation"
+    /// written as Prism1). Such a function neither selects a slot nor takes the mechanism out; a selection with spin
+    /// still turns the selected item.
+    /// </summary>
+    internal bool SecondarySelection { get; set; }
+
+    /// <summary>
+    /// For whole-wheel index and spin functions on a channel without any slot selection of the mechanism, while another
+    /// channel of the same beams selects its slots: the file wrote the index or rotation of a rotating gobo as a wheel
+    /// index or spin (LIGHT_SKY F420BSW "Gobo2WheelIndex" on the "Gobo2Pos" channel, Flash "Shape index", ADJ Focus Hybrid
+    /// "Gobo1WheelSpin" "Clockwise Gobo Rotation"). While a slot is selected it turns the selected item instead of moving
+    /// the wheel off it (at DMX 0 such a channel would otherwise put every wheel back on its first slot).
+    /// </summary>
+    internal bool IndexesSelectedItem { get; set; }
+
+    /// <summary>
+    /// For slot selections on a wheel that holds a single item (one slot, or an open slot and one item: Cameo Oron H2
+    /// "Open" + "Animation Wheel"): the 1-based slot of that item, which insertion ramps and cycles move in and out of the
+    /// beam; 0 otherwise.
+    /// </summary>
+    internal int RampSlot { get; set; }
 
     /// <summary>Colour code of ColorRgb/ColorSub/BladeSoft functions: 0 R, 1 G, 2 B, 3 C, 4 M, 5 Y, 6 side A, 7 side B; −1 otherwise.</summary>
     internal int ColorCode { get; set; } = -1;
@@ -465,20 +543,33 @@ public sealed class ProfileChannel
 /// <summary>A wheel used by a profile with per-slot data pre-computed for evaluation.</summary>
 public sealed class ProfileWheel
 {
-    internal ProfileWheel(int index, Wheel source, Vector3[] slotTransmission, int[] facets, bool[] open)
+    internal ProfileWheel(int index, Wheel source, Vector3[] slotTransmission, int[] facets, bool[] open, float[] stretch, Vector3[] colourXyz)
     {
         Index = index;
         Source = source;
         SlotTransmissionArray = slotTransmission;
         SlotFacetArray = facets;
         SlotOpenArray = open;
+        SlotStretchArray = stretch;
+        SlotColorXyzArray = colourXyz;
     }
+
+    /// <summary>Per slot: CIE XYZ (Y = 1) of the slot's colour (D65 for slots without one), for colour presets of LED engines.</summary>
+    internal Vector3[] SlotColorXyzArray { get; }
 
     internal Vector3[] SlotTransmissionArray { get; }
 
     internal int[] SlotFacetArray { get; }
 
     internal bool[] SlotOpenArray { get; }
+
+    internal float[] SlotStretchArray { get; }
+
+    /// <summary>
+    /// Per slot: elongation of the beam (≥ 1, long axis / short axis) by an anamorphic lens — a beam-shaper slot without
+    /// an image ("Beam Shaper", "Oval", "2:1") — 1 for every other slot.
+    /// </summary>
+    public IReadOnlyList<float> SlotStretch => SlotStretchArray;
 
     /// <summary>Index in <see cref="FixtureProfile.Wheels"/>.</summary>
     public int Index { get; }
@@ -589,6 +680,13 @@ public sealed class ProfileBeam
     /// <summary>Field angle / beam angle of the optics.</summary>
     public float FieldRatio { get; internal set; }
 
+    /// <summary>
+    /// True when <see cref="FieldRatio"/> is the beam type's typical ratio, not the file's: the file gives no field angle,
+    /// or its Beam angles are not a beam/field pair (the zoom range written as BeamAngle/FieldAngle, e.g. Ayrton Rivale
+    /// Wash 4°/57°, or a ratio above 4). Field angles derived from it are estimates and may exceed the file's FieldAngle.
+    /// </summary>
+    public bool FieldRatioEstimated { get; internal set; }
+
     /// <summary>Ω_eff as a function of the beam angle.</summary>
     public BeamSolidAngleTable SolidAngles { get; internal set; } = null!;
 
@@ -607,6 +705,30 @@ public sealed class ProfileBeam
     /// <summary>Emitters of the beam's additive channels with their full-level flux (lm); empty for white-only sources.</summary>
     public PhotometryEmitter[] Emitters { get; internal set; } = Array.Empty<PhotometryEmitter>();
 
+    /// <summary>
+    /// True when the emitters' relative outputs are an estimate: the file's emitter outputs mixed at full to a white far
+    /// from the fixture's researched colour temperature (<c>_specs</c> colorTemperatureK: more than 0.02 Δuv off the
+    /// Planckian locus or a CCT outside the range), so they were trimmed as little as possible to mix to the nearest CCT
+    /// of that range on the locus (<see cref="WhitePointKelvin"/>), as a calibrated LED engine does.
+    /// </summary>
+    public bool WhitePointEstimated { get; internal set; }
+
+    /// <summary>
+    /// True when a channel of the mode colours the beam: additive emitters, CMY or RGB filters, indirect colour (RGB, HSB,
+    /// CIE), colour wheels or colour macros. A beam without (a white source, possibly with CTO/CTB) takes a gel colour set
+    /// on the fixture (<see cref="FixtureState.SetGel"/>, the MVR fixture's &lt;Color&gt;).
+    /// </summary>
+    public bool HasColorSystem { get; internal set; }
+
+    /// <summary>Correlated colour temperature of the beam's emitters at full (K), NaN without emitters or when not meaningful.</summary>
+    public float WhitePointKelvin { get; internal set; } = float.NaN;
+
+    /// <summary>
+    /// True for an LED ring or cell that other modes colour with emitter channels but this mode does not address at all
+    /// (Ayrton Zonda 3 FX "Basic": the liquid-effect ring): it has no light of its own in this mode and stays dark.
+    /// </summary>
+    public bool Unaddressed { get; internal set; }
+
     /// <summary>Maps <see cref="FixtureProfile.Emitters"/> index → index in <see cref="Emitters"/> (−1 when absent).</summary>
     internal int[] EmitterSlot { get; set; } = Array.Empty<int>();
 
@@ -622,6 +744,14 @@ public sealed class ProfileBeam
     /// (<see cref="WhiteEfficiency"/>), not a filter's.
     /// </summary>
     public bool ElectronicColor { get; internal set; }
+
+    /// <summary>
+    /// For a beam whose emitters mix colour (an RGB… LED engine): per profile wheel index, the colour wheel's slots as
+    /// presets the engine renders — per slot the largest flux its emitters make at the slot's chromaticity relative to
+    /// the reference flux, NaN for open slots and slots outside the emitters' gamut (those filter instead); null for
+    /// wheels the beam does not use, and the whole array null for beams without coloured emitters.
+    /// </summary>
+    internal float[]?[]? PresetOutput { get; set; }
 
     /// <summary>Largest white output of the beam's emitters per colour temperature, null when unknown (efficiency 1).</summary>
     internal WhiteEfficiencyTable? WhiteTable { get; set; }

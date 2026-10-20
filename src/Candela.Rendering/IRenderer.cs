@@ -21,6 +21,31 @@ public interface IRenderTarget : IDisposable
 
     /// <summary>Changes the size (viewport resized); contents become undefined.</summary>
     void Resize(int width, int height);
+
+    /// <summary>
+    /// How completely the per-view light lists of the recent frames of this target held the lights that reach each
+    /// part of the view (surface shading, the lux overlay and the volumetric light all read them). When
+    /// <see cref="LightListDiagnostics.HasOverflow"/> is true some lights are missing from the image and the lux
+    /// overlay reads too low there, so the editor shows a warning. GPU renderers read this back a frame or two late;
+    /// renderers without light lists report no overflow.
+    /// </summary>
+    LightListDiagnostics LightLists => default;
+}
+
+/// <summary>
+/// Light-list statistics of a target's recent frames (see <see cref="IRenderTarget.LightLists"/>).
+/// </summary>
+/// <param name="Lights">Lights of the world in the frame.</param>
+/// <param name="ListedLights">Lights the renderer could list (the others are not drawn at all).</param>
+/// <param name="MaxLightsInCluster">Most lights in one cluster (screen tile × depth slice): the lights a pixel there evaluates.</param>
+/// <param name="OverflowedClusters">Clusters reached by at least one light that is not listed: the lights missing in the view.</param>
+public readonly record struct LightListDiagnostics(int Lights, int ListedLights, int MaxLightsInCluster, int OverflowedClusters)
+{
+    /// <summary>Lights the renderer could not list (they are not drawn).</summary>
+    public int UnlistedLights => Math.Max(Lights - ListedLights, 0);
+
+    /// <summary>True when lights that reach the view are missing from its light lists (the image and the lux values are incomplete).</summary>
+    public bool HasOverflow => OverflowedClusters > 0;
 }
 
 /// <summary>Result of a pick query: the instance pick id under a pixel, world position and surface normal.</summary>

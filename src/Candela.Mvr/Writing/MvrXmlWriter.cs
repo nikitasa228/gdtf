@@ -497,7 +497,7 @@ internal static class MvrXmlWriter
 
     private static string I(int v) => v.ToString(CultureInfo.InvariantCulture);
 
-    private static string F(float v) => v == 0 ? "0" : v.ToString("R", CultureInfo.InvariantCulture);
+    private static string F(float v) => MvrMatrix.FormatFloat(v);
 
     private static string V(Vector3 v) => $"{F(v.X)},{F(v.Y)},{F(v.Z)}";
 }

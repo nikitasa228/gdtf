@@ -124,10 +124,10 @@ void main()
 
     vec3 diffuse = vec3(0.0);
     vec3 specular = vec3(0.0);
-    uvec2 cluster = frame.lightCount > 0u ? clusters[clusterIndex(gl_FragCoord.xy, viewDepth)] : uvec2(0u);
-    for (uint i = 0u; i < cluster.y; ++i)
+    ClusterCursor lightsHere = clusterCursor(clusterIndex(gl_FragCoord.xy, viewDepth));
+    uint index;
+    while (nextClusterLight(lightsHere, index))
     {
-        uint index = clusterLights[cluster.x + i];
         vec3 L;
         vec3 E = surfaceIlluminance(index, P, N, pixelSize, noise, L);
         if (E.r + E.g + E.b <= 0.0)

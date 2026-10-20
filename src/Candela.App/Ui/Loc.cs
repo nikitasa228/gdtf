@@ -182,6 +182,8 @@ internal static class Loc
         (Str.ViewportStats, "Statistics", "Статистика"),
         (Str.ViewportFps, "{0:0} fps", "{0:0} к/с"),
         (Str.ViewportFrameTime, "{0:0.0} ms", "{0:0.0} мс"),
+        (Str.ViewportLightListOverflow, "{0} of {1} lights are not drawn (the renderer lists at most {2}): light and lux read too low here",
+            "Не отрисовано {0} из {1} источников (рендерер учитывает не больше {2}): свет и освещённость здесь занижены"),
         (Str.ViewportNoRenderer, "The viewport cannot render (GPU unavailable).", "Вьюпорт не может отрисовать сцену (GPU недоступен)."),
         (Str.ViewportPreviewNote, "Preview stage (renderer test scene)", "Демо-сцена (тестовая сцена рендерера)"),
 

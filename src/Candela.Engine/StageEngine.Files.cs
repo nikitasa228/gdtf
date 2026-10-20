@@ -36,6 +36,21 @@ public sealed record EngineImportOptions
     public string? GroupName { get; init; }
 }
 
+/// <summary>How <see cref="StageEngine.ExportMvr"/> writes the scene.</summary>
+public sealed record EngineExportOptions
+{
+    /// <summary>Default options: stand-ins are written as the models they stand in for.</summary>
+    public static EngineExportOptions Default { get; } = new();
+
+    /// <summary>
+    /// "Write stand-ins" (default off). A fixture drawn with a stand-in GDTF because the library lacks the model the scene
+    /// asks for (<see cref="EngineSettings.Substitutes"/>) is normally exported with the requested <c>GDTFSpec</c> and
+    /// <c>GDTFMode</c>, so the file says what the scene holds. On: it is exported with the stand-in's GDTF and mode, and
+    /// every such fixture is reported as an <c>mvr.substitute-exported</c> warning.
+    /// </summary>
+    public bool WriteStandIns { get; init; }
+}
+
 /// <summary>Where GDTF files added to the fixture library came from (see <see cref="StageEngine.FixtureLibraryChanged"/>).</summary>
 public enum FixtureLibraryChangeSource
 {
@@ -135,31 +150,144 @@ public sealed partial class StageEngine
 
     /// <summary>
     /// Writes the scene as an MVR 1.6 file with the GDTF files of its fixtures (from the library) and its 3D models
-    /// (as GLB). Candela's generic devices (splitters, nodes, dimmer packs) are marked in Candela's <c>UserData</c>, so
-    /// opening the file in Candela gives the same devices back.
+    /// (as GLB with their textures). Fixtures that stand in for models the library lacks
+    /// (<see cref="EngineSettings.Substitutes"/>) are written as the model and mode the scene asks for, with the GDTF the
+    /// source MVR embedded for it when this engine still has it, unless <see cref="EngineExportOptions.WriteStandIns"/> is
+    /// set. Objects on another layer than their parent keep their layer (see docs/mvr.md, "Layers"). Candela's generic
+    /// devices (splitters, nodes, dimmer packs) are marked in Candela's <c>UserData</c>, so opening the file in Candela
+    /// gives the same devices back. Every change the export cannot avoid is in the result's issues, in
+    /// <see cref="Issues"/> and named in the summary line.
     /// </summary>
-    public EngineResult ExportMvr(string path)
+    public EngineResult ExportMvr(string path, EngineExportOptions? options = null)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        options ??= EngineExportOptions.Default;
         if (string.IsNullOrWhiteSpace(path)) return Fail(EngineIssueCodes.ExportFailed, "No file was given.");
         try
         {
-            var options = new MvrExportOptions
+            var library = MvrExportOptions.GdtfFromLibrary(Library);
+            var mvrOptions = new MvrExportOptions
             {
-                GdtfProvider = MvrExportOptions.GdtfFromLibrary(Library),
+                // library files by name, then the GDTFs an MVR embedded for models the library lacks (Depence stubs)
+                GdtfProvider = spec => library(spec) ?? RequestedGdtf(spec),
                 ModelProvider = Models.GetModelData,
+                TextureProvider = TextureFile,
+                // stand-ins go out as the models the scene asks for (or as themselves, reported, when asked to)
+                StandInOf = id => SubstitutionOf(id) is { } s ? new MvrStandIn(s.RequestedSpec, s.RequestedMode) : null,
+                WriteStandIns = options.WriteStandIns,
                 // splitters, nodes and dimmer packs come back as Candela's devices (other programs see fixtures)
                 IsCandelaDevice = GenericDevices.IsGeneric,
             };
-            var result = MvrWriter.WriteFile(_scene, path, options);
+            var result = MvrWriter.WriteFile(_scene, path, mvrOptions);
             var issues = Sorted(result.Issues);
             Report(issues);
-            return new EngineResult(true, $"Exported '{Path.GetFileName(path)}': {result.ObjectCount} objects{Counts(issues)}.", issues, Array.Empty<Guid>());
+            string standIns = result.StandInCount == 0 ? ""
+                : options.WriteStandIns ? $", {result.StandInCount} stand-in fixture(s) written as their stand-ins"
+                : $", {result.StandInCount} stand-in fixture(s) written as the models they stand in for";
+            string textures = result.TextureCount == 0 ? "" : $", {result.TextureCount} texture(s)";
+            return new EngineResult(true,
+                $"Exported '{Path.GetFileName(path)}': {result.ObjectCount} objects{textures}{standIns}{Counts(issues)}.{LossDigest(issues)}",
+                issues, Array.Empty<Guid>());
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
             return Fail(EngineIssueCodes.ExportFailed, $"'{Path.GetFileName(path)}' could not be written: {e.Message}");
         }
+    }
+
+    /// <summary>
+    /// The export's changes for the log line: every warning and every note about content the file cannot hold as it is
+    /// (<c>mvr.not-representable</c>, <c>mvr.layer-split</c>), grouped by code — up to three messages each, then how many
+    /// more — so the log names each loss the Issues panel lists. Empty when there is none.
+    /// </summary>
+    private static string LossDigest(IReadOnlyList<Issue> issues)
+    {
+        var parts = new List<string>();
+        foreach (var group in issues
+                     .Where(i => i.Severity >= IssueSeverity.Warning || i.Code is MvrIssueCodes.NotRepresentable or MvrIssueCodes.LayerSplit)
+                     .GroupBy(i => i.Code, StringComparer.Ordinal))
+        {
+            var list = group.ToList();
+            parts.AddRange(list.Take(3).Select(i => i.Message.TrimEnd('.')));
+            if (list.Count > 3) parts.Add($"{list.Count - 3} more {group.Key} like these");
+        }
+        return parts.Count == 0 ? "" : " Changes: " + string.Join(" | ", parts) + ".";
+    }
+
+    /// <summary>
+    /// PNG or JPEG bytes of a material texture for the MVR export: the asset store's file (original PNG/JPEG, or the
+    /// image re-encoded as PNG), else — for keys it does not serve, such as GDTF archive textures — the decoded image as
+    /// PNG; null when the texture is not available.
+    /// </summary>
+    private byte[]? TextureFile(string key)
+    {
+        if (Assets.TryGetTextureFile(key, out var data)) return data;
+        if (Images.Load(key) is not { Width: > 0, Height: > 0 } image) return null;
+        try
+        {
+            return ImageImporter.EncodePng(image);
+        }
+        catch (ArgumentException)
+        {
+            return null; // a pixel buffer that does not match the image size
+        }
+    }
+
+    /// <summary>Name of the cache folder that keeps the GDTFs MVR files embedded for models the library lacks.</summary>
+    private const string RequestedGdtfFolder = "mvr-requested-gdtf";
+
+    private readonly Dictionary<string, byte[]> _requestedGdtfs = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Keeps the GDTF an MVR embedded for a model the library lacks (a stand-in draws its fixtures), in memory and in the
+    /// cache, so an export writes the requested model with the file the source had — also after the project was saved
+    /// and opened again on this machine.
+    /// </summary>
+    private void RememberRequestedGdtf(string spec, byte[] bytes)
+    {
+        string key = spec.Trim();
+        if (key.Length == 0) return;
+        _requestedGdtfs[key] = bytes;
+        string path = RequestedGdtfPath(key);
+        try
+        {
+            if (File.Exists(path) && new FileInfo(path).Length == bytes.Length && File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes)) return;
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            string tmp = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            File.WriteAllBytes(tmp, bytes);
+            File.Move(tmp, path, overwrite: true);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // the copy in memory serves this session; only an export after a restart would miss the file
+        }
+    }
+
+    /// <summary>The GDTF an MVR embedded for the model <paramref name="spec"/> names (see <see cref="RememberRequestedGdtf"/>), or null.</summary>
+    private byte[]? RequestedGdtf(string spec)
+    {
+        string key = spec.Trim();
+        if (key.Length == 0) return null;
+        if (_requestedGdtfs.TryGetValue(key, out var bytes)) return bytes;
+        try
+        {
+            string path = RequestedGdtfPath(key);
+            return File.Exists(path) ? _requestedGdtfs[key] = File.ReadAllBytes(path) : null;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>Cache file of a requested GDTF: its file name with characters no file system allows replaced, lower case.</summary>
+    private string RequestedGdtfPath(string spec)
+    {
+        string name = Path.GetFileName(spec.Replace('\\', '/'));
+        foreach (char c in Path.GetInvalidFileNameChars()) name = name.Replace(c, '_');
+        foreach (char c in "<>:\"|?*") name = name.Replace(c, '_');
+        if (string.IsNullOrWhiteSpace(name) || name.Trim('.').Length == 0) name = "fixture.gdtf";
+        return Path.Combine(CacheDirectory, RequestedGdtfFolder, name.ToLowerInvariant());
     }
 
     private EngineResult OpenMvr(string path)
@@ -356,14 +484,19 @@ public sealed partial class StageEngine
 
     /// <summary>
     /// Makes the GDTF files and 3D models an MVR import brought in available: GDTFs embedded in the MVR that the library
-    /// does not have are extracted to the cache and added to the library; models become assets (decoded with the MVR
-    /// conventions: 3DS in millimetres, Z up; glTF Y up).
+    /// does not have are extracted to the cache and added to the library, and the ones embedded for models the library
+    /// lacks are kept for the export (<see cref="RememberRequestedGdtf"/>); models become assets (decoded with the MVR
+    /// conventions: 3DS in millimetres, Z up; glTF Y up, with its textures).
     /// </summary>
     private void RegisterMvr(MvrImportResult result, List<Issue> issues)
     {
         var paths = new List<string>();
         foreach (var gdtf in result.Gdtfs)
         {
+            // the file the MVR embedded for a model the library lacks: a stand-in draws the fixtures, and an export writes
+            // the requested model with this file again
+            if (gdtf.MatchKind == FixtureMatchKind.Substitute && gdtf.EmbeddedBytes is { Length: > 0 } requested)
+                RememberRequestedGdtf(gdtf.SpecName, requested);
             if (gdtf.Source is not (MvrGdtfSource.Embedded or MvrGdtfSource.EmbeddedStub) || gdtf.EmbeddedBytes is not { Length: > 0 } bytes) continue;
             if (Library.FindByFileName(gdtf.FileName) is not null) continue;
             if (ExtractGdtf(gdtf.FileName, bytes, issues) is { } file) paths.Add(file);
@@ -387,6 +520,10 @@ public sealed partial class StageEngine
                     $"The MVR model '{asset.FileName}' could not be stored: {e.Message}"));
                 continue;
             }
+            // glTF/GLB decode in the asset store's managed reader on first use, which keeps their textures (embedded images
+            // and image files, as asset:{id}/… keys); the MVR importer's own decode has geometry and factors only. 3DS is
+            // read natively by the store, so the MVR importer's managed decode is used for it.
+            if (asset.Format != ModelFileFormat.ThreeDs) continue;
             try
             {
                 Models.Seed(entry, asset.Decode(), asset.AdditionalFiles);

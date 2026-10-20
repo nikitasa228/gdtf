@@ -171,7 +171,31 @@ public static class MvrMatrix
 
     private static float Snap(float s) => MathF.Abs(s - 1f) <= UnitScaleSnap ? 1f : s;
 
-    private static string F(float value) => value == 0 ? "0" : value.ToString("R", CultureInfo.InvariantCulture);
+    private static string F(float value) => FormatFloat(value);
+
+    /// <summary>
+    /// The shortest round-trip text of a float for an MVR file, without an exponent wherever plain decimals give back the
+    /// same float (<c>-8.7253284E-08</c> → <c>-0.000000087253284</c>), else with a lower-case exponent and no plus sign
+    /// (<c>1e30</c>). DIN SPEC 15801 accepts both letters, but its XML schema only <c>e</c> in matrices and no exponent
+    /// in CIE colours, and a plain number is what every reader parses. Zero and non-finite values give <c>0</c>.
+    /// </summary>
+    internal static string FormatFloat(float value)
+    {
+        if (value == 0 || !float.IsFinite(value)) return "0";
+        string r = value.ToString("R", CultureInfo.InvariantCulture);
+        return r.Contains('E', StringComparison.Ordinal) ? WithoutExponent(r, value) : r;
+    }
+
+    /// <summary><paramref name="text"/> (which has an exponent) as plain decimals when they give back <paramref name="value"/>, else with a schema-valid exponent.</summary>
+    private static string WithoutExponent(string text, double value)
+    {
+        if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d))
+        {
+            string plain = d.ToString("0.############################", CultureInfo.InvariantCulture);
+            if (double.TryParse(plain, NumberStyles.Float, CultureInfo.InvariantCulture, out double back) && (float)back == (float)value) return plain;
+        }
+        return text.Replace("E+", "e", StringComparison.Ordinal).Replace('E', 'e');
+    }
 
     /// <summary>Metres → millimetre text by shifting the shortest round-trip decimal representation.</summary>
     internal static string Millimetres(float metres)
@@ -189,7 +213,9 @@ public static class MvrMatrix
                 // fall through to double formatting
             }
         }
-        return ((double)metres * 1000.0).ToString("R", CultureInfo.InvariantCulture);
+        double millimetres = (double)metres * 1000.0;
+        string text = millimetres.ToString("R", CultureInfo.InvariantCulture);
+        return text.Contains('E', StringComparison.Ordinal) ? text.Replace("E+", "e", StringComparison.Ordinal).Replace('E', 'e') : text;
     }
 
     private static bool TryReadGroups(string text, Span<double> values, Span<int> sizes, out int groups, out int count)

@@ -386,6 +386,71 @@ public sealed class AssetStore : IImageSource
         return slot.Textures.GetOrAdd(relative, r => new Lazy<ImageData?>(() => ResolveModelTexture(slot, r), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
     }
 
+    /// <summary>
+    /// The encoded image file of a texture key (see the class remarks), for writing it into another file (the GLB models
+    /// of an MVR export): PNG or JPEG bytes — the file as imported when it is one of those, otherwise the image decoded
+    /// and re-encoded as PNG (TGA, BMP, PSD, GIF, a JPEG that must be rotated upright by its EXIF orientation, images
+    /// generated during the model import, built-in procedural textures; Radiance HDR is clamped to 0 … 1 and
+    /// sRGB-encoded). Textures inside a model are found among its companion files and, when the model is already decoded
+    /// in this store, among its embedded and generated images: this never starts a model decode (native formats decode
+    /// in the import worker). Returns false for unknown keys and undecodable images.
+    /// </summary>
+    public bool TryGetTextureFile(string key, [NotNullWhen(true)] out byte[]? data)
+    {
+        data = null;
+        if (string.IsNullOrEmpty(key)) return false;
+        if (key.StartsWith(AssetKeys.BuiltinScheme, StringComparison.Ordinal))
+            return Materials.LoadTexture(key) is { } builtin && TryEncodePng(builtin, out data);
+        if (!AssetKeys.TryParseAssetKey(key, out var id, out var relative) || FindSlot(id) is not { } slot) return false;
+
+        var entry = slot.Entry;
+        byte[]? bytes = null;
+        if (relative is null)
+        {
+            if (entry.Kind is AssetKind.Image or AssetKind.Texture) bytes = entry.Data;
+        }
+        else if (entry.Kind == AssetKind.Model)
+        {
+            bytes = FindFile(entry.CompanionFiles, relative);
+            if (bytes is null && slot.TryPeekModel(out var decoded) && decoded.Value is { } model)
+            {
+                if (model.GeneratedImages.TryGetValue(relative, out var generated)) return TryEncodePng(generated, out data);
+                bytes = model.EmbeddedImages.GetValueOrDefault(relative) ?? FindFile(model.Files, relative);
+            }
+        }
+        if (bytes is null) return false;
+
+        string? format = ImageImporter.DetectFormat(bytes);
+        if (format == "png" || (format == "jpeg" && ExifOrientation.Read(bytes) <= 1))
+        {
+            data = bytes;
+            return true;
+        }
+        return ImageImporter.TryDecode(bytes, out var image, out _) && TryEncodePng(image!, out data);
+
+        static byte[]? FindFile(IReadOnlyDictionary<string, byte[]> files, string relative)
+        {
+            if (files.TryGetValue(relative, out var direct)) return direct;
+            foreach (var (k, v) in files)
+                if (string.Equals(k, relative, StringComparison.OrdinalIgnoreCase)) return v;
+            return null;
+        }
+    }
+
+    private static bool TryEncodePng(ImageData image, [NotNullWhen(true)] out byte[]? data)
+    {
+        try
+        {
+            data = ImageImporter.EncodePng(image);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            data = null; // an image without pixels or with a pixel buffer that does not match its size
+            return false;
+        }
+    }
+
     private ImageData? ResolveModelTexture(Slot slot, string relative)
     {
         var entry = slot.Entry;
