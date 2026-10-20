@@ -1101,7 +1101,12 @@ void main()
 
         if (hit.kind == HIT_NONE)
         {
-            radiance += clampContribution(beta * params.background.rgb, scattered);
+            // the background; a ray sampled from a surface's BSDF also gets the surroundings that light the surfaces
+            // (AtmosphereState.AmbientLuminance; the real-time view's ambient term, here shadowed and bounced)
+            vec3 environment = params.background.rgb;
+            if (prevKind == PREV_SURFACE)
+                environment += vec3(params.ambient);
+            radiance += clampContribution(beta * environment, scattered);
             break;
         }
 

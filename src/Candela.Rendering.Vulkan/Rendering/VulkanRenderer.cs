@@ -1030,6 +1030,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.Headlight = new Vector4(keyLight, 0f);
         d.PixelFootprint = new Vector4(2f / (MathF.Abs(projection.M22) * rh), orthoHeight / rh, 0f, 0f);
         d.RenderScale = dec.Scale;
+        d.AmbientLuminance = full ? AmbientLuminanceOf(_world.Atmosphere) : 0f;
 
         // Light range: the display threshold of the Full view; for the lux overlay far enough that the range window
         // is 1 wherever the illuminance is within 10⁻⁴ of the gradient's lower limit.
@@ -1054,6 +1055,13 @@ public sealed unsafe class VulkanRenderer : IRenderer
         d.OverlayOutOfRange = RenderMath.Sanitize(gradient.OutOfRangeColor);
         d.SelectionColor = RenderMath.Sanitize(view.SelectionColor);
     }
+
+    /// <summary>
+    /// The ambient luminance of an atmosphere (<see cref="AtmosphereState.AmbientLuminance"/>, cd/m²) as the shaders get
+    /// it: 0 for none, non-finite or negative values; at most 10⁶ cd/m².
+    /// </summary>
+    internal static float AmbientLuminanceOf(AtmosphereState? atmosphere) =>
+        atmosphere is { AmbientLuminance: var l } && float.IsFinite(l) ? Math.Clamp(l, 0f, 1e6f) : 0f;
 
     /// <summary>Volumetric, media and feature constants (after the light plan and the per-view resources).</summary>
     private void FinishFrameData(VulkanRenderTarget t, PreviewSettings settings, ref Decisions dec, ref GpuFrameData d)

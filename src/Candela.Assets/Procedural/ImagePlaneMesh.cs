@@ -11,12 +11,6 @@ namespace Candela.Assets;
 /// </summary>
 public static class ImagePlaneMesh
 {
-    /// <summary>
-    /// Luminance (cd/m²) given to white in an unlit reference drawing. Core materials have no "unlit" switch, so a
-    /// reference image is shown through its emissive channel at roughly the luminance of a monitor's white.
-    /// </summary>
-    public const float ReferenceLuminance = 100f;
-
     /// <summary>Builds the plane for a component (width/height in metres; invalid sizes are clamped to 1 mm).</summary>
     public static MeshData Create(ImageComponent image)
     {
@@ -38,38 +32,32 @@ public static class ImagePlaneMesh
     }
 
     /// <summary>
-    /// Material for the image: a lit, rough print for <see cref="ImageMode.Poster"/>; for <see cref="ImageMode.Reference"/>
-    /// a black, emissive surface at <see cref="ReferenceLuminance"/> so the drawing reads the same under any stage light.
-    /// Opacity below 1 switches to alpha blending; the component's double-sided flag is carried over.
+    /// Material for the image, which is the base colour (sRGB texture) in both modes. <see cref="ImageMode.Poster"/>: a
+    /// lit, rough print, opaque unless the opacity is below 1. <see cref="ImageMode.Reference"/>: the drawing at its
+    /// opacity, always alpha-blended. The renderer draws reference instances (<c>InstanceFlags.Reference</c>) unlit: the
+    /// base colour is shown as it is, whatever the stage light, the exposure or the view mode. A blended material is drawn
+    /// at its own alpha, so the drawing's pixels appear at <see cref="ImageComponent.Opacity"/> over what lies behind.
+    /// The component's double-sided flag is carried over.
     /// </summary>
     public static MaterialData CreateMaterial(ImageComponent image)
     {
         ArgumentNullException.ThrowIfNull(image);
         string key = AssetKeys.ForAsset(image.ImageAssetId);
         float opacity = float.IsFinite(image.Opacity) ? System.Math.Clamp(image.Opacity, 0f, 1f) : 1f;
-        var m = new MaterialData
+        bool poster = image.Mode == ImageMode.Poster;
+        return new MaterialData
         {
-            Name = image.Mode == ImageMode.Poster ? "Poster" : "Reference drawing",
+            Name = poster ? "Poster" : "Reference drawing",
             DoubleSided = image.DoubleSided,
-            AlphaMode = opacity < 1f ? AlphaMode.Blend : AlphaMode.Opaque,
+            // A reference drawing is blended at its own opacity, also at 1: an opaque material on a reference instance
+            // gets the renderer's fixed 50 % of ghost geometry instead.
+            AlphaMode = poster && opacity >= 1f ? AlphaMode.Opaque : AlphaMode.Blend,
             Metallic = 0f,
+            BaseColorFactor = new Vector4(1f, 1f, 1f, opacity),
+            BaseColorTexture = key,
+            // Printed paper or PVC banner: diffuse, satin finish. A drawing is never lit, so its roughness does not matter.
+            Roughness = poster ? 0.6f : 1f,
         };
-        if (image.Mode == ImageMode.Poster)
-        {
-            // Printed paper / PVC banner: diffuse, satin finish.
-            m.BaseColorFactor = new Vector4(1f, 1f, 1f, opacity);
-            m.BaseColorTexture = key;
-            m.Roughness = 0.6f;
-        }
-        else
-        {
-            m.BaseColorFactor = new Vector4(0f, 0f, 0f, opacity);
-            m.Roughness = 1f;
-            m.EmissiveTexture = key;
-            m.EmissiveColor = Vector3.One;
-            m.EmissiveLuminance = ReferenceLuminance;
-        }
-        return m;
     }
 
     /// <summary>

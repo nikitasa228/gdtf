@@ -261,6 +261,9 @@ internal struct GpuFrameData
 
     /// <summary>Lights the cluster masks list (the first ones of the light buffer; the rest are beyond the renderer's limit).</summary>
     public uint ClusterListedLights;
+
+    /// <summary>Full view: luminance of the uniform surroundings lighting every surface, cd/m² (0 = none); see <see cref="AtmosphereState.AmbientLuminance"/>.</summary>
+    public float AmbientLuminance;
 }
 
 /// <summary>Push constants of every draw (32 bytes), see <c>DrawConstants</c> in common.glsl.</summary>
@@ -336,5 +339,7 @@ internal struct GpuPtParams
     public uint Seed;
     public uint Width;
     public uint Height;
-    public uint Pad0;
+
+    /// <summary>Luminance of the uniform surroundings that light the surfaces (not seen directly, not the media), cd/m².</summary>
+    public float AmbientLuminance;
 }

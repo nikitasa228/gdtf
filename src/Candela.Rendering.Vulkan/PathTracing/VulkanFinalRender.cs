@@ -696,6 +696,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         _params.MediaMax.W = hazeSigma;
         _params.Majorants = new Vector4(smokeMajorant, flame ? VulkanRenderer.FlameAbsorption : 0f, g, 1f / MathF.Max(_exposure, 1e-30f));
         _params.Flags = flags;
+        _params.AmbientLuminance = VulkanRenderer.AmbientLuminanceOf(atmosphere);
 
         b.Use(_frameBuffer, BufferUse.TransferDestination);
         b.Use(_paramsBuffer, BufferUse.TransferDestination);
