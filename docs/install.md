@@ -69,8 +69,9 @@ DMX-режимами, лучом, цветами и гобо. Полная би�
 
 ![Окно «Библиотека приборов» при первом запуске](images/install-first-run-ru.png)
 
-*Первый запуск: в окне «Библиотека приборов» выбрана папка `Документы\Candela\Fixture Library` с шестью файлами
-GDTF — они сразу появились в панели «Библиотека» рядом с четырьмя приборами примера сцены (всего 10).*
+*Первый запуск установленной копии (пользователь «Иван Петров», папка программы `C:\Program Files\Свет Тест\Candela`):
+в окне «Библиотека приборов» выбрана папка `Документы\Candela\Fixture Library` с шестью файлами GDTF — они сразу
+появились в панели «Библиотека» рядом с четырьмя приборами примера сцены (всего 10).*
 
 При первом запуске (пока в библиотеке нет ваших приборов) Candela показывает окно **«Библиотека приборов»**:
 
@@ -261,8 +262,9 @@ four fixtures the sample scene uses are.
 
 ![The Fixture Library window on the first start](images/install-first-run.png)
 
-*First start of an installed copy: the Fixture Library window over the editor; the Library panel holds the sample
-scene's four fixtures.*
+*First start of an installed copy (user "Иван Петров", program folder `C:\Program Files\Свет Тест\Candela`): the
+Fixture Library window with `Documents\Candela\Fixture Library` chosen — its six GDTF files joined the sample scene's
+four fixtures in the Library panel at once (10 in all).*
 
 On the first start (while the library holds none of your fixtures) Candela opens the **Fixture Library** window:
 
