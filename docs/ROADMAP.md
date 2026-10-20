@@ -62,11 +62,13 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 - [ ] Walls and floors as resizable rectangles; built-in materials applicable to any surface
 - [ ] Properties panel: live state first (pan/tilt/colour/intensity/zoom…, locked when console-driven), then
       manufacturer data from GDTF + specs (manufacturer, weight, power, cd, connectors with illustrations…)
-- [ ] File menu: Save / Save as (`.candela` archive) / Open / Render / Export (MVR) / Import (project, 3D model, MVR,
-      image) / Settings
+- [x] File menu: Save / Save as (`.candela` archive) / Open / Render / Export (MVR) / Import (project, 3D model, MVR,
+      image) / Settings (File → Render and F12 start a render with the Render panel's settings — docs/editor.md)
 - [ ] Settings window: UI/font scale (100 %+), key bindings with named presets, library folders, network adapter,
       units, theme, autosave
-- [ ] Preview (real-time quality) and Render (final quality) settings panels with presets; "Render" button
+- [x] Preview (real-time quality) and Render (final quality) settings panels with presets; "Render" button (path
+      tracer or Fast mode, PNG + EXR, bounces, volume bounces, denoise, progress image, Cancel, Stop and save, Open
+      folder; Fast fall-back without ray queries — docs/editor.md#render)
 - [ ] Issues panel (errors / warnings / notes, click → select related objects)
 - [ ] External control panel: protocol selection (all protocols listed below), status, universes, timecode
 
@@ -113,10 +115,12 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       device activity, GPU overlay done; gradient editor in the editor)
 
 ## M6 — Final render and indirect light
-- [ ] Path tracer (ray query): PBR materials, spot lights with cookies, heterogeneous media, fire emission, progressive
-      accumulation, PNG/EXR output
-- [~] Render a frame or a timecode range (DMX recorded from the live input, replayed for each frame) → image sequence
-      (DMX recorder/player with timecode seek, `candela render --look dmx-file --time`; path-traced sequences pending)
+- [x] Path tracer (ray query): PBR materials, spot lights with cookies, heterogeneous media, fire emission, progressive
+      accumulation, PNG/EXR output — `candela render --final` and the editor's Render panel / File → Render / F12
+      (docs/rendering.md#stage-3-the-path-tracer-final-render, docs/editor.md#render)
+- [x] Render a frame or a timecode range (DMX recorded from the live input, replayed for each frame) → image sequence
+      (DMX recorder/player with timecode seek; `candela render --look dmx-file --time … --end … [--final]`; the editor's
+      Render panel renders a timecode range of the recording path traced or in the Fast mode, PNG and EXR per frame)
 - [x] Real-time indirect light: reflective shadow maps (all GPUs), ray-query GI (RT GPUs) — docs/rendering.md
 - [x] Narrow-beam ray marching for sharp gobo beams
 
