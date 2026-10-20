@@ -15,9 +15,9 @@ GDTF parsing, the fixture library, 3DS/glTF decoding), plus SharpGLTF for writin
 | `MvrImporter` | `Import` / `ImportFile` build a new Core `Scene`. `Merge` / `MergeFile` add the file to an existing scene under a new group entity. Both return an `MvrImportResult`. |
 | `MvrImportResult` | `Scene`, `Group` (merge only), `RootEntities`, `Assets` (`ImportedAsset`: id, file name, bytes, kind `Model`, format), `Gdtfs` (`MvrGdtfReference` per distinct `GDTFSpec`), `Issues`, the `Document`, and `FindEntity(mvrUuid)`. |
 | `MvrWriter` | `Write` / `WriteFile` export a Core `Scene` as MVR 1.6. `BuildDocument` produces the document without writing it. `WriteDocument` writes any `MvrDocument`, for example one that was read, edited and saved back. |
-| `MvrExportOptions` | GDTF callback (`GdtfProvider`, with `GdtfFromLibrary(library, folders…)` as a ready-made one), model callback (`ModelProvider: Func<Guid, ModelData?>`), provider name and version, and wall export. |
+| `MvrExportOptions` | GDTF callback (`GdtfProvider`, with `GdtfFromLibrary(library, folders…)` as a ready-made one), model callback (`ModelProvider: Func<Guid, ModelData?>`), texture callback (`TextureProvider: Func<string, byte[]?>`, PNG/JPEG bytes of a texture key), stand-ins (`StandInOf: Func<Guid, MvrStandIn?>` and `WriteStandIns`), Candela's generic devices (`IsCandelaDevice`), provider name and version, and wall export. |
 | `MvrMatrix` | MVR matrix strings to and from `System.Numerics.Matrix4x4`, and `Decompose` into a Core `Transform`. |
-| `MvrModelFiles` / `GlbWriter` | 3DS, glTF and GLB from an archive → Core `ModelData` (metres, Z up). Core `ModelData` → GLB. |
+| `MvrModelFiles` / `GlbWriter` | 3DS, glTF and GLB from an archive → Core `ModelData` (metres, Z up). Core `ModelData` → GLB, with the material textures a texture callback supplies. |
 | `MvrIssueCodes` | Stable issue codes, so the issues panel can filter and silence them. |
 
 ## What is read
@@ -106,9 +106,14 @@ Renderers must flip the triangle winding for entities with an odd number of nega
 only proper rotations: none of the 91 matrices in `stages/Фокина.mvr` mirrors. The synthetic test file contains a
 mirrored object to cover this path.
 
-Writing is the inverse. Axes use the shortest round-trip float text. The origin is the metre value shifted by three
-decimal places, which gives exact millimetres with no binary noise. Read → write → read therefore returns the
-identical float matrix.
+Writing is the inverse. Axes use the shortest round-trip float text, written as plain decimals
+(`-0.000000087253284`, not `-8.7253284E-08`) whenever they give back the same float, and otherwise with a lower-case
+exponent and no plus sign (`1e-40`): DIN SPEC 15801 allows `e` and `E`, but the schema of MVR 1.6 (`mvr.xsd`,
+`matrixtype`) only accepts `e`, and its `ciecolortype` no exponent at all, so colours and other numbers are written the
+same way (`MvrMatrix.FormatFloat`). The origin is the metre value shifted by three decimal places, which gives exact
+millimetres with no binary noise. Read → write → read therefore returns the identical float matrix, and an export
+validates against `mvr.xsd` except for the content of Candela's `UserData/Data` block, which the schema declares empty
+although the specification asks providers to put their data there (Depence's own files fail the same check).
 
 ## Import: MVR → Core
 
@@ -170,6 +175,18 @@ on every import). References that spell one archive file differently (`Box.glb`,
 
 A file that is missing, in an unsupported format or undecodable leaves its object without that geometry and is
 reported.
+
+**Layer parts.** A GroupObject that a Candela export wrote to repeat an object on another layer (a `LayerPart` record
+of Candela's `UserData`, see the export) does not become an entity: its children are built under the entity of the
+object it repeats, on the part's layer, relative to that object, with that object as their MVR parent (a fixture in
+a part of a truss is mounted on the truss). Parts met before their object wait for it, so the layer order does not
+matter; should another program have moved the part or its object, the children are corrected by the difference of
+their world matrices and keep their world place. After the import the joined children are put back at their recorded
+places among their siblings (only children out of place are moved). `FindEntity(partUuid)` gives the object's entity.
+A record whose part is not a GroupObject, whose object is missing, is a focus point or a part itself, and a part
+whose object is never built (it failed, or it sits inside the part) are imported as the plain groups they are, at
+their place, and counted in one `mvr.layer-split` note. Layer counts, parents and child order therefore survive an
+export and import; top-level objects come back layer by layer, the order MVR lists them in.
 
 ## GDTF resolution and stub GDTFs
 
@@ -319,7 +336,18 @@ files.
 `MvrWriter.Write(scene, stream, options)` writes `verMajor="1" verMinor="6" provider="Candela"` (and `providerVersion`).
 
 * **Layers.** Scene layers become MVR layers, keeping their ids and names. A layer's transform is baked into its
-  objects, and layers are written without a `Matrix`.
+  objects, and layers are written without a `Matrix`. Every object is written to its own layer: an entity without a
+  layer, or on a layer the scene does not list (a `mvr.not-representable` note), goes to its parent's layer, a root to
+  the first layer. MVR keeps an object's children on the object's layer, so children on **another layer** than their
+  parent are written under a `GroupObject` of their own layer that repeats the parent — same name and local matrix,
+  under the parent's own part on that layer (or the parent's grandparent object, or the layer root), so every child
+  keeps its world place — one such part per parent and layer (`MvrExportResult.LayerPartCount`, one
+  `mvr.layer-split` note). Other programs see the parent once per layer. Candela's `UserData` records each part
+  (`<LayerPart object="{part}" original="{parent}" children="…"/>`, the children's indices among the parent's
+  children, −1 for a nested part), and the importer joins the parts again (see "Layer parts" below). Example: Фокина
+  merged under a group on the default layer has 78 fixtures under the group on "Default" and 13 on "Light"; the
+  export writes the group on "Default" and a part of it with the 13 fixtures on "Light", and reopening gives 79/13
+  entities again, under the same group, in the same order.
 * **Entity hierarchy.** Entities become objects with their id as uuid, their name, and their local matrix in
   millimetres. The kind is chosen in this order:
 
@@ -337,6 +365,17 @@ files.
   `FixtureIDNumeric`, `UnitNumber` (when numeric), `CustomId`, `Color`, `CastShadow` and `Focus` are written. A
   `FocusPoint` object with a deterministic uuid is created for each focused fixture. Out-of-range addresses and
   non-finite colours or focus points are reported and skipped.
+* **Stand-ins.** A fixture drawn with a similar model's GDTF because the library lacks the model the scene asks for
+  (an MVR import's substitute) is a stand-in when `StandInOf(entityId)` names the requested model
+  (`MvrStandIn(RequestedSpec, RequestedMode)`; the engine answers from `EngineSettings.Substitutes`). It is written
+  with the **requested** `GDTFSpec` and `GDTFMode`, so the file says what the scene holds, and `GdtfProvider` is asked
+  for the requested spec (the engine gives the GDTF the source MVR embedded for it). When nothing supplies that GDTF
+  the spec is written without embedding a file, with an `mvr.export-resource-missing` warning that names the model and
+  its stand-in. `WriteStandIns` (off by default) writes the stand-in's spec and mode instead, with one
+  `mvr.substitute-exported` warning per fixture. `MvrExportResult.StandInCount` counts the stand-ins. Фокина exported
+  without edits therefore names the source's spec and mode for all 91 fixtures: the 87 stand-ins with Depence's stub
+  files byte for byte, and the four Zonda 3 FX, whose stub the importer replaced with the library's complete GDTF of
+  the same model, under that library file's name with the source's mode.
 * **Mandatory elements.** MVR 1.6 requires some elements whatever the scene holds, so they get neutral values:
   * `FixtureID` (empty) and `FixtureIDNumeric` (0) on every device object (`SceneObject`, `Fixture`, `Truss`,
     `Support`), `UnitNumber` 0 on fixtures, `ChainLength` 0 on supports, and `Geometries` (possibly empty) on every
@@ -350,9 +389,22 @@ files.
   A missing, unreadable or non-zip result is reported (`mvr.export-resource-missing`), and the file is then referenced
   without being embedded. `MvrExportOptions.GdtfFromLibrary(library, folders…)` reads library files by name.
 * **Models.** Each `MeshComponent` or `TrussComponent` model is requested once from `ModelProvider(assetId)` and
-  written as binary glTF (Y up, metres) with SharpGLTF. Part transforms are baked, there is one primitive per sub-mesh,
-  and materials are kept as metallic-roughness factors. Objects reference it through `Geometry3D`. Walls, floors and
-  ceilings become scene objects with a generated box (`ExportWalls`).
+  written as binary glTF (Y up, metres) with SharpGLTF. Part transforms are baked, there is one primitive per sub-mesh
+  with its UVs, and materials keep their metallic-roughness factors and their **textures**: every texture key of a
+  material (base colour, metallic-roughness, normal, occlusion, emissive when the material emits) is requested once
+  per export from `TextureProvider` as PNG or JPEG bytes and embedded in the GLB buffer (one image per distinct
+  content), a UV scale other than 1 as `KHR_texture_transform`. A texture that is not supplied, not PNG/JPEG, or
+  without any texture source is reported (`mvr.export-resource-missing`) and the material keeps its factors.
+  `MvrExportResult.TextureCount` counts the embedded images. A primitive whose material binds a texture always has
+  `TEXCOORD_0` — zeros for a mesh without texture coordinates, which Candela's renderer samples at (0, 0) too — since
+  the glTF validator rejects a texture binding without them (`MESH_PRIMITIVE_TOO_FEW_TEXCOORDS`); non-finite positions
+  and texture coordinates are written as 0, as the renderer draws them. Emission is written as an emissive colour of at
+  most 1 and `KHR_materials_emissive_strength` = luminance ÷ `GlbWriter.EmissiveReferenceLuminance` (100 cd/m², the
+  reference Candela's glTF import uses), transmission as `KHR_materials_transmission` and an index of refraction other
+  than 1.5 as `KHR_materials_ior` — optional extensions, so readers without them see the core material — and an LED
+  face or a glass pane comes back with its luminance, transmission and index. The output passes the Khronos glTF
+  validator without errors (normal maps give its warning that tangents are generated at run time). Objects reference the model through `Geometry3D`. Walls,
+  floors and ceilings become scene objects with a generated box (`ExportWalls`).
 * **Candela's own data** (`CandelaUserData`). What MVR cannot hold goes into one `UserData/Data` block with
   `provider="Candela" ver="1"`, which MVR 1.6 asks other programs to keep without interpreting it. Version 1 holds the
   walls, floors and ceilings: one `<Wall object="{uuid}" geometry="{box file}">` per `WallComponent`, its text the
@@ -372,6 +424,10 @@ files.
   one without a valid object uuid, whose `gdtf` is not a plain `.gdtf` file name (no folders, no reserved characters,
   at most 255 characters) or whose `type` is not a uuid is reported once (`mvr.value-invalid`) and the object is
   imported as the fixture it is. Older readers skip the element.
+  The block also lists the **layer parts** (see "Layers"): one `<LayerPart object="{part uuid}" original="{uuid}"
+  children="{index …}"/>` per GroupObject that repeats an object on another layer. `CandelaUserData.ReadLayerParts`
+  reads them; a record without two valid, different uuids is reported once (`mvr.value-invalid`) and its group is
+  imported as a plain group; a damaged `children` list only loses the sibling order.
 * **Geometry children.** Child entities that the importer created for extra geometry are folded back into `Geometry3D`
   entries of their parent, recognised by their derived ids. If such a child's name is not the stem of the file, it is
   written as a `Symbol` of a one-file `Symdef` named after it. Names and ids therefore survive import → export →
@@ -476,6 +532,22 @@ Writing the result again gives the same bytes.
   channel-less splitter as a stub; a renamed embedded copy is brought back under the device's file name; a library
   holding the device supplies its file (`ExactFileName`); damaged records (no object, a path, not a `.gdtf`) are
   reported once and the objects are still imported as fixtures.
+* **`ExportFidelityTests`.** Фокина's stand-ins are exported as the source's specs and modes with its stub files byte
+  for byte, the Zonda 3 FX as the library's complete GDTF of the same model, and reopen exactly as the source; "write
+  stand-ins" is off by default and gives one `mvr.substitute-exported` warning per stand-in; a requested model without
+  a GDTF is named, not embedded, and reported once; a failing stand-in lookup is reported. Children on another layer
+  than their parent (nested, and back again) are written as layer parts and come back with their layer, parent, world
+  place, mount and sibling order, also with the layers swapped and a part moved by another program; parts whose object
+  was deleted, damaged records and a part containing its own object are imported as plain groups and reported; Фокина
+  merged under a group keeps its 79/13 layer counts. Textured models get their images in the GLB (each texture asked
+  for once, one image for equal content, UV scale as a texture transform, deterministic bytes); missing, non-PNG/JPEG,
+  throwing or absent texture sources are reported.
+* **`ExportSpecConformanceTests`.** What other consumers receive: every textured primitive has finite texture
+  coordinates (zeros without UVs) and finite positions; emission, transmission and index of refraction are written as
+  their glTF extensions (optional only); matrices and colours match the number patterns of `mvr.xsd` and read back as
+  the identical floats; a reader without Candela's data composes every object of a layer split at its world place and
+  layer, and Candela without its data imports them there too; a split export merged twice into the scene it came from
+  (every uuid remapped) is joined again, mounts and sibling order included.
 * **`CandelaDeviceRecordStalenessTests`.** The record carries the device's `FixtureTypeID` (a damaged `type` is
   reported); an object another program changed into a real fixture (the Briteq BT-FOG1500 of the repository, embedded
   or only referenced) keeps that fixture, with or without the device in the library; the device renamed and not
@@ -496,8 +568,18 @@ Writing the result again gives the same bytes.
   `Mappings`, are reported but not kept, so a document round trip drops them. Values outside an enumeration (for
   example `ScaleHandeling` `UpScale`, which the spec's own example uses) are reported and dropped the same way.
 * **Cables.** Connections carry ports only. Imported cables are straight two-node cables between the device origins.
-* **Model export.** Textures are not embedded in exported GLBs (only material factors), glTF animations are ignored on
-  import, and a truss's length is taken from its model bounds along X.
+* **Model export.** Exported GLBs hold PNG/JPEG textures (other formats re-encoded as PNG by the caller); readers
+  without `KHR_materials_emissive_strength` see emission capped at the emissive colour, tangents are not written (they
+  are generated on import, by Candela and by other glTF readers), glTF animations are ignored on import, and a truss's
+  length is taken from its model bounds along X. Walls, floors and ceilings go out as grey boxes: their surface material
+  comes back in Candela from `UserData`, other programs see the box only. The MVR module's own decode
+  (`MvrModelFiles.Decode`) leaves texture keys unset; the engine decodes glTF/GLB with the asset store's reader, which
+  keeps them.
+* **Layers.** Other programs see an object whose children span layers once per layer (a GroupObject part on each
+  other layer). Top-level objects come back from an import layer by layer, so their order across layers is the MVR's.
+* **Stand-ins.** The GDTF a source MVR embedded for a model the library lacks is only available to an export on the
+  machine that opened the MVR (the engine keeps it in its cache, not in the project); elsewhere the model is named
+  without its GDTF.
 * **Not implemented.** MVR-xchange, the network protocol for live scene exchange that accompanies MVR 1.6. Elements
   of newer MVR versions are kept as unknown elements but not interpreted.
 * **Substitutes.** A substitute GDTF is a best effort by name within the brand. The UI should show it as a substitute.

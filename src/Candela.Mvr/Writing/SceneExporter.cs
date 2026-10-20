@@ -33,8 +33,14 @@ internal sealed class SceneExporter
     private readonly Dictionary<(string Name, string File), Guid> _symdefs = new();
     private readonly List<CandelaUserData.WallRecord> _walls = new();
     private readonly List<CandelaUserData.DeviceRecord> _candelaDevices = new();
+    private readonly Dictionary<Guid, (MvrObject Object, MvrLayer Layer)> _written = new();
+    private readonly Dictionary<(Guid Entity, Guid Layer), LayerPartInfo> _layerParts = new();
+    private readonly Dictionary<string, byte[]?> _textures = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _standInGdtfs = new(StringComparer.OrdinalIgnoreCase);
     private int _objectCount;
     private int _connectionCount;
+    private int _standInCount;
+    private int _splitChildren;
 
     public SceneExporter(Scene scene, MvrExportOptions options)
     {
@@ -54,16 +60,23 @@ internal sealed class SceneExporter
         SetUpLayers();
         foreach (var root in _scene.Roots)
         {
-            var layer = LayerOf(root);
+            var layer = LayerOf(root, null);
             if (Convert(root, layer) is { } obj) layer.Objects.Add(obj);
         }
         foreach (var (layer, point) in _focusPoints) layer.Objects.Add(point);
         WriteConnections();
-        // walls, floors and ceilings come back as such when Candela imports the file (other programs see their boxes), and
-        // Candela's generic devices as those devices (other programs see fixtures)
-        if (_walls.Count > 0 || _candelaDevices.Count > 0) _doc.UserData.Add(CandelaUserData.Create(_walls, _candelaDevices));
+        ReportLayerParts();
+        // walls, floors and ceilings come back as such when Candela imports the file (other programs see their boxes),
+        // Candela's generic devices as those devices (other programs see fixtures), and objects split across layers as one
+        var layerParts = new List<CandelaUserData.LayerPartRecord>(_layerParts.Count);
+        foreach (var part in _layerParts.Values) layerParts.Add(new CandelaUserData.LayerPartRecord(part.Group.Uuid, part.OriginalId, part.ChildIndices));
+        if (_walls.Count > 0 || _candelaDevices.Count > 0 || layerParts.Count > 0)
+            _doc.UserData.Add(CandelaUserData.Create(_walls, _candelaDevices, layerParts));
         _sink.Complete();
-        return new MvrExportResult(_doc, _issues, _objectCount, _focusPoints.Count, _connectionCount);
+        int textures = 0;
+        foreach (var t in _textures.Values)
+            if (t is not null) textures++;
+        return new MvrExportResult(_doc, _issues, _objectCount, _focusPoints.Count, _connectionCount, _standInCount, layerParts.Count, textures);
     }
 
     // ------------------------------------------------------------------ layers
@@ -85,13 +98,89 @@ internal sealed class SceneExporter
             _doc.Layers.Add(new MvrLayer { Uuid = DeterministicGuid.Create(_scene.Id, "layer", 0), Name = "Default" });
     }
 
-    private MvrLayer LayerOf(Entity root)
+    /// <summary>
+    /// The MVR layer an entity is written to: its own layer; for an entity without a layer, or on a layer the scene does
+    /// not list (reported), its parent's (<paramref name="parentLayer"/>), or the first layer for a root.
+    /// </summary>
+    private MvrLayer LayerOf(Entity e, MvrLayer? parentLayer)
     {
-        if (_layers.TryGetValue(root.LayerId, out var layer)) return layer;
-        _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.NotRepresentable, "layer-missing",
-            n => $"{n} object(s) are on a layer that is not in the scene's layer list; they are written to the layer '{_doc.Layers[0].Name}'.",
-            root.Id);
-        return _doc.Layers[0];
+        if (_layers.TryGetValue(e.LayerId, out var layer)) return layer;
+        var fallback = parentLayer ?? _doc.Layers[0];
+        if (e.LayerId != Guid.Empty || parentLayer is null)
+        {
+            _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.NotRepresentable, "layer-missing",
+                n => $"{n} object(s) are on a layer that is not in the scene's layer list; they are written to their parent's layer (the layer '{_doc.Layers[0].Name}' for top-level objects).",
+                e.Id);
+        }
+        return fallback;
+    }
+
+    /// <summary>
+    /// Adds the object of a child of <paramref name="parent"/> written to <paramref name="layer"/>: to the parent's own
+    /// child list when the parent is on that layer, else to the child list of the parent's part on that layer, noting
+    /// the child's index among the parent's children (−1 for a nested part) so the importer restores the order.
+    /// </summary>
+    private void AddChild(Entity parent, MvrLayer layer, MvrObject child, int index)
+    {
+        var (obj, parentLayer) = _written[parent.Id];
+        if (ReferenceEquals(parentLayer, layer))
+        {
+            ChildrenOf(obj).Add(child);
+            return;
+        }
+        var part = LayerPart(parent, layer);
+        part.Group.Children.Add(child);
+        part.ChildIndices.Add(index);
+    }
+
+    /// <summary>
+    /// The GroupObject that repeats <paramref name="e"/> on another <paramref name="layer"/> (created once): MVR keeps an
+    /// object's children on the object's layer, so children of <paramref name="e"/> on <paramref name="layer"/> are
+    /// written under this group, which has <paramref name="e"/>'s name and local transform and sits under the part (or
+    /// the object) of <paramref name="e"/>'s parent on that layer. The world place of every child is therefore unchanged.
+    /// A <c>LayerPart</c> record in Candela's user data lets the importer join the parts again.
+    /// </summary>
+    private LayerPartInfo LayerPart(Entity e, MvrLayer layer)
+    {
+        if (_layerParts.TryGetValue((e.Id, layer.Uuid), out var part)) return part;
+        var original = _written[e.Id].Object;
+        var group = new MvrGroupObject
+        {
+            Uuid = DeterministicGuid.Create(original.Uuid, "layer-part:" + layer.Uuid.ToString("D")),
+            Name = original.Name,
+            Matrix = original.Matrix,
+            HasMatrix = original.HasMatrix,
+        };
+        part = new LayerPartInfo(group, original.Uuid, e.Id, new List<int>());
+        _layerParts[(e.Id, layer.Uuid)] = part;
+        if (e.Parent is { } parent && _written.ContainsKey(parent.Id)) AddChild(parent, layer, group, -1);
+        else layer.Objects.Add(group);
+        return part;
+    }
+
+    /// <summary>A part of an entity on another layer: the group written there, the object it repeats and the indices of its children.</summary>
+    private sealed record LayerPartInfo(MvrGroupObject Group, Guid OriginalId, Guid EntityId, List<int> ChildIndices);
+
+    private static List<MvrObject> ChildrenOf(MvrObject obj) => obj switch
+    {
+        MvrGroupObject g => g.Children,
+        MvrDeviceObject d => d.Children,
+        _ => throw new InvalidOperationException($"{obj.Kind} objects have no children."),
+    };
+
+    private void ReportLayerParts()
+    {
+        if (_layerParts.Count == 0) return;
+        var related = new List<Guid>(System.Math.Min(64, _layerParts.Count));
+        foreach (var part in _layerParts.Values)
+        {
+            if (related.Count >= 64) break;
+            related.Add(part.EntityId);
+        }
+        _sink.Add(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.LayerSplit,
+            string.Create(CultureInfo.InvariantCulture,
+                $"{_splitChildren} object(s) are on another layer than their parent; MVR keeps children on their parent's layer, so they are written under {_layerParts.Count} GroupObject(s) of their own layer that repeat the parent's name and place. Candela joins them again on import; other programs show the parent once per layer."),
+            related.ToArray());
     }
 
     // ------------------------------------------------------------------ objects
@@ -136,25 +225,12 @@ internal sealed class SceneExporter
         obj.Matrix = LocalMatrix(e);
         obj.HasMatrix = !MvrMatrix.IsIdentity(obj.Matrix, 0f);
         _objectCount++;
-
-        if (e.Children.Count > 0)
-        {
-            foreach (var c in e.Children)
-            {
-                if (c.LayerId != e.LayerId && c.LayerId != Guid.Empty)
-                {
-                    _sink.Aggregate(IssueSeverity.Note, IssueCategory.Scene, MvrIssueCodes.NotRepresentable, "child-layer",
-                        n => $"{n} child object(s) are on another layer than their parent; MVR puts children on their parent's layer.",
-                        c.Id);
-                }
-            }
-        }
+        _written[e.Id] = (obj, layer);
 
         switch (obj)
         {
-            case MvrGroupObject group:
-                foreach (var c in e.Children)
-                    if (Convert(c, layer) is { } child) group.Children.Add(child);
+            case MvrGroupObject:
+                for (int k = 0; k < e.Children.Count; k++) PlaceChild(e.Children[k], k, LayerOf(e.Children[k], layer), e, layer);
                 break;
 
             case MvrDeviceObject device:
@@ -180,18 +256,33 @@ internal sealed class SceneExporter
                 if (device is MvrSupport { ChainLength: null } support) support.ChainLength = 0;
 
                 var geometryChildren = device is MvrFixture ? null : GeometryChildren(e);
-                foreach (var c in e.Children)
+                for (int k = 0; k < e.Children.Count; k++)
                 {
-                    if (geometryChildren is not null && geometryChildren.Contains(c.Id))
+                    var c = e.Children[k];
+                    var childLayer = LayerOf(c, layer);
+                    // geometry the importer split off this object goes back into it (unless it was moved to another layer)
+                    if (geometryChildren is not null && geometryChildren.Contains(c.Id) && ReferenceEquals(childLayer, layer))
                     {
                         AddGeometry(device, c.Get<MeshComponent>()!.ModelAssetId, LocalMatrix(c), c.Id, c);
                         continue;
                     }
-                    if (Convert(c, layer) is { } child) device.Children.Add(child);
+                    PlaceChild(c, k, childLayer, e, layer);
                 }
                 break;
         }
         return obj;
+    }
+
+    /// <summary>
+    /// Writes a child entity (the <paramref name="index"/>-th child of <paramref name="parent"/>): under its parent's
+    /// object when both are on the same layer, else under the parent's part on the child's layer
+    /// (<see cref="LayerPart"/>), so the child keeps its layer and its world place.
+    /// </summary>
+    private void PlaceChild(Entity child, int index, MvrLayer childLayer, Entity parent, MvrLayer parentLayer)
+    {
+        if (Convert(child, childLayer) is not { } obj) return;
+        if (!ReferenceEquals(childLayer, parentLayer)) _splitChildren++;
+        AddChild(parent, childLayer, obj, index);
     }
 
     private Matrix4x4 LocalMatrix(Entity e)
@@ -228,6 +319,20 @@ internal sealed class SceneExporter
     private void ApplyFixture(MvrDeviceObject d, FixtureComponent fc, Entity e, MvrLayer layer)
     {
         string spec = (fc.GdtfSpec ?? "").Trim();
+        string? mode = string.IsNullOrWhiteSpace(fc.GdtfMode) ? null : fc.GdtfMode.Trim();
+        // a stand-in for a model the library lacks: the file says what the scene holds (the requested model and mode),
+        // unless the caller asked for the stand-ins themselves
+        var standIn = spec.Length > 0 ? StandInOf(e) : null;
+        if (standIn is not null)
+        {
+            _standInCount++;
+            if (!_options.WriteStandIns)
+            {
+                _standInGdtfs.TryAdd(standIn.RequestedSpec, spec);
+                spec = standIn.RequestedSpec;
+                mode = standIn.RequestedMode;
+            }
+        }
         if (spec.Length == 0)
         {
             _sink.Aggregate(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.ExportResourceMissing, "fixture-no-spec",
@@ -237,7 +342,7 @@ internal sealed class SceneExporter
         {
             d.GdtfSpec = EmbedGdtf(spec, e.Id);
         }
-        d.GdtfMode = string.IsNullOrWhiteSpace(fc.GdtfMode) ? null : fc.GdtfMode.Trim();
+        d.GdtfMode = mode;
         if (spec.Length > 0 && IsCandelaDevice(spec))
         {
             // the device's own file name (the embedded copy may have been renamed to keep archive names unique)
@@ -256,6 +361,13 @@ internal sealed class SceneExporter
                     n => $"{n} fixture(s) have no DMX mode and the first mode of their GDTF is not known (the file was not supplied or has no modes); they are written without the GDTFMode MVR requires.",
                     e.Id);
             }
+        }
+        if (standIn is not null && _options.WriteStandIns)
+        {
+            string requestedMode = standIn.RequestedMode is { } m ? $" in mode '{m}'" : "";
+            _sink.Add(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.SubstituteExported,
+                $"'{e.Name}' is written with its stand-in GDTF '{d.GdtfSpec}' (mode '{d.GdtfMode}') instead of '{standIn.RequestedSpec}'{requestedMode}, the model the scene asks for; other programs receive the stand-in's fixture type and DMX layout.",
+                e.Id);
         }
         d.CastShadow = fc.CastShadow;
 
@@ -330,6 +442,29 @@ internal sealed class SceneExporter
             _sink.Aggregate(IssueSeverity.Note, IssueCategory.Fixture, MvrIssueCodes.NotRepresentable, "manual-attributes",
                 n => $"{n} fixture(s) have manual attribute values; MVR has no programming data, so they are not exported.", e.Id);
         }
+    }
+
+    /// <summary>
+    /// The model the fixture entity stands in for (<see cref="MvrExportOptions.StandInOf"/>), with the requested spec and
+    /// mode trimmed; null for other fixtures, for an answer without a spec, and when the callback fails (never throws).
+    /// </summary>
+    private MvrStandIn? StandInOf(Entity e)
+    {
+        if (_options.StandInOf is not { } lookup) return null;
+        MvrStandIn? standIn;
+        try
+        {
+            standIn = lookup(e.Id);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            _sink.Aggregate(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.ExportResourceMissing, "stand-in-lookup",
+                n => $"The model {n} fixture(s) stand in for could not be looked up ({ex.Message}); they are written with the GDTF they are drawn with.", e.Id);
+            return null;
+        }
+        if (standIn is null || string.IsNullOrWhiteSpace(standIn.RequestedSpec)) return null;
+        string? mode = string.IsNullOrWhiteSpace(standIn.RequestedMode) ? null : standIn.RequestedMode.Trim();
+        return new MvrStandIn(standIn.RequestedSpec.Trim(), mode);
     }
 
     /// <summary>True when the options say <paramref name="spec"/> is one of Candela's generic devices (never throws).</summary>
@@ -471,11 +606,12 @@ internal sealed class SceneExporter
         }
         if (bytes is null || bytes.Length == 0)
         {
-            _sink.Add(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.ExportResourceMissing,
-                error is null
+            string message = _standInGdtfs.TryGetValue(spec, out var drawnWith) && error is null
+                ? $"No GDTF of '{spec}' is available (the library lacks the model, so its fixtures are drawn with the stand-in '{drawnWith}'); the file names '{spec}' and its mode as the scene asks, but cannot embed the GDTF, so other programs must take it from their own library."
+                : error is null
                     ? $"GDTF '{spec}' was not found; it is referenced by its file name but not embedded."
-                    : $"GDTF '{spec}' could not be read ({error}); it is referenced by its file name but not embedded.",
-                user);
+                    : $"GDTF '{spec}' could not be read ({error}); it is referenced by its file name but not embedded.";
+            _sink.Add(IssueSeverity.Warning, IssueCategory.Fixture, MvrIssueCodes.ExportResourceMissing, message, user);
             return name;
         }
         if (bytes.Length < 4 || bytes[0] != (byte)'P' || bytes[1] != (byte)'K')
@@ -595,8 +731,8 @@ internal sealed class SceneExporter
         byte[] glb;
         try
         {
-            glb = GlbWriter.Write(model, warning => _sink.Add(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.GeometryUnreadable,
-                $"Model '{model.Name}': {warning}", user));
+            glb = GlbWriter.Write(model, key => TextureOf(key, model, user), warning => _sink.Add(IssueSeverity.Warning, IssueCategory.Scene,
+                MvrIssueCodes.GeometryUnreadable, $"Model '{model.Name}': {warning}", user));
         }
         catch (Exception e) when (e is not OutOfMemoryException)
         {
@@ -607,6 +743,53 @@ internal sealed class SceneExporter
         string name = UniqueFileName(preferredName);
         _doc.Files.Add(new MvrEmbeddedFile(name, glb));
         return name;
+    }
+
+    /// <summary>
+    /// The PNG or JPEG bytes of a material texture for the GLB of <paramref name="model"/>: requested once per key from
+    /// <see cref="MvrExportOptions.TextureProvider"/> and shared by every model that uses the key. A texture that is not
+    /// available or not PNG/JPEG is reported (the material keeps its factors) and null is returned.
+    /// </summary>
+    private byte[]? TextureOf(string key, ModelData model, Guid user)
+    {
+        if (_textures.TryGetValue(key, out var known)) return known;
+        byte[]? data = null;
+        if (_options.TextureProvider is not { } provider)
+        {
+            _sink.Aggregate(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.ExportResourceMissing, "texture-no-provider",
+                n => $"No texture source was given; {n} texture(s) of exported models are not embedded, so their materials keep only their colours.", user);
+        }
+        else
+        {
+            string? error = null;
+            try
+            {
+                data = provider(key);
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                error = e.Message;
+            }
+            if (data is not { Length: > 0 })
+            {
+                data = null;
+                string reason = error is null ? "it is not available" : $"it could not be read: {error}";
+                _sink.Aggregate(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.ExportResourceMissing, "texture-missing",
+                    n => n == 1
+                        ? $"Texture '{key}' of model '{model.Name}' is not embedded ({reason}); its material keeps only its colour."
+                        : $"{n} textures of exported models are not embedded (e.g. '{key}' of model '{model.Name}': {reason}); their materials keep only their colours.",
+                    user);
+            }
+            else if (!GlbWriter.IsPngOrJpeg(data))
+            {
+                data = null;
+                _sink.Aggregate(IssueSeverity.Warning, IssueCategory.Scene, MvrIssueCodes.ExportResourceMissing, "texture-format",
+                    n => $"{n} texture(s) of exported models are not PNG or JPEG images (e.g. '{key}' of model '{model.Name}'), which glTF requires; they are not embedded.",
+                    user);
+            }
+        }
+        _textures[key] = data;
+        return data;
     }
 
     private string UniqueFileName(string name)
