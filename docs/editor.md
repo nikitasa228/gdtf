@@ -41,7 +41,7 @@ without a GPU, Mesa's software driver (lavapipe, package `mesa-vulkan-drivers`) 
 | `--validation` | enable the Vulkan validation layer |
 | `--config-dir <dir>` | folder for settings, layouts, presets and the log of this run |
 | `--single-window` | keep torn-off panels inside the main window (no OS windows) |
-| `--width <px>`, `--height <px>` | initial window size (default 1600 × 900) |
+| `--width <px>`, `--height <px>` | initial window size (default 1600 × 900, in screen coordinates scaled by the monitor's content scale; an interactive window that does not fit the monitor's work area — 2400 × 1350 pixels at 150 % — opens maximised, one that sticks out is centred) |
 | `--screenshot <png>` | headless verification: render, save the last frame as PNG and exit |
 | `--frames <n>` | frames rendered before the screenshot (default 12) |
 | `--script <json>` | replay scripted input first (see [Scripted input](#scripted-input)) |
