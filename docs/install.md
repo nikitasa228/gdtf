@@ -59,7 +59,8 @@ Candela-Setup-0.1.0-preview.1-win-x64.exe /S /CurrentUser /D=D:\Программ
 
 `/D=` должен быть последним параметром и без кавычек, даже если в пути есть пробелы. В тихом режиме
 добавляются ярлык на рабочем столе, ассоциации файлов и (если программа установки работает с правами
-администратора) правило брандмауэра.
+администратора) правило брандмауэра. Программа установки более старой версии спрашивает, прежде чем заменить
+установленную более новую Candela; в тихом режиме (`/S`) она заменяет её без вопроса (откат к старой версии).
 
 ### Первый запуск: библиотека приборов
 
@@ -252,7 +253,8 @@ Candela-Setup-0.1.0-preview.1-win-x64.exe /S /CurrentUser /D=D:\Apps\Candela
 ```
 
 `/D=` must come last and must not be quoted, even when the path has spaces. A silent install adds the desktop
-shortcut, the file associations and (when Setup runs with administrator rights) the firewall rule.
+shortcut, the file associations and (when Setup runs with administrator rights) the firewall rule. An older version's
+Setup asks before it replaces a newer installed Candela; a silent one (`/S`) replaces it without asking (a rollback).
 
 ### First start: the fixture library
 

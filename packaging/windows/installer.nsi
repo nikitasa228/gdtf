@@ -369,13 +369,23 @@ FunctionEnd
 ; Installs the bundled Microsoft Visual C++ 2015-2022 x64 runtime when it is missing or older than the bundled build
 ; (the runtime is shared by all programs; its own installer keeps a newer one). Needs administrator rights: a
 ; per-user install asks Windows for them (UAC) only in that case.
+; The x64 runtime registers itself under SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64; depending on the
+; redistributable's version that key is in the 64-bit or in the 32-bit (WOW6432Node) view of the registry, so both are
+; read. Both DLLs the native libraries import must also be in System32.
 Function InstallVcRuntime
   ClearErrors
   SetRegView 64
   ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Installed"
   ReadRegDWORD $1 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Bld"
+  ${If} $0 != 1
+    SetRegView 32
+    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Installed"
+    ReadRegDWORD $1 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Bld"
+    SetRegView 64
+  ${EndIf}
   ${If} $0 == 1
   ${AndIf} $1 >= ${REDIST_BUILD}
+  ${AndIf} ${FileExists} "$SYSDIR\vcruntime140.dll"
   ${AndIf} ${FileExists} "$SYSDIR\vcruntime140_1.dll"
     DetailPrint "$(MsgVcPresent) ($1)"
     Return
