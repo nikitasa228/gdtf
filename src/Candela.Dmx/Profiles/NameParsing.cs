@@ -420,6 +420,20 @@ public static class NameParsing
         return LastWordIs(s, "off") && !ContainsAny(s, "/", "+", "&", "shake", "strobe", " on");
     }
 
+    /// <summary>
+    /// True when a range of a green/magenta (tint) correction names no correction: "Off", "Idle", "No function",
+    /// "No effect", "No shift", "No Green Offset", "Default", "Neutral", "Uncorrected white".
+    /// </summary>
+    public static bool IsNeutralTintName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        string s = name.Trim().ToLowerInvariant();
+        if (IsTransition(s)) return false; // "Neutral to Full Plus Green" is a range of corrections
+        return s is "off" or "idle" or "default" or "neutral" or "center" or "centre" || s.StartsWith("no ", StringComparison.Ordinal) ||
+            s.StartsWith("neutral", StringComparison.Ordinal) || s.StartsWith("uncorrected", StringComparison.Ordinal) ||
+            s.StartsWith("off ", StringComparison.Ordinal) || s.StartsWith("nofunction", StringComparison.Ordinal);
+    }
+
     /// <summary>True for a lower-case gel name of the Roscolux "No Color …" series ("no color blue", "no colour straw l144").</summary>
     private static bool IsNoColorGel(string s)
     {

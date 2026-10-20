@@ -726,7 +726,7 @@ public static class FixtureEvaluator
                 acc.Crossfade = level;
                 break;
             case AttributeKind.Tint:
-                acc.Tint += TintDuv(f, v);
+                if ((flags & ChannelSetFlags.NoFunction) == 0) acc.Tint += TintDuv(f, v);
                 break;
             case AttributeKind.ColorMacro:
                 if (set is not null && (flags & (ChannelSetFlags.Open | ChannelSetFlags.NoFunction | ChannelSetFlags.Closed)) == 0)

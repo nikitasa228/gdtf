@@ -404,6 +404,9 @@ public sealed partial class FixtureProfile
                 var setFlags = string.IsNullOrWhiteSpace(s.Name) ? nameFlags : NameParsing.Flags(s.Name, cls.Kind);
                 if (cls.Kind == AttributeKind.Shutter && (setFlags & ChannelSetFlags.Closed) != 0 && IsStrobeOff(src, s.Name))
                     setFlags = (setFlags & ~ChannelSetFlags.Closed) | ChannelSetFlags.Open;
+                // a green/magenta correction range named "Off", "Idle", "No shift", "No Green Offset" … corrects nothing,
+                // whatever physical value the file gives it (Elation Fuze Max Spot "Idle" at 0 of a 0 … 1 tint)
+                if (cls.Kind == AttributeKind.Tint && NameParsing.IsNeutralTintName(s.Name)) setFlags |= ChannelSetFlags.NoFunction;
                 // a selection range named "Open", "Off", "Removed" … that selects no slot, or an open one, takes the
                 // mechanism out of the beam (Rivale AnimationWheel1 "open", Elation Artiste Picasso "OPEN"); in a rotation,
                 // index or spin function of the mechanism such a range ("No function") leaves the mechanism alone

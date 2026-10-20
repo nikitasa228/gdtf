@@ -221,4 +221,46 @@ public class ColorEvaluationTests
         float t = sum.X + sum.Y + sum.Z;
         return new Vector2(sum.X / t, sum.Y / t);
     }
+
+    [Fact]
+    public void A_tint_channel_at_its_idle_range_leaves_the_white_alone()
+    {
+        // Elation SOL I Blinder: "Green Shift" is 'Idle' at DMX 0 of a 0 … 1 range; read as a level it was full minus
+        // green (Δuv −0.02) and pulled every colour preset towards magenta
+        var p = TestData.Profile("Elation@SOL_I_Blinder", "Ext 21CH");
+        var tint = p.Channels.First(c => c.Name == "Beam_Tint");
+        Assert.Equal(0u, tint.DefaultValue);
+        var buffer = new FixtureDmxBuffer(p);
+        DmxLooks.OpenWhite(buffer);
+        var neutral = FixtureEvaluator.Evaluate(p, buffer).Beams[0].Color.ToXy();
+        buffer.SetValue(tint.Index, 128); // 'Neutral White'
+        var centred = FixtureEvaluator.Evaluate(p, buffer).Beams[0].Color.ToXy();
+        Assert.True(Vector2.Distance(neutral, centred) < 1e-3f, $"{neutral} vs {centred}");
+        buffer.SetValue(tint.Index, 1); // 'Full Minus Green to Neutral'
+        var minusGreen = FixtureEvaluator.Evaluate(p, buffer).Beams[0].Color.ToXy();
+        Assert.True(minusGreen.Y < neutral.Y - 0.005f, $"{minusGreen} vs {neutral}");
+
+        // the "LEE 007 - Pale Yellow" preset of the virtual swatch book comes out in the gel's colour
+        buffer.SetValue(tint.Index, 0);
+        var swatch = p.Channels.First(c => c.Name == "Beam_Color2");
+        buffer.SetValue(swatch.Index, 1);
+        var s = FixtureEvaluator.Evaluate(p, buffer);
+        var slot = p.Wheels[s.Beams[0].ColorWheels[1].Wheel].Source.GetSlot(1)!;
+        Assert.StartsWith("LEE 007", slot.Name, StringComparison.Ordinal);
+        Assert.True(Vector2.Distance(new Vector2(slot.Color.X, slot.Color.Y), s.Beams[0].Color.ToXy()) <= 0.02f, $"{s.Beams[0].Color.ToXy()}");
+    }
+
+    [Theory]
+    [InlineData("Off", true)]
+    [InlineData("Idle", true)]
+    [InlineData("No function", true)]
+    [InlineData("No shift", true)]
+    [InlineData("No Green Offset", true)]
+    [InlineData("Neutral White", true)]
+    [InlineData("Uncorrected white", true)]
+    [InlineData("Full Minus Green to Neutral", false)]
+    [InlineData("Neutral to Full Plus Green", false)]
+    [InlineData("Green Shift", false)]
+    [InlineData("", false)]
+    public void Tint_range_names(string name, bool neutral) => Assert.Equal(neutral, NameParsing.IsNeutralTintName(name));
 }
