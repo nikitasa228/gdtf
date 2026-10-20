@@ -234,6 +234,71 @@ public sealed class InstallLayoutTests : IDisposable
     }
 
     [Fact]
+    public void A_configured_library_that_is_missing_is_reported_although_the_starter_fixtures_exist()
+    {
+        // Review regression: the starter fixtures of an installed copy always exist, so the start-up warning "the library
+        // folder does not exist" (only given when no folder existed) was never shown for a library on an unplugged drive
+        // or an offline network share: the user just saw four fixtures and stand-ins everywhere.
+        var layout = new InstallLayout(MakeInstalledProgram(), null);
+        string unplugged = Path.Combine(_root, "USB-диск", "GDTF");
+        string present = MakeFolder("Библиотека");
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[0]), Path.Combine(present, "Candela_Test@Present@1.gdtf"));
+        var settings = new AppSettings { LibraryFolders = new List<string> { unplugged, present } };
+        var options = StageEngineOptions.FromSettings(settings, null, layout);
+        Assert.Equal(new[] { unplugged, present, layout.StarterFixturesFolder! }, options.LibraryFolders);
+
+        using var engine = new StageEngine(options with { CacheDirectory = MakeFolder("cache-missing"), DmxParallelism = 2, SimulationParallelism = 2 });
+        var warning = Assert.Single(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+        Assert.Equal(IssueSeverity.Warning, warning.Severity);
+        Assert.Contains(unplugged, warning.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain(present, warning.Message, StringComparison.Ordinal);
+        Assert.Equal(StarterFixtures.Length + 1, engine.Library.Count);
+
+        // another folder brings fixtures: the missing one is still missing and still named
+        string other = MakeFolder("other");
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[1]), Path.Combine(other, "Candela_Test@Other@1.gdtf"));
+        Assert.True(engine.AddLibraryFolder(other).Success);
+        Assert.Contains(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing && i.Message.Contains(unplugged, StringComparison.Ordinal));
+
+        // the drive is plugged in and its folder added again: the warning goes, nothing else is lost
+        Directory.CreateDirectory(unplugged);
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[2]), Path.Combine(unplugged, "Candela_Test@Usb@1.gdtf"));
+        var back = engine.AddLibraryFolder(unplugged);
+        Assert.True(back.Success, back.Summary);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+        Assert.Equal(StarterFixtures.Length + 3, engine.Library.Count);
+    }
+
+    [Fact]
+    public void Adding_a_folder_again_reads_the_files_that_arrived_since()
+    {
+        // The first-run window's Rescan: an empty default folder is added, files are copied into it in Explorer, the
+        // folder is added again and only the new files are read.
+        string folder = MakeFolder("Fixture Library");
+        using var engine = new StageEngine(new StageEngineOptions
+        {
+            LibraryFolders = Array.Empty<string>(),
+            CacheDirectory = MakeFolder("cache-rescan"),
+            DmxParallelism = 2,
+            SimulationParallelism = 2,
+        });
+        var empty = engine.AddLibraryFolder(folder);
+        Assert.True(empty.Success);
+        Assert.Contains("add it again", empty.Summary, StringComparison.Ordinal);
+        // still no fixture: the "no library folder" warning stays
+        Assert.Contains(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[3]), Path.Combine(folder, StarterFixtures[3]));
+        var changes = new List<FixtureLibraryChange>();
+        engine.FixtureLibraryChanged += changes.Add;
+        var again = engine.AddLibraryFolder(folder);
+        Assert.True(again.Success, again.Summary);
+        Assert.Equal(1, engine.Library.Count);
+        Assert.Equal(StarterFixtures[3], Path.GetFileName(Assert.Single(Assert.Single(changes).Added).FilePath));
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+    }
+
+    [Fact]
     public void Counting_gdtf_files_reads_only_the_folder_itself_and_never_throws()
     {
         string folder = MakeFolder("count");

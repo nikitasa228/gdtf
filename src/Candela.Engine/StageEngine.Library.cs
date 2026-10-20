@@ -5,14 +5,22 @@ namespace Candela.Engine;
 
 public sealed partial class StageEngine
 {
+    /// <summary>The warning of a run whose settings name no library folder at all.</summary>
+    internal const string NoLibraryFolderMessage =
+        "No fixture library folder is set; only GDTF files inside projects and MVR files are available.";
+
+    private IReadOnlyList<string> _missingLibraryFolders = Array.Empty<string>();
+
     /// <summary>
     /// Adds the <c>.gdtf</c> files directly in <paramref name="folder"/> to the fixture library while the program runs
-    /// (the editor's first-run library setup, a folder added in Settings → Library): no XML is read, files whose name
-    /// the library already has are skipped (the earlier folder wins, as at start-up), every fixture is re-resolved — a
-    /// stand-in or unresolved fixture picks up a real GDTF that arrived — and <see cref="FixtureLibraryChanged"/> is raised
-    /// with the new entries (<see cref="FixtureLibraryChangeSource.Folder"/>). The "no library folder" warning of the
-    /// start-up disappears once the folder brought fixtures. A missing or unreadable folder is a failed result with the
-    /// reason, never an exception.
+    /// (the editor's first-run library setup and its Rescan button, a folder added in Settings → Library): no XML is
+    /// read, files whose name the library already has are skipped (the earlier folder wins, as at start-up) — so adding
+    /// a folder again reads only the files that arrived since —, every fixture is re-resolved — a stand-in or
+    /// unresolved fixture picks up a real GDTF that arrived — and <see cref="FixtureLibraryChanged"/> is raised with the
+    /// new entries (<see cref="FixtureLibraryChangeSource.Folder"/>). The start-up warnings about the library are renewed:
+    /// "no library folder" disappears once the folder brought fixtures, "folder missing" keeps naming only the configured
+    /// folders that are still missing (a drive that was plugged in and added again). A missing or unreadable folder is a
+    /// failed result with the reason, never an exception.
     /// </summary>
     public EngineResult AddLibraryFolder(string folder)
     {
@@ -36,14 +44,15 @@ public sealed partial class StageEngine
         int added = Library.AddFolder(full);
         if (added == 0)
         {
+            RenewLibraryWarnings(broughtFixtures: false);
             int files = InstallLayout.CountGdtfFiles(full);
             return EngineResult.Ok(files == 0
-                ? $"'{full}' holds no GDTF files yet; copy .gdtf files into it and they are read at the next start."
+                ? $"'{full}' holds no GDTF files yet; copy .gdtf files into it, then add it again (or restart) to read them."
                 : $"The {files} GDTF file(s) of '{full}' are already in the fixture library.");
         }
 
         ReloadFixtureTypes();
-        DropLibraryMissingIssues();
+        RenewLibraryWarnings(broughtFixtures: true);
         RefreshIssues();
         var entries = Library.Entries.Where(e => !before.Contains(e)).ToList();
         if (entries.Count > 0)
@@ -51,16 +60,38 @@ public sealed partial class StageEngine
         return EngineResult.Ok($"Added {added} fixture type file(s) from '{full}' to the fixture library.");
     }
 
+    /// <summary>The start-up warning that names the configured library folders that do not exist.</summary>
+    private static Issue MissingLibraryFoldersIssue(IReadOnlyList<string> missing) =>
+        new(IssueSeverity.Warning, IssueCategory.Program, EngineIssueCodes.LibraryMissing,
+            $"The fixture library folder(s) {string.Join(", ", missing.Select(f => $"'{f}'"))} do not exist or cannot be reached " +
+            "(an unplugged drive or an offline network share?); their fixtures are not in the library.");
+
     /// <summary>
-    /// Forgets the start-up's "no library" warnings (a folder with fixtures was added since). The program messages are
-    /// listed again without them, like after opening a file (messages of earlier operations go with them).
+    /// Renews the start-up warnings about the library after a folder was added: the "no library folder" warning goes
+    /// once a folder brought fixtures (<paramref name="broughtFixtures"/>), the "folder missing" warning names only the
+    /// configured folders that are still missing, and every other warning (unreadable researched data) stays. The program
+    /// messages are listed again when something changed, like after opening a file (messages of earlier operations go
+    /// with them).
     /// </summary>
-    private void DropLibraryMissingIssues()
+    private void RenewLibraryWarnings(bool broughtFixtures)
     {
-        static bool IsMissingLibrary(Issue i) => i.Code == EngineIssueCodes.LibraryMissing && i.Severity == IssueSeverity.Warning;
-        if (!_libraryIssues.Any(IsMissingLibrary))
+        static bool IsNotSet(Issue i) => i.Code == EngineIssueCodes.LibraryMissing && i.Message == NoLibraryFolderMessage;
+        bool dropNotSet = broughtFixtures && _libraryIssues.Any(IsNotSet);
+        var stillMissing = _missingLibraryFolders.Where(f => !Directory.Exists(f)).ToList();
+        bool missingChanged = stillMissing.Count != _missingLibraryFolders.Count;
+        if (!dropNotSet && !missingChanged)
             return;
-        _libraryIssues = _libraryIssues.Where(i => !IsMissingLibrary(i)).ToList();
+        var renewed = _libraryIssues.Where(i => !(dropNotSet && IsNotSet(i))).ToList();
+        if (missingChanged)
+        {
+            var old = MissingLibraryFoldersIssue(_missingLibraryFolders);
+            renewed.RemoveAll(i => i.Code == old.Code && i.Message == old.Message);
+            if (stillMissing.Count > 0)
+                renewed.Add(MissingLibraryFoldersIssue(stillMissing));
+            _missingLibraryFolders = stillMissing;
+        }
+
+        _libraryIssues = renewed;
         ResetProgramMessages();
     }
 }
