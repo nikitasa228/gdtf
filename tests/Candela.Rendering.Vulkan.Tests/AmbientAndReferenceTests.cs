@@ -185,13 +185,15 @@ public sealed class AmbientAndReferenceTests
             var litColorless = RenderColorless();
             Assert.Equal(darkColorless.Rgba, litColorless.Rgba);
 
-            // In haze the surroundings light the surfaces, not the air: the background stays black.
+            // In haze the surroundings light the surfaces, not the air: the background stays black, and the floor seen
+            // through 10 m of haze (σ = 0.05 /m) keeps its 15 cd/m² times the transmittance e^(−0.5).
             world.SetAtmosphere(new AtmosphereState { BaseScattering = 0.05f, AmbientLuminance = 30f });
             for (int frame = 0; frame < 3; frame++)
                 renderer.Render(target, view.Camera, options, settings, frame / 30f);
             var hazy = renderer.ReadHdr(target);
             Assert.True(hazy.LuminanceAt(bx, by) < 1e-3f, $"the haze glows with the ambient: {hazy.LuminanceAt(bx, by)} cd/m²");
-            Assert.InRange(hazy.LuminanceAt(fx, fy), 15f * 0.9f, 15f * 1.01f);
+            float transmitted = 15f * MathF.Exp(-0.05f * 10f);
+            Assert.InRange(hazy.LuminanceAt(fx, fy), transmitted * 0.97f, transmitted * 1.03f);
 
             // Damaged values light nothing.
             world.SetAtmosphere(new AtmosphereState { BaseScattering = 0f, AmbientLuminance = float.NaN });
