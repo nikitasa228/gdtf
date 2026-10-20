@@ -68,9 +68,14 @@ positive factors kᵢ on the emitters' full-level fluxes with the least Σ (ln k
 a little rather than switching one off. The two chromaticity conditions Σ kᵢ·Fᵢ·(Xᵢ/Yᵢ − X/Y) = 0 and
 Σ kᵢ·Fᵢ·(Zᵢ/Yᵢ − Z/Y) = 0 are solved by minimum-norm Gauss–Newton steps on ln kᵢ, damped to ±2 per step. Convergence
 is judged against the current mix's flux, because the conditions are homogeneous in k and shrinking every factor
-together would also shrink the residual. The factors are then scaled together so the total flux stays Σ Fᵢ. A target
-outside the emitters' gamut, or off the line between two emitters, is refused (false). It works for 2–16 emitters and
-does not allocate.
+together would also shrink the residual. The factors are then scaled together so the total flux stays Σ Fᵢ. That
+iteration can cycle between two points when one emitter's output dwarfs the others' (a white at 50× the colours); then
+the factors are the least change Σ (kᵢ − 1)² that meets the two conditions and keeps the flux, every kᵢ ≥
+`MinBalanceFactor` (10⁻³): a strictly convex quadratic programme whose solution is the equality-constrained one of some
+set of emitters held at the floor, so every such set is tried (≤ 2¹⁶ 3 × 3 solves, once per beam while a profile is
+compiled). A target outside the emitters' gamut, or off the line between two emitters, is refused (false). It works for
+2–16 emitters and does not allocate; a randomised test (400 RGB and RGBW engines with outputs over two decades) checks
+that every target inside the gamut is reached to 10⁻³ in xy with the flux kept and every target outside is refused.
 
 When a GDTF file has no emitter data, `StandardEmitters.FromColorMixing` builds emitters from the `_specs`
 `colorMixing` code (all codes in `_specs/fixtures_index.json` are understood). Typical stage-LED chromaticities:

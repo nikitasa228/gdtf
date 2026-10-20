@@ -20,7 +20,7 @@ Art-Net / sACN … ──Submit──▶ DmxInputHub ──TryRead (each patched
                                                      axes · beams · device outputs · channel values
 ```
 
-`tests/Candela.Dmx.Tests` (146 tests, ≈ 20–170 s depending on the machine) runs real fixtures from the repository
+`tests/Candela.Dmx.Tests` (278 tests, ≈ 25–170 s depending on the machine) runs real fixtures from the repository
 library through every stage; one test evaluates **every mode of all 1091 GDTF files** with random DMX.
 
 ## Units and conventions
@@ -163,7 +163,35 @@ attribute for "out", so files write it as channel-set names and slots, and the p
   animation wheel's slot selection with spin.
 
 `WheelState.Insertion` is 0 for a mechanism out of the beam (the state then reports it open, with no facets), 1 for an
-item in, and in between for ramps, cycles and animation systems; when several channels set it, the smallest wins.
+item in, and in between for ramps, cycles and animation systems; when several channels set a level (ramp, cycle,
+insertion channel), the smallest wins.
+
+Files often give one mechanism to several channels — a second prism channel written with the first prism's attribute,
+a rotation channel that starts with "Prism Rotation Off" written as Prism1, an effects-macro channel at
+"No animation", the item index of a rotating gobo written as a whole-wheel index. The channels vote:
+
+* a channel whose range selects a slot of the wheel that holds something (`InVote`) puts the mechanism in, whatever
+  "out" range — or selection of an open slot — another channel is at (`OutVote`), in either channel order (ADJ
+  Protege XS, Vizi Beam 12RX, LIGHT_SKY IP520, CLF Poseidon Wash XS "Background Color", Robe Robin T1 macros). A
+  selection that names no slot (a wheel-less prism, DLW Dream L1400P's "AnimationWheel1" 'Zero' … 'max Index') does
+  not outvote an "out" range;
+* a selection function on a channel that selects no slot of its mechanism, while another channel of the same beams
+  does (`ProfileFunction.SecondarySelection`), neither selects nor takes out: ADJ Focus Hybrid's "Prism1Pos" channel
+  with "Off" and "No Rotation" written as Prism1. A selection with spin there still turns the selected item;
+* a whole-wheel index or spin on such a channel (`ProfileFunction.IndexesSelectedItem`: LIGHT_SKY F420BSW "Gobo 2
+  Index", Flash "Shape index", ADJ Focus Hybrid "Gobo1WheelSpin" 'Clockwise Gobo Rotation') turns the selected item
+  instead of moving the wheel off it while a slot is selected; an index or rotation function naming another wheel does
+  not swap the wheel a selection put in place (Vari-Lite VL3600 "Gobo1Pos");
+* a whole-wheel shake whose ranges name slots ("Gobo Shake 1" … in ADJ Focus Hybrid's "Gobo1WheelShake") is read as
+  select-and-shake of those slots.
+
+A wheel's family (which decides whether GDTF's default slot colour means "open") comes from the first function of
+the mode with a wheel attribute that names it, not from a "NO FUNCTION" function that names it first (Infinity
+Furion). Prism slots named as prisms ("Prism", "Prism Insert", "Prism On", "Both Prisms") are prisms even without
+facet data and the default colour (Infinity Furion series, Chauvet Rogue R3 Beam and Maverick Force 2 Profile,
+Vari-Lite VL2600, DTS Synergy 7). Slots named like an out range but carrying a filter colour stay filters, and the
+Roscolux "No Color Blue/Straw/Pink" gels are not out names (Astera virtual wheels, Chauvet COLOrado, CLF, Ayrton
+Zonda).
 
 ## Patch (`Patch`, `PatchIssueProvider`)
 
@@ -297,8 +325,12 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
   nearest CCT (its top when the mix has no CCT), changing every emitter as little as possible and keeping the total
   flux (`ColorMixing.TryBalance`). GDTF files often write every emitter with Y 100: the Ayrton Zonda 3 FX's RGBW then
   mixes to x 0.255, y 0.178, a purple, and becomes 8000 K. The beam is marked `ProfileBeam.WhitePointEstimated` with
-  `WhitePointKelvin`, and the profile warns "… re-balanced to 8000 K (estimate)". Engines whose emitters are all of one
-  colour, or without a datasheet range, keep the file's values.
+  `WhitePointKelvin`, and the profile warns "… not a white of the datasheet's 2700–8000 K; … re-balanced to 8000 K
+  (estimate)". A range of a single colour temperature (min = max) names the white emitter or lamp, not the mix of the
+  coloured emitters (BeamZ RB 90 wW RGB "2200 K", PRstage LED COB 200 RGBW "3200 K"): a full mix on the locus is
+  then taken as written, and one off it goes onto the locus at its own CCT within a factor of two of the given one
+  (ADJ Vintage Bar: 5409 K at Δuv +0.029 → 4000 K, where 2000 K would have taken the blue emitter to nothing).
+  Engines whose emitters are all of one colour, or without a datasheet range, keep the file's values.
 * **Colour wheels on LED engines**: a colour wheel (or virtual gel wheel) of a beam with additive emitters is a preset,
   not a filter in front of a white lamp. The beam takes the slot's chromaticity at the largest luminance its emitters
   can make there, scaled by the current mix's luminance (presets computed once per profile with the white-efficiency
@@ -323,7 +355,11 @@ white (emitter mix level, CMY/CTO, colour-wheel filters).
   kelvin physicals shift the colour temperature relative to their neutral end (no filter at the highest / lowest
   kelvin); a CTO/CTB whose kelvin range runs from warmer to cooler than the source *and* has a separate "Open" range is
   a colour-temperature selector and names the resulting CCT like CTC. Kelvin channel sets ("3200K") interpolate in
-  mired; 0 … 1 ranges map to a full 5600 → 3200 K conversion. `Tint` shifts Δuv (±0.02 for symmetric ranges).
+  mired; 0 … 1 ranges map to a full 5600 → 3200 K conversion. `Tint` shifts Δuv (±0.02 for symmetric ranges);
+  a tint range named "Off", "Idle", "No function", "No shift", "No Green Offset", "Neutral …" or "Uncorrected white"
+  (`NameParsing.IsNeutralTintName`) corrects nothing, whatever physical value the file gives it (Elation SOL I Blinder
+  and Fuze Max Spot: "Idle" at DMX 0 of a 0 … 1 range read as full minus green turned open white and every preset
+  magenta).
 * **Electronic colour temperature**: in an LED engine that mixes its colour or tunes its white (emitters in the
   mode, several coloured emitters in the fixture, a CTC channel, or a CTO/CTB on an LED that is not a spot, profile,
   beam or follow spot — whose CTO is a flag — and no CMY flags) CTC/CTO/CTB re-balance the emitters instead of filtering: the colour
@@ -640,9 +676,15 @@ and physical value are in `FixtureState` for the properties panel), they only do
   stays shared (Rayzor 760); a zoom range written as beam/field angle; fields never above a hemisphere.
 * **Reload**: `ReloadProfiles` keeps motor positions and moves on from there.
 * **Wheel insertion** (`WheelInsertionTests`):
-  * Library-wide: GDTF defaults leave gobos, prisms, animation wheels and beam shapers out, except in 13 listed files
+  * Library-wide: GDTF defaults leave gobos, prisms, animation wheels and beam shapers out, except in 14 listed files
     (each still checked). Every range named open / removed / close / off / no function (8168 ranges) takes its
-    mechanism out, unless it selects a slot holding an item.
+    mechanism out, unless it selects a slot holding an item. Every range that selects a slot holding an item, with all
+    other channels at their defaults, shows that slot (≈ 234 000 selections; two listed files whose other channels
+    written with the same attribute select another item at their defaults).
+  * Channels that share a mechanism: a rotation channel written as Prism1 (ADJ Focus Hybrid), second prism channels
+    written as Prism1 (ADJ Protege XS, Vizi Beam 12RX), an animation macro channel at "No animation" (Robe Robin T1),
+    item indexes written as wheel indexes (LIGHT_SKY F420BSW, Flash Event Wash FX 300), prism slots named "Prism"
+    without facets (Infinity Furion B401, Vari-Lite VL2600), gobo shakes naming their slots (ADJ Focus Hybrid).
   * Rivale animation wheel, ACME Chiron prism, and Elation Artiste Picasso and Mondrian animation wheels are clear at
     defaults and at open white, and go in when selected.
   * Prism indexing alone does not insert the prism (ADJ Focus Profile); an "Open" range on the empty slot of an
@@ -656,6 +698,9 @@ and physical value are in `FixtureState` for the properties panel), they only do
   * The "Liquid Effect" ring is dark in "Basic" and addressed in "+ Liquid".
   * A red gel colours a dimmer-only profile, and a colour-mixing fixture ignores it.
   * `DmxEngine` applies and removes `FixtureComponent.Color`.
+  * A single datasheet colour temperature does not re-balance a mix on the locus (BeamZ RB 90 wW RGB, PRstage LED COB
+    200 RGBW, Portman P2 EVO); an off-locus mix goes onto it near its own CCT (ADJ Vintage Bar).
+  * A tint channel at "Idle" leaves open white and the Pale Yellow swatch alone (Elation SOL I Blinder).
 * **Name parsing** (`NameParsingTests`): out names, plain open slot names, ramp and cycle names, shaper stretch.
 * **Performance**: 2000 fixtures per frame (above).
 
@@ -665,7 +710,10 @@ and physical value are in `FixtureState` for the properties panel), they only do
 * Whether a mechanism is in the beam is read from channel-set and slot names where GDTF has no field for it (out
   ranges, ramps, cycles, open slots). Names outside the recognised vocabulary keep the slot the range selects.
 * An anamorphic beam shaper is drawn as two side-by-side copies of the round beam (at most 2.2:1); a real prism in the
-  same beam keeps the prism and drops the stretch.
+  same beam keeps the prism and drops the stretch (and then draws the beam's stretched peak, not the round one — no
+  library fixture has both, the Rivale Wash's shaper being the only anamorphic one).
+* Channels that select different items of one mechanism at once (several colour layers written with one attribute:
+  Astera's four Color1 channels per pixel, BeamZ zone colours over the shared programs) keep the last channel's item.
 * An LED engine's re-balanced white point and its colour presets are estimates from the datasheet's CCT range and the
   emitters' chromaticities; the firmware's calibration is not known.
 * A gel is applied as a filter computed for a D65 source; on a tungsten source the result has the gel's hue, not its
