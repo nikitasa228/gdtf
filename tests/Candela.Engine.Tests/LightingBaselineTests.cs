@@ -302,8 +302,22 @@ public sealed class ReferenceDrawingCliTests
         // pixels 52 and 108 of 160 on the middle row.
         string[] common =
         [
-            "render", project, "--width", "160", "--height", "120", "--camera", "0,-8,0", "--target", "0,0,0", "--fov", "30",
-            "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root,
+            "render",
+            project,
+            "--width",
+            "160",
+            "--height",
+            "120",
+            "--camera",
+            "0,-8,0",
+            "--target",
+            "0,0,0",
+            "--fov",
+            "30",
+            "--cache",
+            Path.Combine(dir, "cache"),
+            "--library",
+            TestEnvironment.Root,
         ];
         // The real-time render with its default auto exposure (a drawing is display-referred whatever the exposure); the
         // final render at a fixed exposure (a drawing is display-referred against the exposure the render starts with).
