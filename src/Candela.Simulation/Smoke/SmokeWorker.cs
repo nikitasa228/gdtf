@@ -22,9 +22,9 @@ namespace Candela.Simulation;
 /// coarsened (the cell edge × ∛2 per level, half the cells) when a step exceeds the budget, refined again when a finer
 /// grid would fit comfortably. The state moves to the new grid with its smoke mass and heat conserved.</para>
 /// <para><b>Threads.</b> The solver runs on the worker thread plus <see cref="Parallelism"/> − 1 dedicated threads, all
-/// at <see cref="SmokeWorkerOptions.Priority"/> (below normal), never on the shared thread pool. In real time it uses one
-/// core fewer than the machine has, leaving one for the main thread. The public members are for one controlling thread
-/// (the engine's main thread); the worker synchronises with it internally.</para>
+/// at <see cref="SmokeWorkerOptions.Priority"/> (below normal), never on the shared thread pool. In real time it uses half
+/// the cores by default, leaving the others to the main thread, rendering, DMX evaluation and network input. The public
+/// members are for one controlling thread (the engine's main thread); the worker synchronises with it internally.</para>
 /// <para><b>Robustness.</b> Invalid settings are replaced and reported (<see cref="Issues"/>); an exception inside the
 /// solver stops the simulation with an error issue instead of crashing the process (<see cref="Fault"/>), and
 /// <see cref="Reconfigure"/> starts a fresh one.</para>
@@ -40,8 +40,14 @@ public sealed class SmokeWorker : IDisposable
     /// <summary>Measured sub-steps on a grid before the cell size may change again.</summary>
     private const int MeasuredStepsBeforeAdapting = 12;
 
-    /// <summary>Measured sub-steps before coarsening a grid whose steps take more than three times the budget.</summary>
+    /// <summary>
+    /// Measured sub-steps before coarsening a grid that cannot keep up at all (a step takes longer than
+    /// <see cref="RescueFactor"/> × the budget: with the default budget, about the sub-step's own duration).
+    /// </summary>
     private const int MeasuredStepsBeforeRescue = 2;
+
+    /// <summary>Step cost, in budgets, above which the grid is coarsened at once (time is being dropped).</summary>
+    private const double RescueFactor = 1.5;
 
     /// <summary>Wall-clock time the dropped share is at least averaged over, s (a hiccup in the first second is not 100 %).</summary>
     private const double MinDroppedWindow = 1.0;
@@ -116,7 +122,7 @@ public sealed class SmokeWorker : IDisposable
 
         int requested = _settings.MaxDegreeOfParallelism;
         int cores = Environment.ProcessorCount;
-        _parallelism = requested > 0 ? requested : _timing == SmokeTiming.RealTime ? Math.Max(1, cores - 1) : Math.Max(1, cores);
+        _parallelism = requested > 0 ? requested : _timing == SmokeTiming.RealTime ? Math.Max(1, cores / 2) : Math.Max(1, cores);
         if (_parallelism > 1)
             _scheduler = new SolverTaskScheduler(_parallelism - 1, _options.Priority, "Candela smoke solver");
         Enqueue(new WorkItem { Kind = WorkKind.Configure, Settings = settings });
@@ -791,8 +797,8 @@ public sealed class SmokeWorker : IDisposable
 
     /// <summary>
     /// Coarsens when the measured step exceeds the budget (to the first level predicted within 80 % of it; after only a
-    /// couple of steps when it takes more than three times the budget), refines one level when the finer grid is
-    /// predicted within 75 % of it. Cost is proportional to the cell count.
+    /// couple of steps when it takes more than <see cref="RescueFactor"/> budgets, so time is dropped only briefly),
+    /// refines one level when the finer grid is predicted within 75 % of it. Cost is proportional to the cell count.
     /// </summary>
     private void Adapt()
     {
@@ -801,7 +807,7 @@ public sealed class SmokeWorker : IDisposable
         double budget = Budget;
         double cost = _stepSeconds;
         int measured = _stepsOnGrid - WarmUpSteps;
-        bool severe = cost > 3 * budget;
+        bool severe = cost > RescueFactor * budget;
         if (measured < (severe ? MeasuredStepsBeforeRescue : MeasuredStepsBeforeAdapting))
             return;
         double onGrid = Stopwatch.GetElapsedTime(_gridTimestamp).TotalSeconds;
