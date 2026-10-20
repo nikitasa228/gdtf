@@ -392,13 +392,14 @@ public sealed class FinalRenderJobTests : IClassFixture<FinalRenderJobTests.BoxS
     public void Denoising_smooths_the_picture_and_keeps_the_raw_result_in_the_exr()
     {
         _box.GetOrSkip();
-        var raw = Render(PathTraced(_box.Camera, _box.Dir.File("denoise-off.png"), 64, 48, 4));
-        var denoised = Render(PathTraced(_box.Camera, _box.Dir.File("denoise-on.png"), 64, 48, 4, denoise: true));
+        var raw = Render(PathTraced(_box.Camera, _box.Dir.File("denoise-off.png"), 64, 48, 16));
+        var denoised = Render(PathTraced(_box.Camera, _box.Dir.File("denoise-on.png"), 64, 48, 16, denoise: true));
         double ratio = denoised.Noise() / raw.Noise();
         Assert.True(ratio < 0.7, $"the denoised picture is {ratio:P0} as noisy as the raw one");
         Assert.Contains("raw.R", denoised.Channels);
         Assert.DoesNotContain("raw.R", raw.Channels);
-        Assert.True(Math.Abs(denoised.Mean() - raw.Mean()) < 0.25 * raw.Mean(), "denoising keeps the brightness");
+        Assert.True(Math.Abs(denoised.Mean() - raw.Mean()) < 0.25 * raw.Mean(),
+            $"denoising keeps the brightness: mean {raw.Mean():0.#####} raw, {denoised.Mean():0.#####} denoised; noise {raw.Noise():0.###} raw, {denoised.Noise():0.###} denoised");
     }
 
     // ------------------------------------------------------------------------------------------------ responsiveness, cancel
@@ -654,9 +655,9 @@ public sealed class FinalRenderJobTests : IClassFixture<FinalRenderJobTests.BoxS
             { "actions": [
                 { "type": "wait", "frames": 10 },
                 { "type": "key", "chord": "F12" },
-                { "type": "wait", "frames": 150 },
+                { "type": "wait", "frames": 40 },
                 { "type": "menu", "path": "File/Render" },
-                { "type": "wait", "frames": 150 }
+                { "type": "wait", "frames": 40 }
             ] }
             """);
         var run = EditorProcess.Run(dir, new[] { "--open", project, "--screenshot", dir.File("end.png"), "--script", script });
