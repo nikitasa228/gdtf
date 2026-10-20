@@ -299,6 +299,25 @@ public sealed class InstallLayoutTests : IDisposable
     }
 
     [Fact]
+    public void The_program_folder_and_everything_in_it_is_recognised_but_not_its_neighbours()
+    {
+        string program = MakeInstalledProgram();
+        var layout = new InstallLayout(program, null);
+        Assert.True(layout.IsInProgramFolder(program));
+        Assert.True(layout.IsInProgramFolder(program + Path.DirectorySeparatorChar));
+        Assert.True(layout.IsInProgramFolder(Path.Combine(program, "samples")));
+        Assert.True(layout.IsInProgramFolder(Path.GetDirectoryName(layout.SampleScene!)));
+        Assert.True(layout.IsInProgramFolder(Path.Combine(program, "samples", "..", "docs")));
+        // a sibling whose name starts like the program folder is not inside it
+        Assert.False(layout.IsInProgramFolder(program + " 2"));
+        Assert.False(layout.IsInProgramFolder(Path.GetDirectoryName(program)));
+        Assert.False(layout.IsInProgramFolder(Path.Combine(_root, "Documents")));
+        Assert.False(layout.IsInProgramFolder(null));
+        Assert.False(layout.IsInProgramFolder(" "));
+        Assert.False(layout.IsInProgramFolder("\0bad"));
+    }
+
+    [Fact]
     public void Counting_gdtf_files_reads_only_the_folder_itself_and_never_throws()
     {
         string folder = MakeFolder("count");

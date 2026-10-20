@@ -41,9 +41,9 @@ internal sealed class LibrarySetup : IDisposable
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _log = log ?? throw new ArgumentNullException(nameof(log));
+        // Counted only when the window shows it (EnsureProbe): most starts never open the window, and the count walks
+        // the folder's subfolders (a network share, a whole drive) in the background.
         Folder = FirstConfiguredFolder(settings.Settings.LibraryFolders);
-        if (Folder is not null)
-            StartProbe(Folder);
     }
 
     /// <summary>The folder shown in the window: the one chosen, else the first one of the settings; null for none.</summary>
@@ -149,6 +149,23 @@ internal sealed class LibrarySetup : IDisposable
 
         return new FolderProbe(full, true, direct, nested, complete);
     }
+
+    /// <summary>
+    /// Starts counting <see cref="Folder"/> when it has not been counted yet (the window opened); does nothing while a
+    /// count runs or when there is no folder.
+    /// </summary>
+    public void EnsureProbe()
+    {
+        if (Folder is { } folder && Probe is null && _probe is null)
+            StartProbe(folder);
+    }
+
+    /// <summary>
+    /// Reads <see cref="Folder"/> again — the GDTF files copied into it since (in the file manager) reach the library and
+    /// the count is renewed; the window's Rescan button. False (with <see cref="Error"/>) when there is no folder or it
+    /// cannot be used.
+    /// </summary>
+    public bool Rescan() => Folder is { } folder ? UseFolder(folder) : false;
 
     /// <summary>Picks up a finished count (call once per frame).</summary>
     public void Update()

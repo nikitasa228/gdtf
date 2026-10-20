@@ -177,6 +177,54 @@ public sealed partial class InstallExperienceTests : IDisposable
         Assert.Equal(Path.GetFullPath(library), later.Folder);
     }
 
+    private static void WaitForProbe(LibrarySetup setup)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(20);
+        do
+        {
+            Thread.Sleep(20);
+            setup.Update();
+        }
+        while ((setup.Probing || setup.Probe is null) && DateTime.UtcNow < deadline);
+    }
+
+    [Fact]
+    public void Files_copied_into_the_chosen_folder_are_read_by_rescan_and_counting_waits_for_the_window()
+    {
+        // Review regression: after "Use Documents\Candela\Fixture Library" the folder is empty; the user copies GDTF files
+        // into it in Explorer and comes back — the window kept saying "no .gdtf files" until the editor was restarted.
+        string library = Folder("Документы/Candela/Fixture Library");
+        _settings.Settings.LibraryFolders.Add(library);
+        using var session = CreateSession(InstalledLayout());
+        var engine = session.Engine!;
+        using var setup = new LibrarySetup(session, _settings, _log);
+
+        // a start that never shows the window does not walk the folder (a network share, a whole drive)
+        Thread.Sleep(50);
+        setup.Update();
+        Assert.False(setup.Probing);
+        Assert.Null(setup.Probe);
+        setup.EnsureProbe();
+        WaitForProbe(setup);
+        Assert.Equal(0, setup.Probe?.Direct);
+
+        File.Copy(RepositoryGdtf(Zonda), Path.Combine(library, Zonda));
+        int before = engine.Library.Count;
+        Assert.True(setup.Rescan(), setup.Error);
+        Assert.Equal(before + 1, engine.Library.Count);
+        Assert.NotNull(engine.Library.FindByFileName(Zonda));
+        WaitForProbe(setup);
+        Assert.Equal(1, setup.Probe?.Direct);
+        Assert.Single(_settings.Settings.LibraryFolders);
+
+        // no folder: nothing to read again
+        _settings.Settings.LibraryFolders.Clear();
+        using var none = new LibrarySetup(session, _settings, _log);
+        Assert.False(none.Rescan());
+        none.EnsureProbe();
+        Assert.False(none.Probing);
+    }
+
     [Fact]
     public void The_default_folder_is_created_when_it_is_used()
     {
@@ -195,6 +243,34 @@ public sealed partial class InstallExperienceTests : IDisposable
         Assert.False(setup.UseDefaultFolder(Path.Combine(blocked, "Fixture Library")));
         Assert.NotNull(setup.Error);
         Assert.Single(_settings.Settings.LibraryFolders);
+    }
+
+    // ---- saving after "Open Sample Scene" -------------------------------------------------------------------------
+
+    [Fact]
+    public void A_save_dialog_never_starts_in_the_program_folder()
+    {
+        // Review regression: after Open Sample Scene, Save As and Export started in C:\Program Files\Candela\samples
+        // (the scene's folder), where saving fails for the user (and an upgrade would replace the file).
+        var layout = InstalledLayout();
+        string samples = Folder("Program Files/Candela/samples");
+        string projects = Folder("Мои проекты");
+        string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+        // reading from it is fine
+        Assert.Equal(samples, FileBrowserDialog.StartFolderFor(FileBrowserMode.Open, samples, Array.Empty<string>(), layout));
+        // writing starts in the most recent place outside it, else in Documents
+        Assert.Equal(projects, FileBrowserDialog.StartFolderFor(FileBrowserMode.Save, samples, new[] { samples, projects }, layout));
+        Assert.Equal(documents, FileBrowserDialog.StartFolderFor(FileBrowserMode.Save, samples, new[] { samples }, layout));
+        Assert.Equal(documents, FileBrowserDialog.StartFolderFor(FileBrowserMode.SelectFolder, layout.ProgramDirectory, Array.Empty<string>(), layout));
+        // any other folder stays the start
+        Assert.Equal(projects, FileBrowserDialog.StartFolderFor(FileBrowserMode.Save, projects, new[] { samples }, layout));
+        Assert.Equal(projects, FileBrowserDialog.StartFolderFor(FileBrowserMode.Save, Path.Combine(projects, "missing"), new[] { projects }, layout));
+
+        // the dialog itself uses it
+        var dialog = new FileBrowserDialog(_dir.File("recent-places.json")) { Layout = layout };
+        dialog.Show(FileBrowserMode.Save, "Save", Array.Empty<FileFilter>(), samples, "Фокина.candela", _ => { });
+        Assert.NotEqual(Path.GetFullPath(samples), Path.GetFullPath(dialog.Model!.CurrentDirectory));
     }
 
     // ---- GDTF imports are kept in the library folder ---------------------------------------------------------------

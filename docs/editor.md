@@ -327,11 +327,13 @@ repository never show it by themselves):
 
 * what GDTF files are and that the library is a folder of them;
 * **Choose Folder…** (the editor's file browser in folder mode), **Use Documents\Candela\Fixture Library**
-  (created when missing) and **Show in File Manager**;
+  (created when missing), **Show in File Manager** and **Rescan** (reads the folder again: GDTF files copied into
+  it since reach the library without a restart — `AddLibraryFolder` skips the files it already has);
 * the chosen folder is put first in *Settings → Library*, the settings are saved at once and the engine reads the
   folder immediately (`StageEngine.AddLibraryFolder`); a background count shows how many `.gdtf` files are directly
   in it and how many more sit in subfolders (the library reads only the top level), with a time and entry limit
-  so a huge or slow folder never blocks the window;
+  so a huge or slow folder never blocks the window (the count starts when the window shows the folder, not at every
+  start);
 * **Open Sample Scene** (`samples/Фокина.mvr`), **Start** / **Continue Without a Library**, and the check box
   *Show this window at start-up while the library has no fixtures* (`EditorPreferences.ShowLibrarySetup`).
 
@@ -1053,7 +1055,7 @@ in the active viewport when the action runs, so a script does not depend on the 
 | `viewport` | `viewport`, `view`, `projection`, `shading`, `overlay`, `grid` | configure a viewport |
 | `select` | `names` | select objects by name |
 | `layout` | `name` | apply a layout |
-| `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection, librarySetup), `value` | change a setting; `librarySetup` drives the fixture library window: `open`, `close`, `default` (use the default folder), `sample` (open the sample scene) or a folder path (as if chosen) |
+| `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection, librarySetup), `value` | change a setting; `librarySetup` drives the fixture library window: `open`, `close`, `default` (use the default folder), `rescan` (read the chosen folder again), `sample` (open the sample scene) or a folder path (as if chosen) |
 | `window` | `width`, `height` (screen pixels), or `value` (minimize, restore, maximize) | resize the main window or change its state (swapchain recreation) |
 | `open` | `path` | open a scene or project like *File → Open* (asks about unsaved changes) |
 | `drop` | `path`, or `names` (several files), `x`, `y` | drop files onto the main window at (x, y), as a file manager does |

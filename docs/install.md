@@ -78,6 +78,8 @@ GDTF — они сразу появились в панели «Библиоте
   скажет, сколько их, — выберите вложенную папку или перенесите файлы выше.
 * **Использовать Документы\Candela\Fixture Library** — создаёт эту папку; скопируйте в неё файлы GDTF позже.
 * **Показать в проводнике** — открывает выбранную папку.
+* **Обновить** — читает папку снова: файлы GDTF, которые вы скопировали в неё в проводнике, появятся в панели
+  «Библиотека» без перезапуска Candela.
 * **Открыть пример сцены** — открывает `Фокина.mvr` (театральная световая партитура на 91 прибор).
 * **Продолжить без библиотеки** — сцены MVR, в которых есть свои файлы GDTF, и пример сцены открываются и так.
 
@@ -260,6 +262,8 @@ On the first start (while the library holds none of your fixtures) Candela opens
   how many — choose the subfolder or move them up.
 * **Use Documents\Candela\Fixture Library** — creates that folder; copy GDTF files into it later.
 * **Show in File Manager** — opens the chosen folder in Explorer.
+* **Rescan** — reads the folder again: GDTF files you copied into it in Explorer are added to the Library panel
+  without restarting Candela.
 * **Open Sample Scene** — opens `Фокина.mvr` (a theatre lighting rig with 91 fixtures).
 * **Continue Without a Library** — MVR scenes that contain their GDTF files, and the sample scene, open anyway.
 

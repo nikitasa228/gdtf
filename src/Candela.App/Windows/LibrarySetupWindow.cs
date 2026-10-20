@@ -72,6 +72,14 @@ internal sealed class LibrarySetupWindow
     {
         IsOpen = true;
         _focusRequested = true;
+        _setup.EnsureProbe();
+    }
+
+    /// <summary>Reads the folder again after files were copied into it (the Rescan button, scripts and tests).</summary>
+    public void Rescan()
+    {
+        if (_setup.Rescan() && _setup.Added is { } added)
+            _status(added);
     }
 
     /// <summary>Uses <paramref name="folder"/> as the library folder (the browser's answer, scripts and tests).</summary>
@@ -103,6 +111,7 @@ internal sealed class LibrarySetupWindow
         _setup.Update();
         if (!IsOpen)
             return;
+        _setup.EnsureProbe();
         var viewport = ImGui.GetMainViewport();
         var size = PopupPlacement.FitInWindow(new Vector2(700, 0) * scale, viewport.WorkSize);
         ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
@@ -167,6 +176,14 @@ internal sealed class LibrarySetupWindow
             ImGui.SameLine();
             if (ImGui.Button(InstallLoc.With(Icons.FolderOpen, InstallStr.SetupOpenFolder)))
                 NativeShell.Open(folder);
+            // Files copied into the folder in the file manager are read without a restart.
+            ImGui.SameLine();
+            ImGui.BeginDisabled(_setup.Probing);
+            if (ImGui.Button(InstallLoc.With(Icons.Refresh, InstallStr.SetupRescan)))
+                Rescan();
+            ImGui.EndDisabled();
+            if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                SafeText.Tooltip(InstallLoc.Get(InstallStr.SetupRescanTip));
         }
 
         DrawStatus();

@@ -68,7 +68,8 @@ internal sealed partial class Workspace
 
     /// <summary>
     /// Script action <c>setting</c> <c>librarySetup</c>: <c>open</c> / <c>close</c> the window, use the
-    /// <c>default</c> folder, open the <c>sample</c> scene, or any other value: use that folder.
+    /// <c>default</c> folder, <c>rescan</c> the chosen folder, open the <c>sample</c> scene, or any other value: use
+    /// that folder.
     /// </summary>
     private void RunLibrarySetupScript(string value)
     {
@@ -83,6 +84,9 @@ internal sealed partial class Workspace
                 break;
             case "default":
                 window.UseDefaultFolder();
+                break;
+            case "rescan":
+                window.Rescan();
                 break;
             case "sample":
                 window.OpenSample();

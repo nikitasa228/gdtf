@@ -184,6 +184,30 @@ public sealed record InstallLayout(string ProgramDirectory, string? RepositoryRo
     public static bool AnyGdtfFiles(IEnumerable<string>? folders) =>
         folders is not null && folders.Any(f => CountGdtfFiles(f, 1) > 0);
 
+    /// <summary>
+    /// True when <paramref name="path"/> is the program folder or inside it (the installed sample scene, the starter
+    /// fixtures): a place to read from, not to save into — under <c>C:\Program Files</c> it is read-only for the user,
+    /// and an upgrade or uninstall replaces it. False for a malformed path. Never throws.
+    /// </summary>
+    public bool IsInProgramFolder(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
+        try
+        {
+            string program = Path.TrimEndingDirectorySeparator(Path.GetFullPath(ProgramDirectory));
+            string full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+            var comparison = OperatingSystem.IsLinux() ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            return string.Equals(full, program, comparison)
+                || (full.Length > program.Length && full.StartsWith(program, comparison)
+                    && (full[program.Length] == Path.DirectorySeparatorChar || full[program.Length] == Path.AltDirectorySeparatorChar));
+        }
+        catch (Exception e) when (e is ArgumentException or NotSupportedException or PathTooLongException or System.Security.SecurityException)
+        {
+            return false;
+        }
+    }
+
     /// <summary>Compares two folder paths after normalising them (case-insensitively on Windows and macOS).</summary>
     public static bool SamePath(string a, string b)
     {
