@@ -103,7 +103,8 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
 ## M5 — Atmosphere, fire, overlays
 - [~] Smoke/haze fluid simulation (GPU, CPU reference): HAZE/FOG emitters from DMX, FAN airflow, obstacles,
       dissipation; feeds volumetric rendering and path tracer (CPU solver driven by the DMX device outputs in the engine,
-      density grid rendered; GPU solver pending)
+      density grid rendered; the solver runs on its own threads — in real time in the editor, with a cell size chosen
+      from a time budget and a warning when time is dropped, lockstep and bit-stable for renders; GPU solver pending)
 - [~] Fire simulation for GENERATOR FIRE fixtures: flame jets from DMX, blackbody emission lighting the scene, smoke
       (CPU simulation driven by DMX in the engine, flames light the scene and are rendered; no GENERATOR FIRE GDTF in the
       library yet)
