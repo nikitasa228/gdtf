@@ -119,8 +119,9 @@ three messages per issue code and how many more):
   under the library file's name with the source's mode (Фокина's four Zonda 3 FX). `EngineExportOptions.WriteStandIns`
   (off by default, "Write stand-ins") writes the stand-ins as they are drawn instead, with one
   `mvr.substitute-exported` warning per fixture.
-* **Textures.** Models are written as GLB with their base-colour, metallic-roughness, normal, occlusion and emissive
-  textures: `AssetStore.TryGetTextureFile` gives the imported PNG/JPEG file (other formats, generated maps and built-in
+* **Textures and materials.** Models are written as GLB with their base-colour, metallic-roughness, normal, occlusion
+  and emissive textures, and with their emissive luminance, transmission and index of refraction as glTF extensions
+  (docs/mvr.md, "Models"): `AssetStore.TryGetTextureFile` gives the imported PNG/JPEG file (other formats, generated maps and built-in
   procedural textures re-encoded as PNG), and keys the store does not serve are encoded from the engine's image source.
   A texture that cannot be supplied is reported (`mvr.export-resource-missing`).
 * **Layers.** Children on another layer than their parent are written under a GroupObject of their own layer that
@@ -445,7 +446,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (130 tests, ≈ 1.5 min; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (131 tests, ≈ 1.5 min; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
@@ -464,7 +465,9 @@ a device):
   stand-in records; "Write stand-ins" is off by default and reports one `mvr.substitute-exported` warning per stand-in
   (in the result, in `Issues` and in the summary); the stubs survive save → reopen with the same cache and are named but
   not embedded (one warning per model) with another cache; a textured OBJ exports to a GLB with the image and reopens
-  with the same texture pixels, and the CLI renders the exported MVR like the project it came from (Vulkan); the
+  with the same texture pixels, and the CLI renders the exported MVR like the project it came from (Vulkan); an LED
+  face (`Ke`), a glass face (`d`) and a textured face without texture coordinates come back with the same luminance,
+  transmission and index of refraction, in a GLB whose textured primitives all have texture coordinates; the
   audit's project (Фокина opened, imported twice, a crate: Default 237 / Light 39) keeps its layer counts, parents,
   child order, specs and modes through export and reopen; every lossy change is in `Issues` and the summary line.
 * **Demo look**: on Фокина the same look twice, strobes dark and everything else at full, ≥ 30 mirror pairs with the

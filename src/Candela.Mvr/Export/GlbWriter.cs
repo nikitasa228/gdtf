@@ -13,7 +13,11 @@ namespace Candela.Mvr;
 /// SharpGLTF. Part transforms are baked into the vertices, so the file has one node and one mesh with a primitive per
 /// sub-mesh. Materials keep their metallic-roughness factors and, when a texture source is given, their base colour,
 /// metallic-roughness, normal, occlusion and emissive textures as images embedded in the GLB buffer (PNG or JPEG, the
-/// formats core glTF holds), with a UV scale other than 1 as <c>KHR_texture_transform</c>.
+/// formats core glTF holds), with a UV scale other than 1 as <c>KHR_texture_transform</c>. Emissive luminance (cd/m²),
+/// transmission and index of refraction are written with <c>KHR_materials_emissive_strength</c>,
+/// <c>KHR_materials_transmission</c> and <c>KHR_materials_ior</c> (optional extensions: other readers fall back to
+/// the core material). Every primitive whose material binds a texture has <c>TEXCOORD_0</c> (zeros for a mesh without
+/// texture coordinates, which Candela's renderer samples at (0, 0)), and accessors hold finite values only.
 /// </summary>
 public static class GlbWriter
 {
@@ -97,7 +101,7 @@ public static class GlbWriter
             var (positions, normals, flip) = Bake(m, part.Transform);
             var position = VertexAccessor(root, MemoryMarshal.AsBytes(positions.AsSpan()), positions.Length, DimensionType.VEC3);
             var normal = VertexAccessor(root, MemoryMarshal.AsBytes(normals.AsSpan()), normals.Length, DimensionType.VEC3);
-            Accessor? uv = m.TexCoords is { Length: > 0 } tc ? VertexAccessor(root, MemoryMarshal.AsBytes(tc.AsSpan()), tc.Length, DimensionType.VEC2) : null;
+            Accessor? uv = m.TexCoords is { Length: > 0 } tc ? VertexAccessor(root, MemoryMarshal.AsBytes(FiniteTexCoords(tc).AsSpan()), tc.Length, DimensionType.VEC2) : null;
 
             var ranges = m.SubMeshes.Count > 0 ? m.SubMeshes : new List<SubMesh> { new(0, m.Indices.Length, 0) };
             foreach (var sub in ranges)
@@ -113,9 +117,17 @@ public static class GlbWriter
                 var prim = mesh.CreatePrimitive();
                 prim.SetVertexAccessor("POSITION", position);
                 prim.SetVertexAccessor("NORMAL", normal);
+                var material = MaterialFor(sub.MaterialSlot);
+                // a texture binding needs TEXCOORD_0 (glTF validator error MESH_PRIMITIVE_TOO_FEW_TEXCOORDS); a mesh without
+                // texture coordinates samples the texture at (0, 0) in Candela's renderer, so zeros keep its look
+                if (uv is null && HasTexture(material))
+                {
+                    var zeros = new Vector2[m.VertexCount];
+                    uv = VertexAccessor(root, MemoryMarshal.AsBytes(zeros.AsSpan()), zeros.Length, DimensionType.VEC2);
+                }
                 if (uv is not null) prim.SetVertexAccessor("TEXCOORD_0", uv);
                 prim.SetIndexAccessor(IndexAccessor(root, indices));
-                prim.Material = MaterialFor(sub.MaterialSlot);
+                prim.Material = material;
                 written++;
             }
         }
@@ -144,6 +156,8 @@ public static class GlbWriter
         for (int i = 0; i < positions.Length; i++)
         {
             var p = identity ? m.Positions[i] : Vector3.Transform(m.Positions[i], transform);
+            // glTF accessors must hold finite values; the renderer draws a non-finite vertex at the origin
+            if (!(float.IsFinite(p.X) && float.IsFinite(p.Y) && float.IsFinite(p.Z))) p = Vector3.Zero;
             positions[i] = new Vector3(p.X, p.Z, -p.Y);
             var n = identity ? m.Normals[i] : Vector3.TransformNormal(m.Normals[i], normalMatrix);
             float len = n.Length();
@@ -151,6 +165,25 @@ public static class GlbWriter
             normals[i] = new Vector3(n.X, n.Z, -n.Y);
         }
         return (positions, normals, det < 0);
+    }
+
+    /// <summary>The texture coordinates with non-finite values replaced by 0 (glTF accessors must be finite); the array itself when all are finite.</summary>
+    private static Vector2[] FiniteTexCoords(Vector2[] uv)
+    {
+        int bad = Array.FindIndex(uv, t => !(float.IsFinite(t.X) && float.IsFinite(t.Y)));
+        if (bad < 0) return uv;
+        var copy = (Vector2[])uv.Clone();
+        for (int i = bad; i < copy.Length; i++)
+            if (!(float.IsFinite(copy[i].X) && float.IsFinite(copy[i].Y))) copy[i] = Vector2.Zero;
+        return copy;
+    }
+
+    /// <summary>True when any channel of <paramref name="material"/> binds a texture.</summary>
+    private static bool HasTexture(Material material)
+    {
+        foreach (var channel in material.Channels)
+            if (channel.Texture is not null) return true;
+        return false;
     }
 
     private static Accessor VertexAccessor(ModelRoot root, ReadOnlySpan<byte> data, int count, DimensionType dimension)
@@ -173,7 +206,13 @@ public static class GlbWriter
     private static Material CreateMaterial(ModelRoot root, MaterialData data, int slot, Func<string?, Image?> imageFor)
     {
         var material = root.CreateMaterial(string.IsNullOrEmpty(data.Name) ? $"Material {slot}" : data.Name);
-        material.InitializePBRMetallicRoughness();
+        float transmission = Clamp01(data.Transmission);
+        // KHR_materials_transmission only when the surface transmits (glass), so opaque materials stay core glTF
+        if (transmission > 0) material.InitializePBRMetallicRoughness("Transmission");
+        else material.InitializePBRMetallicRoughness();
+        if (transmission > 0 && material.FindChannel("Transmission") is { } transmissive) Set(transmissive, "TransmissionFactor", transmission);
+        // KHR_materials_ior: glTF's default is 1.5, like Core's; other indices (water 1.33, …) are written
+        if (float.IsFinite(data.Ior) && data.Ior >= 1f && MathF.Abs(data.Ior - DefaultIor) > 1e-6f) material.IndexOfRefraction = data.Ior;
         material.DoubleSided = data.DoubleSided;
         material.Alpha = data.AlphaMode switch
         {
@@ -199,14 +238,36 @@ public static class GlbWriter
         if (data.NormalTexture is not null && material.FindChannel("Normal") is { } normal) Texture(normal, imageFor(data.NormalTexture), uvScale);
         if (data.OcclusionTexture is not null && material.FindChannel("Occlusion") is { } occlusion)
             Texture(occlusion, imageFor(data.OcclusionTexture), uvScale);
-        if (data.EmissiveLuminance > 0 && material.FindChannel("Emissive") is { } emissive)
+        if (data.EmissiveLuminance > 0 && float.IsFinite(data.EmissiveLuminance) && material.FindChannel("Emissive") is { } emissive)
         {
+            // glTF's emissive colour is 0 … 1; the luminance goes into KHR_materials_emissive_strength relative to
+            // EmissiveReferenceLuminance, so emitted colour × luminance survives (core readers see the colour only)
             var e = data.EmissiveColor;
-            Set(emissive, "RGB", new Vector3(Clamp01(e.X), Clamp01(e.Y), Clamp01(e.Z)));
-            Texture(emissive, imageFor(data.EmissiveTexture), uvScale);
+            var rgb = new Vector3(float.IsFinite(e.X) ? MathF.Max(e.X, 0) : 0, float.IsFinite(e.Y) ? MathF.Max(e.Y, 0) : 0, float.IsFinite(e.Z) ? MathF.Max(e.Z, 0) : 0);
+            float peak = MathF.Max(rgb.X, MathF.Max(rgb.Y, rgb.Z));
+            if (peak > 0 && float.IsFinite(peak))
+            {
+                // a colour above 1 is scaled into range and its peak moves into the strength
+                float scale = MathF.Max(peak, 1f);
+                Set(emissive, "RGB", rgb / scale);
+                float strength = scale * data.EmissiveLuminance / EmissiveReferenceLuminance;
+                if (float.IsFinite(strength) && MathF.Abs(strength - 1f) > 1e-6f) Set(emissive, "EmissiveStrength", strength);
+                Texture(emissive, imageFor(data.EmissiveTexture), uvScale);
+            }
         }
         return material;
     }
+
+    /// <summary>
+    /// Luminance in cd/m² of a glTF emissive colour of 1 at emissive strength 1: <see cref="MaterialData.EmissiveLuminance"/>
+    /// is written as <c>KHR_materials_emissive_strength</c> relative to it. It is the reference Candela's glTF import
+    /// gives emissive colours (<c>Candela.Assets.MaterialApproximation.EmissiveReferenceLuminance</c>), so an exported
+    /// LED screen comes back with its luminance.
+    /// </summary>
+    public const float EmissiveReferenceLuminance = 100f;
+
+    /// <summary>glTF's index of refraction when <c>KHR_materials_ior</c> is absent (and Core's default).</summary>
+    private const float DefaultIor = 1.5f;
 
     /// <summary>Binds an image to a material channel (texture coordinate set 0, repeat), with a UV scale other than 1 as a texture transform.</summary>
     private static void Texture(MaterialChannel channel, Image? image, Vector2 uvScale)

@@ -187,6 +187,51 @@ public sealed class MvrExportFidelityTests
         Assert.Equal(ImageImporter.Decode(png).Pixels, image!.Pixels);
     }
 
+    [Fact]
+    public void Emission_transmission_and_untextured_parts_survive_export_and_reopening()
+    {
+        // an LED face (Ke 3 → 300 cd/m²), a glass face (d 0.3 → transmission 0.7) and a textured face without texture
+        // coordinates (map_Kd but no vt lines)
+        string folder = TestEnvironment.NewTempDirectory("export-materials");
+        File.WriteAllText(Path.Combine(folder, "box.mtl"),
+            "newmtl painted\nKd 0.8 0.2 0.1\nmap_Kd tex.png\nnewmtl screen\nKd 0 0 0\nKe 3 3 3\nnewmtl glass\nKd 1 1 1\nNs 900\nd 0.3\n");
+        File.WriteAllBytes(Path.Combine(folder, "tex.png"), ImageImporter.EncodePng(new ImageData { Width = 1, Height = 1, Pixels = [0, 255, 0, 255] }));
+        var obj = new System.Text.StringBuilder("mtllib box.mtl\n");
+        foreach (var (x, y, z) in new[] { (0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), (1, 1, 1), (0, 1, 1) })
+            obj.Append($"v {x} {y} {z}\n");
+        obj.Append("usemtl painted\nf 1 4 3 2\nf 5 6 7 8\nusemtl screen\nf 1 2 6 5\nf 2 3 7 6\nusemtl glass\nf 3 4 8 7\nf 4 1 5 8\n");
+        File.WriteAllText(Path.Combine(folder, "box.obj"), obj.ToString());
+
+        using var engine = TestEnvironment.CreateEngine("export-materials");
+        Assert.True(engine.Import(Path.Combine(folder, "box.obj")).Success);
+        string path = NewMvrPath("materials");
+        var result = engine.ExportMvr(path);
+        Assert.True(result.Success, result.Summary);
+
+        // a valid glTF for other programs: the textured primitive has texture coordinates
+        var glb = ModelRoot.ParseGLB(Assert.Single(MvrReader.ReadFile(path).Files, f => f.Name.EndsWith(".glb", StringComparison.Ordinal)).Bytes!);
+        foreach (var primitive in glb.LogicalMeshes.SelectMany(m => m.Primitives))
+            if (primitive.Material.FindChannel("BaseColor")?.Texture is not null) Assert.NotNull(primitive.GetVertexAccessor("TEXCOORD_0"));
+
+        using var reopened = TestEnvironment.CreateEngine("export-materials-reopen");
+        Assert.True(reopened.Open(path).Success);
+        MaterialData Material(StageEngine e, string name)
+        {
+            var mesh = Assert.Single(e.Scene.Query<MeshComponent>()).Component;
+            Assert.True(e.Models.TryGet(mesh.ModelAssetId, out var model, out var error), error);
+            return Assert.Single(model.Model.Materials, m => m.Name == name);
+        }
+        Assert.Equal(GlbWriter.EmissiveReferenceLuminance, MaterialApproximation.EmissiveReferenceLuminance);
+        var screen = Material(engine, "screen");
+        Assert.True(screen.EmissiveLuminance > 100f, $"{screen.EmissiveLuminance} cd/m²");
+        Assert.Equal(screen.EmissiveLuminance, Material(reopened, "screen").EmissiveLuminance, 2);
+        var glass = Material(engine, "glass");
+        Assert.True(glass.Transmission > 0.5f);
+        Assert.Equal(glass.Transmission, Material(reopened, "glass").Transmission, 4);
+        Assert.Equal(glass.Ior, Material(reopened, "glass").Ior, 4);
+        Assert.NotNull(Material(reopened, "painted").BaseColorTexture);
+    }
+
     /// <summary>
     /// The audit's project: Фокина opened, imported twice more (each under a group on the default layer, its "Light"
     /// fixtures on "Light") and a textured crate — 237 entities on "Default", 39 on "Light".

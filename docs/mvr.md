@@ -106,9 +106,14 @@ Renderers must flip the triangle winding for entities with an odd number of nega
 only proper rotations: none of the 91 matrices in `stages/Фокина.mvr` mirrors. The synthetic test file contains a
 mirrored object to cover this path.
 
-Writing is the inverse. Axes use the shortest round-trip float text. The origin is the metre value shifted by three
-decimal places, which gives exact millimetres with no binary noise. Read → write → read therefore returns the
-identical float matrix.
+Writing is the inverse. Axes use the shortest round-trip float text, written as plain decimals
+(`-0.000000087253284`, not `-8.7253284E-08`) whenever they give back the same float, and otherwise with a lower-case
+exponent and no plus sign (`1e-40`): DIN SPEC 15801 allows `e` and `E`, but the schema of MVR 1.6 (`mvr.xsd`,
+`matrixtype`) only accepts `e`, and its `ciecolortype` no exponent at all, so colours and other numbers are written the
+same way (`MvrMatrix.FormatFloat`). The origin is the metre value shifted by three decimal places, which gives exact
+millimetres with no binary noise. Read → write → read therefore returns the identical float matrix, and an export
+validates against `mvr.xsd` except for the content of Candela's `UserData/Data` block, which the schema declares empty
+although the specification asks providers to put their data there (Depence's own files fail the same check).
 
 ## Import: MVR → Core
 
@@ -390,7 +395,15 @@ files.
   per export from `TextureProvider` as PNG or JPEG bytes and embedded in the GLB buffer (one image per distinct
   content), a UV scale other than 1 as `KHR_texture_transform`. A texture that is not supplied, not PNG/JPEG, or
   without any texture source is reported (`mvr.export-resource-missing`) and the material keeps its factors.
-  `MvrExportResult.TextureCount` counts the embedded images. Objects reference the model through `Geometry3D`. Walls,
+  `MvrExportResult.TextureCount` counts the embedded images. A primitive whose material binds a texture always has
+  `TEXCOORD_0` — zeros for a mesh without texture coordinates, which Candela's renderer samples at (0, 0) too — since
+  the glTF validator rejects a texture binding without them (`MESH_PRIMITIVE_TOO_FEW_TEXCOORDS`); non-finite positions
+  and texture coordinates are written as 0, as the renderer draws them. Emission is written as an emissive colour of at
+  most 1 and `KHR_materials_emissive_strength` = luminance ÷ `GlbWriter.EmissiveReferenceLuminance` (100 cd/m², the
+  reference Candela's glTF import uses), transmission as `KHR_materials_transmission` and an index of refraction other
+  than 1.5 as `KHR_materials_ior` — optional extensions, so readers without them see the core material — and an LED
+  face or a glass pane comes back with its luminance, transmission and index. The output passes the Khronos glTF
+  validator without errors (normal maps give its warning that tangents are generated at run time). Objects reference the model through `Geometry3D`. Walls,
   floors and ceilings become scene objects with a generated box (`ExportWalls`).
 * **Candela's own data** (`CandelaUserData`). What MVR cannot hold goes into one `UserData/Data` block with
   `provider="Candela" ver="1"`, which MVR 1.6 asks other programs to keep without interpreting it. Version 1 holds the
@@ -529,6 +542,12 @@ Writing the result again gives the same bytes.
   merged under a group keeps its 79/13 layer counts. Textured models get their images in the GLB (each texture asked
   for once, one image for equal content, UV scale as a texture transform, deterministic bytes); missing, non-PNG/JPEG,
   throwing or absent texture sources are reported.
+* **`ExportSpecConformanceTests`.** What other consumers receive: every textured primitive has finite texture
+  coordinates (zeros without UVs) and finite positions; emission, transmission and index of refraction are written as
+  their glTF extensions (optional only); matrices and colours match the number patterns of `mvr.xsd` and read back as
+  the identical floats; a reader without Candela's data composes every object of a layer split at its world place and
+  layer, and Candela without its data imports them there too; a split export merged twice into the scene it came from
+  (every uuid remapped) is joined again, mounts and sibling order included.
 * **`CandelaDeviceRecordStalenessTests`.** The record carries the device's `FixtureTypeID` (a damaged `type` is
   reported); an object another program changed into a real fixture (the Briteq BT-FOG1500 of the repository, embedded
   or only referenced) keeps that fixture, with or without the device in the library; the device renamed and not
@@ -549,9 +568,11 @@ Writing the result again gives the same bytes.
   `Mappings`, are reported but not kept, so a document round trip drops them. Values outside an enumeration (for
   example `ScaleHandeling` `UpScale`, which the spec's own example uses) are reported and dropped the same way.
 * **Cables.** Connections carry ports only. Imported cables are straight two-node cables between the device origins.
-* **Model export.** Exported GLBs hold PNG/JPEG textures (other formats re-encoded as PNG by the caller) but not a
-  material's emissive luminance in cd/m² (glTF has only a 0 … 1 emissive colour), glTF animations are ignored on
-  import, and a truss's length is taken from its model bounds along X. The MVR module's own decode
+* **Model export.** Exported GLBs hold PNG/JPEG textures (other formats re-encoded as PNG by the caller); readers
+  without `KHR_materials_emissive_strength` see emission capped at the emissive colour, tangents are not written (they
+  are generated on import, by Candela and by other glTF readers), glTF animations are ignored on import, and a truss's
+  length is taken from its model bounds along X. Walls, floors and ceilings go out as grey boxes: their surface material
+  comes back in Candela from `UserData`, other programs see the box only. The MVR module's own decode
   (`MvrModelFiles.Decode`) leaves texture keys unset; the engine decodes glTF/GLB with the asset store's reader, which
   keeps them.
 * **Layers.** Other programs see an object whose children span layers once per layer (a GroupObject part on each
