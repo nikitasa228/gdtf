@@ -498,13 +498,18 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 var texts = _statusTexts;
                 texts.Update(recent ? _status : null, session.Selection.Count, session.Undo.UndoDescription, _ctx.Gpu.Context.Info.DeviceName,
                     _ctx.Timer.FramesPerSecond, _ctx.Timer.Elapsed);
+                // Real-time smoke that cannot keep up skips time: say so while it does.
+                var simulation = session.Engine?.Simulation;
+                bool smokeBehind = simulation is { IsSmokeBehindRealTime: true };
+                texts.UpdateSmoke(smokeBehind ? simulation!.SmokeDroppedFraction : -1, _ctx.Timer.Elapsed);
                 // Right part at the right edge, selection count after the message; a message too long for the space
                 // left is shortened with an ellipsis (whole text in the tooltip) instead of pushing the rest off the window.
                 float gap = 24 * scale;
                 string right = texts.Right;
                 float rightX = ImGui.GetWindowWidth() - ImGui.CalcTextSize(right).X - 16 * scale;
                 float selectionWidth = session.Selection.IsEmpty ? 0f : ImGui.CalcTextSize(texts.Selection).X + gap;
-                float leftSpace = rightX - gap - selectionWidth - ImGui.GetCursorPosX();
+                float smokeWidth = smokeBehind ? ImGui.CalcTextSize(texts.Smoke).X + gap : 0f;
+                float leftSpace = rightX - gap - selectionWidth - smokeWidth - ImGui.GetCursorPosX();
                 string left = _statusFit.Get(texts.Left, MathF.Max(0f, leftSpace));
                 SafeText.Colored(Theme.TextMuted, left);
                 if (_statusFit.IsShortened && ImGui.IsItemHovered())
@@ -512,6 +517,14 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 ImGui.SameLine(0, gap);
                 if (!session.Selection.IsEmpty)
                     SafeText.Colored(Theme.Accent, texts.Selection);
+                if (smokeBehind)
+                {
+                    ImGui.SameLine(0, gap);
+                    SafeText.Colored(Theme.Warning, texts.Smoke);
+                    if (ImGui.IsItemHovered())
+                        SafeText.Tooltip(Loc.Get(Str.StatusSmokeBehindTip));
+                }
+
                 ImGui.SameLine(MathF.Max(ImGui.GetCursorPosX() + 16, rightX));
                 SafeText.Colored(Theme.TextMuted, right);
                 ImGui.EndMenuBar();
@@ -912,6 +925,33 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         public string Selection { get; private set; } = "";
 
         public string Right { get; private set; } = "";
+
+        /// <summary>The "smoke behind real time" warning (valid while <see cref="UpdateSmoke"/> was given a share ≥ 0).</summary>
+        public string Smoke { get; private set; } = "";
+
+        private int _smokePercent = -1;
+        private double _smokeBuiltAt = double.NegativeInfinity;
+        private string _smokeLanguage = "";
+
+        /// <summary>Rebuilds the smoke warning for a skipped share of real time (refreshed twice a second; −1: none).</summary>
+        public void UpdateSmoke(double droppedShare, double now)
+        {
+            if (droppedShare < 0)
+            {
+                _smokePercent = -1;
+                return;
+            }
+
+            int percent = (int)Math.Round(Math.Clamp(droppedShare, 0, 1) * 100);
+            bool language = !string.Equals(_smokeLanguage, Loc.Language, StringComparison.Ordinal);
+            if (language || _smokePercent < 0 || (percent != _smokePercent && now - _smokeBuiltAt > 0.5))
+            {
+                _smokeLanguage = Loc.Language;
+                _smokePercent = percent;
+                _smokeBuiltAt = now;
+                Smoke = $"{Icons.TriangleAlert}  {Loc.Format(Str.StatusSmokeBehind, percent)}";
+            }
+        }
 
         public void Update(string? message, int selectionCount, string? undo, string device, double fps, double now)
         {

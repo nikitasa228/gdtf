@@ -135,7 +135,7 @@ public sealed class TickPipelineTests
         for (float d = 0.5f; d <= 3f; d += 0.5f)
             foreach (var dir in new[] { Vector3.UnitX, -Vector3.UnitX, Vector3.UnitY, -Vector3.UnitY })
                 near = MathF.Max(near, engine.Simulation.DensityAt(new Vector3(0, 0, 0.6f) + dir * d));
-        float far = engine.Simulation.DensityAt(smoke!.Bounds.Max - new Vector3(0.5f));
+        float far = engine.Simulation.DensityAt(smoke!.Current.Bounds.Max - new Vector3(0.5f));
         Assert.True(near > 0.01f, $"no haze near the machine ({near})");
         Assert.True(near > 10f * far, $"haze near {near} vs far corner {far}");
 
@@ -145,9 +145,9 @@ public sealed class TickPipelineTests
 
         // paused: the haze stays as it is
         engine.Settings.SimulationPaused = true;
-        double t = smoke.Time;
+        double t = smoke.Current.Time;
         engine.Tick(1);
-        Assert.Equal(t, smoke.Time);
+        Assert.Equal(t, smoke.Current.Time);
     }
 
     [Fact]

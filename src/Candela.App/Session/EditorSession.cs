@@ -69,6 +69,7 @@ internal sealed class EditorSession : IDisposable
     private string? _displaySource;
     private string _displayFileName = "";
     private bool _disposed;
+    private bool _engineClockHeld;
 
     /// <summary>Creates a session with a new, empty scene and its stage engine.</summary>
     public EditorSession(AppLog log, SettingsStore settings, EditorSessionOptions? options = null)
@@ -76,7 +77,8 @@ internal sealed class EditorSession : IDisposable
         _log = log ?? throw new ArgumentNullException(nameof(log));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _options = options ?? new EditorSessionOptions();
-        var engineOptions = _options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings);
+        // The editor ticks with wall-clock time: smoke is simulated in real time on its own threads (docs/simulation.md).
+        var engineOptions = (_options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings)) with { RealTimeSimulation = true };
         Engine = new StageEngine(engineOptions);
         // The cable tool's generic devices (splitters, nodes, dimmer) join the fixture library before any scene opens.
         GenericDeviceLibrary.Register(Engine);
@@ -118,9 +120,19 @@ internal sealed class EditorSession : IDisposable
 
     /// <summary>
     /// True while something else drives the engine clock (a render job rendering a timecode range ticks the engine at
-    /// the sequence's frame rate): <see cref="Update"/> must then not tick the engine with wall-clock time.
+    /// the sequence's frame rate): <see cref="Update"/> must then not tick the engine with wall-clock time, and the
+    /// smoke is simulated frame by frame (lockstep) instead of in real time.
     /// </summary>
-    public bool EngineClockHeld { get; set; }
+    public bool EngineClockHeld
+    {
+        get => _engineClockHeld;
+        set
+        {
+            _engineClockHeld = value;
+            if (Engine is { } engine)
+                engine.Simulation.RealTime = !value;
+        }
+    }
 
     /// <summary>True when the scene, its assets or its settings changed since it was opened or saved.</summary>
     public bool IsModified => _options.PreviewStage ? Scene.Version != _previewBaseline : EngineOrThrow.IsModified;

@@ -70,7 +70,7 @@ public sealed partial class StageEngine : IDisposable
         ElectricalProfiles = new LibraryFixtureProfileProvider(Library);
         Network = new NetworkSolver(ElectricalProfiles);
         Rigging = new RiggingAnalyzer(ElectricalProfiles);
-        Simulation = new StageSimulation(Options.SimulationParallelism);
+        Simulation = new StageSimulation(Options.SimulationParallelism, Options.RealTimeSimulation);
         Poses = new FixturePoses();
         Undo = new UndoStack();
         Selection = new Selection();
@@ -384,6 +384,7 @@ public sealed partial class StageEngine : IDisposable
         _autosave?.Dispose();
         _autosave = null;
         Protocols.Dispose();
+        Simulation.Dispose();
         _scene.Changed -= OnSceneChanged;
         _project.Assets.AssetChanged -= OnAssetChanged;
         Dmx.Dispose();

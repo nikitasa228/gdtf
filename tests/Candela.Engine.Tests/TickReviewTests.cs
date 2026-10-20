@@ -109,8 +109,8 @@ public sealed class TickReviewTests
                 engine.Tick(frame % 3 == 0 ? Frame : 0.5 * Frame);
             }
             var smoke = engine.Simulation.Smoke!;
-            var density = new float[smoke.CellCount];
-            smoke.CopyDensityTo(density);
+            var density = new float[smoke.Current.CellCount];
+            smoke.Current.CopyDensityTo(density);
             var lights = engine.Lights.ToArray().SelectMany(l => new[] { l.Position.X, l.Direction.X, l.Direction.Y, l.PeakCandela, l.Color.X, l.BeamAngle }).ToArray();
             return (density, lights);
         }

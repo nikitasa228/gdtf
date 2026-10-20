@@ -307,6 +307,8 @@ internal enum Str
     StatusReady,
     StatusSelected,
     StatusUndo,
+    StatusSmokeBehind,
+    StatusSmokeBehindTip,
     StatusModified,
     StatusDocsMissing,
     Search,

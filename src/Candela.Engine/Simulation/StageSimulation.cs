@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Candela.Core.Diagnostics;
 using Candela.Core.Math;
@@ -26,10 +27,16 @@ namespace Candela.Engine;
 /// <para><b>Noise.</b> Level = <c>noiseLevelDb</c> + 10·log₁₀(activity): a light's activity is
 /// <see cref="EngineSettings.IdleNoiseShare"/> + (1 − share) × its brightest beam's intensity (cooling fans follow the
 /// lamp load); an atmospheric device's activity is its largest output and it is silent when it does not run.</para>
-/// <para>Stepping uses the simulations' fixed sub-steps and is deterministic for a given sequence of frame times.
-/// Main thread only.</para>
+/// <para><b>Smoke solver thread.</b> The smoke solver runs on its own threads (<see cref="SmokeWorker"/>): each frame
+/// hands it the emitters and the frame time and takes the newest finished density grid, so a solver step never runs on
+/// the main thread. With <see cref="RealTime"/> off (the default: command-line renders, tests, offline sequences) every
+/// frame waits for its smoke, and the results are bit-identical to stepping the solver in the frame and deterministic
+/// for a given sequence of frame times. With <see cref="RealTime"/> on (the editor) the frame does not wait: the
+/// solver keeps up with wall-clock time on its own, at a cell size chosen from a time budget, and reports time it had to
+/// drop (<see cref="IsSmokeBehindRealTime"/>).</para>
+/// <para>Fire and sound are stepped in the frame (they are cheap). Main thread only.</para>
 /// </remarks>
-public sealed class StageSimulation
+public sealed class StageSimulation : IDisposable
 {
     /// <summary>Margin added around the scene content for the automatic smoke box, m.</summary>
     public const float AutomaticMargin = 2f;
@@ -51,18 +58,63 @@ public sealed class StageSimulation
     private bool _domainDirty = true;
     private bool _obstaclesDirty = true;
     private bool _automaticDomain;
+    private bool _realTime;
     private int _volumeCount;
 
-    /// <summary>Creates the simulations; <paramref name="parallelism"/> threads for the smoke solver (−1: all cores).</summary>
-    public StageSimulation(int parallelism = -1)
+    /// <summary>
+    /// Creates the simulations; <paramref name="parallelism"/> threads for the smoke solver (−1: all cores, in real time
+    /// all but one); <paramref name="realTime"/> sets <see cref="RealTime"/>.
+    /// </summary>
+    public StageSimulation(int parallelism = -1, bool realTime = false)
     {
         _parallelism = parallelism;
+        _realTime = realTime;
         Fire = new FireSimulation();
         Acoustics = new AcousticField();
     }
 
-    /// <summary>The smoke/haze simulation, or null while the scene has no smoke domain.</summary>
-    public SmokeSimulation? Smoke { get; private set; }
+    /// <summary>
+    /// The smoke/haze solver (on its own threads), or null while the scene has no smoke domain. Its
+    /// <see cref="SmokeWorker.Current"/> frame is the density the frame shows.
+    /// </summary>
+    public SmokeWorker? Smoke { get; private set; }
+
+    /// <summary>
+    /// Whether the smoke solver keeps up with wall-clock time on its own instead of finishing every frame's smoke before
+    /// the frame ends (see the remarks). The editor turns it on and off again while it renders a sequence frame by frame;
+    /// switching off returns to the requested cell size.
+    /// </summary>
+    public bool RealTime
+    {
+        get => _realTime;
+        set
+        {
+            if (_realTime == value)
+                return;
+            _realTime = value;
+            if (Smoke is { } smoke)
+            {
+                smoke.Timing = value ? SmokeTiming.RealTime : SmokeTiming.Lockstep;
+                if (!value)
+                    smoke.Synchronize();
+            }
+        }
+    }
+
+    /// <summary>
+    /// True while the real-time smoke does not keep up with wall-clock time (time is being dropped, or the solver failed):
+    /// the editor shows a warning. Always false with <see cref="RealTime"/> off.
+    /// </summary>
+    public bool IsSmokeBehindRealTime => _realTime && Smoke is { IsBehindRealTime: true };
+
+    /// <summary>Share of real time the smoke solver could not simulate over the last few seconds (0 … 1; 0 without smoke).</summary>
+    public double SmokeDroppedFraction => Smoke?.DroppedFraction ?? 0;
+
+    /// <summary>
+    /// Main-thread time of the last <see cref="Step"/> call, ms: building the emitters, fire, sound, handing the frame to
+    /// the smoke solver and taking its result (with <see cref="RealTime"/> off, also waiting for the smoke).
+    /// </summary>
+    public double LastStepMilliseconds { get; private set; }
 
     /// <summary>True when <see cref="Smoke"/> is the automatic box around the scene rather than an atmosphere volume.</summary>
     public bool IsAutomaticDomain => Smoke is not null && _automaticDomain;
@@ -91,7 +143,7 @@ public sealed class StageSimulation
     /// <summary>The noise sources of the last step as a span (no copy; valid until the next step).</summary>
     public ReadOnlySpan<Rendering.NoiseSource> NoiseSourceSpan => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_noiseSources);
 
-    /// <summary>Problems of the simulations (bad settings, ignored emitters, extra atmosphere volumes).</summary>
+    /// <summary>Problems of the simulations (bad settings, ignored emitters, extra atmosphere volumes, adapted cell size).</summary>
     public IReadOnlyList<Issue> Issues
     {
         get
@@ -103,8 +155,8 @@ public sealed class StageSimulation
         }
     }
 
-    /// <summary>Smoke density (0 … about 1) at a world point; 0 outside the domain or without smoke.</summary>
-    public float DensityAt(Vector3 point) => Smoke?.DensityAt(point) ?? 0f;
+    /// <summary>Smoke density (0 … about 1) at a world point in the current smoke frame; 0 outside the domain or without smoke.</summary>
+    public float DensityAt(Vector3 point) => Smoke?.Current.DensityAt(point) ?? 0f;
 
     /// <summary>Sound pressure level at a point, dB(A) (−∞ when silent).</summary>
     public float NoiseLevelAt(Vector3 point) => Acoustics.LevelAt(point);
@@ -112,6 +164,7 @@ public sealed class StageSimulation
     /// <summary>Discards all smoke, flames and time (scene replaced or simulation reset by the user).</summary>
     public void Reset()
     {
+        Smoke?.Dispose();
         Smoke = null;
         _smokeSettings = null;
         _automaticDomain = false;
@@ -125,6 +178,14 @@ public sealed class StageSimulation
         _soundSources.Clear();
         Acoustics.SetSources(ReadOnlySpan<SoundSource>.Empty);
         _issues.Clear();
+    }
+
+    /// <summary>Stops the smoke solver's threads (the engine disposes its simulation with itself).</summary>
+    public void Dispose()
+    {
+        Smoke?.Dispose();
+        Smoke = null;
+        _smokeSettings = null;
     }
 
     /// <summary>Called by the engine for scene changes that can affect the smoke domain or its obstacles.</summary>
@@ -155,20 +216,32 @@ public sealed class StageSimulation
     /// </summary>
     internal void Step(double deltaTime, Scene scene, FixturePoses poses, EngineSettings settings, bool paused)
     {
+        long start = Stopwatch.GetTimestamp();
         BuildEmitters(poses, settings);
         UpdateDomain(scene, settings);
         if (Smoke is not null && _obstaclesDirty) UpdateObstacles(scene);
 
-        if (paused || !(deltaTime > 0) || !double.IsFinite(deltaTime)) return;
-        Time += deltaTime;
+        if (!paused && deltaTime > 0 && double.IsFinite(deltaTime))
+        {
+            Time += deltaTime;
 
-        if (settings.SimulateFire && (_flameEmitters.Count > 0 || Fire.Volumes.Count > 0 || Fire.LightSamples.Length > 0))
-            Fire.Step(deltaTime, System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_flameEmitters));
-        if (settings.SimulateFire)
-            foreach (var e in Fire.SmokeEmitters) _smokeEmitters.Add(e);
+            if (settings.SimulateFire && (_flameEmitters.Count > 0 || Fire.Volumes.Count > 0 || Fire.LightSamples.Length > 0))
+                Fire.Step(deltaTime, System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_flameEmitters));
+            if (settings.SimulateFire)
+                foreach (var e in Fire.SmokeEmitters) _smokeEmitters.Add(e);
 
-        if (settings.SimulateSmoke && Smoke is not null)
-            Smoke.Step(deltaTime, System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_smokeEmitters));
+            if (settings.SimulateSmoke && Smoke is not null)
+                Smoke.Submit(deltaTime, System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_smokeEmitters));
+        }
+
+        // Real time: the newest smoke the solver has finished (it simulates on while the frame goes on); otherwise the
+        // smoke of this very frame, as if the solver had run here.
+        if (Smoke is { } smoke)
+        {
+            if (_realTime) smoke.AcquireLatest();
+            else smoke.Synchronize();
+        }
+        LastStepMilliseconds = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
     }
 
     private void BuildEmitters(FixturePoses poses, EngineSettings settings)
@@ -269,6 +342,7 @@ public sealed class StageSimulation
             }
             else if (Smoke is not null && !_automaticDomain)
             {
+                Smoke.Dispose();
                 Smoke = null;
                 _smokeSettings = null;
             }
@@ -295,7 +369,11 @@ public sealed class StageSimulation
 
     private void CreateSmoke(SmokeSimulationSettings settings, bool automatic)
     {
-        Smoke = new SmokeSimulation(settings);
+        // One solver thread per stage: a changed atmosphere volume replaces the simulation, not the thread.
+        if (Smoke is { } smoke)
+            smoke.Reconfigure(settings);
+        else
+            Smoke = new SmokeWorker(settings, new SmokeWorkerOptions { Timing = _realTime ? SmokeTiming.RealTime : SmokeTiming.Lockstep });
         _smokeSettings = settings;
         _automaticDomain = automatic;
         _obstaclesDirty = true;
