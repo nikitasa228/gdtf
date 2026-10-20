@@ -337,6 +337,26 @@ public partial class WheelInsertionTests(ITestOutputHelper output)
         Assert.True(Evaluate(p, buffer).Beams[0].PrismFacets >= 3);
     }
 
+    [Fact]
+    public void A_wheel_shake_with_a_slot_per_range_shakes_that_gobo()
+    {
+        // ADJ Focus Hybrid "Gobo1WheelShake": 'Gobo Shake 1' … 'Gobo Shake 8', each range naming its slot; read as a
+        // shake of the whole wheel it stayed on the open slot
+        var p = TestData.Profile("ADJ@Focus_Hybrid", "Basic Mode 19ch Pan540");
+        var buffer = OpenWhite(p);
+        int ch = Channel(p, "Gobo1");
+        var f = p.Functions.Single(fn => fn.Channel == ch && fn.Attribute == "Gobo1WheelShake");
+        Assert.Equal(AttributeKind.WheelSelectShake, f.Class.Kind);
+        var set = f.Sets.First(st => st.Name == "Gobo Shake 1");
+        buffer.SetValue(ch, set.DmxFrom + 2);
+        var s = Evaluate(p, buffer);
+        var w = s.Beams[0].Gobos[0];
+        Assert.True(Inserted(w), $"slot {w.Slot} open {w.IsOpen}");
+        Assert.Equal(set.WheelSlot, w.Slot);
+        Assert.True(s.IsAnimating);
+        Assert.True(w.ShakeFrequency > 0f);
+    }
+
     private static FixtureState Evaluate(FixtureProfile p, FixtureDmxBuffer buffer, double time = 0) => FixtureEvaluator.Evaluate(p, buffer, time);
 
     private static FixtureDmxBuffer OpenWhite(FixtureProfile p)

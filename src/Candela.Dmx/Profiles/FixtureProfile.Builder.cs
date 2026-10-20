@@ -352,6 +352,10 @@ public sealed partial class FixtureProfile
                     : AttributeClass.Ignored;
                 Warnings.Add($"{src.FullName}: Dimmer function on a '{ch.Attribute}' channel read as {(cls.Kind == AttributeKind.Ignored ? "no intensity" : ch.Attribute)}.");
             }
+            // "Gobo Shake 1", "Gobo Shake 2" … written as a whole-wheel shake with a slot per range (ADJ Focus Hybrid
+            // "Gobo1WheelShake"): each range selects its slot and shakes it, as Gobo(n)SelectShake does
+            if (cls.Kind == AttributeKind.WheelShake && src.Wheel is not null && src.ChannelSets.Exists(s => s.WheelSlotIndex > 0))
+                cls = cls with { Kind = AttributeKind.WheelSelectShake };
             float physicalFrom = Finite(src.PhysicalFrom, 0f), physicalTo = Finite(src.PhysicalTo, 1f);
             // GDTF's default physical range 0 … 1 is a placeholder unless channel sets carry the real values
             bool defaultRange = IsDefaultRange(physicalFrom, physicalTo);
