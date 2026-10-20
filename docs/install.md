@@ -169,6 +169,10 @@ candela info сцена.mvr --library "D:\GDTF"
   производителя видеокарты (сообщение называет вашу видеокарту и предлагает открыть страницу загрузки драйвера) и
   запустите Candela снова. На компьютере без подходящей видеокарты (например, в виртуальной машине) Candela не
   работает.
+* **«Не найдена среда выполнения Microsoft Visual C++ 2015-2022 (x64)»** — программа установки ставит её сама, но
+  не если запрос прав администратора был отклонён или её собственная установка не удалась. Установите её с сайта
+  Microsoft (<https://aka.ms/vs/17/release/vc_redist.x64.exe>; сообщение предлагает скачать её) и запустите Candela
+  снова.
 * **«Candela остановлена из-за ошибки»** — редактор записал отчёт `crash-<дата>-<время>.txt` в
   `%LOCALAPPDATA%\Candela\logs` и предлагает открыть эту папку. Несохранённая работа, сохранённая автосохранением
   (каждые 5 минут), будет предложена к восстановлению при следующем запуске.
@@ -354,6 +358,9 @@ the fixture library folder are **never** removed. The Visual C++ runtime stays (
 * **"Candela cannot start … needs a graphics card with a Vulkan 1.3 driver"** — install a current driver from the
   GPU maker (the message names your graphics card and offers to open the driver download page) and start Candela
   again. Without a suitable GPU (in a virtual machine, for example) Candela does not run.
+* **"The Microsoft Visual C++ 2015-2022 runtime (x64) is missing"** — Setup installs it, but not when its
+  administrator prompt was declined or its own setup failed. Install it from Microsoft
+  (<https://aka.ms/vs/17/release/vc_redist.x64.exe>; the message offers to download it) and start Candela again.
 * **"Candela stopped because of an error"** — the editor wrote `crash-<date>-<time>.txt` into
   `%LOCALAPPDATA%\Candela\logs` and offers to open the folder. Work kept by the autosave (every 5 minutes) is offered
   for recovery at the next start.

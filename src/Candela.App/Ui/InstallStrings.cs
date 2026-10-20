@@ -58,6 +58,11 @@ internal enum InstallStr
     NoVulkanLog,
     NoVulkanOpenPage,
 
+    // Native message box: the Microsoft Visual C++ runtime is missing
+    VcRuntimeTitle,
+    VcRuntimeText,
+    VcRuntimeOpenPage,
+
     // Native message boxes: crash report
     CrashTitle,
     CrashText,
@@ -140,6 +145,12 @@ internal static class InstallLoc
         (InstallStr.NoVulkanVendorUnknown, "Your graphics adapter: {0}.", "Ваш видеоадаптер: {0}."),
         (InstallStr.NoVulkanLog, "Details are in the log: {0}", "Подробности — в журнале: {0}"),
         (InstallStr.NoVulkanOpenPage, "Open the driver download page now?", "Открыть страницу загрузки драйвера?"),
+
+        (InstallStr.VcRuntimeTitle, "Candela cannot start", "Candela не может запуститься"),
+        (InstallStr.VcRuntimeText,
+            "The Microsoft Visual C++ 2015-2022 runtime (x64) is missing ({0}). Candela's user interface libraries need it; Setup installs it, but here it was not installed (cancelled, no administrator rights, or a copied program folder).\n\nPlease install it from Microsoft:\n  {1}\nand start Candela again.\n\nDetails are in the log: {2}",
+            "Не найдена среда выполнения Microsoft Visual C++ 2015-2022 (x64) ({0}). Она нужна библиотекам интерфейса Candela; программа установки ставит её, но здесь она не установлена (установка отменена, нет прав администратора или папка программы скопирована вручную).\n\nУстановите её с сайта Microsoft:\n  {1}\nи запустите Candela снова.\n\nПодробности — в журнале: {2}"),
+        (InstallStr.VcRuntimeOpenPage, "Download it now?", "Скачать её сейчас?"),
 
         (InstallStr.CrashTitle, "Candela stopped because of an error", "Candela остановлена из-за ошибки"),
         (InstallStr.CrashText,

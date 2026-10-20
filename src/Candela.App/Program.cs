@@ -60,7 +60,7 @@ internal static class Program
             // Start-up failures outside the frame loop (the loop itself never lets exceptions out).
             log.Error("Fatal", "The editor stopped", e);
             string? report = CrashReport.Write(AppFolders.LogsDirectory, "The editor stopped because of an exception.", e, log);
-            CrashReport.Notify(app.Started, report, interactive, log);
+            NotifyFailure(app.Started, report, interactive, log);
             reported = true;
             exitCode = ExitCodes.Failure;
         }
@@ -81,9 +81,20 @@ internal static class Program
             // The editor could not start (no display, no window) or its frame loop gave up: a report for the user too.
             string what = app.FailureReason ?? (app.Started ? "The editor stopped." : "The editor could not start.");
             string? report = CrashReport.Write(AppFolders.LogsDirectory, what, null, log);
-            CrashReport.Notify(app.Started, report, interactive, log);
+            NotifyFailure(app.Started, report, interactive, log);
         }
 
         return exitCode;
+    }
+
+    /// <summary>
+    /// Tells the user why the editor stopped: a start that failed because the Microsoft Visual C++ runtime is missing
+    /// (the window libraries cannot load) names the runtime and its download; everything else gets the crash report.
+    /// </summary>
+    private static void NotifyFailure(bool started, string? report, bool interactive, AppLog log)
+    {
+        if (!started && VcRuntime.ReportIfMissing(interactive, log))
+            return;
+        CrashReport.Notify(started, report, interactive, log);
     }
 }

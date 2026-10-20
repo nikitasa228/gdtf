@@ -597,6 +597,31 @@ public sealed partial class InstallExperienceTests : IDisposable
     }
 
     [Fact]
+    public void A_missing_visual_cpp_runtime_is_named_with_its_download_instead_of_a_generic_report()
+    {
+        // Review regression: without the runtime (Setup's runtime install declined or failed, a copied folder) GLFW and
+        // cimgui cannot load and the user only read "Candela could not start" with a crash report.
+        var none = VcRuntime.Missing(name => false);
+        Assert.Equal(VcRuntime.Libraries, none);
+        Assert.Empty(VcRuntime.Missing(name => true));
+        Assert.Equal(new[] { "vcruntime140_1.dll" }, VcRuntime.Missing(name => name == "vcruntime140.dll"));
+        Assert.Equal(VcRuntime.Libraries, VcRuntime.Missing(name => throw new BadImageFormatException()));
+        // this test host has what it needs (nothing is missing outside Windows)
+        if (!OperatingSystem.IsWindows())
+            Assert.Empty(VcRuntime.Missing());
+
+        string en = VcRuntime.Message(none, @"C:\Users\Иван\AppData\Local\Candela\logs\candela-app.log");
+        Assert.Contains("vcruntime140.dll, vcruntime140_1.dll", en, StringComparison.Ordinal);
+        Assert.Contains(VcRuntime.DownloadUrl, en, StringComparison.Ordinal);
+        Assert.Contains("candela-app.log", en, StringComparison.Ordinal);
+        Loc.SetLanguage("ru");
+        string ru = VcRuntime.Message(none, "log.txt");
+        Assert.Contains("Visual C++", ru, StringComparison.Ordinal);
+        Assert.Contains("Установите", ru, StringComparison.Ordinal);
+        Assert.Contains(VcRuntime.DownloadUrl, ru, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void A_release_file_version_sorts_after_its_previews()
     {
         // Review regression: the release was 0.1.0.0 and its previews 0.1.0.N, so the installer of the release took the
