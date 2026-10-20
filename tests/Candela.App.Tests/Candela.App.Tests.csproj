@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="../../src/Candela.App/Candela.App.csproj" />
+    <!-- candela.dll next to the tests: the editor's path tracer is compared with the command line (render, final mode) run in its own process. -->
+    <ProjectReference Include="../../src/Candela.Cli/Candela.Cli.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="StbImageSharp" />

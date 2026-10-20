@@ -67,6 +67,8 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
     private (int Frame, int Count, int Done, int Total, bool Preparing, RenderMode Mode, string Lang) _progressKey;
     private string _timeText = "";
     private (long Seconds, int Permille, string Lang) _timeKey = (-1, -1, "");
+    private string? _note;
+    private (string Device, string Lang) _noteKey;
     private string? _rangeError;
     private string? _folderHint;
     private UiTexture? _preview;
@@ -131,6 +133,27 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
 
     /// <summary>True when the path tracer cannot run on the editor's GPU (no ray queries): renders use the Fast mode.</summary>
     internal bool PathTracerUnavailable => _stage.Tools.RendererInfo is { SupportsRayTracing: false };
+
+    /// <summary>
+    /// The note under the renderer row while the path tracer is chosen but cannot run on this GPU (no ray queries): the
+    /// render will use the Fast mode. Null otherwise.
+    /// </summary>
+    internal string? RendererNote
+    {
+        get
+        {
+            if (_mode != RenderMode.PathTraced || _stage.Tools.RendererInfo is not { SupportsRayTracing: false } info)
+                return null;
+            var key = (info.DeviceName, Loc.Language);
+            if (key != _noteKey || _note is null)
+            {
+                _noteKey = key;
+                _note = StageLoc.Format(StageStr.RenderNoRayTracing, info.DeviceName);
+            }
+
+            return _note;
+        }
+    }
 
     /// <summary>The text of the last progress line drawn (tests).</summary>
     internal string ProgressText => _progressText;
@@ -314,12 +337,12 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
 
         if (ImGui.IsItemHovered())
             SafeText.Tooltip(StageLoc.Get(StageStr.RenderModeHint));
-        if (_mode == RenderMode.PathTraced && PathTracerUnavailable)
+        if (RendererNote is { } note)
         {
             PropertyGrid.Row("");
             ImGui.PushStyleColor(ImGuiCol.Text, Theme.Warning);
             ImGui.PushTextWrapPos(0f);
-            ImGui.TextUnformatted(StageLoc.Format(StageStr.RenderNoRayTracing, _stage.Tools.RendererInfo?.DeviceName ?? "GPU"));
+            ImGui.TextUnformatted(note);
             ImGui.PopTextWrapPos();
             ImGui.PopStyleColor();
         }
