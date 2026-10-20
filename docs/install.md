@@ -480,6 +480,15 @@ this in a prefix whose user is "Иван Петров" (Cyrillic letters and a s
 upgrade in place that keeps a file the user put into the program folder, an uninstall that leaves only that file and
 the settings, the first-run window's Default folder → files copied in Explorer → **Rescan** → sample scene flow from
 `C:\Program Files\Свет Тест\Candela`, the CLI's import worker (assimp) on a Cyrillic file name, and the message for a
-missing Visual C++ runtime (`WINEDLLOVERRIDES="vcruntime140=d;vcruntime140_1=d"`). Not covered by Wine:
-the Visual C++ redistributable's own setup (a 32-bit bootstrapper; a 64-bit-only prefix cannot run it), Windows
-Firewall, SmartScreen and real GPU drivers.
+missing Visual C++ runtime (`WINEDLLOVERRIDES="vcruntime140=d;vcruntime140_1=d"`). A second review drove Setup's
+pages with the keyboard in Russian (language choice, read-me, install mode, components, firewall page, folder, the
+finish page) for an upgrade in place of the previous build in `C:\Program Files\Свет (тест)\Candela`, uninstalled
+through the uninstaller's pages with "remove my settings" ticked (program folder, shortcuts, associations, registry
+entries and `%APPDATA%`/`%LOCALAPPDATA%\Candela` gone; Documents, the fixture library and projects kept), ran a
+per-user silent install for a fresh user "Иван Петров", the editor's real first start (the Fixture Library window
+opens by itself), the setup window with a Cyrillic folder, and checked the imports of every native DLL of the build
+with `objdump` (only Windows' own DLLs, `vulkan-1.dll` and `vcruntime140*.dll`). Not covered by Wine:
+the Visual C++ redistributable's own setup (a 32-bit bootstrapper; a 64-bit-only prefix cannot run it — Setup then
+says so and the editor names the runtime and its download at start), Windows Firewall, SmartScreen and real GPU
+drivers. Under Wine the command-line tool needs an X display for Vulkan (`winevulkan` goes through the X11 driver);
+on Windows it does not.
