@@ -80,6 +80,16 @@ public sealed partial class SmokeSimulation
 
     /// <summary>Creates a simulation for <paramref name="settings"/> (invalid values are replaced and reported in <see cref="Issues"/>).</summary>
     public SmokeSimulation(SmokeSimulationSettings settings)
+        : this(settings, null)
+    {
+    }
+
+    /// <summary>
+    /// Creates a simulation whose parallel slices run on <paramref name="scheduler"/> (null: the shared thread pool).
+    /// <see cref="SmokeWorker"/> passes its own below-normal-priority threads, so the solver never competes with the
+    /// main thread for the thread pool. Results do not depend on the scheduler.
+    /// </summary>
+    internal SmokeSimulation(SmokeSimulationSettings settings, TaskScheduler? scheduler)
     {
         ArgumentNullException.ThrowIfNull(settings);
         _settings = Sanitize(settings, _issues);
@@ -126,6 +136,8 @@ public sealed partial class SmokeSimulation
         {
             MaxDegreeOfParallelism = _settings.MaxDegreeOfParallelism > 0 ? _settings.MaxDegreeOfParallelism : -1,
         };
+        if (scheduler is not null)
+            _parallelOptions.TaskScheduler = scheduler;
         _parallel = _cellCount >= ParallelThreshold && _settings.MaxDegreeOfParallelism != 1;
         if (_settings.PressurePreconditioner == PressurePreconditioner.Multigrid)
         {
@@ -208,8 +220,17 @@ public sealed partial class SmokeSimulation
     /// </summary>
     /// <param name="deltaTime">Frame time, s.</param>
     /// <param name="emitters">Hazers, fog machines, fans and plumes active during this frame.</param>
-    public int Step(double deltaTime, ReadOnlySpan<SmokeEmitter> emitters)
+    public int Step(double deltaTime, ReadOnlySpan<SmokeEmitter> emitters) =>
+        StepCapped(deltaTime, emitters, _settings.MaxSubStepsPerCall);
+
+    /// <summary>
+    /// <see cref="Step(double, ReadOnlySpan{SmokeEmitter})"/> with an explicit sub-step cap (at least 1) instead of
+    /// <see cref="SmokeSimulationSettings.MaxSubStepsPerCall"/>: a real-time worker that falls behind caps each call by
+    /// how many sub-steps it can finish in time, so its results never lag far behind the frames that drive it.
+    /// </summary>
+    internal int StepCapped(double deltaTime, ReadOnlySpan<SmokeEmitter> emitters, int maxSubSteps)
     {
+        maxSubSteps = Math.Max(1, maxSubSteps);
         if (!double.IsFinite(deltaTime) || deltaTime <= 0)
         {
             _statistics = _statistics with { SubSteps = 0, DroppedTime = 0 };
@@ -222,7 +243,7 @@ public sealed partial class SmokeSimulation
         // The small tolerance keeps e.g. 30 calls of 1/30 s from losing a step to rounding.
         while (_accumulator + 1e-9 * _dt >= _dt)
         {
-            if (steps >= _settings.MaxSubStepsPerCall)
+            if (steps >= maxSubSteps)
             {
                 double whole = Math.Floor((_accumulator + 1e-9 * _dt) / _dt) * _dt;
                 dropped = whole;
@@ -549,7 +570,8 @@ public sealed partial class SmokeSimulation
 
     private static bool IsFinite(Vector3 v) => float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z);
 
-    private static SmokeSimulationSettings Sanitize(SmokeSimulationSettings s, List<Issue> issues)
+    /// <summary>Replaces invalid settings by their defaults, adding an issue for each (shared with <see cref="SmokeWorker"/>).</summary>
+    internal static SmokeSimulationSettings Sanitize(SmokeSimulationSettings s, List<Issue> issues)
     {
         void Report(string name, object value, object replacement) => issues.Add(new Issue(IssueSeverity.Warning, IssueCategory.Scene,
             "simulation.invalid-setting", $"Smoke simulation setting {name} = {value} is invalid; using {replacement}."));
@@ -629,7 +651,12 @@ public sealed partial class SmokeSimulation
         };
     }
 
-    private static (int Nx, int Ny, int Nz, float H, Aabb Bounds) LayoutGrid(SmokeSimulationSettings s, List<Issue> issues)
+    /// <summary>
+    /// The grid for sanitised settings: the requested cell size, enlarged until the cell budget holds (with a note), and
+    /// the box rounded up to whole cells around its centre. Shared with <see cref="SmokeWorker"/>, which lays out its
+    /// grids before the simulation exists.
+    /// </summary>
+    internal static (int Nx, int Ny, int Nz, float H, Aabb Bounds) LayoutGrid(SmokeSimulationSettings s, List<Issue> issues)
     {
         var size = Vector3.Max(s.Bounds.Size, new Vector3(1e-3f));
         float h = s.CellSize;
