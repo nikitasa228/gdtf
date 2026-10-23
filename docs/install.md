@@ -487,7 +487,12 @@ through the uninstaller's pages with "remove my settings" ticked (program folder
 entries and `%APPDATA%`/`%LOCALAPPDATA%\Candela` gone; Documents, the fixture library and projects kept), ran a
 per-user silent install for a fresh user "Иван Петров", the editor's real first start (the Fixture Library window
 opens by itself), the setup window with a Cyrillic folder, and checked the imports of every native DLL of the build
-with `objdump` (only Windows' own DLLs, `vulkan-1.dll` and `vcruntime140*.dll`). Not covered by Wine:
+with `objdump` (only Windows' own DLLs, `vulkan-1.dll` and `vcruntime140*.dll`). The build with the smoke overlay and
+the fixes for the UI scale, the library hover previews and the lens artefacts was checked the same way: a silent
+install into `C:\Program Files\Свет Тест\Candela` (registry entries, shortcuts, associations), `candela.exe --help`
+(listing `--overlay smoke`), `info` and `render-test`, renders of the sample with `--look demo` and with
+`--overlay smoke --haze 0.02` (the smoke summary and the greyed, tinted picture), the editor's start with the library
+thumbnails as Dear ImGui textures, and a silent uninstall that leaves nothing behind. Not covered by Wine:
 the Visual C++ redistributable's own setup (a 32-bit bootstrapper; a 64-bit-only prefix cannot run it — Setup then
 says so and the editor names the runtime and its download at start), Windows Firewall, SmartScreen and real GPU
 drivers. Under Wine the command-line tool needs an X display for Vulkan (`winevulkan` goes through the X11 driver);
