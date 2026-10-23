@@ -171,17 +171,19 @@ internal sealed unsafe class UiTextures : IDisposable
 
     /// <summary>
     /// Destroys every texture now (the GPU must be idle and the backend alive: called before the Dear ImGui backend shuts
-    /// down).
+    /// down). Without a renderer backend (headless) only the CPU side is freed.
     /// </summary>
     public void Dispose()
     {
         if (_disposed)
             return;
         _disposed = true;
+        bool backend = !ImGui.GetCurrentContext().IsNull && ImGui.GetIO().BackendRendererUserData != null;
         foreach (var handle in _live.Concat(_releasing))
         {
             var data = (ImTextureData*)handle;
-            if (data->Status is ImTextureStatus.Ok or ImTextureStatus.WantUpdates or ImTextureStatus.WantDestroy && data->TexID != new ImTextureID(0UL))
+            if (backend && data->Status is ImTextureStatus.Ok or ImTextureStatus.WantUpdates or ImTextureStatus.WantDestroy &&
+                data->TexID != new ImTextureID(0UL))
             {
                 data->Status = ImTextureStatus.WantDestroy;
                 data->UnusedFrames = int.MaxValue / 2;
