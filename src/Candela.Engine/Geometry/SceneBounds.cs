@@ -43,6 +43,37 @@ public static class SceneBounds
     }
 
     /// <summary>
+    /// The lowest point the visible content rests on (world Z, m), or null when there is no content: the bottom of every
+    /// component with an extent of its own (walls, floors, images, trusses, models with known bounds) and the position of
+    /// every other entity that counts as content (fixtures, consoles, power sources, hoists, models that cannot be
+    /// decoded). Such an entity's origin is the point it stands on or hangs from (a floor-standing fixture's base);
+    /// <see cref="Compute"/> puts a framing box of ± <see cref="DefaultHalfExtent"/> around it, which would reach below
+    /// the floor it stands on. Non-finite values are ignored.
+    /// </summary>
+    public static float? LowestPoint(Scene scene, Func<Guid, Aabb?>? modelBounds = null)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        float lowest = float.PositiveInfinity;
+        foreach (var entity in scene.All())
+        {
+            if (!entity.IsVisibleInHierarchy) continue;
+            var world = entity.WorldMatrix;
+            bool any = false;
+            foreach (var component in entity.Components)
+            {
+                if (component is not (WallComponent or ImageComponent or TrussComponent or MeshComponent)) continue;
+                if (!TryLocalBox(component, modelBounds, out var box)) continue;
+                var transformed = box.Transform(world);
+                if (!IsFinite(transformed)) continue;
+                lowest = MathF.Min(lowest, transformed.Min.Z);
+                any = true;
+            }
+            if (!any && CountsAsPoint(entity) && IsFinite(world.Translation)) lowest = MathF.Min(lowest, world.Translation.Z);
+        }
+        return float.IsFinite(lowest) ? lowest : null;
+    }
+
+    /// <summary>
     /// Appends the world-space corners of every visible entity's content box (8 per box; a single point for an entity
     /// without a known extent) to <paramref name="corners"/>: a tighter hull of the content than <see cref="Compute"/>'s
     /// box, for framing views (<see cref="ViewFraming.Frame(ReadOnlySpan{Vector3}, Vector3, float, float, float)"/>).

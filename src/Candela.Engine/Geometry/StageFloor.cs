@@ -12,10 +12,11 @@ namespace Candela.Engine;
 /// step, when it opens a floorless MVR; both use <see cref="CreateIfMissing"/>.
 /// <para>
 /// The floor is a <see cref="WallKind.Floor"/> wall of <see cref="MaterialIds.WoodStage"/>, <see cref="Thickness"/> thick,
-/// covering the content's footprint plus <see cref="Margin"/> on every side, with its top face at the content's lowest
-/// point (at most Z = 0, the stage level of right-handed Z-up scenes). A scene has a floor when it holds a floor wall
-/// (visible or not: a hidden floor is the user's choice), or when an imported model reaches down to the content's
-/// lowest point and covers at least <see cref="ModelCoverage"/> of its footprint — a venue or set model brings its own
+/// covering the content's footprint plus <see cref="Margin"/> on every side, with its top face at the lowest point the
+/// content rests on (<see cref="SceneBounds.LowestPoint"/>: a floor-standing fixture's base, not the framing box around
+/// it; at most Z = 0, the stage level of right-handed Z-up scenes). A scene has a floor when it holds a floor wall
+/// (visible or not: a hidden floor is the user's choice), or when an imported model reaches down to that lowest point
+/// and covers at least <see cref="ModelCoverage"/> of the content's footprint — a venue or set model brings its own
 /// floor, and a second one at the same height would only z-fight with it.
 /// </para>
 /// </summary>
@@ -28,7 +29,7 @@ public static class StageFloor
     public const float Thickness = 0.1f;
 
     /// <summary>
-    /// A model whose bottom lies within this distance of the content's lowest point (m) can be the venue's floor
+    /// A model whose bottom lies within this distance of the lowest point the content rests on (m) can be the venue's floor
     /// (see <see cref="ModelCoverage"/>).
     /// </summary>
     public const float ModelFloorTolerance = 0.05f;
@@ -48,8 +49,9 @@ public static class StageFloor
     {
         ArgumentNullException.ThrowIfNull(scene);
         if (HasFloorWall(scene)) return true;
+        modelBounds = Cached(modelBounds);
         var content = SceneBounds.Compute(scene, modelBounds);
-        return !content.IsEmpty && HasFloorModel(scene, modelBounds, content);
+        return !content.IsEmpty && SceneBounds.LowestPoint(scene, modelBounds) is { } lowest && HasFloorModel(scene, modelBounds, content, lowest);
     }
 
     /// <summary>
@@ -61,14 +63,16 @@ public static class StageFloor
     {
         ArgumentNullException.ThrowIfNull(scene);
         if (HasFloorWall(scene)) return null;
+        modelBounds = Cached(modelBounds);
         var content = SceneBounds.Compute(scene, modelBounds);
-        if (content.IsEmpty || !IsFinite(content.Min) || !IsFinite(content.Max) || HasFloorModel(scene, modelBounds, content))
+        if (content.IsEmpty || !IsFinite(content.Min) || !IsFinite(content.Max) || SceneBounds.LowestPoint(scene, modelBounds) is not { } lowest ||
+            HasFloorModel(scene, modelBounds, content, lowest))
             return null;
 
         var size = new Vector2(content.Size.X + 2f * Margin, content.Size.Y + 2f * Margin);
         var floor = new Entity(string.IsNullOrWhiteSpace(name) ? DefaultName : name)
         {
-            Local = new Transform(new Vector3(content.Center.X, content.Center.Y, MathF.Min(0f, content.Min.Z)), Quaternion.Identity, Vector3.One),
+            Local = new Transform(new Vector3(content.Center.X, content.Center.Y, MathF.Min(0f, lowest)), Quaternion.Identity, Vector3.One),
         };
         floor.Add(new WallComponent
         {
@@ -110,8 +114,8 @@ public static class StageFloor
         return false;
     }
 
-    /// <summary>A visible model reaches down to the content's lowest point and covers most of its footprint.</summary>
-    private static bool HasFloorModel(Scene scene, Func<Guid, Aabb?>? modelBounds, Aabb content)
+    /// <summary>A visible model reaches down to the lowest point the content rests on and covers most of its footprint.</summary>
+    private static bool HasFloorModel(Scene scene, Func<Guid, Aabb?>? modelBounds, Aabb content, float lowest)
     {
         if (modelBounds is null) return false;
         float footprint = MathF.Max(content.Size.X, 1e-3f) * MathF.Max(content.Size.Y, 1e-3f);
@@ -119,13 +123,33 @@ public static class StageFloor
         {
             if (!entity.IsVisibleInHierarchy) continue;
             var box = SceneBounds.Of(entity, modelBounds);
-            if (box.IsEmpty || box.Min.Z > content.Min.Z + ModelFloorTolerance) continue;
+            if (box.IsEmpty || box.Min.Z > lowest + ModelFloorTolerance) continue;
             float overlapX = MathF.Min(box.Max.X, content.Max.X) - MathF.Max(box.Min.X, content.Min.X);
             float overlapY = MathF.Min(box.Max.Y, content.Max.Y) - MathF.Max(box.Min.Y, content.Min.Y);
             if (overlapX > 0f && overlapY > 0f && overlapX * overlapY >= ModelCoverage * footprint) return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// <paramref name="modelBounds"/> asked once per model asset: the bounds of a decoded model are computed from all its
+    /// vertices, and one model (a truss piece, a chair) is often placed hundreds of times.
+    /// </summary>
+    private static Func<Guid, Aabb?>? Cached(Func<Guid, Aabb?>? modelBounds)
+    {
+        if (modelBounds is null) return null;
+        var known = new Dictionary<Guid, Aabb?>();
+        return id =>
+        {
+            if (!known.TryGetValue(id, out var bounds))
+            {
+                bounds = modelBounds(id);
+                known[id] = bounds;
+            }
+
+            return bounds;
+        };
     }
 
     private static bool IsFinite(Vector3 v) => float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z);

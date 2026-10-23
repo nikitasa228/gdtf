@@ -156,8 +156,44 @@ public sealed class StageFloorTests
         broken.Add(new FixtureComponent());
         scene.Add(broken);
         var floor = StageFloor.CreateIfMissing(scene)!;
-        Assert.Equal(-2f - SceneBounds.DefaultHalfExtent, floor.Local.Position.Z, 4);
+        // The pit light stands at Z = −2 (its origin is its base): the floor's top face is there, not 0.3 m lower where
+        // the framing box around it ends.
+        Assert.Equal(-2f, floor.Local.Position.Z, 4);
         Assert.True(float.IsFinite(floor.Local.Position.X) && float.IsFinite(StageFloor.SizeOf(floor).X));
+    }
+
+    [Fact]
+    public void Fixtures_and_devices_standing_on_the_stage_stand_on_the_floor_not_above_it()
+    {
+        // A rig over the stage with floor-standing fixtures and a console at Z = 0: their origins are their bases.
+        var scene = new Scene("floor rig");
+        foreach (var (name, at) in new[] { ("Hanging", new Vector3(0f, 0f, 6f)), ("Floor spot", new Vector3(2f, 1f, 0f)), ("Floor wash", new Vector3(-2f, 1f, 0f)) })
+        {
+            var fixture = new Entity(name) { Local = new Transform(at, Quaternion.Identity, Vector3.One) };
+            fixture.Add(new FixtureComponent());
+            scene.Add(fixture);
+        }
+
+        var console = new Entity("Desk") { Local = new Transform(new Vector3(0f, -6f, 0f), Quaternion.Identity, Vector3.One) };
+        console.Add(new ConsoleComponent());
+        scene.Add(console);
+        Assert.Equal(0f, SceneBounds.LowestPoint(scene));
+        var floor = StageFloor.CreateIfMissing(scene)!;
+        Assert.Equal(0f, floor.Local.Position.Z, 4);
+        // The footprint still covers the framing boxes, with the margin.
+        var content = SceneBounds.Compute(scene);
+        Assert.Equal(content.Size.X + 2f * StageFloor.Margin, StageFloor.SizeOf(floor).X, 3);
+        Assert.Equal(content.Size.Y + 2f * StageFloor.Margin, StageFloor.SizeOf(floor).Y, 3);
+
+        // Hidden content, groups and damaged positions do not count; an empty scene has no lowest point.
+        var hidden = new Entity("Hidden pit") { Visible = false, Local = new Transform(new Vector3(0f, 0f, -5f), Quaternion.Identity, Vector3.One) };
+        hidden.Add(new FixtureComponent());
+        scene.Add(hidden);
+        var broken = new Entity("Broken") { Local = new Transform(new Vector3(0f, 0f, float.NegativeInfinity), Quaternion.Identity, Vector3.One) };
+        broken.Add(new FixtureComponent());
+        scene.Add(broken);
+        Assert.Equal(0f, SceneBounds.LowestPoint(scene));
+        Assert.Null(SceneBounds.LowestPoint(new Scene("empty")));
     }
 
     [Fact]
@@ -186,8 +222,19 @@ public sealed class StageFloorTests
         Assert.Null(StageFloor.CreateIfMissing(engine.Scene, engine.Models.GetBounds));
         Assert.Null(StageFloor.AddIfMissing(engine));
 
-        // Hidden, it is not the floor any more; without model bounds it is unknown and does not count either.
+        // Lowered so its top is the stage level, with a floor-standing fixture on it: still the floor (the fixture's
+        // framing box reaches 0.3 m below the slab's top, its base does not).
         var venueEntity = engine.Scene.Find(venue.Entities[0])!;
+        var placed = venueEntity.Local;
+        venueEntity.Local = new Transform(placed.Position - new Vector3(0f, 0f, 0.3f), placed.Rotation, placed.Scale);
+        var floorSpot = new Entity("Floor spot") { Local = new Transform(new Vector3(1f, 1f, 0f), Quaternion.Identity, Vector3.One) };
+        floorSpot.Add(new FixtureComponent());
+        engine.Scene.Add(floorSpot);
+        Assert.Equal(-0.3f, SceneBounds.LowestPoint(engine.Scene, engine.Models.GetBounds)!.Value, 3);
+        Assert.True(StageFloor.HasFloor(engine.Scene, engine.Models.GetBounds));
+        Assert.Null(StageFloor.CreateIfMissing(engine.Scene, engine.Models.GetBounds));
+
+        // Hidden, it is not the floor any more; without model bounds it is unknown and does not count either.
         venueEntity.Visible = false;
         Assert.False(StageFloor.HasFloor(engine.Scene, engine.Models.GetBounds));
         venueEntity.Visible = true;
