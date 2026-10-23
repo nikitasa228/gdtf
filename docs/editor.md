@@ -1232,7 +1232,10 @@ fixtures with its margin, is drawn, and goes with one Undo (and out of the rende
 project saved without it reopens without it and with an empty undo history; an MVR with a floor of its own gets none.
 Work light *Off* sends no light at all for the dark rig, is saved with the project, survives New and reopen (and *On*
 likewise, with the rig). The Ambient row's value reaches the renderer's atmosphere (30 → 30, NaN and negative → 0). On
-lavapipe (headless screenshots, `lighting-baseline-*.png` in the test output): a textured OBJ (red and green halves)
+lavapipe (headless screenshots, `lighting-baseline-*.png` in the test output): Фокина just opened, in Full shading at the
+viewport's default EV 8 with the default preview and haze, shows its added wood floor (its front margin at least 40/255
+and wood-coloured; with the earlier 40 lx work light it was 5/255) and the air above the rig stays dark (the work light
+does not light the haze); a textured OBJ (red and green halves)
 imported into an empty scene is lit in Full shading by the Auto work light at the default EV 8 with both colours
 visible, black with the work light Off, and lit again in its colours by 30 cd/m² of ambient light without any light; a
 reference drawing shows its red and green halves in Full and Colorless shading without any light — made opaque, the
