@@ -278,7 +278,19 @@ New / Open replace the engine's project, so panels keep their references to the 
   reason (a refused GDTF with the engine's), and the status bar counts the rest.
 * **Engine tick.** Every frame `Update` ticks the engine (DMX input, fixture motors, smoke, fire, sound, lights, render
   binding) — also while the window is minimised (ten times a second, without drawing); the issue analysis (patch, power, rigging, assets) runs again half a second after the last edit, so a
-  gizmo drag does not re-check the scene every frame. Clicking an issue selects and frames the objects it names.
+  gizmo drag does not re-check the scene every frame, and again when the smoke solver reports something from its own
+  thread (an obstacle outside its box, a cell size adapted to the computer, a failure). Clicking an issue selects and
+  frames the objects it names.
+* **Real-time smoke.** The editor's engine simulates smoke in real time (`StageEngineOptions.RealTimeSimulation`): the
+  solver runs on its own threads at a cell size that fits the computer, and the frame only takes its newest density
+  grid, so a hazer costs the frame rate next to nothing (see [simulation.md](simulation.md#solver-thread-and-real-time-smokeworker)).
+  While it cannot keep up and skips time, the status bar shows a warning — *Smoke behind real time: N % skipped*, with
+  a tooltip explaining what helps; *Smoke behind real time* while frames still wait for it without anything skipped yet
+  (a large new atmosphere volume being set up), and *Smoke simulation stopped (see Issues)* after an internal error.
+  A render job that ticks a timecode range holds the clock (`EngineClockHeld`) and the smoke is then simulated frame by
+  frame (lockstep), as in the command-line renderer — from the first tick of its preroll on (the job switches the
+  engine itself, and the workspace marks the clock held in the frame the job starts, so no wall-clock tick slips in
+  between the preroll and the first frame); the job hands real time back when it ends.
 * **Autosave and recovery.** The engine autosaves the open project at the interval of *Settings → Files* (only when
   something changed; a save removes the session's autosaves; a clean exit deletes them). Changing the interval, or
   turning autosave off and on, reconfigures the running autosave session (`StageEngine.ConfigureAutosave`) instead of
@@ -1220,7 +1232,11 @@ on a real (headless) Vulkan renderer with picking.
 The phase-B1 tests: `EngineSessionTests` (`EditorSession` over the real engine: Фокина opened, saved as `.candela`
 and reopened unchanged; a project, an MVR, a 3D model, an image and a GDTF imported, each one undo step; MVR export
 and reopening it; missing and damaged files failing with a reason in the Issues panel instead of an exception, in
-English and Russian; recent files; simulation pause), `SessionFlowTests` (the unsaved-changes, busy, open-or-import
+English and Russian; recent files; simulation pause; smoke in real time except while a render job holds the clock;
+an obstacle note the smoke solver raises on its own thread reaching the Issues panel without another edit),
+`SmokeEditorTests` (a sequence render simulates its 1.5 s preroll of haze completely, frame by frame, and hands real
+time back when cancelled; the status bar's smoke warning for a skipped share, a lagging and a stopped solver in English
+and Russian), `SessionFlowTests` (the unsaved-changes, busy, open-or-import
 and recovery dialogs answered headlessly, recovery of an autosaved session, discarding it, file classification,
 Duplicate / Copy / Paste of a truss with its fixtures — references remapped, kept or cleared), `EngineViewportTests`
 (on a headless Vulkan device: the Фокина scene picked fixture by fixture — a part never comes back instead of its

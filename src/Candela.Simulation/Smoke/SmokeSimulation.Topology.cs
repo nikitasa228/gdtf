@@ -34,6 +34,9 @@ public sealed partial class SmokeSimulation
     private Vector3 _ambientLo, _ambientHi;
     private int _settingsIssueCount;
 
+    /// <summary>Counts the rebuilds of the solid cells and face flags (so copies of the solid mask know when to refresh).</summary>
+    private int _topologyVersion;
+
     /// <summary>
     /// Replaces the solid obstacles. Each box is voxelised conservatively: a cell is solid when its centre lies inside
     /// the box inflated to at least one cell of thickness, so thin walls never leak. Smoke inside new solids is removed.
@@ -165,6 +168,7 @@ public sealed partial class SmokeSimulation
         }
 
         _hasObstacles = Array.IndexOf(_solid, (byte)1) >= 0;
+        _topologyVersion++;
         var open = _settings.OpenFaces;
         for (int k = 0; k < _nz; k++)
         {

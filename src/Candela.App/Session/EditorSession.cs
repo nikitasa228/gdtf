@@ -65,6 +65,8 @@ internal sealed partial class EditorSession : IDisposable
     private long _previewBaseline = -1;
     private long _issuesVersion = -1;
     private long _seenVersion = -1;
+    private IReadOnlyList<Issue>? _seenSmokeIssues;
+    private bool _smokeIssuesChanged;
     private double _lastChangeAt;
     private double _clock;
     private int _autosaveMinutes = -1;
@@ -72,6 +74,7 @@ internal sealed partial class EditorSession : IDisposable
     private string? _displaySource;
     private string _displayFileName = "";
     private bool _disposed;
+    private bool _engineClockHeld;
 
     /// <summary>Creates a session with a new, empty scene and its stage engine.</summary>
     public EditorSession(AppLog log, SettingsStore settings, EditorSessionOptions? options = null)
@@ -80,7 +83,8 @@ internal sealed partial class EditorSession : IDisposable
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _options = options ?? new EditorSessionOptions();
         Layout = _options.Layout ?? InstallLayout.Current;
-        var engineOptions = _options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings, null, Layout);
+        // The editor ticks with wall-clock time: smoke is simulated in real time on its own threads (docs/simulation.md).
+        var engineOptions = (_options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings, null, Layout)) with { RealTimeSimulation = true };
         Engine = new StageEngine(engineOptions);
         // The cable tool's generic devices (splitters, nodes, dimmer) join the fixture library before any scene opens.
         GenericDeviceLibrary.Register(Engine);
@@ -125,9 +129,19 @@ internal sealed partial class EditorSession : IDisposable
 
     /// <summary>
     /// True while something else drives the engine clock (a render job rendering a timecode range ticks the engine at
-    /// the sequence's frame rate): <see cref="Update"/> must then not tick the engine with wall-clock time.
+    /// the sequence's frame rate): <see cref="Update"/> must then not tick the engine with wall-clock time, and the
+    /// smoke is simulated frame by frame (lockstep) instead of in real time.
     /// </summary>
-    public bool EngineClockHeld { get; set; }
+    public bool EngineClockHeld
+    {
+        get => _engineClockHeld;
+        set
+        {
+            _engineClockHeld = value;
+            if (Engine is { } engine)
+                engine.Simulation.RealTime = !value;
+        }
+    }
 
     /// <summary>True when the scene, its assets or its settings changed since it was opened or saved.</summary>
     public bool IsModified => _options.PreviewStage ? Scene.Version != _previewBaseline : EngineOrThrow.IsModified;
@@ -436,6 +450,7 @@ internal sealed partial class EditorSession : IDisposable
         if (_disposed)
             return;
         _issuesVersion = Scene.Version;
+        _smokeIssuesChanged = false;
         if (_options.PreviewStage)
         {
             // The preview stage's procedural meshes are not project assets: only program messages are listed.
@@ -607,7 +622,16 @@ internal sealed partial class EditorSession : IDisposable
             _lastChangeAt = _clock;
         }
 
-        if (version != _issuesVersion && _clock - _lastChangeAt >= IssueRefreshDelay)
+        // The smoke solver reports from its own thread (obstacles outside its box, a cell size adapted to the computer, a
+        // failure), possibly after the analysis of the edit that caused it has run: a new report runs the analysis again.
+        var smokeIssues = Engine?.Simulation.Smoke?.Issues;
+        if (!ReferenceEquals(smokeIssues, _seenSmokeIssues))
+        {
+            _seenSmokeIssues = smokeIssues;
+            _smokeIssuesChanged = true;
+        }
+
+        if ((version != _issuesVersion || _smokeIssuesChanged) && _clock - _lastChangeAt >= IssueRefreshDelay)
             RefreshIssuesNow();
     }
 

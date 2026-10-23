@@ -106,7 +106,8 @@ public sealed partial class RenderSync : IDisposable
     private bool _linesDirty = true;
     private bool _cablesDirty = true;
     private bool _atmosphereDirty = true;
-    private long _smokeStep = -1;
+    private long _smokeVersion = -1;
+    private Candela.Simulation.SmokeWorker? _smokeWorker;
     private long _fireStep = -1;
     private float _lastHaze = float.NaN;
     private float _lastAnisotropy = float.NaN;
@@ -421,7 +422,8 @@ public sealed partial class RenderSync : IDisposable
         _cablesDirty = true;
         _cableSupports.Invalidate();
         _atmosphereDirty = true;
-        _smokeStep = _fireStep = -1;
+        _smokeVersion = _fireStep = -1;
+        _smokeWorker = null;
     }
 
     private void ProcessChanges()
@@ -1111,25 +1113,29 @@ public sealed partial class RenderSync : IDisposable
                 _smokeGrid = null;
                 changed = true;
             }
-            _smokeStep = -1;
+            _smokeVersion = -1;
+            _smokeWorker = null;
         }
-        else if (smoke.StepCount != _smokeStep || _smokeGrid is null)
+        else if (smoke.Current is var frame && (frame.Version != _smokeVersion || !ReferenceEquals(smoke, _smokeWorker) || _smokeGrid is null))
         {
-            _smokeStep = smoke.StepCount;
-            if (_smokeGrid is null || _smokeGrid.SizeX != smoke.SizeX || _smokeGrid.SizeY != smoke.SizeY || _smokeGrid.SizeZ != smoke.SizeZ
-                || _smokeGrid.Min != smoke.Bounds.Min || _smokeGrid.Max != smoke.Bounds.Max)
+            // The frame the smoke worker published last (the solver runs on its own thread; in real time the grid's
+            // resolution can change when the worker adapts it to the time budget).
+            _smokeVersion = frame.Version;
+            _smokeWorker = smoke;
+            if (_smokeGrid is null || _smokeGrid.SizeX != frame.SizeX || _smokeGrid.SizeY != frame.SizeY || _smokeGrid.SizeZ != frame.SizeZ
+                || _smokeGrid.Min != frame.Bounds.Min || _smokeGrid.Max != frame.Bounds.Max)
             {
                 _smokeGrid = new VolumeGrid
                 {
-                    Min = smoke.Bounds.Min,
-                    Max = smoke.Bounds.Max,
-                    SizeX = smoke.SizeX,
-                    SizeY = smoke.SizeY,
-                    SizeZ = smoke.SizeZ,
-                    Values = new float[smoke.CellCount],
+                    Min = frame.Bounds.Min,
+                    Max = frame.Bounds.Max,
+                    SizeX = frame.SizeX,
+                    SizeY = frame.SizeY,
+                    SizeZ = frame.SizeZ,
+                    Values = new float[frame.CellCount],
                 };
             }
-            smoke.CopyDensityTo(_smokeGrid.Values);
+            frame.CopyDensityTo(_smokeGrid.Values);
             _atmosphere.SmokeDensity = _smokeGrid;
             _atmosphere.SmokeScatteringAtFullDensity = simulation.SmokeScatteringAtFullDensity;
             changed = true;

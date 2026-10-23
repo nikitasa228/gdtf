@@ -12,7 +12,7 @@ metres, linear Rec.2020 light colour with luminance 1 plus a photometric magnitu
  Art-Net, sACN … │ ProtocolManager ─▶ DmxInputHub ◀─ DmxPlayer (recording)      DmxRecorder ◀─ hub      │
  (own threads)   │                        │                                                             │
                  │ Tick(dt): NetworkSolution (console-driven?) ─▶ DmxEngine.Update ─▶ FixturePoses       │
-                 │   ─▶ StageSimulation.Step (hazers, fog, fans → smoke; flames → fire; noise sources)   │
+                 │   ─▶ StageSimulation.Step (hazers, fog, fans → smoke worker thread; flames → fire; noise) │
                  │   ─▶ StageLightCollector (one SpotLight per lit beam, gobos/iris/blades/prism/frost)  │
                  │   ─▶ RenderSync.Update ─▶ IRenderWorld (instances, lights, lines, atmosphere, noise)  │
                  │ Project (ProjectData: scene, AssetStore, settings sections, GDTF copies)             │
@@ -57,8 +57,10 @@ the folder containing `Candela.sln`, searched upwards from the program and the c
 (default: `_specs/fixtures_index.json` next to a library folder), a shared `Library` (tests, several engines),
 `StageEngineOptions.FromSettings(settings[, libraryFolders, layout])` fills both from the user's settings (or the
 CLI's `--library` folders) in the order of [Install layout](#install-layout),
-`CacheDirectory` (default `ConfigPaths.CacheDir`), the import worker (below), and thread counts. A missing library or
-unreadable specs file becomes an issue (`engine.library-missing`), never an exception.
+`CacheDirectory` (default `ConfigPaths.CacheDir`), the import worker (below), thread counts and `RealTimeSimulation`
+(the smoke solver keeps up with wall-clock time on its own — the editor turns it on; see the frame below). A missing
+library or unreadable specs file becomes an issue (`engine.library-missing`), never an exception. `Dispose` stops the
+smoke solver's threads.
 
 **Generic cabling devices.** `GenericDeviceLibrary.Register(engine)` (in `Cabling/`) writes the GDTF files of the
 generic DMX splitters, Art-Net / sACN nodes and dimmer pack (`Candela.Electrical.GenericDevices`, byte-identical on
@@ -227,7 +229,18 @@ same way. On Windows its console output is UTF-8, so Cyrillic names print correc
    → a sound source of `noiseLevelDb + 10·log₁₀(activity)` (lights: idle share + (1 − share) × brightest beam;
    atmospheric devices: their largest output, silent when off). The smoke domain is the first enabled
    `AtmosphereVolumeComponent`, or — with `AutomaticAtmosphere` — a box around the scene created when a device first
-   emits; walls are obstacles. Fixed sub-steps; `SimulationPaused` freezes smoke, fire and sound.
+   emits; walls are obstacles. Fixed sub-steps; `SimulationPaused` freezes smoke, fire and sound. **The smoke solver
+   runs on its own threads** (`SmokeWorker`, docs/simulation.md): the tick hands it the frame's emitters and time and
+   takes the newest finished density grid (`Simulation.Smoke.Current`). By default (`RealTimeSimulation` off:
+   command-line renders, tests) the tick then waits for this frame's smoke, so results are bit-identical to running
+   the solver in the tick and deterministic. The editor turns `StageSimulation.RealTime` on: the tick never waits, the
+   solver keeps up with wall-clock time at a cell size chosen from a time budget (coarsened and refined again as the
+   measured step cost requires, reported as `simulation.cell-size-adapted`), and time it has to drop is reported
+   (`IsSmokeBehindRealTime`, `SmokeDroppedFraction`: the editor's status bar warns). Turning `RealTime` off (a sequence
+   render ticking frame by frame) returns to lockstep at the requested cell size. With a hazer running on `Фокина.mvr`
+   the simulation's share of the tick (`LastStepMilliseconds`) is about 0.2–0.4 ms and the tick stays at its
+   no-smoke cost (≈ 0.5–1 ms in Release on the 4-core test machine), against 34 ms median and up to 0.4 s per tick
+   with the solver in the tick before.
 5. **Lights** (`StageLightCollector`): one `SpotLight` per beam with intensity > 0 — position, direction and gobo `Up`
    from the beam part's world matrix (GDTF beams leave along local −Z), peak candela, colour (`LightColor.Rgb`), beam
    and field angle, beam type, source radius (`BeamRadius`), gobo texture of the current wheel slot (a wheel between
@@ -242,7 +255,8 @@ same way. On Windows its console output is UTF-8, so Cyrillic names print correc
 6. **Render sync** (below).
 
 The result depends only on the scene, the DMX received and the sequence of frame times (tested: two engines, same
-input sequence, identical lights and smoke; evaluation and simulation threads do not change results). "The scene"
+input sequence, identical lights and smoke; evaluation and simulation threads do not change results) — with
+`RealTime` off; real-time smoke depends on how fast the machine is. "The scene"
 includes its entity ids: they seed each fixture's random effects (random strobe, random wheel positions), so the same
 show rebuilt with new ids flickers differently. Steady-state frames — fixtures moving,
 nothing edited — allocate nothing on the main thread (tested on `Фокина.mvr` with every motor moving).
@@ -500,7 +514,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (149 tests, ≈ 4 min; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (154 tests, ≈ 4 min; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
@@ -557,6 +571,13 @@ a device):
 * **Recordings**: 120 frames of two universes with timecode round-trip through a file (< 8 KiB) and play back
   byte-exact, including a lost universe and seeking backwards; seek by timecode; truncated and damaged files; the
   engine records its own input and plays it back to its fixtures.
+* **Smoke solver thread** (`SmokeSolverThreadTests`): `Фокина.mvr` with a hazer added at the stage centre, ticked
+  like the editor (wall-clock frame times at 60 Hz, real time): the median tick stays under 2 ms (or within 0.5 ms of
+  the tick without smoke, for Debug builds on a loaded machine), the simulation's share of it under 1 ms, and over the
+  last 1.5 s the smoke simulates at least 90 % of the frame time or `IsSmokeBehindRealTime` says it does not; the CLI's
+  re-simulation of haze (`RenderCommand.Simulate`, 2 s) is bit-identical in two runs and with 1 or 2 threads; switching
+  real time off simulates every frame again at the requested cell size; real-time ticks allocate nothing on the main
+  thread; disposing the engine stops the solver.
 * **Fire**: a flame projector (synthetic GENERATOR FIRE GDTF) burns from its manual values, lights the floor through
   the flame light samples, sends a temperature grid above 1000 K to the render world, feeds soot into the smoke and
   dies down when its valve closes.

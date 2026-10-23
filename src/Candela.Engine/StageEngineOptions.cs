@@ -45,8 +45,18 @@ public sealed record StageEngineOptions
     /// <summary>Threads used to evaluate fixtures (default: all cores). Results do not depend on it.</summary>
     public int DmxParallelism { get; init; } = Math.Max(1, Environment.ProcessorCount);
 
-    /// <summary>Threads used by the smoke simulation (−1: all cores). Results do not depend on it.</summary>
+    /// <summary>
+    /// Threads used by the smoke simulation (−1: all cores; with <see cref="RealTimeSimulation"/> half of them, the rest
+    /// staying free for the main thread, rendering and input). Results do not depend on it.
+    /// </summary>
     public int SimulationParallelism { get; init; } = -1;
+
+    /// <summary>
+    /// Whether the smoke solver keeps up with wall-clock time on its own threads (the editor) instead of finishing each
+    /// frame's smoke before <see cref="StageEngine.Tick"/> returns (the default: command-line renders and tests, which
+    /// are deterministic and bit-stable). See <see cref="StageSimulation.RealTime"/>, which can also be switched later.
+    /// </summary>
+    public bool RealTimeSimulation { get; init; }
 
     /// <summary>
     /// Internal universe = Art-Net port-address + this offset (see <see cref="AppSettings.ArtNetUniverseOffset"/>).

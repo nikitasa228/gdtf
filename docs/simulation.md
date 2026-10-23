@@ -10,6 +10,7 @@ turns DMX-evaluated fixture states into the emitter descriptors these classes ta
 | Class | What it does | Output for the engine / renderer |
 |---|---|---|
 | `SmokeSimulation` | Eulerian stable-fluids solver over the `AtmosphereVolumeComponent` box: air velocity, smoke density, temperature | `Density` (x fastest, then y, then z) + `Bounds`, `SizeX/Y/Z` → `VolumeGrid`; `DensityAt`, `TotalSmokeMass` |
+| `SmokeWorker` | runs a `SmokeSimulation` on its own threads, lockstep (bit-identical) or in real time (time budget, adaptive cell size) | `Current` (`SmokeFrame`: density grid, box, time, mass, dropped time) without blocking the main thread |
 | `FireSimulation` | flame devices: valve, burn timer, burning fuel parcels | `LightSamples` (position, `LightColor`, cd), `Volumes` (temperature in K) / `RasterizeTemperature`, `SmokeEmitters` |
 | `AcousticField` | SPL of noise sources (`_specs` `noiseLevelDb`) | `LevelAt`, `ComputeGrid` (dB(A) grid for the volumetric noise fog), `SampleSurface`/`SampleRectangle` |
 | `FlameModel` | flame correlations (height ↔ heat release, luminous flux, gas velocity, flicker) | used by `FireSimulation`, handy for UI readouts |
@@ -21,9 +22,11 @@ fire.Step(dt, flameDevices);                         // GENERATOR FIRE fixtures 
 emitters.Clear();
 emitters.AddRange(hazersFogsFans);                   // SmokeEmitter.Hazer / FogMachine / Fan from fixture states
 emitters.AddRange(fire.SmokeEmitters);               // soot and heat of the flames
-smoke.Step(dt, CollectionsMarshal.AsSpan(emitters)); // fixed sub-steps inside
-atmosphere.SmokeDensity = new VolumeGrid { Min = smoke.Bounds.Min, Max = smoke.Bounds.Max, SizeX = smoke.SizeX, …,
-                                           Values = copy of smoke.Density };
+smoke.Submit(dt, CollectionsMarshal.AsSpan(emitters)); // SmokeWorker: fixed sub-steps on the solver's own threads
+if (realTime) smoke.AcquireLatest(); else smoke.Synchronize();   // newest finished grid / exactly this frame's
+var frame = smoke.Current;                           // SmokeFrame: stays unchanged until the next acquire
+atmosphere.SmokeDensity = new VolumeGrid { Min = frame.Bounds.Min, Max = frame.Bounds.Max, SizeX = frame.SizeX, …,
+                                           Values = copy of frame.Density };
 lights.AddRange(fire.LightSamples);                  // isotropic point lights, colour × candela
 fire.RasterizeTemperature(fire.CombinedBounds, nx, ny, nz, flameGrid);
 ```
@@ -184,11 +187,86 @@ time, fixer corrections) and `LastTimings` (ms per stage).
 
 ### Determinism and threading
 
-Not thread-safe; called from one (simulation) thread. Work is split over Z slices with `Parallel.For`; no slice writes
+Not thread-safe; called from one (simulation) thread — in the engine the thread of a `SmokeWorker` (below). Work is split over Z slices with `Parallel.For`; no slice writes
 outside itself, and every reduction (dot products, sums, maxima) is accumulated per slice and combined in slice order,
 so results are bit-identical for any `MaxDegreeOfParallelism` (tested with 1, 2 and all cores). Grids below 8192 cells
 run on one thread. Per-slice delegates are created once; apart from `Parallel.For`'s own bookkeeping, stepping does
 not allocate (tested single-threaded).
+
+### Solver thread and real time (`SmokeWorker`)
+
+A step of the solver takes tens of milliseconds (≈ 60 ms for the 74 000 cells of the automatic box around
+`Фокина.mvr` at 0.4 m on the 4-core test machine), so it must not run in the frame: with the solver in the engine's tick
+a single hazer dropped the editor to 1–5 fps. `SmokeWorker` owns a `SmokeSimulation` and runs it on a thread of its own:
+
+* **Frames and commands.** The main thread hands over each frame (`Submit(dt, emitters)`, the emitters are copied into
+  pooled buffers) and commands (`SetObstacles`, `Reconfigure`, `Reset`, `AddSmoke`, `Fill`), which the worker applies
+  in submission order. `CaptureSnapshot`/`RestoreSnapshot` wait for the queue and then use the idle simulation.
+* **Published frames.** After each step call that ran sub-steps (and after each command) the worker copies density,
+  box, solid mask (only when it changed), time, step count, statistics and the total mass (summed per z slice in slice
+  order, so it equals `TotalSmokeMass()` bit for bit) into a `SmokeFrame`. Three frames rotate — one written by the
+  worker, one ready, one held by the main thread — so the main thread takes the newest (`AcquireLatest`, a lock and a
+  pointer swap) and reads it (`Current`, `DensityAt`, `CopyDensityTo`) without ever waiting for a step; the worker never
+  writes the frame the main thread holds. Submitting and acquiring take well under a microsecond and allocate nothing
+  (tested: median 0.2 µs while the solver is busy with 64 × 64 × 32 cells).
+* **Threads.** The solver's parallel slices run on the worker thread plus dedicated helper threads
+  (`SolverTaskScheduler`), never on the shared thread pool — the main thread's own parallel work (DMX evaluation) never
+  waits for a smoke slice — and all of them run below normal priority, so the main thread wins every contention for a
+  core (where the operating system honours thread priorities: Windows; Linux ignores them for normal processes). In real
+  time the solver uses half the cores by default, leaving the rest to the main thread, rendering, DMX and input.
+* **Faults.** An exception inside the solver stops it with an error issue (`simulation.smoke-failed`, `Fault`) instead
+  of taking the process down; frames are then dropped (and counted) until `Reconfigure` starts a fresh simulation.
+
+**Lockstep** (`SmokeTiming.Lockstep`, the default): every submitted frame is simulated exactly as
+`SmokeSimulation.Step` would, at the requested cell size; a caller that needs the result waits (`Synchronize`). The
+results are bit-identical to stepping the solver directly (tested with 1 and 3 threads on a jittery frame sequence
+including a stall beyond the sub-step cap, and with commands interleaved), so conservation and determinism are those of
+the solver: the closed-room probe — a hazer at full output in a closed 6 × 6 × 3 m room without dissipation, 2400 frames
+of 1/60 s — holds 1.599 g after 39.97 s (1199 sub-steps; 2400 × 1/60 s sum to a hair under 40 s, so the 1200th sub-step
+is still carried), exactly the hazer's 0.04 g/s, through the worker as without it. Command-line renders, tests and
+sequence renders use lockstep.
+
+**Real time** (`SmokeTiming.RealTime`, the editor): the worker keeps up with wall-clock time on its own.
+
+* Frames that arrive while it is busy merge into the one still waiting (times add up, the newest emitters apply), and
+  a reconfiguration or obstacle set still waiting is replaced by the newest (what was queued after a reconfiguration
+  then applies to the new simulation), so the queue never grows: dragging the atmosphere volume builds one grid
+  whenever the worker is ready, not one per frame (tested: 30 frames of reconfiguring while the worker is busy build
+  one grid, for the last box and obstacles; lockstep keeps all 30 in order).
+* How much of a frame a step call simulates: a solver measured well within real time (a step within the budget and
+  at most 80 % of the sub-step) may spend 80 % of the frame's wall-clock time on it (or `MaxLatency`, 0.1 s, if that is
+  longer) — enough for the whole frame, so nothing is dropped however slowly frames come (tested: 4 frames per second
+  of 0.25 s each, a viewport on a slow GPU, lose nothing; with `MaxSubStepsPerCall` = 4 as the cap they lost half the
+  time). Any other solver — slower, or not measured yet on a new grid — simulates only as many sub-steps as fit
+  `MaxLatency` at the measured (or estimated) cost, at least one, and drops the rest, so the published smoke never
+  lags far behind. Every call is shorter than the wall time it covers, so frames submitted faster than real time
+  cannot make the calls ever longer. `MaxSubStepsPerCall`, the synchronous solver's guard against slow frames feeding
+  ever slower frames, does not apply here: the main thread never waits for the solver.
+* **Cell size from a time budget.** The budget is `RealTimeLoad` (0.6) × the sub-step: a 1/30 s sub-step may take
+  20 ms of wall time, leaving headroom for load spikes. Adaptation levels coarsen the requested cell edge by ∛2 each
+  (half the cells; at most `MaxCellSizeFactor` = 4×, never below 8 cells along an axis). A new domain starts at the
+  finest level whose estimated cost fits 80 % of the budget; the estimate is the cost per cell and sub-step measured by
+  earlier workers of the process (`SmokeCostModel`, by thread count), before any measurement a prior of
+  0.6 µs/(1 + 0.25·(threads − 1)) per cell. Then the measured cost (moving average after two warm-up steps) decides: a
+  grid whose steps exceed the budget is coarsened to the first level predicted within 80 % of it (after 12 measured
+  steps and 2 s; after 2 steps when a step takes more than 1.5 budgets, i.e. time is being dropped), and a grid is
+  refined one level when the finer one is predicted within 75 % of the budget (after 5 s). The cost is proportional to
+  the cell count (multigrid: about the same pressure iterations at any resolution), so the hysteresis between the two
+  thresholds keeps the level stable. A level above 0 is reported as a note (`simulation.cell-size-adapted`).
+* **Moving the state to a new grid** (`TransferStateFrom`): velocity faces, density, temperature and pressure are
+  resampled trilinearly (solid corners skipped, as `DensityAt` does), the smoke mass is rescaled and the heat corrected
+  (the conservation fixer's correction) to the source's totals — the boxes differ by less than a cell at each side and
+  resampling is not conservative — the ventilation ramp, time and step counters continue, and the velocity is
+  projected, so the next step starts divergence-free (tested both ways between 0.2 and 0.252 m: mass equal to 10⁻⁵,
+  heat to 10⁻³, centre of mass within half a cell, divergence < 10⁻² 1/s).
+* **Dropped time.** Every second the solver could not simulate is counted (`DroppedTime`; frame time that passed
+  while a new domain was being set up counts too — at most the set-up's own duration, beyond one sub-step — but not
+  against the solver). `DroppedFraction` is the share of
+  real time dropped over the last seconds (Σ dropped / Σ wall time, both weighted by e^(−age/3 s), at least 1 s of wall
+  time in the denominator; it decays while nothing more is dropped), and `IsBehindRealTime` is true while it exceeds
+  `BehindThreshold` (5 %), while more than 0.5 s of submitted frames still waits for the solver (`Lag`), or after a
+  fault. Simulated time therefore keeps up with wall time, or the editor says it does not (status bar).
+* Switching a worker back to lockstep (`Timing`) returns to the requested cell size, moving the state along.
 
 ### Performance
 
@@ -236,6 +314,9 @@ steps); the reference keeps 10⁻⁴. `SmokePerformanceTests` prints the current
 * The atmosphere is one box with axis-aligned walls/openings; obstacles are voxelised boxes (no curved geometry);
   smoke does not stick to or deposit on surfaces; droplets do not evaporate locally (only the global dissipation).
 * Light absorption by the smoke (soot) is not represented by `Density` — it is scattering only.
+* No GPU (Vulkan compute) solver yet: the solver runs on the CPU, on its own threads (`SmokeWorker`). In the editor the
+  cell size is coarsened until a step fits the time budget, so on a slow computer the haze is resolved more coarsely
+  (the status bar and a note say so) rather than the frame rate dropping; offline renders keep the requested cells.
 
 ## 2. Fire (`FireSimulation`, `FlameModel`)
 
@@ -332,7 +413,7 @@ wall or floor). Tests: the grid matches L₁ − 20·log₁₀ d at every cell a
 from `_specs` produce the expected field. Limits: no directivity, air absorption, screening by obstacles or room
 reverberation (a reverberant room adds a diffuse field that this model omits).
 
-## 4. Tests (`tests/Candela.Simulation.Tests`, ≈ 75 tests, ≈ 45 s in Release, ≈ 75 s in Debug on a busy machine)
+## 4. Tests (`tests/Candela.Simulation.Tests`, ≈ 100 tests, ≈ 75 s in Release, ≈ 110 s in Debug on a busy machine)
 
 * Smoke physics: a closed box with a stirring fan conserves mass over 200 steps (0.00 % with the fixer); the projection
   removes > 99.8 % of the divergence (with obstacles, open faces); warm smoke rises and accelerates; a 1.9 kW plume
@@ -356,6 +437,21 @@ reverberation (a reverberant room adds a diffuse field that this model omits).
   allocations in steady state.
 * Acoustics: as listed above, plus determinism over thread counts and bad sources.
 * Performance: the 64³ benchmark above (prints the numbers; asserts only against pathological regressions).
+* Solver thread (`SmokeWorkerTests`): lockstep bit-identical to the synchronous solver (density, velocity,
+  temperature, pressure, statistics, dropped time; 1 and 3 threads); the closed-room probe (1.599 g after 40 s at
+  60 fps, equal to the direct solver); commands in order with the frames and `SmokeFrame.DensityAt` equal to
+  `SmokeSimulation.DensityAt` at 500 points next to obstacles; snapshots through the worker; the main thread's calls
+  return in microseconds while the solver works; real time keeps up on a small grid (simulated + dropped = wall time up
+  to the carried remainder, mass = hazer rate × simulated time), drops time and says so when no machine could keep up
+  (1 ms sub-steps), starts at a cell size chosen from the budget, coarsens a grid that is too slow (keeping the smoke
+  mass), refines again when steps are cheap, returns to the requested grid in lockstep; moving state between grids
+  conserves smoke and heat; a fault is reported and `Reconfigure` recovers; invalid settings are reported as the
+  simulation reports them; no allocations per frame on the calling thread. `SmokeWorkerReviewTests`: real time at
+  4 frames per second drops nothing when the solver has time to spare, and still bounds the lag when it is slower
+  than real time; a frame the main thread holds never changes while the worker publishes (its mass matches its
+  density, and re-reading it after more publications gives the same values); a reconfigured lockstep worker equals a
+  fresh solver with the new obstacles bit for bit; 30 frames of dragging the volume while the worker is busy build one
+  grid (lockstep: all 30, in order); the adapted-cell note quotes the requested grid's cost.
 
 ## References
 

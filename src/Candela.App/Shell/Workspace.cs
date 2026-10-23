@@ -226,6 +226,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
         _guard.Run("editing keys", _handleEditingKeys);
         _guard.Run("shortcuts", _dispatch);
+        // A render job started from this frame's UI holds the engine clock from now on: the next frame's session update
+        // must not tick the engine with wall-clock time between its preroll and its first frame.
+        _ctx.Session.EngineClockHeld = _ctx.Tools.Stage.Render.HoldsEngineClock;
         UpdateTitle();
     }
 
@@ -530,13 +533,19 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 var texts = _statusTexts;
                 texts.Update(recent ? _status : null, session.Selection.Count, session.Undo.UndoDescription, _ctx.Gpu.Context.Info.DeviceName,
                     _ctx.Timer.FramesPerSecond, _ctx.Timer.Elapsed);
+                // Real-time smoke that cannot keep up skips time: say so while it does.
+                var simulation = session.Engine?.Simulation;
+                bool smokeBehind = simulation is { IsSmokeBehindRealTime: true };
+                bool smokeFailed = smokeBehind && simulation!.Smoke?.Fault is not null;
+                texts.UpdateSmoke(smokeBehind ? simulation!.SmokeDroppedFraction : -1, smokeFailed, _ctx.Timer.Elapsed);
                 // Right part at the right edge, selection count after the message; a message too long for the space
                 // left is shortened with an ellipsis (whole text in the tooltip) instead of pushing the rest off the window.
                 float gap = 24 * scale;
                 string right = texts.Right;
                 float rightX = ImGui.GetWindowWidth() - ImGui.CalcTextSize(right).X - 16 * scale;
                 float selectionWidth = session.Selection.IsEmpty ? 0f : ImGui.CalcTextSize(texts.Selection).X + gap;
-                float leftSpace = rightX - gap - selectionWidth - ImGui.GetCursorPosX();
+                float smokeWidth = smokeBehind ? ImGui.CalcTextSize(texts.Smoke).X + gap : 0f;
+                float leftSpace = rightX - gap - selectionWidth - smokeWidth - ImGui.GetCursorPosX();
                 string left = _statusFit.Get(texts.Left, MathF.Max(0f, leftSpace));
                 SafeText.Colored(Theme.TextMuted, left);
                 if (_statusFit.IsShortened && ImGui.IsItemHovered())
@@ -544,6 +553,14 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 ImGui.SameLine(0, gap);
                 if (!session.Selection.IsEmpty)
                     SafeText.Colored(Theme.Accent, texts.Selection);
+                if (smokeBehind)
+                {
+                    ImGui.SameLine(0, gap);
+                    SafeText.Colored(Theme.Warning, texts.Smoke);
+                    if (ImGui.IsItemHovered())
+                        SafeText.Tooltip(Loc.Get(smokeFailed ? Str.StatusSmokeFailedTip : Str.StatusSmokeBehindTip));
+                }
+
                 ImGui.SameLine(MathF.Max(ImGui.GetCursorPosX() + 16, rightX));
                 SafeText.Colored(Theme.TextMuted, right);
                 ImGui.EndMenuBar();
@@ -916,6 +933,23 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
     private static IssueSeverity Severity(SessionOutcome outcome) => outcome == SessionOutcome.Failed ? IssueSeverity.Error : IssueSeverity.Note;
 
+    /// <summary>Whole percent of a skipped share of real time (0 … 100).</summary>
+    private static int SmokePercent(double droppedShare) =>
+        double.IsFinite(droppedShare) ? (int)Math.Round(Math.Clamp(droppedShare, 0, 1) * 100) : 0;
+
+    /// <summary>
+    /// The status bar's smoke warning: the solver stopped after an error, the share of real time it skipped, or — when
+    /// none was skipped yet (frames still waiting for the solver, a new atmosphere volume being set up) — that it is
+    /// behind.
+    /// </summary>
+    internal static string SmokeStatusText(double droppedShare, bool failed)
+    {
+        if (failed)
+            return Loc.Get(Str.StatusSmokeFailed);
+        int percent = SmokePercent(droppedShare);
+        return percent > 0 ? Loc.Format(Str.StatusSmokeBehind, percent) : Loc.Get(Str.StatusSmokeLagging);
+    }
+
     /// <summary>Status bar texts, rebuilt only when what they show changes (no string building per frame).</summary>
     private sealed class StatusTexts
     {
@@ -932,6 +966,38 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         public string Selection { get; private set; } = "";
 
         public string Right { get; private set; } = "";
+
+        /// <summary>The "smoke behind real time" warning (valid while <see cref="UpdateSmoke"/> was given a share ≥ 0).</summary>
+        public string Smoke { get; private set; } = "";
+
+        private bool _smokeShown;
+        private int _smokePercent;
+        private double _smokeBuiltAt = double.NegativeInfinity;
+        private string _smokeLanguage = "";
+
+        /// <summary>
+        /// Rebuilds the smoke warning for a skipped share of real time, or for a solver that stopped after an error
+        /// (refreshed twice a second; a share &lt; 0: none).
+        /// </summary>
+        public void UpdateSmoke(double droppedShare, bool failed, double now)
+        {
+            if (droppedShare < 0)
+            {
+                _smokeShown = false;
+                return;
+            }
+
+            int percent = failed ? -1 : SmokePercent(droppedShare);
+            bool language = !string.Equals(_smokeLanguage, Loc.Language, StringComparison.Ordinal);
+            if (language || !_smokeShown || (percent != _smokePercent && (failed || _smokePercent < 0 || now - _smokeBuiltAt > 0.5)))
+            {
+                _smokeShown = true;
+                _smokeLanguage = Loc.Language;
+                _smokePercent = percent;
+                _smokeBuiltAt = now;
+                Smoke = $"{Icons.TriangleAlert}  {SmokeStatusText(droppedShare, failed)}";
+            }
+        }
 
         public void Update(string? message, int selectionCount, string? undo, string device, double fps, double now)
         {
