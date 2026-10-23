@@ -261,6 +261,9 @@ internal struct GpuFrameData
 
     /// <summary>Lights the cluster masks list (the first ones of the light buffer; the rest are beyond the renderer's limit).</summary>
     public uint ClusterListedLights;
+
+    /// <summary>Full view: luminance of the uniform surroundings lighting every surface, cd/m² (0 = none); see <see cref="AtmosphereState.AmbientLuminance"/>.</summary>
+    public float AmbientLuminance;
 }
 
 /// <summary>Push constants of every draw (32 bytes), see <c>DrawConstants</c> in common.glsl.</summary>
@@ -317,7 +320,10 @@ internal struct GpuPtParams
     /// <summary>Box the haze fills (xyz), m; w = haze scattering coefficient, 1/m.</summary>
     public Vector4 MediaMax;
 
-    /// <summary>x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 1 / exposure.</summary>
+    /// <summary>
+    /// x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 0 (unused: unlit and
+    /// reference surfaces go to the display-referred overlay, independent of the exposure).
+    /// </summary>
     public Vector4 Majorants;
 
     /// <summary>rgb = background luminance (Rec.2020, cd/m²), w = firefly clamp (cd/m², 0 = off).</summary>
@@ -336,5 +342,7 @@ internal struct GpuPtParams
     public uint Seed;
     public uint Width;
     public uint Height;
-    public uint Pad0;
+
+    /// <summary>Luminance of the uniform surroundings that light the surfaces (not seen directly, not the media), cd/m².</summary>
+    public float AmbientLuminance;
 }

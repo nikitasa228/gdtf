@@ -103,7 +103,7 @@ internal static class Program
         writer.WriteLine("      are up, --exr also writes linear HDR OpenEXR (with albedo, normal and depth layers), --denoise filters");
         writer.WriteLine("      the result (the EXR keeps the raw one as layer 'raw'). Auto exposure meters the first image; a sequence");
         writer.WriteLine("      keeps it. Defaults: 6 bounces, 2 volume bounces, seed 0, no clamp. Ctrl+C writes what is rendered.");
-        writer.WriteLine("      --work-light auto adds a dim neutral key and ambient light when no fixture emits, on always; a render");
+        writer.WriteLine("      --work-light auto adds a neutral work light (key and ambient) when no fixture emits, on always; a render");
         writer.WriteLine("      never gets it unless asked (default off).");
         writer.WriteLine();
         writer.WriteLine("  candela artnet-test --to <ip[:port]> [--universes 1-4] [--seconds N] [--fps F] [--offset O]");

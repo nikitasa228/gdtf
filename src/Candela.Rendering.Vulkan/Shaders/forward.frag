@@ -1,8 +1,9 @@
 #version 460
 #extension GL_GOOGLE_include_directive : require
 // Full view: forward PBR shading with the physically based spot lights of the fragment's cluster.
-//   L = sum over lights of BRDF(v, l) * E_light + albedo / pi * E_indirect + L_emissive + L_instance
-// (L_instance: the instance's additive emission, e.g. the glowing lens of a lit fixture)
+//   L = sum over lights of BRDF(v, l) * E_light + albedo / pi * E_indirect + R_env(v) * L_ambient + L_emissive + L_instance
+// (L_instance: the instance's additive emission, e.g. the glowing lens of a lit fixture; R_env: the BRDF's directional
+// albedo under the uniform surroundings of luminance L_ambient, see ambientReflectance)
 //   E_light = I0 * profile(theta) * cookie * colour * shadow * cos(incidence) / d^2
 // Output: luminance (cd/m2, linear Rec.2020) x exposure, into the RGBA16F HDR image.
 // Variant TRANSPARENT (alpha BLEND and transmissive materials): premultiplied output; coverage = alpha *
@@ -22,9 +23,6 @@ layout(location = 4) flat in uint inInstance;
 layout(location = 5) flat in uint inMaterial;
 
 layout(location = 0) out vec4 outColor;
-
-// Opacity of reference drawings (InstanceFlags.Reference): unlit and semi-transparent.
-const float REFERENCE_OPACITY = 0.5;
 
 // Joint bilateral upsampling of the reduced-resolution indirect irradiance: the four nearest low-resolution samples,
 // bilinear weights times a view-depth similarity weight (samples on other surfaces do not bleed across edges).
@@ -71,18 +69,20 @@ void main()
         alpha = m.baseColor.a;
     }
 
-    // Reference drawings and unlit materials show their base colour as a display-referred value, independent of the
-    // exposure and the stage lights; reference drawings are semi-transparent. The Colorless view (reference drawings
-    // only) writes display-linear Rec.709, which its display transform passes through.
+    // Reference drawings and unlit materials show their base colour (texture x factor) as a display-referred value,
+    // independent of the exposure and the stage lights. Reference instances are semi-transparent: an alpha-blended
+    // material (an imported drawing) at its own alpha, any other (ghost geometry) at REFERENCE_OPACITY. The Colorless
+    // view (reference drawings only) writes display-linear Rec.709, which its display transform passes through.
     bool reference = (instances[inInstance].flags & INSTANCE_FLAG_REFERENCE) != 0u;
     if ((m.flags & MATERIAL_UNLIT) != 0u || reference)
     {
 #ifdef TRANSPARENT
-        float a = alpha * (reference ? REFERENCE_OPACITY : 1.0);
+        float a = clamp(alpha, 0.0, 1.0) * (reference && (m.flags & MATERIAL_ALPHA_BLEND) == 0u ? REFERENCE_OPACITY : 1.0);
         vec3 display = frame.viewMode == VIEW_COLORLESS ? clamp(rec2020ToRec709(albedo), 0.0, 1.0) : albedo;
         outColor = vec4(display * a, a);
 #else
-        outColor = vec4(albedo, 1.0);
+        // alpha 0: no scene light here (the HDR image's alpha is the share of scene light the auto exposure meters)
+        outColor = vec4(albedo, 0.0);
 #endif
         return;
     }
@@ -136,6 +136,19 @@ void main()
         evaluateBrdf(surface, N, V, L, fd, fs);
         diffuse += fd * E;
         specular += fs * E;
+    }
+
+    // The surroundings (AtmosphereState.AmbientLuminance): a uniform environment of that luminance, unoccluded (the
+    // material's occlusion map, when it has one, darkens it).
+    if (frame.ambientLuminance > 0.0)
+    {
+        vec3 ambientDiffuse, ambientSpecular;
+        ambientReflectance(surface, N, V, ambientDiffuse, ambientSpecular);
+        float ambient = frame.ambientLuminance;
+        if ((m.flags & MATERIAL_OCCLUSION_TEXTURE) != 0u)
+            ambient *= clamp(sampleTexture(m.occlusionTexture, uv).r, 0.0, 1.0);
+        diffuse += ambientDiffuse * ambient;
+        specular += ambientSpecular * ambient;
     }
 
 #ifndef TRANSPARENT

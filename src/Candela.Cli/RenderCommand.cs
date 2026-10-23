@@ -49,10 +49,15 @@ internal sealed class RenderOptions
     /// </summary>
     public float? Ev100 { get; private set; }
 
+    /// <summary>
+    /// <c>--floor auto</c> (default): a scene without a floor gets the engine's stage floor for the render
+    /// (<see cref="StageFloor.AddIfMissing"/>, the same floor the editor adds when it opens a floorless MVR);
+    /// <c>--floor none</c> renders the scene as it is.
+    /// </summary>
     public bool Floor { get; private set; } = true;
 
     /// <summary>
-    /// The work light (<c>--work-light off|auto|on</c>, default off): a dim neutral key and ambient light for scenes
+    /// The work light (<c>--work-light off|auto|on</c>, default off): a neutral key and ambient light for scenes
     /// whose fixtures are dark. A render never gets it unless asked.
     /// </summary>
     public WorkLightMode WorkLight { get; private set; } = WorkLightMode.Off;
@@ -505,8 +510,11 @@ internal static class RenderCommand
             MinimumLogLevel = VulkanLogLevel.Error,
             Log = (level, message) => error.WriteLine($"[vulkan {level.ToString().ToLowerInvariant()}] {message}"),
         };
-        if (options.Floor && AddFloorIfMissing(engine) is { } floor)
+        if (options.Floor && StageFloor.AddIfMissing(engine, "Stage floor (render)") is { } added)
+        {
+            var floor = StageFloor.SizeOf(added);
             output.WriteLine(string.Create(CultureInfo.InvariantCulture, $"Floor:    added a {floor.X:0.#} × {floor.Y:0.#} m stage floor (the scene has none)"));
+        }
 
         using var renderer = VulkanRenderer.Create(contextOptions);
         try
@@ -799,34 +807,6 @@ internal static class RenderCommand
     /// <summary>The EV100 of an exposure factor (inverse of <see cref="Core.Math.Units.ExposureFromEv100"/>).</summary>
     internal static float Ev100Of(float exposure) =>
         exposure > 0f && float.IsFinite(exposure) ? MathF.Log2(1f / (1.2f * exposure)) : 0f;
-
-    /// <summary>
-    /// Adds a wooden stage floor under the scene when it has no floor (MVR exports often contain only the rig), so the
-    /// light has something to land on: the content's footprint plus 3 m on every side, top face at the lowest content
-    /// height (at most 0). Returns its size, or null when the scene has a floor or no content.
-    /// </summary>
-    public static Vector2? AddFloorIfMissing(StageEngine engine)
-    {
-        foreach (var (_, wall) in engine.Scene.Query<Core.SceneGraph.Components.WallComponent>())
-            if (wall.Kind == Core.SceneGraph.Components.WallKind.Floor) return null;
-        var bounds = SceneBounds.Compute(engine.Scene, engine.Models.GetBounds);
-        if (bounds.IsEmpty) return null;
-        var size = new Vector2(bounds.Size.X + 6f, bounds.Size.Y + 6f);
-        var floor = new Core.SceneGraph.Entity("Stage floor (render)")
-        {
-            Local = new Core.Math.Transform(new Vector3(bounds.Center.X, bounds.Center.Y, MathF.Min(0f, bounds.Min.Z)), Quaternion.Identity, Vector3.One),
-        };
-        floor.Add(new Core.SceneGraph.Components.WallComponent
-        {
-            Kind = Core.SceneGraph.Components.WallKind.Floor,
-            Width = size.X,
-            Height = size.Y,
-            Thickness = 0.1f,
-            MaterialId = Core.SceneGraph.Components.MaterialIds.WoodStage,
-        });
-        engine.Scene.Add(floor);
-        return size;
-    }
 
     /// <summary>The camera of the options: explicit eye/target, or a preset framing the scene's bounds.</summary>
     public static RenderCamera CreateCamera(StageEngine engine, RenderOptions options)

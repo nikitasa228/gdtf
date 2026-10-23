@@ -125,6 +125,23 @@ public sealed partial class StageEngine
     }
 
     /// <summary>
+    /// Adds the stage floor (<see cref="StageFloor.CreateIfMissing"/>, named <paramref name="name"/>) to a scene that has
+    /// none, as one undo step, and returns it; null when the scene has a floor or no content. With
+    /// <paramref name="partOfOpening"/> — the editor right after opening a floorless MVR — the floor counts as part of
+    /// the opened scene: a project without unsaved changes stays without them (closing it at once asks nothing, the
+    /// autosave has nothing to store), while Undo, which removes the floor, is a change like any other.
+    /// </summary>
+    public Entity? AddStageFloor(string? name = null, bool partOfOpening = false)
+    {
+        var floor = StageFloor.CreateIfMissing(_scene, Models.GetBounds, name);
+        if (floor is null) return null;
+        bool modified = IsModified;
+        Undo.Execute(new AddEntityCommand(_scene, floor));
+        if (partOfOpening && !modified) IsModified = false;
+        return floor;
+    }
+
+    /// <summary>
     /// Brings a file into the open scene: an MVR (merged under a new group), another Candela project (merged), a 3D
     /// model (OBJ, FBX, DAE, 3DS, STL, PLY, glTF/GLB — native formats imported in the isolated worker), an image
     /// (reference drawing or poster) or a GDTF file (added to the fixture library). Undoable.

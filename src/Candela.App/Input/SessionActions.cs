@@ -17,7 +17,7 @@ internal static class SessionActions
     /// <summary>View → Work Light → Off: the preview shows the fixtures' light only.</summary>
     public const string WorkLightOff = "view.workLightOff";
 
-    /// <summary>View → Work Light → Auto: a dim work light while no fixture emits (the default).</summary>
+    /// <summary>View → Work Light → Auto: a work light while no fixture emits (the default).</summary>
     public const string WorkLightAuto = "view.workLightAuto";
 
     /// <summary>View → Work Light → On: the work light always, on top of the fixtures' light.</summary>

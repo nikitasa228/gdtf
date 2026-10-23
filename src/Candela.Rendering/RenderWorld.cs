@@ -184,6 +184,16 @@ public sealed class AtmosphereState
 
     /// <summary>Sound pressure level field in dB for the noise overlay's volumetric fog, or null.</summary>
     public VolumeGrid? NoiseField { get; set; }
+
+    /// <summary>
+    /// Luminance of the surroundings in cd/m² (the venue beyond the modelled scene: house lights, walls, exit signs): a
+    /// uniform environment that lights every surface in the Full view and in the final render, so a white Lambertian
+    /// surface open to it has this luminance. It lights surfaces only — not the haze — and it is not what the camera sees
+    /// where nothing is drawn (that is <see cref="ViewOptions.BackgroundLuminance"/> /
+    /// <see cref="FinalRenderOptions.BackgroundLuminance"/>). The real-time view leaves it unoccluded; the path tracer
+    /// traces it (shadowed by the scene, bounced). 0 = a black venue (default). Non-finite or negative values count as 0.
+    /// </summary>
+    public float AmbientLuminance { get; set; }
 }
 
 /// <summary>Noise source for the noise overlay (fixture position + dB(A) at 1 m).</summary>

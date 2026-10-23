@@ -15,11 +15,17 @@ namespace Candela.App.Panels;
 /// The Preview panel (requirement "Превью"): the real-time quality of every viewport — resolution scale, shadows,
 /// volumetric light, indirect light, bloom, tone mapping, auto exposure and EV trim (<see cref="PreviewSettings"/>, with
 /// the preset dropdown Default / Custom / Save as…), the viewports' camera exposure (EV100, with an incident-light
-/// reading of the stage) and grid, and the stage atmosphere (haze density and anisotropy, ambient light; undoable scene
-/// settings).
+/// reading of the stage) and grid, the stage atmosphere (haze density and anisotropy, ambient light; undoable scene
+/// settings) and the work light of the project's view (Off / Auto / On).
 /// </summary>
 internal sealed class PreviewPanel : Panel
 {
+    /// <summary>
+    /// Top of the Ambient light slider, cd/m² (<see cref="Candela.Core.SceneGraph.SceneSettings.AmbientLuminance"/>: the
+    /// uniform luminance of the venue that lights every surface; a lit hall is a few tens).
+    /// </summary>
+    public const float MaxAmbientLuminance = 100f;
+
     private static readonly string[] ToneMappers = { "AgX", "ACES", "Neutral" };
     private static readonly int[] ShadowResolutions = { 512, 1024, 2048, 4096 };
     private static readonly string[] ShadowResolutionLabels = { "512", "1024", "2048", "4096" };
@@ -315,9 +321,15 @@ internal sealed class PreviewPanel : Panel
         EndDrag();
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewAmbient));
         float ambient = settings.AmbientLuminance;
-        if (ImGui.SliderFloat("##ambient", ref ambient, 0f, 5f, StageUnits.Current.FormatLuminance, ImGuiSliderFlags.Logarithmic))
-            _stage.Undo.Execute(SceneSetting(scene, "ambient", s => s.AmbientLuminance, (s, v) => s.AmbientLuminance = v, Math.Clamp(ambient, 0f, 100f)));
+        if (ImGui.SliderFloat("##ambient", ref ambient, 0f, MaxAmbientLuminance, StageUnits.Current.FormatLuminance, ImGuiSliderFlags.Logarithmic))
+        {
+            _stage.Undo.Execute(SceneSetting(scene, "ambient", s => s.AmbientLuminance, (s, v) => s.AmbientLuminance = v,
+                float.IsFinite(ambient) ? Math.Clamp(ambient, 0f, MaxAmbientLuminance) : 0f));
+        }
+
         EndDrag();
+        if (ImGui.IsItemHovered())
+            SafeText.Tooltip(StageLoc.Get(StageStr.PreviewAmbientHint));
 
         PropertyGrid.Row(StageLoc.Get(StageStr.PreviewWorkLight));
         var engine = _stage.Engine;

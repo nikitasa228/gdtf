@@ -57,4 +57,23 @@ void evaluateBrdf(SurfaceBrdf s, vec3 N, vec3 V, vec3 L, out vec3 diffuse, out v
     diffuse = (vec3(1.0) - F) * (1.0 - s.metallic) * s.albedo * INV_PI;
 }
 
+// Directional albedo of the BRDF under light of equal luminance from every direction above the surface (a uniform
+// environment): reflected luminance = these factors x the environment's luminance. Specular: Karis' analytic fit of the
+// split-sum environment BRDF for GGX ("Physically Based Shading on Mobile", 2014) with the BRDF's F0 and F90; diffuse:
+// Lambert weighted by the energy the specular part leaves. With F0 = 0 (IOR 1) the specular part vanishes and a white
+// Lambertian surface reflects exactly the environment's luminance (the furnace test).
+void ambientReflectance(SurfaceBrdf s, vec3 N, vec3 V, out vec3 diffuse, out vec3 specular)
+{
+    float NdotV = clamp(abs(dot(N, V)), 1e-4, 1.0);
+    vec3 f0 = mix(vec3(s.f0), s.albedo, s.metallic);
+    float f90 = clamp(50.0 * dot(f0, vec3(0.3333)), 0.0, 1.0);
+    const vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
+    const vec4 c1 = vec4(1.0, 0.0425, 1.04, -0.04);
+    vec4 r = s.roughness * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28 * NdotV)) * r.x + r.y;
+    vec2 ab = vec2(-1.04, 1.04) * a004 + r.zw;
+    specular = clamp(f0 * ab.x + vec3(f90 * ab.y), 0.0, 1.0);
+    diffuse = (vec3(1.0) - specular) * (1.0 - s.metallic) * s.albedo;
+}
+
 #endif

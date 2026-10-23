@@ -110,6 +110,7 @@ public sealed partial class RenderSync : IDisposable
     private long _fireStep = -1;
     private float _lastHaze = float.NaN;
     private float _lastAnisotropy = float.NaN;
+    private float _lastAmbient = float.NaN;
     private float? _hazeOverride;
     private VolumeGrid? _smokeGrid;
     private Scene _scene;
@@ -173,6 +174,17 @@ public sealed partial class RenderSync : IDisposable
             _atmosphereDirty = true;
         }
     }
+
+    /// <summary>Largest ambient luminance passed to the renderer, cd/m² (a bright daylit room is a few hundred).</summary>
+    public const float MaxAmbientLuminance = 100_000f;
+
+    /// <summary>
+    /// The ambient luminance (cd/m²) the last <see cref="Update"/> sent with the atmosphere
+    /// (<see cref="AtmosphereState.AmbientLuminance"/>): the scene's <see cref="SceneSettings.AmbientLuminance"/>, the
+    /// uniform luminance of the surroundings that lights every surface in the Full view and in the final render, clamped
+    /// to 0 … <see cref="MaxAmbientLuminance"/> (non-finite values count as 0).
+    /// </summary>
+    public float AmbientLuminance => _atmosphere.AmbientLuminance;
 
     /// <summary>Number of renderer instances created for the scene.</summary>
     public int InstanceCount
@@ -1079,12 +1091,15 @@ public sealed partial class RenderSync : IDisposable
         var settings = _scene.Settings;
         float haze = _hazeOverride ?? (float.IsFinite(settings.BaseHazeScattering) ? Math.Max(0f, settings.BaseHazeScattering) : 0f);
         float g = float.IsFinite(settings.HazeAnisotropy) ? Math.Clamp(settings.HazeAnisotropy, -0.95f, 0.95f) : 0.7f;
-        bool changed = _atmosphereDirty || haze != _lastHaze || g != _lastAnisotropy;
+        float ambient = float.IsFinite(settings.AmbientLuminance) ? Math.Clamp(settings.AmbientLuminance, 0f, MaxAmbientLuminance) : 0f;
+        bool changed = _atmosphereDirty || haze != _lastHaze || g != _lastAnisotropy || ambient != _lastAmbient;
         _atmosphereDirty = false;
         _lastHaze = haze;
         _lastAnisotropy = g;
+        _lastAmbient = ambient;
         _atmosphere.BaseScattering = haze;
         _atmosphere.Anisotropy = g;
+        _atmosphere.AmbientLuminance = ambient;
 
         var simulation = _engine.Simulation;
         var smoke = simulation.Smoke;

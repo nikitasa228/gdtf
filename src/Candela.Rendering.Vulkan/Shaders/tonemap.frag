@@ -3,7 +3,9 @@
 // Display transform at display resolution: HDR (pre-exposed linear Rec.2020, internal resolution; bilinear upscaling
 // when ResolutionScale < 1) mixed with the bloom (energy conserving: (1 - k) scene + k bloom) -> tone mapper
 // (draw.mode = TONE_*) -> analysis overlays -> sRGB encoding into the RGBA8 display image. TONE_PASSTHROUGH
-// (Colorless/Wireframe) only clamps the display-linear values. A +-0.5 LSB triangular dither from interleaved gradient
+// (Colorless/Wireframe) only clamps the display-linear values. The HDR alpha is the share of scene light: the rest
+// (reference drawings, unlit materials, written after the exposure) is shown as it is, not tone mapped
+// (displayTransformShared). A +-0.5 LSB triangular dither from interleaved gradient
 // noise hides 8-bit banding in the soft edges of light pools.
 //  Lux / noise overlay: surfaces show the overlay gradient colour of their analysis value (alpha blended in linear
 //  display space; values outside the range use the out-of-range colour).
@@ -56,12 +58,12 @@ vec4 noiseFog(vec3 origin, vec3 direction, float tMax, float jitter)
 void main()
 {
     vec2 uv = gl_FragCoord.xy * frame.displaySize.zw;
-    vec3 hdr = hasFeature(FEATURE_SCALED) ? textureLod(hdrTexture, uv, 0.0).rgb : texelFetch(hdrTexture, ivec2(gl_FragCoord.xy), 0).rgb;
-    hdr = finiteLight(hdr); // an overflowed blend (+inf) must not reach the tone mapper as NaN
+    vec4 texel = hasFeature(FEATURE_SCALED) ? textureLod(hdrTexture, uv, 0.0) : texelFetch(hdrTexture, ivec2(gl_FragCoord.xy), 0);
+    vec3 hdr = finiteLight(texel.rgb); // an overflowed blend (+inf) must not reach the tone mapper as NaN
     if (hasFeature(FEATURE_BLOOM))
         hdr = mix(hdr, finiteLight(textureLod(bloomTexture, uv, 0.0).rgb) * draw.width, frame.bloomIntensity);
 
-    vec3 display = displayTransform(hdr, draw.mode);
+    vec3 display = displayTransformShared(hdr, draw.mode, texel.a);
 
     if (frame.overlayMode != OVERLAY_NONE)
     {

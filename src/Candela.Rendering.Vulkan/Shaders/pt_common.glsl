@@ -21,7 +21,9 @@ struct PtParams
     uint seed;
     uint width;
     uint height;
-    uint pad0;
+    float ambient;        // luminance of the uniform surroundings lighting the surfaces (cd/m2): rays leaving a surface
+                          // that reach nothing add it on top of the background, unattenuated by the media (not seen
+                          // directly, not lighting the media)
 };
 
 layout(set = SET_PASS, binding = BINDING_PT_PARAMS, scalar) uniform PtParamsBlock

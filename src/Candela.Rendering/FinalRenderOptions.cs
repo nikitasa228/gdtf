@@ -45,7 +45,8 @@ public sealed class FinalRenderOptions
 
     /// <summary>
     /// Luminance of the surroundings (environment seen by rays that leave the scene), cd/m², like
-    /// <see cref="ViewOptions.BackgroundLuminance"/> (a dark venue: 0.02). It also lights the scene.
+    /// <see cref="ViewOptions.BackgroundLuminance"/> (a dark venue: 0.02). It also lights the scene. The venue's ambient
+    /// light (<see cref="AtmosphereState.AmbientLuminance"/>, set on the world) is added for rays that leave a surface.
     /// </summary>
     public float BackgroundLuminance { get; set; } = 0.02f;
 

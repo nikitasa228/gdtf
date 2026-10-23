@@ -80,7 +80,7 @@ public sealed class ShaderTests
         Assert.Equal(192, Unsafe.SizeOf<GpuShadowSlot>());
         Assert.Equal(48, Unsafe.SizeOf<GpuVpl>());
         Assert.Equal(16, Unsafe.SizeOf<GpuExposureResult>());
-        Assert.Equal(992, Unsafe.SizeOf<GpuFrameData>());
+        Assert.Equal(996, Unsafe.SizeOf<GpuFrameData>()); // scalar layout; vkCmdUpdateBuffer needs a multiple of 4
         Assert.Equal(32, Unsafe.SizeOf<GpuDrawConstants>());
         Assert.Equal(16, Unsafe.SizeOf<GpuClusterCounter>());
         Assert.Equal(32, Unsafe.SizeOf<LineVertex>());

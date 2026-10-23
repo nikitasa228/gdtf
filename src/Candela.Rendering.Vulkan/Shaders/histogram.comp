@@ -2,7 +2,9 @@
 #extension GL_GOOGLE_include_directive : require
 // Auto exposure, step 1: histogram of log2 scene luminance (cd/m2: HDR / exposure) over HISTOGRAM_BINS bins between
 // HISTOGRAM_MIN_LOG2 and HISTOGRAM_MAX_LOG2, accumulated in shared memory per 16 x 16 tile and added to the view's
-// exposure buffer (cleared every frame).
+// exposure buffer (cleared every frame). Pixels whose HDR alpha (the share of scene light) is below one half show mostly
+// display-referred colour — reference drawings and unlit materials, written after the exposure — and are left out: they
+// do not scale with the exposure, so metering them would chase its own tail.
 
 #include "view.glsl"
 #include "color.glsl"
@@ -31,11 +33,15 @@ void main()
     ivec2 size = ivec2(frame.renderSize.xy);
     if (all(lessThan(p, size)))
     {
-        vec3 hdr = finiteLight(texelFetch(hdrTexture, p, 0).rgb);
-        float luminance = max(luminanceRec2020(hdr), 0.0) / max(frame.exposure, 1e-30);
-        float x = (log2(max(luminance, 1e-12)) - HISTOGRAM_MIN_LOG2) / (HISTOGRAM_MAX_LOG2 - HISTOGRAM_MIN_LOG2);
-        uint bin = uint(clamp(x * float(HISTOGRAM_BINS), 0.0, float(HISTOGRAM_BINS - 1u)));
-        atomicAdd(sBins[bin], 1u);
+        vec4 texel = texelFetch(hdrTexture, p, 0);
+        if (!(texel.a < 0.5))
+        {
+            vec3 hdr = finiteLight(texel.rgb);
+            float luminance = max(luminanceRec2020(hdr), 0.0) / max(frame.exposure, 1e-30);
+            float x = (log2(max(luminance, 1e-12)) - HISTOGRAM_MIN_LOG2) / (HISTOGRAM_MAX_LOG2 - HISTOGRAM_MIN_LOG2);
+            uint bin = uint(clamp(x * float(HISTOGRAM_BINS), 0.0, float(HISTOGRAM_BINS - 1u)));
+            atomicAdd(sBins[bin], 1u);
+        }
     }
 
     barrier();

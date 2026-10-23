@@ -1,10 +1,12 @@
 #version 460
 #extension GL_GOOGLE_include_directive : require
 // Display transform of the final render, the same as the real-time view's (tonemap.frag without bloom and overlays):
-// mean luminance (cd/m2) x exposure (draw.width) -> tone mapper (draw.mode = TONE_*) -> sRGB encoding with a +-0.5 LSB
-// triangular dither into the RGBA8 output. draw.instanceIndex flags: PT_DISPLAY_MEAN = the source is ptInput (mean,
-// e.g. denoised) instead of ptAccum (sum + count); PT_DISPLAY_HISTOGRAM = only add the pixels to the log2-luminance
-// histogram of the auto exposure (the bins of histogram.comp).
+// mean luminance (cd/m2) x exposure (draw.width) + mean display-referred overlay (unlit and reference surfaces, as the
+// real-time view draws them into its exposed HDR image) -> tone mapper (draw.mode = TONE_*; the overlay's share of the
+// pixel, its mean coverage, is shown as it is: displayTransformShared) -> sRGB encoding with a +-0.5 LSB triangular
+// dither into the RGBA8 output. draw.instanceIndex flags: PT_DISPLAY_MEAN = the source is ptInput
+// (mean, e.g. denoised) instead of ptAccum (sum + count); PT_DISPLAY_HISTOGRAM = only add the pixels' scene light (not
+// the overlay) to the log2-luminance histogram of the auto exposure (the bins of histogram.comp).
 
 #include "pt_common.glsl"
 #include "tonemap.glsl"
@@ -14,6 +16,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 layout(set = SET_PASS, binding = BINDING_PT_ACCUM, rgba32f) uniform readonly image2D ptAccum;
 layout(set = SET_PASS, binding = BINDING_PT_INPUT, rgba32f) uniform readonly image2D ptInput;
 layout(set = SET_PASS, binding = BINDING_PT_OUTPUT, rgba8) uniform writeonly image2D ptOutput;
+layout(set = SET_PASS, binding = BINDING_PT_OVERLAY, rgba32f) uniform readonly image2D ptOverlay;
 
 void main()
 {
@@ -43,8 +46,11 @@ void main()
         return;
     }
 
-    vec3 hdr = finiteLight(mean * draw.width);
-    vec3 encoded = srgbEncode(displayTransform(hdr, draw.mode));
+    vec4 overlay = imageLoad(ptOverlay, p) / max(imageLoad(ptAccum, p).a, 1.0);
+    vec3 shown = isFiniteVec(overlay.rgb) ? max(overlay.rgb, vec3(0.0)) : vec3(0.0);
+    float coverage = overlay.a >= 0.0 ? min(overlay.a, 1.0) : 0.0;
+    vec3 hdr = finiteLight(mean * draw.width + shown);
+    vec3 encoded = srgbEncode(displayTransformShared(hdr, draw.mode, 1.0 - coverage));
     vec2 fragCoord = vec2(p) + 0.5;
     float noise = interleavedGradientNoise(fragCoord) + interleavedGradientNoise(fragCoord + vec2(47.0, 17.0)) - 1.0;
     imageStore(ptOutput, p, vec4(clamp(encoded + noise / 255.0, 0.0, 1.0), 1.0));

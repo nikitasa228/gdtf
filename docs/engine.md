@@ -133,6 +133,19 @@ three messages per issue code and how many more):
   order survive export and reopen (docs/mvr.md).
 * **Content MVR cannot hold** (images, cameras, consoles, …) is listed as `mvr.not-representable` notes.
 
+**Stage floor** (`StageFloor`). MVR exports often contain only the rig (Фокина: 91 fixtures and nothing else), so the
+light lands on nothing. `StageFloor.CreateIfMissing(scene, modelBounds, name)` builds — without adding it — a
+`WallKind.Floor` wall of `MaterialIds.WoodStage`, `Thickness` 0.1 m thick, covering the content's footprint
+(`SceneBounds.Compute`) plus `Margin` = 3 m on every side, its top face at the lowest point the content rests on but at
+most Z = 0 (`SceneBounds.LowestPoint`: the bottom of walls, images, trusses and models, the origin of fixtures and
+devices — a floor-standing fixture's base, not the ± 0.3 m framing box around it, which would leave it floating 0.3 m
+above the floor); it returns null when the scene has no content or already has a floor: a floor wall (hidden or not),
+or a visible model that reaches within 5 cm of that lowest point and covers at least half of the footprint (a venue or
+set model brings its own floor, and a second one at the same height would z-fight with it). Model bounds are asked once
+per model asset. `AddIfMissing(engine, name)` adds it
+directly (the CLI's `--floor auto`); the editor adds the same floor through an undoable command when it opens a
+floorless MVR (docs/editor.md), so both use one rule. `HasFloor` and `SizeOf` answer the questions on their own.
+
 ### Import worker (native-crash isolation)
 
 Assimp is native code: a crafted OBJ, FBX, COLLADA or 3DS file could crash the process despite the checks in
@@ -255,7 +268,7 @@ update).
 | Trusses | Their model, or `TrussMesh` in aluminium. |
 | Cables | Tube meshes (`CableTubeMesh`, catenary sag from the slack factor, dark rubber tinted by the type) plus coloured lines (`SetLines`, the cable type's colour) for the cable overlay; rebuilt when an anchor entity moves. **Cables lie on surfaces** (`CableSupports`, a `CableSupportSurfaces`): the ground plane (`GroundHeight`, Z = 0 m by default, where the cable tool puts free nodes; null for none) and the upper faces of floors and ceilings (`WallComponent` Floor/Ceiling, also tilted up to 60°). A span is drawn straight when it is fixed along an object (both nodes anchored to the same entity: truss, wall, floor) or lies on a surface (both nodes rest within 5 cm on surfaces of the same height); other spans sag with the cable's slack but never below the surface under them — a sample is kept a tube radius above the highest surface not above the span's chord or the cable's height at the previous sample, walked from both ends, so a cable leaving a riser drapes over its edge (a taut span too) while one running under a platform is left alone; on a ramp the tube keeps its radius along the surface normal. Moving, adding or editing a floor redraws only the cables whose nodes' horizontal extent meets the floors that changed (`CableSupportSurfaces.TakeChanges`), so dragging or resizing a floor does not redraw every cable on every frame; changing the ground redraws them all. Drawing only: cut lengths stay routed length × slack. |
 | Consoles, power sources, rigging points | Simple primitives: a desk and a distro box of `DeviceCatalog.ConsoleSize` / `PowerSourceSize` (the sizes the Devices section and the cable tool use) standing on their origin, a hoist. |
-| Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, the smoke density grid when the smoke simulation stepped, one temperature grid per flame (its own box and resolution: the first as `FlameTemperature`, the others as `FlameTemperatures`; the grid objects are reused between steps); noise sources every frame. |
+| Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, `SceneSettings.AmbientLuminance` as `AtmosphereState.AmbientLuminance` (cd/m², clamped to 0 … `RenderSync.MaxAmbientLuminance` = 100 000; non-finite or negative = 0; the last value sent is `RenderSync.AmbientLuminance`), the smoke density grid when the smoke simulation stepped, one temperature grid per flame (its own box and resolution: the first as `FlameTemperature`, the others as `FlameTemperatures`; the grid objects are reused between steps); noise sources every frame. |
 
 **Flags.** `Selected` (selection), `Hidden` (entity or an ancestor hidden, or its layer hidden; a hidden fixture still
 emits its light — hiding the rig to look at the stage keeps the stage lit; its dimmer switches it off), `CableHighlight`
@@ -278,19 +291,21 @@ model, a wall, a cable) — for box selection, framing and drop targets; boxes l
 and non-finite placements are left out of the visible totals. Nothing is allocated per query beyond the caller's list.
 
 **Work light.** `RenderSync.WorkLight` (`WorkLightMode`: `Off` — the default, so renders never get it unless asked —,
-`Auto`, `On`) adds `WorkLightRig`'s dim neutral rig to the light list sent to the renderer: one D65 key light from the
-audience side (front-left, above; 40 lx at the centre on a surface facing it; casts shadows) and a soft ambient of six
-very wide lights from ±X, ±Y and ±Z (8 lx each on a surface facing them; no shadows), aimed at the centre of the drawn
-content from 2.5 × its radius (at least 5 m). `Auto` adds it only while no stage light reaches 1 cd (no fixture emits,
+`Auto`, `On`) adds `WorkLightRig`'s neutral rig to the light list sent to the renderer: one D65 key light from the
+audience side (front-left, above; 300 lx at the centre on a surface facing it; casts shadows) and a soft ambient of six
+very wide lights from ±X, ±Y and ±Z (60 lx each on a surface facing them; no shadows), aimed at the centre of the drawn
+content from 2.5 × its radius (at least 5 m). The levels are a stage work light's, about half a lit stage, so the set
+reads clearly at the editor's default exposure (EV 8, a lit stage); the earlier 40 lx left a freshly opened Фокина
+practically black there (its floor 5/255). `Auto` adds it only while no stage light reaches 1 cd (no fixture emits,
 every dimmer closed). The rig is placed around `WorkLightContent`: the visible instances like `VisibleWorldBounds()`, but
 with each fixture's parts at the fixture's own placement instead of their pan/tilt pose, so where the heads point (DMX,
 motors still travelling when the rig was placed) never moves it. It depends only on that box and is recomputed only when
 the scene or the set of drawn entities changes, so the same scene always gets the same work light, whatever happened
 before, and it costs nothing per frame. It is not stage light: `engine.Lights`, the
 light meter and the light plot never include it, and it is left out while the project's view shows the lux overlay.
-Its lights carry `SpotLight.NoVolumetricScattering = true`, so a renderer that honours the flag lights the set with them
-without making the haze glow (the Vulkan renderer does not read the flag yet; until it does, the work light also
-scatters in haze, as before). The
+Its lights carry `SpotLight.NoVolumetricScattering = true`, which the Vulkan renderer honours (no froxel injection, no
+raymarched beam, no in-scattering in the path tracer), so the work light lights the set without making the haze glow.
+The
 editor's preview passes `ViewSettings.WorkLight` (stored with the project, default `Auto`); `candela render
 --work-light auto|on` asks for it in a render. `IsWorkLightOn` and `WorkLights` tell what the last update sent, `WorkLightContent` the box the rig was placed around.
 
@@ -409,8 +424,9 @@ each side of the picture touches its outermost point with a 10 % margin and the 
 the picture. `--out` must name a file (a folder is a usage error). `--overlay lux` keeps the default gradient
 (1 … 5000 lx) unless the floor is brighter; then the same colours are stretched up to the brightest floor reading
 (a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
-the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets a
-temporary wooden stage floor under its footprint (`--floor none` disables it). `--work-light auto` (or `on`) adds the
+the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets the engine's stage
+floor for the render (`StageFloor.AddIfMissing`, the floor the editor adds when it opens a floorless MVR; `--floor none`
+disables it). `--work-light auto` (or `on`) adds the
 work light (see RenderSync) for scenes whose fixtures are dark; a render never gets it unless asked, and never in a
 `--overlay lux` picture (the overlay of the picture rendered decides, not the one saved with a project). The exposure is automatic by default
 (`--ev auto`): a stage picture is mostly dark air with bright beams and pools, which a reading of the floor alone says
@@ -555,6 +571,17 @@ a device):
   the stage; the thumbnail of the MAC Viper shows the fixture against the background, is cached, and orbit frames
   differ; a GDTF deleted since the scan gives a dark thumbnail, not an exception; `--look dmx-file` plays a recording
   for `--time` before rendering.
+* **Lighting baseline** (`LightingBaselineTests.cs`: `StageFloorTests`, `ReferenceDrawingCliTests`): Фокина gets a
+  wood floor under every fixture with the 3 m margin, top at the stage level, created without being added;
+  `AddIfMissing` adds it once; a floor wall (also hidden) counts, a wall does not, an empty scene gets none, content below
+  Z = 0 puts the floor under it (at a pit light's base) and a NaN position is ignored; fixtures and a console standing at
+  Z = 0 stand on the floor (top at 0, not 0.3 m lower); a 20 × 15 m venue model on the ground is the floor, also lowered
+  to the stage level with a floor-standing fixture on it, a 1 m prop is not (nor the venue hidden, nor without model
+  bounds); `SceneSettings.AmbientLuminance` reaches the
+  atmosphere (30 → 30, unchanged → no update, NaN/−3/∞ → 0, 10⁹ → `MaxAmbientLuminance`); a project holding only a red
+  and green opaque reference drawing renders with `candela render` (auto exposure), `--final` (auto exposure) and
+  `--final --ev 2` showing both halves in the image's own colours (±8/255: not tone mapped, not fogged by the default
+  haze, whatever the exposure), and every render prints the added stage floor (Vulkan).
 * **Final render CLI** (`FinalRenderCliTests`): the `--final` options parse, have their defaults (`--seconds` alone
   renders until the time is up) and are refused without `--final` or with `--mode`/`--overlay`/`--grid`; times parse
   as seconds or timecodes (drop-frame with `;`), timecodes need a recording, an end before the start is refused; a
@@ -584,7 +611,7 @@ a device):
   only when enabled; view/engine settings changes make the project modified, survive save and reopen and reach the
   autosave; flags after 120 random visibility/layer/selection/reparent/lock/cable edits equal a per-frame scan, steady
   frames send no flag updates, a selected group can outline its content; world bounds per entity and pick id follow
-  moves and hiding; the work light lights a dark scene in `Auto` (40 lx key at the centre, never in `engine.Lights` or
+  moves and hiding; the work light lights a dark scene in `Auto` (300 lx key at the centre, never in `engine.Lights` or
   the light meter, off with a lit fixture, on top of it in `On`, off under the lux overlay, deterministic) and its key
   covers the content; a 44 Hz console recorded by a 30 fps engine keeps every packet at its arrival time and a
   timecode seek lands between engine frames; unchanged packets are not recorded, a timed-out source is stamped when it

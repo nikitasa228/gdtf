@@ -353,8 +353,22 @@ internal sealed class ForwardTransparentPass : RenderPass
     public override void Execute(PassContext context)
     {
         PassRecording.Begin(context, context.Target.Hdr, null, context.Target.Depth, depthClear: false);
-        PassRecording.BindGraphics(context, context.Pipelines.ForwardTransparent);
-        PassRecording.DrawMeshes(context, context.Draws.Blended);
+        // Back to front, in runs: reference instances (display-referred drawings) with the pipeline that takes their
+        // coverage out of the HDR image's scene-light share (its alpha, which the auto exposure meters by).
+        var items = context.Draws.Blended;
+        var world = context.World;
+        int start = 0;
+        while (start < items.Length)
+        {
+            bool reference = (world.InstanceAt(items[start].Instance).Flags & InstanceFlags.Reference) != 0;
+            int end = start + 1;
+            while (end < items.Length && ((world.InstanceAt(items[end].Instance).Flags & InstanceFlags.Reference) != 0) == reference)
+                end++;
+            PassRecording.BindGraphics(context, reference ? context.Pipelines.ForwardReference : context.Pipelines.ForwardTransparent);
+            PassRecording.DrawMeshes(context, items[start..end]);
+            start = end;
+        }
+
         context.Context.Vk.CmdEndRendering(context.Cmd);
     }
 }

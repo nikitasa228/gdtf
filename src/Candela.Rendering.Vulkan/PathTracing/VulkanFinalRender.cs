@@ -61,12 +61,12 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     private readonly bool _autoExposure;
     private readonly ExposureMetering _metering;
     private readonly float _compensation;
-    private readonly float _cameraExposure;
     private readonly TimeSpan? _timeLimit;
     private readonly Vector3 _mediaMin;
     private readonly Vector3 _mediaMax;
 
     private readonly GpuImage _accum;
+    private readonly GpuImage _overlay;
     private readonly GpuImage _aux;
     private readonly GpuImage _guide;
     private readonly GpuImage _ping;
@@ -148,8 +148,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         _metering = options.Metering is ExposureMetering.Average or ExposureMetering.Stage ? options.Metering : ExposureMetering.Stage;
         _compensation = float.IsFinite(options.ExposureCompensation) ? Math.Clamp(options.ExposureCompensation, -20f, 20f) : 0f;
         float ev = (float.IsFinite(camera.Ev100) ? camera.Ev100 : 6f) - _compensation;
-        _cameraExposure = Units.ExposureFromEv100(ev);
-        _exposure = _cameraExposure;
+        _exposure = Units.ExposureFromEv100(ev);
         _timeLimit = options.TimeLimit is { } limit && limit > TimeSpan.Zero ? limit : null;
 
         // The lights are fixed for the whole render (their indices address the light geometry).
@@ -208,6 +207,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             var storage = ImageUsageFlags.StorageBit | ImageUsageFlags.TransferSrcBit | ImageUsageFlags.TransferDstBit;
             uint w = (uint)_width, h = (uint)_height;
             _accum = GpuImage.Create2D(_context, w, h, Format.R32G32B32A32Sfloat, storage, "final render accumulation", dedicated: true);
+            _overlay = GpuImage.Create2D(_context, w, h, Format.R32G32B32A32Sfloat, storage, "final render display-referred overlay", dedicated: true);
             _aux = GpuImage.Create2D(_context, w, h, Format.R32G32B32A32Sfloat, storage, "final render albedo", dedicated: true);
             _guide = GpuImage.Create2D(_context, w, h, Format.R32G32B32A32Sfloat, storage, "final render normal and depth", dedicated: true);
             _ping = GpuImage.Create2D(_context, w, h, Format.R32G32B32A32Sfloat, storage, "final render denoise ping", dedicated: true);
@@ -263,10 +263,11 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     public float Exposure => _exposure;
 
     /// <summary>
-    /// GPU memory of the images of a <paramref name="width"/> × <paramref name="height"/> render, bytes: five RGBA32F
-    /// images (accumulation, albedo, normal + depth, two denoiser buffers), the RGBA8 display and the RGBA32F read-back.
+    /// GPU memory of the images of a <paramref name="width"/> × <paramref name="height"/> render, bytes: six RGBA32F
+    /// images (accumulation, display-referred overlay, albedo, normal + depth, two denoiser buffers), the RGBA8 display
+    /// and the RGBA32F read-back.
     /// </summary>
-    public static ulong ImageBytes(int width, int height) => (ulong)Math.Max(width, 0) * (ulong)Math.Max(height, 0) * (5 * 16 + 4 + 16);
+    public static ulong ImageBytes(int width, int height) => (ulong)Math.Max(width, 0) * (ulong)Math.Max(height, 0) * (6 * 16 + 4 + 16);
 
     /// <summary>Output width, px.</summary>
     public int Width => _width;
@@ -576,6 +577,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     private void DeclareTraceResources(BarrierBatch b)
     {
         b.Use(_accum, ImageUse.StorageCompute);
+        b.Use(_overlay, ImageUse.StorageCompute);
         b.Use(_aux, ImageUse.StorageCompute);
         b.Use(_guide, ImageUse.StorageCompute);
         _tlas.DeclareRead(b);
@@ -634,7 +636,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
 
         var clear = new ClearColorValue(0f, 0f, 0f, 0f);
         var range = new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1);
-        foreach (var image in new[] { _accum, _aux, _guide, _ping, _pong })
+        foreach (var image in new[] { _accum, _overlay, _aux, _guide, _ping, _pong })
         {
             b.Use(image, ImageUse.TransferDestination, discard: true);
             b.Flush();
@@ -642,7 +644,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         }
 
         // Every image of the path tracer's sets lives in GENERAL from now on (shaders may statically use any of them).
-        foreach (var image in new[] { _accum, _aux, _guide, _ping, _pong })
+        foreach (var image in new[] { _accum, _overlay, _aux, _guide, _ping, _pong })
             b.Use(image, ImageUse.StorageCompute);
         b.Use(_display, ImageUse.StorageCompute, discard: true);
         b.Flush();
@@ -694,8 +696,9 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         _frameData.NoiseMax = new Vector4(gpu.Noise.BoxMax, 0f);
         _frameData.NoiseSourceCount = (uint)gpu.NoiseSources.Count;
         _params.MediaMax.W = hazeSigma;
-        _params.Majorants = new Vector4(smokeMajorant, flame ? VulkanRenderer.FlameAbsorption : 0f, g, 1f / MathF.Max(_exposure, 1e-30f));
+        _params.Majorants = new Vector4(smokeMajorant, flame ? VulkanRenderer.FlameAbsorption : 0f, g, 0f);
         _params.Flags = flags;
+        _params.AmbientLuminance = VulkanRenderer.AmbientLuminanceOf(atmosphere);
 
         b.Use(_frameBuffer, BufferUse.TransferDestination);
         b.Use(_paramsBuffer, BufferUse.TransferDestination);
@@ -854,6 +857,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         w.Image(set, ShaderConstants.BindingPtGuide, DescriptorType.StorageImage, default, _guide.View, general);
         w.Image(set, ShaderConstants.BindingPtOutput, DescriptorType.StorageImage, default, output.View, general);
         w.Image(set, ShaderConstants.BindingPtInput, DescriptorType.StorageImage, default, input.View, general);
+        w.Image(set, ShaderConstants.BindingPtOverlay, DescriptorType.StorageImage, default, _overlay.View, general);
         w.AccelerationStructure(set, ShaderConstants.BindingPtTlas, _tlas.Handle);
         w.Buffer(set, ShaderConstants.BindingPtGeometry, DescriptorType.StorageBuffer, _scene.GeometryTable.Handle);
         w.Buffer(set, ShaderConstants.BindingPtLights, DescriptorType.StorageBuffer, _lightBuffer.Handle);
@@ -1010,19 +1014,27 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     private void DeclareDisplayReads(BarrierBatch b, GpuImage source)
     {
         b.Use(_accum, ImageUse.StorageCompute);
+        b.Use(_overlay, ImageUse.StorageCompute);
         b.Use(ReferenceEquals(source, _pong) ? _pong : _ping, ImageUse.StorageCompute);
     }
 
+    /// <summary>
+    /// The result as the display transform gets it: mean radiance × <paramref name="exposure"/> plus the mean
+    /// display-referred overlay (unlit and reference surfaces, see pt_trace.comp).
+    /// </summary>
     private ImageData ReadHdr(GpuImage source, bool mean, float exposure)
     {
         var values = ReadFloats(source);
+        var overlay = ReadFloats(_overlay);
+        var counts = mean ? ReadFloats(_accum) : values;
         int pixels = _width * _height;
         for (int i = 0; i < pixels; i++)
         {
-            float scale = exposure / (mean ? 1f : MathF.Max(values[4 * i + 3], 1f));
-            values[4 * i] = Finite(values[4 * i] * scale);
-            values[4 * i + 1] = Finite(values[4 * i + 1] * scale);
-            values[4 * i + 2] = Finite(values[4 * i + 2] * scale);
+            float n = MathF.Max(counts[4 * i + 3], 1f);
+            float scale = exposure / (mean ? 1f : n);
+            values[4 * i] = Finite(values[4 * i] * scale + overlay[4 * i] / n);
+            values[4 * i + 1] = Finite(values[4 * i + 1] * scale + overlay[4 * i + 1] / n);
+            values[4 * i + 2] = Finite(values[4 * i + 2] * scale + overlay[4 * i + 2] / n);
             values[4 * i + 3] = 1f;
         }
 
@@ -1123,6 +1135,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
         Release(_volumeBuffer);
         Release(_lensBuffer);
         Release(_accum);
+        Release(_overlay);
         Release(_aux);
         Release(_guide);
         Release(_ping);

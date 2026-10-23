@@ -205,6 +205,7 @@ struct FrameData
     float beamQuality;       // 0.25 .. 1: scales the segments and cookie samples per beam crossing (load shedding)
     float beamSigmaRef;      // scattering coefficient (1/m) of the beam envelope image (temporal ratio reference)
     uint clusterListedLights; // lights the cluster masks list (lights[0 .. clusterListedLights)); the rest are not drawn
+    float ambientLuminance;  // Full view: luminance (cd/m2) of the uniform surroundings lighting every surface; 0 = none
 };
 
 layout(set = SET_VIEW, binding = BINDING_FRAME, scalar) uniform FrameBlock

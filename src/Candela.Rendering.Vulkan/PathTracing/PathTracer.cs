@@ -141,6 +141,7 @@ internal sealed unsafe class PathTracer : IDisposable
         bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPtParams, DescriptorType.UniformBuffer, 1, compute);
         bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPtHistogram, DescriptorType.StorageBuffer, 1, compute);
         bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPtInput, DescriptorType.StorageImage, 1, compute);
+        bindings[n++] = new DescriptorSetLayoutBinding(ShaderConstants.BindingPtOverlay, DescriptorType.StorageImage, 1, compute);
         var info = new DescriptorSetLayoutCreateInfo
         {
             SType = StructureType.DescriptorSetLayoutCreateInfo,

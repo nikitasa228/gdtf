@@ -46,6 +46,11 @@ layout(set = SET_PASS, binding = BINDING_PT_ACCUM, rgba32f) uniform image2D ptAc
 layout(set = SET_PASS, binding = BINDING_PT_AUX, rgba32f) uniform image2D ptAux;
 // xyz = sum of the first surface's world normal, w = sum of its view depth
 layout(set = SET_PASS, binding = BINDING_PT_GUIDE, rgba32f) uniform image2D ptGuide;
+// rgb = sum of the display-referred colour of the unlit and reference surfaces the camera sees (linear Rec.2020, the
+// count is ptAccum's a), a = sum of their coverage: pt_display adds the mean colour after the exposure and shows that
+// share of the pixel without tone mapping — as the real-time view draws them — so they show their colours whatever
+// exposure the render ends with (auto exposure meters ptAccum only)
+layout(set = SET_PASS, binding = BINDING_PT_OVERLAY, rgba32f) uniform image2D ptOverlay;
 layout(set = SET_PASS, binding = BINDING_PT_TLAS) uniform accelerationStructureEXT ptTlas;
 layout(set = SET_PASS, binding = BINDING_PT_LIGHTS, scalar) readonly buffer PtLightBuffer
 {
@@ -349,7 +354,10 @@ bool lensBehind(vec3 o, vec3 d, float tSurface, uint skipLight, out float tLens,
 // Closest surface or lens along the ray in [0, tMax]; alpha holes and blended surfaces are crossed stochastically, and
 // surfaces within a lens's clearance in front of it are crossed (lensBehind), as next-event estimation crosses them.
 // skipLight: the lens the ray has just passed (a ray meets a lens polygon once; numerically it could meet it again).
-PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
+// camera: the ray is seen by the camera (nothing has scattered yet), so it also meets reference instances (drawings,
+// ghost geometry: PT_MASK_REFERENCE), crossed stochastically by their opacity — a blended material's own alpha, any
+// other REFERENCE_OPACITY, as the real-time view blends them.
+PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, bool camera, inout uint rng)
 {
     PtHit hit;
     hit.kind = HIT_NONE;
@@ -363,7 +371,8 @@ PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
     for (int layer = 0; layer < PT_MAX_LAYERS; ++layer)
     {
         rayQueryEXT q;
-        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, PT_MASK_SCENE | PT_MASK_DISC, o, tMin, d, tMax);
+        uint mask = PT_MASK_SCENE | PT_MASK_DISC | (camera ? PT_MASK_REFERENCE : 0u);
+        rayQueryInitializeEXT(q, ptTlas, gl_RayFlagsNoneEXT, mask, o, tMin, d, tMax);
         while (rayQueryProceedEXT(q))
         {
             if (rayQueryGetIntersectionTypeEXT(q, false) == gl_RayQueryCandidateIntersectionTriangleEXT)
@@ -391,10 +400,14 @@ PtHit traceSurface(vec3 o, vec3 d, float tMax, uint skipLight, inout uint rng)
         uint geometry = uint(rayQueryGetIntersectionGeometryIndexEXT(q, true));
         vec2 bary = rayQueryGetIntersectionBarycentricsEXT(q, true);
         Material m = materials[rtMaterialIndex(custom, geometry)];
-        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
+        bool reference = (instances[custom].flags & INSTANCE_FLAG_REFERENCE) != 0u;
+        if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u || reference)
         {
-            RtSurface s = rtFetchSurface(custom, geometry, primitive, bary);
-            float coverage = coverageOf(m, s.uv);
+            float coverage = 1.0;
+            if ((m.flags & (MATERIAL_ALPHA_MASK | MATERIAL_ALPHA_BLEND)) != 0u)
+                coverage = coverageOf(m, rtFetchSurface(custom, geometry, primitive, bary).uv);
+            if (reference && (m.flags & MATERIAL_ALPHA_BLEND) == 0u)
+                coverage *= REFERENCE_OPACITY;
             if (coverage < 1.0 && rand(rng) >= coverage)
             {
                 tMin = t + max(1e-4, 1e-5 * t);
@@ -680,6 +693,9 @@ float equiAngularPhase(float theta)
 // phase function over the angle subtended (Simpson's rule). `cone` returns that part.
 float segmentLightWeight(Light l, vec3 o, vec3 d, vec2 range, out vec2 cone)
 {
+    cone = vec2(0.0);
+    if ((l.flags & LIGHT_NO_VOLUME) != 0u)
+        return 0.0; // lights surfaces only (the editor's work light): no in-scattering
     cone = coneInterval(l, o, d, range);
     if (!(cone.x < cone.y))
         return 0.0;
@@ -1007,6 +1023,8 @@ void main()
     o = worldFromDepth(uv, 1.0);
 
     vec3 radiance = vec3(0.0);
+    vec3 overlay = vec3(0.0);          // display-referred colour seen directly (unlit and reference surfaces)
+    float overlayCoverage = 0.0;       // ... and the share of the sample it covers (0 or 1: opacity is sampled)
     vec3 beta = vec3(1.0);
     bool visible = true;               // nothing has scattered yet: the camera sees what the ray reaches
     uint surfaceBounces = 0u;
@@ -1035,9 +1053,14 @@ void main()
 
     for (int iteration = 0; iteration < PT_MAX_ITERATIONS; ++iteration)
     {
-        PtHit hit = traceSurface(o, d, PT_FAR, passedLens, rng);
+        PtHit hit = traceSurface(o, d, PT_FAR, passedLens, visible, rng);
         float tEnd = hit.kind == HIT_NONE ? PT_FAR : hit.t;
         bool scattered = surfaceBounces + volumeVertices > 0u;
+        // The camera sees a display-referred surface (a reference instance or an unlit material): drawn over the scene
+        // as the real-time view draws it, not fogged by the media in front of it (see the overlay below).
+        bool overlayHit = visible && hit.kind == HIT_SURFACE &&
+            ((instances[hit.instance].flags & INSTANCE_FLAG_REFERENCE) != 0u ||
+             (materials[rtMaterialIndex(hit.instance, hit.geometry)].flags & MATERIAL_UNLIT) != 0u);
 
         if (!aovDone)
         {
@@ -1059,7 +1082,13 @@ void main()
             }
         }
 
-        if (media)
+        // The surroundings (AtmosphereState.AmbientLuminance) light a surface along a direction sampled from its BSDF
+        // that leaves the scene, unattenuated by the media: a scattering medium in a uniform environment scatters as much
+        // of it into the ray as out of it (the real-time view's ambient term, here shadowed and bounced).
+        if (hit.kind == HIT_NONE && prevKind == PREV_SURFACE)
+            radiance += clampContribution(beta * vec3(params.ambient), scattered);
+
+        if (media && !overlayHit)
         {
             bool mayScatter = volumeVertices < params.maxVolumeBounces;
             if (mayScatter)
@@ -1101,6 +1130,7 @@ void main()
 
         if (hit.kind == HIT_NONE)
         {
+            // the background (the surroundings' ambient light was added before the media, above)
             radiance += clampContribution(beta * params.background.rgb, scattered);
             break;
         }
@@ -1183,11 +1213,16 @@ void main()
 
         vec3 V = -d;
         vec3 albedo = albedoAt(m, s.uv);
-        if ((m.flags & MATERIAL_UNLIT) != 0u)
+        if ((m.flags & MATERIAL_UNLIT) != 0u || (instances[hit.instance].flags & INSTANCE_FLAG_REFERENCE) != 0u)
         {
-            // display-referred base colour (as in the real-time view), seen directly only
+            // display-referred base colour (as in the real-time view), seen directly only, into the overlay (not scene
+            // light: independent of the exposure); reference instances (only camera rays meet them, see traceSurface)
+            // are unlit whatever their material
             if (visible)
-                radiance += beta * albedo * params.majorants.w;
+            {
+                overlay += beta * albedo;
+                overlayCoverage = 1.0;
+            }
             break;
         }
 
@@ -1291,10 +1326,14 @@ void main()
     if (!isFiniteVec(radiance))
         radiance = vec3(0.0);
     radiance = max(radiance, vec3(0.0));
+    overlay = isFiniteVec(overlay) ? max(overlay, vec3(0.0)) : vec3(0.0);
+    overlayCoverage = overlayCoverage >= 0.0 ? overlayCoverage : 0.0;
 
     ivec2 p = ivec2(pixel);
     float lum = luminanceRec2020(radiance);
     imageStore(ptAccum, p, imageLoad(ptAccum, p) + vec4(radiance, 1.0));
     imageStore(ptAux, p, imageLoad(ptAux, p) + vec4(aovAlbedo, lum * lum));
     imageStore(ptGuide, p, imageLoad(ptGuide, p) + vec4(aovNormal, aovDepth));
+    if (overlayCoverage > 0.0)
+        imageStore(ptOverlay, p, imageLoad(ptOverlay, p) + vec4(overlay, overlayCoverage));
 }

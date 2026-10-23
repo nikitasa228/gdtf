@@ -37,7 +37,7 @@ public sealed partial class RenderSync
     }
 
     /// <summary>
-    /// The work light of this binding (see <see cref="WorkLightRig"/>): a dim neutral key and ambient light added to the
+    /// The work light of this binding (see <see cref="WorkLightRig"/>): a neutral key and ambient light added to the
     /// light list sent to the renderer — in <see cref="WorkLightMode.Auto"/> only while no stage light emits. Default
     /// <see cref="WorkLightMode.Off"/>, so renders never get it unless asked; the editor's preview passes
     /// <see cref="ViewSettings.WorkLight"/> (default <see cref="WorkLightMode.Auto"/>). It never enters

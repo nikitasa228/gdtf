@@ -58,7 +58,7 @@ internal static class ShaderConstants
     public const uint BindingPassBuffer = 7;
 
     // Set 2 of the path tracer's pipelines (PathTracer): accumulation images, its acceleration structure, light
-    // snapshot, parameters and the exposure histogram.
+    // snapshot, parameters, the exposure histogram and the display-referred overlay (unlit and reference surfaces).
     public const uint BindingPtAccum = 0;
     public const uint BindingPtAux = 1;
     public const uint BindingPtGuide = 2;
@@ -69,7 +69,14 @@ internal static class ShaderConstants
     public const uint BindingPtParams = 7;
     public const uint BindingPtHistogram = 8;
     public const uint BindingPtInput = 9;
-    public const uint PtBindingCount = 10;
+    public const uint BindingPtOverlay = 10;
+    public const uint PtBindingCount = 11;
+
+    /// <summary>
+    /// Opacity of reference instances (<see cref="InstanceFlags.Reference"/>) whose material is not alpha-blended (ghost
+    /// geometry), in the real-time view and the path tracer; a blended material (an imported drawing) brings its own.
+    /// </summary>
+    public const float ReferenceOpacity = 0.5f;
 
     /// <summary>Cull-mask bit of the path tracer's light discs (the emitting lens of each spot light).</summary>
     public const uint PtMaskDisc = 0x02;
@@ -156,6 +163,12 @@ internal static class ShaderConstants
     public const uint LightGobo = 1u << 1;
     public const uint LightBlades = 1u << 2;
     public const uint LightPrism = 1u << 3;
+
+    /// <summary>
+    /// The light does not scatter in participating media (<see cref="SpotLight.NoVolumetricScattering"/>: the editor's
+    /// work light): no froxel injection, no raymarched beam, no in-scattering in the path tracer; it lights surfaces only.
+    /// </summary>
+    public const uint LightNoVolume = 1u << 4;
 
     // Per-view light flags (LightView.flags).
 
@@ -296,8 +309,12 @@ internal static class ShaderConstants
         ("BINDING_PT_PARAMS", I(BindingPtParams)),
         ("BINDING_PT_HISTOGRAM", I(BindingPtHistogram)),
         ("BINDING_PT_INPUT", I(BindingPtInput)),
+        ("BINDING_PT_OVERLAY", I(BindingPtOverlay)),
         ("PT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
         ("PT_MASK_SHADOW", I(RayTracingScene.ShadowCasterMask) + "u"),
+        ("PT_MASK_REFERENCE", I(RayTracingScene.ReferenceMask) + "u"),
+        ("RT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
+        ("REFERENCE_OPACITY", F(ReferenceOpacity)),
         ("PT_MASK_DISC", I(PtMaskDisc) + "u"),
         ("PT_MASK_LIGHT_VOLUME", I(PtMaskLightVolume) + "u"),
         ("PT_CUSTOM_DISC", I(PtCustomDisc) + "u"),
@@ -336,6 +353,7 @@ internal static class ShaderConstants
         ("LIGHT_GOBO", I(LightGobo)),
         ("LIGHT_BLADES", I(LightBlades)),
         ("LIGHT_PRISM", I(LightPrism)),
+        ("LIGHT_NO_VOLUME", I(LightNoVolume)),
         ("LIGHT_VIEW_BEAM", I(LightViewBeam)),
         ("LIGHT_VIEW_RSM", I(LightViewRsm)),
         ("NO_SHADOW", I(NoShadow) + "u"),

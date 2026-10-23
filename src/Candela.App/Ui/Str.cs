@@ -346,6 +346,8 @@ internal enum Str
     MsgNewScene,
     MsgFileMissing,
     MsgOpened,
+    MsgStageFloorAdded,
+    StageFloorName,
     MsgNeedsSaveAs,
     MsgSaved,
     MsgImported,

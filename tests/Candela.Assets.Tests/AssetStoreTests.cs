@@ -296,11 +296,40 @@ public class AssetStoreTests
 
         Assert.Equal(entry.ImageKey, posterMaterial.BaseColorTexture);
         Assert.Equal(AlphaMode.Opaque, posterMaterial.AlphaMode);
+        Assert.Equal(Vector4.One, posterMaterial.BaseColorFactor);
+        Assert.Equal(0.6f, posterMaterial.Roughness);
         Assert.Equal(0f, posterMaterial.EmissiveLuminance);
-        Assert.Equal(entry.ImageKey, referenceMaterial.EmissiveTexture);
-        Assert.Equal(ImagePlaneMesh.ReferenceLuminance, referenceMaterial.EmissiveLuminance);
+        Assert.Null(posterMaterial.EmissiveTexture);
+
+        // The drawing is the base colour (the renderer shows reference instances unlit), white × the image at its opacity.
+        Assert.Equal(entry.ImageKey, referenceMaterial.BaseColorTexture);
+        Assert.Equal(new Vector4(1f, 1f, 1f, 0.5f), referenceMaterial.BaseColorFactor);
         Assert.Equal(AlphaMode.Blend, referenceMaterial.AlphaMode);
-        Assert.Equal(0.5f, referenceMaterial.BaseColorFactor.W);
+        Assert.Equal(0f, referenceMaterial.EmissiveLuminance);
+        Assert.Null(referenceMaterial.EmissiveTexture);
         Assert.NotNull(store.Load(posterMaterial.BaseColorTexture!));
+        Assert.NotNull(store.Load(referenceMaterial.BaseColorTexture!));
+    }
+
+    [Fact]
+    public void ImagePlaneMaterialOpacityAndModes()
+    {
+        var id = Guid.NewGuid();
+        // An opaque drawing is still blended (at its own alpha 1), so it is not drawn at the renderer's 50 % of ghost geometry.
+        var opaqueReference = ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, Mode = ImageMode.Reference, Opacity = 1f });
+        Assert.Equal(AlphaMode.Blend, opaqueReference.AlphaMode);
+        Assert.Equal(1f, opaqueReference.BaseColorFactor.W);
+
+        // A see-through poster blends; damaged opacities are clamped or taken as opaque.
+        var faintPoster = ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, Mode = ImageMode.Poster, Opacity = 0.25f });
+        Assert.Equal(AlphaMode.Blend, faintPoster.AlphaMode);
+        Assert.Equal(new Vector4(1f, 1f, 1f, 0.25f), faintPoster.BaseColorFactor);
+        Assert.Equal(1f, ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, Mode = ImageMode.Poster, Opacity = float.NaN }).BaseColorFactor.W);
+        Assert.Equal(AlphaMode.Opaque, ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, Mode = ImageMode.Poster, Opacity = 7f }).AlphaMode);
+        Assert.Equal(0f, ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, Mode = ImageMode.Reference, Opacity = -1f }).BaseColorFactor.W);
+
+        // Double-sided is carried over in both modes.
+        Assert.False(ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, DoubleSided = false }).DoubleSided);
+        Assert.True(ImagePlaneMesh.CreateMaterial(new ImageComponent { ImageAssetId = id, Mode = ImageMode.Poster, DoubleSided = true }).DoubleSided);
     }
 }

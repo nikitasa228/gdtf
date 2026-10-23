@@ -102,7 +102,10 @@ public sealed class EngineViewportTests : IDisposable
             var hit = renderer.Pick(target, (int)pixel.X, (int)pixel.Y);
             if (hit is { } h && content.EntityForPick(h.PickId) is { } id)
             {
-                Assert.NotNull(session.Scene.Find(id)!.Get<FixtureComponent>()); // never a part entity
+                var picked = session.Scene.Find(id)!;
+                if (picked.Get<WallComponent>() is { Kind: WallKind.Floor })
+                    continue; // the stage floor added under the rig, seen past the fixture
+                Assert.NotNull(picked.Get<FixtureComponent>()); // never a part entity
                 if (id == fixture.Id)
                     hits++;
             }

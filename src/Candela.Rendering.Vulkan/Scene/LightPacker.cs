@@ -137,6 +137,8 @@ internal static class LightPacker
         var right = Vector3.Cross(direction, up);
 
         uint flags = light.CastShadows ? ShaderConstants.LightCastShadows : 0u;
+        if (light.NoVolumetricScattering)
+            flags |= ShaderConstants.LightNoVolume;
         if (goboSlot != 0)
             flags |= ShaderConstants.LightGobo;
         if (facets > 0)
