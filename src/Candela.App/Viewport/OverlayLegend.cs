@@ -13,11 +13,12 @@ namespace Candela.App.Viewport;
 
 /// <summary>
 /// The legend window in the bottom-right corner of a viewport that shows an analysis overlay (requirement "Оверлеи"):
-/// for Lux and Noise the gradient bar from the smallest to the largest value with its colour stops — drag, add, remove,
-/// recolour — the range limits (outside → grey), linear/log scale and the preset dropdown (Default / Custom / Save as…);
-/// for Cables the colour of every cable type used in the scene. The gradients are the shared ones of
-/// <see cref="StageToolState"/> (every viewport, the renderer's <see cref="ViewOptions"/> and the project's <c>view</c>
-/// settings section use the same objects).
+/// for Lux, Noise and Smoke the gradient bar from the smallest to the largest value with its colour stops — drag, add,
+/// remove, recolour — the range limits (outside → grey, for smoke: no colour), linear/log scale and the preset dropdown
+/// (Default / Custom / Save as…); for Smoke also the haze, the densest air and the emitters with their output, whose
+/// names the viewport writes next to their arrows; for Cables the colour of every cable type used in the scene. The
+/// gradients are the shared ones of <see cref="StageToolState"/> (every viewport, the renderer's
+/// <see cref="ViewOptions"/> and the project's <c>view</c> settings section use the same objects).
 /// </summary>
 internal sealed class OverlayLegend
 {
@@ -25,8 +26,11 @@ internal sealed class OverlayLegend
 
     private readonly GradientEditor _luxEditor = new("lux", "lx");
     private readonly GradientEditor _noiseEditor = new("noise", "dB");
+    private readonly GradientEditor _smokeEditor = new("smoke", "/m");
+    private readonly SmokeEmitterLabels _emitters = new();
     private PresetCombo<ColorGradient>? _luxPresets;
     private PresetCombo<ColorGradient>? _noisePresets;
+    private PresetCombo<ColorGradient>? _smokePresets;
     private StageToolState? _presetsOf;
     private float _height = 120f;
     private int _appliedVersion;
@@ -62,6 +66,8 @@ internal sealed class OverlayLegend
         legend.Apply(stage, viewport, active);
         if (viewport.View.Overlay == OverlayMode.None)
             return false;
+        if (viewport.View.Overlay == OverlayMode.Smoke && context.Session.Engine is { } engine)
+            legend._emitters.DrawLabels(engine, viewport.Camera, imageMin, imageSize);
         return legend.DrawWindow(stage, context.Session.Engine, viewport.View.Overlay, imageMin, imageSize);
     }
 
@@ -73,6 +79,8 @@ internal sealed class OverlayLegend
             view.LuxGradient = stage.Lux.Live;
         if (!ReferenceEquals(view.NoiseGradient, stage.Noise.Live))
             view.NoiseGradient = stage.Noise.Live;
+        if (!ReferenceEquals(view.SmokeGradient, stage.Smoke.Live))
+            view.SmokeGradient = stage.Smoke.Live;
         if (_appliedVersion != stage.ViewportApplyVersion)
         {
             _appliedVersion = stage.ViewportApplyVersion;
@@ -108,6 +116,7 @@ internal sealed class OverlayLegend
         {
             _luxEditor.Unit = StageUnits.Current.Lux;
             _noiseEditor.Unit = StageUnits.Current.Decibel;
+            _smokeEditor.Unit = StageUnits.Current.PerMetre;
             switch (mode)
             {
                 case OverlayMode.Lux:
@@ -115,6 +124,11 @@ internal sealed class OverlayLegend
                     break;
                 case OverlayMode.Noise:
                     GradientContent(stage.Noise, _noisePresets!, _noiseEditor, Icons.AudioLines, StageStr.LegendNoise, StageStr.LegendNoiseHint);
+                    break;
+                case OverlayMode.Smoke:
+                    GradientContent(stage.Smoke, _smokePresets!, _smokeEditor, Icons.CloudFog, StageStr.LegendSmoke, StageStr.LegendSmokeHint);
+                    if (engine is not null)
+                        _emitters.DrawList(engine);
                     break;
                 default:
                     CablesContent(engine);
@@ -136,6 +150,7 @@ internal sealed class OverlayLegend
     {
         OverlayMode.Lux => "##legend-lux",
         OverlayMode.Noise => "##legend-noise",
+        OverlayMode.Smoke => "##legend-smoke",
         _ => "##legend-cables",
     };
 
@@ -146,6 +161,7 @@ internal sealed class OverlayLegend
         _presetsOf = stage;
         _luxPresets = new PresetCombo<ColorGradient>(stage.Lux, "lux");
         _noisePresets = new PresetCombo<ColorGradient>(stage.Noise, "noise");
+        _smokePresets = new PresetCombo<ColorGradient>(stage.Smoke, "smoke");
     }
 
     private void GradientContent(PresetBinding<ColorGradient> binding, PresetCombo<ColorGradient> presets, GradientEditor editor, string icon,

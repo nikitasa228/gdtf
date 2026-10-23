@@ -24,6 +24,9 @@ internal static class AppActions
     /// <summary>Overlay off.</summary>
     public const string OverlayNone = "view.overlay.none";
 
+    /// <summary>Smoke overlay (density of smoke and haze, emitters marked).</summary>
+    public const string OverlaySmoke = "view.overlay.smoke";
+
     /// <summary>Grid on/off in the active viewport.</summary>
     public const string ToggleGrid = "view.grid";
 
@@ -64,6 +67,7 @@ internal static class AppActions
         Add(ViewBack, new KeyChord("Numpad1", c));
         Add(ViewBottom, new KeyChord("Numpad7", c));
         Add(OverlayNone, new KeyChord("0", KeyModifiers.Alt));
+        Add(OverlaySmoke, new KeyChord("H", KeyModifiers.Alt));
         Add(ToggleGrid, new KeyChord("G", KeyModifiers.Alt));
         Add(NewViewport, new KeyChord("N", c | KeyModifiers.Alt));
         Add(ResetLayout);

@@ -170,6 +170,7 @@ internal static class Loc
         (Str.OverlayLux, "Illuminance (lux)", "Освещённость (лк)"),
         (Str.OverlayNoise, "Noise (dB)", "Шум (дБ)"),
         (Str.OverlayCables, "Cables", "Кабели"),
+        (Str.OverlaySmoke, "Smoke and haze (1/m)", "Дым и дымка (1/м)"),
         (Str.ViewTop, "Top", "Сверху"),
         (Str.ViewBottom, "Bottom", "Снизу"),
         (Str.ViewFront, "Front", "Спереди"),

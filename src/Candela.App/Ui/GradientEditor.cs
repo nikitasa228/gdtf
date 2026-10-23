@@ -419,7 +419,7 @@ internal sealed class GradientEditor
         return (float)(Math.Round(value / magnitude) * magnitude);
     }
 
-    /// <summary>A compact value label: "0.5", "50", "300", "1.2k", "5k".</summary>
+    /// <summary>A compact value label: "0.005", "0.02", "0.5", "50", "300", "1.2k", "5k" (small values keep two significant digits).</summary>
     internal static string FormatValue(float value)
     {
         var inv = CultureInfo.InvariantCulture;
@@ -432,6 +432,10 @@ internal sealed class GradientEditor
             return value.ToString("0", inv);
         if (a >= 1f)
             return value.ToString("0.#", inv);
-        return value.ToString("0.##", inv);
+        if (a >= 0.1f || a == 0f)
+            return value.ToString("0.##", inv);
+        if (a >= 0.01f)
+            return value.ToString("0.###", inv);
+        return value.ToString("0.####", inv);
     }
 }

@@ -158,7 +158,25 @@ public enum SmokeEmitterMarkerKind
 /// <param name="Output">Current output level 0 … 1 (fog or haze output, fan speed, flame output).</param>
 /// <param name="Kind">What the device is.</param>
 /// <param name="DeviceId">Entity id of the device (for labels and picking in the editor).</param>
-public readonly record struct SmokeEmitterMarker(Vector3 Position, Vector3 Direction, float Output, SmokeEmitterMarkerKind Kind, Guid DeviceId);
+public readonly record struct SmokeEmitterMarker(Vector3 Position, Vector3 Direction, float Output, SmokeEmitterMarkerKind Kind, Guid DeviceId)
+{
+    /// <summary>
+    /// Colour (sRGB, 0 … 1) the smoke overlay marks a running emitter of <paramref name="kind"/> with — hazers cyan, fog
+    /// machines white, low fog pale blue, fans green, flames orange — so arrows, labels and legends agree.
+    /// </summary>
+    public static Vector3 ColorOf(SmokeEmitterMarkerKind kind) => kind switch
+    {
+        SmokeEmitterMarkerKind.Hazer => new Vector3(0.35f, 0.9f, 1f),
+        SmokeEmitterMarkerKind.FogMachine => new Vector3(1f, 1f, 1f),
+        SmokeEmitterMarkerKind.LowFog => new Vector3(0.6f, 0.72f, 1f),
+        SmokeEmitterMarkerKind.Fan => new Vector3(0.45f, 1f, 0.55f),
+        SmokeEmitterMarkerKind.Flame => new Vector3(1f, 0.55f, 0.12f),
+        _ => new Vector3(1f, 1f, 1f),
+    };
+
+    /// <summary>Colour (sRGB) of an emitter that is switched off.</summary>
+    public static Vector3 OffColor => new(0.62f, 0.62f, 0.62f);
+}
 
 /// <summary>
 /// A 3D scalar field over a box (smoke density, flame temperature) for the volumetric renderer. The renderer reads it

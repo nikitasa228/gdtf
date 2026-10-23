@@ -34,18 +34,10 @@ internal static class SmokeMarkers
     public const int MaxMarkers = 1024;
 
     /// <summary>Colour of a device that is switched off (sRGB, alpha).</summary>
-    private static readonly Vector4 OffColor = new(0.62f, 0.62f, 0.62f, 0.85f);
+    private static readonly Vector4 OffColor = new(SmokeEmitterMarker.OffColor, 0.85f);
 
-    /// <summary>Line colour of a running emitter of each kind (sRGB): hazers cyan, fog white, low fog pale blue, fans green, flames orange.</summary>
-    public static Vector3 ColorOf(SmokeEmitterMarkerKind kind) => kind switch
-    {
-        SmokeEmitterMarkerKind.Hazer => new Vector3(0.35f, 0.9f, 1f),
-        SmokeEmitterMarkerKind.FogMachine => new Vector3(1f, 1f, 1f),
-        SmokeEmitterMarkerKind.LowFog => new Vector3(0.6f, 0.72f, 1f),
-        SmokeEmitterMarkerKind.Fan => new Vector3(0.45f, 1f, 0.55f),
-        SmokeEmitterMarkerKind.Flame => new Vector3(1f, 0.55f, 0.12f),
-        _ => new Vector3(1f, 1f, 1f),
-    };
+    /// <summary>Line colour of a running emitter of each kind (sRGB; <see cref="SmokeEmitterMarker.ColorOf"/>).</summary>
+    public static Vector3 ColorOf(SmokeEmitterMarkerKind kind) => SmokeEmitterMarker.ColorOf(kind);
 
     /// <summary>Arrow length for an output level, m (non-finite levels count as off).</summary>
     public static float ArrowLength(float output) =>

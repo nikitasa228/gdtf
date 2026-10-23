@@ -116,6 +116,7 @@ internal enum Str
     OverlayLux,
     OverlayNoise,
     OverlayCables,
+    OverlaySmoke,
     ViewTop,
     ViewBottom,
     ViewFront,
