@@ -46,6 +46,9 @@ internal sealed class ThumbnailWorker : IDisposable
     /// <summary>Pause between two renders, so a software renderer leaves the main thread its share of the CPU.</summary>
     public static readonly TimeSpan Pause = TimeSpan.FromMilliseconds(4);
 
+    /// <summary>Failures of the worker's Vulkan device in a row after which fixture pictures are given up (icons only).</summary>
+    public const int MaxDeviceFailures = 3;
+
     private readonly object _gate = new();
     private readonly List<ThumbnailRequest> _wanted = new();
     private readonly HashSet<string> _done = new(StringComparer.Ordinal);
@@ -59,6 +62,7 @@ internal sealed class ThumbnailWorker : IDisposable
     private bool _stop;
     private string? _current;
     private volatile string? _error;
+    private int _deviceFailures;
 
     /// <summary>
     /// Starts the worker over <paramref name="library"/>. <paramref name="deviceName"/> picks the GPU of the editor;
@@ -174,6 +178,26 @@ internal sealed class ThumbnailWorker : IDisposable
                         ThumbnailKind.Image => ImageThumbnail(request),
                         _ => RenderFixture(request, ref renderer, ref thumbnails),
                     };
+                    if (image is not null && !IsUsable(image, request))
+                    {
+                        _log.Warn("Library", $"No picture for '{request.Entry?.FileName ?? request.Path}': the renderer returned an unusable image.");
+                        image = null;
+                    }
+
+                    if (request.Kind != ThumbnailKind.Image && renderer is not null)
+                        _deviceFailures = 0;
+                }
+                catch (VulkanException e)
+                {
+                    // The device of the worker failed (lost, out of memory): this fixture gets an icon, the device is
+                    // rebuilt for the next picture, and after repeated failures fixture pictures stay icons.
+                    _log.Warn("Library", $"No picture for '{request.Entry?.FileName ?? request.Path}': {e.Message}");
+                    ReleaseRenderer(ref renderer, ref thumbnails);
+                    if (++_deviceFailures >= MaxDeviceFailures)
+                    {
+                        _error = e.Message;
+                        _log.Warn("Library", $"Fixture pictures are turned off after {_deviceFailures} failures of the thumbnail renderer.");
+                    }
                 }
                 catch (Exception e) when (e is not (StackOverflowException or AccessViolationException))
                 {
@@ -195,17 +219,47 @@ internal sealed class ThumbnailWorker : IDisposable
         }
         finally
         {
-            try
-            {
-                thumbnails?.Dispose();
-                renderer?.Dispose();
-            }
-            catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
-            {
-                // An exception leaving this thread would end the program; the device is gone with the process anyway.
-                _log.Warn("Library", $"The thumbnail renderer could not be released: {e.Message}");
-            }
+            ReleaseRenderer(ref renderer, ref thumbnails);
         }
+    }
+
+    /// <summary>
+    /// True when <paramref name="image"/> is a picture the panel can show: RGBA8 of the requested size (fixtures) with all
+    /// its pixels. Anything else would become a texture of the wrong size or read past the pixel array.
+    /// </summary>
+    private static bool IsUsable(ImageData image, ThumbnailRequest request)
+    {
+        if (image.Format != PixelFormat.Rgba8 || image.Width <= 0 || image.Height <= 0 || image.Width > 4096 || image.Height > 4096)
+            return false;
+        if (image.Pixels.Length < (long)image.Width * image.Height * 4)
+            return false;
+        return request.Kind == ThumbnailKind.Image || image.Width == image.Height;
+    }
+
+    /// <summary>Disposes the worker's renderer and its device (never throws: this runs on the worker thread).</summary>
+    private void ReleaseRenderer(ref VulkanRenderer? renderer, ref FixtureThumbnailRenderer? thumbnails)
+    {
+        try
+        {
+            thumbnails?.Dispose();
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            _log.Warn("Library", $"The thumbnail renderer could not be released: {e.Message}");
+        }
+
+        try
+        {
+            renderer?.Dispose();
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            // An exception leaving this thread would end the program; the device is gone with the process anyway.
+            _log.Warn("Library", $"The thumbnail device could not be released: {e.Message}");
+        }
+
+        thumbnails = null;
+        renderer = null;
     }
 
     private ImageData? RenderFixture(ThumbnailRequest request, ref VulkanRenderer? renderer, ref FixtureThumbnailRenderer? thumbnails)

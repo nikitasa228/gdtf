@@ -828,6 +828,20 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     }
 
     /// <inheritdoc/>
+    public void RevealLibraryTile(int index)
+    {
+        if (!_library.IsOpen)
+            _library.IsOpen = true;
+        _library.RevealTile(index);
+    }
+
+    /// <inheritdoc/>
+    public Vector2? LibraryTilePoint(int index) => _library.TilePoint(index);
+
+    /// <summary>The Library panel (tests and diagnostics).</summary>
+    internal LibraryPanel Library => _library;
+
+    /// <inheritdoc/>
     public Vector2? ScreenPointOf(Vector3? world, string entityName)
     {
         var viewport = ActiveViewport;

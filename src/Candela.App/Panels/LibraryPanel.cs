@@ -102,6 +102,10 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     private FixtureLibraryEntry? _selected;
     private bool _revealSelected;
     private bool _showFixturesTab;
+    private int _revealIndex = -1;
+    private int _probeIndex = -1;
+    private bool _probeValid;
+    private Vector2 _probeCentre;
     private readonly FixtureLibraryWatcher _watcher = new();
     private int _loggedChanges;
     private bool _disposed;
@@ -123,6 +127,28 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
 
     /// <summary>Times the engine reported new GDTF files (tests).</summary>
     internal int LibraryChanges => _watcher.Changes;
+
+    /// <summary>
+    /// Scrolls the fixture grid so that the tile at <paramref name="index"/> (in the order shown, after the category and
+    /// search filter) lies in the middle of the grid at the next frame; <see cref="TilePoint"/> then gives its centre.
+    /// Scripted input uses it to hover tiles like a user would.
+    /// </summary>
+    public void RevealTile(int index)
+    {
+        _showFixturesTab = true;
+        _revealIndex = Math.Max(0, index);
+        _probeIndex = _revealIndex;
+        _probeValid = false;
+    }
+
+    /// <summary>The centre (screen pixels) of the tile at <paramref name="index"/> when the last frame drew it whole, or null.</summary>
+    public Vector2? TilePoint(int index) => _probeValid && _probeIndex == index ? _probeCentre : null;
+
+    /// <summary>Number of fixture tiles the grid shows (after the category and search filter).</summary>
+    public int TileCount => _filtered.Count;
+
+    /// <summary>Counters of the panel's textures (diagnostics and tests).</summary>
+    public UiTextureStatistics TextureStatistics => _textures.Statistics;
 
     /// <summary>
     /// Selects <paramref name="entry"/> in the Fixtures tab (after a GDTF import): the tab comes forward, the category and
@@ -284,6 +310,9 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         _watcher.Dispose();
         _worker?.Dispose();
         _worker = null;
+        var stats = _textures.Statistics;
+        _ctx.Log.Info("Library", string.Create(CultureInfo.InvariantCulture,
+            $"Pictures: {stats.Created} textures made, {stats.Freed} freed, {stats.Alive} alive, {stats.Releasing} waiting for the GPU, {stats.Refused} refused."));
         _textures.Dispose();
         _slots.Clear();
     }
@@ -420,6 +449,16 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         object? hovered = null;
         Vector2 hoveredMin = default, hoveredMax = default;
         bool cardOwnsMouse = _hover is not null && _hoverGrow > 0.05f && CardRect(out var cardMin, out var cardMax) && Inside(mouse, cardMin, cardMax);
+        _probeValid = false;
+        if (_revealIndex >= 0)
+        {
+            // Scripted hover: the requested tile is scrolled into the middle of the grid.
+            int revealed = Math.Min(_revealIndex, _filtered.Count - 1);
+            _revealIndex = -1;
+            float top = revealed / columns * (tileHeight + spacing);
+            ImGui.SetScrollY(MathF.Max(0f, top - (ImGui.GetWindowHeight() - tileHeight) * 0.5f));
+        }
+
         if (_revealSelected && _selected is not null)
         {
             // Once, after a GDTF import: the new type's tile is scrolled into the middle of the grid.
@@ -449,6 +488,12 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
                         var entry = _filtered[index];
                         var min = rowStart + new Vector2(c * (tile + spacing), 0f);
                         var max = min + new Vector2(tile, tileHeight);
+                        if (index == _probeIndex)
+                        {
+                            _probeCentre = (min + max) * 0.5f;
+                            _probeValid = min.Y >= _gridMin.Y && max.Y <= _gridMax.Y;
+                        }
+
                         ImGui.SetCursorScreenPos(min);
                         ImGui.PushID(index);
                         ImGui.SetNextItemAllowOverlap();
