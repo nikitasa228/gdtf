@@ -228,9 +228,20 @@ sequence renders use lockstep.
 
 **Real time** (`SmokeTiming.RealTime`, the editor): the worker keeps up with wall-clock time on its own.
 
-* Frames that arrive while it is busy merge into the one still waiting (times add up, the newest emitters apply), so
-  the queue never grows. A step call simulates only as many sub-steps as fit `MaxLatency` (0.1 s) at the measured cost
-  (at least one, at most `MaxSubStepsPerCall`) and drops the rest, so the published smoke never lags far behind.
+* Frames that arrive while it is busy merge into the one still waiting (times add up, the newest emitters apply), and
+  a reconfiguration or obstacle set still waiting is replaced by the newest (what was queued after a reconfiguration
+  then applies to the new simulation), so the queue never grows: dragging the atmosphere volume builds one grid
+  whenever the worker is ready, not one per frame (tested: 30 frames of reconfiguring while the worker is busy build
+  one grid, for the last box and obstacles; lockstep keeps all 30 in order).
+* How much of a frame a step call simulates: a solver measured well within real time (a step within the budget and
+  at most 80 % of the sub-step) may spend 80 % of the frame's wall-clock time on it (or `MaxLatency`, 0.1 s, if that is
+  longer) — enough for the whole frame, so nothing is dropped however slowly frames come (tested: 4 frames per second
+  of 0.25 s each, a viewport on a slow GPU, lose nothing; with `MaxSubStepsPerCall` = 4 as the cap they lost half the
+  time). Any other solver — slower, or not measured yet on a new grid — simulates only as many sub-steps as fit
+  `MaxLatency` at the measured (or estimated) cost, at least one, and drops the rest, so the published smoke never
+  lags far behind. Every call is shorter than the wall time it covers, so frames submitted faster than real time
+  cannot make the calls ever longer. `MaxSubStepsPerCall`, the synchronous solver's guard against slow frames feeding
+  ever slower frames, does not apply here: the main thread never waits for the solver.
 * **Cell size from a time budget.** The budget is `RealTimeLoad` (0.6) × the sub-step: a 1/30 s sub-step may take
   20 ms of wall time, leaving headroom for load spikes. Adaptation levels coarsen the requested cell edge by ∛2 each
   (half the cells; at most `MaxCellSizeFactor` = 4×, never below 8 cells along an axis). A new domain starts at the
@@ -249,7 +260,8 @@ sequence renders use lockstep.
   projected, so the next step starts divergence-free (tested both ways between 0.2 and 0.252 m: mass equal to 10⁻⁵,
   heat to 10⁻³, centre of mass within half a cell, divergence < 10⁻² 1/s).
 * **Dropped time.** Every second the solver could not simulate is counted (`DroppedTime`; frame time that passed
-  while a new domain was being set up counts too, but not against the solver). `DroppedFraction` is the share of
+  while a new domain was being set up counts too — at most the set-up's own duration, beyond one sub-step — but not
+  against the solver). `DroppedFraction` is the share of
   real time dropped over the last seconds (Σ dropped / Σ wall time, both weighted by e^(−age/3 s), at least 1 s of wall
   time in the denominator; it decays while nothing more is dropped), and `IsBehindRealTime` is true while it exceeds
   `BehindThreshold` (5 %), while more than 0.5 s of submitted frames still waits for the solver (`Lag`), or after a

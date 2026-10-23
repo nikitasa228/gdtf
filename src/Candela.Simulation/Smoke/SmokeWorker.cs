@@ -16,8 +16,10 @@ namespace Candela.Simulation;
 /// <para><b>Timing.</b> In <see cref="SmokeTiming.Lockstep"/> every frame is simulated exactly as
 /// <see cref="SmokeSimulation.Step"/> would (bit-identical results at the requested cell size); a caller that needs the
 /// result waits with <see cref="Synchronize()"/>. In <see cref="SmokeTiming.RealTime"/> the worker keeps up with wall-clock
-/// time: frames that arrive while it is busy merge, a call that is behind simulates what fits
-/// <see cref="SmokeWorkerOptions.MaxLatency"/> and drops the rest (<see cref="IsBehindRealTime"/>), and the cell size is
+/// time: frames that arrive while it is busy merge (and a reconfiguration or obstacle set still waiting is replaced by
+/// the newest, so dragging the volume builds one grid whenever the worker is ready), a solver within its budget
+/// simulates whole frames at any frame rate, a slower one what fits <see cref="SmokeWorkerOptions.MaxLatency"/>, dropping
+/// the rest (<see cref="IsBehindRealTime"/>), and the cell size is
 /// chosen from the time budget (<see cref="SmokeWorkerOptions.RealTimeLoad"/>) and adapted to the measured step cost:
 /// coarsened (the cell edge × ∛2 per level, half the cells) when a step exceeds the budget, refined again when a finer
 /// grid would fit comfortably. The state moves to the new grid with its smoke mass and heat conserved.</para>

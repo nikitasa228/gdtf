@@ -13,9 +13,10 @@ public enum SmokeTiming
 
     /// <summary>
     /// The solver keeps up with wall-clock time on its own thread: frames that arrive while it is busy are merged
-    /// (their time adds up, the newest emitters apply), each call simulates only what it can finish within
-    /// <see cref="SmokeWorkerOptions.MaxLatency"/> and drops the rest (counted, see <see cref="SmokeWorker.IsBehindRealTime"/>),
-    /// and the cell size is chosen and adapted so a step fits the time budget
+    /// (their time adds up, the newest emitters apply; a reconfiguration or obstacle set still waiting is replaced by the
+    /// newest), a solver within its budget simulates all of a frame however long it is, a slower one only what it can
+    /// finish within <see cref="SmokeWorkerOptions.MaxLatency"/>, dropping the rest (counted, see
+    /// <see cref="SmokeWorker.IsBehindRealTime"/>), and the cell size is chosen and adapted so a step fits the time budget
     /// (<see cref="SmokeWorkerOptions.RealTimeLoad"/>). Results depend on the machine's speed (the editor).
     /// </summary>
     RealTime,
@@ -48,8 +49,10 @@ public sealed record SmokeWorkerOptions
     public float MaxCellSizeFactor { get; init; } = 4f;
 
     /// <summary>
-    /// Longest wall-clock time a real-time step call may take, s: a call that is behind simulates only as many fixed
-    /// sub-steps as fit (at least one) and drops the rest, so the smoke never lags far behind the frames that drive it.
+    /// Longest wall-clock time a real-time step call of a solver that is not well within real time may take, s: such a
+    /// call simulates only as many fixed sub-steps as fit (at least one) and drops the rest, so the smoke never lags far
+    /// behind the frames that drive it. A solver whose measured step fits the budget and 80 % of the sub-step may take up
+    /// to 80 % of the frame's wall-clock time instead (it then simulates whole frames at any frame rate).
     /// </summary>
     public double MaxLatency { get; init; } = 0.1;
 
