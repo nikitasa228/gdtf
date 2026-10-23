@@ -23,7 +23,7 @@
   -->
   <PropertyGroup>
     <CandelaVersion>0.1.0</CandelaVersion>
-    <CandelaPreview>1</CandelaPreview>
+    <CandelaPreview>2</CandelaPreview>
     <VersionPrefix>$(CandelaVersion)</VersionPrefix>
     <VersionSuffix Condition="'$(CandelaPreview)' != ''">preview.$(CandelaPreview)</VersionSuffix>
     <AssemblyVersion>$(CandelaVersion).0</AssemblyVersion>
