@@ -1,5 +1,7 @@
 using System.Numerics;
 using Candela.App.Session;
+using Candela.App.Shell;
+using Candela.App.Ui;
 using Candela.Core.SceneGraph.Components;
 using Candela.Dmx.Input;
 using Candela.Engine;
@@ -8,12 +10,13 @@ using Candela.Rendering;
 namespace Candela.App.Tests;
 
 /// <summary>
-/// A sequence render ticks the engine frame by frame from its preroll on, so the smoke must be simulated with exactly
-/// those frames (lockstep) from the first preroll tick — not in the editor's real time, which merges frames that arrive
-/// faster than wall-clock time and drops what does not fit, leaving the haze of the first frames unsettled.
+/// The editor's real-time smoke: a sequence render ticks the engine frame by frame from its preroll on, so the smoke
+/// must be simulated with exactly those frames (lockstep) from the first preroll tick — not in real time, which merges
+/// frames that arrive faster than wall-clock time and drops what does not fit, leaving the haze of the first frames
+/// unsettled; and the status bar's warning says what is wrong.
 /// </summary>
 [Collection(UiStateCollection.Name)]
-public sealed class SmokeRenderJobTests
+public sealed class SmokeEditorTests
 {
     private const string EntourHaze = "ADJ@Entour_Haze_PRO@2023-09-08_First_Release.gdtf";
 
@@ -72,5 +75,27 @@ public sealed class SmokeRenderJobTests
         job.Cancel();
         Assert.False(job.HoldsEngineClock);
         Assert.True(engine.Simulation.RealTime);
+    }
+
+    [Fact]
+    public void The_status_bar_warning_names_the_skipped_share_a_lagging_solver_or_a_stopped_one()
+    {
+        try
+        {
+            Loc.SetLanguage("en");
+            Assert.Equal("Smoke behind real time: 12 % skipped", Workspace.SmokeStatusText(0.123, failed: false));
+            // Behind without anything skipped yet (frames waiting, a new volume being set up): no "0 % skipped".
+            Assert.Equal("Smoke behind real time", Workspace.SmokeStatusText(0.001, failed: false));
+            Assert.Equal("Smoke behind real time", Workspace.SmokeStatusText(double.NaN, failed: false));
+            Assert.Equal("Smoke simulation stopped (see Issues)", Workspace.SmokeStatusText(0.5, failed: true));
+            Loc.SetLanguage("ru");
+            Assert.Equal("Дым отстаёт от реального времени: пропущено 100 %", Workspace.SmokeStatusText(2.0, failed: false));
+            Assert.Equal("Дым отстаёт от реального времени", Workspace.SmokeStatusText(0, failed: false));
+            Assert.StartsWith("Симуляция дыма остановлена", Workspace.SmokeStatusText(0, failed: true), StringComparison.Ordinal);
+        }
+        finally
+        {
+            Loc.SetLanguage("en");
+        }
     }
 }
