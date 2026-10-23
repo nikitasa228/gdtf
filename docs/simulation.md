@@ -302,6 +302,9 @@ steps); the reference keeps 10⁻⁴. `SmokePerformanceTests` prints the current
 * The atmosphere is one box with axis-aligned walls/openings; obstacles are voxelised boxes (no curved geometry);
   smoke does not stick to or deposit on surfaces; droplets do not evaporate locally (only the global dissipation).
 * Light absorption by the smoke (soot) is not represented by `Density` — it is scattering only.
+* No GPU (Vulkan compute) solver yet: the solver runs on the CPU, on its own threads (`SmokeWorker`). In the editor the
+  cell size is coarsened until a step fits the time budget, so on a slow computer the haze is resolved more coarsely
+  (the status bar and a note say so) rather than the frame rate dropping; offline renders keep the requested cells.
 
 ## 2. Fire (`FireSimulation`, `FlameModel`)
 

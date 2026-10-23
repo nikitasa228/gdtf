@@ -275,7 +275,15 @@ New / Open replace the engine's project, so panels keep their references to the 
   reason (a refused GDTF with the engine's), and the status bar counts the rest.
 * **Engine tick.** Every frame `Update` ticks the engine (DMX input, fixture motors, smoke, fire, sound, lights, render
   binding) — also while the window is minimised (ten times a second, without drawing); the issue analysis (patch, power, rigging, assets) runs again half a second after the last edit, so a
-  gizmo drag does not re-check the scene every frame. Clicking an issue selects and frames the objects it names.
+  gizmo drag does not re-check the scene every frame, and again when the smoke solver reports something from its own
+  thread (an obstacle outside its box, a cell size adapted to the computer, a failure). Clicking an issue selects and
+  frames the objects it names.
+* **Real-time smoke.** The editor's engine simulates smoke in real time (`StageEngineOptions.RealTimeSimulation`): the
+  solver runs on its own threads at a cell size that fits the computer, and the frame only takes its newest density
+  grid, so a hazer costs the frame rate next to nothing (see [simulation.md](simulation.md#solver-thread-and-real-time-smokeworker)).
+  While it cannot keep up and skips time, the status bar shows a warning — *Smoke behind real time: N % skipped*, with
+  a tooltip explaining what helps. A render job that ticks a timecode range holds the clock (`EngineClockHeld`) and the
+  smoke is then simulated frame by frame (lockstep), as in the command-line renderer.
 * **Autosave and recovery.** The engine autosaves the open project at the interval of *Settings → Files* (only when
   something changed; a save removes the session's autosaves; a clean exit deletes them). Changing the interval, or
   turning autosave off and on, reconfigures the running autosave session (`StageEngine.ConfigureAutosave`) instead of
