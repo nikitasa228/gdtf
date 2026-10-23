@@ -124,6 +124,34 @@ public sealed class SmokeOverlayEngineTests
     }
 
     [Fact]
+    public void The_cli_summary_names_the_haze_the_densest_air_and_every_emitter()
+    {
+        using var engine = CreateEngine("smoke-summary");
+        SceneBuilder.Floor(engine.Scene, 16f);
+        var hazer = SceneBuilder.Fixture(engine.Scene, Hazer, "1 Channel Mode", new Vector3(-2f, 0f, 0f), name: "Hazer SL");
+        SceneBuilder.Fixture(engine.Scene, Fogger, "1Ch", new Vector3(2f, 0f, 0f), name: "Fogger SR");
+        hazer.Get<FixtureComponent>()!.ManualAttributes = new() { ["Haze1"] = 50f };
+        engine.Scene.Settings.BaseHazeScattering = 0.03f;
+        for (int i = 0; i < 60; i++) engine.Tick(1.0 / 30);
+
+        var output = new StringWriter();
+        Cli.RenderCommand.WriteSmokeSummary(engine, ColorGradient.DefaultSmoke(), null, output);
+        string text = output.ToString();
+        Assert.Contains("Smoke:    overlay 0.005 … 2 /m (log scale), haze 0.03 /m", text, StringComparison.Ordinal);
+        Assert.Contains("Hazer SL (haze) 50 %", text, StringComparison.Ordinal);
+        Assert.Contains("Fogger SR (fog) off", text, StringComparison.Ordinal);
+        // the hazer has filled some air above the haze
+        var densest = System.Text.RegularExpressions.Regex.Match(text, @"densest air ([0-9.]+) /m");
+        Assert.True(densest.Success, text);
+        Assert.True(float.Parse(densest.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture) > 0.03f, text);
+
+        // --haze overrides the scene's haze in the summary as in the picture
+        var overridden = new StringWriter();
+        Cli.RenderCommand.WriteSmokeSummary(engine, ColorGradient.DefaultSmoke(), 0.1f, overridden);
+        Assert.Contains("haze 0.1 /m", overridden.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void The_smoke_overlay_and_its_gradient_are_kept_in_the_project()
     {
         string path = Path.Combine(TestEnvironment.NewTempDirectory("smoke-overlay-project"), "smoke.candela");

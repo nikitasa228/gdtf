@@ -137,8 +137,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
     /// <summary>
     /// Density (1/m) of the smoke overlay's display-referred coloured fog at the top of the gradient range (proportional
     /// to the square of the position of the air's scattering coefficient in the range, times the gradient's alpha): a
-    /// metre of fog at the top of the default range shows its colour at about 40 %, 20 m of a light haze (0.02 /m) tint
-    /// the view by about a third.
+    /// metre of fog at the top of the default range shows its colour at about 40 %, 30 m of a light haze (0.02 /m) tint
+    /// the view by about a quarter.
     /// </summary>
     public const float SmokeFogStrength = 0.6f;
 

@@ -156,8 +156,8 @@ public sealed class ColorGradient
     /// <summary>
     /// Default smoke gradient: the scattering coefficient of the air (haze plus smoke), 1/m, on a log scale from
     /// 0.005 /m (a trace of haze; visibility ≈ 3 / σ = 600 m) to 2 /m (thick fog, 1.5 m visibility): faint blue →
-    /// cyan → green (an even working haze, 0.1 /m) → yellow → magenta. Partly transparent, so the greyed scene shows
-    /// through; clearer (or denser) air than the range shows no colour.
+    /// cyan → green (a thick working haze, 0.1 /m) → yellow → magenta. The thin end is the most transparent, so an even
+    /// haze leaves the greyed scene readable; clearer (or denser) air than the range shows no colour.
     /// </summary>
     public static ColorGradient DefaultSmoke() => new()
     {
@@ -167,10 +167,10 @@ public sealed class ColorGradient
         OutOfRangeColor = new Vector4(0.35f, 0.35f, 0.35f, 0f),
         Stops =
         {
-            new(0.005f, new Vector4(0.25f, 0.35f, 0.9f, 0.35f)),
-            new(0.02f, new Vector4(0.0f, 0.75f, 0.95f, 0.55f)),
-            new(0.1f, new Vector4(0.15f, 0.85f, 0.3f, 0.7f)),
-            new(0.5f, new Vector4(1.0f, 0.85f, 0.1f, 0.85f)),
+            new(0.005f, new Vector4(0.25f, 0.35f, 0.9f, 0.1f)),
+            new(0.02f, new Vector4(0.0f, 0.75f, 0.95f, 0.2f)),
+            new(0.1f, new Vector4(0.15f, 0.85f, 0.3f, 0.45f)),
+            new(0.5f, new Vector4(1.0f, 0.85f, 0.1f, 0.75f)),
             new(2f, new Vector4(1.0f, 0.2f, 0.65f, 0.95f)),
         },
     };

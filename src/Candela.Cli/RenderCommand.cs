@@ -170,7 +170,8 @@ internal sealed class RenderOptions
                         "lux" => OverlayMode.Lux,
                         "noise" => OverlayMode.Noise,
                         "cables" => OverlayMode.Cables,
-                        var v => throw new UsageException($"Unknown overlay '{v}' (none, lux, noise, cables)."),
+                        "smoke" => OverlayMode.Smoke,
+                        var v => throw new UsageException($"Unknown overlay '{v}' (none, lux, noise, cables, smoke)."),
                     };
                     break;
                 case "--haze":
@@ -622,6 +623,58 @@ internal static class RenderCommand
         return Program.ExitOk;
     }
 
+    /// <summary>Most emitters the smoke overlay's summary lists by name (the rest are counted).</summary>
+    private const int MaxListedEmitters = 8;
+
+    /// <summary>
+    /// The smoke overlay's lines of the summary: the gradient range (scattering coefficient of the air, 1/m), the haze and
+    /// the densest air of the scene, and the hazers, fog machines, fans and flames the picture marks with their output.
+    /// </summary>
+    internal static void WriteSmokeSummary(StageEngine engine, ColorGradient gradient, float? hazeOverride, TextWriter output)
+    {
+        var inv = CultureInfo.InvariantCulture;
+        float haze = hazeOverride ?? engine.Scene.Settings.BaseHazeScattering;
+        haze = float.IsFinite(haze) ? Math.Max(haze, 0f) : 0f;
+        float densest = 0f;
+        if (engine.Settings.SimulateSmoke && engine.Simulation.Smoke is { } smoke)
+        {
+            foreach (float d in smoke.Current.Density)
+            {
+                if (d > densest && float.IsFinite(d)) densest = d;
+            }
+        }
+        float peak = haze + densest * engine.Simulation.SmokeScatteringAtFullDensity;
+        output.WriteLine(string.Create(inv,
+            $"Smoke:    overlay {gradient.RangeMin:0.###} … {gradient.RangeMax:0.###} /m{(gradient.Logarithmic ? " (log scale)" : "")}, haze {haze:0.###} /m, densest air {peak:0.###} /m"));
+        var markers = engine.Simulation.EmitterMarkers;
+        if (markers.Count == 0)
+        {
+            output.WriteLine("Emitters: none (no hazer, fog machine, fan or flame device in the scene)");
+            return;
+        }
+
+        var parts = new List<string>(Math.Min(markers.Count, MaxListedEmitters) + 1);
+        for (int i = 0; i < markers.Count && i < MaxListedEmitters; i++)
+        {
+            var m = markers[i];
+            string name = engine.Scene.Find(m.DeviceId)?.Name is { Length: > 0 } n ? n : KindName(m.Kind);
+            string level = m.Output > 0f ? string.Create(inv, $"{m.Output * 100f:0} %") : "off";
+            parts.Add($"{name} ({KindName(m.Kind)}) {level}");
+        }
+        if (markers.Count > MaxListedEmitters) parts.Add($"… {markers.Count - MaxListedEmitters} more");
+        output.WriteLine($"Emitters: {string.Join(", ", parts)}");
+
+        static string KindName(SmokeEmitterMarkerKind kind) => kind switch
+        {
+            SmokeEmitterMarkerKind.Hazer => "haze",
+            SmokeEmitterMarkerKind.FogMachine => "fog",
+            SmokeEmitterMarkerKind.LowFog => "low fog",
+            SmokeEmitterMarkerKind.Fan => "fan",
+            SmokeEmitterMarkerKind.Flame => "flame",
+            _ => "emitter",
+        };
+    }
+
     /// <summary>What a render mode did: exit code, frames written, and the words for the summary lines.</summary>
     private readonly record struct RenderResult(int Code, int Written, bool Cancelled, string Exposure, string Description, string Work);
 
@@ -641,6 +694,12 @@ internal static class RenderCommand
             view.LuxGradient = LuxGradientFor(engine, bounds);
             output.WriteLine(string.Create(CultureInfo.InvariantCulture,
                 $"Lux:      overlay {view.LuxGradient.RangeMin:0} … {view.LuxGradient.RangeMax:0} lx (grey outside)"));
+        }
+        else if (options.Overlay == OverlayMode.Smoke)
+        {
+            // The project's smoke gradient (what the editor's legend shows), else the default.
+            view.SmokeGradient = engine.View.View?.SmokeGradient ?? ColorGradient.DefaultSmoke();
+            WriteSmokeSummary(engine, view.SmokeGradient, options.Haze, output);
         }
         var settings = new PreviewSettings
         {

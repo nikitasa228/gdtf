@@ -115,6 +115,12 @@ public sealed class CliTests
         Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--ev", "bright"]));
         Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--look", "party"]));
 
+        // the smoke overlay
+        Assert.Equal(Rendering.OverlayMode.Smoke, RenderOptions.Parse(["show.mvr", "--out", "x.png", "--overlay", "Smoke"]).Overlay);
+        var unknown = Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--overlay", "fog"]));
+        Assert.Contains("smoke", unknown.Message, StringComparison.Ordinal);
+        Assert.Throws<UsageException>(() => RenderOptions.Parse(["show.mvr", "--out", "x.png", "--overlay", "smoke", "--final"]));
+
         // the work light: never in a render unless asked
         Assert.Equal(WorkLightMode.Off, defaults.WorkLight);
         Assert.Equal(WorkLightMode.Auto, RenderOptions.Parse(["show.mvr", "--out", "x.png", "--work-light", "auto"]).WorkLight);

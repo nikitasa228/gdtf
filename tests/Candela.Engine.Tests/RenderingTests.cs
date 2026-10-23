@@ -212,6 +212,49 @@ public sealed class RenderingTests
     }
 
     [SkippableFact]
+    public void Cli_render_with_the_smoke_overlay_greys_the_scene_and_marks_the_running_hazer()
+    {
+        using (CreateRendererOrSkip())
+        {
+            // only probes for a device; the CLI creates its own renderer
+        }
+        string dir = TestEnvironment.NewTempDirectory("cli-smoke");
+        string project = Path.Combine(dir, "hazer.candela");
+        using (var engine = TestEnvironment.CreateEngine("cli-smoke-build"))
+        {
+            SceneBuilder.Floor(engine.Scene, 12f, Core.SceneGraph.Components.MaterialIds.WoodStage);
+            var hazer = SceneBuilder.Fixture(engine.Scene, SceneBuilder.EntourHaze, "1 Channel Mode", new System.Numerics.Vector3(0f, 0f, 0f),
+                name: "Hazer");
+            hazer.Get<Core.SceneGraph.Components.FixtureComponent>()!.ManualAttributes["Haze1"] = 100f;
+            Assert.True(engine.SaveAs(project).Success);
+        }
+
+        string png = Path.Combine(dir, "smoke.png");
+        var output = new StringWriter();
+        var error = new StringWriter();
+        int code = Cli.Program.Run(
+            ["render", project, "--out", png, "--width", "320", "--height", "180", "--overlay", "smoke", "--look", "show", "--time", "4",
+                "--camera", "0,-6,3", "--target", "0,0,0.8", "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root],
+            output, error);
+        Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
+        string text = output.ToString();
+        Assert.Contains("overlay Smoke", text, StringComparison.Ordinal);
+        Assert.Contains("Smoke:    overlay 0.005 … 2 /m", text, StringComparison.Ordinal);
+        Assert.Contains("Hazer (haze) 100 %", text, StringComparison.Ordinal);
+        File.Copy(png, Path.Combine(OutputDirectory, "cli-smoke-overlay.png"), overwrite: true);
+
+        // the hazer's arrow (cyan) is drawn; everything else is grey or tinted by the gradient's colours
+        Assert.True(ImageImporter.TryDecode(File.ReadAllBytes(png), out var image, out var problem), problem);
+        int cyan = 0;
+        for (int i = 0; i < image!.Width * image.Height; i++)
+        {
+            int r = image.Pixels[4 * i], g = image.Pixels[4 * i + 1], b = image.Pixels[4 * i + 2];
+            if (b > 200 && g > 170 && r < 140) cyan++;
+        }
+        Assert.True(cyan > 20, $"no hazer marker: {cyan} cyan pixels");
+    }
+
+    [SkippableFact]
     public void Thumbnail_of_a_file_deleted_since_the_scan_is_a_dark_picture_not_an_exception()
     {
         using var renderer = CreateRendererOrSkip();
