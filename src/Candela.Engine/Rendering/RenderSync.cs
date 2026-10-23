@@ -237,6 +237,7 @@ public sealed partial class RenderSync : IDisposable
         if (_linesDirty) UpdateLines();
         UpdateAtmosphere();
         World.SetNoiseSources(_engine.Simulation.NoiseSourceSpan);
+        World.SetSmokeEmitters(_engine.Simulation.EmitterMarkerSpan);
     }
 
     /// <summary>
@@ -304,6 +305,7 @@ public sealed partial class RenderSync : IDisposable
             DestroyAll(destroySharedResources: true);
             World.SetLines(ReadOnlySpan<LineVertex>.Empty);
             World.SetNoiseSources(ReadOnlySpan<NoiseSource>.Empty);
+            World.SetSmokeEmitters(ReadOnlySpan<SmokeEmitterMarker>.Empty);
             World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
         }
         catch (ObjectDisposedException)

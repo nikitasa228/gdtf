@@ -128,6 +128,38 @@ public struct LineVertex
     public float Width;
 }
 
+/// <summary>What a <see cref="SmokeEmitterMarker"/> stands for.</summary>
+public enum SmokeEmitterMarkerKind
+{
+    /// <summary>Haze machine (fine aerosol, low exit speed).</summary>
+    Hazer,
+
+    /// <summary>Fog machine (dense, warm jet).</summary>
+    FogMachine,
+
+    /// <summary>Low-fog machine (chilled fog that sinks to the floor).</summary>
+    LowFog,
+
+    /// <summary>Effect fan or wind machine (moves the air, emits no smoke).</summary>
+    Fan,
+
+    /// <summary>Flame projector (its plume carries heat and soot upwards).</summary>
+    Flame,
+}
+
+/// <summary>
+/// A device that puts smoke into the air or moves it, for the smoke overlay (<see cref="OverlayMode.Smoke"/>): the
+/// renderer marks it with an arrow from its nozzle along <see cref="Direction"/> whose length, width and brightness grow
+/// with <see cref="Output"/>; a device that is switched off is drawn as a short grey arrow. Set every frame through
+/// <see cref="IRenderWorld.SetSmokeEmitters"/>.
+/// </summary>
+/// <param name="Position">Nozzle (or outlet, or burner) position, world space, m.</param>
+/// <param name="Direction">Direction the jet leaves in (normalised by the renderer; a zero or non-finite vector means +Z).</param>
+/// <param name="Output">Current output level 0 … 1 (fog or haze output, fan speed, flame output).</param>
+/// <param name="Kind">What the device is.</param>
+/// <param name="DeviceId">Entity id of the device (for labels and picking in the editor).</param>
+public readonly record struct SmokeEmitterMarker(Vector3 Position, Vector3 Direction, float Output, SmokeEmitterMarkerKind Kind, Guid DeviceId);
+
 /// <summary>
 /// A 3D scalar field over a box (smoke density, flame temperature) for the volumetric renderer. The renderer reads it
 /// when it is set through <see cref="IRenderWorld.SetAtmosphere"/> and uploads it with the next frame, so a producer may
@@ -258,4 +290,12 @@ public interface IRenderWorld
 
     void SetAtmosphere(AtmosphereState atmosphere);
     void SetNoiseSources(ReadOnlySpan<NoiseSource> sources);
+
+    /// <summary>
+    /// Replaces the smoke emitters the smoke overlay marks (hazers, fog machines, fans, flames; see
+    /// <see cref="SmokeEmitterMarker"/>). The renderer copies the span. Renderers without the smoke overlay ignore it.
+    /// </summary>
+    void SetSmokeEmitters(ReadOnlySpan<SmokeEmitterMarker> emitters)
+    {
+    }
 }

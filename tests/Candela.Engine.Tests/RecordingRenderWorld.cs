@@ -19,6 +19,7 @@ internal sealed class RecordingRenderWorld : IRenderWorld
     public SpotLight[] Lights { get; private set; } = Array.Empty<SpotLight>();
     public LineVertex[] Lines { get; private set; } = Array.Empty<LineVertex>();
     public NoiseSource[] NoiseSources { get; private set; } = Array.Empty<NoiseSource>();
+    public SmokeEmitterMarker[] SmokeEmitters { get; private set; } = Array.Empty<SmokeEmitterMarker>();
     public AtmosphereState? Atmosphere { get; private set; }
     public int AtmosphereUpdates { get; private set; }
     public int InstanceUpdates { get; private set; }
@@ -148,6 +149,8 @@ internal sealed class RecordingRenderWorld : IRenderWorld
     }
 
     public void SetNoiseSources(ReadOnlySpan<NoiseSource> sources) => NoiseSources = sources.ToArray();
+
+    public void SetSmokeEmitters(ReadOnlySpan<SmokeEmitterMarker> emitters) => SmokeEmitters = emitters.ToArray();
 
     private void CheckMatrix(in Matrix4x4 m)
     {

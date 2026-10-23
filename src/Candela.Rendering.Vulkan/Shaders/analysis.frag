@@ -5,6 +5,7 @@
 //  OVERLAY_LUX:   illuminance E (lx, photopic) = sum over lights of I0 x profile x cookie x shadow x max(cos, 0) / d^2
 //                 (no albedo) - the luminance of the summed Rec.2020 illuminance, since light colours have luminance 1.
 //  OVERLAY_NOISE: free-field sound pressure level (dB) of the noise sources (or the noise field) at the surface.
+//  OVERLAY_SMOKE: scattering coefficient (1/m) of the air at the surface: haze plus the smoke grid (volume.glsl).
 // The lux overlay is what a light meter reads in clear air (CLEAR_AIR: no haze extinction), like LightMeter. The
 // cluster's light list is a bit mask over every listed light (view.glsl), so overlapping beams are never truncated.
 
@@ -27,6 +28,12 @@ void main()
     if (frame.overlayMode == OVERLAY_NOISE)
     {
         outValue = soundLevelAt(P);
+        return;
+    }
+
+    if (frame.overlayMode == OVERLAY_SMOKE)
+    {
+        outValue = smokeOverlayAt(P);
         return;
     }
 

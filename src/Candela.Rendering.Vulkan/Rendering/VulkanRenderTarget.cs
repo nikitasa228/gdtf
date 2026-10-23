@@ -123,6 +123,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             LightViews = new SceneBuffer<GpuLightView>(_context, BufferUsageFlags.StorageBufferBit, "light views", 64);
             Lists = new SceneBuffer<uint>(_context, BufferUsageFlags.StorageBufferBit, "view light lists", 64);
             BeamLines = new SceneBuffer<LineVertex>(_context, BufferUsageFlags.VertexBufferBit, "beam outlines", 64);
+            EmitterLines = new SceneBuffer<LineVertex>(_context, BufferUsageFlags.VertexBufferBit, "smoke emitter markers", 64);
             CreateSceneImages();
             CreateDisplayImage();
         }
@@ -194,11 +195,11 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     /// <summary>Hash of the gradient the table holds.</summary>
     internal int GradientHash { get; set; }
 
-    /// <summary>Baked lux (0) and noise (1) gradients with their hashes, so switching overlays does not re-bake.</summary>
-    internal Vector4[]?[] GradientBakes { get; } = new Vector4[]?[2];
+    /// <summary>Baked lux (0), noise (1) and smoke (2) gradients with their hashes, so switching overlays does not re-bake.</summary>
+    internal Vector4[]?[] GradientBakes { get; } = new Vector4[]?[3];
 
     /// <summary>Hashes of <see cref="GradientBakes"/>.</summary>
-    internal int[] GradientBakeHashes { get; } = new int[2];
+    internal int[] GradientBakeHashes { get; } = new int[3];
 
     internal GpuImage? SelectionMask { get; private set; }
 
@@ -292,6 +293,9 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
 
     /// <summary>Beam outline line segments of the current frame.</summary>
     internal SceneBuffer<LineVertex> BeamLines { get; } = null!;
+
+    /// <summary>Smoke emitter marker segments of the current frame (smoke overlay only; drawn over everything).</summary>
+    internal SceneBuffer<LineVertex> EmitterLines { get; } = null!;
 
     /// <summary>32-bit words in <see cref="ClusterMasks"/>.</summary>
     internal uint ClusterMaskCapacity { get; private set; }
@@ -766,6 +770,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         _context.DeferDispose(LightViews);
         _context.DeferDispose(Lists);
         _context.DeferDispose(BeamLines);
+        _context.DeferDispose(EmitterLines);
         if (Vpls is not null)
             _context.DeferDispose(Vpls);
         if (Exposure is not null)
@@ -1084,6 +1089,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         LightViews?.Dispose();
         Lists?.Dispose();
         BeamLines?.Dispose();
+        EmitterLines?.Dispose();
         Vpls?.Dispose();
         Exposure?.Dispose();
         for (int i = 0; i < ExposureReadback.Length; i++)

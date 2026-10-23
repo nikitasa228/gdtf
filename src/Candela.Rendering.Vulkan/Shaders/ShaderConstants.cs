@@ -210,12 +210,14 @@ internal static class ShaderConstants
     public const uint FeatureTemporal = 1u << 10;
     public const uint FeatureNoiseFog = 1u << 11;
     public const uint FeatureVolumeLights = 1u << 12;
+    public const uint FeatureSmokeFog = 1u << 13;
 
     // Overlay modes (FrameData.overlayMode).
     public const uint OverlayNone = 0;
     public const uint OverlayLux = 1;
     public const uint OverlayNoise = 2;
     public const uint OverlayCables = 3;
+    public const uint OverlaySmoke = 4;
 
     // Draw modes (push constant `mode`).
     public const uint DrawModeDefault = 0;
@@ -379,10 +381,12 @@ internal static class ShaderConstants
         ("FEATURE_TEMPORAL", I(FeatureTemporal)),
         ("FEATURE_NOISE_FOG", I(FeatureNoiseFog)),
         ("FEATURE_VOLUME_LIGHTS", I(FeatureVolumeLights)),
+        ("FEATURE_SMOKE_FOG", I(FeatureSmokeFog)),
         ("OVERLAY_NONE", I(OverlayNone)),
         ("OVERLAY_LUX", I(OverlayLux)),
         ("OVERLAY_NOISE", I(OverlayNoise)),
         ("OVERLAY_CABLES", I(OverlayCables)),
+        ("OVERLAY_SMOKE", I(OverlaySmoke)),
         ("DRAW_MODE_DEFAULT", I(DrawModeDefault)),
         ("DRAW_MODE_SELECTED", I(DrawModeSelected)),
         ("BEAM_TILE_SIZE", I(BeamTileSize)),

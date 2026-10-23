@@ -263,6 +263,7 @@ public sealed class FixtureThumbnailRenderer : IDisposable
         _renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
         _renderer.World.SetLines(ReadOnlySpan<LineVertex>.Empty);
         _renderer.World.SetNoiseSources(ReadOnlySpan<NoiseSource>.Empty);
+        _renderer.World.SetSmokeEmitters(ReadOnlySpan<SmokeEmitterMarker>.Empty);
     }
 
     private static RenderSpotLight Studio(Vector3 centre, float distance, float azimuth, float elevation, float lux, Vector3 color)

@@ -192,6 +192,12 @@ public sealed class LifecycleTests
                 new ViewOptions { Shading = ViewShading.Full },
                 new ViewOptions { Shading = ViewShading.Colorless },
                 new ViewOptions { Shading = ViewShading.Wireframe },
+                new ViewOptions { Shading = ViewShading.Full, Overlay = OverlayMode.Smoke },
+            };
+            var emitters = new[]
+            {
+                new SmokeEmitterMarker(new Vector3(-4f, 0f, 0.3f), Vector3.UnitZ, 0.5f, SmokeEmitterMarkerKind.Hazer, Guid.NewGuid()),
+                new SmokeEmitterMarker(new Vector3(4f, 0f, 1f), -Vector3.UnitX, 0f, SmokeEmitterMarkerKind.Fan, Guid.NewGuid()),
             };
             using var target = renderer.CreateTarget(96, 64);
             var lights = scene.Lights;
@@ -206,6 +212,8 @@ public sealed class LifecycleTests
                 renderer.World.SetLights(lights);
                 long t1 = GC.GetAllocatedBytesForCurrentThread();
                 renderer.World.SetLines(lines);
+                emitters[0] = emitters[0] with { Output = 0.5f + 0.001f * (i % 100) };
+                renderer.World.SetSmokeEmitters(emitters);
                 long t2 = GC.GetAllocatedBytesForCurrentThread();
                 renderer.World.UpdateInstance(box, Matrix4x4.CreateTranslation(-3.2f, 1.6f + 0.001f * i, 0.5f), InstanceFlags.CastShadow);
                 long t3 = GC.GetAllocatedBytesForCurrentThread();

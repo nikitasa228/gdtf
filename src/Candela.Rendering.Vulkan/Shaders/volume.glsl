@@ -135,6 +135,36 @@ float soundLevelAt(vec3 P)
     return maxLevel <= -1e8 ? -1e9 : maxLevel + 10.0 * log(sum) / log(10.0);
 }
 
+// Scattering coefficient (1/m) of the air at P for the smoke overlay: the uniform haze plus the smoke grid's density x
+// scattering at full density, in every view mode (unlike scatteringAt, which follows the Full view's media features).
+// frame.media.x / .z are 0 without haze / smoke; frame.smokeMin.w marks a smoke grid.
+float smokeOverlayAt(vec3 P)
+{
+    float sigma = max(frame.media.x, 0.0);
+    vec3 uvw;
+    if (frame.smokeMin.w > 0.5 && boxCoordinates(P, frame.smokeMin, frame.smokeMax, uvw))
+        sigma += finiteClamp(textureLod(smokeTexture, uvw, 0.0).r, 0.0, 1e6) * max(frame.media.z, 0.0);
+    return sigma;
+}
+
+// Position of a value in the overlay gradient's range, 0 ... 1 (on the gradient's log scale when overlayRange.z is
+// set and `followScale` is true, else linear), or -1 below the range or when the range is empty.
+float overlayRangePosition(float value, bool followScale)
+{
+    float lo = frame.overlayRange.x;
+    float hi = frame.overlayRange.y;
+    if (!(value >= lo) || !(hi > lo))
+        return -1.0;
+    if (followScale && frame.overlayRange.z > 0.5)
+    {
+        float a = log(max(lo, 1e-6));
+        float b = log(max(hi, 1e-6));
+        return b > a ? clamp((log(max(value, 1e-6)) - a) / (b - a), 0.0, 1.0) : 0.0;
+    }
+
+    return clamp((value - lo) / (hi - lo), 0.0, 1.0);
+}
+
 // Overlay gradient lookup for a value in the overlay's unit: sRGB colour + alpha, or the out-of-range colour.
 vec4 overlayGradient(float value)
 {

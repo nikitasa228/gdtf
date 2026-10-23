@@ -161,6 +161,7 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
     private readonly List<(DescriptorPool Pool, int Free)> _pools = new();
     private readonly FrameSets[] _frameSets = new FrameSets[VulkanContext.FramesInFlight];
     private readonly List<NoiseSource> _noiseSources = new();
+    private readonly List<SmokeEmitterMarker> _smokeEmitters = new();
     private readonly HashSet<string> _missingImages = new(StringComparer.Ordinal);
     private readonly BarrierBatch _submitBarriers;
     private readonly Dictionary<Guid, int> _lightOccurrences = new();
@@ -208,6 +209,9 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
 
     /// <summary>Noise sources of the current frame (noise overlay).</summary>
     public IReadOnlyList<NoiseSource> NoiseSources => _noiseSources;
+
+    /// <summary>The smoke emitters of the current frame (<see cref="SetSmokeEmitters"/>), marked by the smoke overlay.</summary>
+    public IReadOnlyList<SmokeEmitterMarker> SmokeEmitters => _smokeEmitters;
 
     /// <summary>GPU volumes of the atmosphere, the blackbody table and the noise sources.</summary>
     internal AtmosphereResources AtmosphereGpu => _atmosphere!;
@@ -604,6 +608,15 @@ public sealed unsafe class VulkanRenderWorld : IRenderWorld, IDisposable, IFrame
         foreach (var s in sources)
             _noiseSources.Add(s);
         _atmosphere!.SetNoiseSources(sources);
+    }
+
+    /// <inheritdoc/>
+    public void SetSmokeEmitters(ReadOnlySpan<SmokeEmitterMarker> emitters)
+    {
+        ThrowIfDisposed();
+        _smokeEmitters.Clear();
+        foreach (var e in emitters)
+            _smokeEmitters.Add(e);
     }
 
     /// <summary>Destroys every GPU object of the world (the device must be idle; called by the renderer).</summary>
