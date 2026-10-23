@@ -492,7 +492,16 @@ the fixes for the UI scale, the library hover previews and the lens artefacts wa
 install into `C:\Program Files\Свет Тест\Candela` (registry entries, shortcuts, associations), `candela.exe --help`
 (listing `--overlay smoke`), `info` and `render-test`, renders of the sample with `--look demo` and with
 `--overlay smoke --haze 0.02` (the smoke summary and the greyed, tinted picture), the editor's start with the library
-thumbnails as Dear ImGui textures, and a silent uninstall that leaves nothing behind. Not covered by Wine:
+thumbnails as Dear ImGui textures, and a silent uninstall that leaves nothing behind. The review of that work repeated
+it with the review's fixes in a fresh 64-bit prefix (silent all-users install into `C:\Program Files\Свет Тест\Candela`
+— under Wine `/D=` has to reach Setup unquoted, e.g. through `wine cmd /c` with a UTF-8 locale —, registry entries and
+associations, `--help`, `info`, `render-test`, the sample with `--look demo` and with `--overlay smoke --haze 0.02`),
+ran the Windows build of the editor with the library of the repository and a script that hovers twelve tiles with the
+picture cap lowered (`libraryTextureCap` 32: 57 pictures made, 29 released and destroyed by the Windows build of the
+Dear ImGui Vulkan backend, none left waiting) and a script that sweeps the interface scale 100 → 300 → 100 % with a
+28 px font (no abort; 300 % is shown at 183 %, the largest text the glyph atlas holds), then uninstalled silently:
+program folder, shortcuts, associations and registry entries gone, the per-user caches kept as documented. Not covered
+by Wine:
 the Visual C++ redistributable's own setup (a 32-bit bootstrapper; a 64-bit-only prefix cannot run it — Setup then
 says so and the editor names the runtime and its download at start), Windows Firewall, SmartScreen and real GPU
 drivers. Under Wine the command-line tool needs an X display for Vulkan (`winevulkan` goes through the X11 driver);
