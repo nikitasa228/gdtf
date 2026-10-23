@@ -108,6 +108,15 @@ public sealed class ColorGradient
         return stops[^1].Color;
     }
 
+    /// <summary>
+    /// True when <paramref name="gradient"/> can be evaluated and baked: it exists, has a stop list and a finite range
+    /// with <see cref="RangeMax"/> above <see cref="RangeMin"/>. Gradients come from user data (presets, project files), so
+    /// renderers check this and fall back to the overlay's default instead of failing.
+    /// </summary>
+    public static bool IsDrawable(ColorGradient? gradient) =>
+        gradient is { Stops: not null } && float.IsFinite(gradient.RangeMin) && float.IsFinite(gradient.RangeMax) &&
+        gradient.RangeMax > gradient.RangeMin;
+
     /// <summary>Samples the gradient for a GPU lookup texture covering [RangeMin, RangeMax].</summary>
     public Vector4[] Bake(int samples)
     {

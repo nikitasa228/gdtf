@@ -697,8 +697,13 @@ internal static class RenderCommand
         }
         else if (options.Overlay == OverlayMode.Smoke)
         {
-            // The project's smoke gradient (what the editor's legend shows), else the default.
-            view.SmokeGradient = engine.View.View?.SmokeGradient ?? ColorGradient.DefaultSmoke();
+            // The project's smoke gradient (what the editor's legend shows), else the default; a damaged one (no stops,
+            // a range that is not finite or not increasing — hand-edited or from another version) is replaced, as the
+            // editor does.
+            var projectGradient = engine.View.View?.SmokeGradient;
+            view.SmokeGradient = ColorGradient.IsDrawable(projectGradient) ? projectGradient! : ColorGradient.DefaultSmoke();
+            if (projectGradient is not null && !ReferenceEquals(projectGradient, view.SmokeGradient))
+                output.WriteLine("Smoke:    the project's smoke gradient is damaged; the default gradient is used");
             WriteSmokeSummary(engine, view.SmokeGradient, options.Haze, output);
         }
         var settings = new PreviewSettings

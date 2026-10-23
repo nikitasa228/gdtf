@@ -802,6 +802,11 @@ background is not coloured.
   emitter inside a device body or behind a wall stays visible. `candela render --overlay smoke` draws the same picture
   and prints the gradient range, the haze, the densest air and every emitter with its output.
 
+Gradients are user data (presets, project files): one the renderer cannot bake — missing, without a stop list, with a
+range that is not finite or not increasing (`ColorGradient.IsDrawable`) — is replaced by the overlay's default gradient
+for that frame instead of failing; `candela render --overlay smoke` does the same with a damaged project gradient and
+says so in its summary.
+
 `VulkanRenderer.ReadAnalysis` (internal) reads the lux / dB / 1/m image back for tests and tools.
 
 ## Editor visuals

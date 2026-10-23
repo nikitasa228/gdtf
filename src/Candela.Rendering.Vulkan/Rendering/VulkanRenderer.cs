@@ -1051,7 +1051,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         float scale = full ? exposure / (MathF.PI * ShaderConstants.LightRangeEpsilon) : 0f;
         if (dec.Overlay == OverlayMode.Lux)
         {
-            float rangeMin = float.IsFinite(view.LuxGradient.RangeMin) ? view.LuxGradient.RangeMin : 0f;
+            float rangeMin = GradientOf(OverlayMode.Lux, view).RangeMin;
             float minimumLux = MathF.Max(1e-4f * MathF.Max(rangeMin, 1e-2f), 1e-6f);
             scale = MathF.Max(scale, 1f / minimumLux);
         }
@@ -1271,13 +1271,33 @@ public sealed unsafe class VulkanRenderer : IRenderer
         }
     }
 
-    /// <summary>The gradient an analysis overlay maps its values through (the lux gradient for the overlays without one).</summary>
-    internal static ColorGradient GradientOf(OverlayMode overlay, ViewOptions view) => overlay switch
+    /// <summary>
+    /// The gradient an analysis overlay maps its values through (the lux gradient for the overlays without one). A gradient
+    /// the overlay cannot be drawn with — missing, without a stop list, with a range that is not finite or not increasing
+    /// (user data: a hand-edited project, another version) — is replaced by the overlay's default instead of failing
+    /// every frame.
+    /// </summary>
+    internal static ColorGradient GradientOf(OverlayMode overlay, ViewOptions view)
     {
-        OverlayMode.Noise => view.NoiseGradient,
-        OverlayMode.Smoke => view.SmokeGradient,
-        _ => view.LuxGradient,
-    };
+        var gradient = overlay switch
+        {
+            OverlayMode.Noise => view.NoiseGradient,
+            OverlayMode.Smoke => view.SmokeGradient,
+            _ => view.LuxGradient,
+        };
+        if (ColorGradient.IsDrawable(gradient))
+            return gradient;
+        return overlay switch
+        {
+            OverlayMode.Noise => s_defaultNoise,
+            OverlayMode.Smoke => s_defaultSmoke,
+            _ => s_defaultLux,
+        };
+    }
+
+    private static readonly ColorGradient s_defaultLux = ColorGradient.DefaultLux();
+    private static readonly ColorGradient s_defaultNoise = ColorGradient.DefaultNoise();
+    private static readonly ColorGradient s_defaultSmoke = ColorGradient.DefaultSmoke();
 
     /// <summary>Re-bakes the overlay gradient table of the target when the gradient changed (allocation only then).</summary>
     private void UpdateGradient(VulkanRenderTarget t, in Decisions d, BarrierBatch barriers)
