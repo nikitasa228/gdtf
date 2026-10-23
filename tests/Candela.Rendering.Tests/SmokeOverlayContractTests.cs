@@ -30,6 +30,23 @@ public class SmokeOverlayContractTests
     }
 
     [Fact]
+    public void Only_gradients_with_stops_and_an_increasing_finite_range_are_drawable()
+    {
+        Assert.True(ColorGradient.IsDrawable(ColorGradient.DefaultLux()));
+        Assert.True(ColorGradient.IsDrawable(ColorGradient.DefaultNoise()));
+        Assert.True(ColorGradient.IsDrawable(ColorGradient.DefaultSmoke()));
+        Assert.True(ColorGradient.IsDrawable(new ColorGradient())); // no stops yet: every value is out of range, still drawable
+        Assert.False(ColorGradient.IsDrawable(null));
+        Assert.False(ColorGradient.IsDrawable(new ColorGradient { Stops = null! }));
+        Assert.False(ColorGradient.IsDrawable(new ColorGradient { RangeMin = 2f, RangeMax = 2f }));
+        Assert.False(ColorGradient.IsDrawable(new ColorGradient { RangeMin = 5f, RangeMax = 1f }));
+        Assert.False(ColorGradient.IsDrawable(new ColorGradient { RangeMin = float.NaN }));
+        Assert.False(ColorGradient.IsDrawable(new ColorGradient { RangeMax = float.PositiveInfinity }));
+        // what the check protects: baking an inverted range throws
+        Assert.ThrowsAny<ArgumentException>(() => new ColorGradient { RangeMin = 5f, RangeMax = 1f, Stops = { new GradientStop(1f, Vector4.One) } }.Bake(4));
+    }
+
+    [Fact]
     public void Every_emitter_kind_has_its_own_colour_and_off_is_grey()
     {
         var colours = Enum.GetValues<SmokeEmitterMarkerKind>().Select(SmokeEmitterMarker.ColorOf).ToList();
