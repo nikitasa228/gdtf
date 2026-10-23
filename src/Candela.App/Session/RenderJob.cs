@@ -152,8 +152,18 @@ internal sealed class RenderJobRunner : IDisposable
     /// </summary>
     public static readonly TimeSpan DispatchTarget = TimeSpan.FromMilliseconds(20);
 
-    /// <summary>Time between two progress images of the path tracer (each reads the whole image back).</summary>
+    /// <summary>
+    /// Shortest time between two progress images of the path tracer (each tone-maps — and denoises, when asked — and
+    /// reads the whole image back).
+    /// </summary>
     public static readonly TimeSpan PreviewInterval = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// A progress image is followed by at least this many times its own cost before the next one, so progress images
+    /// take at most a tenth of the render (a large or denoised image on a slow GPU is shown less often instead of
+    /// stalling the editor every second).
+    /// </summary>
+    public const int PreviewCostFactor = 9;
 
     /// <summary>Longest wait for fixture models still loading in the background before a path-traced frame starts anyway.</summary>
     public static readonly TimeSpan MaxLoadWait = TimeSpan.FromSeconds(30);
@@ -175,6 +185,7 @@ internal sealed class RenderJobRunner : IDisposable
     private bool _frameReady;
     private long _waitStarted;
     private long _lastPreview;
+    private TimeSpan _previewWait;
     private long _startedAt;
     private long _endedAt;
     private bool _disposed;
@@ -507,12 +518,15 @@ internal sealed class RenderJobRunner : IDisposable
             return;
         }
 
-        // The first sample and then about once a second: each progress image reads the whole image back.
+        // The first sample and then about once a second (less often when a progress image is expensive): each progress
+        // image reads the whole image back.
         long now = Stopwatch.GetTimestamp();
-        if (SamplesDone > 0 && (_lastPreview == 0 || Stopwatch.GetElapsedTime(_lastPreview, now) >= PreviewInterval))
+        if (SamplesDone > 0 && (_lastPreview == 0 || Stopwatch.GetElapsedTime(_lastPreview, now) >= _previewWait))
         {
-            _lastPreview = now;
             SetPreview(final.Preview());
+            _lastPreview = Stopwatch.GetTimestamp();
+            var cost = Stopwatch.GetElapsedTime(now, _lastPreview);
+            _previewWait = cost * PreviewCostFactor > PreviewInterval ? cost * PreviewCostFactor : PreviewInterval;
         }
     }
 
@@ -582,6 +596,7 @@ internal sealed class RenderJobRunner : IDisposable
         SamplesTotal = _final.SamplesTotal;
         SamplesDone = 0;
         _lastPreview = 0;
+        _previewWait = PreviewInterval;
         return true;
     }
 

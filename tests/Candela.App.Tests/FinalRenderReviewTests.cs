@@ -292,6 +292,43 @@ public sealed class FinalRenderReviewTests
         Assert.True(median < limit, $"the median sampling frame took {median:0} ms (limit {limit:0} ms): {string.Join(" ", steps.Select(s => s.ToString("0")))}");
     }
 
+    [Theory]
+    [InlineData(0, 1000, 1300)]
+    [InlineData(200, 1800, 4000)]
+    public void Progress_images_come_once_a_second_or_less_often_when_they_are_expensive(int costMs, int minGapMs, int maxGapMs)
+    {
+        Loc.SetLanguage("en");
+        using var dir = new TempDir();
+        using var engine = StageTestSupport.CreateEngine(dir);
+        var renderer = new FakePathTracer { PreviewCost = TimeSpan.FromMilliseconds(costMs) };
+        engine.AttachRenderWorld(renderer.World, loadFixtureModelsInBackground: false);
+        engine.Tick(0);
+        using var job = new RenderJobRunner();
+        Assert.True(job.Start(Request(dir.File("long.png"), RenderMode.PathTraced, samples: 60000), engine), job.Message);
+        var changes = new List<TimeSpan>();
+        var watch = Stopwatch.StartNew();
+        int version = job.PreviewVersion;
+        while (changes.Count < 2 && watch.Elapsed < TimeSpan.FromSeconds(15))
+        {
+            job.Step(engine, renderer, 0);
+            if (job.PreviewVersion != version)
+            {
+                version = job.PreviewVersion;
+                changes.Add(watch.Elapsed);
+            }
+
+            Thread.Sleep(5);
+        }
+
+        job.Cancel();
+        Assert.Equal(2, changes.Count);
+        for (int i = 1; i < changes.Count; i++)
+        {
+            double gap = (changes[i] - changes[i - 1]).TotalMilliseconds;
+            Assert.InRange(gap, minGapMs, maxGapMs);
+        }
+    }
+
     /// <summary>A 10 × 10 m floor, a back wall and one moving head at full open white in haze, bound to <paramref name="renderer"/>.</summary>
     private static StageEngine LitRoom(TempDir dir, VulkanRenderer renderer)
     {
@@ -328,6 +365,9 @@ public sealed class FinalRenderReviewTests
         /// <summary>EV100 the stand-in auto exposure meters (before compensation).</summary>
         public float MeteredEv100 { get; init; } = 9f;
 
+        /// <summary>Time each progress image takes (a large or denoised image on a slow GPU).</summary>
+        public TimeSpan PreviewCost { get; init; }
+
         /// <summary>Every path-traced frame started: the render, the player position and whether it meters itself.</summary>
         public List<(FakeFinalRender Render, double Position, bool AutoExposure)> Started { get; } = new();
 
@@ -355,7 +395,10 @@ public sealed class FinalRenderReviewTests
         {
             var render = new FakeFinalRender(settings, options.AutoExposure
                 ? Units.ExposureFromEv100(MeteredEv100 - options.ExposureCompensation)
-                : Units.ExposureFromEv100(camera.Ev100 - options.ExposureCompensation));
+                : Units.ExposureFromEv100(camera.Ev100 - options.ExposureCompensation))
+            {
+                PreviewCost = PreviewCost,
+            };
             Started.Add((render, Engine?.Player?.Position ?? double.NaN, options.AutoExposure));
             return render;
         }
@@ -396,6 +439,8 @@ public sealed class FinalRenderReviewTests
 
         public float Exposure { get; } = exposure;
 
+        public TimeSpan PreviewCost { get; init; }
+
         public void Advance(TimeSpan budget)
         {
             if (IsComplete)
@@ -408,6 +453,8 @@ public sealed class FinalRenderReviewTests
 
         public ImageData Preview()
         {
+            if (PreviewCost > TimeSpan.Zero)
+                Thread.Sleep(PreviewCost);
             var pixels = new byte[_width * _height * 4];
             Array.Fill(pixels, (byte)128);
             return new ImageData { Width = _width, Height = _height, Pixels = pixels };
