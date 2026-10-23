@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using Candela.App.Ui;
+using Candela.Engine;
 using Hexa.NET.ImGui;
 
 namespace Candela.App.Files;
@@ -37,6 +38,12 @@ internal sealed class FileBrowserDialog
         _recentPlacesFile = recentPlacesFile;
     }
 
+    /// <summary>
+    /// The program's layout: a save dialog never starts in the program folder (default <see cref="InstallLayout.Current"/>;
+    /// tests pass their own).
+    /// </summary>
+    internal InstallLayout Layout { get; init; } = InstallLayout.Current;
+
     /// <summary>True while the dialog is open.</summary>
     public bool IsOpen => _model is not null;
 
@@ -57,8 +64,7 @@ internal sealed class FileBrowserDialog
             Loc.Get(Str.BrowserDesktop), Loc.Get(Str.BrowserWorkingFolder));
         _onAccept = onAccept ?? throw new ArgumentNullException(nameof(onAccept));
         _title = SafeText.Label(title) + PopupId;
-        string start = startFolder is { Length: > 0 } && Directory.Exists(startFolder) ? startFolder
-            : _model.RecentPlaces.FirstOrDefault(Directory.Exists) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        string start = StartFolderFor(mode, startFolder, _model.RecentPlaces, Layout);
         if (!_model.Navigate(start) && !_model.Navigate(Environment.CurrentDirectory))
             _model.Navigate(Path.GetPathRoot(Environment.CurrentDirectory) ?? "/");
         _pathText = _model.CurrentDirectory;
@@ -66,6 +72,23 @@ internal sealed class FileBrowserDialog
         _focusFileName = mode == FileBrowserMode.Save;
         _confirmOverwrite = false;
         _selected = -1;
+    }
+
+    /// <summary>
+    /// The folder the dialog shows first: <paramref name="startFolder"/> when it exists, else the most recent place that
+    /// exists, else the documents folder. A save (or folder) dialog skips folders inside the program folder of
+    /// <paramref name="layout"/>: the sample scene offered at the first start is in <c>C:\Program Files\Candela\samples</c>,
+    /// and saving there fails (read-only for the user) or is lost at the next upgrade.
+    /// </summary>
+    internal static string StartFolderFor(FileBrowserMode mode, string? startFolder, IEnumerable<string> recentPlaces, InstallLayout layout)
+    {
+        ArgumentNullException.ThrowIfNull(recentPlaces);
+        ArgumentNullException.ThrowIfNull(layout);
+        bool writing = mode != FileBrowserMode.Open;
+        bool Usable(string? folder) => folder is { Length: > 0 } && Directory.Exists(folder) && !(writing && layout.IsInProgramFolder(folder));
+        if (Usable(startFolder))
+            return startFolder!;
+        return recentPlaces.FirstOrDefault(Usable) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
     }
 
     /// <summary>Draws the dialog when open (call once per frame at top level).</summary>

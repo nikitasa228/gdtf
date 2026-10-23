@@ -60,11 +60,15 @@ internal static class CliArgs
         return result.ToList();
     }
 
-    /// <summary>Engine options from the user's settings, with the command-line overrides.</summary>
+    /// <summary>
+    /// Engine options from the user's settings (the same <c>settings.json</c> as the editor), with the command-line
+    /// overrides: <c>--library</c> folders replace the settings' library folders (the installed starter fixtures stay
+    /// behind them, and the researched specs are looked up for the new folders), <c>--cache</c> the cache folder.
+    /// </summary>
     public static StageEngineOptions EngineOptions(IReadOnlyList<string> libraries, string? cache)
     {
-        var options = StageEngineOptions.FromSettings(AppSettings.Load());
-        if (libraries.Count > 0) options = options with { LibraryFolders = libraries.ToList() };
+        var folders = libraries.Where(f => !string.IsNullOrWhiteSpace(f)).ToList();
+        var options = StageEngineOptions.FromSettings(AppSettings.Load(), folders);
         if (!string.IsNullOrWhiteSpace(cache)) options = options with { CacheDirectory = cache };
         return options;
     }

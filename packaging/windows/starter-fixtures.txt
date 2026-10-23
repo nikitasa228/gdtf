@@ -1,0 +1,7 @@
+# GDTF files installed as starter fixtures (samples/fixtures): the fixture types the sample scene samples/Фокина.mvr
+# uses (as the library resolves them; see `candela info stages/Фокина.mvr`), so the sample opens with real fixtures
+# without the full library. One repository-relative file name per line.
+Ayrton@Zonda_3_FX@V1.81_Corrected_Factory_Tilt.gdtf
+Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf
+Ayrton@Rivale_Wash@V1.8_Correct_Gobo_Value.gdtf
+Martin_Professional@VDO_Atomic_Bold@20260620.gdtf

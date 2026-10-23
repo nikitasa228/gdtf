@@ -130,7 +130,10 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
   - [~] ETC Eos (OSC: cues, show, command line; levels via Art-Net/sACN) - [ ] BlackTrax (RTTrPM) - [ ] Kinesys - [ ] PangolinLD - [ ] LasergraphDSP - [ ] NDI (SDK)
   - [ ] Compulite VC - [ ] MA-Net2 / MA-Net3 (proprietary, need MA's SDK — Art-Net/sACN from MA consoles work)
 - [ ] Performance: GPU-driven instancing, thousands of fixtures, async compute
-- [~] Windows packaging, crash reporting, autosave/recovery (autosave and recovery done: Candela.Project + engine)
+- [x] Windows packaging, crash reporting, autosave/recovery: NSIS installer (English/Russian, all users or per user,
+      VC++ runtime, shortcuts, file associations, firewall rule, upgrade in place), first-run fixture library window,
+      crash reports and logs in `%LOCALAPPDATA%\Candela\logs`, autosave and recovery (Candela.Project + engine) —
+      see [install.md](install.md); not code-signed yet
 
 ## Known limitations
 - SketchUp `.skp` cannot be read (closed format); export to DAE/FBX/glTF from SketchUp.

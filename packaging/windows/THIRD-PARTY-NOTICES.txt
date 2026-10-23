@@ -1,0 +1,65 @@
+Candela — third-party software
+
+Candela is built with the following components. Each is used under its own licence, summarised here; the full licence
+texts are at the addresses given (and, for the fonts, in the "licenses" folder next to this file).
+
+Component                                   Licence                 Source
+------------------------------------------  ----------------------  -------------------------------------------------
+.NET 8 runtime (incl. System.IO.Ports,      MIT                     https://github.com/dotnet/runtime
+  MsQuic)
+Silk.NET (Vulkan, shaderc bindings)         MIT                     https://github.com/dotnet/Silk.NET
+shaderc, glslang, SPIRV-Tools               Apache-2.0 (and BSD-3   https://github.com/google/shaderc
+  (shaderc_shared.dll)                        for parts of glslang)
+Hexa.NET.ImGui, Hexa.NET.ImGuizmo,          MIT                     https://github.com/HexaEngine/Hexa.NET.ImGui
+  Hexa.NET.ImGui.Backends, HexaGen.Runtime                          https://github.com/JunaMeinhold/HexaGen
+Hexa.NET.GLFW                               MIT                     https://github.com/HexaEngine/Hexa.NET.GLFW
+Dear ImGui and cimgui (cimgui.dll,          MIT                     https://github.com/ocornut/imgui
+  ImGuiImpl.dll, ImGuiImplGLFW.dll)                                 https://github.com/cimgui/cimgui
+ImGuizmo (cimguizmo.dll)                    MIT                     https://github.com/CedricGuillemet/ImGuizmo
+GLFW (glfw3.dll)                            zlib/libpng             https://www.glfw.org
+AssimpNet                                   MIT                     https://bitbucket.org/Starnick/assimpnet
+Open Asset Import Library (assimp.dll)      BSD-3-Clause            https://github.com/assimp/assimp
+SharpGLTF                                   MIT                     https://github.com/vpenades/SharpGLTF
+StbImageSharp, StbImageWriteSharp           Public domain           https://github.com/StbSharp
+                                              (Unlicense) or MIT
+Inter typeface                              SIL OFL 1.1             https://github.com/rsms/inter
+                                                                    (licenses/Inter-OFL.txt)
+Lucide icons                                ISC                     https://lucide.dev (licenses/Lucide-LICENSE.txt)
+Microsoft Visual C++ 2015-2022              Microsoft Software      https://aka.ms/vs/17/release/vc_redist.x64.exe
+  Redistributable (installed by Setup         License Terms
+  when missing)
+
+Sample content: "samples/Фокина.mvr" is a real theatre rig exported from Depence; "samples/fixtures" holds the GDTF
+files of the fixture types it uses, as published by their manufacturers (Ayrton, Martin Professional) on GDTF-Share.
+"data/specs/fixtures_index.json" is Candela's own researched fixture data.
+
+The MIT licence (for the components marked MIT):
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+  documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+  the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+  the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Copyright notices of the MIT components: .NET — © .NET Foundation and Contributors; Silk.NET — © .NET Foundation and
+Contributors; Hexa.NET.* and HexaGen — © 2023-2024 Juna Meinhold; Dear ImGui — © 2014-2025 Omar Cornut; cimgui —
+© 2015 Stephan Dilly; ImGuizmo — © 2016 Cedric Guillemet; AssimpNet — © 2012-2020 Nicholas Woodfield; SharpGLTF —
+© 2019 Vicente Penades.
+
+GLFW — © 2002-2006 Marcus Geelnard, © 2006-2019 Camilla Löwy. This software is provided 'as-is', without any express
+or implied warranty. Permission is granted to anyone to use this software for any purpose, including commercial
+applications, and to alter it and redistribute it freely, subject to the zlib/libpng licence's restrictions.
+
+Open Asset Import Library — © 2006-2021 assimp team. Redistribution and use in source and binary forms, with or
+without modification, are permitted under the conditions of the 3-clause BSD licence
+(https://github.com/assimp/assimp/blob/master/LICENSE).
+
+shaderc — © 2015 The shaderc Authors, licensed under the Apache License, Version 2.0
+(https://www.apache.org/licenses/LICENSE-2.0).
