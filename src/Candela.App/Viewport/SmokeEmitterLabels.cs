@@ -113,8 +113,11 @@ internal sealed class SmokeEmitterLabels
         RefreshAir(engine, frame);
     }
 
-    /// <summary>Draws the label of every emitter next to its arrow in the viewport image rectangle.</summary>
-    public void DrawLabels(StageEngine engine, ViewportCamera camera, Vector2 imageMin, Vector2 imageSize)
+    /// <summary>
+    /// Draws the label of every emitter next to its arrow in the viewport image rectangle, leaving out the labels that
+    /// would lie under <paramref name="exclude"/> (the legend window: min x, min y, max x, max y; empty for none).
+    /// </summary>
+    public void DrawLabels(StageEngine engine, ViewportCamera camera, Vector2 imageMin, Vector2 imageSize, Vector4 exclude = default)
     {
         ArgumentNullException.ThrowIfNull(camera);
         Refresh(engine);
@@ -139,6 +142,8 @@ internal sealed class SmokeEmitterLabels
             var size = ImGui.CalcTextSize(entry.Label);
             var min = new Vector2(p.X + offset, p.Y - 0.5f * size.Y - pad);
             var max = min + size + new Vector2(2f * pad);
+            if (exclude.Z > exclude.X && max.X > exclude.X && min.X < exclude.Z && max.Y > exclude.Y && min.Y < exclude.W)
+                continue;
             dl.AddRectFilled(min, max, Theme.U32(Theme.OverlayBackground), 3f * scale);
             dl.AddRectFilled(min, new Vector2(min.X + 2f * scale, max.Y), Theme.U32(entry.Color), 1f * scale);
             dl.AddText(min + new Vector2(pad + 1f * scale, pad), Theme.U32(Theme.Text), entry.Label);
@@ -174,7 +179,7 @@ internal sealed class SmokeEmitterLabels
             dl.AddRectFilled(p + new Vector2(0f, swatch * 0.25f), p + new Vector2(swatch * 0.5f, swatch * 0.75f), Theme.U32(entry.Color), 2f);
             ImGui.Dummy(new Vector2(swatch * 0.7f, swatch));
             ImGui.SameLine();
-            ImGui.TextUnformatted(entry.Label);
+            SafeText.Wrapped(entry.Label);
         }
 
         int more = _order.Count - MaxListed;

@@ -67,7 +67,7 @@ internal sealed class OverlayLegend
         if (viewport.View.Overlay == OverlayMode.None)
             return false;
         if (viewport.View.Overlay == OverlayMode.Smoke && context.Session.Engine is { } engine)
-            legend._emitters.DrawLabels(engine, viewport.Camera, imageMin, imageSize);
+            legend._emitters.DrawLabels(engine, viewport.Camera, imageMin, imageSize, legend.Bounds(imageMin, imageSize));
         return legend.DrawWindow(stage, context.Session.Engine, viewport.View.Overlay, imageMin, imageSize);
     }
 
@@ -94,18 +94,34 @@ internal sealed class OverlayLegend
             stage.ActiveViewport = viewport;
     }
 
-    /// <summary>Draws the legend window for <paramref name="mode"/> in the corner of the image rectangle; true while hovered.</summary>
-    internal bool DrawWindow(StageToolState stage, StageEngine? engine, OverlayMode mode, Vector2 imageMin, Vector2 imageSize)
+    /// <summary>
+    /// Where the legend window goes in the image rectangle (screen pixels: min x, min y, max x, max y; its height from
+    /// the last frame), or an empty rectangle when the view is too small for it.
+    /// </summary>
+    internal Vector4 Bounds(Vector2 imageMin, Vector2 imageSize)
     {
         var style = ImGui.GetStyle();
         float scale = style.FontScaleMain * style.FontScaleDpi;
         float margin = 8f * scale;
         float width = MathF.Min(310f * scale, imageSize.X - 2f * margin);
         if (width < 120f * scale || imageSize.Y < 80f * scale)
-            return false;
-        EnsurePresets(stage);
+            return Vector4.Zero;
         var pos = new Vector2(imageMin.X + imageSize.X - width - margin, imageMin.Y + imageSize.Y - _height - margin);
         pos.Y = MathF.Max(pos.Y, imageMin.Y + margin);
+        return new Vector4(pos.X, pos.Y, pos.X + width, pos.Y + _height);
+    }
+
+    /// <summary>Draws the legend window for <paramref name="mode"/> in the corner of the image rectangle; true while hovered.</summary>
+    internal bool DrawWindow(StageToolState stage, StageEngine? engine, OverlayMode mode, Vector2 imageMin, Vector2 imageSize)
+    {
+        var bounds = Bounds(imageMin, imageSize);
+        if (bounds.Z <= bounds.X)
+            return false;
+        var style = ImGui.GetStyle();
+        float scale = style.FontScaleMain * style.FontScaleDpi;
+        float width = bounds.Z - bounds.X;
+        EnsurePresets(stage);
+        var pos = new Vector2(bounds.X, bounds.Y);
         ImGui.SetCursorScreenPos(pos);
         ImGui.PushStyleColor(ImGuiCol.ChildBg, Theme.OverlayBackground);
         ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 6f * scale);

@@ -282,6 +282,7 @@ update).
 | Trusses | Their model, or `TrussMesh` in aluminium. |
 | Cables | Tube meshes (`CableTubeMesh`, catenary sag from the slack factor, dark rubber tinted by the type) plus coloured lines (`SetLines`, the cable type's colour) for the cable overlay; rebuilt when an anchor entity moves. **Cables lie on surfaces** (`CableSupports`, a `CableSupportSurfaces`): the ground plane (`GroundHeight`, Z = 0 m by default, where the cable tool puts free nodes; null for none) and the upper faces of floors and ceilings (`WallComponent` Floor/Ceiling, also tilted up to 60°). A span is drawn straight when it is fixed along an object (both nodes anchored to the same entity: truss, wall, floor) or lies on a surface (both nodes rest within 5 cm on surfaces of the same height); other spans sag with the cable's slack but never below the surface under them — a sample is kept a tube radius above the highest surface not above the span's chord or the cable's height at the previous sample, walked from both ends, so a cable leaving a riser drapes over its edge (a taut span too) while one running under a platform is left alone; on a ramp the tube keeps its radius along the surface normal. Moving, adding or editing a floor redraws only the cables whose nodes' horizontal extent meets the floors that changed (`CableSupportSurfaces.TakeChanges`), so dragging or resizing a floor does not redraw every cable on every frame; changing the ground redraws them all. Drawing only: cut lengths stay routed length × slack. |
 | Consoles, power sources, rigging points | Simple primitives: a desk and a distro box of `DeviceCatalog.ConsoleSize` / `PowerSourceSize` (the sizes the Devices section and the cable tool use) standing on their origin, a hoist. |
+| Smoke emitters | `SetSmokeEmitters` every frame with `StageSimulation.EmitterMarkers`: one `SmokeEmitterMarker` per output of every hazer, fog / low-fog machine, fan and flame device — nozzle exit (the position the smoke simulation uses), jet direction (fans reversed by their direction channel, flames up their beam or straight up), output 0 … 1, kind and device id — also for devices that are switched off (output 0), so the smoke overlay marks them all. What a device can emit comes from its DMX functions (Haze, Fog, Fan / Blower on atmospheric devices, Flame), else from its category; cached per fixture type. Cleared when the binding detaches. |
 | Atmosphere | `SceneSettings.BaseHazeScattering` (or `HazeOverride`) and anisotropy, `SceneSettings.AmbientLuminance` as `AtmosphereState.AmbientLuminance` (cd/m², clamped to 0 … `RenderSync.MaxAmbientLuminance` = 100 000; non-finite or negative = 0; the last value sent is `RenderSync.AmbientLuminance`), the smoke density grid when the smoke simulation stepped, one temperature grid per flame (its own box and resolution: the first as `FlameTemperature`, the others as `FlameTemperatures`; the grid objects are reused between steps); noise sources every frame. |
 
 **Flags.** `Selected` (selection), `Hidden` (entity or an ancestor hidden, or its layer hidden; a hidden fixture still
@@ -369,7 +370,13 @@ renderer of its own (e.g. a second `VulkanRenderer` on the editor's context): th
 hang), a neutral three-point studio light (5600 K key, fill and rim spots), a three-quarter front view framing the
 model's box, dark background, fixed exposure. `Render(entry, size, mode)` caches square images in Candela.Assets'
 `ThumbnailStore` keyed by the GDTF file's SHA-256 (variant `fixture`); `RenderOrbitFrame(entry, width, height,
-azimuth)` renders the frames of the rotating hover preview (the fixture stays loaded between frames).
+azimuth)` renders the frames of the rotating hover preview (the fixture stays loaded between frames). A fixture it
+cannot draw — no model, a model that fails to load, a non-finite or degenerate placement, an exception while loading,
+a model larger than 50 m framed — gives a dark picture instead of an exception, and its GPU resources are created and
+destroyed per fixture, so one broken file never poisons the next. `ThumbnailSweepTests` render a still and two orbit
+frames of the riskiest fixtures (the 12 largest files and every 60th of the library) with one renderer under the
+validation layer with synchronisation validation, and require pictures of the right size, finite, without a validation
+error; `CANDELA_THUMBNAIL_SWEEP=all` sweeps all 1091 GDTFs of the repository (about ten minutes on lavapipe; passes).
 
 ## Looks and the test show
 
@@ -414,7 +421,7 @@ Ctrl+C (a final render writes what it has rendered).
 ```
 candela render <scene.mvr|scene.candela> --out <file.png> [--width W --height H]
                [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov deg]
-               [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]
+               [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables|smoke] [--haze <1/m>]
                [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s|HH:MM:SS:FF>]
                [--end <s|HH:MM:SS:FF> [--fps F]] [--ev auto|floor|<EV100>] [--auto-exposure] [--frames N] [--grid]
                [--floor auto|none] [--work-light off|auto|on] [--device <name>] [--library <dir>]... [--cache <dir>]
@@ -438,7 +445,11 @@ each side of the picture touches its outermost point with a 10 % margin and the 
 the picture. `--out` must name a file (a folder is a usage error). `--overlay lux` keeps the default gradient
 (1 … 5000 lx) unless the floor is brighter; then the same colours are stretched up to the brightest floor reading
 (a 32 × 32 grid plus the point under every beam axis), so a rig at full is not drawn grey (out of range) everywhere —
-the range used is printed. A scene without a floor (MVR exports often contain only the rig) gets the engine's stage
+the range used is printed. `--overlay smoke` uses the smoke gradient saved with the project (the editor's legend;
+the default otherwise) and prints it with the haze (`--haze` or the scene's), the densest air of the smoke grid and
+every hazer, fog machine, fan and flame with its output (*Emitters: Hazer SL (haze) 100 %, Fog DSR (fog) off*); the
+picture greys the scene, tints surfaces and air by the scattering coefficient and marks the emitters with arrows
+(docs/rendering.md, analysis overlays). A scene without a floor (MVR exports often contain only the rig) gets the engine's stage
 floor for the render (`StageFloor.AddIfMissing`, the floor the editor adds when it opens a floorless MVR; `--floor none`
 disables it). `--work-light auto` (or `on`) adds the
 work light (see RenderSync) for scenes whose fixtures are dark; a render never gets it unless asked, and never in a
@@ -527,6 +538,18 @@ a device):
   light per lit beam — every fixture lit, the pixel-mapped MagicBlade stand-in included, except a pure strobe between
   flashes — with no field wider than 4 × its beam and nothing clamped; identical results for identical input
   sequences; export → reopen keeps ids, specs and addresses.
+* **Rivale with gobo wheel 1 at OPEN** (`RivaleOpenGoboTests`): on Фокина at open white and with the Rivale stand-ins'
+  gobo wheel 1 set to its OPEN slot explicitly — also after the wheel visited a gobo and came back — no gobo,
+  animation disc (the "CMY Animation" colour mosaic), prism or beam shaper is in any beam, and no light reaching the
+  render world carries a cookie; the picture the Vulkan renderer draws from just in front of a Rivale's lens along its
+  beam is an even white field (luminance spread < 0.1, chromaticity spread < 0.01), while the same view with gobo 2
+  shows its pattern (spread 1.5) and with the animation disc in its colour mosaic (chromaticity spread 0.11), and the
+  field is even again once both are out.
+* **Smoke overlay** (`SmokeOverlayEngineTests`): real hazer, fog and low-fog GDTFs and a flame jet reach the render
+  world as markers with their outputs, nozzles and directions (the fog machine that is off with output 0, the low-fog
+  machine as low fog, the flame upwards), markers follow the outputs and are cleared on detach; the CLI summary names
+  the haze, the densest air and every emitter (`--haze` overrides the haze); the overlay and its gradient survive a
+  project save and open; `candela render --overlay smoke` of a project with a running hazer marks it.
 * **Install layout** (`InstallLayoutTests`): an installed copy (a temporary program folder with `data/specs`,
   `samples` and starter fixtures) finds its files next to the program and ignores the repository; the development
   layout uses the repository; library folders are the configured ones, then the starter fixtures; specs are found next

@@ -35,7 +35,7 @@ without a GPU, Mesa's software driver (lavapipe, package `mesa-vulkan-drivers`) 
 | `scene` / `--open <file>` | scene or project to open at start (`.candela`, `.mvr`), behind the busy overlay of the first frame |
 | `--layout <name>` | start with a layout: `default`, `viewports-4` or a saved layout name |
 | `--reset-layout` | ignore the saved workspace and start with the default layout |
-| `--scale <1-4>` | UI scale (1 = 100 %), overrides the setting |
+| `--scale <1-3>` | UI scale (1 = 100 %), overrides the setting |
 | `--language <en\|ru>` | UI language, overrides the setting |
 | `--device <name>` | preferred GPU (substring of the device name) |
 | `--validation` | enable the Vulkan validation layer |
@@ -176,7 +176,7 @@ view shows the snapped face, the arrows to its neighbours and the caption.*
 **Toolbar** (top left; compact icons when the viewport is narrow): select / move / rotate tool, local / world space,
 snapping, shading (Wireframe, Colorless, Full — the menu's last entry, *Viewport Settings…*, opens the Preview panel
 with the real-time quality settings of the Full mode), projection (perspective / orthographic), overlay (None, Lux,
-Noise, Cables), grid, statistics. When even the compact toolbar is wider than the view (four views at a large UI
+Noise, Cables, Smoke and haze), grid, statistics. When even the compact toolbar is wider than the view (four views at a large UI
 scale), the view options move to a second row, so every button stays reachable.
 
 **View cube** (top right, beside the toolbar when there is room, otherwise below it; it shrinks in small views
@@ -375,7 +375,15 @@ modes, weight and power.*
   renderer of its own (a second, window-less device on the same GPU), so drawing the panel never waits for them; still
   pictures are cached on disk in Candela.Assets' `ThumbnailStore` (keyed by the GDTF file's content), so a fixture is
   rendered once per machine. Only tiles on screen ask for pictures, newest request first; pictures arrive a few per frame
-  as Dear ImGui user textures, at most 240 stay in memory (least recently drawn are released).
+  as Dear ImGui user textures, at most 240 stay in memory (least recently drawn are released). A released texture is
+  destroyed by the Vulkan backend once no frame in flight can use it: Dear ImGui counts the frames a texture has been
+  unused only for its own font atlas, so `UiTextures` counts them for the released thumbnails and preview frames
+  (without that, every hover preview left 24 GPU images and descriptor sets behind until the backend's descriptor pool
+  ran out and the driver crashed). All picture textures together never exceed 400 (alive or waiting for the GPU); beyond
+  that a tile shows its fallback icon until older ones are gone. A fixture the thumbnail renderer cannot draw (a broken
+  model, a non-finite transform, an exception, a lost device) gets the fallback icon too; after three device failures
+  the worker recreates its renderer. The log line at exit counts them (*Pictures: … textures made, … freed, … alive,
+  … waiting for the GPU, … refused.*).
 * **Hover preview.** Resting on a tile for a moment grows it upward (0.18 s, ease-out) into a card twice its size — it
   hangs down from the top when there is no room above — showing the fixture **turning** (24 frames around it,
   rendered coarse-to-fine in the background and cross-faded, so a whole turn is visible early) and a line of facts.
@@ -631,7 +639,7 @@ Shortcuts are commands bound to key chords (Core `KeyBindingSet`); menus show th
 | Snapping / Local-world space | Alt+S / Alt+X | Frame selection | F |
 | Top / Front / Right view | Num 7 / 1 / 3 | Bottom / Back / Left view | Ctrl+Num 7 / 1 / 3 |
 | Perspective ↔ orthographic | Num 5 | Grid | Alt+G |
-| Wireframe / Colorless / Full | Alt+1 / Alt+2 / Alt+3 | Overlay None / Lux / Noise / Cables | Alt+0 / Alt+L / Alt+N / Alt+C |
+| Wireframe / Colorless / Full | Alt+1 / Alt+2 / Alt+3 | Overlay None / Lux / Noise / Cables / Smoke | Alt+0 / Alt+L / Alt+N / Alt+C / Alt+H |
 | New viewport | Ctrl+Alt+N | Keyboard shortcuts | F1 |
 | Pause / resume simulation | Alt+P | Import GDTF, Open White | (unbound) |
 
@@ -651,7 +659,7 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
 
 | Section | Settings |
 |---|---|
-| Interface | UI scale (100–400 %, multiplied with the monitor's DPI scale), font size, language (English / Русский), theme |
+| Interface | UI scale (100–300 %, multiplied with the monitor's DPI scale), font size, language (English / Русский), theme; the scale and font sliders apply when released (dragging only previews the number) |
 | Keyboard | key binding editor: search, click a chord to record a new one (the recorded press does not run the command), add / remove chords (right-click a chord), conflict warnings; presets *Default*, saved names and *Custom* (Core `PresetLibrary` over a `FilePresetStore` in `presets/`; any edit switches to *Custom*), Save as…, Delete, Reset to default |
 | Viewport | navigation style (Candela / Blender / Maya, with a summary of its mouse bindings), zoom speed, display units (metric / imperial), grid spacing (also the move-snapping step), rotation snapping step |
 | Library | library folders (add with the folder browser, remove; missing folders in red) |
@@ -675,6 +683,12 @@ damaged settings file is kept aside as `settings.json.damaged-<time>` and defaul
   that every key has both and that placeholders match), including the issue categories of Core. Menus and panel titles
   switch immediately.
 * DPI: the UI scale is *user scale × monitor content scale*; windows moved between monitors adapt.
+* The UI scale is applied to a fresh copy of Dear ImGui's default style every time (`Theme.Apply`), never on top of the
+  current sizes, so moving the slider back and forth always lands on the same layout. The glyph size the font atlas
+  has to hold is limited by the GPU's largest texture (at most 8192 px, `UiScale.AtlasSize`): when scale × font size ×
+  DPI would need more, the scale actually used is lowered to what fits and the Interface section says so (*Shown at
+  …: the largest text this font size and screen allow.*); before, a large scale filled the atlas and froze or crashed
+  the editor.
 
 ## Engine-backed panels
 
@@ -981,6 +995,24 @@ types*; while the scene has no cables, it lists the whole catalogue.
 
 ![Оверлей кабелей, русский интерфейс, 150 %](images/editor-overlay-cables-ru.png)
 
+![Smoke overlay with its legend and the emitter labels](images/editor-overlay-smoke.png)
+
+The *Smoke and haze* overlay (View → Overlay, the viewport's overlay menu, Alt+H) shows where the air is dense: the
+scene is greyed like in the cable overlay, surfaces take the colour of the density of the air next to them, and the air
+itself is tinted by a coloured fog — an even haze as a light veil over everything, a fog machine's cloud as a bright
+patch. The density is the **scattering coefficient of the air in 1/m** (the haze of the scene plus the simulated
+smoke; the visibility is about 3 ÷ the value: 0.01 /m is a light haze, 0.1 /m a thick one, 1 /m and more a fog
+cloud). Every hazer, fog machine, low-fog machine, fan and flame is marked with an **arrow** from its nozzle in the
+direction of its jet — the longer, wider and brighter, the higher its output; grey and short when it is off — drawn
+over everything, so it shows through the device body or a wall, and a label beside it names the device with its
+outputs (*Hazer SL · haze 100 %, fan 60 %*). The legend has the density gradient (0.005 … 2 /m on a log scale by
+default; the same editing, range fields and presets *Default / Custom / Save as…* as the other overlays; air clearer
+than the range gets no colour), the haze of the scene and the densest air at the moment, and the list of emitters in
+their arrow colours (hazer cyan, fog white, low fog pale blue, fan green, flame orange). The gradient is saved in the
+project and used by `candela render --overlay smoke`.
+
+![Оверлей дыма, русский интерфейс, 150 %](images/editor-overlay-smoke-ru.png)
+
 ### Implementation
 
 ```
@@ -994,7 +1026,8 @@ src/Candela.App/
             accumulation, the fall-back without ray queries, timecode sequences)
   Panels/   StagePropertiesSection → FixtureInspectorView, DeviceFactsView, SurfaceInspectorView; ExternalControlPanel;
             PreviewPanel; RenderPanel
-  Viewport/ OverlayLegend (legend window of a viewport)
+  Viewport/ OverlayLegend (legend window of a viewport), SmokeEmitterLabels (the smoke overlay's emitter labels and
+            legend list, cached per device)
   Ui/       StageStrings (StageStr / StageLoc: English and Russian texts of these panels), StageUnits (unit symbols in
             the UI language), StageIcons, ConnectorIcons (vector connector drawings), GradientEditor, PresetCombo,
             MaterialSwatch, AttributeLabels, LabelColumn
@@ -1176,8 +1209,9 @@ src/Candela.App/
               light), ViewSettingsEdits (work light and stored camera in the project's view settings),
               IViewportContent, PreviewStage (--preview-stage), SessionResult, CableLinkModel (the strip of the
               cable link window)
-  Thumbnails/ ThumbnailWorker (background renderer for library stills and orbit frames), UiTextures (ImGui user
-              textures with deferred release)
+  Thumbnails/ ThumbnailWorker (background renderer for library stills and orbit frames, recovering from a lost
+              device), UiTextures (ImGui user textures: released ones destroyed once unused for the swapchain's image
+              count, a budget of 400, counters)
   Input/      key names, commands, KeyBindingMap / dispatcher, KeyBindingsService, InputScript, ScriptPlayer,
               SessionActions
   Files/      FileFilter, FileBrowserModel (pure logic), FileBrowserDialog (UI)
@@ -1250,7 +1284,16 @@ category filter). `SessionSafetyTests` (changing or switching off the autosave i
 the unsaved work; the engine's own frames never mark an opened rig modified and allocate nothing; a failed Save As keeps
 the scene name; Enter or Escape pressed in the frame a question opens does not answer it) and `LibraryRobustnessTests`
 (unreadable GDTF files give fixture types without modes that are placed unpatched instead of throwing; a model library of
-thousands of entries loads in linear time). `EditorEndToEndTests` start the real editor under `xvfb-run` with scripted input: open the Фокина
+thousands of entries loads in linear time). `UiScaleRegressionTests` (applying the theme is idempotent — the style
+after 100 → 300 → 100 % equals the style of a fresh 100 % field by field —, the applied scale never asks the font atlas
+for more than the GPU's texture size, dragging a scale slider changes nothing until it is released, the whole range at
+every font size builds the atlas without the FreeType "out of texture memory" assert), `UiTextureLifecycleTests`
+(released thumbnails and hover frames are destroyed by a stand-in for the Vulkan backend once unused for the swapchain's
+image count and freed — 300 hovers of 24-frame previews keep the count bounded; the 400-texture budget refuses and
+recovers; three of the four fail without the frame counting) and `SmokeOverlayEditorTests` (the overlay in the viewport
+selector, the View menu and Alt+H; its gradient bound to the project and its presets; the legend and the emitter labels
+— *Hazer SL · haze 60 %, fan 100 %*, *Fogger SR · fog off*, in Russian *дымка … вентилятор … выкл.* — follow the
+outputs, keep unchanged labels, drop removed devices). `EditorEndToEndTests` start the real editor under `xvfb-run` with scripted input: open the Фокина
 scene, click a fixture, check that the Properties panel names it and that the viewport shows the orange outline, save
 it as `.candela`, reopen it and compare the scene (entities, transforms, components, patch) with the original; and
 build a stage — draw a floor and a wall, drag a fixture from the Library onto the floor, drop an image onto the

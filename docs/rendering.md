@@ -229,18 +229,20 @@ wraps each pass in a debug label and GPU timestamps, and runs passes in `RenderS
 
 | Stage | Pass | Views | Work |
 |---|---|---|---|
+| 50 `Diagnostics` | history fill (test hook) | when asked | fills the temporal histories with NaN / ±∞ (see [Numeric robustness](#numeric-robustness)) |
 | 100 `ShadowAtlas` | shadow atlas | Full, Lux | (re-)renders the atlas tiles that changed; RSM variant also writes reflectance + normal |
 | 200 `DepthPrepass` | depth pre-pass | all | reverse-Z depth, pick ids (`R32_UINT`, 0 = none / `NotPickable`), instance indices, normals; alpha-mask variant discards |
 | 300 `LightAssignment` | light assignment | Full, Lux | `cluster.comp`, one work group per cluster |
 | 350 `Indirect` | virtual point lights, indirect gather / ray-traced GI (+ filter) | Full | half-resolution indirect irradiance |
 | 400 `Opaque` | forward opaque / colorless / wireframe | one per view | depth test `EQUAL` against the pre-pass (no overdraw shading) |
-| 450 `Analysis` | analysis overlay | Lux, Noise | lx or dB per pixel into the `R32F` analysis image |
+| 450 `Analysis` | analysis overlay | Lux, Noise, Smoke | lx, dB or 1/m per pixel into the `R32F` analysis image |
 | 500 `Volumetrics` | froxel injection, integration, beam tile culling, beam single scattering, beam temporal accumulation, volumetric composite | Full with media | in-scattering and transmittance over the opaque scene: the beams per pixel, the remaining lights in the froxels |
 | 600 `Transparent` | forward transparent | Full | blended and transmissive materials, back to front, premultiplied, fogged |
+| 650 `DiagnosticsAfterScene` | HDR overflow (test hook) | when asked | writes half-float +∞ into a block of the HDR image |
 | 700 `HdrPost` | bloom, auto exposure | Full | bloom pyramid; luminance histogram → exposure read back a few frames later |
 | 800 `DisplayTransform` | tone mapping | all | HDR (+ bloom) → tone mapper → overlays → sRGB encode (+ ±½ LSB dither) → display |
 | 850 `OverlayDepth` | overlay depth | scaled | nearest scene depth at display resolution for the overlays |
-| 900 `Overlays` | grid, lines (+ beam outlines), selection mask, outline | all | over the display image, depth-tested against the scene depth |
+| 900 `Overlays` | grid, lines (+ beam outlines, smoke emitter markers), selection mask, outline | all | over the display image, depth-tested against the scene depth (emitter markers on top) |
 
 After the last pass the display image is transitioned to `SHADER_READ_ONLY_OPTIMAL` (fragment-shader read).
 Recording allocates no managed memory in steady state (draw lists, barrier batches, light plans, baked overlay
@@ -698,7 +700,9 @@ histories then turn into NaN.
 `bloom_down.comp` builds a half-resolution pyramid (up to 6 levels, down to ~4 px) with the 13-tap filter of five
 overlapping box filters (weights ½ and 4 × ⅛, normalised: every level keeps the image's energy); the first level limits
 samples to a luma of 2¹⁰ (10 stops above white) so a stray overflow cannot flood the pyramid — unlike a Karis average
-this leaves all realistic highlights untouched. `bloom_up.comp` adds each coarser level, tent-filtered, into the finer
+this leaves all realistic highlights untouched. The first level filters the HDR image **in the shader** from four
+texels made finite first (`sampleLightBilinear`, see [Numeric robustness](#numeric-robustness)), never with the
+texture unit, and limits the filtered sample; every level is written finite. `bloom_up.comp` adds each coarser level, tent-filtered, into the finer
 one. The display transform uses `(1 − k) · scene + k · Σ levels / levels` with k = `BloomIntensity`: the bloom only
 redistributes light (energy within 3 % in the tests).
 
@@ -725,6 +729,33 @@ indirect light. The display transform upscales the HDR image bilinearly to the d
 outlines are drawn at display resolution, depth-tested against the nearest scene depth (`depth_upsample.frag`).
 `Pick`, `ReadPixels` and the display image always use display coordinates.
 
+### Numeric robustness
+
+A non-finite value in a light image spreads: a texture unit filtering a texel of +∞ returns NaN (0 · ∞, ∞ − ∞), a
+NaN in a blend makes the pixel NaN for good, and every later pass that filters it — the bloom pyramid, the froxel and
+beam histories, the scaled display — turns it into blocks of the level's size. Around a bright lens in haze that shows
+as dark squares that follow the camera and flicker. The renderer keeps every light image finite on every GPU:
+
+* **Tests on the bits.** `common.glsl` decides "non-finite" on the IEEE bits (`floatBitsToUint(x) & 0x7F800000`),
+  never with `isnan` / `isinf` / `x != x`, which a compiler that assumes finite math may fold to false.
+  `finiteLight` (NaN → 0, clamp to [0, 30000], +∞ → 30000), `finiteClamp`, `allFinite` and `isNonFinite` are applied
+  to what is loaded from a history or a light image (a loaded value carries no compiler assumptions) and to what is
+  stored; a test checks that no shader uses the folding forms.
+* **Blend headroom.** Every pass that blends into the HDR colour attachment (forward opaque and transparent, the
+  volumetric composite) writes at most `HDR_BLEND_MAX` = 12000 (pre-exposed; 13.5 stops above white): five layers still
+  sum below the half-float maximum 65504, so no blend overflows to +∞.
+* **Filtered in the shader.** The bloom's first level and the scaled display transform read the HDR image through
+  `sampleLightBilinear` — four `texelFetch` reads, each made finite, then the bilinear weights — so even an overflow
+  that a GPU stored (lavapipe clamps, others do not) stays a bright texel instead of becoming NaN.
+* **Histories.** The froxel, beam and ray-traced indirect histories reject (or sanitise) non-finite texels before they
+  are blended with the current frame; the volumetric composite checks the half-resolution beam samples.
+
+Two test hooks (stage `Diagnostics` / `DiagnosticsAfterScene`) write what a misbehaving GPU might leave:
+`HistoryFillPass` fills every temporal history with NaN or ±∞ before a frame (`VulkanRenderTarget.HistoryFillForTests`),
+`HdrOverflowPass` writes half-float +∞ into a block of the HDR image after the scene passes (`HdrOverflowForTests`).
+`LensGlareTests` look into a 2 Mcd lens through haze with temporal histories, also after those hooks ran, and require a
+finite picture without dark blocks around the lens, in the bloom and in the display, at full and reduced resolution.
+
 ## Analysis overlays (`ViewOptions.Overlay`)
 
 Overlay values are computed per pixel of every visible opaque surface into an `R32F` analysis image
@@ -750,8 +781,28 @@ background is not coloured.
 * **Cables**: the shaded image with everything except instances flagged `InstanceFlags.CableHighlight` desaturated and
   darkened to 32 % of its luminance; lines (`SetLines`: the cable runs) are drawn on top of everything at full
   brightness.
+* **Smoke** (`SmokeGradient`, default 0.005 … 2 /m, logarithmic): the **density of smoke and haze** as the
+  **scattering coefficient of the air**, σ = `AtmosphereState.BaseScattering` + smoke density ×
+  `SmokeScatteringAtFullDensity` (1/m; the visibility is about 3 / σ: 0.01 /m is a light haze, 0.1 /m a thick one,
+  1 /m and more a fog cloud). It works in every view shading (`smokeOverlayAt` in `volume.glsl` reads the media
+  constants and the smoke grid directly, not the Full view's media features). The scene is **greyed** like the cable
+  overlay (32 % of its luminance); surfaces show the gradient colour of σ in the air next to them (the analysis
+  value), blended with the gradient's alpha; the air is tinted by a display-referred **fog** like the noise overlay's,
+  of density `0.6 /m · t² · alpha` (t = σ's position in the gradient range on its log scale): an even haze stays a
+  veil while dense clouds stand out. The fog reaches 30 m over the background and covers at most 65 % of what is
+  behind it, so the greyed scene stays readable. The default gradient runs faint blue → cyan → green → yellow →
+  magenta and is most transparent at its thin end; σ below the range leaves the air and surfaces uncoloured
+  (`OutOfRangeColor` with alpha 0), σ above it counts as the top of the range in the fog.
+  **Emitters** (`IRenderWorld.SetSmokeEmitters`, one `SmokeEmitterMarker` per hazer, fog / low-fog machine, fan or
+  flame output: nozzle, jet direction, output 0 … 1, kind, device id) are marked in views with this overlay: a ring
+  around the nozzle (larger for fans), an arrow along the jet from 0.4 m (off) to 2.4 m (full output) whose width and
+  brightness grow with the output, and a four-armed arrowhead; colours by kind (`SmokeEmitterMarker.ColorOf`: hazer
+  cyan, fog white, low fog pale blue, fan green, flame orange), grey when off. The markers are built per view into the
+  target's own line buffer (`SmokeMarkers`, no allocation in steady frames) and drawn **over everything**, so an
+  emitter inside a device body or behind a wall stays visible. `candela render --overlay smoke` draws the same picture
+  and prints the gradient range, the haze, the densest air and every emitter with its output.
 
-`VulkanRenderer.ReadAnalysis` (internal) reads the lux / dB image back for tests and tools.
+`VulkanRenderer.ReadAnalysis` (internal) reads the lux / dB / 1/m image back for tests and tools.
 
 ## Editor visuals
 
@@ -796,6 +847,8 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `OverlayTests` | lux overlay = `LightMeter` within 1 % (four lights, three beam types; and 1320 overlapping beams from above and in perspective, after the cluster masks grew from 12 lights); gradient and out-of-range grey (golden `overlay-lux`); noise overlay = `Acoustics.SplAt` within 0.5 dB, noise field instead of sources; golden `overlay-noise` (surfaces + fog); golden `overlay-cables` (greyed scene, highlighted device keeps its colours); golden `selection-outline` (orange, dimmed through an occluder, absent when disabled); golden `beam-outlines`; reference drawings unlit at 50 % (Full and Colorless) |
 | `PostTests` | golden `bloom`; the bloom image has the HDR image's energy (3 %), a halo appears and the source gives up light; auto exposure (average metering) converges to the trimmed-mean measurement (0.2 stop), follows a 4× brighter scene by 2 stops (adapting over time) and adds compensation; resolution scale 0.5 renders a quarter of the pixels, keeps the display size and picking (< 1 cm), clamps to [0.5, 1] |
 | `IndirectTests` | a red wall bleeds onto a white floor: red/green rises by more than 30 % against `Indirect = Off`, and the added luminance matches a CPU integral of the wall's reflected light (RSM within 12 %, ray-traced GI within 20 %, both measured on lavapipe); a red floor bleeds onto a white wall (RSM 5 %, ray-traced 10 %); fallbacks |
+| `SmokeOverlayTests` | the smoke overlay's analysis value is haze + smoke grid × scattering at full density in every view shading (4 × 10⁻³ /m), haze alone outside the grid; golden `overlay-smoke` (greyed scene, a smoke cloud as coloured fog, a running hazer's cyan arrow — also from inside a box —, a fan that is off short and grey); marker geometry (ring, shaft along the jet as long as the output asks, invalid emitters skipped, invalid directions up) |
+| `LensGlareTests` | a 2 Mcd lens seen through haze from several distances, with temporal histories: finite, no dark blocks around the lens in the HDR image, the bloom and the display (full and 0.75 resolution), also after the histories were filled with NaN / ±∞; an HDR block at +∞ stays bright in the bloom and the picture; no shader relies on `isnan` / `isinf` / self-comparison |
 | `RobustnessTests` | NaN / out-of-range settings, lights and atmosphere grids (empty, short, beyond the 3D image limit, NaN, infinite, null) in every view and overlay; 1000 shadow-casting lights with every feature (256 tiles, ≤ 256 VPLs); 2 Mcd into the camera through dense haze stays below the half-float limit and finite |
 | `MemoryTests` | alignment, free-list reuse and coalescing, granularity, dedicated allocations |
 | `SwapchainTests` | headless surface: acquire/present, resize, minimise, misuse errors, ImGui handoff state |

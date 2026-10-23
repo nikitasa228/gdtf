@@ -233,8 +233,28 @@ public sealed class RenderingTests
         var output = new StringWriter();
         var error = new StringWriter();
         int code = Cli.Program.Run(
-            ["render", project, "--out", png, "--width", "320", "--height", "180", "--overlay", "smoke", "--look", "show", "--time", "4",
-                "--camera", "0,-6,3", "--target", "0,0,0.8", "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root],
+            ["render",
+                project,
+                "--out",
+                png,
+                "--width",
+                "320",
+                "--height",
+                "180",
+                "--overlay",
+                "smoke",
+                "--look",
+                "show",
+                "--time",
+                "4",
+                "--camera",
+                "0,-6,3",
+                "--target",
+                "0,0,0.8",
+                "--cache",
+                Path.Combine(dir, "cache"),
+                "--library",
+                TestEnvironment.Root],
             output, error);
         Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
         string text = output.ToString();
