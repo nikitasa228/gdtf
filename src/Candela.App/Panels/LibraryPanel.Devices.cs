@@ -55,7 +55,7 @@ internal sealed partial class LibraryPanel
 
     private void DrawDevices()
     {
-        float scale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
+        float scale = UiScale.Frame();
         var style = ImGui.GetStyle();
         ImGui.SetNextItemWidth(-1f);
         ImGui.InputTextWithHint("##device-search", Labels.With(Icons.Search, Str.Search), ref _deviceSearch, 128);

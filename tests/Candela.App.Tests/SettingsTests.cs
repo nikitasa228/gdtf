@@ -172,7 +172,7 @@ public sealed class UiScaleTests
     [InlineData(1f, 1f, 1f)]
     [InlineData(1.5f, 2f, 3f)]
     [InlineData(0.2f, 1f, 1f)]
-    [InlineData(10f, 1f, 4f)]
+    [InlineData(10f, 1f, 3f)]
     [InlineData(1f, 0f, 1f)]
     [InlineData(1f, float.NaN, 1f)]
     [InlineData(2f, 8f, 8f)]

@@ -293,7 +293,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     private void DrawFixtures()
     {
         var engine = _ctx.Session.Engine;
-        float scale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
+        float scale = UiScale.Frame();
         var style = ImGui.GetStyle();
         float buttonWidth = ImGui.CalcTextSize(Icons.FileInput).X + style.FramePadding.X * 2;
         ImGui.SetNextItemWidth(-(buttonWidth + style.ItemSpacing.X));
@@ -680,7 +680,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
 
     private void DrawModels()
     {
-        float scale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
+        float scale = UiScale.Frame();
         var style = ImGui.GetStyle();
         string importLabel = Labels.With(Icons.FileInput, Str.LibImport);
         float buttonWidth = ImGui.CalcTextSize(importLabel).X + style.FramePadding.X * 2;

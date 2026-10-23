@@ -71,7 +71,9 @@ internal sealed unsafe class FontSet
         try
         {
             text.FontDataOwnedByAtlas = true;
-            text.OversampleH = 2;
+            // Automatic oversampling: 2× horizontally for small sizes, none above 36 px, where it only doubles the
+            // atlas space a large UI scale needs.
+            text.OversampleH = 0;
             text.OversampleV = 1;
             text.GlyphExcludeRanges = exclude;
             SetName(text, name);

@@ -254,6 +254,8 @@ internal static class Loc
         (Str.SettingsInterface, "Interface", "Интерфейс"),
         (Str.SettingsUiScale, "Interface scale", "Масштаб интерфейса"),
         (Str.SettingsFontSize, "Font size", "Размер шрифта"),
+        (Str.SettingsUiScaleLimited, "Shown at {0}: the largest text this font size and screen allow.",
+            "Применяется {0}: самый крупный текст, допустимый для этого шрифта и экрана."),
         (Str.SettingsLanguage, "Language", "Язык"),
         (Str.SettingsTheme, "Theme", "Тема"),
         (Str.SettingsThemeDark, "Dark", "Тёмная"),

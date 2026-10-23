@@ -204,6 +204,7 @@ internal enum Str
     SettingsInterface,
     SettingsUiScale,
     SettingsFontSize,
+    SettingsUiScaleLimited,
     SettingsLanguage,
     SettingsTheme,
     SettingsThemeDark,

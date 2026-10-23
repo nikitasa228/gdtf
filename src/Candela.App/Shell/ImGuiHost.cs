@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Candela.App.Diagnostics;
+using Candela.App.Ui;
 using Candela.Rendering.Vulkan;
 using Hexa.NET.ImGui;
 using Hexa.NET.ImGui.Backends.GLFW;
@@ -175,6 +176,11 @@ internal sealed unsafe class ImGuiHost : IDisposable
         gizmoStyle.CenterCircleSize = 7f;
 
         var io = ImGui.GetIO();
+        // The glyph atlas never grows past what the GPU can sample (nor past Dear ImGui's default); Theme.Apply bounds the
+        // UI scale by this size, so the glyphs of a frame always fit (see UiScale.Applied).
+        int atlasSize = UiScale.AtlasSize(gpu.Context.Capabilities.MaxImageDimension2D);
+        io.Fonts.TexMaxWidth = atlasSize;
+        io.Fonts.TexMaxHeight = atlasSize;
         io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.DockingEnable;
         if (MultiViewport)
             io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;

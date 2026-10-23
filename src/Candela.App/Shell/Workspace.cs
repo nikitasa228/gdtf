@@ -196,7 +196,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void Draw(float deltaTime)
     {
         _ = deltaTime;
-        _frameScale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
+        _frameScale = UiScale.Frame();
         _guard.Run("dock tab styles", _applyTabStyles);
         _guard.Run("main menu", _drawMainMenu);
         _guard.Run("status bar", _drawStatusBar);
