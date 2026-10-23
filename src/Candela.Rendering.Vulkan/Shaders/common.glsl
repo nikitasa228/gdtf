@@ -233,11 +233,71 @@ const float HALF_SAFE_MAX = 30000.0;
 // beam into the sky or an open venue is drawn to its end, not cut at the far end of the froxel volume.
 const float BEAM_BACKGROUND_DEPTH = 100000.0;
 
-// NaN -> 0, then clamped to [0, HALF_SAFE_MAX] (+inf -> HALF_SAFE_MAX).
+// Largest pre-exposed luminance one pass writes into the HDR colour attachment (forward opaque and transparent, the
+// volumetric composite). The attachment is blended (opaque + volumetric + transparent layers): five such values still
+// sum below the half-float maximum 65504, so no blend overflows to +infinity — which a premultiplied blend of an opaque
+// layer then turns into NaN (0 x inf), and which bilinear filtering (bloom, scaled display) turns into NaN as well.
+// 12000 is still 13.5 stops above display white; the bloom limits its input to 2^10 and the tone mappers saturate long
+// before.
+const float HDR_BLEND_MAX = 12000.0;
+
+// Non-finite tests on the bits of a value (exponent all ones: infinity or NaN). A shader compiler that assumes finite
+// floating point ("fast math", as GPU compilers may) folds isnan(x), isinf(x) and x != x to false, so those tests could
+// not catch the NaN they are meant for; integer operations on the bits are exact on every implementation.
+bool isNonFinite(float x)
+{
+    return (floatBitsToUint(x) & 0x7F800000u) == 0x7F800000u;
+}
+
+bool allFinite(vec4 v)
+{
+    return all(notEqual(floatBitsToUint(v) & uvec4(0x7F800000u), uvec4(0x7F800000u)));
+}
+
+// x clamped to [lo, hi]; +infinity -> hi, NaN and -infinity -> lo (decided on the bits, see isNonFinite).
+float finiteClamp(float x, float lo, float hi)
+{
+    uint bits = floatBitsToUint(x);
+    if ((bits & 0x7F800000u) == 0x7F800000u)
+        return bits == 0x7F800000u ? hi : lo;
+    return clamp(x, lo, hi);
+}
+
+vec3 finiteClamp(vec3 c, float lo, float hi)
+{
+    return vec3(finiteClamp(c.x, lo, hi), finiteClamp(c.y, lo, hi), finiteClamp(c.z, lo, hi));
+}
+
+// Light values for the half-float light images: NaN -> 0, then clamped to [0, HALF_SAFE_MAX] (+inf -> HALF_SAFE_MAX).
+// Readers apply it to what they load (a loaded value carries no compiler assumptions), writers to what they store.
 vec3 finiteLight(vec3 c)
 {
-    c = mix(c, vec3(0.0), isnan(c));
-    return clamp(c, vec3(0.0), vec3(HALF_SAFE_MAX));
+    return finiteClamp(c, 0.0, HALF_SAFE_MAX);
+}
+
+// Light written into the blended HDR colour attachment: like finiteLight, at most HDR_BLEND_MAX.
+vec3 finiteHdr(vec3 c)
+{
+    return finiteClamp(c, 0.0, HDR_BLEND_MAX);
+}
+
+// Bilinear sample of the light image `image` at normalised position uv (clamp to edge), filtered in the shader from
+// four texelFetch reads that are each made finite first. The texture unit's own filtering would blend a stored
+// +infinity (a half-float overflow on a GPU that does not clamp) with weight 0 or against another infinity into NaN
+// before any test could see it.
+vec3 sampleLightBilinear(sampler2D image, vec2 uv)
+{
+    ivec2 size = textureSize(image, 0);
+    vec2 pos = uv * vec2(size) - 0.5;
+    vec2 base = floor(pos);
+    vec2 f = pos - base;
+    ivec2 p0 = clamp(ivec2(base), ivec2(0), size - 1);
+    ivec2 p1 = clamp(ivec2(base) + 1, ivec2(0), size - 1);
+    vec3 a = finiteLight(texelFetch(image, ivec2(p0.x, p0.y), 0).rgb);
+    vec3 b = finiteLight(texelFetch(image, ivec2(p1.x, p0.y), 0).rgb);
+    vec3 c = finiteLight(texelFetch(image, ivec2(p0.x, p1.y), 0).rgb);
+    vec3 d = finiteLight(texelFetch(image, ivec2(p1.x, p1.y), 0).rgb);
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
 bool isOrthographic()

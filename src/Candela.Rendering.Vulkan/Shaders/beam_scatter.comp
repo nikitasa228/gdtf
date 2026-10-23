@@ -738,8 +738,14 @@ void main()
                 sumB += facetB * flux;
             }
 
-            L += sumL;
-            B += light.intensity * sumB;
+            // A beam whose integral is not finite (a degenerate geometry at the lens) adds nothing instead of turning
+            // every other beam of this sample into NaN; tested on the bits (common.glsl).
+            vec3 beamB = light.intensity * sumB;
+            if (allFinite(vec4(sumL, 0.0)) && allFinite(vec4(beamB, 0.0)))
+            {
+                L += sumL;
+                B += beamB;
+            }
         }
     }
 

@@ -40,6 +40,7 @@ vec3 indirectIrradiance(float viewDepth)
         {
             ivec2 p = ivec2(clamp(base + vec2(i, j), vec2(0.0), size - 1.0));
             vec4 s = texelFetch(indirectTexture, p, 0);
+            s = vec4(finiteLight(s.rgb), finiteClamp(s.a, 0.0, 1e30));
             float w = (i == 0 ? 1.0 - f.x : f.x) * (j == 0 ? 1.0 - f.y : f.y);
             w *= exp(-abs(s.a - viewDepth) / max(0.03 * viewDepth, 1e-3)) + 1e-4;
             sum += s.rgb * w;
@@ -172,9 +173,9 @@ void main()
         color = color * fog.a + fog.rgb * coverage;
     }
 
-    outColor = vec4(finiteLight(color), coverage);
+    outColor = vec4(finiteHdr(color), finiteClamp(coverage, 0.0, 1.0));
 
 #else
-    outColor = vec4(finiteLight((diffuse + specular + emissive) * frame.exposure), 1.0);
+    outColor = vec4(finiteHdr((diffuse + specular + emissive) * frame.exposure), 1.0);
 #endif
 }

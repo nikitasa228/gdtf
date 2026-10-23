@@ -59,7 +59,11 @@ void main()
 {
     vec2 uv = gl_FragCoord.xy * frame.displaySize.zw;
     vec4 texel = hasFeature(FEATURE_SCALED) ? textureLod(hdrTexture, uv, 0.0) : texelFetch(hdrTexture, ivec2(gl_FragCoord.xy), 0);
-    vec3 hdr = finiteLight(texel.rgb); // an overflowed blend (+inf) must not reach the tone mapper as NaN
+    // An overflowed blend (+inf) must not reach the tone mapper as NaN: a scaled image is filtered from checked
+    // texels (common.glsl), never by the texture unit, which would turn an infinity into NaN. The alpha (the share of
+    // scene light, < 1 on reference drawings) is at most 1 and only needs the non-finite case: scene light.
+    vec3 hdr = hasFeature(FEATURE_SCALED) ? sampleLightBilinear(hdrTexture, uv) : finiteLight(texel.rgb);
+    texel.a = isNonFinite(texel.a) ? 1.0 : texel.a;
     if (hasFeature(FEATURE_BLOOM))
         hdr = mix(hdr, finiteLight(textureLod(bloomTexture, uv, 0.0).rgb) * draw.width, frame.bloomIntensity);
 

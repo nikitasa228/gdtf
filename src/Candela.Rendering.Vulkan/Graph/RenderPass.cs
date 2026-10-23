@@ -10,6 +10,9 @@ namespace Candela.Rendering.Vulkan;
 /// </summary>
 internal enum RenderStage
 {
+    /// <summary>Diagnostics recorded before everything else (test hooks such as filling the temporal histories).</summary>
+    Diagnostics = 50,
+
     /// <summary>Shadow maps (and reflective shadow maps) of the spot lights into the shadow atlas.</summary>
     ShadowAtlas = 100,
 

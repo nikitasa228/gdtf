@@ -183,6 +183,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _world = new VulkanRenderWorld(context, buildEdges: _edgeWireframe);
             Pipelines = new PipelineLibrary(context, _compiler, _world.SceneSetLayout, polygonWireframe: !_edgeWireframe);
             _pass = new PassContext(context, _world, Pipelines, _barriers, _shared) { EdgeWireframe = _edgeWireframe };
+            _passes.Add(new HistoryFillPass());
             _passes.Add(new ShadowPass());
             _passes.Add(new DepthPrepassPass());
             _passes.Add(new ClusterAssignPass());

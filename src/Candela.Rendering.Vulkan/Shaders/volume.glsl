@@ -24,8 +24,11 @@ float froxelSlice(float viewDepth)
 // so slice coordinate s maps to texel coordinate s - 0.5; inside the first slice the value is interpolated from 0.
 vec4 sampleIntegratedVolume(vec2 uv, float viewDepth)
 {
-    float s = clamp(froxelSlice(viewDepth), 0.0, frame.volumeGrid.z);
+    float s = finiteClamp(froxelSlice(viewDepth), 0.0, frame.volumeGrid.z);
     vec4 v = textureLod(volumeTexture, vec3(uv, (s - 0.5) * frame.volumeGrid.w), 0.0);
+    // What the filter returns is checked on its bits: no non-finite light or transmittance reaches a blend (NaN alpha
+    // would turn the whole pixel and every later blend of it into NaN).
+    v = vec4(finiteLight(v.rgb), finiteClamp(v.a, 0.0, 1.0));
     if (s < 1.0)
         v = mix(vec4(0.0, 0.0, 0.0, 1.0), v, s);
     return v;

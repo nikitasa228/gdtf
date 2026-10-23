@@ -31,8 +31,8 @@ const float CLIP_SPREAD = 1.0;
 vec3 ratioAt(ivec2 p, ivec2 size, out bool valid)
 {
     p = clamp(p, ivec2(0), size - 1);
-    vec3 l = texelFetch(currentScatter, p, 0).rgb;
-    vec3 b = texelFetch(currentBase, p, 0).rgb;
+    vec3 l = finiteLight(texelFetch(currentScatter, p, 0).rgb);
+    vec3 b = finiteLight(texelFetch(currentBase, p, 0).rgb);
     valid = b.r + b.g + b.b > MIN_ENVELOPE;
     return valid ? l / max(b, vec3(MIN_ENVELOPE)) : vec3(0.0);
 }
@@ -43,10 +43,13 @@ void main()
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
     if (any(greaterThanEqual(id, size)))
         return;
+    // Everything loaded is checked on its bits (common.glsl), so no non-finite value of the scatter pass or of an old
+    // history can spread through the neighbourhood statistics or persist in the history.
     vec4 current = texelFetch(currentScatter, id, 0);
+    current = vec4(finiteLight(current.rgb), finiteClamp(current.a, -HALF_SAFE_MAX, HALF_SAFE_MAX));
     vec4 envelope = texelFetch(currentBase, id, 0);
-    vec3 base = envelope.rgb;
-    float viewDepth = envelope.a;
+    vec3 base = finiteLight(envelope.rgb);
+    float viewDepth = finiteClamp(envelope.a, 0.0, HALF_SAFE_MAX);
     bool beam = base.r + base.g + base.b > MIN_ENVELOPE;
     if (!beam)
     {
@@ -75,7 +78,7 @@ void main()
             {
                 vec4 history = textureLod(historyRatio, prevUv, 0.0);
                 bool depthMatch = history.a > 0.0 && abs(history.a - prevDepth) <= 0.05 * max(prevDepth, 1e-3);
-                if (depthMatch && all(equal(history, history)))
+                if (depthMatch && allFinite(history))
                 {
                     // Variance clipping: the history may only deviate from the mean of the current modulation around
                     // this pixel by about its spread, so the pattern of a moving gobo or shadow does not lag behind.

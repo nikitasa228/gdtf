@@ -61,7 +61,7 @@ void main()
         float meanLum = luminanceRec2020(mean);
         float secondMoment = imageLoad(ptAux, p).a / n;
         float variance = max(secondMoment - meanLum * meanLum, 0.0) / n;
-        if (!isFiniteVec(mean) || isnan(variance) || isinf(variance))
+        if (!isFiniteVec(mean) || isNonFinite(variance))
         {
             mean = vec3(0.0);
             variance = 0.0;
@@ -84,7 +84,7 @@ void main()
         {
             ivec2 q = clamp(p + ivec2(dx, dy), ivec2(0), size - 1);
             float v = imageLoad(ptInput, q).a;
-            variance += (isnan(v) || isinf(v) ? 0.0 : max(v, 0.0)) * gauss[abs(dx)] * gauss[abs(dy)] * 4.0;
+            variance += (isNonFinite(v) ? 0.0 : max(v, 0.0)) * gauss[abs(dx)] * gauss[abs(dy)] * 4.0;
         }
     }
 

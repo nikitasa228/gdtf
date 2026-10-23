@@ -129,11 +129,11 @@ void main()
             if (all(greaterThanEqual(prevUv, vec2(0.0))) && all(lessThanEqual(prevUv, vec2(1.0))))
             {
                 vec4 h = textureLod(historyIndirect, prevUv, 0.0);
-                if (abs(h.a - prevDepth) < 0.05 * prevDepth && all(equal(h, h)))
+                if (allFinite(h) && abs(h.a - prevDepth) < 0.05 * prevDepth)
                     E = mix(E, h.rgb, historyWeight);
             }
         }
     }
 
-    imageStore(outIndirect, p, vec4(finiteLight(E), viewDepth));
+    imageStore(outIndirect, p, vec4(finiteLight(E), finiteClamp(viewDepth, 0.0, HALF_SAFE_MAX)));
 }

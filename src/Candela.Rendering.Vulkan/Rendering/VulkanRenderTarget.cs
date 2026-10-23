@@ -336,6 +336,12 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     internal bool IndirectHistoryValid;
     internal IndirectLighting IndirectHistoryMode;
 
+    /// <summary>
+    /// Test hook: when set, the next frame first fills every temporal history with this value (NaN, ±infinity) and keeps
+    /// it marked valid (<see cref="HistoryFillPass"/>), so tests can check that no reader lets such values through.
+    /// </summary>
+    internal float? HistoryFillForTests;
+
     /// <summary>History image the next beam temporal pass reads (it writes the other one).</summary>
     internal int BeamHistoryIndex;
 
@@ -494,7 +500,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         for (int i = 0; i < 2; i++)
         {
             Ensure(i == 0 ? SlotBeamHistory0 : SlotBeamHistory1, _beamHistory[i], beams && r.BeamHistory, bw, bh, 1, TargetFormats.HdrStorage,
-                beamUsage, i == 0 ? "beam history 0" : "beam history 1", out var beamHistory);
+                beamUsage | ImageUsageFlags.TransferDstBit, i == 0 ? "beam history 0" : "beam history 1", out var beamHistory);
             if (!ReferenceEquals(beamHistory, _beamHistory[i]))
                 BeamHistoryValid = false;
             _beamHistory[i] = beamHistory;

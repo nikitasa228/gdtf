@@ -89,12 +89,13 @@ void main()
             if (all(greaterThanEqual(uvw, vec3(0.0))) && all(lessThanEqual(uvw, vec3(1.0))))
             {
                 vec4 history = textureLod(historyVolume, uvw, 0.0);
-                if (all(equal(history, history)))
-                    current = mix(current, history * vec4(vec3(frame.volumeJitter.w), 1.0), frame.volumeHistoryWeight);
-
+                // Rejected when not finite (tested on the bits: history != history may be folded to false by a
+                // compiler that assumes finite math, and a NaN history would then persist in the volume for good).
+                if (allFinite(history))
+                    current = mix(current, vec4(finiteLight(history.rgb * frame.volumeJitter.w), history.a), frame.volumeHistoryWeight);
             }
         }
     }
 
-    imageStore(outInjected, ivec3(id), vec4(finiteLight(current.rgb), current.a));
+    imageStore(outInjected, ivec3(id), vec4(finiteLight(current.rgb), finiteClamp(current.a, 0.0, 1e4)));
 }

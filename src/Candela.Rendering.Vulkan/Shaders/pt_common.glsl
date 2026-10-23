@@ -134,9 +134,10 @@ vec3 sampleHenyeyGreenstein(vec3 forward, float g, vec2 u)
     return normalize(t * (sinTheta * cos(phi)) + b * (sinTheta * sin(phi)) + forward * cosTheta);
 }
 
+// Tested on the bits (common.glsl: isnan / isinf may be folded away by a compiler that assumes finite math).
 bool isFiniteVec(vec3 v)
 {
-    return !any(isnan(v)) && !any(isinf(v));
+    return allFinite(vec4(v, 0.0));
 }
 
 #endif
