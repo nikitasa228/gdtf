@@ -340,9 +340,11 @@ HDR = (L_o · T_view + L_in-scattered) · exposure
 * Shadows, cookies (gobo, framing blades, prism) and haze extinction multiply this, see the stage-2 sections.
 * **`SpotLight.NoVolumetricScattering`** (contract, default false): a light marked so lights surfaces only and adds no
   in-scattered light to the base haze, smoke or flame volumes. The engine sets it on the work light
-  (`WorkLightRig`), which must not glow in haze. The Vulkan renderer does not read the field yet and draws such lights
-  like any other (a safe fallback: surfaces are lit correctly, the haze shows some extra glow); honouring it means
-  skipping these lights in the froxel/raymarched in-scattering and the volumetric beam passes.
+  (`WorkLightRig`), which must not glow in haze. The light packer marks such lights `LIGHT_NO_VOLUME`: the froxel
+  injection skips them, `LightPlanner` makes them neither a volumetric beam nor a froxel light, and the path tracer gives
+  them no weight in its in-scattering (`segmentLightWeight`). Their light still reaches surfaces through the media
+  (attenuated), and light those surfaces reflect scatters in the path tracer's haze like any surface light (test: a
+  marked spot in 0.05/m of haze lights the floor as expected in both renderers, the unmarked one adds its glow).
 
 ### BRDF (energy-conserving, single scattering)
 

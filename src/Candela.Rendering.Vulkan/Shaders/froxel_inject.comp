@@ -58,6 +58,8 @@ void main()
             if ((lv.flags & LIGHT_VIEW_BEAM) != 0u)
                 continue;
             Light light = lights[index];
+            if ((light.flags & LIGHT_NO_VOLUME) != 0u)
+                continue; // lights surfaces only (the editor's work light)
             vec3 L;
             float d2;
             vec3 I = lightIntensityToward(light, P, footprint, L, d2);

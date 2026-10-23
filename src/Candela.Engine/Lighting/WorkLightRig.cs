@@ -21,7 +21,7 @@ public enum WorkLightMode
 }
 
 /// <summary>
-/// The work light: a dim, neutral (D65) light rig that lets the user see the set in <see cref="ViewShading.Full"/>
+/// The work light: a neutral (D65) light rig that lets the user see the set in <see cref="ViewShading.Full"/>
 /// shading when no fixture emits — one key light from the audience side (front-left, above; casts shadows) and a soft
 /// ambient made of six very wide lights from ±X, ±Y and ±Z (no shadows), all aimed at the centre of the drawn content.
 /// It is not stage light: the engine's <see cref="StageEngine.Lights"/>, the light meter and the light plot never include
@@ -31,9 +31,11 @@ public enum WorkLightMode
 /// </summary>
 /// <remarks>
 /// Levels: <see cref="KeyIlluminance"/> on a surface facing the key at the centre, <see cref="AmbientIlluminance"/> on a
-/// surface facing any axis — a dim room light, about 1/10 of a lit stage, so a scene still reads as "dark" and the first
-/// fixture switched on dominates. The lights are placed at 2.5 × the bounds' radius from the centre (at least 5 m), so the
-/// illuminance varies little over the content. Directions follow the project's convention: right-handed, Z up, the
+/// surface facing any axis — a stage work light, about half a lit stage: the editor's viewports start at EV 8, the
+/// exposure of a lit stage (an incident reading of about 640 lx), where the set reads clearly about a stop below middle
+/// grey (a dimmer rig, 40 lx, left a freshly opened scene practically black there). In <see cref="WorkLightMode.Auto"/>
+/// it goes off as soon as a fixture emits, so it never competes with the stage light. The lights are placed at 2.5 × the
+/// bounds' radius from the centre (at least 5 m), so the illuminance varies little over the content. Directions follow the project's convention: right-handed, Z up, the
 /// audience on the −Y side.
 /// </remarks>
 public static class WorkLightRig
@@ -42,10 +44,10 @@ public static class WorkLightRig
     public const int LightCount = 7;
 
     /// <summary>Illuminance of the key light at the centre of the content on a surface facing it, lx.</summary>
-    public const float KeyIlluminance = 40f;
+    public const float KeyIlluminance = 300f;
 
     /// <summary>Illuminance of each ambient light at the centre on a surface facing it, lx.</summary>
-    public const float AmbientIlluminance = 8f;
+    public const float AmbientIlluminance = 60f;
 
     /// <summary>
     /// In <see cref="WorkLightMode.Auto"/>, the frame counts as lit when one of its lights has at least this peak

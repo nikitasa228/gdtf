@@ -136,6 +136,8 @@ internal sealed class LightPlanner
                 if (_scores[i] <= 0f)
                     break;
                 ref readonly var l = ref lights[i];
+                if ((l.Flags & ShaderConstants.LightNoVolume) != 0)
+                    continue; // lights surfaces only (the work light): neither a beam nor in the froxels
                 if (BeamCount >= maxBeams || !IsBeam(l))
                 {
                     FroxelLights++;

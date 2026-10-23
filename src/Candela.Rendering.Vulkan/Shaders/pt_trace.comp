@@ -693,6 +693,9 @@ float equiAngularPhase(float theta)
 // phase function over the angle subtended (Simpson's rule). `cone` returns that part.
 float segmentLightWeight(Light l, vec3 o, vec3 d, vec2 range, out vec2 cone)
 {
+    cone = vec2(0.0);
+    if ((l.flags & LIGHT_NO_VOLUME) != 0u)
+        return 0.0; // lights surfaces only (the editor's work light): no in-scattering
     cone = coneInterval(l, o, d, range);
     if (!(cone.x < cone.y))
         return 0.0;

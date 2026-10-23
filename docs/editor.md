@@ -1234,8 +1234,9 @@ likewise, with the rig). The Ambient row's value reaches the renderer's atmosphe
 lavapipe (headless screenshots, `lighting-baseline-*.png` in the test output): a textured OBJ (red and green halves)
 imported into an empty scene is lit in Full shading by the Auto work light at the default EV 8 with both colours
 visible, black with the work light Off, and lit again in its colours by 30 cd/m² of ambient light without any light; a
-reference drawing shows its red and green halves in Full and Colorless shading without any light, and a poster of the
-same image is dark until the work light is on, then shows its image.
+reference drawing shows its red and green halves in Full and Colorless shading without any light — made opaque, the
+image's own sRGB pixels (±6/255: display-referred, not tone mapped) — and a poster of the same image is dark until the
+work light is on, then shows its image.
 
 The install tests: `InstallExperienceTests` (when the fixture library window opens at start-up — installed copy
 without a library of the user's own, never headless, in development or with a file to open, always with

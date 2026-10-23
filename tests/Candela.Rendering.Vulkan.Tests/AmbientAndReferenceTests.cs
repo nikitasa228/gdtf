@@ -488,6 +488,61 @@ public sealed class AmbientAndReferenceTests
     }
 
     [SkippableFact]
+    public void A_light_without_volumetric_scattering_lights_surfaces_but_not_the_haze()
+    {
+        // SpotLight.NoVolumetricScattering (the editor's work light): in 0.05/m of haze a spot 5 m above a grey floor
+        // lights the floor alike, but the air in its beam does not glow — the floor is seen through the haze in front of
+        // it (×T) with nothing added, in the real-time view and in the path tracer; the same light without the flag adds
+        // its in-scattering.
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var world = renderer.World;
+            var floor = TopDownView.WhiteLambertian();
+            floor.BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+            FinalRenderSupport.Floor(world, floor, 8f);
+            world.SetAtmosphere(new AtmosphereState { BaseScattering = 0.05f });
+            var view = new TopDownView(32, 32, 4f, ev100: 4f);
+            var (cx, cy, _) = view.NearestPixel(Vector3.Zero);
+            using var target = renderer.CreateTarget(32, 32);
+            var full = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
+            var preview = new PreviewSettings { Bloom = false, TemporalAccumulation = false };
+
+            (float RealTime, float Traced) FloorUnderTheSpot(bool noVolume)
+            {
+                var spot = StageSceneLights.Overhead(4000f);
+                spot.NoVolumetricScattering = noVolume;
+                world.SetLights([spot]);
+                for (int frame = 0; frame < 4; frame++)
+                    renderer.Render(target, view.Camera, full, preview, 0f);
+                float realTime = renderer.ReadHdr(target).LuminanceAt(cx, cy);
+                using var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(32, 32, 32, bounces: 2),
+                    new FinalRenderOptions { BackgroundLuminance = 0f });
+                return (realTime, FinalRenderSupport.Luminance(render.ResultHdr(), render.Exposure).MeanLuminance(cx, cy, 1));
+            }
+
+            // 4000 cd at 5 m: 160 lx dimmed by the 5 m of haze on the way, ρ·E/π, seen through the 10 m of haze in front
+            // of the camera.
+            float cameraTransmittance = MathF.Exp(-0.05f * (10f - view.Camera.Near));
+            float floorLuminance = 0.5f * 4000f / 25f * MathF.Exp(-0.05f * 5f) / MathF.PI;
+            float expected = floorLuminance * cameraTransmittance;
+            var surfacesOnly = FloorUnderTheSpot(noVolume: true);
+            Assert.InRange(surfacesOnly.RealTime, expected * 0.95f, expected * 1.05f);
+            // The path tracer also scatters the floor's own light back towards the camera in the haze (at most half of
+            // the directions around a point of the air see the floor): surface light, which the flag does not concern.
+            Assert.InRange(surfacesOnly.Traced, expected * 0.95f, expected + 0.5f * (1f - cameraTransmittance) * floorLuminance);
+            var scattering = FloorUnderTheSpot(noVolume: false);
+            Assert.True(scattering.RealTime > surfacesOnly.RealTime * 1.1f, $"real-time: the haze adds nothing ({scattering.RealTime} vs {surfacesOnly.RealTime})");
+            Assert.True(scattering.Traced > surfacesOnly.Traced * 1.1f, $"path tracer: the haze adds nothing ({scattering.Traced} vs {surfacesOnly.Traced})");
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void A_lambertian_sphere_in_ambient_surroundings_matches_between_the_views()
     {
         // The furnace with the ambient instead of the background: a white Lambertian sphere (convex, so nothing occludes

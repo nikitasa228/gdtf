@@ -286,6 +286,65 @@ public sealed class LightingBaselineTests : IDisposable
     }
 
     [SkippableFact]
+    public void Opening_Fokina_shows_the_set_in_Full_shading_at_the_default_exposure()
+    {
+        // The default view of a freshly opened MVR: Full shading, the viewport's EV 8 (a lit stage), default preview
+        // quality (the scene's default haze). The Auto work light lights the added stage floor so it reads clearly, and,
+        // lighting surfaces only, it does not make the haze glow: the air above the stage stays dark.
+        using var renderer = CreateOrSkip();
+        using var session = EngineTestSupport.CreateSession(_log, _settings, _dir);
+        session.AttachRenderer(renderer);
+        Assert.True(session.Open(EngineTestSupport.Fokina).Succeeded);
+        var content = Assert.IsType<EngineViewportContent>(session.Content);
+        Frame(session);
+        Assert.True(content.Binding.IsWorkLightOn);
+        Assert.True(session.Scene.Settings.BaseHazeScattering > 0f, "the default haze is part of the test");
+        var floor = Assert.Single(Floors(session.Scene));
+
+        var bounds = content.Binding.VisibleWorldBounds();
+        var camera = new ViewportCamera { Target = bounds.Center, Yaw = 0.3f, Pitch = 0.35f, Distance = 25f };
+        Assert.Equal(8f, camera.Ev100);
+        using var target = renderer.CreateTarget(240, 135);
+        var view = new ViewOptions { ShowGrid = false };
+        for (int frame = 0; frame < 6; frame++)
+            renderer.Render(target, camera.ToRenderCamera(), view, new PreviewSettings(), 1f / 30f);
+        var display = renderer.ReadPixels(target);
+        ImageFiles.WritePng(display, Path.Combine(AppContext.BaseDirectory, "lighting-baseline-fokina.png"));
+
+        // The floor's front margin (1.5 m inside its front edge, in front of every fixture) reads as wood.
+        var size = StageFloor.SizeOf(floor);
+        var onFloor = floor.WorldPosition - new Vector3(0f, 0.5f * size.Y - 1.5f, 0f);
+        Assert.True(camera.WorldToScreen(onFloor, new Vector2(display.Width, display.Height), out var p));
+        double r = 0, g = 0, b = 0;
+        for (int y = (int)p.Y - 2; y <= (int)p.Y + 2; y++)
+        {
+            for (int x = (int)p.X - 2; x <= (int)p.X + 2; x++)
+            {
+                int i = 4 * (Math.Clamp(y, 0, display.Height - 1) * display.Width + Math.Clamp(x, 0, display.Width - 1));
+                (r, g, b) = (r + display.Pixels[i] / 25.0, g + display.Pixels[i + 1] / 25.0, b + display.Pixels[i + 2] / 25.0);
+            }
+        }
+
+        Assert.True(0.2126 * r + 0.7152 * g + 0.0722 * b > 40, $"the stage floor is (nearly) black: {(r, g, b)}");
+        Assert.True(r > 1.3 * b, $"the wood floor shows as {(r, g, b)}");
+
+        // The air above the rig (the top rows of the picture) stays dark: the work light does not light the haze.
+        double sky = 0;
+        int count = 0;
+        for (int y = 0; y < 12; y++)
+        {
+            for (int x = 0; x < display.Width; x++)
+            {
+                int i = 4 * (y * display.Width + x);
+                sky += 0.2126 * display.Pixels[i] + 0.7152 * display.Pixels[i + 1] + 0.0722 * display.Pixels[i + 2];
+                count++;
+            }
+        }
+
+        Assert.True(sky / count < 20, $"the haze glows in the work light: {sky / count}");
+    }
+
+    [SkippableFact]
     public void A_textured_model_dropped_into_an_empty_scene_shows_its_texture_in_Full_shading()
     {
         using var renderer = CreateOrSkip();

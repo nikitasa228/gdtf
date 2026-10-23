@@ -291,19 +291,21 @@ model, a wall, a cable) — for box selection, framing and drop targets; boxes l
 and non-finite placements are left out of the visible totals. Nothing is allocated per query beyond the caller's list.
 
 **Work light.** `RenderSync.WorkLight` (`WorkLightMode`: `Off` — the default, so renders never get it unless asked —,
-`Auto`, `On`) adds `WorkLightRig`'s dim neutral rig to the light list sent to the renderer: one D65 key light from the
-audience side (front-left, above; 40 lx at the centre on a surface facing it; casts shadows) and a soft ambient of six
-very wide lights from ±X, ±Y and ±Z (8 lx each on a surface facing them; no shadows), aimed at the centre of the drawn
-content from 2.5 × its radius (at least 5 m). `Auto` adds it only while no stage light reaches 1 cd (no fixture emits,
+`Auto`, `On`) adds `WorkLightRig`'s neutral rig to the light list sent to the renderer: one D65 key light from the
+audience side (front-left, above; 300 lx at the centre on a surface facing it; casts shadows) and a soft ambient of six
+very wide lights from ±X, ±Y and ±Z (60 lx each on a surface facing them; no shadows), aimed at the centre of the drawn
+content from 2.5 × its radius (at least 5 m). The levels are a stage work light's, about half a lit stage, so the set
+reads clearly at the editor's default exposure (EV 8, a lit stage); the earlier 40 lx left a freshly opened Фокина
+practically black there (its floor 5/255). `Auto` adds it only while no stage light reaches 1 cd (no fixture emits,
 every dimmer closed). The rig is placed around `WorkLightContent`: the visible instances like `VisibleWorldBounds()`, but
 with each fixture's parts at the fixture's own placement instead of their pan/tilt pose, so where the heads point (DMX,
 motors still travelling when the rig was placed) never moves it. It depends only on that box and is recomputed only when
 the scene or the set of drawn entities changes, so the same scene always gets the same work light, whatever happened
 before, and it costs nothing per frame. It is not stage light: `engine.Lights`, the
 light meter and the light plot never include it, and it is left out while the project's view shows the lux overlay.
-Its lights carry `SpotLight.NoVolumetricScattering = true`, so a renderer that honours the flag lights the set with them
-without making the haze glow (the Vulkan renderer does not read the flag yet; until it does, the work light also
-scatters in haze, as before). The
+Its lights carry `SpotLight.NoVolumetricScattering = true`, which the Vulkan renderer honours (no froxel injection, no
+raymarched beam, no in-scattering in the path tracer), so the work light lights the set without making the haze glow.
+The
 editor's preview passes `ViewSettings.WorkLight` (stored with the project, default `Auto`); `candela render
 --work-light auto|on` asks for it in a render. `IsWorkLightOn` and `WorkLights` tell what the last update sent, `WorkLightContent` the box the rig was placed around.
 

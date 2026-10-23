@@ -164,6 +164,12 @@ internal static class ShaderConstants
     public const uint LightBlades = 1u << 2;
     public const uint LightPrism = 1u << 3;
 
+    /// <summary>
+    /// The light does not scatter in participating media (<see cref="SpotLight.NoVolumetricScattering"/>: the editor's
+    /// work light): no froxel injection, no raymarched beam, no in-scattering in the path tracer; it lights surfaces only.
+    /// </summary>
+    public const uint LightNoVolume = 1u << 4;
+
     // Per-view light flags (LightView.flags).
 
     /// <summary>The light is a volumetric beam of the view (per-pixel single scattering; skipped by the froxels).</summary>
@@ -347,6 +353,7 @@ internal static class ShaderConstants
         ("LIGHT_GOBO", I(LightGobo)),
         ("LIGHT_BLADES", I(LightBlades)),
         ("LIGHT_PRISM", I(LightPrism)),
+        ("LIGHT_NO_VOLUME", I(LightNoVolume)),
         ("LIGHT_VIEW_BEAM", I(LightViewBeam)),
         ("LIGHT_VIEW_RSM", I(LightViewRsm)),
         ("NO_SHADOW", I(NoShadow) + "u"),
