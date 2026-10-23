@@ -21,6 +21,9 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     /// <summary>Longest a single dispatch is planned to take, s (drivers reset GPUs that are stuck for about 2 s).</summary>
     public const double MaxDispatchSeconds = 0.25;
 
+    /// <summary>Shortest dispatch time <see cref="DispatchSeconds"/> accepts, s (below it the submissions' overhead dominates).</summary>
+    public const double MinDispatchSeconds = 0.005;
+
     /// <summary>Most samples per pixel.</summary>
     public const int MaxSamples = 65536;
 
@@ -102,6 +105,7 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     private int _samplesDone;
     private int _rowsPerDispatch;
     private double _secondsPerRow;
+    private double _dispatchSeconds = MaxDispatchSeconds;
     private bool _complete;
     private bool _cancelled;
     private bool _disposed;
@@ -285,6 +289,23 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
     /// large images are split by their measured cost.
     /// </summary>
     internal int MaxRowsPerDispatch { get; set; } = int.MaxValue;
+
+    /// <summary>
+    /// Time a dispatch is planned to take, s (<see cref="MinDispatchSeconds"/> … <see cref="MaxDispatchSeconds"/>, the
+    /// default): an interactive caller that advances the render within a short frame budget (the editor) sets a fraction
+    /// of that budget, so a single dispatch does not hold its frame for longer; each dispatch costs a little submission
+    /// overhead.
+    /// </summary>
+    public double DispatchSeconds
+    {
+        get => _dispatchSeconds;
+        set
+        {
+            _dispatchSeconds = double.IsFinite(value) ? Math.Clamp(value, MinDispatchSeconds, MaxDispatchSeconds) : MaxDispatchSeconds;
+            if (_secondsPerRow > 0.0)
+                SizeDispatches();
+        }
+    }
 
     /// <inheritdoc/>
     public void Advance(TimeSpan budget) => Advance(budget, CancellationToken.None);
@@ -521,7 +542,13 @@ public sealed unsafe class VulkanFinalRender : IFinalRender
             return;
         double perRow = seconds / rows;
         _secondsPerRow = _secondsPerRow > 0.0 ? 0.5 * (_secondsPerRow + perRow) : perRow;
-        int rowsForBudget = (int)Math.Floor(MaxDispatchSeconds / _secondsPerRow);
+        SizeDispatches();
+    }
+
+    /// <summary>Rows of a dispatch that takes about <see cref="DispatchSeconds"/> at the measured cost (whole 8-row workgroups).</summary>
+    private void SizeDispatches()
+    {
+        int rowsForBudget = (int)Math.Min(Math.Floor(_dispatchSeconds / _secondsPerRow), int.MaxValue);
         _rowsPerDispatch = rowsForBudget >= _height ? _height : Math.Clamp(rowsForBudget / 8 * 8, 8, _height);
     }
 

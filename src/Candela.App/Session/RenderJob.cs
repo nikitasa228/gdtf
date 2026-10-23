@@ -3,6 +3,7 @@ using System.Globalization;
 using Candela.App.Ui;
 using Candela.Assets;
 using Candela.Core.Geometry;
+using Candela.Core.SceneGraph;
 using Candela.Engine;
 using Candela.Rendering;
 using Candela.Rendering.Vulkan;
@@ -144,6 +145,13 @@ internal sealed class RenderJobRunner : IDisposable
     /// <summary>Time spent rendering per editor frame (at least one render pass or path tracer dispatch runs).</summary>
     public static readonly TimeSpan Budget = TimeSpan.FromMilliseconds(60);
 
+    /// <summary>
+    /// Planned GPU time of one path tracer dispatch (<see cref="VulkanFinalRender.DispatchSeconds"/>): a third of the
+    /// <see cref="Budget"/>, so a frame whose budget runs out during a dispatch ends soon after it (the renderer's own
+    /// default, a quarter of a second, would hold every editor frame that long on a large image).
+    /// </summary>
+    public static readonly TimeSpan DispatchTarget = TimeSpan.FromMilliseconds(20);
+
     /// <summary>Time between two progress images of the path tracer (each reads the whole image back).</summary>
     public static readonly TimeSpan PreviewInterval = TimeSpan.FromSeconds(1);
 
@@ -155,6 +163,8 @@ internal sealed class RenderJobRunner : IDisposable
     private RenderRequest? _request;
     private StageEngine? _playing;
     private StageEngine? _stage;
+    private Scene? _scene;
+    private double _rangeEngineTime;
     private IRenderTarget? _target;
     private IRenderer? _targetOwner;
     private float[]? _accumulator;
@@ -333,6 +343,7 @@ internal sealed class RenderJobRunner : IDisposable
 
         _request = request;
         _stage = engine;
+        _scene = engine?.Scene;
         Mode = request.Mode;
         FellBack = false;
         IsPreparing = false;
@@ -368,6 +379,7 @@ internal sealed class RenderJobRunner : IDisposable
                     engine.Tick(1.0 / r.FrameRate);
                 engine.Player?.Seek(r.StartSeconds, engine.Time);
                 engine.Tick(0);
+                _rangeEngineTime = engine.Time;
             }
             catch (Exception e) when (!IsFatal(e))
             {
@@ -403,7 +415,7 @@ internal sealed class RenderJobRunner : IDisposable
     public bool StopAndSave()
     {
         if (State != RenderJobState.Running || Mode != RenderMode.PathTraced || _final is not { SamplesDone: > 0 } final ||
-            _request is not { } request)
+            _request is not { } request || StageReplaced(_stage))
         {
             Cancel();
             return false;
@@ -426,9 +438,16 @@ internal sealed class RenderJobRunner : IDisposable
     private static bool IsFatal(Exception e) => e is OutOfMemoryException or StackOverflowException or AccessViolationException;
 
     /// <summary>
+    /// True when <paramref name="engine"/> is not the stage the job started on any more: another engine, no engine, or
+    /// the same engine with another scene — File → New, Open and recovery replace the scene inside the editor's one
+    /// <see cref="StageEngine"/> (and reset its clock), so the engine reference alone does not tell.
+    /// </summary>
+    private bool StageReplaced(StageEngine? engine) => !ReferenceEquals(engine, _stage) || !ReferenceEquals(engine?.Scene, _scene);
+
+    /// <summary>
     /// Renders for about <see cref="Budget"/> (at least one pass or path tracer dispatch) and writes the frames that are
     /// complete. Call once per editor frame, outside the GPU frame, with the stage the job was started with: another
-    /// stage (a document opened or closed meanwhile) cancels the job.
+    /// stage (a document opened, created or closed meanwhile, also when the engine replaced its scene) cancels the job.
     /// </summary>
     public void Step(StageEngine? engine, IRenderer renderer, double now)
     {
@@ -440,9 +459,10 @@ internal sealed class RenderJobRunner : IDisposable
             return;
         }
 
-        if (!ReferenceEquals(engine, _stage))
+        if (StageReplaced(engine))
         {
-            // Another stage was opened (or the stage was closed): the picture asked for no longer exists.
+            // Another stage was opened (or the stage was closed): the picture asked for no longer exists, and the path
+            // tracer's light snapshot belongs to the old scene.
             Cancel();
             return;
         }
@@ -504,14 +524,8 @@ internal sealed class RenderJobRunner : IDisposable
     {
         if (!_frameReady)
         {
-            if (FrameIndex > 0 && request.Range is { } range && engine is not null)
-            {
-                // Next frame of the sequence: exactly one frame interval of the recording and of the engine clock.
-                double dt = 1.0 / range.FrameRate;
-                engine.Player?.Seek(range.TimeOf(FrameIndex) - dt, engine.Time);
-                engine.Tick(dt);
-            }
-
+            if (request.Range is { } range && engine is not null)
+                PlayFrame(engine, range);
             _frameReady = true;
             _waitStarted = Stopwatch.GetTimestamp();
         }
@@ -563,6 +577,8 @@ internal sealed class RenderJobRunner : IDisposable
             return false;
         }
 
+        if (_final is VulkanFinalRender vulkan)
+            vulkan.DispatchSeconds = DispatchTarget.TotalSeconds;
         SamplesTotal = _final.SamplesTotal;
         SamplesDone = 0;
         _lastPreview = 0;
@@ -587,8 +603,10 @@ internal sealed class RenderJobRunner : IDisposable
         SetPreview(image);
         if (_autoExposure && FrameCount > 1 && _camera is { } camera)
         {
-            // The rest of the sequence keeps the first frame's exposure (no flicker between frames).
-            camera.Ev100 = Ev100Of(final.Exposure);
+            // The rest of the sequence keeps the first frame's exposure (no flicker between frames). The metered exposure
+            // already includes the compensation, which the path tracer subtracts from the camera's EV100 again: add it
+            // back so the following frames are not compensated twice.
+            camera.Ev100 = Ev100Of(final.Exposure) + Compensation(request.FinalOptions);
             _autoExposure = false;
         }
 
@@ -630,6 +648,13 @@ internal sealed class RenderJobRunner : IDisposable
         exposure > 0f && float.IsFinite(exposure) ? MathF.Log2(1f / (1.2f * exposure)) : 0f;
 
     /// <summary>
+    /// The exposure compensation the path tracer applies, stops (non-finite counts as 0, clamped to ±20 like
+    /// <see cref="VulkanFinalRender"/>): its exposure is that of the camera's EV100 minus this.
+    /// </summary>
+    internal static float Compensation(FinalRenderOptions options) =>
+        float.IsFinite(options.ExposureCompensation) ? Math.Clamp(options.ExposureCompensation, -20f, 20f) : 0f;
+
+    /// <summary>
     /// Switches a path-traced job to the Fast renderer (the GPU has no ray queries). False (the job failed) when the
     /// size does not fit the Fast renderer's target.
     /// </summary>
@@ -668,13 +693,8 @@ internal sealed class RenderJobRunner : IDisposable
         ApplyWorkLight(engine, request);
         do
         {
-            if (PassIndex == 0 && FrameIndex > 0 && request.Range is { } range && engine is not null)
-            {
-                // Next frame of the sequence: exactly one frame interval of the recording and of the engine clock.
-                double dt = 1.0 / range.FrameRate;
-                engine.Player?.Seek(range.TimeOf(FrameIndex) - dt, engine.Time);
-                engine.Tick(dt);
-            }
+            if (PassIndex == 0 && request.Range is { } range && engine is not null)
+                PlayFrame(engine, range);
 
             float delta = PassIndex == 0 ? 0f : 1f / 60f;
             renderer.Render(_target!, request.Camera, request.View, request.Settings, delta);
@@ -694,6 +714,28 @@ internal sealed class RenderJobRunner : IDisposable
             }
         }
         while (Stopwatch.GetElapsedTime(start) < Budget);
+    }
+
+    /// <summary>
+    /// Brings a sequence's stage to output frame <see cref="FrameIndex"/>: a following frame is exactly one frame interval
+    /// of the recording and of the engine clock later; the first frame is the range's start, played again when the engine
+    /// was ticked after <see cref="Start"/> (the editor ticks the stage once more in the frame after a render starts from
+    /// its UI, before it sees the clock held — by up to a second when that frame was slow).
+    /// </summary>
+    private void PlayFrame(StageEngine engine, RenderRange range)
+    {
+        if (FrameIndex > 0)
+        {
+            double dt = 1.0 / range.FrameRate;
+            engine.Player?.Seek(range.TimeOf(FrameIndex) - dt, engine.Time);
+            engine.Tick(dt);
+        }
+        else if (engine.Time != _rangeEngineTime)
+        {
+            engine.Player?.Seek(range.StartSeconds, engine.Time);
+            engine.Tick(0);
+            _rangeEngineTime = engine.Time;
+        }
     }
 
     /// <summary>
@@ -820,6 +862,7 @@ internal sealed class RenderJobRunner : IDisposable
     {
         IsPreparing = false;
         _stage = null;
+        _scene = null;
         _endedAt = _startedAt != 0 ? Stopwatch.GetTimestamp() : 0;
         try
         {

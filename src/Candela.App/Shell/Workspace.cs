@@ -436,9 +436,15 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
         _render.StartFromCommand();
     }
 
-    /// <summary>A render ended (written, stopped, cancelled or failed): its message goes to the status bar and the log.</summary>
+    /// <summary>
+    /// A render started or ended: the engine clock changes hands at once, and an end (written, stopped, cancelled or
+    /// failed) puts its message in the status bar and the log.
+    /// </summary>
     private void OnRenderStateChanged(RenderJobRunner job)
     {
+        // The clock changes hands at once: a render started from the UI must not see the stage ticked once more with
+        // wall-clock time at the start of the next frame (BeforeFrame, which also sets it, runs after that tick).
+        _ctx.Session.EngineClockHeld = job.HoldsEngineClock;
         if (job.State == RenderJobState.Running || job.Message is not { } message)
             return;
         SetStatus(message);
