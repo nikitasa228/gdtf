@@ -382,6 +382,18 @@ public sealed class LightingBaselineTests : IDisposable
             AssertDominant(right, 1, 80, $"{name}: the drawing's right half (green)");
         }
 
+        // Fully opaque, it shows the image's own pixels in both views: display-referred, not tone mapped.
+        var image = entity.Get<ImageComponent>()!;
+        image.Opacity = 1f;
+        image.NotifyChanged();
+        Frame(session);
+        foreach (var (view, name) in new[] { (full, "Full"), (colorless, "Colorless") })
+        {
+            var display = Render(view);
+            AssertImagePixel(PixelAt(display, camera, leftPoint), Left, $"{name}, opaque: the drawing's left half");
+            AssertImagePixel(PixelAt(display, camera, rightPoint), Right, $"{name}, opaque: the drawing's right half");
+        }
+
         // A poster is a lit print: dark without light, its image under the work light.
         Assert.True(session.Undo.CanUndo);
         session.Undo.Undo();
@@ -414,6 +426,11 @@ public sealed class LightingBaselineTests : IDisposable
         int other2 = channel == 2 ? pixel.G : pixel.B;
         Assert.True(own >= minimum && own > 1.5f * other1 && own > 1.5f * other2, $"{what} shows as {pixel}");
     }
+
+    /// <summary>The display pixel is the image's own sRGB colour, within a few levels.</summary>
+    private static void AssertImagePixel((int R, int G, int B) pixel, (byte R, byte G, byte B) source, string what) =>
+        Assert.True(Math.Abs(pixel.R - source.R) <= 6 && Math.Abs(pixel.G - source.G) <= 6 && Math.Abs(pixel.B - source.B) <= 6,
+            $"{what} shows as {pixel}, the image has {source}");
 
     private static void WriteHalves(string path)
     {

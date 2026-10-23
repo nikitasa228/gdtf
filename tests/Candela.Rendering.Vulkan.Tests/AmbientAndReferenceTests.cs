@@ -445,6 +445,49 @@ public sealed class AmbientAndReferenceTests
     }
 
     [SkippableFact]
+    public void The_ambient_light_reaches_surfaces_through_haze_alike_in_both_renderers()
+    {
+        // The default stage haze (0.02/m) scatters as much of a uniform surroundings' light into a ray as out of it, so
+        // an open floor under 30 cd/m² keeps ρ·L however far the haze reaches (the path tracer's haze box extends 30 m
+        // beyond the scene); only the camera's own 10 m through the haze dims it, in both renderers.
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var world = renderer.World;
+            var floor = TopDownView.WhiteLambertian();
+            floor.BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+            FinalRenderSupport.Floor(world, floor, 6f);
+            world.SetAtmosphere(new AtmosphereState { BaseScattering = 0.02f, AmbientLuminance = 30f });
+            var view = new TopDownView(32, 32, 10f, ev100: 6f);
+            var (fx, fy, _) = view.NearestPixel(new Vector3(-1f, -1f, 0f));
+
+            using var target = renderer.CreateTarget(32, 32);
+            var full = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
+            var preview = new PreviewSettings { Bloom = false, TemporalAccumulation = false };
+            for (int frame = 0; frame < 4; frame++)
+                renderer.Render(target, view.Camera, full, preview, 0f);
+            float realTime = renderer.ReadHdr(target).LuminanceAt(fx, fy);
+
+            using var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, FinalRenderSupport.Settings(32, 32, 32, bounces: 4),
+                new FinalRenderOptions { BackgroundLuminance = 0f });
+            float traced = FinalRenderSupport.Luminance(render.ResultHdr(), render.Exposure).MeanLuminance(fx, fy, 1);
+
+            // The real-time view: the floor's ρ·L dimmed by the camera's 10 m of haze. The path tracer also scatters the
+            // floor's own light back towards the camera in that haze (at most the floor's luminance); attenuated on its
+            // way to the floor, its ambient was about half of the real-time view's (6.2 instead of 12.3 cd/m²).
+            float transmittance = MathF.Exp(-0.02f * (10f - view.Camera.Near));
+            float expected = 15f * transmittance;
+            Assert.InRange(realTime, expected * 0.95f, expected * 1.05f);
+            Assert.InRange(traced, expected * 0.95f, expected + (1f - transmittance) * 15f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
     public void A_lambertian_sphere_in_ambient_surroundings_matches_between_the_views()
     {
         // The furnace with the ambient instead of the background: a white Lambertian sphere (convex, so nothing occludes

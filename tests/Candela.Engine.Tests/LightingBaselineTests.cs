@@ -291,7 +291,7 @@ public sealed class ReferenceDrawingCliTests
         }
     }
 
-    /// <summary>A project holding one reference drawing, 4 m wide, red left half and green right half, standing at the origin facing −Y.</summary>
+    /// <summary>A project holding one opaque reference drawing, 4 m wide, red left half and green right half, standing at the origin facing −Y.</summary>
     private static string WriteProject(string dir)
     {
         const int w = 32, h = 24;
@@ -311,6 +311,8 @@ public sealed class ReferenceDrawingCliTests
         using var engine = TestEnvironment.CreateEngine("drawing-project");
         var imported = engine.Import(png, new EngineImportOptions { ImageMode = ImageMode.Reference, ImageWidth = 4f });
         Assert.True(imported.Success, imported.Summary);
+        // fully opaque (a new drawing is 60 %), so the pixels are the image's alone
+        engine.Scene.Find(imported.Entities[0])!.Get<ImageComponent>()!.Opacity = 1f;
         string project = Path.Combine(dir, "drawing.candela");
         Assert.True(engine.SaveAs(project).Success);
         return project;
@@ -332,12 +334,9 @@ public sealed class ReferenceDrawingCliTests
         return sum / 25f;
     }
 
-    private static void AssertDominant(Vector3 rgb, int channel, string what)
-    {
-        float own = channel == 0 ? rgb.X : rgb.Y;
-        float other1 = channel == 0 ? rgb.Y : rgb.X;
-        Assert.True(own > 60f && own > 1.5f * other1 && own > 1.5f * rgb.Z, $"{what} shows as {rgb}");
-    }
+    /// <summary>The block shows the image's own sRGB colour (display-referred, not tone mapped), within a few levels.</summary>
+    private static void AssertShows(Vector3 rgb, (byte R, byte G, byte B) source, string what) =>
+        Assert.True(Vector3.Distance(rgb, new Vector3(source.R, source.G, source.B)) <= 8f, $"{what} shows as {rgb}, the image has {source}");
 
     [SkippableFact]
     public void A_reference_drawing_shows_its_image_in_a_cli_render_and_a_final_render()
@@ -366,9 +365,15 @@ public sealed class ReferenceDrawingCliTests
             "--library",
             TestEnvironment.Root,
         ];
-        // The real-time render with its default auto exposure (a drawing is display-referred whatever the exposure); the
-        // final render at a fixed exposure (a drawing is display-referred against the exposure the render starts with).
-        foreach (var (extra, name) in new[] { (Array.Empty<string>(), "real-time"), (new[] { "--final", "--samples", "16", "--ev", "8" }, "final") })
+        // The real-time and the final render with their default auto exposure, and the final render at a fixed exposure
+        // far from it: a drawing is display-referred, the same pixels whatever the exposure, and it does not drive the
+        // auto exposure.
+        foreach (var (extra, name) in new[]
+                 {
+                     (Array.Empty<string>(), "real-time"),
+                     (new[] { "--final", "--samples", "16" }, "final"),
+                     (new[] { "--final", "--samples", "16", "--ev", "2" }, "final at EV 2"),
+                 })
         {
             string png = Path.Combine(dir, name + ".png");
             var output = new StringWriter();
@@ -378,8 +383,8 @@ public sealed class ReferenceDrawingCliTests
             // The drawing is content without a floor: the engine's stage floor goes under it.
             Assert.Contains("Floor:    added a ", output.ToString(), StringComparison.Ordinal);
             Assert.True(ImageImporter.TryDecode(File.ReadAllBytes(png), out var image, out var problem), problem);
-            AssertDominant(Block(image!, 52, 60), 0, $"{name}: the drawing's left half (red)");
-            AssertDominant(Block(image!, 108, 60), 1, $"{name}: the drawing's right half (green)");
+            AssertShows(Block(image!, 52, 60), Red, $"{name}: the drawing's left half");
+            AssertShows(Block(image!, 108, 60), Green, $"{name}: the drawing's right half");
         }
     }
 }

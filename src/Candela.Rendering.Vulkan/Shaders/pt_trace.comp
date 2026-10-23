@@ -1021,7 +1021,7 @@ void main()
 
     vec3 radiance = vec3(0.0);
     vec3 overlay = vec3(0.0);          // display-referred colour seen directly (unlit and reference surfaces)
-    float overlayCoverage = 0.0;       // ... and the share of the sample it covers (the transmittance in front of it)
+    float overlayCoverage = 0.0;       // ... and the share of the sample it covers (0 or 1: opacity is sampled)
     vec3 beta = vec3(1.0);
     bool visible = true;               // nothing has scattered yet: the camera sees what the ray reaches
     uint surfaceBounces = 0u;
@@ -1053,6 +1053,11 @@ void main()
         PtHit hit = traceSurface(o, d, PT_FAR, passedLens, visible, rng);
         float tEnd = hit.kind == HIT_NONE ? PT_FAR : hit.t;
         bool scattered = surfaceBounces + volumeVertices > 0u;
+        // The camera sees a display-referred surface (a reference instance or an unlit material): drawn over the scene
+        // as the real-time view draws it, not fogged by the media in front of it (see the overlay below).
+        bool overlayHit = visible && hit.kind == HIT_SURFACE &&
+            ((instances[hit.instance].flags & INSTANCE_FLAG_REFERENCE) != 0u ||
+             (materials[rtMaterialIndex(hit.instance, hit.geometry)].flags & MATERIAL_UNLIT) != 0u);
 
         if (!aovDone)
         {
@@ -1074,7 +1079,13 @@ void main()
             }
         }
 
-        if (media)
+        // The surroundings (AtmosphereState.AmbientLuminance) light a surface along a direction sampled from its BSDF
+        // that leaves the scene, unattenuated by the media: a scattering medium in a uniform environment scatters as much
+        // of it into the ray as out of it (the real-time view's ambient term, here shadowed and bounced).
+        if (hit.kind == HIT_NONE && prevKind == PREV_SURFACE)
+            radiance += clampContribution(beta * vec3(params.ambient), scattered);
+
+        if (media && !overlayHit)
         {
             bool mayScatter = volumeVertices < params.maxVolumeBounces;
             if (mayScatter)
@@ -1116,12 +1127,8 @@ void main()
 
         if (hit.kind == HIT_NONE)
         {
-            // the background; a ray sampled from a surface's BSDF also gets the surroundings that light the surfaces
-            // (AtmosphereState.AmbientLuminance; the real-time view's ambient term, here shadowed and bounced)
-            vec3 environment = params.background.rgb;
-            if (prevKind == PREV_SURFACE)
-                environment += vec3(params.ambient);
-            radiance += clampContribution(beta * environment, scattered);
+            // the background (the surroundings' ambient light was added before the media, above)
+            radiance += clampContribution(beta * params.background.rgb, scattered);
             break;
         }
 
@@ -1211,7 +1218,7 @@ void main()
             if (visible)
             {
                 overlay += beta * albedo;
-                overlayCoverage = clamp(luminanceRec2020(beta), 0.0, 1.0);
+                overlayCoverage = 1.0;
             }
             break;
         }

@@ -360,7 +360,14 @@ photometric tests use. Roughness is clamped to [0.02, 1] (α ≥ 0.002 keeps a p
 * **Transparency**: blend materials and `Transmission > 0` are drawn after the opaque pass, premultiplied:
   coverage = alpha · (1 − transmission) scales diffuse and emission, specular reflection is added in full (glass keeps
   its highlights). Tinted transmission and refraction are left to the path tracer.
-* **Unlit materials**: base colour (texture × factor) shown display-referred. **`InstanceFlags.Reference`** (imported
+* **Unlit materials**: base colour (texture × factor) shown display-referred. Display-referred colour is written after
+  the exposure and leaves the HDR image's alpha, the **share of scene light** in the pixel (opaque unlit surfaces write
+  0; reference instances are blended with the `ForwardReference` pipeline, whose coverage takes its share out of the
+  alpha). The auto exposure's histogram leaves pixels with less than half scene light out — metering a value that does
+  not scale with the exposure would chase its own tail: a drawing filling part of the view drove the exposure 8 stops
+  down until the stage was black — and the display transform shows the display-referred share as it is, without the
+  tone mapper (`displayTransformShared` in tonemap.glsl), so a drawing shows its image's pixels.
+  **`InstanceFlags.Reference`** (imported
   drawings, ghost geometry): unlit, base colour display-referred, drawn with the transparent pass — an alpha-blended
   material (an imported reference drawing: the image as base colour, `ImagePlaneMesh.CreateMaterial`) at its own alpha,
   any other material (ghost geometry) at `ShaderConstants.ReferenceOpacity` = 50 % (no shadows cast, not in the
@@ -696,7 +703,8 @@ redistributes light (energy within 3 % in the tests).
 ### Auto exposure
 
 `histogram.comp` builds a 128-bin histogram of log2 scene luminance (HDR / exposure, cd/m²) over [−14, 22] in shared
-memory; `exposure.comp` takes the mean log2 luminance of a percentile band and copies it to a host-visible buffer of
+memory, leaving out pixels whose HDR alpha (the share of scene light) is below one half — reference drawings and unlit
+materials, written after the exposure (see [Surfaces](#surfaces)); with nothing left to meter the exposure stays; `exposure.comp` takes the mean log2 luminance of a percentile band and copies it to a host-visible buffer of
 the frame slot. When the slot comes round again (no wait) the renderer adapts
 `log2 L ← log2 L + (measured − log2 L) · (1 − e^(−1.5 · dt))` and uses `EV100 = log2(L · 100 / 12.5) + metering stops`
 (minus the compensation). Without a measurement yet, the camera EV is used. `PreviewSettings.Metering`:
@@ -797,7 +805,7 @@ shutdown. Tests are skipped with a message when no Vulkan device exists. Images 
 | `PathTracerMediaTests` | a 6° spot and a 40° wash in haze seen from the side: within 3 % of `BeamReference` and 6 % of the real-time beam (single-scattering limit); a half-open gobo in the air (4 %; measured 2 %, the bilinear gobo edge); smoke through the density grid scatters like haze of the same coefficient (4 %; measured 1.7 %); a beam in a dense smoke cloud: every further order of scattering adds light, less than the one before, and only multiple scattering lights the smoke beside the beam; an optically thick flame shows its blackbody luminance (3 %; measured 0.25 %) and chromaticity (0.01); 20 m of thin smoke in a grid whose majorant is set by one very dense cell dims a panel behind it by e^−0.5 (3 %, with and without a volume bounce) |
 | `PathTracerLightTests` | a red and a green spot on a white floor: the overlap equals the sum of the single renders (3 %) and the photometric sum (4 %), superposition everywhere within 5 %; a rotated gobo projected like the real-time cookie (correlation > 0.98, measured 0.998; mean difference 0.2 % of the peak; flux ratio 1.003); 300 random coloured lights converge to the CPU sum (4 %; measured 1.6 %); a red gel tints the light passing through it ((1 − F)² × colour², 5 %); a plate in a beam shadows the floor only while it has `CastShadow`, and not at all for a light without `CastShadows` (3 %) |
 | `PathTracerSessionTests` | the error falls like 1/√N (RMSE ratios 2.10 and 1.98 from 4 to 16 to 64 samples); the same seed gives the same image, another seed a different one; cancellation (also by token) stops within one dispatch and keeps the samples; the time limit ends at a whole pass, also when a pass takes several dispatches; the denoiser lowers the error inside surfaces (RMSE 4.05 → 1.33 cd/m² at 8 samples) and keeps the raw result and the total luminance (3 %); a noise-free preview equals the real-time display (±2/255) and auto exposure the stage metering (0.15 stop); bad settings, options and lights stay finite and validation-clean; every result read before the first sample is a black image of the right size (denoised one included); every pixel gets exactly one sample per pass whatever the band size; advancing inside the caller's frames gives the same image as alone, keeps the time limit and allocates nothing in steady frames; a device without ray query says "not supported on this GPU" |
-| `AmbientAndReferenceTests` | a reference drawing (four colour quadrants, an alpha-blended material on a `Reference` instance) under a 20 000 cd light and 30 cd/m² of ambient: in Full each quadrant's HDR value is the image's colour × its opacity (0.6, then 1) as a display value (2 %), in Colorless display-linear Rec.709 over the background (0.01), the display pixels in the quadrant's colour; the same material on a normal instance is lit; the path tracer shows the drawing at 60 % over the lit floor, which is lit as without it (no shadow, 5 %) and unchanged beside it; ambient 0 → 30 cd/m²: a grey Lambertian floor 0 → 15 cd/m² (1 %) and a chrome square ≈ 30 in the real-time view, the background and the Colorless view unchanged, through 10 m of haze 15·e^−0.5 (3 %) with the air not lit; NaN and negative ambients light nothing; the path tracer's open floor 15 cd/m² (3 %) with the background not lit; a white Lambertian sphere in 1 cd/m² of ambient has 1 cd/m² in both renderers (1 % / 3 %) |
+| `AmbientAndReferenceTests` | a reference drawing (four colour quadrants, an alpha-blended material on a `Reference` instance) under a 20 000 cd light and 30 cd/m² of ambient: in Full each quadrant's HDR value is the image's colour × its opacity (0.6, then 1) as a display value (2 %), in Colorless display-linear Rec.709 over the background (0.01), the display pixels in the quadrant's colour — opaque, the image's own pixels (±4/255) with AgX, ACES and Neutral; the same material on a normal instance is lit; with auto exposure a drawing in a corner leaves the exposure of the lit floor as it is (0.25 stop; it ran 8 stops down before) and shows its colours; the path tracer shows the drawing at 60 % over the lit floor, which is lit as without it (no shadow, 5 %) and unchanged beside it; with auto exposure ending > 3 stops from the camera's EV the final render shows the drawing's pixels as the real-time view does (±6/255) and meters the floor alone (0.25 stop); ambient 0 → 30 cd/m²: a grey Lambertian floor 0 → 15 cd/m² (1 %) and a chrome square ≈ 30 in the real-time view, the background and the Colorless view unchanged, through 10 m of haze 15·e^−0.5 (3 %) with the air not lit; NaN and negative ambients light nothing; the path tracer's open floor 15 cd/m² (3 %) with the background not lit; a white Lambertian sphere in 1 cd/m² of ambient has 1 cd/m² in both renderers (1 % / 3 %) |
 | `PathTracerSceneTests` | the procedural stage in haze: finite and validation-clean, 16 samples at 240 × 180 within 2 minutes; writes `pt-stage-final.png` next to the real-time view |
 | `OpenExrTests` | bit-exact round trips for every compression and sample type (37 × 21: not a multiple of the 16-line ZIP blocks; long names), ZIP compresses smooth images, RGBA + layers, chromaticities and white luminance, HALF channels hold no infinities or NaN (clamped to ±65 504), damaged and tiled files rejected with `InvalidDataException`; the files were checked with the official OpenEXR library |
 
@@ -1056,13 +1064,22 @@ reference instances are in the acceleration structure with their own cull-mask b
 alone), which only the camera rays (`traceSurface(…, camera = true)`, before any scattering) include, so they neither
 block nor reflect light (shadow rays, next-event estimation, bounces and the real-time ray-traced GI, which traces
 `RT_MASK_SCENE`, never see them); a camera ray crosses one stochastically by its opacity (a blended material's alpha,
-else 50 %). The display value is converted with the camera's exposure, fixed for the whole render
-(`PtParams.majorants.w`): with a fixed EV a drawing looks as in the real-time view; with auto exposure it is scaled by
-the ratio of the metered to the starting exposure, like everything else. The venue's **ambient light**
+else 50 %). The display value goes to its own accumulation image, the **display-referred overlay** (`ptOverlay`:
+the colour, and the coverage in alpha), not into the radiance: `pt_display.comp` adds its mean after the exposure and
+shows that share of the pixel without tone mapping (`displayTransformShared`), as the real-time view composites
+them — so a drawing shows the image's own pixels whatever exposure the render ends with (auto exposure meters the
+radiance only, a drawing does not drive it), is not denoised, and is not fogged by the media in front of it (the camera
+segment that ends on it skips the media, as the real-time view draws drawings over the volumetric composite);
+`ResultHdr` and the EXR carry it added after the exposure. The venue's **ambient light**
 (`AtmosphereState.AmbientLuminance`) is the luminance of the environment for rays that leave a surface and reach
-nothing (on top of `BackgroundLuminance`; not for camera rays nor in the media), so it is shadowed and bounced: an open
-Lambertian floor of albedo ρ has ρ · L_ambient (test: within 3 %), a white Lambertian sphere exactly L_ambient in both
-renderers. Russian roulette after the third scattering vertex, by the path throughput.
+nothing (on top of `BackgroundLuminance`; not for camera rays, not lighting the media), so it is shadowed and bounced: an
+open Lambertian floor of albedo ρ has ρ · L_ambient (test: within 3 %), a white Lambertian sphere exactly L_ambient in
+both renderers. It reaches the surface unattenuated by the haze and smoke on the way (added before the segment's media
+are tracked): a scattering medium in a uniform environment scatters as much of it into the ray as out of it, and the
+real-time view's term is unattenuated too — so in the default stage haze both renderers agree (test: an open floor in
+0.02/m of haze reaching 30 m beyond the scene, seen through 10 m of it: ρ·L·T within 5 % in the real-time view, and in
+the path tracer between that and that plus the floor's own light the haze scatters back, which only the path tracer
+has; attenuated, the path tracer's ambient was about half: 6.2 instead of 12.3 cd/m²). Russian roulette after the third scattering vertex, by the path throughput.
 
 ### Media
 
@@ -1115,7 +1132,8 @@ The display uses the real-time view's transform (`tonemap.glsl: displayTransform
 curves and the same ordered dither), so a converged final render and the real-time view of a noise-free scene are
 identical to ±2/255. Auto exposure meters the image with the real-time histogram (stage metering by default) on the
 GPU and the trimmed mean on the CPU (`ExposureMeter`, the twin of `exposure.comp`), within 0.15 stop of the
-real-time meter. There is no bloom in the final render.
+real-time meter; it meters the radiance only, not the display-referred overlay (reference drawings, unlit materials),
+which the display adds after the exposure and shows without the tone mapper. There is no bloom in the final render.
 
 `OpenExr` (`Diagnostics/OpenExr.cs`) writes and reads single-part scanline OpenEXR 2 images (no compression, ZIPS or
 ZIP with the format's byte reordering and predictor through `ZLibStream`; HALF, FLOAT, UINT channels; layer names;

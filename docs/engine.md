@@ -136,10 +136,13 @@ three messages per issue code and how many more):
 **Stage floor** (`StageFloor`). MVR exports often contain only the rig (Фокина: 91 fixtures and nothing else), so the
 light lands on nothing. `StageFloor.CreateIfMissing(scene, modelBounds, name)` builds — without adding it — a
 `WallKind.Floor` wall of `MaterialIds.WoodStage`, `Thickness` 0.1 m thick, covering the content's footprint
-(`SceneBounds.Compute`) plus `Margin` = 3 m on every side, its top face at the content's lowest point but at most Z = 0;
-it returns null when the scene has no content or already has a floor: a floor wall (hidden or not), or a visible model
-that reaches within 5 cm of the content's lowest point and covers at least half of its footprint (a venue or set model
-brings its own floor, and a second one at the same height would z-fight with it). `AddIfMissing(engine, name)` adds it
+(`SceneBounds.Compute`) plus `Margin` = 3 m on every side, its top face at the lowest point the content rests on but at
+most Z = 0 (`SceneBounds.LowestPoint`: the bottom of walls, images, trusses and models, the origin of fixtures and
+devices — a floor-standing fixture's base, not the ± 0.3 m framing box around it, which would leave it floating 0.3 m
+above the floor); it returns null when the scene has no content or already has a floor: a floor wall (hidden or not),
+or a visible model that reaches within 5 cm of that lowest point and covers at least half of the footprint (a venue or
+set model brings its own floor, and a second one at the same height would z-fight with it). Model bounds are asked once
+per model asset. `AddIfMissing(engine, name)` adds it
 directly (the CLI's `--floor auto`); the editor adds the same floor through an undoable command when it opens a
 floorless MVR (docs/editor.md), so both use one rule. `HasFloor` and `SizeOf` answer the questions on their own.
 
@@ -569,11 +572,14 @@ a device):
 * **Lighting baseline** (`LightingBaselineTests.cs`: `StageFloorTests`, `ReferenceDrawingCliTests`): Фокина gets a
   wood floor under every fixture with the 3 m margin, top at the stage level, created without being added;
   `AddIfMissing` adds it once; a floor wall (also hidden) counts, a wall does not, an empty scene gets none, content below
-  Z = 0 puts the floor under it and a NaN position is ignored; a 20 × 15 m venue model on the ground is the floor, a
-  1 m prop is not (nor the venue hidden, nor without model bounds); `SceneSettings.AmbientLuminance` reaches the
+  Z = 0 puts the floor under it (at a pit light's base) and a NaN position is ignored; fixtures and a console standing at
+  Z = 0 stand on the floor (top at 0, not 0.3 m lower); a 20 × 15 m venue model on the ground is the floor, also lowered
+  to the stage level with a floor-standing fixture on it, a 1 m prop is not (nor the venue hidden, nor without model
+  bounds); `SceneSettings.AmbientLuminance` reaches the
   atmosphere (30 → 30, unchanged → no update, NaN/−3/∞ → 0, 10⁹ → `MaxAmbientLuminance`); a project holding only a red
-  and green reference drawing renders with `candela render` (auto exposure) and `--final` (at EV 8) showing both
-  halves in their colours, and both renders print the added stage floor (Vulkan).
+  and green opaque reference drawing renders with `candela render` (auto exposure), `--final` (auto exposure) and
+  `--final --ev 2` showing both halves in the image's own colours (±8/255: not tone mapped, not fogged by the default
+  haze, whatever the exposure), and every render prints the added stage floor (Vulkan).
 * **Final render CLI** (`FinalRenderCliTests`): the `--final` options parse, have their defaults (`--seconds` alone
   renders until the time is up) and are refused without `--final` or with `--mode`/`--overlay`/`--grid`; times parse
   as seconds or timecodes (drop-frame with `;`), timecodes need a recording, an end before the start is refused; a
