@@ -132,6 +132,11 @@ internal sealed partial class Workspace
             if (!_options.IsScreenshotMode)
                 OfferRecovery();
         }
+        else if (_recoveryChecked && _pendingOperation is null && !ModalOpen())
+        {
+            // After the recovery prompt was answered: the fixture library setup of a first start.
+            OfferLibrarySetup();
+        }
     }
 
     /// <summary>True while a modal dialog (session question, message box, file browser) has the user's attention.</summary>

@@ -19,9 +19,9 @@ internal enum DuplicatePatchMode
 
 /// <summary>
 /// Editing preferences of the editor that the shared <c>AppSettings</c> of Candela.Core do not hold (stored in
-/// <c>editor-preferences.json</c> in the config folder): currently what happens to the DMX addresses of duplicated and
-/// pasted fixtures. Read defensively (a damaged file gives the defaults) and written atomically; read-only runs never
-/// write.
+/// <c>editor-preferences.json</c> in the config folder): what happens to the DMX addresses of duplicated and pasted
+/// fixtures, and whether the fixture library setup window opens at start-up. Read defensively (a damaged file gives the
+/// defaults) and written atomically; read-only runs never write.
 /// </summary>
 internal sealed class EditorPreferences
 {
@@ -36,6 +36,12 @@ internal sealed class EditorPreferences
 
     /// <summary>What Duplicate and Paste do with the copied fixtures' addresses.</summary>
     public DuplicatePatchMode DuplicatePatch { get; set; } = DuplicatePatchMode.Ask;
+
+    /// <summary>
+    /// The fixture library setup window opens at start-up while no library folder of the settings holds a GDTF file
+    /// (the window's check box; Help → Fixture Library Setup opens it at any time).
+    /// </summary>
+    public bool ShowLibrarySetup { get; set; } = true;
 
     /// <summary>Reads the preferences of <paramref name="configDir"/> (defaults when missing or unreadable).</summary>
     public static EditorPreferences Load(string configDir, AppLog? log = null)

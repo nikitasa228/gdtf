@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <!-- A GUI program on Windows (no console window; the editor attaches to the console it was started from to print
+         its usage, command-line errors and headless screenshot runs); the same as Exe elsewhere. -->
+    <OutputType>WinExe</OutputType>
     <!-- The editor is started as `candela-app`. -->
     <AssemblyName>candela-app</AssemblyName>
     <RootNamespace>Candela.App</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <!-- Windows file properties, icon and manifest (per-monitor DPI awareness v2, long paths); see packaging/windows. -->
+    <AssemblyTitle>Candela Editor</AssemblyTitle>
+    <Description>Candela stage lighting editor: GDTF fixtures, MVR scenes, physically based light and haze.</Description>
+    <ApplicationIcon>../../packaging/windows/icon/candela.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Candela.Engine/Candela.Engine.csproj" />
@@ -22,11 +29,13 @@
     <PackageReference Include="StbImageWriteSharp" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Bundled fonts (Inter: SIL OFL 1.1, Lucide icons: ISC); licences next to them and in the output folder. -->
+    <!-- Bundled fonts (Inter: SIL OFL 1.1, Lucide icons: ISC); licences next to them and in licenses/ of the output folder. -->
     <EmbeddedResource Include="Assets/Fonts/*.otf;Assets/Fonts/*.ttf">
       <LogicalName>Fonts/%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
-    <None Include="Assets/Fonts/*.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="licenses" />
+    <None Update="Assets/Fonts/*.txt" CopyToOutputDirectory="PreserveNewest" Link="licenses/%(Filename)%(Extension)" />
+    <!-- The window and taskbar icon (drawn by packaging/windows/icon/make_icon.py, like candela.ico). -->
+    <EmbeddedResource Include="../../packaging/windows/icon/candela-256.png" LogicalName="Icons/candela-256.png" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Candela.App.Tests" />
