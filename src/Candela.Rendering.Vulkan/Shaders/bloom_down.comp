@@ -18,33 +18,16 @@ layout(set = SET_PASS, binding = BINDING_PASS_SAMPLED0) uniform sampler2D source
 
 const float FIREFLY_LUMA = 1024.0;
 
-#ifdef FIRST
-// One HDR texel, finite (tested on its bits) and limited to FIREFLY_LUMA.
-vec3 hdrTexel(ivec2 p)
-{
-    vec3 c = finiteLight(texelFetch(hdrTexture, p, 0).rgb);
-    float luma = dot(c, vec3(0.2627, 0.6780, 0.0593));
-    return luma > FIREFLY_LUMA ? c * (FIREFLY_LUMA / luma) : c;
-}
-#endif
-
 vec3 fetch(vec2 uv)
 {
 #ifdef FIRST
-    // Filtered here from four checked texels, never by the texture unit: an HDR texel that overflowed to +infinity
-    // would come out of hardware bilinear filtering as NaN (0 x inf, inf - inf) and spread through the whole pyramid
-    // as dark blocks of every level's size around a bright lens.
-    ivec2 size = textureSize(hdrTexture, 0);
-    vec2 pos = uv * vec2(size) - 0.5;
-    vec2 base = floor(pos);
-    vec2 f = pos - base;
-    ivec2 p0 = clamp(ivec2(base), ivec2(0), size - 1);
-    ivec2 p1 = clamp(ivec2(base) + 1, ivec2(0), size - 1);
-    vec3 a = hdrTexel(ivec2(p0.x, p0.y));
-    vec3 b = hdrTexel(ivec2(p1.x, p0.y));
-    vec3 c = hdrTexel(ivec2(p0.x, p1.y));
-    vec3 d = hdrTexel(ivec2(p1.x, p1.y));
-    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+    // Filtered in the shader from four texels made finite first (common.glsl), never by the texture unit: an HDR texel
+    // that overflowed to +infinity would come out of hardware bilinear filtering as NaN (0 x inf, inf - inf) and spread
+    // through the whole pyramid as dark blocks of every level's size around a bright lens. The filtered sample is then
+    // limited, as before, so a lens of a few texels still blooms with the energy of its filtered footprint.
+    vec3 c = sampleLightBilinear(hdrTexture, uv);
+    float luma = dot(c, vec3(0.2627, 0.6780, 0.0593));
+    return luma > FIREFLY_LUMA ? c * (FIREFLY_LUMA / luma) : c;
 #else
     return textureLod(sourceLevel, uv, 0.0).rgb;
 #endif
