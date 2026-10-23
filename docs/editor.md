@@ -150,13 +150,14 @@ bounds the render binding keeps for every drawn object (`RenderSync.TryGetWorldB
 keeps no second copy of the render world.
 
 **Work light.** In *Full* shading the stage is lit by its fixtures. While none of them emits — an MVR fresh from the
-designer, an un-programmed rig such as Фокина — the preview adds a dim **work light** (a soft key from above the stage
+designer, an un-programmed rig such as Фокина — the preview adds a **work light** (a soft key from above the stage
 and its bounce), so the stage is never just black. *Preview → Stage → Work light* and *View → Work Light* switch it
 between **Off**, **Auto** (default: only while no fixture emits) and **On**; the choice is stored in the project's view
 settings (`ViewSettings.WorkLight`) and applied to the render binding at once. A viewport showing the *Illuminance*
 overlay leaves it out (the lux values are the fixtures' own), and final renders never use it unless the Render panel
-asks for it. The work light is deliberately dim — about a tenth of a lit stage (40 lx key), so at the viewport's
-default EV 8 the set reads as a dark room; *Preview → Meter* or a lower EV brightens the picture. *Off* gives the view
+asks for it. The work light has a stage work light's level — about half a lit stage (300 lx key) — so the set reads
+clearly at the viewport's default EV 8, the exposure of a lit stage, and it lights surfaces only: the haze does not glow
+in it. (*Preview → Meter* reads the fixtures' light only, so it does not change the exposure of a dark rig.) *Off* gives the view
 without it: only the fixtures (and the *Ambient light* of the stage) light the set. *Tools → Open White* (one undo step)
 brings every fixture up in open white with the moving heads aimed at the stage. The command line option `--preview-stage` shows the renderer's procedural test stage instead of the document
 (the phase-A behaviour, kept for tests that need a fixed picture).

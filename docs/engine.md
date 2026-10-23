@@ -611,7 +611,7 @@ a device):
   only when enabled; view/engine settings changes make the project modified, survive save and reopen and reach the
   autosave; flags after 120 random visibility/layer/selection/reparent/lock/cable edits equal a per-frame scan, steady
   frames send no flag updates, a selected group can outline its content; world bounds per entity and pick id follow
-  moves and hiding; the work light lights a dark scene in `Auto` (40 lx key at the centre, never in `engine.Lights` or
+  moves and hiding; the work light lights a dark scene in `Auto` (300 lx key at the centre, never in `engine.Lights` or
   the light meter, off with a lit fixture, on top of it in `On`, off under the lux overlay, deterministic) and its key
   covers the content; a 44 Hz console recorded by a 30 fps engine keeps every packet at its arrival time and a
   timecode seek lands between engine frames; unchanged packets are not recorded, a timed-out source is stamped when it

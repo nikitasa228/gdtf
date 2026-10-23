@@ -57,7 +57,7 @@ internal sealed class RenderOptions
     public bool Floor { get; private set; } = true;
 
     /// <summary>
-    /// The work light (<c>--work-light off|auto|on</c>, default off): a dim neutral key and ambient light for scenes
+    /// The work light (<c>--work-light off|auto|on</c>, default off): a neutral key and ambient light for scenes
     /// whose fixtures are dark. A render never gets it unless asked.
     /// </summary>
     public WorkLightMode WorkLight { get; private set; } = WorkLightMode.Off;
