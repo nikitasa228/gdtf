@@ -887,6 +887,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
             case "librarysetup":
                 RunLibrarySetupScript(value);
                 break;
+            case "librarytexturecap":
+                _library.TextureCap = int.Parse(value, CultureInfo.InvariantCulture);
+                break;
             default:
                 throw new KeyNotFoundException($"unknown setting '{name}'");
         }

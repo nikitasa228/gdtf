@@ -49,6 +49,9 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     /// <summary>Thumbnail textures kept alive (least recently drawn are released beyond this).</summary>
     public const int MaxTextures = 240;
 
+    /// <summary>Smallest <see cref="TextureCap"/> (one hover preview and a screen of tiles still fit).</summary>
+    public const int MinTextureCap = 32;
+
     /// <summary>Frames of the rotating hover preview (one every 15°).</summary>
     public const int OrbitFrames = 24;
 
@@ -102,6 +105,7 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
     private FixtureLibraryEntry? _selected;
     private bool _revealSelected;
     private bool _showFixturesTab;
+    private int _textureCap = MaxTextures;
     private int _revealIndex = -1;
     private int _probeIndex = -1;
     private bool _probeValid;
@@ -149,6 +153,17 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
 
     /// <summary>Counters of the panel's textures (diagnostics and tests).</summary>
     public UiTextureStatistics TextureStatistics => _textures.Statistics;
+
+    /// <summary>
+    /// Textures kept alive before the least recently drawn are released: <see cref="MaxTextures"/>, lowered by scripted
+    /// runs (setting <c>libraryTextureCap</c>) so that a short hover script exercises the release of textures through
+    /// the renderer backend — [<see cref="MinTextureCap"/>, <see cref="MaxTextures"/>].
+    /// </summary>
+    public int TextureCap
+    {
+        get => _textureCap;
+        set => _textureCap = Math.Clamp(value, MinTextureCap, MaxTextures);
+    }
 
     /// <summary>
     /// Selects <paramref name="entry"/> in the Fixtures tab (after a GDTF import): the tab comes forward, the category and
@@ -968,12 +983,12 @@ internal sealed unsafe partial class LibraryPanel : Panel, IDisposable
         foreach (var (_, slot) in _slots)
             if (slot.Texture is not null)
                 alive++;
-        if (alive <= MaxTextures)
+        if (alive <= _textureCap)
             return;
         _evict.Clear();
         foreach (var (key, slot) in _slots.OrderBy(kv => kv.Value.LastUsed))
         {
-            if (alive <= MaxTextures * 3 / 4)
+            if (alive <= _textureCap * 3 / 4)
                 break;
             if (slot.Texture is null || slot.LastUsed >= _frame - 1)
                 continue;

@@ -381,8 +381,8 @@ modes, weight and power.*
   (without that, every hover preview left 24 GPU images and descriptor sets behind until the backend's descriptor pool
   ran out and the driver crashed). All picture textures together never exceed 400 (alive or waiting for the GPU); beyond
   that a tile shows its fallback icon until older ones are gone. A fixture the thumbnail renderer cannot draw (a broken
-  model, a non-finite transform, an exception, a lost device) gets the fallback icon too; after three device failures
-  the worker recreates its renderer. The log line at exit counts them (*Pictures: … textures made, … freed, … alive,
+  model, a non-finite transform, an exception, a lost device) gets the fallback icon too; after a device failure the
+  worker recreates its renderer for the next picture, and after three failures in a row it shows icons only. The log line at exit counts them (*Pictures: … textures made, … freed, … alive,
   … waiting for the GPU, … refused.*).
 * **Hover preview.** Resting on a tile for a moment grows it upward (0.18 s, ease-out) into a card twice its size — it
   hangs down from the top when there is no room above — showing the fixture **turning** (24 frames around it,
@@ -1162,11 +1162,11 @@ in the active viewport when the action runs, so a script does not depend on the 
 | Type | Fields | Effect |
 |---|---|---|
 | `wait` | `frames` | do nothing for n frames |
-| `move` | `x`, `y` (or `world` / `entity`) | move the mouse |
-| `click` | `x`, `y` (or `world` / `entity`), `button` (left/right/middle), `modifiers` ("ctrl+shift"), `double` | click |
-| `press` / `release` | `x`, `y` (or `world` / `entity`), `button`, `modifiers` | press a button and hold it across later actions / release it where the mouse is |
+| `move` | `x`, `y` (or `world` / `entity` / `tile`) | move the mouse; `tile` is a fixture tile of the Library (index in the order the grid shows, 0 = first), scrolled into view first — hovering it grows the tile and starts its rotating preview |
+| `click` | `x`, `y` (or `world` / `entity` / `tile`), `button` (left/right/middle), `modifiers` ("ctrl+shift"), `double` | click |
+| `press` / `release` | `x`, `y` (or `world` / `entity` / `tile`), `button`, `modifiers` | press a button and hold it across later actions / release it where the mouse is |
 | `drag` | `x`, `y`, `toX`, `toY`, `steps`, `button`, `modifiers` | press, move in steps, release |
-| `scroll` | `x`, `y` (or `world` / `entity`), `delta` | mouse wheel |
+| `scroll` | `x`, `y` (or `world` / `entity` / `tile`), `delta` | mouse wheel |
 | `key` | `chord` ("Ctrl+Shift+S") | press and release a key chord |
 | `text` | `text` | type text into the focused field |
 | `menu` | `path` ("File/Settings", "/" or ">" separated; labels in either language, ellipsis and icons ignored) | select a main-menu item |
@@ -1177,7 +1177,7 @@ in the active viewport when the action runs, so a script does not depend on the 
 | `viewport` | `viewport`, `view`, `projection`, `shading`, `overlay`, `grid` | configure a viewport |
 | `select` | `names` | select objects by name |
 | `layout` | `name` | apply a layout |
-| `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection, librarySetup), `value` | change a setting; `librarySetup` drives the fixture library window: `open`, `close`, `default` (use the default folder), `rescan` (read the chosen folder again), `sample` (open the sample scene) or a folder path (as if chosen) |
+| `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection, librarySetup, libraryTextureCap), `value` | change a setting; `librarySetup` drives the fixture library window: `open`, `close`, `default` (use the default folder), `rescan` (read the chosen folder again), `sample` (open the sample scene) or a folder path (as if chosen); `libraryTextureCap` lowers the number of Library pictures kept as textures (32 … 240, default 240), so a short hover script makes the Library release textures through the renderer backend |
 | `window` | `width`, `height` (screen pixels), or `value` (minimize, restore, maximize) | resize the main window or change its state (swapchain recreation) |
 | `open` | `path` | open a scene or project like *File → Open* (asks about unsaved changes) |
 | `drop` | `path`, or `names` (several files), `x`, `y` | drop files onto the main window at (x, y), as a file manager does |

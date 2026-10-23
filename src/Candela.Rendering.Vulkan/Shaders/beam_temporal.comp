@@ -109,5 +109,7 @@ void main()
     }
 
     imageStore(outResolved, id, vec4(finiteLight(base * result), current.a));
-    imageStore(outHistory, id, vec4(clamp(result, vec3(0.0), vec3(HALF_SAFE_MAX)), viewDepth));
+    // Checked on the bits like every other light store: clamp() leaves a NaN undefined (it may stay NaN), and the history
+    // must hold only finite ratios.
+    imageStore(outHistory, id, vec4(finiteLight(result), viewDepth));
 }

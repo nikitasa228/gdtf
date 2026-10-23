@@ -202,11 +202,11 @@ internal sealed class SmokeEmitterLabels
         var hash = new HashCode();
         running = false;
         runningKind = markers[first].Kind;
-        for (int i = first; i < markers.Count; i++)
+        // The markers of one device are consecutive (StageSimulation adds them device by device), so the scan stops at
+        // the next device: labelling n emitters stays linear in n.
+        for (int i = first; i < markers.Count && markers[i].DeviceId == id; i++)
         {
             var m = markers[i];
-            if (m.DeviceId != id)
-                continue;
             int percent = Percent(m.Output);
             hash.Add((int)m.Kind);
             hash.Add(percent);
@@ -226,11 +226,9 @@ internal sealed class SmokeEmitterLabels
         var text = new System.Text.StringBuilder(deviceName is { Length: > 0 } ? deviceName : KindName(markers[first].Kind));
         text.Append(" · ");
         bool any = false;
-        for (int i = first; i < markers.Count; i++)
+        for (int i = first; i < markers.Count && markers[i].DeviceId == id; i++)
         {
             var m = markers[i];
-            if (m.DeviceId != id)
-                continue;
             if (any)
                 text.Append(", ");
             any = true;
