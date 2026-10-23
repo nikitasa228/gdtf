@@ -241,22 +241,22 @@ public sealed class SmokeWorker : IDisposable
             if (_exited)
                 return;
             _submittedTime += deltaTime;
-            if (_timing == SmokeTiming.RealTime && _count > 0)
+            // Real time: the frame still waiting takes this one's time too (across obstacle replacements, which may
+            // apply a frame early; never across other commands, which must see the time before them simulated first).
+            int pending = _timing == SmokeTiming.RealTime ? FindPending(WorkKind.Frame, passObstacles: true, passCommands: false) : -1;
+            if (pending >= 0)
             {
-                ref var tail = ref Tail();
-                if (tail.Kind == WorkKind.Frame)
+                ref var waiting = ref _items[pending];
+                waiting.DeltaTime += deltaTime;
+                if (waiting.Emitters!.Length < emitters.Length)
                 {
-                    tail.DeltaTime += deltaTime;
-                    if (tail.Emitters!.Length < emitters.Length)
-                    {
-                        _emitterPool.Push(tail.Emitters);
-                        tail.Emitters = RentEmitters(emitters.Length);
-                    }
-
-                    emitters.CopyTo(tail.Emitters);
-                    tail.EmitterCount = emitters.Length;
-                    return;
+                    _emitterPool.Push(waiting.Emitters);
+                    waiting.Emitters = RentEmitters(emitters.Length);
                 }
+
+                emitters.CopyTo(waiting.Emitters);
+                waiting.EmitterCount = emitters.Length;
+                return;
             }
 
             if (_timing == SmokeTiming.Lockstep)
@@ -320,8 +320,11 @@ public sealed class SmokeWorker : IDisposable
         var copy = boxes.ToArray();
         lock (_gate)
         {
-            if (_timing == SmokeTiming.RealTime && _count > 0 && Tail().Kind == WorkKind.Obstacles)
-                Tail().Obstacles = copy;
+            // The newest boxes win; the worker keeps them for a simulation it builds later, so a replacement waiting
+            // before a reconfiguration may be overwritten too.
+            int pending = _timing == SmokeTiming.RealTime ? FindPending(WorkKind.Obstacles, passObstacles: true, passCommands: true) : -1;
+            if (pending >= 0)
+                _items[pending].Obstacles = copy;
             else
                 Enqueue(new WorkItem { Kind = WorkKind.Obstacles, Obstacles = copy });
             Monitor.PulseAll(_gate);
@@ -330,7 +333,9 @@ public sealed class SmokeWorker : IDisposable
 
     /// <summary>
     /// Replaces the simulation with a fresh one for <paramref name="settings"/> (queued; the smoke is discarded, the
-    /// obstacles are kept). Used when the atmosphere volume changes.
+    /// obstacles are kept). Used when the atmosphere volume changes. In real time a reconfiguration still waiting is
+    /// redirected to the new settings instead (what was queued after it then applies to the new simulation), so
+    /// dragging the volume builds one grid whenever the worker is ready for it, not one per frame.
     /// </summary>
     public void Reconfigure(SmokeSimulationSettings settings)
     {
@@ -339,7 +344,10 @@ public sealed class SmokeWorker : IDisposable
         _settings = SmokeSimulation.Sanitize(settings, new List<Issue>());
         lock (_gate)
         {
-            if (_count > 0 && Tail().Kind == WorkKind.Configure)
+            int pending = _timing == SmokeTiming.RealTime ? FindPending(WorkKind.Configure, passObstacles: true, passCommands: true) : -1;
+            if (pending >= 0)
+                _items[pending].Settings = settings;
+            else if (_count > 0 && Tail().Kind == WorkKind.Configure)
                 Tail().Settings = settings;
             else
                 Enqueue(new WorkItem { Kind = WorkKind.Configure, Settings = settings });
@@ -417,6 +425,9 @@ public sealed class SmokeWorker : IDisposable
     /// <summary>Makes the worker fail on its thread as an internal error would (tests of the fault handling).</summary>
     internal void FailForTesting() => EnqueueCommand(new WorkItem { Kind = WorkKind.Fail });
 
+    /// <summary>Makes the worker wait for <paramref name="until"/> before its next item (tests of the queue).</summary>
+    internal void PauseForTesting(WaitHandle until) => EnqueueCommand(new WorkItem { Kind = WorkKind.Pause, Gate = until });
+
     /// <summary>Sets a thread's priority where the operating system allows it (ignored elsewhere).</summary>
     internal static void TrySetPriority(Thread thread, ThreadPriority priority)
     {
@@ -443,6 +454,7 @@ public sealed class SmokeWorker : IDisposable
         Fill,
         Timing,
         Fail,
+        Pause,
     }
 
     private struct WorkItem
@@ -456,6 +468,7 @@ public sealed class SmokeWorker : IDisposable
         public Vector3 Point;
         public float Radius, Value, Temperature;
         public SmokeTiming Timing;
+        public WaitHandle? Gate;
     }
 
     private void EnqueueCommand(WorkItem item)
@@ -493,6 +506,33 @@ public sealed class SmokeWorker : IDisposable
     }
 
     private ref WorkItem Tail() => ref _items[(_head + _count - 1) % _items.Length];
+
+    /// <summary>
+    /// Index in the queue of the newest waiting item of <paramref name="kind"/>, searched back from the tail across
+    /// frames, obstacle replacements (when <paramref name="passObstacles"/>) and the other commands (when
+    /// <paramref name="passCommands"/>), never across a timing change; −1 when there is none.
+    /// </summary>
+    private int FindPending(WorkKind kind, bool passObstacles, bool passCommands)
+    {
+        for (int n = _count - 1; n >= 0; n--)
+        {
+            int index = (_head + n) % _items.Length;
+            var found = _items[index].Kind;
+            if (found == kind)
+                return index;
+            bool passable = found switch
+            {
+                WorkKind.Frame => true,
+                WorkKind.Obstacles => passObstacles,
+                WorkKind.Configure or WorkKind.Reset or WorkKind.AddSmoke or WorkKind.Fill => passCommands,
+                _ => false,
+            };
+            if (!passable)
+                return -1;
+        }
+
+        return -1;
+    }
 
     private SmokeEmitter[] RentEmitters(int count)
     {
@@ -635,6 +675,9 @@ public sealed class SmokeWorker : IDisposable
                 break;
             case WorkKind.Fail:
                 throw new InvalidOperationException("Failure requested by a test.");
+            case WorkKind.Pause:
+                item.Gate!.WaitOne();
+                break;
         }
     }
 

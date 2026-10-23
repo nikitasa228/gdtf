@@ -224,4 +224,62 @@ public sealed class SmokeWorkerReviewTests(ITestOutputHelper output)
         Assert.True(worker.Current.CellSize > settings.CellSize);
         Assert.Contains("about 7 ms", note.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Dragging_the_volume_in_real_time_builds_one_grid_when_the_worker_is_ready_not_one_per_frame()
+    {
+        // The engine reconfigures, sends the obstacles and submits a frame every frame while the user drags the
+        // atmosphere volume. While the worker is busy, those must collapse into one reconfiguration (for the newest box),
+        // one obstacle set and one frame — otherwise it builds a grid per frame, one after the other, and falls further
+        // behind for as long as the drag lasts.
+        var settings = ClosedBox(new Vector3(6f, 6f, 3f), 0.25f);
+        using var worker = new SmokeWorker(settings, new SmokeWorkerOptions
+        {
+            Timing = SmokeTiming.RealTime,
+            AdaptCellSize = false,
+            CostModel = new SmokeCostModel(),
+        });
+        worker.Synchronize();
+        int generation = worker.Current.SolidKey.Generation;
+
+        using var gate = new ManualResetEventSlim();
+        worker.PauseForTesting(gate.WaitHandle);
+        SmokeSimulationSettings last = settings;
+        ObstacleBox[] walls = [];
+        for (int frame = 1; frame <= 30; frame++)
+        {
+            last = settings with { Bounds = new Aabb(settings.Bounds.Min, settings.Bounds.Max + new Vector3(0.05f * frame, 0f, 0f)) };
+            worker.Reconfigure(last);
+            walls = [ObstacleBox.FromAabb(new Aabb(new Vector3(-0.5f + 0.02f * frame, -0.5f, 0f), new Vector3(0.5f, 0.5f, 1f)))];
+            worker.SetObstacles(walls);
+            worker.Submit(1.0 / 60, Hazer);
+        }
+
+        gate.Set();
+        worker.Synchronize();
+        var current = worker.Current;
+        Assert.Equal(generation + 1, current.SolidKey.Generation);
+        var direct = new SmokeSimulation(last);
+        direct.SetObstacles(walls);
+        Assert.Equal(direct.Bounds.Max, current.Bounds.Max);
+        Assert.Equal((direct.SizeX, direct.SizeY, direct.SizeZ), (current.SizeX, current.SizeY, current.SizeZ));
+        var solids = worker.CaptureSnapshot().Solid;
+        Assert.Equal(direct.CaptureSnapshot().Solid, solids);
+        // All submitted time was taken in (simulated, or dropped as set-up time), nothing waits.
+        Assert.Equal(worker.SubmittedTime, current.ConsumedTime, 9);
+        Assert.Equal(0.0, worker.Lag, 9);
+
+        // Lockstep keeps every reconfiguration in order (bit-identical replays): 30 grids.
+        using var lockstep = new SmokeWorker(settings);
+        lockstep.Synchronize();
+        int start = lockstep.Current.SolidKey.Generation;
+        for (int frame = 1; frame <= 30; frame++)
+        {
+            lockstep.Reconfigure(settings with { Bounds = new Aabb(settings.Bounds.Min, settings.Bounds.Max + new Vector3(0.05f * frame, 0f, 0f)) });
+            lockstep.SetObstacles(walls);
+        }
+
+        lockstep.Synchronize();
+        Assert.Equal(start + 30, lockstep.Current.SolidKey.Generation);
+    }
 }
