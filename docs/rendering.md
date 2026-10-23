@@ -976,7 +976,8 @@ off the pools, it lights the room. (`PathTracerSceneTests` renders the scene at 
   a pass may be shorter; the rows its last workgroup overhangs are not traced, so every pixel gets exactly one sample
   per pass). The first bands hold about 64 000 pixels; then the cost per row is measured and a dispatch is planned to
   stay below 0.25 s (`MaxDispatchSeconds`; drivers reset a GPU that is stuck for about 2 s), a submission below
-  0.5 s. `Advance` called while the caller records a frame adds one dispatch to that frame and returns (the editor's
+  0.5 s. An interactive caller sets a shorter planned dispatch time (`DispatchSeconds`, 5 ms … 0.25 s; the editor's
+  render job uses 20 ms) so a dispatch that starts near the end of its frame budget does not hold the frame long. `Advance` called while the caller records a frame adds one dispatch to that frame and returns (the editor's
   frame loop; such frames allocate no managed memory, and the rendering time counted for a time limit is the
   wall-clock time from one such call to the next, at most 0.5 s each); otherwise it submits and waits itself. With a
   time limit every submission ends at a pass boundary, where the time is checked.

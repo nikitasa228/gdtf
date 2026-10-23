@@ -902,11 +902,14 @@ EV100); auto exposure, metering and exposure compensation come from the Preview 
 * **Path traced** (`RenderJobRunner`, `RenderMode.PathTraced`): the job starts the path tracer
   (`IRenderer.StartFinalRender`, the same light transport as `candela render --final` — bounced light between
   surfaces, multiple scattering in haze and smoke, see [rendering.md](rendering.md#stage-3-the-path-tracer-final-render))
-  and calls `IFinalRender.Advance` once per editor frame with what is left of the frame's 60 ms budget, so the editor
-  stays usable while it renders. The stage stands still meanwhile (the job holds the engine clock); before the first
-  sample it waits, without blocking the editor, for fixture models still loading in the background (at most 30 s). The
-  picture below the buttons shows the progress image about once a second (scaled to at most 1024 px), the progress bar
-  the frame and the samples (*Frame 1/1 · 37/256 samples*), and the line under it the time spent and the time left.
+  and calls `IFinalRender.Advance` once per editor frame with what is left of the frame's 60 ms budget, in dispatches
+  planned at 20 ms (`VulkanFinalRender.DispatchSeconds`; the renderer's own 0.25 s would hold every editor frame that
+  long on a large image), so the editor stays usable while it renders. The stage stands still meanwhile (the job holds
+  the engine clock from the moment the render starts); before the first sample it waits, without blocking the editor,
+  for fixture models still loading in the background (at most 30 s). The picture below the buttons shows the progress
+  image about once a second — less often when one progress image costs more than a tenth of that time (a large or
+  denoised image on a slow GPU) — scaled to at most 1024 px; the progress bar shows the frame and the samples
+  (*Frame 1/1 · 37/256 samples*), and the line under it the time spent and the time left.
   When the samples are done the frame is written exactly like `candela render --final`: the tone-mapped PNG
   (`IFinalRender.Preview`, denoised when asked) and, with *PNG + EXR*, the EXR — the result as R, G, B, A (32-bit
   float, linear Rec.2020 scaled by the PNG's exposure; the header's `whiteLuminance` = 1 / exposure turns the values
@@ -927,10 +930,15 @@ EV100); auto exposure, metering and exposure compensation come from the Preview 
 A **timecode range** renders an image sequence (`name_0001.png`, …, with *PNG + EXR* also `name_0001.exr`, …): the job
 takes over the engine clock (the editor stops ticking the stage with wall-clock time), plays the recording from two
 seconds before the start so moving heads and fades have arrived, and for every frame seeks the player, ticks the engine
-by one frame period and renders it. Path traced with auto exposure, the first frame's metered exposure is kept for the
-rest of the sequence (no flicker between frames), as on the command line. Errors (folder not writable, disk full, a GPU
-error such as a lost device or an image too large for the GPU) stop the job with the reason; a cancelled or failed
-sequence stops the recording playback it started. The result (*Written …*, *Stopped at 37 samples per pixel; written
+by one frame period and renders it; the first frame is the range's start even when the stage was ticked once more after
+the render started. Path traced with auto exposure, the first frame's metered exposure is kept for the rest of the
+sequence (no flicker between frames), as on the command line — with the Preview panel's exposure compensation counted
+once, not again on every following frame. Opening, creating or recovering another stage (File → Open, New, recovery —
+they replace the scene inside the editor's one engine) cancels a running render, and *Stop and save* then writes
+nothing: the samples belong to the stage that was closed. An output folder that disappears during a render is created
+again before the frame is written. Errors (folder not writable, disk full, a GPU error such as a lost device or an
+image too large for the GPU) stop the job with the reason; a cancelled or failed sequence stops the recording playback
+it started. The result (*Written …*, *Stopped at 37 samples per pixel; written
 …*, the failure) appears in the panel, the status bar and the log; **Open folder** shows the folder of the last file
 written in the system's file manager.
 
@@ -990,10 +998,19 @@ checked pixel by pixel) and `FinalRenderJobTests` (the path tracer in the editor
 by `candela render --final` with the same camera and samples, PNG and EXR compared within the noise; one test each for
 samples, bounces, volume bounces and denoise changing the output; the editor staying responsive — every step returns
 within its budget, the progress image updates — and *Cancel* stopping within one frame; the fall-back to the Fast mode
-without ray queries and the panel's note; F12 and File → Render starting a render with the panel's settings).
+without ray queries and the panel's note; F12 and File → Render starting a render with the panel's settings) and
+`FinalRenderReviewTests` (a scene replaced inside the same engine — File → New or Open — cancelling a running still or
+sequence, also *Stop and save*; a path-traced sequence with auto exposure and +2 EV compensation writing PNG and EXR
+frames with one exposure, on the GPU and with a stand-in path tracer; the first frame of a sequence at the range start
+after one more editor tick; a 960 × 540 path-traced render advancing within the frame budget; progress images once a
+second, or less often when they are expensive; an output folder deleted during the render; zero surface bounces
+leaving surfaces unlit, as the bounce row's tooltip says).
 
 Limitations: the path tracer runs on the editor's GPU between its frames, so the viewports update more slowly while
-it renders (each editor frame spends up to 60 ms on it, plus one dispatch of at most 0.25 s on a slow GPU); the first
+it renders (each editor frame spends about 60 ms on it, plus at most about one 20 ms dispatch); the light of a running
+path-traced frame is fixed when the frame starts while edits of geometry and materials reach it at once (edit the stage
+before rendering, or cancel and render again); a write error (disk full) ends the job and the frame's samples are lost;
+the first
 path-traced render of a session also compiles the path tracer's pipelines, which holds the editor for a moment; the
 issue messages of the engine (patch, MVR
 import) and the operating system's messages quoted in a protocol error stay English (the protocols' own status texts
