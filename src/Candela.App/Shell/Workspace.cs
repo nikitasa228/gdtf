@@ -223,6 +223,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
 
         _guard.Run("editing keys", _handleEditingKeys);
         _guard.Run("shortcuts", _dispatch);
+        // A render job started from this frame's UI holds the engine clock from now on: the next frame's session update
+        // must not tick the engine with wall-clock time between its preroll and its first frame.
+        _ctx.Session.EngineClockHeld = _ctx.Tools.Stage.Render.HoldsEngineClock;
         UpdateTitle();
     }
 

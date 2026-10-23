@@ -98,6 +98,7 @@ internal sealed class RenderJobRunner : IDisposable
 
     private RenderRequest? _request;
     private StageEngine? _playing;
+    private bool _restoreRealTime;
     private IRenderTarget? _target;
     private IRenderer? _targetOwner;
     private float[]? _accumulator;
@@ -215,7 +216,12 @@ internal sealed class RenderJobRunner : IDisposable
         if (request.Range is { } r && engine is not null)
         {
             // Play from a little before the first frame so motors, haze and flames have settled; the clock is ours now.
+            // The smoke follows these frames exactly (lockstep, as in the command-line renderer) from the first preroll
+            // tick on: in the editor's real time, frames ticked faster than wall-clock time would merge and mostly be
+            // dropped. The workspace only sees that the job holds the clock on its next frame, so the job switches here.
             _playing = engine;
+            _restoreRealTime = engine.Simulation.RealTime;
+            engine.Simulation.RealTime = false;
             try
             {
                 double preroll = Math.Min(Preroll, r.StartSeconds);
@@ -248,13 +254,20 @@ internal sealed class RenderJobRunner : IDisposable
         StopPlayback();
     }
 
-    /// <summary>Stops the playback of the recording the running sequence plays (the engine returns to live input).</summary>
+    /// <summary>
+    /// Stops the playback of the recording the running sequence plays (the engine returns to live input) and hands the
+    /// smoke back to real time if it ran in real time before the job.
+    /// </summary>
     private void StopPlayback()
     {
         var engine = _playing;
         _playing = null;
         if (engine is null)
             return;
+        bool realTime = _restoreRealTime;
+        _restoreRealTime = false;
+        if (realTime)
+            engine.Simulation.RealTime = true;
         try
         {
             engine.Play(null);
