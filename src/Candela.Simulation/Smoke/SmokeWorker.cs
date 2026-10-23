@@ -58,6 +58,16 @@ public sealed class SmokeWorker : IDisposable
     /// <summary>Submitted frame time still waiting for the solver above which it counts as behind real time, s.</summary>
     private const double MaxLag = 0.5;
 
+    /// <summary>Upper bound of the sub-steps of one real-time call (only keeps the arithmetic finite; time decides).</summary>
+    private const int MaxSubStepsPerRealTimeCall = 100_000;
+
+    /// <summary>
+    /// Share of a frame's wall-clock time a real-time call with time to spare may spend on it: a solver whose step costs
+    /// at most this share of the sub-step simulates the whole frame within it, and since every call is shorter than the
+    /// frame it covers, frames submitted faster than real time cannot make the calls ever longer.
+    /// </summary>
+    private const double SpareShare = 0.8;
+
     private readonly object _gate = new();
     private readonly SmokeWorkerOptions _options;
     private readonly SolverTaskScheduler? _scheduler;
@@ -99,6 +109,7 @@ public sealed class SmokeWorker : IDisposable
     private int _stepsOnGrid;
     private long _lastFrameTimestamp, _gridTimestamp;
     private bool _trimNextFrame;
+    private double _setupSeconds;
     private Issue? _adaptIssue, _faultIssue;
 
     /// <summary>
@@ -630,6 +641,7 @@ public sealed class SmokeWorker : IDisposable
     /// <summary>A fresh simulation for <paramref name="settings"/>, at the level the time budget allows in real time.</summary>
     private void Configure(SmokeSimulationSettings settings)
     {
+        long start = Stopwatch.GetTimestamp();
         var issues = new List<Issue>();
         _rawSettings = settings;
         _workerSettings = SmokeSimulation.Sanitize(settings, issues);
@@ -643,6 +655,7 @@ public sealed class SmokeWorker : IDisposable
         CreateSimulation(level, transferFrom: null);
         // The frames that arrived while the grid was being built are dropped, but not counted against the solver.
         _trimNextFrame = true;
+        _setupSeconds = Stopwatch.GetElapsedTime(start).TotalSeconds;
     }
 
     private bool Adapting => _workerTiming == SmokeTiming.RealTime && _options.AdaptCellSize;
@@ -707,7 +720,7 @@ public sealed class SmokeWorker : IDisposable
         _stepsOnGrid = 0;
         _stepSeconds = 0;
         _gridTimestamp = Stopwatch.GetTimestamp();
-        UpdateAdaptIssue(estimate: level > 0 ? _levelCells[level] * _options.CostModel.SecondsPerCell(_parallelism) : 0);
+        UpdateAdaptIssue();
         PublishIssues();
         Publish();
     }
@@ -737,14 +750,17 @@ public sealed class SmokeWorker : IDisposable
         if (_trimNextFrame)
         {
             // Time that passed while a new simulation was set up: beyond one sub-step it is lost (and counted), but it
-            // does not mean the solver cannot keep up.
+            // does not mean the solver cannot keep up. Frame time beyond the setup's duration passed afterwards and is
+            // simulated as usual.
             _trimNextFrame = false;
-            double setup = Math.Max(0, deltaTime - simulation.TimeStep);
+            double setup = Math.Clamp(deltaTime - simulation.TimeStep, 0, _setupSeconds);
             _dropped += setup;
             deltaTime -= setup;
         }
 
-        int steps = simulation.StepCapped(deltaTime, emitters, RealTimeCap(simulation));
+        // The wall-clock time this (possibly merged) frame stands for: the time since the previous call started.
+        double wall = _lastFrameTimestamp == 0 ? double.PositiveInfinity : (now - _lastFrameTimestamp) / (double)Stopwatch.Frequency;
+        int steps = simulation.StepCapped(deltaTime, emitters, RealTimeCap(simulation, Math.Min(deltaTime, wall)));
         double elapsed = Stopwatch.GetElapsedTime(now).TotalSeconds;
         double dropped = simulation.LastStatistics.DroppedTime;
         _dropped += dropped;
@@ -756,13 +772,27 @@ public sealed class SmokeWorker : IDisposable
         Adapt();
     }
 
-    /// <summary>Sub-steps a real-time call may run: what fits <see cref="SmokeWorkerOptions.MaxLatency"/> (1 … the settings' cap).</summary>
-    private int RealTimeCap(SmokeSimulation simulation)
+    /// <summary>
+    /// Sub-steps a real-time call may run (at least one); <paramref name="realTime"/> is the wall-clock time the call's
+    /// frame stands for (its frame time, at most the wall time since the previous call). A solver measured well within
+    /// real time (a step within the budget and at most <see cref="SpareShare"/> of the sub-step) may spend
+    /// <see cref="SpareShare"/> of that, or <see cref="SmokeWorkerOptions.MaxLatency"/> if that is longer — enough for the
+    /// whole frame, so nothing is dropped however slowly the frames come (a viewport at 4 fps hands over 0.25 s per
+    /// frame). Otherwise — slower than that, or not measured yet on this grid — a call gets
+    /// <see cref="SmokeWorkerOptions.MaxLatency"/> only, so the published smoke never trails the frames by more than that
+    /// and merged frames cannot snowball (nor can frames submitted faster than real time).
+    /// <see cref="SmokeSimulationSettings.MaxSubStepsPerCall"/>, the synchronous solver's guard against slow frames
+    /// feeding ever slower frames, does not apply: the main thread never waits here.
+    /// </summary>
+    private int RealTimeCap(SmokeSimulation simulation, double realTime)
     {
         double perStep = _stepSeconds > 0 ? _stepSeconds : simulation.CellCount * _options.CostModel.SecondsPerCell(_parallelism);
         double latency = double.IsFinite(_options.MaxLatency) && _options.MaxLatency > 0 ? _options.MaxLatency : 0.1;
-        double fit = Math.Floor(latency / Math.Max(perStep, 1e-6));
-        return (int)Math.Clamp(fit, 1, _workerSettings.MaxSubStepsPerCall);
+        bool spare = _stepSeconds > 0 && _stepSeconds <= Math.Min(Budget, SpareShare * simulation.TimeStep);
+        // The frame plus the remainder carried from the previous call (less than one sub-step).
+        double allowed = spare ? Math.Max(latency, SpareShare * (realTime + simulation.TimeStep)) : latency;
+        double fit = Math.Floor(allowed / Math.Max(perStep, 1e-6));
+        return (int)Math.Clamp(fit, 1, MaxSubStepsPerRealTimeCall);
     }
 
     /// <summary>
@@ -840,7 +870,11 @@ public sealed class SmokeWorker : IDisposable
             Publish();
     }
 
-    private void UpdateAdaptIssue(double estimate)
+    /// <summary>
+    /// The note for an adapted grid: the cell sizes, and what a step at the requested size would cost (the cost per cell
+    /// the workers of this process measured, × the requested cell count) against the budget.
+    /// </summary>
+    private void UpdateAdaptIssue()
     {
         if (_level == 0)
         {
@@ -848,11 +882,13 @@ public sealed class SmokeWorker : IDisposable
             return;
         }
 
-        double perStep = _stepSeconds > 0 ? _stepSeconds : estimate;
+        double requested = _levelCells[0] * _options.CostModel.SecondsPerCell(_parallelism);
         _adaptIssue = new Issue(IssueSeverity.Note, IssueCategory.Scene, "simulation.cell-size-adapted",
-            $"The smoke simulation uses {_levelCellSize[_level]:0.###} m cells instead of {_levelCellSize[0]:0.###} m to keep up " +
-            $"with real time on this computer (a {_workerSettings.TimeStep * 1000:0} ms step takes about {perStep * 1000:0} ms " +
-            $"at the requested size × {(double)_levelCells[0] / Math.Max(1, _levelCells[_level]):0.#} cells).");
+            string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"The smoke simulation uses {_levelCellSize[_level]:0.###} m cells instead of {_levelCellSize[0]:0.###} m to keep up " +
+                $"with real time on this computer: a {_workerSettings.TimeStep * 1000:0} ms step at the requested size " +
+                $"({(double)_levelCells[0] / Math.Max(1, _levelCells[_level]):0.#} × the cells) would take about {requested * 1000:0} ms, " +
+                $"and the solver may use {Budget * 1000:0} ms of it."));
     }
 
     /// <summary>Copies the current state into the back frame and makes it the ready one (worker thread, or idle worker).</summary>
