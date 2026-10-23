@@ -605,6 +605,7 @@ internal sealed class RenderJobRunner : IDisposable
     {
         string png = FramePath(request.OutputPath, FrameIndex, FrameCount);
         var image = final.Preview();
+        EnsureFolder(png);
         ImageImporter.SavePng(image, png);
         LastOutput = png;
         if (request.WriteExr)
@@ -656,6 +657,17 @@ internal sealed class RenderJobRunner : IDisposable
 
         float exposure = render.Exposure > 0f && float.IsFinite(render.Exposure) ? render.Exposure : 1f;
         OpenExr.WriteRgba(path, result, ExrPixelType.Float, ExrCompression.Zip, channels, ExrColorimetry.Rec2020 with { WhiteLuminance = 1f / exposure });
+    }
+
+    /// <summary>
+    /// Creates the folder of an output file again when it went away during the render (moved or deleted while the samples
+    /// were taken), so the picture is not lost for a folder that <see cref="Start"/> had created.
+    /// </summary>
+    private static void EnsureFolder(string path)
+    {
+        string? folder = Path.GetDirectoryName(Path.GetFullPath(path));
+        if (!string.IsNullOrEmpty(folder))
+            Directory.CreateDirectory(folder);
     }
 
     /// <summary>The EV100 of an exposure factor (inverse of <c>Units.ExposureFromEv100</c>: exposure = 1 / (1.2 · 2^EV100)).</summary>
@@ -835,6 +847,7 @@ internal sealed class RenderJobRunner : IDisposable
 
         string path = FramePath(request.OutputPath, FrameIndex, FrameCount);
         var image = new ImageData { Width = w, Height = h, Pixels = pixels };
+        EnsureFolder(path);
         ImageImporter.SavePng(image, path);
         LastOutput = path;
         SetPreview(image);

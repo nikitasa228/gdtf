@@ -329,6 +329,67 @@ public sealed class FinalRenderReviewTests
         }
     }
 
+    // ------------------------------------------------------------------------------------------------ output folder
+
+    [Fact]
+    public void An_output_folder_deleted_during_the_render_is_created_again()
+    {
+        Loc.SetLanguage("en");
+        using var dir = new TempDir();
+        using var engine = StageTestSupport.CreateEngine(dir);
+        var renderer = new FakePathTracer();
+        engine.AttachRenderWorld(renderer.World, loadFixtureModelsInBackground: false);
+        engine.Tick(0);
+        using var job = new RenderJobRunner();
+        string folder = dir.File("shots");
+        string path = Path.Combine(folder, "shot.png");
+        var request = Request(path, RenderMode.PathTraced, samples: 3) with { WriteExr = true };
+        Assert.True(job.Start(request, engine), job.Message);
+        Assert.True(Directory.Exists(folder), "Start creates the folder");
+        job.Step(engine, renderer, 0);
+        Directory.Delete(folder, recursive: true);
+        RunToEnd(job, engine, renderer);
+        Assert.True(job.State == RenderJobState.Completed, job.Message);
+        Assert.True(File.Exists(path));
+        Assert.True(File.Exists(Path.Combine(folder, "shot.exr")));
+    }
+
+    // ------------------------------------------------------------------------------------------------ bounces hint
+
+    [SkippableFact]
+    public void Zero_surface_bounces_leave_surfaces_unlit_as_the_hint_says()
+    {
+        Loc.SetLanguage("en");
+        Assert.Contains("0 = no light on surfaces, 1 = direct light only", StageLoc.Get(StageStr.RenderBouncesHint), StringComparison.Ordinal);
+        using var dir = new TempDir();
+        using var renderer = FinalRenderSupportForApp.CreateOrSkip();
+        using var engine = LitRoom(dir, renderer);
+        var camera = RenderCamera.LookAt(new Vector3(0f, -6f, 2.2f), new Vector3(0f, 1.5f, 1.4f), 55f);
+        camera.Ev100 = 8f;
+        double Mean(int bounces)
+        {
+            using var job = new RenderJobRunner();
+            string path = dir.File($"bounces-{bounces}.png");
+            var request = new RenderRequest(camera, new ViewOptions { ShowGrid = false }, new PreviewSettings(), 48, 32, 1, 1, path, null)
+            {
+                Mode = RenderMode.PathTraced,
+                Final = new FinalRenderSettings { Width = 48, Height = 32, SamplesPerPixel = 4, MaxBounces = bounces, MaxVolumeBounces = 0, Denoise = false },
+                FinalOptions = new FinalRenderOptions { AutoExposure = false, BackgroundLuminance = 0f },
+                WriteExr = true,
+            };
+            Assert.True(job.Start(request, engine), job.Message);
+            RunToEnd(job, engine, renderer);
+            Assert.True(job.State == RenderJobState.Completed, job.Message);
+            var exr = OpenExr.Read(job.LastExr!);
+            var g = exr.Channel("G")!.Values;
+            return g.Average();
+        }
+
+        double none = Mean(0), direct = Mean(1);
+        Assert.True(direct > 0, "one bounce shows the direct light on the floor and the wall");
+        Assert.True(none < 0.02 * direct, $"no bounces: {none:0.#####}, direct light: {direct:0.#####}");
+    }
+
     /// <summary>A 10 × 10 m floor, a back wall and one moving head at full open white in haze, bound to <paramref name="renderer"/>.</summary>
     private static StageEngine LitRoom(TempDir dir, VulkanRenderer renderer)
     {
