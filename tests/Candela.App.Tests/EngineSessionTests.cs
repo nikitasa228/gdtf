@@ -4,6 +4,7 @@ using Candela.App.Session;
 using Candela.App.Settings;
 using Candela.App.Ui;
 using Candela.Core.Diagnostics;
+using Candela.Core.Math;
 using Candela.Core.SceneGraph;
 using Candela.Core.SceneGraph.Components;
 
@@ -227,6 +228,31 @@ public sealed class EngineSessionTests : IDisposable
         Assert.False(simulation.RealTime);
         _session.EngineClockHeld = false;
         Assert.True(simulation.RealTime);
+    }
+
+    [Fact]
+    public void Problems_the_smoke_solver_reports_from_its_own_thread_reach_the_issue_list()
+    {
+        // A haze volume and a wall far outside it: the solver, on its own thread, notes the obstacle it ignores — maybe
+        // only after the analysis of the edit has run, which must then run again without another edit.
+        var volume = new Entity("Haze volume") { Local = new Transform(new Vector3(0f, 0f, 1.5f)) };
+        volume.Add(new AtmosphereVolumeComponent { Size = new Vector3(6f, 6f, 3f), CellSize = 0.5f });
+        _session.Scene.Add(volume);
+        var wall = new Entity("Far wall") { Local = new Transform(new Vector3(40f, 0f, 0f)) };
+        wall.Add(new WallComponent { Kind = WallKind.Wall, Width = 2f, Height = 2f, Thickness = 0.2f });
+        _session.Scene.Add(wall);
+
+        _session.Update(1.0 / 60);
+        Assert.NotNull(_session.Engine!.Simulation.Smoke);
+        _session.Update(EditorSession.IssueRefreshDelay + 0.01);
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+        while (!_session.Issues.Current.Any(i => i.Code == "simulation.obstacle-outside") && DateTime.UtcNow < deadline)
+        {
+            Thread.Sleep(10);
+            _session.Update(1.0 / 60);
+        }
+
+        Assert.Contains(_session.Issues.Current, i => i.Code == "simulation.obstacle-outside");
     }
 
     [Fact]

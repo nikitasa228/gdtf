@@ -65,6 +65,8 @@ internal sealed partial class EditorSession : IDisposable
     private long _previewBaseline = -1;
     private long _issuesVersion = -1;
     private long _seenVersion = -1;
+    private IReadOnlyList<Issue>? _seenSmokeIssues;
+    private bool _smokeIssuesChanged;
     private double _lastChangeAt;
     private double _clock;
     private int _autosaveMinutes = -1;
@@ -431,6 +433,7 @@ internal sealed partial class EditorSession : IDisposable
         if (_disposed)
             return;
         _issuesVersion = Scene.Version;
+        _smokeIssuesChanged = false;
         if (_options.PreviewStage)
         {
             // The preview stage's procedural meshes are not project assets: only program messages are listed.
@@ -602,7 +605,16 @@ internal sealed partial class EditorSession : IDisposable
             _lastChangeAt = _clock;
         }
 
-        if (version != _issuesVersion && _clock - _lastChangeAt >= IssueRefreshDelay)
+        // The smoke solver reports from its own thread (obstacles outside its box, a cell size adapted to the computer, a
+        // failure), possibly after the analysis of the edit that caused it has run: a new report runs the analysis again.
+        var smokeIssues = Engine?.Simulation.Smoke?.Issues;
+        if (!ReferenceEquals(smokeIssues, _seenSmokeIssues))
+        {
+            _seenSmokeIssues = smokeIssues;
+            _smokeIssuesChanged = true;
+        }
+
+        if ((version != _issuesVersion || _smokeIssuesChanged) && _clock - _lastChangeAt >= IssueRefreshDelay)
             RefreshIssuesNow();
     }
 
