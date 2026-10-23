@@ -41,13 +41,20 @@ without a GPU, Mesa's software driver (lavapipe, package `mesa-vulkan-drivers`) 
 | `--validation` | enable the Vulkan validation layer |
 | `--config-dir <dir>` | folder for settings, layouts, presets and the log of this run |
 | `--single-window` | keep torn-off panels inside the main window (no OS windows) |
-| `--width <px>`, `--height <px>` | initial window size (default 1600 × 900) |
+| `--width <px>`, `--height <px>` | initial window size (default 1600 × 900, in screen coordinates scaled by the monitor's content scale; an interactive window that does not fit the monitor's work area — 2400 × 1350 pixels at 150 % — opens maximised, one that sticks out is centred) |
 | `--screenshot <png>` | headless verification: render, save the last frame as PNG and exit |
 | `--frames <n>` | frames rendered before the screenshot (default 12) |
 | `--script <json>` | replay scripted input first (see [Scripted input](#scripted-input)) |
 | `--preview-stage` | diagnostics: the viewports show the renderer's procedural test scene instead of the stage |
+| `--library-setup` | open the [fixture library setup window](#library-folders-and-the-first-start) at start-up |
 
 Exit codes: `0` ok, `1` failure, `2` usage error (bad option, unreadable script), `3` no usable Vulkan device.
+
+On Windows `candela-app.exe` is a GUI program (no console window opens with it); `--help`, a usage error and
+`--screenshot` runs attach to the console they were started from, so their output still appears there. The
+executable carries the Candela icon, version information and a manifest (per-monitor DPI awareness v2, long paths).
+Installing the editor on Windows: [install.md](install.md). The very first start (no settings file yet) takes the
+interface language from the operating system (Russian for a Russian Windows or locale, English otherwise).
 
 `--scale`, `--language` and `--device` apply to the current run only: the settings file keeps its values unless the
 setting is changed in the editor during the run. Headless runs (`--screenshot`) never write settings, the workspace or
@@ -65,7 +72,12 @@ Per-user files live in the Candela config folder (`%APPDATA%\Candela`, `~/.confi
 | `keybindings.custom.json` | the edited ("Custom") key bindings |
 | `recent-places.json` | recently used folders of the file browser |
 | `model-library.json` | the files of the Library's Models tab (paths; see [Library](#library)) |
-| `logs/candela-app.log` | the log of the current run (also shown in the Console panel; at most 16 MB), `candela-app.previous.log` the one before |
+| `logs/candela-app.log` | Linux and macOS: the log of the current run (also shown in the Console panel; at most 16 MB), `candela-app.previous.log` the one before, and the crash reports `crash-*.txt` |
+
+On Windows the log and the crash reports are machine-local, in `%LOCALAPPDATA%\Candela\logs` next to the caches
+(`%LOCALAPPDATA%\Candela`), not in the roaming config folder; with `--config-dir` or `CANDELA_CONFIG_DIR` they stay
+in `logs` of that folder on every platform, so a test or portable run leaves nothing in the user's folders. The first
+line of the log names the version and the program folder.
 
 ## Workspace
 
@@ -299,7 +311,42 @@ added — is **selected**: the Library panel comes forward on the Fixtures tab, 
 in orange (an older revision selects its model's tile, the newest). The panel follows the engine's
 `FixtureLibraryChanged` event, so the grid, the category counts, the Devices section and the hover facts are rebuilt
 whenever GDTF files reach the library — imported ones, the GDTFs embedded in an opened or imported MVR, the GDTF copies
-of a project — and the new tiles ask for their thumbnails as they come into view.
+of a project, a library folder added in the settings or the setup window — and the new tiles ask for their
+thumbnails as they come into view.
+
+An imported GDTF is **copied into the user's library folder** first (the first existing folder of the settings; with
+none set, `Documents\Candela\Fixture Library` of an installed copy, created and added to the settings), so it is
+still in the library at the next start even when the original — a file in Downloads — is deleted. The copy is
+written aside and renamed (a library scan never sees half a file); a file of that name already in the folder is
+used when identical and never overwritten when different; a copy the engine then refuses is deleted again. When
+the copy fails the original is used for this session and the Issues panel says so. In a development run without
+configured folders (the repository is the library) files are read where they are.
+
+### Library folders and the first start
+
+An installed copy ships only the four GDTF files of the sample scene (`samples/fixtures`, appended to the library
+folders with the lowest priority; see [engine.md](engine.md#install-layout)). While the user has no library of their
+own — no fixture type of the library comes from a library folder of the settings — the editor opens
+the **Fixture Library** window over the workspace at start-up (after a recovery prompt, never in headless runs or
+when a file is opened from the command line or Explorer; `--library-setup` forces it, development runs from the
+repository never show it by themselves):
+
+* what GDTF files are and that the library is a folder of them;
+* **Choose Folder…** (the editor's file browser in folder mode), **Use Documents\Candela\Fixture Library**
+  (created when missing), **Show in File Manager** and **Rescan** (reads the folder again: GDTF files copied into
+  it since reach the library without a restart — `AddLibraryFolder` skips the files it already has);
+* the chosen folder is put first in *Settings → Library*, the settings are saved at once and the engine reads the
+  folder immediately (`StageEngine.AddLibraryFolder`); a background count shows how many `.gdtf` files are directly
+  in it and how many more sit in subfolders (the library reads only the top level), with a time and entry limit
+  so a huge or slow folder never blocks the window (the count starts when the window shows the folder, not at every
+  start);
+* **Open Sample Scene** (`samples/Фокина.mvr`), **Start** / **Continue Without a Library**, and the check box
+  *Show this window at start-up while the library has no fixtures* (`EditorPreferences.ShowLibrarySetup`).
+
+*Help → Fixture Library Setup…* opens the window at any time. A folder added in *Settings → Library* is also read
+at once; removing one takes effect at the next start.
+
+![The Fixture Library window on the first start of an installed copy](images/install-first-run.png)
 
 ![A dropped GDTF selected in the Library](images/editor-library-import.png)
 
@@ -928,13 +975,20 @@ are localised); changes of the view settings count as unsaved changes but are no
   and is placed unpatched; a picture the thumbnail thread cannot make (an image too large to decode included) becomes
   an icon; a failure while drawing the busy overlay lets the waiting file operation run without it instead of blocking
   every later one.
-* Without a Vulkan device the editor explains what to install, in a small OpenGL window (or on standard error in
-  headless runs) and exits with code 3:
+* Without a Vulkan device the editor explains what to install and exits with code 3. On Windows a message box says
+  whether the Vulkan runtime (`vulkan-1.dll`) is missing or no device supports Vulkan 1.3, names the display adapter
+  (from the registry) and offers to open its maker's driver page (NVIDIA, AMD, Intel); elsewhere a small OpenGL
+  window shows the text (standard error in headless runs):
 
   > No Vulkan graphics device: Candela needs a GPU with a Vulkan 1.3 driver. Install or update the graphics driver
   > (AMD, NVIDIA, Intel), or on Linux without a GPU install Mesa's software Vulkan driver (mesa-vulkan-drivers,
   > lavapipe).
 
+* **Crash reports.** When the editor stops because of an error — an exception that escaped everything, a start-up
+  failure, a frame loop that kept failing — it writes `crash-yyyyMMdd-HHmmss.txt` into the logs folder (version,
+  system, the error with inner exceptions and stack traces, the last 300 log entries; at most 20 reports are kept)
+  and tells the user where it is: on Windows a message box that offers to open the folder, elsewhere a line on
+  standard error. Writing a report never throws.
 * Settings, layouts, presets and the recent-places list are written atomically and read defensively. A damaged
   settings file is moved aside once (`settings.json.damaged-<time>`), not copied again at every start; headless runs
   leave it untouched. Key binding files with missing tables, null or empty chords are repaired when read (a custom set
@@ -1011,7 +1065,7 @@ in the active viewport when the action runs, so a script does not depend on the 
 | `viewport` | `viewport`, `view`, `projection`, `shading`, `overlay`, `grid` | configure a viewport |
 | `select` | `names` | select objects by name |
 | `layout` | `name` | apply a layout |
-| `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection), `value` | change a setting |
+| `setting` | `name` (uiScale, fontSize, language, navigation, settingsSection, librarySetup), `value` | change a setting; `librarySetup` drives the fixture library window: `open`, `close`, `default` (use the default folder), `rescan` (read the chosen folder again), `sample` (open the sample scene) or a folder path (as if chosen) |
 | `window` | `width`, `height` (screen pixels), or `value` (minimize, restore, maximize) | resize the main window or change its state (swapchain recreation) |
 | `open` | `path` | open a scene or project like *File → Open* (asks about unsaved changes) |
 | `drop` | `path`, or `names` (several files), `x`, `y` | drop files onto the main window at (x, y), as a file manager does |
@@ -1081,7 +1135,7 @@ changes). Allocations happen on user actions (edits, opening menus and dialogs, 
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 600 tests, under three minutes; the end-to-end runs whose checks do not depend
+`tests/Candela.App.Tests` (xUnit, about 630 tests, about five minutes on lavapipe; the end-to-end runs whose checks do not depend
 on lit pixels use Colorless shading, since on lavapipe the lit preview of a dark rig — with the Auto work light's
 shadowed key — takes about twice the frame time) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
@@ -1182,6 +1236,20 @@ imported into an empty scene is lit in Full shading by the Auto work light at th
 visible, black with the work light Off, and lit again in its colours by 30 cd/m² of ambient light without any light; a
 reference drawing shows its red and green halves in Full and Colorless shading without any light, and a poster of the
 same image is dark until the work light is on, then shows its image.
+
+The install tests: `InstallExperienceTests` (when the fixture library window opens at start-up — installed copy
+without a library of the user's own, never headless, in development or with a file to open, always with
+`--library-setup`; a folder counted with its subfolders, a missing one; a chosen folder put first in the settings and
+read by the running engine; the default folder created on use; an imported GDTF copied into the library folder, a
+refused one deleted again, read-only runs and development leaving files where they are, a different file of the same
+name never replaced; the window's states drawn in English and Russian through Dear ImGui's text log, the sample scene
+opened from it; the logs folder per platform and with an explicit config folder; a crash report with the error and the
+last log lines, old reports pruned; the no-Vulkan message naming the cause, the card and its driver page; the first
+start's language from the operating system; the window icon's sizes; every install text in both languages with the
+same placeholders; the option parsed and in the usage) and `LibrarySetupEndToEndTests` (the real editor under
+`xvfb-run` with `--library-setup`: a folder `Мои приборы/GDTF files` chosen through the scripted `librarySetup`
+setting is counted — one file directly, one in a subfolder — and read into the library, and no crash report is
+written).
 
 ## Limitations
 

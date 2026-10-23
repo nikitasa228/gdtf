@@ -380,6 +380,7 @@ internal sealed partial class Workspace
             Item(AppActions.Shortcuts);
             if (_menu.Item(Str.HelpDocs, Icons.BookOpen))
                 OpenDocsFolder();
+            DrawLibrarySetupMenuItem();
             _menu.Separator();
             if (_menu.Item(Str.HelpAbout, Icons.Info))
                 _about.IsOpen = true;

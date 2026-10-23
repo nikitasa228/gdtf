@@ -62,6 +62,9 @@ public enum FixtureLibraryChangeSource
 
     /// <summary>GDTF copies stored in a Candela project that was opened, recovered or merged.</summary>
     Project,
+
+    /// <summary>A library folder added while the program runs (<see cref="StageEngine.AddLibraryFolder"/>).</summary>
+    Folder,
 }
 
 /// <summary>GDTF files that were added to the engine's fixture library.</summary>

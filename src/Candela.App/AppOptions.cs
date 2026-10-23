@@ -83,6 +83,12 @@ internal sealed record AppOptions
     /// </summary>
     public bool PreviewStage { get; init; }
 
+    /// <summary>
+    /// Opens the fixture library setup window at start-up even when a library is set, during development and in headless
+    /// runs (<c>--library-setup</c>; screenshots and tests of the first-run experience).
+    /// </summary>
+    public bool LibrarySetup { get; init; }
+
     /// <summary>True when the run ends after writing a screenshot.</summary>
     public bool IsScreenshotMode => ScreenshotPath is not null;
 
@@ -151,6 +157,9 @@ internal sealed record AppOptions
                 case "--preview-stage":
                     o = o with { PreviewStage = true };
                     break;
+                case "--library-setup":
+                    o = o with { LibrarySetup = true };
+                    break;
                 default:
                     if (a.StartsWith('-'))
                         throw new AppUsageException($"Unknown option '{a}'.");
@@ -183,6 +192,7 @@ internal sealed record AppOptions
           --config-dir <dir>     folder for settings, layouts and presets of this run
           --single-window        keep torn-off panels inside the main window
           --preview-stage        diagnostics: show the renderer's test scene instead of the stage
+          --library-setup        open the fixture library setup window at start-up
           --width <px>           initial window width  (default 1600)
           --height <px>          initial window height (default 900)
 
@@ -190,6 +200,9 @@ internal sealed record AppOptions
           --screenshot <png>     render the UI, save the last frame as PNG and exit
           --frames <n>           frames to render before the screenshot (default 12)
           --script <json>        replay scripted input (mouse moves/clicks/drags, keys, menu items) first
+
+        Settings live in %APPDATA%\Candela (~/.config/Candela), logs and crash reports in
+        %LOCALAPPDATA%\Candela\logs (~/.config/Candela/logs).
 
         Exit codes: 0 ok, 1 failure, 2 usage, 3 no usable Vulkan device.
         """;

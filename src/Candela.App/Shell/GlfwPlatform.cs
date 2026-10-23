@@ -46,6 +46,14 @@ internal static unsafe class GlfwPlatform
             error = $"The GLFW library could not be loaded: {e.Message}";
             return false;
         }
+        catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException or EntryPointNotFoundException
+            or BadImageFormatException or FileNotFoundException)
+        {
+            // The bindings load glfw3.dll in their static constructor (it fails without the Visual C++ runtime, or when an
+            // antivirus program quarantined the file).
+            error = $"The GLFW library could not be loaded: {e.InnerException.Message}";
+            return false;
+        }
 
         IsInitialized = true;
         ResolveVulkanEntryPoints(log);

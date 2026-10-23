@@ -23,7 +23,7 @@ metres, linear Rec.2020 light colour with luminance 1 plus a photometric magnitu
 ## StageEngine
 
 ```csharp
-using var engine = StageEngine.FromSettings(AppSettings.Load());   // library = settings, else the folder of Candela.sln
+using var engine = StageEngine.FromSettings(AppSettings.Load());   // library = settings (else the repository) + starter fixtures
 var opened = engine.Open("stages/Фокина.mvr");                     // or a .candela project
 engine.StartProtocols(new[] { ProtocolIds.ArtNet, ProtocolIds.Sacn });
 var sync = engine.AttachRenderWorld(renderer.World);           // (world, loadFixtureModelsInBackground: false) for CLI/tests
@@ -37,7 +37,8 @@ while (running)
 | Member | What it is |
 |---|---|
 | `Scene`, `Project`, `Assets` | The open project (`Candela.Project.ProjectData`): scene, asset store, settings sections, GDTF copies, thumbnail. Replaced by `New`/`Open` (`SceneReplaced` event). |
-| `Library`, `Specs`, `Profiles`, `FixtureLibraryChanged` | Fixture library (library folders + GDTFs brought in by projects and MVR files), `_specs/fixtures_index.json`, compiled DMX profiles. `FixtureLibraryChanged` (`FixtureLibraryChange`: the new entries and their source — `Import` of a `.gdtf`, GDTFs embedded in an `Mvr`, a `Project`'s copies) is raised after GDTF files were added and every fixture was re-resolved. |
+| `Library`, `Specs`, `Profiles`, `FixtureLibraryChanged` | Fixture library (library folders + GDTFs brought in by projects and MVR files), `_specs/fixtures_index.json`, compiled DMX profiles. `FixtureLibraryChanged` (`FixtureLibraryChange`: the new entries and their source — `Import` of a `.gdtf`, GDTFs embedded in an `Mvr`, a `Project`'s copies, a
+library `Folder` added at run time) is raised after GDTF files were added and every fixture was re-resolved. |
 | `Input`, `Protocols`, `StartProtocols` | DMX input hub and the protocol manager; `StartProtocols` subscribes to the universes the patch uses. |
 | `Dmx`, `Poses` | DMX evaluation of every fixture; world matrices of every fixture part. |
 | `Simulation` | Smoke, fire and the acoustic field (`StageSimulation`). |
@@ -54,6 +55,8 @@ while (running)
 **Construction.** `new StageEngine(StageEngineOptions)`: `LibraryFolders` (empty → the repository during development:
 the folder containing `Candela.sln`, searched upwards from the program and the current directory), `SpecsIndexPath`
 (default: `_specs/fixtures_index.json` next to a library folder), a shared `Library` (tests, several engines),
+`StageEngineOptions.FromSettings(settings[, libraryFolders, layout])` fills both from the user's settings (or the
+CLI's `--library` folders) in the order of [Install layout](#install-layout),
 `CacheDirectory` (default `ConfigPaths.CacheDir`), the import worker (below), and thread counts. A missing library or
 unreadable specs file becomes an issue (`engine.library-missing`), never an exception.
 
@@ -76,6 +79,7 @@ false only when nothing happened (the open scene is then unchanged).
 | `Open(path)` | `.candela` through `Candela.Project` (tolerant loading; load issues reported; the `engine`/`view` sections restored, a section that no longer parses gives `engine.settings-invalid` and the defaults); `.mvr` through `Candela.Mvr` as a new, unsaved project. |
 | `Save()`, `SaveAs(path)` | Atomic `.candela` write with the scene, every asset (original bytes), copies of the GDTF files the fixtures use (from the library or the project's own copies), the thumbnail (`Project.Thumbnail`) and the `engine`/`view` sections. `Save()` without a path fails with "Save as". |
 | `Import(path, EngineImportOptions)` | `.mvr` merged under a new group (undoable); `.candela` merged under a group through `ProjectMerge` (new ids, references remapped, undoable); 3D models (OBJ, FBX, DAE, 3DS, STL, PLY, glTF/GLB) as a `MeshComponent` entity at `Placement`; images (PNG, JPEG, TGA, BMP, PSD, GIF, HDR) as an `ImageComponent` reference drawing or poster sized to the image's aspect; `.gdtf` read completely first (`GdtfReader`) and added to the fixture library only when it is a readable fixture type with at least one DMX mode — a broken file is refused with `engine.import-failed` (category Fixture) and never becomes a library entry; warnings of the reader become one `engine.gdtf-warnings` note. The result carries the new (or already present) entry in `EngineResult.LibraryEntry` and `FixtureLibraryChanged` is raised, so the editor can select it. SketchUp files are refused with advice. |
+| `AddLibraryFolder(folder)` | Adds the `.gdtf` files directly in a folder to the library while the program runs (the editor's first-run library window, a folder added in Settings → Library): no XML is read up front, names the library already has are skipped (the earlier folder wins, as at start-up), every fixture is re-resolved (a stand-in or unresolved fixture picks up a real GDTF that arrived) and `FixtureLibraryChanged` is raised with source `Folder`. Adding a folder again reads only the files that arrived since (the editor's *Rescan*). The start-up warnings are renewed: "no library folder is set" goes once the folder brought fixtures, "folder(s) … do not exist" keeps naming only the configured folders that are still missing. The summary says how many files were added, that the folder holds no GDTF yet, or that its files were already there. A missing or unreadable folder fails with `engine.library-missing` and the reason. |
 | `ExportMvr(path, EngineExportOptions)` | MVR 1.6 with the library's GDTF files and the models as GLB with their textures (`Candela.Mvr`; see "MVR export" below). Stand-ins are written as the models and modes the scene asks for unless `WriteStandIns` is set. Generic devices (`GenericDevices`: splitters, nodes, dimmer packs) are written as ordinary MVR fixtures with their GDTF embedded and marked in Candela's `UserData` block (`MvrExportOptions.IsCandelaDevice = GenericDevices.IsGeneric`), so opening the file in Candela gives the same devices back (by their own file names, without stub reports) while other programs see valid fixtures. |
 
 **GDTF files that are not in the library.** Complete GDTFs embedded in an MVR, and the GDTF copies of a project, are
@@ -166,6 +170,40 @@ application process and a note says so (`engine.import-in-process`). glTF/GLB (S
 readers) are managed code and always stay in-process. `IsolateNativeImports = false` turns isolation off for trusted
 files. Textures of worker-decoded models (`asset:{id}/…`) are served by `EngineImageSource` from the decoded package,
 so embedded and generated images never require the native importer again.
+
+## Install layout
+
+`InstallLayout` (`InstallLayout.Current`, detected once from `AppContext.BaseDirectory`) says where the program
+finds the files it ships with. A copy is **installed** when `data/specs/fixtures_index.json` exists next to the
+executables (the Windows installer, any `dotnet publish` folder completed by `packaging/windows/winpack.py`); it
+then never looks at the working directory or a repository, so it runs from any folder (Program Files, paths with
+spaces or Cyrillic letters, a USB stick). Otherwise it is the **development** layout and `RepositoryRoot` is the
+folder with `Candela.sln` above the program. The installed layout and the installer: [install.md](install.md).
+
+| What | Lookup order (the first hit wins) |
+|---|---|
+| Fixture library folders (`LibraryFoldersFor`) | the settings' `LibraryFolders` or the CLI's `--library`; when none is set and the program is not installed, the repository root; then always the **starter fixtures** `samples/fixtures` (the four GDTF files of the sample scene) with the lowest priority, so a library file of the same name wins |
+| Researched specs (`FindSpecsIndex`) | the settings' `SpecsIndexPath`; `_specs/fixtures_index.json` in or above a library folder; `{program}/data/specs/fixtures_index.json`; `{repository}/_specs/fixtures_index.json` |
+| Sample scene (`SampleScene`) | `{program}/samples/Фокина.mvr`, then `{repository}/stages/Фокина.mvr` |
+| Documentation (`DocsFolder`) | `{program}/docs`, then `{repository}/docs` |
+| Import worker | `candela.exe` / `candela` next to the running program ([Import worker](#import-worker-native-crash-isolation)) |
+| Default user library (`DefaultUserLibraryFolder`) | `Documents\Candela\Fixture Library` (`~/Documents/Candela/Fixture Library` elsewhere); created by the editor when the user picks it or imports a GDTF without a library folder |
+
+Fonts and shaders are embedded in the assemblies and the generic cabling devices are generated into the cache, so
+nothing else is looked up; settings, caches, autosaves and logs live in the per-user folders of `ConfigPaths`,
+never in the program folder (read-only under Program Files). `CountGdtfFiles`, `AnyGdtfFiles` and `SamePath`
+(case-insensitive on Windows and macOS) are the small helpers the editor's library window uses; `IsInProgramFolder`
+tells the editor's save dialogs not to start in the program folder (the installed sample scene's folder). A configured
+library folder that does not exist — an unplugged drive, an offline network share — is named in an
+`engine.library-missing` warning at start-up even though the starter fixtures exist. `AssimpProgramFolder.Prepare()`
+(called by the import worker and the editor at start-up) loads `assimp.dll` by its bare name when the program folder
+has non-ASCII characters: AssimpNet loads it with `LoadLibraryA` and the full path, which a Windows whose ANSI code
+page cannot spell the folder (a per-user install under `C:\Users\Иван`, Cyrillic folder names on a Western Windows)
+turns into question marks — every OBJ/FBX/COLLADA/3DS import failed there.
+
+The CLI builds its engine with `StageEngineOptions.FromSettings(AppSettings.Load(), --library folders)`, so
+`candela info scene.mvr` sees the same library as the editor; `candela info file.gdtf` reads the specs found the
+same way. On Windows its console output is UTF-8, so Cyrillic names print correctly.
 
 ## Frame (`Tick`)
 
@@ -457,7 +495,7 @@ Plus the modules' own: `patch.*` (patch), `data.*`, `power.*`, `rigging.*` (elec
 
 ## Tests
 
-`tests/Candela.Engine.Tests` (131 tests, ≈ 1.5 min; the Vulkan tests run one at a time on lavapipe and are skipped without
+`tests/Candela.Engine.Tests` (149 tests, ≈ 4 min; the Vulkan tests run one at a time on lavapipe and are skipped without
 a device):
 
 * **Фокина.mvr**: opens with 91 fixtures, one substitute per model the library lacks (4 today) and no errors; Depence's
@@ -470,6 +508,14 @@ a device):
   light per lit beam — every fixture lit, the pixel-mapped MagicBlade stand-in included, except a pure strobe between
   flashes — with no field wider than 4 × its beam and nothing clamped; identical results for identical input
   sequences; export → reopen keeps ids, specs and addresses.
+* **Install layout** (`InstallLayoutTests`): an installed copy (a temporary program folder with `data/specs`,
+  `samples` and starter fixtures) finds its files next to the program and ignores the repository; the development
+  layout uses the repository; library folders are the configured ones, then the starter fixtures; specs are found next
+  to a library folder, then in the installed copy, then in the repository; an installed engine without a library opens
+  Фокина.mvr with all 91 fixtures resolved from the four starter GDTFs; the CLI's `--library` replaces the settings'
+  folders and finds specs for them; `AddLibraryFolder` adds a folder's files, raises `FixtureLibraryChanged` with
+  source `Folder`, skips names already known and fails with a reason for a missing folder; GDTF counting reads only
+  the folder itself and never throws; the default user library is `Documents/Candela/Fixture Library`.
 * **MVR export fidelity** (`MvrExportFidelityTests`): Фокина exported without edits names the source's `GDTFSpec` and
   `GDTFMode` for all 91 fixtures — the stand-ins' requested models with the source's stub files byte for byte, the
   Zonda 3 FX stubs as the library's complete GDTF of the same model — and reopens to the same specs, modes, patch and

@@ -33,7 +33,7 @@ public sealed partial class StageEngine : IDisposable
 {
     private readonly StageLightCollector _lights = new();
     private readonly List<IIssueProvider> _providers = new();
-    private readonly IReadOnlyList<Issue> _libraryIssues = Array.Empty<Issue>();
+    private IReadOnlyList<Issue> _libraryIssues = Array.Empty<Issue>();
     private ProjectData _project;
     private Scene _scene;
     private readonly CableAnchorIndex _cableAnchors = new();
@@ -58,7 +58,7 @@ public sealed partial class StageEngine : IDisposable
         Options = options ?? new StageEngineOptions();
         CacheDirectory = Options.CacheDirectory ?? ConfigPaths.CacheDir;
         Issues = new IssueLog();
-        Library = Options.Library ?? LoadLibrary(Options, out _libraryIssues);
+        Library = Options.Library ?? LoadLibrary(Options, out _libraryIssues, out _missingLibraryFolders);
         Profiles = new FixtureProfileCache(Library);
         _project = new ProjectData(new Scene());
         _scene = _project.Scene;
@@ -563,10 +563,11 @@ public sealed partial class StageEngine : IDisposable
         Simulation.OnSceneChanged(change);
     }
 
-    private static FixtureLibrary LoadLibrary(StageEngineOptions options, out IReadOnlyList<Issue> issues)
+    private static FixtureLibrary LoadLibrary(StageEngineOptions options, out IReadOnlyList<Issue> issues, out IReadOnlyList<string> missingFolders)
     {
         var found = new List<Issue>();
         issues = found;
+        missingFolders = Array.Empty<string>();
         var folders = options.LibraryFolders.Where(f => !string.IsNullOrWhiteSpace(f)).ToList();
         FixtureSpecsIndex? specs = null;
         try
@@ -584,13 +585,13 @@ public sealed partial class StageEngine : IDisposable
         }
 
         var existing = folders.Where(Directory.Exists).ToList();
-        if (existing.Count == 0)
-        {
-            found.Add(new Issue(IssueSeverity.Warning, IssueCategory.Program, EngineIssueCodes.LibraryMissing,
-                folders.Count == 0
-                    ? "No fixture library folder is set; only GDTF files inside projects and MVR files are available."
-                    : $"The fixture library folder(s) {string.Join(", ", folders.Select(f => $"'{f}'"))} do not exist."));
-        }
+        // Every configured folder that is missing is named, also when another folder exists: an installed copy always
+        // has its starter fixtures, and a library on an unplugged drive or an offline network share must not go unnoticed.
+        missingFolders = folders.Where(f => !existing.Contains(f, StringComparer.Ordinal)).ToList();
+        if (folders.Count == 0)
+            found.Add(new Issue(IssueSeverity.Warning, IssueCategory.Program, EngineIssueCodes.LibraryMissing, NoLibraryFolderMessage));
+        else if (missingFolders.Count > 0)
+            found.Add(MissingLibraryFoldersIssue(missingFolders));
         try
         {
             return FixtureLibrary.Scan(existing, specs);

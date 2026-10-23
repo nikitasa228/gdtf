@@ -142,6 +142,8 @@ public static class ImportWorker
         ArgumentException.ThrowIfNullOrEmpty(outputDirectory);
         ArgumentNullException.ThrowIfNull(options);
         Directory.CreateDirectory(outputDirectory);
+        // An installed program in a folder the ANSI code page cannot spell (C:\Users\Иван\…): see AssimpProgramFolder.
+        AssimpProgramFolder.Prepare();
         try
         {
             var model = ModelImporter.Import(input, options with { TextureKeyPrefix = "" });

@@ -18,7 +18,11 @@ internal static class Program
     internal const int ExitInputErrors = 4;
     internal const int ExitCancelled = 130;
 
-    private static int Main(string[] args) => Run(args, Console.Out, Console.Error);
+    private static int Main(string[] args)
+    {
+        using var console = Utf8ConsoleScope.Enter();
+        return Run(args, Console.Out, Console.Error);
+    }
 
     /// <summary>Runs a command line (also used by tests in-process).</summary>
     internal static int Run(string[] args, TextWriter output, TextWriter error)

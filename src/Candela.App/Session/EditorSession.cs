@@ -32,6 +32,9 @@ internal sealed record EditorSessionOptions
 
     /// <summary>Fixture models load on background threads (false: during the frame that needs them; tests).</summary>
     public bool LoadFixtureModelsInBackground { get; init; } = true;
+
+    /// <summary>Where the program's own files are (null: <see cref="InstallLayout.Current"/>; tests pass their own).</summary>
+    public InstallLayout? Layout { get; init; }
 }
 
 /// <summary>
@@ -42,7 +45,7 @@ internal sealed record EditorSessionOptions
 /// smoke, fire, sound, lights, render binding), re-runs the issue analysis shortly after edits, and applies the autosave
 /// interval of the settings. Nothing here throws for content problems: a damaged file is a failed result with a reason.
 /// </summary>
-internal sealed class EditorSession : IDisposable
+internal sealed partial class EditorSession : IDisposable
 {
     /// <summary>
     /// Most distinct program messages kept in the issues panel; an error repeated every frame is reported once, so
@@ -76,7 +79,8 @@ internal sealed class EditorSession : IDisposable
         _log = log ?? throw new ArgumentNullException(nameof(log));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _options = options ?? new EditorSessionOptions();
-        var engineOptions = _options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings);
+        Layout = _options.Layout ?? InstallLayout.Current;
+        var engineOptions = _options.Engine ?? StageEngineOptions.FromSettings(_settings.Settings, null, Layout);
         Engine = new StageEngine(engineOptions);
         // The cable tool's generic devices (splitters, nodes, dimmer) join the fixture library before any scene opens.
         GenericDeviceLibrary.Register(Engine);
@@ -85,6 +89,9 @@ internal sealed class EditorSession : IDisposable
         _entityExists = id => Engine.Scene.Find(id) is not null;
         _log.Info("Session", $"Stage engine ready: {Engine.Library.Count} fixtures in the library ({string.Join(", ", Engine.Library.Folders)}).");
     }
+
+    /// <summary>Where the program's own files are (sample scene, starter fixtures, documentation).</summary>
+    public InstallLayout Layout { get; }
 
     /// <summary>The stage engine (the open project, fixture library, DMX, simulations, render binding); never null.</summary>
     public StageEngine? Engine { get; }
@@ -312,9 +319,20 @@ internal sealed class EditorSession : IDisposable
         bool gdtf = kind == ImportKind.Gdtf || path.EndsWith(".gdtf", StringComparison.OrdinalIgnoreCase);
         // A file the library already has is selected, not added again (the message must not claim it was added).
         var known = gdtf ? EngineOrThrow.Library.FindByFileName(Path.GetFileName(path)) : null;
+        // A new GDTF is kept: copied into the user's library folder first, so it is in the library at the next start too.
+        string? copied = null;
+        if (gdtf && known is null && CopyIntoLibraryFolder(path, out bool created) is { } copy)
+        {
+            path = copy;
+            copied = created ? copy : null;
+        }
+
         var result = EngineOrThrow.Import(path, options);
         if (!result.Success)
         {
+            // A refused file does not stay in the library folder (it would be listed at the next start).
+            if (copied is not null)
+                DeleteCopy(copied);
             if (!gdtf)
                 return Failed(result);
             // A GDTF the engine refused (unreadable, no DMX mode): its reason, under a line in the UI language.
