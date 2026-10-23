@@ -109,7 +109,7 @@ internal static class SettingsCopy
         s.Width = Math.Clamp(s.Width, 16, 16384);
         s.Height = Math.Clamp(s.Height, 16, 16384);
         s.SamplesPerPixel = Math.Clamp(s.SamplesPerPixel, 1, 65536);
-        s.MaxBounces = Math.Clamp(s.MaxBounces, 1, 64);
+        s.MaxBounces = Math.Clamp(s.MaxBounces, 0, 64);
         s.MaxVolumeBounces = Math.Clamp(s.MaxVolumeBounces, 0, 64);
         s.FrameRate = double.IsFinite(s.FrameRate) ? Math.Clamp(s.FrameRate, 1, 240) : 25;
         s.OutputPath ??= "render.png";

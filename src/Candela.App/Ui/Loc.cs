@@ -95,7 +95,7 @@ internal static class Loc
         (Str.FileImportImage, "Image…", "Изображение…"),
         (Str.FileExport, "Export", "Экспорт"),
         (Str.FileExportMvr, "MVR Scene…", "Сцена MVR…"),
-        (Str.FileRender, "Render…", "Рендер…"),
+        (Str.FileRender, "Render", "Рендер"),
         (Str.FileSettings, "Settings…", "Настройки…"),
         (Str.FileExit, "Exit", "Выход"),
 
@@ -236,8 +236,6 @@ internal static class Loc
         (Str.RenderBounces, "Light bounces", "Отражений света"),
         (Str.RenderFormat, "Format", "Формат"),
         (Str.RenderStart, "Render", "Сделать рендер"),
-        (Str.RenderNotAvailable, "The path tracer arrives in a later milestone; final renders are not available yet.",
-            "Трассировщик путей появится в следующих этапах; финальный рендер пока недоступен."),
         (Str.RenderFrame, "Single frame", "Один кадр"),
         (Str.RenderRange, "Timecode range", "Диапазон таймкода"),
         (Str.RenderRangeStart, "From (s)", "С (с)"),
@@ -329,7 +327,6 @@ internal static class Loc
         (Str.BrowserImages, "Images", "Изображения"),
         (Str.BrowserMvr, "MVR scenes", "Сцены MVR"),
 
-        (Str.MsgNotAvailableTitle, "Not Available Yet", "Пока недоступно"),
         (Str.MsgEngineMissing, "{0} needs the stage engine, which is not part of this build yet. Nothing was changed.",
             "Для операции «{0}» нужен движок сцены, которого ещё нет в этой сборке. Ничего не изменено."),
         (Str.MsgOk, "OK", "ОК"),

@@ -96,7 +96,7 @@ windows have no OS decorations).*
 | Library | the engine's fixture library by category with 3D thumbnails and a rotating hover preview, the user's models and images; drag into a viewport to place (see [Library](#library)) |
 | Properties | name, visibility, lock, layer, numeric transform (metres or feet, Euler degrees), components, wall material |
 | Preview | real-time quality settings of the viewports (shadows, volumetrics, indirect light, bloom, exposure …) |
-| Render | final render settings (resolution, samples, bounces, format, frame range); *Render* asks the session |
+| Render | the final render: path tracer or Fast mode, PNG or PNG + EXR, resolution, samples, bounces, volume bounces, denoising, frame or timecode range; *Render* (also File → Render, F12) starts it with progress, picture, *Cancel* and *Open folder* |
 | Issues | errors / warnings / notes with severity toggles, category filter and search; click selects and frames; the tooltip shows the whole message and the issue code |
 | Console | the editor log with level filter, text filter and auto-scroll |
 
@@ -583,7 +583,7 @@ data or power row of a fixture's patch is clicked (`StageToolState.CableLinkRequ
 
 | Menu | Items |
 |---|---|
-| File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image, GDTF fixture), Export (MVR scene), Render…, Settings…, Exit |
+| File | New, Open…, Open Recent, Save, Save As…, Import (Candela project, 3D model, MVR scene, image, GDTF fixture), Export (MVR scene), Render (F12: starts a render with the Render panel's settings), Settings…, Exit |
 | Edit | Undo / Redo (with the step name), Cut, Copy, Paste, Duplicate, Delete, Select All, Deselect |
 | View | Shading, Projection, Camera views, Overlay, Work Light (Off / Auto / On), Grid, Statistics, View cube, Frame selection, New viewport, Reset layout |
 | Tools | Select, Move, Rotate, Wall, Floor, Cable (the tool, then every cable type with its colour), Snapping, Local/World space, Open White (all fixtures), Pause Simulation |
@@ -678,7 +678,7 @@ one step, not one per frame. Without an open stage the panels show an empty stat
 | Properties | current state of a fixture, manual controls for every attribute of its mode, DMX patch, manufacturer data, connectors with the cable in each port; size and material of walls, floors and models |
 | External Control | the fifteen show-control protocols with support level, settings and live status; universe activity and 512-slot view; sources; timecode; merge mode; Art-Net test show; DMX recorder |
 | Preview | real-time quality of every viewport, exposure (with a light meter), haze, ambient light and grid of the stage; presets |
-| Render | still frames or image sequences of a timecode range at the highest real-time quality; presets |
+| Render | path-traced still frames or image sequences of a timecode range (PNG and linear HDR EXR, like `candela render --final`), or the Fast real-time mode; presets |
 
 ### Properties
 
@@ -860,9 +860,9 @@ another address feeds a second Candela or any Art-Net node. An empty stage gets 
 
 ### Preview
 
-![Preview and Render panels](images/editor-preview-render.png)
+![Preview panel](images/editor-preview-render.png)
 
-*Preview (left) and Render (right) with their preset drop-downs.*
+*The Preview panel with its preset drop-down.*
 
 **Quality**: resolution scale, shadows (map size, lights with shadows), volumetric light (volume slices, sharp beams),
 temporal accumulation, indirect light (off / reflective shadow maps / ray traced). **Image**: bloom (intensity), tone
@@ -882,24 +882,72 @@ the current values are saved in the project (`settings.json`, section `view`) an
 
 ### Render
 
-**Output**: folder (default `Pictures/Candela`), file name and format (PNG; EXR needs the path tracer and is disabled
-with that reason). **Quality**: resolution (with common sizes) and samples per pixel, tone mapper; the panel shows the
-plan, e.g. *2× supersampling, 64 accumulated frames → 1920 × 1080 PNG*. **Frame or timecode range**: a single frame, or
-start and end (timecode `HH:MM:SS:FF` or seconds) and frame rate of the DMX recording. **Work light**: Off by default —
-a final render shows the fixtures' light only, whatever the preview uses —; Auto or On adds it to this render (not saved
-with the preset). **Path tracer**: bounces, volume bounces and denoising, kept for the final renderer.
+| While it renders (F12 on a small hazy stage) | The PNG it wrote (320 × 180, 32 samples, denoised) |
+|---|---|
+| ![Render panel while path tracing](images/editor-render-panel.png) | ![Path-traced result](images/editor-render-result.png) |
 
-Final path tracing is not available yet, and the panel says so: **Render uses the real-time renderer at its highest
-quality** — 2048-texel shadow maps for up to 256 lights, 256 volume slices, ray-marched beams, indirect light on — and
-renders at twice the resolution in each direction (when the target stays within 8192 pixels) for `samples ÷ 4` frames
-of temporal accumulation (up to 256), averages the last four frames read back and filters them down to the output
-size. A **timecode range** renders an image sequence
-(`name_0001.png`, …): the job takes over the engine clock (the editor stops ticking the stage with wall-clock time),
-plays the recording from two seconds before the start so moving heads and fades have arrived, and for every frame seeks
-the player, ticks the engine by one frame period and renders. The job runs a slice per editor frame (about 60 ms) with
-a progress bar and *Cancel*, so the editor stays usable; errors (folder not writable, disk full, a GPU error such as a
-lost device or a target too large for the GPU) stop it with the reason, and a cancelled or failed sequence stops the
-recording playback it started.
+*The Render panel undocked during a path-traced render — progress bar with frame and samples, the time spent and left,
+Cancel and Stop and save, the progress image under* Result *— and the picture it wrote: three moving heads in haze of
+0.04 m⁻¹, the light scattered in the air and bounced off the floor onto the back wall (lavapipe).*
+
+**Output**: folder (default `Pictures/Candela`), file name and format — *PNG*, or *PNG + EXR*, which also writes the
+linear HDR OpenEXR next to the PNG (`name.exr`; disabled in the Fast mode and on a GPU without ray queries, with that
+reason). **Quality**: the **renderer** — *Path traced* (default) or *Fast (real-time)*; kept for the session —,
+resolution (with common sizes, up to 16 384 px per side) and samples per pixel, tone mapper and **work light** (Off by
+default — a final render shows the fixtures' light only, whatever the preview uses —; Auto or On adds it to this render,
+not saved with the preset); the panel shows the plan, e.g. *Path traced, 256 samples per pixel → 1920 × 1080 PNG + EXR*.
+**Frame or timecode range**: a single frame, or start and end (timecode `HH:MM:SS:FF` or seconds) and frame rate of the
+DMX recording. **Path tracer**: surface **bounces** per light path (0 = no light at all on surfaces, 1 = direct light
+only), **volume bounces** (scattering events in haze and smoke per path: 0 = no light scattered in the air, 1 = single
+scattering, 2 and more = multiple scattering) and **denoise** (the edge-aware denoiser guided by albedo, normals and
+depth); all three are kept with the preset.
+
+**Render**, **File → Render** and **F12** start a render with the panel's current settings (and bring the panel to the
+front; while a render runs they leave it alone). The camera is the active viewport's (its view, field of view and
+EV100); auto exposure, metering and exposure compensation come from the Preview panel, the background from the viewport.
+
+* **Path traced** (`RenderJobRunner`, `RenderMode.PathTraced`): the job starts the path tracer
+  (`IRenderer.StartFinalRender`, the same light transport as `candela render --final` — bounced light between
+  surfaces, multiple scattering in haze and smoke, see [rendering.md](rendering.md#stage-3-the-path-tracer-final-render))
+  and calls `IFinalRender.Advance` once per editor frame with what is left of the frame's 60 ms budget, in dispatches
+  planned at 20 ms (`VulkanFinalRender.DispatchSeconds`; the renderer's own 0.25 s would hold every editor frame that
+  long on a large image), so the editor stays usable while it renders. The stage stands still meanwhile (the job holds
+  the engine clock from the moment the render starts); before the first sample it waits, without blocking the editor,
+  for fixture models still loading in the background (at most 30 s). The picture below the buttons shows the progress
+  image about once a second — less often when one progress image costs more than a tenth of that time (a large or
+  denoised image on a slow GPU) — scaled to at most 1024 px; the progress bar shows the frame and the samples
+  (*Frame 1/1 · 37/256 samples*), and the line under it the time spent and the time left.
+  When the samples are done the frame is written exactly like `candela render --final`: the tone-mapped PNG
+  (`IFinalRender.Preview`, denoised when asked) and, with *PNG + EXR*, the EXR — the result as R, G, B, A (32-bit
+  float, linear Rec.2020 scaled by the PNG's exposure; the header's `whiteLuminance` = 1 / exposure turns the values
+  back into cd/m²), the raw result as the layer `raw` when denoised, and the denoiser's guides `albedo`, `N` and `Z`.
+  The same camera, settings and seed give the same files as the command line (a test renders `Фокина.mvr` both ways
+  and compares them). *Stop and save* stops sampling and writes the image with the samples done so far; *Cancel*
+  stops at once — no further GPU work is issued, the frame in progress is dropped, files already written stay.
+* **Fast**: the real-time renderer at its highest quality — 2048-texel shadow maps for up to 256 lights, 256 volume
+  slices, ray-marched beams, indirect light on — rendered at twice the resolution in each direction (when the target
+  stays within 8192 pixels) for `samples ÷ 4` frames of temporal accumulation (up to 256); the last four frames read
+  back are averaged and filtered down to the output size, written as PNG (seconds instead of minutes, no bounces, volume
+  bounces or denoising).
+* **No ray queries**: on a GPU without ray tracing support (`RendererInfo.SupportsRayTracing` false) the panel says so
+  under the renderer row (*This GPU has no ray queries (…), so Render uses the Fast real-time mode*), *PNG + EXR* is
+  disabled, and a path-traced render runs in the Fast mode; its result line ends with *rendered in the Fast real-time
+  mode*.
+
+A **timecode range** renders an image sequence (`name_0001.png`, …, with *PNG + EXR* also `name_0001.exr`, …): the job
+takes over the engine clock (the editor stops ticking the stage with wall-clock time), plays the recording from two
+seconds before the start so moving heads and fades have arrived, and for every frame seeks the player, ticks the engine
+by one frame period and renders it; the first frame is the range's start even when the stage was ticked once more after
+the render started. Path traced with auto exposure, the first frame's metered exposure is kept for the rest of the
+sequence (no flicker between frames), as on the command line — with the Preview panel's exposure compensation counted
+once, not again on every following frame. Opening, creating or recovering another stage (File → Open, New, recovery —
+they replace the scene inside the editor's one engine) cancels a running render, and *Stop and save* then writes
+nothing: the samples belong to the stage that was closed. An output folder that disappears during a render is created
+again before the frame is written. Errors (folder not writable, disk full, a GPU error such as a lost device or an
+image too large for the GPU) stop the job with the reason; a cancelled or failed sequence stops the recording playback
+it started. The result (*Written …*, *Stopped at 37 samples per pixel; written
+…*, the failure) appears in the panel, the status bar and the log; **Open folder** shows the folder of the last file
+written in the system's file manager.
 
 ### Overlay legends
 
@@ -929,7 +977,9 @@ src/Candela.App/
             render job), PresetBinding / SettingsCopy (live settings ↔ preset library ↔ project), FixtureControls
             (attributes of a mode → controls, live state), ManualAttributeCommand, SetFieldCommand, DeviceFacts
             (manufacturer rows, ports and cables), ExternalControl (protocol settings, status polling, test show,
-            recorder), RenderJob (RenderJobRunner: plan, supersampling, accumulation, timecode sequences)
+            recorder), RenderJob (RenderJobRunner: path tracer driven per frame — Advance within the frame's budget,
+            progress images, PNG + EXR like the CLI, Stop and save, Cancel —, the Fast mode's plan, supersampling and
+            accumulation, the fall-back without ray queries, timecode sequences)
   Panels/   StagePropertiesSection → FixtureInspectorView, DeviceFactsView, SurfaceInspectorView; ExternalControlPanel;
             PreviewPanel; RenderPanel
   Viewport/ OverlayLegend (legend window of a viewport)
@@ -950,10 +1000,26 @@ a port, every connector drawing), `ExternalControlTests` (the acceptance path en
 Art-Net console sends DMX and timecode, the source, universe activity and fixture state appear —, the test show,
 recording / playback / seeking / saving, settings files, timecode parsing), `PresetsAndOverlayTests` (presets, Custom,
 project adoption, gradient editing rules, legends, Preview / Render / legend drawing under a window-less ImGui context)
-and `RenderJobTests` (the plan, a frame and a timecode sequence rendered on a headless Vulkan device and checked
-pixel by pixel).
+`RenderJobTests` (the Fast mode's plan, a frame and a timecode sequence rendered on a headless Vulkan device and
+checked pixel by pixel) and `FinalRenderJobTests` (the path tracer in the editor: `Фокина.mvr` rendered by the job and
+by `candela render --final` with the same camera and samples, PNG and EXR compared within the noise; one test each for
+samples, bounces, volume bounces and denoise changing the output; the editor staying responsive — every step returns
+within its budget, the progress image updates — and *Cancel* stopping within one frame; the fall-back to the Fast mode
+without ray queries and the panel's note; F12 and File → Render starting a render with the panel's settings) and
+`FinalRenderReviewTests` (a scene replaced inside the same engine — File → New or Open — cancelling a running still or
+sequence, also *Stop and save*; a path-traced sequence with auto exposure and +2 EV compensation writing PNG and EXR
+frames with one exposure, on the GPU and with a stand-in path tracer; the first frame of a sequence at the range start
+after one more editor tick; a 960 × 540 path-traced render advancing within the frame budget; progress images once a
+second, or less often when they are expensive; an output folder deleted during the render; zero surface bounces
+leaving surfaces unlit, as the bounce row's tooltip says).
 
-Limitations: final path tracing and EXR output wait for the path tracer; the issue messages of the engine (patch, MVR
+Limitations: the path tracer runs on the editor's GPU between its frames, so the viewports update more slowly while
+it renders (each editor frame spends about 60 ms on it, plus at most about one 20 ms dispatch); the light of a running
+path-traced frame is fixed when the frame starts while edits of geometry and materials reach it at once (edit the stage
+before rendering, or cancel and render again); a write error (disk full) ends the job and the frame's samples are lost;
+the first
+path-traced render of a session also compiles the path tracer's pipelines, which holds the editor for a moment; the
+issue messages of the engine (patch, MVR
 import) and the operating system's messages quoted in a protocol error stay English (the protocols' own status texts
 are localised); changes of the view settings count as unsaved changes but are not undo steps.
 
@@ -1136,7 +1202,7 @@ changes). Allocations happen on user actions (edits, opening menus and dialogs, 
 
 ## Tests
 
-`tests/Candela.App.Tests` (xUnit, about 630 tests, about five minutes on lavapipe; the end-to-end runs whose checks do not depend
+`tests/Candela.App.Tests` (xUnit, about 655 tests, three to five minutes on lavapipe; the end-to-end runs whose checks do not depend
 on lit pixels use Colorless shading, since on lavapipe the lit preview of a dark rig — with the Auto work light's
 shadowed key — takes about twice the frame time) covers everything that does not need a window:
 camera math (orthonormal basis, axis views, pan / zoom-to-cursor keeping the point under the cursor, framing, rays),
@@ -1242,6 +1308,19 @@ reference drawing shows its red and green halves in Full and Colorless shading w
 image's own sRGB pixels (±6/255: display-referred, not tone mapped) — and a poster of the same image is dark until the
 work light is on, then shows its image.
 
+The path-traced final render (`FinalRenderJobTests`, on the headless Vulkan device — lavapipe has ray queries):
+`Фокина.mvr` with every fixture at open white rendered by the Render panel's job and by `candela render --final` (run in
+its own process, with an empty configuration) with the same camera, exposure and 4 samples per pixel — the PNGs agree
+block by block and in mean brightness, the EXRs have the same layers, `whiteLuminance` and mean luminance; in a small
+hazy room one test per setting: 32 samples per pixel are less than 0.6 times as noisy as 2, four surface bounces light
+the wall that direct light leaves dark, two volume bounces make the air around the beam glow, denoising lowers the noise
+(and the EXR gains the `raw` layer); a long render stepped like editor frames — every sampling frame within 0.6 s on
+lavapipe, the progress image renewed about once a second, *Cancel* ending the job at once with no further work and no
+file — and *Stop and save* writing the samples done; with the memory renderer (no ray queries) the panel's note, the Fast
+plan and a render that falls back and says so; the Render command with the panel's settings (renderer, size, samples,
+bounces, volume bounces, denoising, tone mapper, EXR, work light, exposure) leaving a running render alone; F12 bound to
+it; and the real editor under `xvfb-run` rendering a project's stage twice, once by F12 and once by File → Render.
+
 The install tests: `InstallExperienceTests` (when the fixture library window opens at start-up — installed copy
 without a library of the user's own, never headless, in development or with a file to open, always with
 `--library-setup`; a folder counted with its subfolders, a missing one; a chosen folder put first in the settings and
@@ -1273,7 +1352,7 @@ written).
   mode and unpatched (its ghost is a 1 m box), and the engine reports the file in the Issues panel.
 * Thumbnails are rendered on a second (headless) Vulkan device in the background; without one (or before it has
   started) the Library shows category icons instead.
-* *Render* in the Render panel still answers that final rendering is not available yet (it comes with the Render
-  panel's job runner).
+* The path tracer needs ray queries (`VK_KHR_ray_query`): on other GPUs the Render panel renders in the Fast real-time
+  mode (PNG only) and says so.
 * File dialogs are the editor's own browser on every platform (no native OS dialogs).
 * Multi-object editing in the Properties panel edits the primary object; the gizmo moves all selected objects.

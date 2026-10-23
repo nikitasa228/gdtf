@@ -13,7 +13,7 @@ internal enum MessageKind
     /// <summary>Information.</summary>
     Info,
 
-    /// <summary>Something is not available yet / a warning.</summary>
+    /// <summary>A warning.</summary>
     Warning,
 
     /// <summary>An error.</summary>
@@ -21,7 +21,7 @@ internal enum MessageKind
 }
 
 /// <summary>
-/// Modal message boxes (one at a time, queued): "not available yet" notices, errors that need attention, confirmations.
+/// Modal message boxes (one at a time, queued): warnings and errors that need attention, confirmations.
 /// </summary>
 internal sealed class MessageBoxes
 {

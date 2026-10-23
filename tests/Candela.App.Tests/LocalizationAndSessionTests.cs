@@ -72,7 +72,6 @@ public sealed partial class LocalizationTests : IDisposable
     [InlineData(nameof(Str.PanelRender))]
     [InlineData(nameof(Str.PanelPreview))]
     [InlineData(nameof(Str.PanelSettings))]
-    [InlineData(nameof(Str.MsgNotAvailableTitle))]
     public void Menus_and_panel_titles_are_russian(string name)
     {
         var key = Enum.Parse<Str>(name);

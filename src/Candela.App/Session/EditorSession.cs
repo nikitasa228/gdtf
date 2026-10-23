@@ -366,13 +366,6 @@ internal sealed partial class EditorSession : IDisposable
         return Done(Loc.Format(Str.MsgExported, Path.GetFileName(path)), result);
     }
 
-    /// <summary>Render panel → Render (final, path-traced frame or timecode range).</summary>
-    public SessionResult StartFinalRender(FinalRenderSettings settings)
-    {
-        ArgumentNullException.ThrowIfNull(settings);
-        return SessionResult.NotAvailable(Loc.Get(Str.RenderNotAvailable));
-    }
-
     /// <summary>Autosaved sessions of earlier runs that did not end cleanly, newest first (start-up recovery prompt).</summary>
     public IReadOnlyList<RecoverableSession> FindRecoverable()
     {

@@ -185,7 +185,6 @@ internal enum Str
     RenderBounces,
     RenderFormat,
     RenderStart,
-    RenderNotAvailable,
     RenderFrame,
     RenderRange,
     RenderRangeStart,
@@ -280,7 +279,6 @@ internal enum Str
     BrowserMvr,
 
     // Messages
-    MsgNotAvailableTitle,
     MsgEngineMissing,
     MsgOk,
     MsgCancel,
