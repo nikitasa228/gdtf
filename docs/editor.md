@@ -1290,7 +1290,11 @@ for more than the GPU's texture size, dragging a scale slider changes nothing un
 every font size builds the atlas without the FreeType "out of texture memory" assert), `UiTextureLifecycleTests`
 (released thumbnails and hover frames are destroyed by a stand-in for the Vulkan backend once unused for the swapchain's
 image count and freed — 300 hovers of 24-frame previews keep the count bounded; the 400-texture budget refuses and
-recovers; three of the four fail without the frame counting) and `SmokeOverlayEditorTests` (the overlay in the viewport
+recovers; three of the four fail without the frame counting; freed textures leave Dear ImGui's backend texture list at
+once, which the Vulkan backend's shutdown walks), `LibraryHoverEndToEndTests` (the real editor with the real Vulkan
+backend and the validation layer hovers Library tiles by script with the texture cap lowered to 32 through the
+`libraryTextureCap` script setting: released pictures are destroyed a few frames later — before the fix none was — and
+no destruction touches an image in flight) and `SmokeOverlayEditorTests` (the overlay in the viewport
 selector, the View menu and Alt+H; its gradient bound to the project and its presets; the legend and the emitter labels
 — *Hazer SL · haze 60 %, fan 100 %*, *Fogger SR · fog off*, in Russian *дымка … вентилятор … выкл.* — follow the
 outputs, keep unchanged labels, drop removed devices). `EditorEndToEndTests` start the real editor under `xvfb-run` with scripted input: open the Фокина

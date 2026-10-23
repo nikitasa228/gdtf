@@ -255,16 +255,17 @@ public sealed unsafe class UiScaleRegressionTests : IDisposable
     [SkippableFact]
     public void The_editor_survives_the_whole_scale_range_in_both_directions()
     {
-        // The real editor at the reporter's window size: the settings window open, the scale set frame after frame over
-        // the whole slider range up and down (as the old slider applied it while dragging), with the smallest and the
-        // largest font. Before the fix this aborted in Dear ImGui after a few dozen values (exit code 134).
+        // The real editor with the settings window open, the scale set frame after frame over the whole slider range up
+        // and down (as the old slider applied it while dragging), with the largest font (the most glyph-atlas space; the
+        // headless sweep above covers every font size). Before the fix this aborted in Dear ImGui after a few dozen values
+        // (exit code 134).
         var actions = new List<string>
         {
             """{ "type": "wait", "frames": 2 }""",
             """{ "type": "menu", "path": "File/Settings" }""",
             """{ "type": "wait", "frames": 2 }""",
         };
-        foreach (string font in new[] { "28", "11" })
+        foreach (string font in new[] { "28" })
         {
             actions.Add($$"""{ "type": "setting", "name": "fontSize", "value": "{{font}}" }""");
             for (int percent = 100; percent <= 300; percent += 8)
