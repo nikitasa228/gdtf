@@ -32,7 +32,17 @@ internal static class StartupFailureScreen
         }
 
         log.Error("Startup", $"{title}. {detail}");
-        if (!interactive || !GlfwPlatform.IsInitialized)
+        if (!interactive)
+            return;
+        if (NativeShell.HasMessageBoxes)
+        {
+            // Windows: the operating system's message box. The Dear ImGui backends cannot even be loaded without the
+            // Vulkan runtime (they link vulkan-1.dll), so an ImGui window is no option there.
+            ShowNative(reason, log);
+            return;
+        }
+
+        if (!GlfwPlatform.IsInitialized)
             return;
         try
         {
@@ -42,6 +52,23 @@ internal static class StartupFailureScreen
         {
             log.Warn("Startup", $"The error window could not be shown: {e.Message}");
         }
+    }
+
+    /// <summary>
+    /// The native message box: what is missing (the Vulkan runtime, or a Vulkan 1.3 device), the graphics card, the
+    /// driver download pages and the log file; Yes opens the card maker's driver page.
+    /// </summary>
+    private static void ShowNative(string reason, AppLog log)
+    {
+        bool loader = GraphicsDriverHelp.VulkanLoaderPresent();
+        var adapter = GraphicsDriverHelp.MainAdapter(GraphicsDriverHelp.DisplayAdapters());
+        string? page = adapter is { } a ? GraphicsDriverHelp.DriverPage(a.Vendor) : null;
+        log.Info("Startup", $"Vulkan runtime {(loader ? "present" : "missing")}; graphics adapter: {adapter?.Name ?? "unknown"}.");
+        string message = GraphicsDriverHelp.Message(reason, loader, adapter, log.FilePath ?? Diagnostics.AppFolders.LogFile, page is not null);
+        bool? answer = NativeShell.ShowMessage(InstallLoc.Get(InstallStr.NoVulkanTitle), message,
+            page is null ? NativeButtons.Ok : NativeButtons.YesNo, NativeIcon.Error);
+        if (answer == true && page is not null)
+            NativeShell.Open(page, log);
     }
 
     private static unsafe void RunWindow(string title, string text, string detail, AppLog log)

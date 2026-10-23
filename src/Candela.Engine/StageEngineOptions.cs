@@ -67,19 +67,29 @@ public sealed record StageEngineOptions
     public string NetworkInterface { get; init; } = "";
 
     /// <summary>
-    /// Options for a program run: library folders and specs from the settings; when the settings list no library folder,
-    /// the folder that contains <c>Candela.sln</c> (searched upwards from the program and from the current directory) is
-    /// used, which is the bundled library during development.
+    /// Options for a program run from the user's settings, located by <see cref="InstallLayout.Current"/>: the library
+    /// folders of the settings (or the repository during development, when none is set), then the starter fixtures of an
+    /// installed copy; the specs of the settings, else the ones next to a library folder, the installed copy or the
+    /// repository's (see <see cref="InstallLayout"/> for the order).
     /// </summary>
-    public static StageEngineOptions FromSettings(AppSettings settings)
+    public static StageEngineOptions FromSettings(AppSettings settings) => FromSettings(settings, null, InstallLayout.Current);
+
+    /// <summary>
+    /// Options for a program run from the user's settings with the library folders <paramref name="libraryFolders"/>
+    /// instead of the settings' ones (the CLI's <c>--library</c>; null or empty keeps the settings' folders), located by
+    /// <paramref name="layout"/> (default <see cref="InstallLayout.Current"/>).
+    /// </summary>
+    public static StageEngineOptions FromSettings(AppSettings settings, IReadOnlyList<string>? libraryFolders, InstallLayout? layout = null)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        var folders = settings.LibraryFolders.Where(f => !string.IsNullOrWhiteSpace(f)).ToList();
-        if (folders.Count == 0 && DevelopmentLibrary.FindRepositoryRoot() is { } root) folders.Add(root);
+        layout ??= InstallLayout.Current;
+        var configured = libraryFolders is { Count: > 0 } ? libraryFolders : settings.LibraryFolders ?? new List<string>();
+        var folders = layout.LibraryFoldersFor(configured);
+        string? specs = string.IsNullOrWhiteSpace(settings.SpecsIndexPath) ? layout.FindSpecsIndex(folders) : settings.SpecsIndexPath;
         return new StageEngineOptions
         {
             LibraryFolders = folders,
-            SpecsIndexPath = string.IsNullOrWhiteSpace(settings.SpecsIndexPath) ? null : settings.SpecsIndexPath,
+            SpecsIndexPath = specs,
             ArtNetUniverseOffset = settings.ArtNetUniverseOffset,
             NetworkInterface = settings.NetworkInterface ?? "",
         };

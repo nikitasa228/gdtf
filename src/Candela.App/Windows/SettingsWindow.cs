@@ -592,12 +592,15 @@ internal sealed class SettingsWindow
                 {
                     s.LibraryFolders.Add(path);
                     Changed();
+                    // The running engine reads the new folder at once (its fixtures appear in the Library panel).
+                    if (_ctx.Session.Engine is { } engine)
+                        _ctx.Log.Info("Library", engine.AddLibraryFolder(path).Summary);
                 }
             });
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
-        SafeText.Wrapped(Loc.Get(Str.SettingsRestartNote));
+        SafeText.Wrapped(InstallLoc.Get(InstallStr.SettingsAppliedNow));
         ImGui.PopStyleColor();
     }
 

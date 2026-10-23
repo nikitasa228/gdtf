@@ -1,0 +1,373 @@
+using Candela.Core.Diagnostics;
+using Candela.Core.Settings;
+using Candela.Gdtf;
+
+namespace Candela.Engine.Tests;
+
+/// <summary>
+/// The installed layout (docs/install.md): resources found relative to the program folder — also one with spaces and
+/// Cyrillic letters, outside the repository —, the lookup order of library folders and researched specs, the starter
+/// fixtures that let the sample scene open without a library, and library folders added while the program runs.
+/// </summary>
+public sealed class InstallLayoutTests : IDisposable
+{
+    /// <summary>The GDTF files the sample scene resolves to (packaging/windows/starter-fixtures.txt).</summary>
+    private static readonly string[] StarterFixtures =
+    [
+        "Ayrton@Zonda_3_FX@V1.81_Corrected_Factory_Tilt.gdtf",
+        "Ayrton@MagicPanel_602@V2.5_Add_Mode.gdtf",
+        "Ayrton@Rivale_Wash@V1.8_Correct_Gobo_Value.gdtf",
+        "Martin_Professional@VDO_Atomic_Bold@20260620.gdtf",
+    ];
+
+    // Outside the repository on purpose: walking up from these folders must not find the repository's _specs.
+    private readonly string _root = Path.Combine(Path.GetTempPath(), "candela-install-tests-" + Guid.NewGuid().ToString("N"));
+
+    public void Dispose()
+    {
+        try
+        {
+            Directory.Delete(_root, recursive: true);
+        }
+        catch (IOException)
+        {
+            // Best effort.
+        }
+    }
+
+    /// <summary>A program folder like the installer's, at a path with spaces and Cyrillic letters.</summary>
+    private string MakeInstalledProgram(bool withStarters = true)
+    {
+        string program = Path.Combine(_root, "Program Files", "Свет тест", "Candela");
+        string specs = Path.Combine(program, "data", "specs");
+        Directory.CreateDirectory(specs);
+        File.Copy(Path.Combine(TestEnvironment.Root, FixtureSpecsIndex.DefaultRelativePath), Path.Combine(specs, "fixtures_index.json"));
+        string samples = Path.Combine(program, "samples");
+        Directory.CreateDirectory(Path.Combine(samples, "fixtures"));
+        File.Copy(TestEnvironment.Fokina, Path.Combine(samples, InstallLayout.SampleSceneFileName));
+        if (withStarters)
+        {
+            foreach (var name in StarterFixtures)
+                File.Copy(Path.Combine(TestEnvironment.Root, name), Path.Combine(samples, "fixtures", name));
+        }
+
+        Directory.CreateDirectory(Path.Combine(program, "docs"));
+        return program;
+    }
+
+    private string MakeFolder(params string[] parts)
+    {
+        string folder = Path.Combine([_root, .. parts]);
+        Directory.CreateDirectory(folder);
+        return folder;
+    }
+
+    [Fact]
+    public void An_installed_copy_finds_its_files_next_to_the_program()
+    {
+        string program = MakeInstalledProgram();
+        var layout = new InstallLayout(program, null);
+
+        Assert.True(layout.IsInstalled);
+        Assert.Equal(Path.Combine(program, "data", "specs", "fixtures_index.json"), layout.InstalledSpecsIndex);
+        Assert.Equal(Path.Combine(program, "samples", "fixtures"), layout.StarterFixturesFolder);
+        Assert.Equal(Path.Combine(program, "samples", "Фокина.mvr"), layout.SampleScene);
+        Assert.Equal(Path.Combine(program, "docs"), layout.DocsFolder);
+    }
+
+    [Fact]
+    public void The_development_layout_uses_the_repository()
+    {
+        var layout = new InstallLayout(MakeFolder("bin"), TestEnvironment.Root);
+
+        Assert.False(layout.IsInstalled);
+        Assert.Null(layout.StarterFixturesFolder);
+        Assert.Equal(TestEnvironment.Fokina, layout.SampleScene);
+        Assert.Equal(Path.Combine(TestEnvironment.Root, "docs"), layout.DocsFolder);
+        Assert.Equal(new[] { TestEnvironment.Root }, layout.LibraryFoldersFor(null));
+        Assert.Equal(Path.Combine(TestEnvironment.Root, FixtureSpecsIndex.DefaultRelativePath), layout.FindSpecsIndex(Array.Empty<string>()));
+
+        // The test run itself is the development layout: the program is not installed and the repository is found.
+        Assert.False(InstallLayout.Current.IsInstalled);
+        Assert.Equal(TestEnvironment.Root, InstallLayout.Current.RepositoryRoot);
+    }
+
+    [Fact]
+    public void Library_folders_are_the_configured_ones_then_the_starter_fixtures()
+    {
+        var layout = new InstallLayout(MakeInstalledProgram(), null);
+        string starter = layout.StarterFixturesFolder!;
+        string mine = MakeFolder("Мои приборы");
+
+        Assert.Equal(new[] { starter }, layout.LibraryFoldersFor(null));
+        Assert.Equal(new[] { starter }, layout.LibraryFoldersFor(new[] { "", "  " }));
+        Assert.Equal(new[] { mine, starter }, layout.LibraryFoldersFor(new[] { mine }));
+        // configured explicitly (another spelling of the same folder) it is not listed twice
+        Assert.Equal(new[] { starter + Path.DirectorySeparatorChar }, layout.LibraryFoldersFor(new[] { starter + Path.DirectorySeparatorChar }));
+
+        // without starter files the folder is not used
+        var bare = new InstallLayout(Path.Combine(_root, "bare"), null);
+        Directory.CreateDirectory(Path.Combine(_root, "bare", "samples", "fixtures"));
+        Assert.Null(bare.StarterFixturesFolder);
+        Assert.Empty(bare.LibraryFoldersFor(null));
+    }
+
+    [Fact]
+    public void Specs_are_looked_up_next_to_a_library_then_in_the_installed_copy_then_in_the_repository()
+    {
+        string program = MakeInstalledProgram();
+        var installed = new InstallLayout(program, null);
+        var development = new InstallLayout(MakeFolder("dev-bin"), TestEnvironment.Root);
+
+        // a library that ships its own _specs (like the repository) wins, also from a subfolder of it
+        string ownSpecs = Path.Combine(MakeFolder("lib-with-specs", "_specs"), "fixtures_index.json");
+        File.WriteAllText(ownSpecs, "[]");
+        string sub = MakeFolder("lib-with-specs", "gdtf");
+        Assert.Equal(ownSpecs, installed.FindSpecsIndex(new[] { sub }));
+
+        // a plain folder of GDTF files: the installed copy, else the repository's
+        string plain = MakeFolder("plain library");
+        Assert.Equal(installed.InstalledSpecsIndex, installed.FindSpecsIndex(new[] { plain }));
+        Assert.Equal(Path.Combine(TestEnvironment.Root, FixtureSpecsIndex.DefaultRelativePath), development.FindSpecsIndex(new[] { plain }));
+        Assert.Null(new InstallLayout(MakeFolder("nothing"), null).FindSpecsIndex(new[] { plain }));
+
+        // malformed folder names never throw
+        Assert.Equal(installed.InstalledSpecsIndex, installed.FindSpecsIndex(new[] { "\0bad", "" }));
+    }
+
+    [Fact]
+    public void An_installed_engine_without_a_library_opens_the_sample_scene_with_the_starter_fixtures()
+    {
+        var layout = new InstallLayout(MakeInstalledProgram(), null);
+        var options = StageEngineOptions.FromSettings(new AppSettings(), null, layout);
+        Assert.Equal(new[] { layout.StarterFixturesFolder! }, options.LibraryFolders);
+        Assert.Equal(layout.InstalledSpecsIndex, options.SpecsIndexPath);
+
+        using var engine = new StageEngine(options with { CacheDirectory = MakeFolder("cache"), DmxParallelism = 2, SimulationParallelism = 2 });
+        Assert.Equal(StarterFixtures.Length, engine.Library.Count);
+        Assert.True(engine.Specs.Count >= 1091, $"{engine.Specs.Count} researched records");
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+        Assert.All(engine.Library.Entries, e => Assert.NotNull(e.Specs));
+
+        var result = engine.Open(layout.SampleScene!);
+        Assert.True(result.Success, result.Summary);
+        Assert.DoesNotContain(result.Issues, i => i.Severity == IssueSeverity.Error);
+        var fixtures = engine.Scene.All().Select(e => e.Get<Core.SceneGraph.Components.FixtureComponent>()).OfType<Core.SceneGraph.Components.FixtureComponent>().ToList();
+        Assert.Equal(91, fixtures.Count);
+        // every fixture is drawn with one of the four starter GDTFs (no stub, no unresolved type)
+        Assert.All(fixtures, f =>
+        {
+            var resolved = engine.Profiles.Resolve(f.GdtfSpec, f.GdtfMode);
+            Assert.True(resolved.Success, resolved.Error);
+            Assert.Equal(layout.StarterFixturesFolder, Path.GetDirectoryName(resolved.Entry!.FilePath));
+        });
+    }
+
+    [Fact]
+    public void The_command_line_library_replaces_the_settings_folders_and_finds_specs_for_them()
+    {
+        var layout = new InstallLayout(MakeInstalledProgram(), null);
+        string mine = MakeFolder("cli library");
+        var settings = new AppSettings { LibraryFolders = new List<string> { MakeFolder("from settings") } };
+
+        var fromSettings = StageEngineOptions.FromSettings(settings, null, layout);
+        Assert.Equal(new[] { settings.LibraryFolders[0], layout.StarterFixturesFolder! }, fromSettings.LibraryFolders);
+        var fromCommandLine = StageEngineOptions.FromSettings(settings, new[] { mine }, layout);
+        Assert.Equal(new[] { mine, layout.StarterFixturesFolder! }, fromCommandLine.LibraryFolders);
+        Assert.Equal(layout.InstalledSpecsIndex, fromCommandLine.SpecsIndexPath);
+
+        // a specs file chosen in the settings is used as it is
+        var chosen = StageEngineOptions.FromSettings(new AppSettings { SpecsIndexPath = "/somewhere/specs.json" }, new[] { mine }, layout);
+        Assert.Equal("/somewhere/specs.json", chosen.SpecsIndexPath);
+
+        // the CLI helper (the same settings file as the editor) puts --library first
+        var cli = Cli.CliArgs.EngineOptions(new[] { mine }, null);
+        Assert.Equal(mine, cli.LibraryFolders[0]);
+        Assert.NotNull(cli.SpecsIndexPath);
+    }
+
+    [Fact]
+    public void A_library_folder_added_at_run_time_reaches_the_library_and_its_listeners()
+    {
+        string folder = MakeFolder("Новая библиотека");
+        foreach (var name in StarterFixtures.Take(2))
+            File.Copy(Path.Combine(TestEnvironment.Root, name), Path.Combine(folder, name));
+        File.WriteAllText(Path.Combine(folder, "notes.txt"), "not a fixture");
+        Directory.CreateDirectory(Path.Combine(folder, "sub"));
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[3]), Path.Combine(folder, "sub", StarterFixtures[3]));
+
+        using var engine = new StageEngine(new StageEngineOptions
+        {
+            LibraryFolders = Array.Empty<string>(),
+            CacheDirectory = MakeFolder("cache-add"),
+            DmxParallelism = 2,
+            SimulationParallelism = 2,
+        });
+        Assert.Contains(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+        var changes = new List<FixtureLibraryChange>();
+        engine.FixtureLibraryChanged += changes.Add;
+
+        var result = engine.AddLibraryFolder(folder);
+
+        Assert.True(result.Success, result.Summary);
+        Assert.Equal(2, engine.Library.Count); // the subfolder is not read, like at start-up
+        var change = Assert.Single(changes);
+        Assert.Equal(FixtureLibraryChangeSource.Folder, change.Source);
+        Assert.Equal(2, change.Added.Count);
+        Assert.Contains(Path.GetFullPath(folder), engine.Library.Folders);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+
+        // again: nothing new, no event
+        var again = engine.AddLibraryFolder(folder);
+        Assert.True(again.Success);
+        Assert.Contains("already", again.Summary, StringComparison.Ordinal);
+        Assert.Single(changes);
+
+        // an empty folder is fine and says so; a missing one fails with the reason
+        var empty = engine.AddLibraryFolder(MakeFolder("empty"));
+        Assert.True(empty.Success);
+        Assert.Contains("no GDTF files", empty.Summary, StringComparison.Ordinal);
+        var missing = engine.AddLibraryFolder(Path.Combine(_root, "missing"));
+        Assert.False(missing.Success);
+        Assert.Contains(missing.Issues, i => i.Code == EngineIssueCodes.LibraryMissing);
+        Assert.False(engine.AddLibraryFolder("  ").Success);
+    }
+
+    [Fact]
+    public void A_configured_library_that_is_missing_is_reported_although_the_starter_fixtures_exist()
+    {
+        // Review regression: the starter fixtures of an installed copy always exist, so the start-up warning "the library
+        // folder does not exist" (only given when no folder existed) was never shown for a library on an unplugged drive
+        // or an offline network share: the user just saw four fixtures and stand-ins everywhere.
+        var layout = new InstallLayout(MakeInstalledProgram(), null);
+        string unplugged = Path.Combine(_root, "USB-диск", "GDTF");
+        string present = MakeFolder("Библиотека");
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[0]), Path.Combine(present, "Candela_Test@Present@1.gdtf"));
+        var settings = new AppSettings { LibraryFolders = new List<string> { unplugged, present } };
+        var options = StageEngineOptions.FromSettings(settings, null, layout);
+        Assert.Equal(new[] { unplugged, present, layout.StarterFixturesFolder! }, options.LibraryFolders);
+
+        using var engine = new StageEngine(options with { CacheDirectory = MakeFolder("cache-missing"), DmxParallelism = 2, SimulationParallelism = 2 });
+        var warning = Assert.Single(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+        Assert.Equal(IssueSeverity.Warning, warning.Severity);
+        Assert.Contains(unplugged, warning.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain(present, warning.Message, StringComparison.Ordinal);
+        Assert.Equal(StarterFixtures.Length + 1, engine.Library.Count);
+
+        // another folder brings fixtures: the missing one is still missing and still named
+        string other = MakeFolder("other");
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[1]), Path.Combine(other, "Candela_Test@Other@1.gdtf"));
+        Assert.True(engine.AddLibraryFolder(other).Success);
+        Assert.Contains(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing && i.Message.Contains(unplugged, StringComparison.Ordinal));
+
+        // the drive is plugged in and its folder added again: the warning goes, nothing else is lost
+        Directory.CreateDirectory(unplugged);
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[2]), Path.Combine(unplugged, "Candela_Test@Usb@1.gdtf"));
+        var back = engine.AddLibraryFolder(unplugged);
+        Assert.True(back.Success, back.Summary);
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+        Assert.Equal(StarterFixtures.Length + 3, engine.Library.Count);
+    }
+
+    [Fact]
+    public void Adding_a_folder_again_reads_the_files_that_arrived_since()
+    {
+        // The first-run window's Rescan: an empty default folder is added, files are copied into it in Explorer, the
+        // folder is added again and only the new files are read.
+        string folder = MakeFolder("Fixture Library");
+        using var engine = new StageEngine(new StageEngineOptions
+        {
+            LibraryFolders = Array.Empty<string>(),
+            CacheDirectory = MakeFolder("cache-rescan"),
+            DmxParallelism = 2,
+            SimulationParallelism = 2,
+        });
+        var empty = engine.AddLibraryFolder(folder);
+        Assert.True(empty.Success);
+        Assert.Contains("add it again", empty.Summary, StringComparison.Ordinal);
+        // still no fixture: the "no library folder" warning stays
+        Assert.Contains(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+
+        File.Copy(Path.Combine(TestEnvironment.Root, StarterFixtures[3]), Path.Combine(folder, StarterFixtures[3]));
+        var changes = new List<FixtureLibraryChange>();
+        engine.FixtureLibraryChanged += changes.Add;
+        var again = engine.AddLibraryFolder(folder);
+        Assert.True(again.Success, again.Summary);
+        Assert.Equal(1, engine.Library.Count);
+        Assert.Equal(StarterFixtures[3], Path.GetFileName(Assert.Single(Assert.Single(changes).Added).FilePath));
+        Assert.DoesNotContain(engine.Issues.Current, i => i.Code == EngineIssueCodes.LibraryMissing);
+    }
+
+    [Fact]
+    public void The_program_folder_and_everything_in_it_is_recognised_but_not_its_neighbours()
+    {
+        string program = MakeInstalledProgram();
+        var layout = new InstallLayout(program, null);
+        Assert.True(layout.IsInProgramFolder(program));
+        Assert.True(layout.IsInProgramFolder(program + Path.DirectorySeparatorChar));
+        Assert.True(layout.IsInProgramFolder(Path.Combine(program, "samples")));
+        Assert.True(layout.IsInProgramFolder(Path.GetDirectoryName(layout.SampleScene!)));
+        Assert.True(layout.IsInProgramFolder(Path.Combine(program, "samples", "..", "docs")));
+        // a sibling whose name starts like the program folder is not inside it
+        Assert.False(layout.IsInProgramFolder(program + " 2"));
+        Assert.False(layout.IsInProgramFolder(Path.GetDirectoryName(program)));
+        Assert.False(layout.IsInProgramFolder(Path.Combine(_root, "Documents")));
+        Assert.False(layout.IsInProgramFolder(null));
+        Assert.False(layout.IsInProgramFolder(" "));
+        Assert.False(layout.IsInProgramFolder("\0bad"));
+    }
+
+    [Fact]
+    public void Assimp_is_loaded_by_its_bare_name_only_from_a_windows_folder_the_ansi_code_page_may_not_spell()
+    {
+        // Review regression (seen under Wine with the Western code page): from C:\Program Files\Тест\Candela the import
+        // worker failed with "Assimp is not available: module not found" — AssimpNet loads the library with LoadLibraryA
+        // and the full path of the program folder.
+        string cyrillic = MakeFolder("Программы", "Candela");
+        string ascii = MakeFolder("Programs", "Candela");
+        string empty = MakeFolder("Пусто");
+        File.WriteAllText(Path.Combine(cyrillic, AssimpProgramFolder.LibraryFileName), "");
+        File.WriteAllText(Path.Combine(ascii, AssimpProgramFolder.LibraryFileName), "");
+
+        Assert.True(AssimpProgramFolder.NeedsBareNameLoad(cyrillic, windows: true));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad(cyrillic, windows: false));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad(ascii, windows: true));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad(empty, windows: true)); // development layout: not next to the program
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad("", windows: true));
+        Assert.False(AssimpProgramFolder.NeedsBareNameLoad("\0bad", windows: true));
+        // nothing to do in this (non-Windows or ASCII) test host
+        if (!OperatingSystem.IsWindows())
+            Assert.False(AssimpProgramFolder.Prepare());
+    }
+
+    [Fact]
+    public void Counting_gdtf_files_reads_only_the_folder_itself_and_never_throws()
+    {
+        string folder = MakeFolder("count");
+        File.WriteAllText(Path.Combine(folder, "a.gdtf"), "");
+        File.WriteAllText(Path.Combine(folder, "B.GDTF"), "");
+        File.WriteAllText(Path.Combine(folder, "c.txt"), "");
+        Directory.CreateDirectory(Path.Combine(folder, "deeper"));
+        File.WriteAllText(Path.Combine(folder, "deeper", "d.gdtf"), "");
+
+        Assert.Equal(2, InstallLayout.CountGdtfFiles(folder));
+        Assert.Equal(1, InstallLayout.CountGdtfFiles(folder, limit: 1));
+        Assert.Equal(0, InstallLayout.CountGdtfFiles(Path.Combine(folder, "missing")));
+        Assert.Equal(0, InstallLayout.CountGdtfFiles(null));
+        Assert.Equal(0, InstallLayout.CountGdtfFiles("\0"));
+        Assert.True(InstallLayout.AnyGdtfFiles(new[] { Path.Combine(folder, "missing"), folder }));
+        Assert.False(InstallLayout.AnyGdtfFiles(new[] { Path.Combine(folder, "deeper", "nothing") }));
+        Assert.False(InstallLayout.AnyGdtfFiles(null));
+    }
+
+    [Fact]
+    public void The_default_user_library_is_in_the_documents_folder()
+    {
+        string folder = InstallLayout.DefaultUserLibraryFolder;
+        Assert.True(Path.IsPathRooted(folder), folder);
+        Assert.Equal("Fixture Library", Path.GetFileName(folder));
+        Assert.Equal("Candela", Path.GetFileName(Path.GetDirectoryName(folder)));
+        Assert.True(InstallLayout.SamePath(folder + Path.DirectorySeparatorChar, folder));
+        Assert.False(InstallLayout.SamePath(folder, Path.GetDirectoryName(folder)!));
+    }
+}
