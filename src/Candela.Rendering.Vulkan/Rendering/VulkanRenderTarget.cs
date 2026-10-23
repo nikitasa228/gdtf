@@ -123,6 +123,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
             LightViews = new SceneBuffer<GpuLightView>(_context, BufferUsageFlags.StorageBufferBit, "light views", 64);
             Lists = new SceneBuffer<uint>(_context, BufferUsageFlags.StorageBufferBit, "view light lists", 64);
             BeamLines = new SceneBuffer<LineVertex>(_context, BufferUsageFlags.VertexBufferBit, "beam outlines", 64);
+            EmitterLines = new SceneBuffer<LineVertex>(_context, BufferUsageFlags.VertexBufferBit, "smoke emitter markers", 64);
             CreateSceneImages();
             CreateDisplayImage();
         }
@@ -194,11 +195,11 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     /// <summary>Hash of the gradient the table holds.</summary>
     internal int GradientHash { get; set; }
 
-    /// <summary>Baked lux (0) and noise (1) gradients with their hashes, so switching overlays does not re-bake.</summary>
-    internal Vector4[]?[] GradientBakes { get; } = new Vector4[]?[2];
+    /// <summary>Baked lux (0), noise (1) and smoke (2) gradients with their hashes, so switching overlays does not re-bake.</summary>
+    internal Vector4[]?[] GradientBakes { get; } = new Vector4[]?[3];
 
     /// <summary>Hashes of <see cref="GradientBakes"/>.</summary>
-    internal int[] GradientBakeHashes { get; } = new int[2];
+    internal int[] GradientBakeHashes { get; } = new int[3];
 
     internal GpuImage? SelectionMask { get; private set; }
 
@@ -293,6 +294,9 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     /// <summary>Beam outline line segments of the current frame.</summary>
     internal SceneBuffer<LineVertex> BeamLines { get; } = null!;
 
+    /// <summary>Smoke emitter marker segments of the current frame (smoke overlay only; drawn over everything).</summary>
+    internal SceneBuffer<LineVertex> EmitterLines { get; } = null!;
+
     /// <summary>32-bit words in <see cref="ClusterMasks"/>.</summary>
     internal uint ClusterMaskCapacity { get; private set; }
 
@@ -335,6 +339,19 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     internal float VolumeHistoryExposure;
     internal bool IndirectHistoryValid;
     internal IndirectLighting IndirectHistoryMode;
+
+    /// <summary>
+    /// Test hook: when set, the next frame first fills every temporal history with this value (NaN, ±infinity) and keeps
+    /// it marked valid (<see cref="HistoryFillPass"/>), so tests can check that no reader lets such values through.
+    /// </summary>
+    internal float? HistoryFillForTests;
+
+    /// <summary>
+    /// Test hook: when set, the next frame writes +infinity into this rectangle of the HDR image before the bloom and the
+    /// display transform read it (<see cref="HdrOverflowPass"/>), as a GPU that does not clamp half floats stores an
+    /// overflowed blend.
+    /// </summary>
+    internal System.Drawing.Rectangle? HdrOverflowForTests;
 
     /// <summary>History image the next beam temporal pass reads (it writes the other one).</summary>
     internal int BeamHistoryIndex;
@@ -494,7 +511,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         for (int i = 0; i < 2; i++)
         {
             Ensure(i == 0 ? SlotBeamHistory0 : SlotBeamHistory1, _beamHistory[i], beams && r.BeamHistory, bw, bh, 1, TargetFormats.HdrStorage,
-                beamUsage, i == 0 ? "beam history 0" : "beam history 1", out var beamHistory);
+                beamUsage | ImageUsageFlags.TransferDstBit, i == 0 ? "beam history 0" : "beam history 1", out var beamHistory);
             if (!ReferenceEquals(beamHistory, _beamHistory[i]))
                 BeamHistoryValid = false;
             _beamHistory[i] = beamHistory;
@@ -753,6 +770,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         _context.DeferDispose(LightViews);
         _context.DeferDispose(Lists);
         _context.DeferDispose(BeamLines);
+        _context.DeferDispose(EmitterLines);
         if (Vpls is not null)
             _context.DeferDispose(Vpls);
         if (Exposure is not null)
@@ -801,7 +819,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         Normals = GpuImage.Create2D(_context, w, h, TargetFormats.Normal,
             ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit, "normals", dedicated: true);
         Hdr = GpuImage.Create2D(_context, w, h, TargetFormats.Hdr,
-            ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit, "hdr", dedicated: true);
+            ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit | ImageUsageFlags.TransferDstBit, "hdr",
+            dedicated: true);
     }
 
     private void CreateDisplayImage()
@@ -1070,6 +1089,7 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         LightViews?.Dispose();
         Lists?.Dispose();
         BeamLines?.Dispose();
+        EmitterLines?.Dispose();
         Vpls?.Dispose();
         Exposure?.Dispose();
         for (int i = 0; i < ExposureReadback.Length; i++)

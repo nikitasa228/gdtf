@@ -55,6 +55,12 @@ internal interface IScriptTarget
     /// or null when it is not visible there.
     /// </summary>
     Vector2? ScreenPointOf(Vector3? world, string entityName);
+
+    /// <summary>Scrolls the Library's fixture grid so that tile <paramref name="index"/> is in view at the next frame.</summary>
+    void RevealLibraryTile(int index);
+
+    /// <summary>The screen point (Dear ImGui coordinates) of the centre of Library tile <paramref name="index"/>, or null when not in view.</summary>
+    Vector2? LibraryTilePoint(int index);
 }
 
 /// <summary>
@@ -143,6 +149,18 @@ internal sealed class ScriptPlayer
                         : $"the world point {step.Action.World} is not visible in the active viewport");
                 io.AddMousePosEvent(p.X, p.Y);
                 break;
+            case StepKind.RevealTile:
+                target.RevealLibraryTile(step.Action!.Tile ?? 0);
+                break;
+            case StepKind.MouseTile:
+                {
+                    int index = step.Action!.Tile ?? 0;
+                    if (target.LibraryTilePoint(index) is not { } tile)
+                        throw new InvalidOperationException($"Library tile {index} is not in view");
+                    io.AddMousePosEvent(tile.X, tile.Y);
+                    break;
+                }
+
             case StepKind.MouseButton:
                 io.AddMouseButtonEvent(step.Button, step.Down);
                 break;
@@ -218,8 +236,14 @@ internal sealed class ScriptPlayer
     {
         var pos = new Vector2(a.X, a.Y);
         var mods = ParseModifiers(a.Modifiers);
-        // A scene point (world position or entity) is turned into a screen point when the action runs.
-        var mouse = a.HasScenePoint ? Step.MouseAt(a) : Step.Mouse(pos);
+        // A scene point (world position or entity) is turned into a screen point when the action runs; a Library tile is
+        // scrolled into view first and its centre is taken two frames later, once the grid has been drawn there.
+        var mouse = a.Tile is not null ? Step.MouseOnTile(a) : a.HasScenePoint ? Step.MouseAt(a) : Step.Mouse(pos);
+        if (a.Tile is not null && a.Type is ScriptActionType.Move or ScriptActionType.Click or ScriptActionType.Press or ScriptActionType.Scroll)
+        {
+            At(schedule, frame).Add(Step.Reveal(a));
+            frame += 2;
+        }
         switch (a.Type)
         {
             case ScriptActionType.Wait:
@@ -330,6 +354,8 @@ internal sealed class ScriptPlayer
     {
         MousePos,
         MouseScene,
+        RevealTile,
+        MouseTile,
         MouseButton,
         Wheel,
         Modifiers,
@@ -351,6 +377,8 @@ internal sealed class ScriptPlayer
 
         public static Step Mouse(Vector2 p) => new(StepKind.MousePos) { Position = p, Text = "" };
         public static Step MouseAt(ScriptAction a) => new(StepKind.MouseScene) { Action = a, Text = "" };
+        public static Step MouseOnTile(ScriptAction a) => new(StepKind.MouseTile) { Action = a, Text = "" };
+        public static Step Reveal(ScriptAction a) => new(StepKind.RevealTile) { Action = a, Text = "" };
         public static Step ButtonEvent(int b, bool down) => new(StepKind.MouseButton) { Button = b, Down = down, Text = "" };
         public static Step WheelEvent(float amount) => new(StepKind.Wheel) { Amount = amount, Text = "" };
         public static Step Mods(KeyModifiers m) => new(StepKind.Modifiers) { Modifiers = m, Text = "" };

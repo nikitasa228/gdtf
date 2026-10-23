@@ -677,7 +677,7 @@ vec2 coneInterval(Light l, vec3 o, vec3 d, vec2 range)
     }
 
     r = vec2(max(r.x, range.x), min(r.y, range.y));
-    return any(isnan(r)) ? range : r;
+    return allFinite(vec4(r, 0.0, 0.0)) ? r : range;
 }
 
 // Phase function of the in-scattering at equi-angular angle theta along a ray (theta = atan((t - tc) / D), tc the

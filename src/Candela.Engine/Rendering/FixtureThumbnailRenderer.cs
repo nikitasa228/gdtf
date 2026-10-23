@@ -164,12 +164,28 @@ public sealed class FixtureThumbnailRenderer : IDisposable
             return;
         }
 
+        try
+        {
+            CreateResources(entry, profile);
+        }
+        catch (Exception e) when (e is not (OutOfMemoryException or StackOverflowException or AccessViolationException))
+        {
+            // Nothing half-made stays in the renderer's world; the key stays loaded (empty), so the frames of the same
+            // fixture do not read the file again, and the caller shows its fallback for this picture.
+            DestroyResources();
+            _bounds = Aabb.Empty;
+            throw;
+        }
+    }
+
+    private void CreateResources(FixtureLibraryEntry entry, FixtureProfile profile)
+    {
         var models = FixtureModelLoader.Load(entry.FilePath, profile);
         // GDTF models hang (base up, beam down): turn the fixture over so it stands on its base
         var standing = Matrix4x4.CreateRotationX(MathF.PI);
         var world = new Matrix4x4[profile.Geometry.Parts.Count];
         profile.Geometry.ComputeWorldTransforms(world, standing);
-        var images = new GdtfImageSource(_archive);
+        var images = new GdtfImageSource(_archive!);
         var perModel = new Dictionary<ModelData, (MeshHandle[] Meshes, MaterialHandle[] Materials)>(ReferenceEqualityComparer.Instance);
         var world3d = _renderer.World;
         foreach (var (part, model) in models.Parts)
@@ -194,13 +210,36 @@ public sealed class FixtureThumbnailRenderer : IDisposable
             {
                 if (!res.Meshes[i].IsValid) continue;
                 var m = model.Parts[i].Transform * world[part];
+                if (!IsFinite(m)) continue;
                 _instances.Add(world3d.CreateInstance(res.Meshes[i], res.Materials, m, InstanceFlags.CastShadow, 0));
-                _bounds.Include(model.Parts[i].Mesh.ComputeBounds().Transform(m));
+                var partBounds = model.Parts[i].Mesh.ComputeBounds().Transform(m);
+                // A part with non-finite or absurd coordinates (a broken model) is drawn but does not frame the picture.
+                if (!partBounds.IsEmpty && IsFinite(partBounds.Min) && IsFinite(partBounds.Max) && (partBounds.Max - partBounds.Min).Length() < MaxFramedSize)
+                    _bounds.Include(partBounds);
             }
         }
     }
 
+    /// <summary>Largest fixture extent framed by the thumbnail camera, metres (larger parts are broken models).</summary>
+    private const float MaxFramedSize = 50f;
+
+    private static bool IsFinite(Vector3 v) => float.IsFinite(v.X) && float.IsFinite(v.Y) && float.IsFinite(v.Z);
+
+    private static bool IsFinite(in Matrix4x4 m) =>
+        float.IsFinite(m.M11) && float.IsFinite(m.M12) && float.IsFinite(m.M13) && float.IsFinite(m.M14) &&
+        float.IsFinite(m.M21) && float.IsFinite(m.M22) && float.IsFinite(m.M23) && float.IsFinite(m.M24) &&
+        float.IsFinite(m.M31) && float.IsFinite(m.M32) && float.IsFinite(m.M33) && float.IsFinite(m.M34) &&
+        float.IsFinite(m.M41) && float.IsFinite(m.M42) && float.IsFinite(m.M43) && float.IsFinite(m.M44);
+
     private void Unload()
+    {
+        DestroyResources();
+        _archive?.Dispose();
+        _archive = null;
+        _loadedKey = null;
+    }
+
+    private void DestroyResources()
     {
         var world = _renderer.World;
         foreach (var i in _instances) world.DestroyInstance(i);
@@ -209,9 +248,6 @@ public sealed class FixtureThumbnailRenderer : IDisposable
         _instances.Clear();
         _meshes.Clear();
         _materials.Clear();
-        _archive?.Dispose();
-        _archive = null;
-        _loadedKey = null;
     }
 
     private void SetStudioLights(Vector3 centre, float radius, float azimuth)
@@ -227,6 +263,7 @@ public sealed class FixtureThumbnailRenderer : IDisposable
         _renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
         _renderer.World.SetLines(ReadOnlySpan<LineVertex>.Empty);
         _renderer.World.SetNoiseSources(ReadOnlySpan<NoiseSource>.Empty);
+        _renderer.World.SetSmokeEmitters(ReadOnlySpan<SmokeEmitterMarker>.Empty);
     }
 
     private static RenderSpotLight Studio(Vector3 centre, float distance, float azimuth, float elevation, float lux, Vector3 color)

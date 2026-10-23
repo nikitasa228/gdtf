@@ -134,6 +134,14 @@ public sealed unsafe class VulkanRenderer : IRenderer
     /// </summary>
     public const float NoiseFogStrength = 0.05f;
 
+    /// <summary>
+    /// Density (1/m) of the smoke overlay's display-referred coloured fog at the top of the gradient range (proportional
+    /// to the square of the position of the air's scattering coefficient in the range, times the gradient's alpha): a
+    /// metre of fog at the top of the default range shows its colour at about 40 %, 30 m of a light haze (0.02 /m) tint
+    /// the view by about a quarter.
+    /// </summary>
+    public const float SmokeFogStrength = 0.6f;
+
     /// <summary>Froxel tile size, pixels.</summary>
     public const int FroxelTileSize = 8;
 
@@ -183,6 +191,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _world = new VulkanRenderWorld(context, buildEdges: _edgeWireframe);
             Pipelines = new PipelineLibrary(context, _compiler, _world.SceneSetLayout, polygonWireframe: !_edgeWireframe);
             _pass = new PassContext(context, _world, Pipelines, _barriers, _shared) { EdgeWireframe = _edgeWireframe };
+            _passes.Add(new HistoryFillPass());
             _passes.Add(new ShadowPass());
             _passes.Add(new DepthPrepassPass());
             _passes.Add(new ClusterAssignPass());
@@ -200,6 +209,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _passes.Add(new BeamTemporalPass());
             _passes.Add(new VolumeCompositePass());
             _passes.Add(new ForwardTransparentPass());
+            _passes.Add(new HdrOverflowPass());
             _passes.Add(new BloomPass());
             _passes.Add(new ExposurePass());
             _passes.Add(new TonemapPass());
@@ -382,6 +392,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 ListedLights = _maxClusteredLights,
             };
             _planner.Plan(_world, t, decisions.Shadows ? _atlas : null, plan);
+            SmokeMarkers.Build(_world.SmokeEmitters, t.EmitterLines, decisions.Overlay == OverlayMode.Smoke);
             tilesRendered = decisions.Shadows ? _atlas!.PendingRenders.Length : 0;
             p.IndirectLightCount = _planner.IndirectLightCount;
             p.RayTracing = null;
@@ -417,6 +428,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             bool lightViews = t.LightViews.PrepareUpload(barriers);
             bool lists = t.Lists.PrepareUpload(barriers);
             bool beamLines = t.BeamLines.PrepareUpload(barriers);
+            bool emitterLines = t.EmitterLines.PrepareUpload(barriers);
             bool slots = _atlas is not null && _atlas.Slots.PrepareUpload(barriers);
             barriers.Flush();
             if (lightViews)
@@ -425,6 +437,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
                 t.Lists.RecordUpload(cmd);
             if (beamLines)
                 t.BeamLines.RecordUpload(cmd);
+            if (emitterLines)
+                t.EmitterLines.RecordUpload(cmd);
             if (slots)
                 _atlas!.Slots.RecordUpload(cmd);
             t.UpdateDescriptors(_shared, _world, _atlas, _rayTracing?.Tlas ?? default,
@@ -741,15 +755,15 @@ public sealed unsafe class VulkanRenderer : IRenderer
 
     /// <summary>
     /// Test/diagnostic hook: the analysis image of the target's last frame (internal resolution, top row first) —
-    /// illuminance in lux with <see cref="OverlayMode.Lux"/>, sound level in dB with <see cref="OverlayMode.Noise"/>.
-    /// Blocking.
+    /// illuminance in lux with <see cref="OverlayMode.Lux"/>, sound level in dB with <see cref="OverlayMode.Noise"/>, the
+    /// scattering coefficient of the air at the surface in 1/m with <see cref="OverlayMode.Smoke"/>. Blocking.
     /// </summary>
     internal float[] ReadAnalysis(IRenderTarget target)
     {
         ThrowIfDisposed();
         var t = Validate(target);
-        if (!t.Last.Valid || t.Analysis is null || t.Last.Overlay is not (OverlayMode.Lux or OverlayMode.Noise))
-            throw new InvalidOperationException("The target's last frame has no lux or noise overlay.");
+        if (!t.Last.Valid || t.Analysis is null || t.Last.Overlay is not (OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Smoke))
+            throw new InvalidOperationException("The target's last frame has no lux, noise or smoke overlay.");
         int w = t.RenderWidth, h = t.RenderHeight;
         ulong size = (ulong)w * (ulong)h * 4;
         var readback = Readback(size);
@@ -830,7 +844,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             // Plain range checks: Enum.IsDefined reads the enum's runtime type cache, which the GC may collect under
             // memory pressure and which is then rebuilt (allocating) on the next call.
             Shading = view.Shading is ViewShading.Full or ViewShading.Colorless or ViewShading.Wireframe ? view.Shading : ViewShading.Full,
-            Overlay = view.Overlay is OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Cables ? view.Overlay : OverlayMode.None,
+            Overlay = view.Overlay is OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Cables or OverlayMode.Smoke ? view.Overlay : OverlayMode.None,
         };
         bool full = d.Shading == ViewShading.Full;
         int lights = _world.LightCount;
@@ -866,7 +880,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             RenderWidth = rw,
             RenderHeight = rh,
             Scaled = d.Scaled,
-            Analysis = d.Overlay is OverlayMode.Lux or OverlayMode.Noise,
+            Analysis = d.Overlay is OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Smoke,
             Selection = view.ShowSelectionOutline,
             IndirectHistory = indirect == IndirectLighting.RayTraced,
             VplCapacity = d.VplCapacity,
@@ -1037,21 +1051,23 @@ public sealed unsafe class VulkanRenderer : IRenderer
         float scale = full ? exposure / (MathF.PI * ShaderConstants.LightRangeEpsilon) : 0f;
         if (dec.Overlay == OverlayMode.Lux)
         {
-            float rangeMin = float.IsFinite(view.LuxGradient.RangeMin) ? view.LuxGradient.RangeMin : 0f;
+            float rangeMin = GradientOf(OverlayMode.Lux, view).RangeMin;
             float minimumLux = MathF.Max(1e-4f * MathF.Max(rangeMin, 1e-2f), 1e-6f);
             scale = MathF.Max(scale, 1f / minimumLux);
         }
 
         d.LightRangeScale = scale;
-        var gradient = dec.Overlay == OverlayMode.Noise ? view.NoiseGradient : view.LuxGradient;
+        var gradient = GradientOf(dec.Overlay, view);
         d.OverlayMode = dec.Overlay switch
         {
             OverlayMode.Lux => ShaderConstants.OverlayLux,
             OverlayMode.Noise => ShaderConstants.OverlayNoise,
             OverlayMode.Cables => ShaderConstants.OverlayCables,
+            OverlayMode.Smoke => ShaderConstants.OverlaySmoke,
             _ => ShaderConstants.OverlayNone,
         };
-        d.OverlayRange = new Vector4(Finite(gradient.RangeMin, 0f), Finite(gradient.RangeMax, 1f), gradient.Logarithmic ? 1f : 0f, NoiseFogStrength);
+        d.OverlayRange = new Vector4(Finite(gradient.RangeMin, 0f), Finite(gradient.RangeMax, 1f), gradient.Logarithmic ? 1f : 0f,
+            dec.Overlay == OverlayMode.Smoke ? SmokeFogStrength : NoiseFogStrength);
         d.OverlayOutOfRange = RenderMath.Sanitize(gradient.OutOfRangeColor);
         d.SelectionColor = RenderMath.Sanitize(view.SelectionColor);
     }
@@ -1091,6 +1107,8 @@ public sealed unsafe class VulkanRenderer : IRenderer
             features |= ShaderConstants.FeatureTemporal;
         if (dec.Overlay == OverlayMode.Noise)
             features |= ShaderConstants.FeatureNoiseFog;
+        if (dec.Overlay == OverlayMode.Smoke)
+            features |= ShaderConstants.FeatureSmokeFog;
         if (dec.VolumeLights)
             features |= ShaderConstants.FeatureVolumeLights;
         d.Features = features;
@@ -1253,13 +1271,41 @@ public sealed unsafe class VulkanRenderer : IRenderer
         }
     }
 
+    /// <summary>
+    /// The gradient an analysis overlay maps its values through (the lux gradient for the overlays without one). A gradient
+    /// the overlay cannot be drawn with — missing, without a stop list, with a range that is not finite or not increasing
+    /// (user data: a hand-edited project, another version) — is replaced by the overlay's default instead of failing
+    /// every frame.
+    /// </summary>
+    internal static ColorGradient GradientOf(OverlayMode overlay, ViewOptions view)
+    {
+        var gradient = overlay switch
+        {
+            OverlayMode.Noise => view.NoiseGradient,
+            OverlayMode.Smoke => view.SmokeGradient,
+            _ => view.LuxGradient,
+        };
+        if (ColorGradient.IsDrawable(gradient))
+            return gradient;
+        return overlay switch
+        {
+            OverlayMode.Noise => s_defaultNoise,
+            OverlayMode.Smoke => s_defaultSmoke,
+            _ => s_defaultLux,
+        };
+    }
+
+    private static readonly ColorGradient s_defaultLux = ColorGradient.DefaultLux();
+    private static readonly ColorGradient s_defaultNoise = ColorGradient.DefaultNoise();
+    private static readonly ColorGradient s_defaultSmoke = ColorGradient.DefaultSmoke();
+
     /// <summary>Re-bakes the overlay gradient table of the target when the gradient changed (allocation only then).</summary>
     private void UpdateGradient(VulkanRenderTarget t, in Decisions d, BarrierBatch barriers)
     {
         var lut = t.GradientLut;
         if (lut is null)
             return;
-        var gradient = d.Overlay == OverlayMode.Noise ? _pass.View.NoiseGradient : _pass.View.LuxGradient;
+        var gradient = GradientOf(d.Overlay, _pass.View);
         var hash = new HashCode();
         hash.Add(gradient.RangeMin);
         hash.Add(gradient.RangeMax);
@@ -1275,7 +1321,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
         if (value == t.GradientHash)
             return;
         t.GradientHash = value;
-        int kind = d.Overlay == OverlayMode.Noise ? 1 : 0;
+        int kind = d.Overlay switch { OverlayMode.Noise => 1, OverlayMode.Smoke => 2, _ => 0 };
         var colors = t.GradientBakes[kind];
         if (colors is null || colors.Length != lut.Width || t.GradientBakeHashes[kind] != value)
         {

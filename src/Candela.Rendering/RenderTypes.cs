@@ -34,6 +34,13 @@ public enum OverlayMode
 
     /// <summary>Scene greyed out; cables coloured by type and the devices they connect highlighted.</summary>
     Cables,
+
+    /// <summary>
+    /// Scene greyed out; the density of smoke and haze — the scattering coefficient of the air, 1/m — mapped through
+    /// <see cref="ViewOptions.SmokeGradient"/> on surfaces and as tinted fog in the volume; hazers, fog machines, fans
+    /// and flames marked with their output and direction (<see cref="IRenderWorld.SetSmokeEmitters"/>).
+    /// </summary>
+    Smoke,
 }
 
 /// <summary>
@@ -71,7 +78,7 @@ public sealed class RenderCamera
 public readonly record struct GradientStop(float Value, Vector4 Color);
 
 /// <summary>
-/// Gradient of an analysis overlay (lux, noise). Values between <see cref="RangeMin"/> and <see cref="RangeMax"/> are
+/// Gradient of an analysis overlay (lux, noise, smoke). Values between <see cref="RangeMin"/> and <see cref="RangeMax"/> are
 /// coloured by interpolating the stops; values outside the range are shown grey (requirement). Stored as presets.
 /// </summary>
 public sealed class ColorGradient
@@ -100,6 +107,15 @@ public sealed class ColorGradient
         }
         return stops[^1].Color;
     }
+
+    /// <summary>
+    /// True when <paramref name="gradient"/> can be evaluated and baked: it exists, has a stop list and a finite range
+    /// with <see cref="RangeMax"/> above <see cref="RangeMin"/>. Gradients come from user data (presets, project files), so
+    /// renderers check this and fall back to the overlay's default instead of failing.
+    /// </summary>
+    public static bool IsDrawable(ColorGradient? gradient) =>
+        gradient is { Stops: not null } && float.IsFinite(gradient.RangeMin) && float.IsFinite(gradient.RangeMax) &&
+        gradient.RangeMax > gradient.RangeMin;
 
     /// <summary>Samples the gradient for a GPU lookup texture covering [RangeMin, RangeMax].</summary>
     public Vector4[] Bake(int samples)
@@ -143,6 +159,28 @@ public sealed class ColorGradient
             new(45f, new Vector4(0.9f, 0.85f, 0.1f, 1f)),
             new(65f, new Vector4(1.0f, 0.45f, 0.05f, 1f)),
             new(80f, new Vector4(0.85f, 0.05f, 0.1f, 1f)),
+        },
+    };
+
+    /// <summary>
+    /// Default smoke gradient: the scattering coefficient of the air (haze plus smoke), 1/m, on a log scale from
+    /// 0.005 /m (a trace of haze; visibility ≈ 3 / σ = 600 m) to 2 /m (thick fog, 1.5 m visibility): faint blue →
+    /// cyan → green (a thick working haze, 0.1 /m) → yellow → magenta. The thin end is the most transparent, so an even
+    /// haze leaves the greyed scene readable; clearer (or denser) air than the range shows no colour.
+    /// </summary>
+    public static ColorGradient DefaultSmoke() => new()
+    {
+        RangeMin = 0.005f,
+        RangeMax = 2f,
+        Logarithmic = true,
+        OutOfRangeColor = new Vector4(0.35f, 0.35f, 0.35f, 0f),
+        Stops =
+        {
+            new(0.005f, new Vector4(0.25f, 0.35f, 0.9f, 0.1f)),
+            new(0.02f, new Vector4(0.0f, 0.75f, 0.95f, 0.2f)),
+            new(0.1f, new Vector4(0.15f, 0.85f, 0.3f, 0.45f)),
+            new(0.5f, new Vector4(1.0f, 0.85f, 0.1f, 0.75f)),
+            new(2f, new Vector4(1.0f, 0.2f, 0.65f, 0.95f)),
         },
     };
 }
@@ -258,6 +296,10 @@ public sealed class ViewOptions
     public OverlayMode Overlay { get; set; } = OverlayMode.None;
     public ColorGradient LuxGradient { get; set; } = ColorGradient.DefaultLux();
     public ColorGradient NoiseGradient { get; set; } = ColorGradient.DefaultNoise();
+
+    /// <summary>Gradient of the smoke overlay: scattering coefficient of the air (haze plus smoke), 1/m.</summary>
+    public ColorGradient SmokeGradient { get; set; } = ColorGradient.DefaultSmoke();
+
     public bool ShowGrid { get; set; } = true;
     public float GridSpacing { get; set; } = 1f;
     public bool ShowSelectionOutline { get; set; } = true;

@@ -56,6 +56,8 @@ vec3 beamLight(float viewDepth)
         {
             ivec2 p = ivec2(clamp(base + vec2(i, j), vec2(0.0), size - 1.0));
             vec4 s = texelFetch(beamTexture, p, 0);
+            // Checked on its bits (common.glsl): a non-finite sample would make the weighted sum NaN.
+            s = vec4(finiteLight(s.rgb), finiteClamp(s.a, -HALF_SAFE_MAX, HALF_SAFE_MAX));
             float difference = s.a < 0.0 ? max(-s.a - viewDepth, 0.0) : abs(s.a - viewDepth);
             if (difference < bestDifference)
             {
@@ -82,5 +84,6 @@ void main()
     vec4 fog = sampleIntegratedVolume(uv, viewDepth);
     // Beams over the background reach their own range (the froxel volume ends at its far depth).
     vec3 beams = frame.beamCount > 0u ? beamLight(depth > 0.0 ? viewDepth : BEAM_BACKGROUND_DEPTH) : vec3(0.0);
-    outColor = vec4(finiteLight(fog.rgb + beams), fog.a);
+    // At most HDR_BLEND_MAX over the opaque scene (dst = src + T x dst): the blend cannot overflow the half floats.
+    outColor = vec4(finiteHdr(fog.rgb + beams), fog.a);
 }

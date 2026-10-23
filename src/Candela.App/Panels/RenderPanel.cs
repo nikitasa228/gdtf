@@ -765,6 +765,7 @@ internal sealed unsafe class RenderPanel : Panel, IDisposable
             ShowBeamOutlines = false,
             LuxGradient = _stage.Tools.Lux.Live,
             NoiseGradient = _stage.Tools.Noise.Live,
+            SmokeGradient = _stage.Tools.Smoke.Live,
             BackgroundLuminance = background,
         };
         var preview = _stage.Tools.Preview.Live;

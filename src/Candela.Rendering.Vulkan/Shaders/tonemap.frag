@@ -14,6 +14,13 @@
 //  per metre, integrated front to back along the view ray up to the surface (or NOISE_FOG_RANGE over the background)
 //  with NOISE_FOG_STEPS jittered, quadratically spaced samples. Being display-referred it is not tone mapped, so the
 //  fog shows the gradient colours exactly and does not depend on exposure or on the scene's lighting.
+//  Smoke overlay (FEATURE_SMOKE_FOG): the scene is desaturated and darkened like the cable overlay, surfaces show the
+//  gradient colour of the scattering coefficient of the air next to them (analysis value, 1/m; the default gradient is
+//  partly transparent, so the greyed scene shows through) and the air is tinted with the gradient colour of its own
+//  scattering coefficient — the same display-referred fog as the noise overlay's, of density overlayRange.w x
+//  (position of the value in the gradient range, log scale when the gradient is)^2 x gradient alpha per metre. Haze is
+//  uniform, so it tints the whole view as a veil (SMOKE_FOG_RANGE over the background, at most SMOKE_FOG_MAX_OPACITY);
+//  smoke shows as coloured clouds where the smoke grid holds it.
 //  Cable overlay: everything except instances with InstanceFlags.CableHighlight is desaturated and darkened.
 // draw.width = 1 / number of bloom levels (normalisation of the summed bloom pyramid).
 
@@ -27,11 +34,16 @@ layout(location = 0) out vec4 outColor;
 const float CABLE_DIM = 0.32;
 const int NOISE_FOG_STEPS = 24;
 const float NOISE_FOG_RANGE = 60.0;
+// The smoke fog reaches 30 m over the background and covers at most 65 % of the view behind it: haze fills the whole
+// room evenly, and the greyed scene must stay readable through it.
+const float SMOKE_FOG_RANGE = 30.0;
+const float SMOKE_FOG_MAX_OPACITY = 0.65;
 
-// Noise overlay fog along the ray origin + t direction, t in [0, tMax]: (display colour, transmittance).
-vec4 noiseFog(vec3 origin, vec3 direction, float tMax, float jitter)
+// Overlay fog along the ray origin + t direction, t in [0, tMax]: (display colour, transmittance). The value along the
+// ray is the sound level (noise overlay) or the air's scattering coefficient (smoke overlay, `smoke` true); values
+// below the gradient range leave the air clear, values above it count as its top.
+vec4 overlayFog(vec3 origin, vec3 direction, float tMax, float jitter, bool smoke)
 {
-    float lo = frame.overlayRange.x;
     float hi = frame.overlayRange.y;
     vec3 colour = vec3(0.0);
     float transmittance = 1.0;
@@ -41,15 +53,27 @@ vec4 noiseFog(vec3 origin, vec3 direction, float tMax, float jitter)
         float u = float(i + 1) / float(NOISE_FOG_STEPS);
         float next = tMax * u * u;
         float dt = next - previous;
-        float level = soundLevelAt(origin + direction * (previous + jitter * dt));
+        vec3 P = origin + direction * (previous + jitter * dt);
+        float value = smoke ? smokeOverlayAt(P) : soundLevelAt(P);
         previous = next;
-        if (!(level >= lo) || hi <= lo)
+        // The noise fog grows linearly through its range (as it always has); the smoke fog follows the gradient's scale.
+        float position = overlayRangePosition(value, smoke);
+        if (position < 0.0)
             continue;
-        vec4 g = overlayGradient(min(level, hi));
-        float density = frame.overlayRange.w * clamp((level - lo) / (hi - lo), 0.0, 1.0) * clamp(g.a, 0.0, 1.0);
+        vec4 g = overlayGradient(min(value, hi));
+        // The smoke fog weighs the position quadratically: haze, which fills the whole view, stays a veil while dense
+        // clouds stand out.
+        float density = frame.overlayRange.w * (smoke ? position * position : position) * clamp(g.a, 0.0, 1.0);
         float opacity = 1.0 - exp(-density * dt);
         colour += transmittance * opacity * srgbDecode(g.rgb);
         transmittance *= 1.0 - opacity;
+    }
+
+    if (smoke && transmittance < 1.0 - SMOKE_FOG_MAX_OPACITY)
+    {
+        // Scaled back to the largest opacity with the same colours.
+        colour *= SMOKE_FOG_MAX_OPACITY / max(1.0 - transmittance, 1e-6);
+        transmittance = 1.0 - SMOKE_FOG_MAX_OPACITY;
     }
 
     return vec4(colour, transmittance);
@@ -59,7 +83,11 @@ void main()
 {
     vec2 uv = gl_FragCoord.xy * frame.displaySize.zw;
     vec4 texel = hasFeature(FEATURE_SCALED) ? textureLod(hdrTexture, uv, 0.0) : texelFetch(hdrTexture, ivec2(gl_FragCoord.xy), 0);
-    vec3 hdr = finiteLight(texel.rgb); // an overflowed blend (+inf) must not reach the tone mapper as NaN
+    // An overflowed blend (+inf) must not reach the tone mapper as NaN: a scaled image is filtered from checked
+    // texels (common.glsl), never by the texture unit, which would turn an infinity into NaN. The alpha (the share of
+    // scene light, < 1 on reference drawings) is at most 1 and only needs the non-finite case: scene light.
+    vec3 hdr = hasFeature(FEATURE_SCALED) ? sampleLightBilinear(hdrTexture, uv) : finiteLight(texel.rgb);
+    texel.a = isNonFinite(texel.a) ? 1.0 : texel.a;
     if (hasFeature(FEATURE_BLOOM))
         hdr = mix(hdr, finiteLight(textureLod(bloomTexture, uv, 0.0).rgb) * draw.width, frame.bloomIntensity);
 
@@ -75,20 +103,26 @@ void main()
             if (!highlighted)
                 display = vec3(dot(display, vec3(0.2126, 0.7152, 0.0722)) * CABLE_DIM);
         }
-        else if (instance != 0u)
+        else
         {
-            vec4 g = overlayGradient(texelFetch(analysisTexture, p, 0).r);
-            display = mix(display, srgbDecode(g.rgb), clamp(g.a, 0.0, 1.0));
+            if (frame.overlayMode == OVERLAY_SMOKE)
+                display = vec3(dot(display, vec3(0.2126, 0.7152, 0.0722)) * CABLE_DIM);
+            if (instance != 0u)
+            {
+                vec4 g = overlayGradient(texelFetch(analysisTexture, p, 0).r);
+                display = mix(display, srgbDecode(g.rgb), clamp(g.a, 0.0, 1.0));
+            }
         }
 
-        if (hasFeature(FEATURE_NOISE_FOG))
+        if (hasFeature(FEATURE_NOISE_FOG) || hasFeature(FEATURE_SMOKE_FOG))
         {
             vec2 renderUv = (vec2(p) + 0.5) * frame.renderSize.zw;
             float depth = texelFetch(sceneDepth, p, 0).r;
             vec3 origin, direction;
             viewRay(renderUv, origin, direction);
-            float tMax = depth > 0.0 ? distance(origin, worldFromDepth(renderUv, depth)) : NOISE_FOG_RANGE;
-            vec4 fog = noiseFog(origin, direction, tMax, interleavedGradientNoise(gl_FragCoord.xy + vec2(13.0, 71.0)));
+            bool smoke = hasFeature(FEATURE_SMOKE_FOG);
+            float tMax = depth > 0.0 ? distance(origin, worldFromDepth(renderUv, depth)) : smoke ? SMOKE_FOG_RANGE : NOISE_FOG_RANGE;
+            vec4 fog = overlayFog(origin, direction, tMax, interleavedGradientNoise(gl_FragCoord.xy + vec2(13.0, 71.0)), smoke);
             display = display * fog.a + fog.rgb;
         }
     }

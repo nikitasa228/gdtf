@@ -42,6 +42,7 @@ internal sealed class StageUnits
         FormatNanometres = "%.0f " + nanometre;
         FormatCandela = "%.0f " + candela;
         FormatPerMetre = "%.3f /" + metre;
+        PerMetre = "/" + metre;
         FormatLuminance = "%.3f " + candelaPerSquareMetre;
         FormatFramesPerSecond = "%.2f " + framesPerSecond;
     }
@@ -57,6 +58,9 @@ internal sealed class StageUnits
 
     /// <summary>Decibel (sound level; the overlay legend's values).</summary>
     public string Decibel { get; }
+
+    /// <summary>Per metre ("/m"): the scattering coefficient of haze and smoke (the smoke overlay legend's values).</summary>
+    public string PerMetre { get; }
 
     /// <summary>Candela (luminous intensity).</summary>
     public string Candela { get; }

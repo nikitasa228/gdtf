@@ -52,6 +52,8 @@ public sealed class StageSimulation : IDisposable
     private readonly List<FlameEmitter> _flameEmitters = new();
     private readonly List<SoundSource> _soundSources = new();
     private readonly List<Rendering.NoiseSource> _noiseSources = new();
+    private readonly List<Rendering.SmokeEmitterMarker> _emitterMarkers = new();
+    private readonly Dictionary<Candela.Dmx.FixtureProfile, EmitterCapabilities> _capabilities = new(ReferenceEqualityComparer.Instance);
     private readonly List<ObstacleBox> _obstacles = new();
     private readonly List<Issue> _issues = new();
     private SmokeSimulationSettings? _smokeSettings;
@@ -143,6 +145,17 @@ public sealed class StageSimulation : IDisposable
     /// <summary>The noise sources of the last step as a span (no copy; valid until the next step).</summary>
     public ReadOnlySpan<Rendering.NoiseSource> NoiseSourceSpan => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_noiseSources);
 
+    /// <summary>
+    /// Every hazer, fog machine, fan and flame device of the last step with its nozzle, jet direction and current output,
+    /// also the ones that are switched off (output 0): what the smoke overlay marks
+    /// (<see cref="Rendering.IRenderWorld.SetSmokeEmitters"/>). A device with several outputs (a hazer with a fan) has
+    /// one marker per output. Positions are the nozzle exits the smoke simulation uses.
+    /// </summary>
+    public IReadOnlyList<Rendering.SmokeEmitterMarker> EmitterMarkers => _emitterMarkers;
+
+    /// <summary>The emitter markers of the last step as a span (no copy; valid until the next step).</summary>
+    public ReadOnlySpan<Rendering.SmokeEmitterMarker> EmitterMarkerSpan => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_emitterMarkers);
+
     /// <summary>Problems of the simulations (bad settings, ignored emitters, extra atmosphere volumes, adapted cell size).</summary>
     public IReadOnlyList<Issue> Issues
     {
@@ -175,6 +188,8 @@ public sealed class StageSimulation : IDisposable
         _smokeEmitters.Clear();
         _flameEmitters.Clear();
         _noiseSources.Clear();
+        _emitterMarkers.Clear();
+        _capabilities.Clear();
         _soundSources.Clear();
         Acoustics.SetSources(ReadOnlySpan<SoundSource>.Empty);
         _issues.Clear();
@@ -250,6 +265,7 @@ public sealed class StageSimulation : IDisposable
         _flameEmitters.Clear();
         _soundSources.Clear();
         _noiseSources.Clear();
+        _emitterMarkers.Clear();
         foreach (var pose in poses.All)
         {
             var profile = pose.Profile;
@@ -258,6 +274,7 @@ public sealed class StageSimulation : IDisposable
                 or FixtureCategory.Fan or FixtureCategory.GeneratorFire;
             var position = pose.Position;
             if (!IsFinite(position)) continue;
+            if (atmospheric || outputs.Any) AddMarkers(pose, profile, outputs, position);
 
             if (outputs.Any)
             {
@@ -419,6 +436,81 @@ public sealed class StageSimulation : IDisposable
         foreach (var e in _smokeEmitters)
             if (e.Output > 0f && e.Kind != SmokeEmitterKind.Fan) return true;
         return _flameEmitters.Count > 0 && Fire.LightSamples.Length > 0;
+    }
+
+    /// <summary>What an atmospheric device can emit, from its DMX functions and its category (cached per profile).</summary>
+    [Flags]
+    private enum EmitterCapabilities
+    {
+        None = 0,
+        Haze = 1,
+        Fog = 2,
+        Fan = 4,
+        Flame = 8,
+    }
+
+    private EmitterCapabilities CapabilitiesOf(Candela.Dmx.FixtureProfile profile)
+    {
+        if (_capabilities.TryGetValue(profile, out var known)) return known;
+        var c = EmitterCapabilities.None;
+        foreach (var f in profile.Functions)
+        {
+            c |= f.Class.Kind switch
+            {
+                Candela.Dmx.AttributeKind.Haze => EmitterCapabilities.Haze,
+                Candela.Dmx.AttributeKind.Fog => EmitterCapabilities.Fog,
+                Candela.Dmx.AttributeKind.Fan or Candela.Dmx.AttributeKind.FanDirection when profile.IsAtmospheric => EmitterCapabilities.Fan,
+                Candela.Dmx.AttributeKind.Flame or Candela.Dmx.AttributeKind.FlameHeight => EmitterCapabilities.Flame,
+                _ => EmitterCapabilities.None,
+            };
+        }
+        // A device whose channels do not say it (or that has none) is what its category says.
+        if (c == EmitterCapabilities.None)
+        {
+            c = profile.Category switch
+            {
+                FixtureCategory.Haze => EmitterCapabilities.Haze,
+                FixtureCategory.Fog => EmitterCapabilities.Fog,
+                FixtureCategory.Fan => EmitterCapabilities.Fan,
+                FixtureCategory.GeneratorFire => EmitterCapabilities.Flame,
+                _ => EmitterCapabilities.None,
+            };
+        }
+        _capabilities[profile] = c;
+        return c;
+    }
+
+    /// <summary>The smoke overlay's markers of one device: one per kind of output it has (running or not).</summary>
+    private void AddMarkers(FixturePose pose, Candela.Dmx.FixtureProfile profile, in Candela.Dmx.DeviceOutputs outputs, Vector3 position)
+    {
+        var c = CapabilitiesOf(profile);
+        if (outputs.Haze > 0f) c |= EmitterCapabilities.Haze;
+        if (outputs.Fog > 0f) c |= EmitterCapabilities.Fog;
+        if (outputs.FanSpeed > 0f) c |= EmitterCapabilities.Fan;
+        if (outputs.Flame > 0f) c |= EmitterCapabilities.Flame;
+        if (c == EmitterCapabilities.None) return;
+        var id = pose.Entity.Id;
+        if ((c & (EmitterCapabilities.Haze | EmitterCapabilities.Fog | EmitterCapabilities.Fan)) != 0)
+        {
+            var nozzle = NozzleDirection(pose);
+            var exit = position + nozzle * 0.25f;
+            if ((c & EmitterCapabilities.Haze) != 0)
+                _emitterMarkers.Add(new Rendering.SmokeEmitterMarker(exit, nozzle, Level(outputs.Haze), Rendering.SmokeEmitterMarkerKind.Hazer, id));
+            if ((c & EmitterCapabilities.Fog) != 0)
+            {
+                var kind = IsLowFog(profile) ? Rendering.SmokeEmitterMarkerKind.LowFog : Rendering.SmokeEmitterMarkerKind.FogMachine;
+                _emitterMarkers.Add(new Rendering.SmokeEmitterMarker(exit, nozzle, Level(outputs.Fog), kind, id));
+            }
+            if ((c & EmitterCapabilities.Fan) != 0)
+            {
+                var dir = outputs.FanDirection < 0f ? -nozzle : nozzle;
+                _emitterMarkers.Add(new Rendering.SmokeEmitterMarker(exit, dir, Level(outputs.FanSpeed), Rendering.SmokeEmitterMarkerKind.Fan, id));
+            }
+        }
+        if ((c & EmitterCapabilities.Flame) != 0)
+            _emitterMarkers.Add(new Rendering.SmokeEmitterMarker(position, FlameDirection(pose), Level(outputs.Flame), Rendering.SmokeEmitterMarkerKind.Flame, id));
+
+        static float Level(float v) => float.IsFinite(v) ? Math.Clamp(v, 0f, 1f) : 0f;
     }
 
     private static Vector3 NozzleDirection(FixturePose pose)

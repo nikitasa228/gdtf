@@ -119,6 +119,10 @@ Every requirement from [REQUIREMENTS.ru.md](REQUIREMENTS.ru.md) is listed once, 
       presets: Default / Custom / save as named) (GPU overlay and CPU light meter done; gradient editor in the editor)
 - [~] Noise overlay: SPL on surfaces + coloured volumetric fog, own gradient + presets (sources from `_specs` noise ×
       device activity, GPU overlay done; gradient editor in the editor)
+- [x] Smoke overlay: scene greyed, density of haze and smoke (scattering coefficient, 1/m) on surfaces and as coloured
+      fog, hazers / fog machines / fans / flames marked with their output and direction, legend with the density
+      gradient editor and presets, saved with the project; `candela render --overlay smoke`
+      (docs/rendering.md#analysis-overlays-viewoptionsoverlay, docs/editor.md#overlay-legends)
 
 ## M6 — Final render and indirect light
 - [x] Path tracer (ray query): PBR materials, spot lights with cookies, heterogeneous media, fire emission, progressive

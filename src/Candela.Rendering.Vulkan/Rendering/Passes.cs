@@ -462,8 +462,8 @@ internal sealed class WireframePass : RenderPass
 
 /// <summary>
 /// Display transform: the HDR image (bilinear upscaling from the internal resolution) mixed with the bloom, through the
-/// tone mapper (Full: AgX/ACES/Neutral; Colorless/Wireframe: pass-through), the lux/noise/cable overlay colouring and
-/// sRGB encoding into the display image.
+/// tone mapper (Full: AgX/ACES/Neutral; Colorless/Wireframe: pass-through), the lux/noise/smoke/cable overlay colouring
+/// and sRGB encoding into the display image.
 /// </summary>
 internal sealed class TonemapPass : RenderPass
 {
@@ -489,7 +489,7 @@ internal sealed class TonemapPass : RenderPass
         if (t.GradientLut is { } lut)
             barriers.Use(lut, ImageUse.SampledFragment);
 
-        // The noise overlay's fog: scene depth and the sound sources / noise field.
+        // The noise and smoke overlays' fog: scene depth and the sound sources / noise field / smoke grid.
         barriers.Use(t.Depth, ImageUse.DepthSampledFragment);
         PassRecording.DeclareMediaReads(context, barriers, compute: false);
     }
@@ -537,8 +537,9 @@ internal sealed class GridPass : RenderPass
 }
 
 /// <summary>
-/// Line segments of <see cref="IRenderWorld.SetLines"/> and the beam outlines: anti-aliased screen-space quads over the
-/// display image, depth-tested — except in the cable overlay, where the lines are drawn on top of everything.
+/// Line segments of <see cref="IRenderWorld.SetLines"/>, the beam outlines and the smoke overlay's emitter markers:
+/// anti-aliased screen-space quads over the display image, depth-tested — except in the cable overlay, where the lines
+/// are drawn on top of everything, and the emitter markers, which are always on top.
 /// </summary>
 internal sealed class LinesPass : RenderPass
 {
@@ -547,7 +548,8 @@ internal sealed class LinesPass : RenderPass
     {
     }
 
-    public override bool IsActive(PassContext context) => context.World.LineSegmentCount > 0 || context.Target.BeamLines.Count > 0;
+    public override bool IsActive(PassContext context) =>
+        context.World.LineSegmentCount > 0 || context.Target.BeamLines.Count > 0 || context.Target.EmitterLines.Count > 0;
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {
@@ -558,6 +560,8 @@ internal sealed class LinesPass : RenderPass
             barriers.Use(context.World.LineBuffer, BufferUse.VertexInput);
         if (context.Target.BeamLines.Count > 0)
             barriers.Use(context.Target.BeamLines.Buffer, BufferUse.VertexInput);
+        if (context.Target.EmitterLines.Count > 0)
+            barriers.Use(context.Target.EmitterLines.Buffer, BufferUse.VertexInput);
     }
 
     public override unsafe void Execute(PassContext context)
@@ -581,6 +585,15 @@ internal sealed class LinesPass : RenderPass
             var buffer = context.World.LineBuffer.Handle;
             vk.CmdBindVertexBuffers(context.Cmd, 0, 1, &buffer, &offset);
             vk.CmdDraw(context.Cmd, 6, (uint)context.World.LineSegmentCount, 0, 0);
+        }
+
+        int emitterSegments = context.Target.EmitterLines.Count / 2;
+        if (emitterSegments > 0)
+        {
+            vk.CmdSetDepthTestEnable(context.Cmd, false);
+            var emitters = context.Target.EmitterLines.Buffer.Handle;
+            vk.CmdBindVertexBuffers(context.Cmd, 0, 1, &emitters, &offset);
+            vk.CmdDraw(context.Cmd, 6, (uint)emitterSegments, 0, 0);
         }
 
         vk.CmdEndRendering(context.Cmd);

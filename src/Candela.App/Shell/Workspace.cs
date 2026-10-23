@@ -196,7 +196,7 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     public void Draw(float deltaTime)
     {
         _ = deltaTime;
-        _frameScale = UiScale.Effective(_ctx.Settings.Settings.UiScale, ImGui.GetStyle().FontScaleDpi);
+        _frameScale = UiScale.Frame();
         _guard.Run("dock tab styles", _applyTabStyles);
         _guard.Run("main menu", _drawMainMenu);
         _guard.Run("status bar", _drawStatusBar);
@@ -828,6 +828,20 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
     }
 
     /// <inheritdoc/>
+    public void RevealLibraryTile(int index)
+    {
+        if (!_library.IsOpen)
+            _library.IsOpen = true;
+        _library.RevealTile(index);
+    }
+
+    /// <inheritdoc/>
+    public Vector2? LibraryTilePoint(int index) => _library.TilePoint(index);
+
+    /// <summary>The Library panel (tests and diagnostics).</summary>
+    internal LibraryPanel Library => _library;
+
+    /// <inheritdoc/>
     public Vector2? ScreenPointOf(Vector3? world, string entityName)
     {
         var viewport = ActiveViewport;
@@ -872,6 +886,9 @@ internal sealed unsafe partial class Workspace : IViewportHost, IScriptTarget, I
                 break;
             case "librarysetup":
                 RunLibrarySetupScript(value);
+                break;
+            case "librarytexturecap":
+                _library.TextureCap = int.Parse(value, CultureInfo.InvariantCulture);
                 break;
             default:
                 throw new KeyNotFoundException($"unknown setting '{name}'");

@@ -26,5 +26,6 @@ void main()
     sum += textureLod(coarser, uv + vec2(-t.x, -t.y), 0.0).rgb + textureLod(coarser, uv + vec2(t.x, -t.y), 0.0).rgb +
            textureLod(coarser, uv + vec2(-t.x, t.y), 0.0).rgb + textureLod(coarser, uv + vec2(t.x, t.y), 0.0).rgb;
     vec4 current = imageLoad(level, p);
-    imageStore(level, p, vec4(current.rgb + sum / 16.0, 1.0));
+    // Checked on the bits (common.glsl): whatever a level holds, nothing non-finite is passed up the chain.
+    imageStore(level, p, vec4(finiteLight(finiteLight(current.rgb) + finiteLight(sum / 16.0)), 1.0));
 }

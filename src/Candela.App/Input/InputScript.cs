@@ -164,6 +164,12 @@ internal sealed record ScriptAction(ScriptActionType Type)
     /// <summary>An entity whose drawn centre the mouse goes to instead of <see cref="X"/>/<see cref="Y"/> (move, click, press, scroll).</summary>
     public string Entity { get; init; } = "";
 
+    /// <summary>
+    /// A fixture tile of the Library (index in the order the grid shows, 0 = first) whose centre the mouse goes to instead
+    /// of <see cref="X"/>/<see cref="Y"/>: the grid scrolls it into view first (move, click, press, scroll).
+    /// </summary>
+    public int? Tile { get; init; }
+
     /// <summary>True when the mouse position is resolved in the scene when the action runs.</summary>
     public bool HasScenePoint => World is not null || Entity.Length > 0;
 }
@@ -265,6 +271,9 @@ internal sealed class InputScript
                 : Array.Empty<string>(),
             World = WorldPoint(e),
             Entity = Str(e, "entity") ?? "",
+            Tile = e.TryGetProperty("tile", out var tile) ? tile.ValueKind == JsonValueKind.Number && tile.TryGetInt32(out int t) && t >= 0
+                ? t
+                : throw new FormatException("\"tile\" must be a tile index (0 or more)") : null,
         };
         // "panel" names the panel of panel/undock/tabStyle actions; a panel action may also give it as "name"/"id".
         if (action.Type == ScriptActionType.Panel && action.Panel.Length == 0)

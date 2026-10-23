@@ -24,8 +24,11 @@ float froxelSlice(float viewDepth)
 // so slice coordinate s maps to texel coordinate s - 0.5; inside the first slice the value is interpolated from 0.
 vec4 sampleIntegratedVolume(vec2 uv, float viewDepth)
 {
-    float s = clamp(froxelSlice(viewDepth), 0.0, frame.volumeGrid.z);
+    float s = finiteClamp(froxelSlice(viewDepth), 0.0, frame.volumeGrid.z);
     vec4 v = textureLod(volumeTexture, vec3(uv, (s - 0.5) * frame.volumeGrid.w), 0.0);
+    // What the filter returns is checked on its bits: no non-finite light or transmittance reaches a blend (NaN alpha
+    // would turn the whole pixel and every later blend of it into NaN).
+    v = vec4(finiteLight(v.rgb), finiteClamp(v.a, 0.0, 1.0));
     if (s < 1.0)
         v = mix(vec4(0.0, 0.0, 0.0, 1.0), v, s);
     return v;
@@ -130,6 +133,36 @@ float soundLevelAt(vec3 P)
     }
 
     return maxLevel <= -1e8 ? -1e9 : maxLevel + 10.0 * log(sum) / log(10.0);
+}
+
+// Scattering coefficient (1/m) of the air at P for the smoke overlay: the uniform haze plus the smoke grid's density x
+// scattering at full density, in every view mode (unlike scatteringAt, which follows the Full view's media features).
+// frame.media.x / .z are 0 without haze / smoke; frame.smokeMin.w marks a smoke grid.
+float smokeOverlayAt(vec3 P)
+{
+    float sigma = max(frame.media.x, 0.0);
+    vec3 uvw;
+    if (frame.smokeMin.w > 0.5 && boxCoordinates(P, frame.smokeMin, frame.smokeMax, uvw))
+        sigma += finiteClamp(textureLod(smokeTexture, uvw, 0.0).r, 0.0, 1e6) * max(frame.media.z, 0.0);
+    return sigma;
+}
+
+// Position of a value in the overlay gradient's range, 0 ... 1 (on the gradient's log scale when overlayRange.z is
+// set and `followScale` is true, else linear), or -1 below the range or when the range is empty.
+float overlayRangePosition(float value, bool followScale)
+{
+    float lo = frame.overlayRange.x;
+    float hi = frame.overlayRange.y;
+    if (!(value >= lo) || !(hi > lo))
+        return -1.0;
+    if (followScale && frame.overlayRange.z > 0.5)
+    {
+        float a = log(max(lo, 1e-6));
+        float b = log(max(hi, 1e-6));
+        return b > a ? clamp((log(max(value, 1e-6)) - a) / (b - a), 0.0, 1.0) : 0.0;
+    }
+
+    return clamp((value - lo) / (hi - lo), 0.0, 1.0);
 }
 
 // Overlay gradient lookup for a value in the overlay's unit: sRGB colour + alpha, or the out-of-range colour.

@@ -21,7 +21,11 @@ const float FIREFLY_LUMA = 1024.0;
 vec3 fetch(vec2 uv)
 {
 #ifdef FIRST
-    vec3 c = finiteLight(textureLod(hdrTexture, uv, 0.0).rgb);
+    // Filtered in the shader from four texels made finite first (common.glsl), never by the texture unit: an HDR texel
+    // that overflowed to +infinity would come out of hardware bilinear filtering as NaN (0 x inf, inf - inf) and spread
+    // through the whole pyramid as dark blocks of every level's size around a bright lens. The filtered sample is then
+    // limited, as before, so a lens of a few texels still blooms with the energy of its filtered footprint.
+    vec3 c = sampleLightBilinear(hdrTexture, uv);
     float luma = dot(c, vec3(0.2627, 0.6780, 0.0593));
     return luma > FIREFLY_LUMA ? c * (FIREFLY_LUMA / luma) : c;
 #else
@@ -63,5 +67,5 @@ void main()
     vec3 centre = (d + e + i + j) * 0.25;
     vec3 corners = (a + b + f + g) + (b + c + g + h) + (f + g + k + l) + (g + h + l + m);
     vec3 result = centre * 0.5 + corners * (0.125 * 0.25);
-    imageStore(outLevel, p, vec4(result, 1.0));
+    imageStore(outLevel, p, vec4(finiteLight(result), 1.0));
 }

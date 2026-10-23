@@ -48,19 +48,47 @@ internal static class Theme
     /// <summary>
     /// Applies colours and sizes for the user's UI scale <paramref name="uiScale"/> (≥ 1, the setting) on a monitor with
     /// content scale <paramref name="dpiScale"/>, with base font size <paramref name="fontSize"/> (pixels at 100 %).
-    /// Called at start-up and whenever one of them changes; fonts re-rasterise on demand.
+    /// Called at start-up and whenever one of them changes; fonts re-rasterise on demand. Idempotent: the style is first
+    /// reset to a freshly constructed Dear ImGui style, because <c>ImGuiStyle.ScaleAllSizes</c> multiplies the current
+    /// values — every field it scales that was not reset would compound with each call (a dragged scale slider applied
+    /// some fifty scales in a row, <c>WindowBorderHoverPadding</c> overflowed to a negative integer and Dear ImGui
+    /// aborted the process in its new-frame sanity check). The user scale is bounded by <see cref="UiScale.Applied"/>
+    /// for the side of the font atlas (<c>TexMaxWidth</c> × <c>TexMaxHeight</c>, set by the ImGui host from the GPU).
     /// </summary>
-    public static void Apply(float uiScale, float dpiScale, float fontSize)
+    /// <returns>The user scale actually applied (<see cref="UiScale.Applied"/>; below the setting when limited).</returns>
+    public static float Apply(float uiScale, float dpiScale, float fontSize)
     {
-        uiScale = UiScale.ClampScale(uiScale);
         dpiScale = UiScale.ClampDpi(dpiScale);
+        fontSize = UiScale.ClampFontSize(fontSize);
+        var atlas = ImGui.GetIO().Fonts;
+        int atlasSize = atlas.IsNull ? UiScale.MaxAtlasSize : Math.Min(atlas.TexMaxWidth, atlas.TexMaxHeight);
+        float applied = UiScale.Applied(uiScale, dpiScale, fontSize, atlasSize);
         var style = ImGui.GetStyle();
+        ResetToDefaults(style);
         ResetSizes(style);
-        style.ScaleAllSizes(uiScale * dpiScale);
-        style.FontSizeBase = UiScale.ClampFontSize(fontSize);
-        style.FontScaleMain = uiScale;
+        style.ScaleAllSizes(applied * dpiScale);
+        style.FontSizeBase = fontSize;
+        style.FontScaleMain = applied;
         style.FontScaleDpi = dpiScale;
         ApplyColors(style);
+        return applied;
+    }
+
+    /// <summary>
+    /// Copies a freshly constructed Dear ImGui style over <paramref name="style"/>: every size — fields this theme does not
+    /// set and fields a newer Dear ImGui adds included — starts again from its unscaled default.
+    /// </summary>
+    private static unsafe void ResetToDefaults(ImGuiStylePtr style)
+    {
+        var pristine = ImGui.ImGuiStyle();
+        try
+        {
+            *style.Handle = *pristine.Handle;
+        }
+        finally
+        {
+            pristine.Destroy();
+        }
     }
 
     /// <summary>ImGui colour (packed ABGR) of an sRGB colour with alpha.</summary>

@@ -86,7 +86,7 @@ internal interface IViewportHost
 /// A 3D viewport panel (requirement): the world rendered into the panel's own render target (sized to the panel in
 /// framebuffer pixels) and shown as an ImGui image; camera navigation (orbit, pan, zoom, fly with W/A/S/D + mouse,
 /// frame selection, focus on double-click) following the navigation style setting; perspective / orthographic;
-/// Wireframe / Colorless / Full shading; overlay selector (None / Lux / Noise / Cables); grid; FPS readout; the corner
+/// Wireframe / Colorless / Full shading; overlay selector (None / Lux / Noise / Cables / Smoke); grid; FPS readout; the corner
 /// view cube that snaps to the six orthographic views; click / Shift+click / box selection through the renderer's pick
 /// buffer; and ImGuizmo move / rotate gizmos with snapping, every drag one undo step.
 /// </summary>
@@ -1082,6 +1082,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         OverlayMode.Lux => Loc.Get(Str.OverlayLux),
         OverlayMode.Noise => Loc.Get(Str.OverlayNoise),
         OverlayMode.Cables => Loc.Get(Str.OverlayCables),
+        OverlayMode.Smoke => Loc.Get(Str.OverlaySmoke),
         _ => Loc.Get(Str.OverlayNone),
     };
 
@@ -1091,6 +1092,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
         OverlayMode.Lux => Icons.Sun,
         OverlayMode.Noise => Icons.AudioLines,
         OverlayMode.Cables => Icons.Cable,
+        OverlayMode.Smoke => Icons.CloudFog,
         _ => Icons.Layers,
     };
 
@@ -1098,7 +1100,7 @@ internal sealed unsafe partial class ViewportPanel : Panel, IViewportVisibility
     public static readonly ViewShading[] ShadingModes = { ViewShading.Wireframe, ViewShading.Colorless, ViewShading.Full };
 
     /// <summary>All overlays in menu order.</summary>
-    public static readonly OverlayMode[] OverlayModes = { OverlayMode.None, OverlayMode.Lux, OverlayMode.Noise, OverlayMode.Cables };
+    public static readonly OverlayMode[] OverlayModes = { OverlayMode.None, OverlayMode.Lux, OverlayMode.Noise, OverlayMode.Cables, OverlayMode.Smoke };
 
     private static readonly (ImGuiMouseButton, NavigationButton)[] Buttons =
     {

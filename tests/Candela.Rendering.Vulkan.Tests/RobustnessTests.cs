@@ -23,12 +23,37 @@ public sealed class RobustnessTests
             var everything = new PreviewSettings { AutoExposure = true, Indirect = IndirectLighting.RayTraced };
             void EveryView(PreviewSettings settings)
             {
-                foreach (var overlay in new[] { OverlayMode.None, OverlayMode.Lux, OverlayMode.Noise, OverlayMode.Cables })
+                foreach (var overlay in new[] { OverlayMode.None, OverlayMode.Lux, OverlayMode.Noise, OverlayMode.Cables, OverlayMode.Smoke })
                 {
                     foreach (var shading in new[] { ViewShading.Full, ViewShading.Colorless, ViewShading.Wireframe })
                         renderer.Render(target, camera, new ViewOptions { Overlay = overlay, Shading = shading, ShowBeamOutlines = true }, settings, 1f / 60f);
                 }
             }
+
+            // Overlay gradients from user data that cannot be baked as they are (no stop list, an inverted or a
+            // non-finite range, none at all): the overlay's default is drawn instead of failing every frame.
+            var damagedGradients = new Func<ColorGradient?>[]
+            {
+                () => new ColorGradient { Stops = null! },
+                () => new ColorGradient { RangeMin = 5f, RangeMax = 1f, Stops = { new GradientStop(1f, Vector4.One) } },
+                () => new ColorGradient { RangeMin = float.NaN, RangeMax = float.PositiveInfinity, Logarithmic = true },
+                () => null,
+            };
+            foreach (var make in damagedGradients)
+            {
+                foreach (var overlay in new[] { OverlayMode.Lux, OverlayMode.Noise, OverlayMode.Smoke })
+                {
+                    var view = new ViewOptions { Overlay = overlay, LuxGradient = make()!, NoiseGradient = make()!, SmokeGradient = make()! };
+                    renderer.Render(target, camera, view, everything, 1f / 60f);
+                }
+            }
+
+            renderer.World.SetSmokeEmitters(new[]
+            {
+                new SmokeEmitterMarker(new Vector3(float.NaN), Vector3.UnitZ, 1f, SmokeEmitterMarkerKind.Hazer, Guid.NewGuid()),
+                new SmokeEmitterMarker(Vector3.Zero, new Vector3(float.PositiveInfinity), float.NaN, (SmokeEmitterMarkerKind)99, Guid.Empty),
+                new SmokeEmitterMarker(new Vector3(1e30f), Vector3.Zero, -5f, SmokeEmitterMarkerKind.Fan, Guid.Empty),
+            });
 
             // No lights, but haze, smoke, a flame and a noise field.
             var grid = new VolumeGrid { Min = new Vector3(-2f), Max = new Vector3(2f), SizeX = 4, SizeY = 4, SizeZ = 4, Values = Enumerable.Repeat(0.5f, 64).ToArray() };

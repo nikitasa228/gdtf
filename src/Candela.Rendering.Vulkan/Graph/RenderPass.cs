@@ -10,6 +10,9 @@ namespace Candela.Rendering.Vulkan;
 /// </summary>
 internal enum RenderStage
 {
+    /// <summary>Diagnostics recorded before everything else (test hooks such as filling the temporal histories).</summary>
+    Diagnostics = 50,
+
     /// <summary>Shadow maps (and reflective shadow maps) of the spot lights into the shadow atlas.</summary>
     ShadowAtlas = 100,
 
@@ -33,6 +36,9 @@ internal enum RenderStage
 
     /// <summary>Alpha-blended and transmissive surfaces, back to front.</summary>
     Transparent = 600,
+
+    /// <summary>Diagnostics on the finished HDR image before post-processing (test hooks).</summary>
+    DiagnosticsAfterScene = 650,
 
     /// <summary>Bloom and the auto-exposure measurement.</summary>
     HdrPost = 700,

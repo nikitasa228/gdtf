@@ -47,5 +47,5 @@ void main()
         E += v.flux * (cosV * cosP * lightPathTransmittance(d2 * invD) / (PI * max(d2, VPL_MIN_DISTANCE * VPL_MIN_DISTANCE)));
     }
 
-    imageStore(outIndirect, p, vec4(finiteLight(E), viewDepthOf(P)));
+    imageStore(outIndirect, p, vec4(finiteLight(E), finiteClamp(viewDepthOf(P), 0.0, HALF_SAFE_MAX)));
 }

@@ -81,7 +81,7 @@ internal static class Program
         writer.WriteLine("Usage:");
         writer.WriteLine("  candela render <scene.mvr|scene.candela> --out <file.png> [--width W] [--height H]");
         writer.WriteLine("                 [--camera x,y,z --target x,y,z | --view front|top|side|auto] [--fov <deg>]");
-        writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables] [--haze <1/m>]");
+        writer.WriteLine("                 [--mode full|colorless|wireframe] [--overlay none|lux|noise|cables|smoke] [--haze <1/m>]");
         writer.WriteLine("                 [--look open-white|demo|show|dmx-file <recording.cdmx>] [--time <s|HH:MM:SS:FF>]");
         writer.WriteLine("                 [--end <s|HH:MM:SS:FF> [--fps F]] [--ev auto|floor|<EV100>] [--auto-exposure] [--frames N]");
         writer.WriteLine("                 [--grid] [--floor auto|none] [--work-light off|auto|on]");
@@ -103,6 +103,8 @@ internal static class Program
         writer.WriteLine("      are up, --exr also writes linear HDR OpenEXR (with albedo, normal and depth layers), --denoise filters");
         writer.WriteLine("      the result (the EXR keeps the raw one as layer 'raw'). Auto exposure meters the first image; a sequence");
         writer.WriteLine("      keeps it. Defaults: 6 bounces, 2 volume bounces, seed 0, no clamp. Ctrl+C writes what is rendered.");
+        writer.WriteLine("      --overlay smoke greys the scene and shows the density of haze and smoke (scattering coefficient, 1/m) on");
+        writer.WriteLine("      surfaces and as coloured fog, with arrows on hazers, fog machines, fans and flames (length = output).");
         writer.WriteLine("      --work-light auto adds a neutral work light (key and ambient) when no fixture emits, on always; a render");
         writer.WriteLine("      never gets it unless asked (default off).");
         writer.WriteLine();

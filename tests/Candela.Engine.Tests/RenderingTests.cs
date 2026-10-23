@@ -212,6 +212,143 @@ public sealed class RenderingTests
     }
 
     [SkippableFact]
+    public void Cli_render_with_the_smoke_overlay_greys_the_scene_and_marks_the_running_hazer()
+    {
+        using (CreateRendererOrSkip())
+        {
+            // only probes for a device; the CLI creates its own renderer
+        }
+        string dir = TestEnvironment.NewTempDirectory("cli-smoke");
+        string project = Path.Combine(dir, "hazer.candela");
+        using (var engine = TestEnvironment.CreateEngine("cli-smoke-build"))
+        {
+            SceneBuilder.Floor(engine.Scene, 12f, Core.SceneGraph.Components.MaterialIds.WoodStage);
+            var hazer = SceneBuilder.Fixture(engine.Scene, SceneBuilder.EntourHaze, "1 Channel Mode", new System.Numerics.Vector3(0f, 0f, 0f),
+                name: "Hazer");
+            hazer.Get<Core.SceneGraph.Components.FixtureComponent>()!.ManualAttributes["Haze1"] = 100f;
+            Assert.True(engine.SaveAs(project).Success);
+        }
+
+        string png = Path.Combine(dir, "smoke.png");
+        var output = new StringWriter();
+        var error = new StringWriter();
+        int code = Cli.Program.Run(
+            ["render",
+                project,
+                "--out",
+                png,
+                "--width",
+                "320",
+                "--height",
+                "180",
+                "--overlay",
+                "smoke",
+                "--look",
+                "show",
+                "--time",
+                "4",
+                "--camera",
+                "0,-6,3",
+                "--target",
+                "0,0,0.8",
+                "--cache",
+                Path.Combine(dir, "cache"),
+                "--library",
+                TestEnvironment.Root],
+            output, error);
+        Assert.True(code == Cli.Program.ExitOk, $"exit {code}\n{output}\n{error}");
+        string text = output.ToString();
+        Assert.Contains("overlay Smoke", text, StringComparison.Ordinal);
+        Assert.Contains("Smoke:    overlay 0.005 … 2 /m", text, StringComparison.Ordinal);
+        Assert.Contains("Hazer (haze) 100 %", text, StringComparison.Ordinal);
+        File.Copy(png, Path.Combine(OutputDirectory, "cli-smoke-overlay.png"), overwrite: true);
+
+        // the hazer's arrow (cyan) is drawn; everything else is grey or tinted by the gradient's colours
+        Assert.True(ImageImporter.TryDecode(File.ReadAllBytes(png), out var image, out var problem), problem);
+        int cyan = 0;
+        for (int i = 0; i < image!.Width * image.Height; i++)
+        {
+            int r = image.Pixels[4 * i], g = image.Pixels[4 * i + 1], b = image.Pixels[4 * i + 2];
+            if (b > 200 && g > 170 && r < 140) cyan++;
+        }
+        Assert.True(cyan > 20, $"no hazer marker: {cyan} cyan pixels");
+    }
+
+    [SkippableFact]
+    public void Cli_smoke_render_of_a_project_with_a_damaged_smoke_gradient_uses_a_safe_one()
+    {
+        // A project's view settings are user data (hand-edited, from another version): a smoke gradient without stops,
+        // with an inverted or non-finite range must not stop `candela render --overlay smoke` (the renderer bakes the
+        // gradient every frame and walks its stops).
+        using (CreateRendererOrSkip())
+        {
+            // only probes for a device; the CLI creates its own renderer
+        }
+        string dir = TestEnvironment.NewTempDirectory("cli-smoke-damaged");
+        var damaged = new (string Name, Func<Rendering.ColorGradient> Make)[]
+        {
+            ("no stops", () => new Rendering.ColorGradient { Stops = null!, RangeMin = 0.01f, RangeMax = 1f, Logarithmic = true }),
+            ("inverted", () =>
+            {
+                var g = Rendering.ColorGradient.DefaultSmoke();
+                g.RangeMin = 3f;
+                g.RangeMax = 0.01f;
+                return g;
+            }),
+            ("not finite", () =>
+            {
+                var g = Rendering.ColorGradient.DefaultSmoke();
+                g.RangeMin = float.NaN;
+                g.RangeMax = float.PositiveInfinity;
+                g.Stops[1] = g.Stops[1] with { Value = float.NaN };
+                return g;
+            }),
+        };
+        foreach (var (name, make) in damaged)
+        {
+            string project = Path.Combine(dir, $"{name}.candela");
+            using (var engine = TestEnvironment.CreateEngine("cli-smoke-damaged-build"))
+            {
+                SceneBuilder.Floor(engine.Scene, 8f);
+                engine.View.View.Overlay = Rendering.OverlayMode.Smoke;
+                engine.View.View.SmokeGradient = make();
+                Assert.True(engine.SaveAs(project).Success, name);
+            }
+
+            var output = new StringWriter();
+            var error = new StringWriter();
+            int code = Cli.Program.Run(
+                ["render",
+                    project,
+                    "--out",
+                    Path.Combine(dir, $"{name}.png"),
+                    "--width",
+                    "96",
+                    "--height",
+                    "64",
+                    "--overlay",
+                    "smoke",
+                    "--haze",
+                    "0.02",
+                    "--camera",
+                    "0,-6,3",
+                    "--target",
+                    "0,0,0.5",
+                    "--cache",
+                    Path.Combine(dir, "cache"),
+                    "--library",
+                    TestEnvironment.Root],
+                output, error);
+            Assert.True(code == Cli.Program.ExitOk, $"{name}: exit {code}\n{output}\n{error}");
+            var summary = System.Text.RegularExpressions.Regex.Match(output.ToString(), @"Smoke:    overlay ([^ ]+) … ([^ ]+) /m");
+            Assert.True(summary.Success, $"{name}: {output}");
+            float lo = float.Parse(summary.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+            float hi = float.Parse(summary.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
+            Assert.True(float.IsFinite(lo) && float.IsFinite(hi) && hi > lo && lo > 0f, $"{name}: range {lo} … {hi}");
+        }
+    }
+
+    [SkippableFact]
     public void Thumbnail_of_a_file_deleted_since_the_scan_is_a_dark_picture_not_an_exception()
     {
         using var renderer = CreateRendererOrSkip();

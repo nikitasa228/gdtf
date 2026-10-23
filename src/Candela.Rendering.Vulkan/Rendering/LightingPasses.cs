@@ -284,8 +284,9 @@ internal sealed class RayTracedGiPass : RenderPass
 }
 
 /// <summary>
-/// Lux and noise overlays: per-pixel illuminance (lx) or sound level (dB) of every visible opaque surface into the
-/// analysis image (EQUAL depth test against the pre-pass; analysis.frag). Runs in every view mode.
+/// Lux, noise and smoke overlays: per-pixel illuminance (lx), sound level (dB) or scattering coefficient of the air
+/// (1/m) at every visible opaque surface into the analysis image (EQUAL depth test against the pre-pass; analysis.frag).
+/// Runs in every view mode.
 /// </summary>
 internal sealed class AnalysisPass : RenderPass
 {
@@ -295,7 +296,7 @@ internal sealed class AnalysisPass : RenderPass
     }
 
     public override bool IsActive(PassContext context) =>
-        context.Overlay is OverlayMode.Lux or OverlayMode.Noise && context.Target.Analysis is not null;
+        context.Overlay is OverlayMode.Lux or OverlayMode.Noise or OverlayMode.Smoke && context.Target.Analysis is not null;
 
     public override void DeclareResources(PassContext context, BarrierBatch barriers)
     {

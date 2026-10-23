@@ -70,6 +70,12 @@ internal sealed class SettingsWindow
     private string _gridFormat = "";
     private string _formatsLanguage = "";
     private bool _focusRequested;
+    private float? _pendingScalePercent;
+    private float? _pendingFontSize;
+    private float _limitedScale = float.NaN;
+    private float _sizedForScale = float.NaN;
+    private string _limitedLanguage = "";
+    private string _limitedNote = "";
 
     /// <summary>Creates the window.</summary>
     public SettingsWindow(WorkspaceContext context, KeyBindingsService keys, CommandRegistry commands, KeyBindingDispatcher dispatcher,
@@ -125,8 +131,12 @@ internal sealed class SettingsWindow
         }
 
         var viewport = ImGui.GetMainViewport();
-        ImGui.SetNextWindowSize(PopupPlacement.FitInWindow(new Vector2(860, 560) * scale, viewport.WorkSize), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, ImGuiCond.FirstUseEver, new Vector2(0.5f, 0.5f));
+        // The window follows a changed UI scale (sized again, within the main window), so its controls — the scale
+        // slider among them — stay reachable however large the interface became.
+        var sizing = MathF.Abs(scale - _sizedForScale) > 1e-3f && float.IsFinite(_sizedForScale) ? ImGuiCond.Always : ImGuiCond.FirstUseEver;
+        _sizedForScale = scale;
+        ImGui.SetNextWindowSize(PopupPlacement.FitInWindow(new Vector2(860, 560) * scale, viewport.WorkSize), sizing);
+        ImGui.SetNextWindowPos(viewport.WorkPos + viewport.WorkSize * 0.5f, sizing, new Vector2(0.5f, 0.5f));
         if (_focusRequested)
         {
             ImGui.SetNextWindowFocus();
@@ -244,13 +254,32 @@ internal sealed class SettingsWindow
             ImGui.EndCombo();
         }
 
+        // Both sliders apply their value when they are let go (or a typed value is confirmed), not while dragging: the
+        // re-scaled UI would move the slider under the mouse, and every intermediate value would restyle the whole UI
+        // and rasterise the fonts at yet another size.
         PropertyGrid.Row("");
-        float percent = s.UiScale * 100f;
-        if (ImGui.SliderFloat("##scale-fine", ref percent, 100f, 300f, "%.0f %%"))
+        if (DeferredSlider.Float("##scale-fine", ref _pendingScalePercent, s.UiScale * 100f, UiScale.Min * 100f, UiScale.Max * 100f, "%.0f %%",
+                out float percent))
             SetScale(MathF.Round(percent) / 100f);
+
+        float applied = ImGui.GetStyle().FontScaleMain;
+        if (_pendingScalePercent is null && applied < s.UiScale - 0.005f)
+        {
+            if (applied != _limitedScale || !string.Equals(_limitedLanguage, Loc.Language, StringComparison.Ordinal))
+            {
+                _limitedScale = applied;
+                _limitedLanguage = Loc.Language;
+                _limitedNote = Loc.Format(Str.SettingsUiScaleLimited, UiScale.AppliedPercent(applied));
+            }
+
+            PropertyGrid.Row("");
+            ImGui.PushStyleColor(ImGuiCol.Text, Theme.TextMuted);
+            SafeText.Wrapped(_limitedNote);
+            ImGui.PopStyleColor();
+        }
+
         PropertyGrid.Row(Str.SettingsFontSize);
-        float font = s.FontSize;
-        if (ImGui.SliderFloat("##font", ref font, UiScale.MinFontSize, UiScale.MaxFontSize, "%.0f px"))
+        if (DeferredSlider.Float("##font", ref _pendingFontSize, s.FontSize, UiScale.MinFontSize, UiScale.MaxFontSize, "%.0f px", out float font))
         {
             s.FontSize = UiScale.ClampFontSize(MathF.Round(font));
             Changed();

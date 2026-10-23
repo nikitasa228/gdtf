@@ -80,14 +80,15 @@ internal sealed class StagePanelContext
 
 /// <summary>
 /// State shared by the engine-backed panels and the viewports: the preset bindings of the Preview and Render settings
-/// and of the lux and noise overlay gradients (one live object each, used by every viewport), their binding to the
+/// and of the lux, noise and smoke overlay gradients (one live object each, used by every viewport), their binding to the
 /// open project's <c>view</c> settings section, external control (protocols, test console, DMX recorder), the final
 /// render job, and the request to show a cable's link view. Main thread only.
 /// </summary>
 internal sealed class StageToolState : IDisposable
 {
     /// <summary>Preset folder names (under the presets directory of the config folder).</summary>
-    public const string PreviewKind = "preview", FinalRenderKind = "final-render", LuxKind = "lux-gradient", NoiseKind = "noise-gradient";
+    public const string PreviewKind = "preview", FinalRenderKind = "final-render", LuxKind = "lux-gradient", NoiseKind = "noise-gradient",
+        SmokeKind = "smoke-gradient";
 
     private ViewSettings? _boundView;
     private long _viewVersions = -1;
@@ -108,6 +109,8 @@ internal sealed class StageToolState : IDisposable
             static g => SettingsCopy.Sanitized(g, ColorGradient.DefaultLux), store);
         Noise = new PresetBinding<ColorGradient>(NoiseKind, ColorGradient.DefaultNoise(), ColorGradient.DefaultNoise, SettingsCopy.Copy,
             static g => SettingsCopy.Sanitized(g, ColorGradient.DefaultNoise), store);
+        Smoke = new PresetBinding<ColorGradient>(SmokeKind, ColorGradient.DefaultSmoke(), ColorGradient.DefaultSmoke, SettingsCopy.Copy,
+            static g => SettingsCopy.Sanitized(g, ColorGradient.DefaultSmoke), store);
         External = new ExternalControl();
         Render = new RenderJobRunner();
     }
@@ -123,6 +126,9 @@ internal sealed class StageToolState : IDisposable
 
     /// <summary>The noise overlay gradient every viewport uses.</summary>
     public PresetBinding<ColorGradient> Noise { get; }
+
+    /// <summary>The smoke overlay gradient every viewport uses (scattering coefficient of the air, 1/m).</summary>
+    public PresetBinding<ColorGradient> Smoke { get; }
 
     /// <summary>Protocols, test console and DMX recorder of the external-control panel.</summary>
     public ExternalControl External { get; }
@@ -154,8 +160,8 @@ internal sealed class StageToolState : IDisposable
     /// <summary>Grid switch to apply to every viewport, or null to leave each viewport's own switch.</summary>
     public bool? ViewportGrid { get; private set; }
 
-    /// <summary>Sum of the live values' change counters (preview, final render, lux and noise gradients).</summary>
-    private long LiveVersions => Preview.Version + FinalRender.Version + Lux.Version + Noise.Version;
+    /// <summary>Sum of the live values' change counters (preview, final render, lux, noise and smoke gradients).</summary>
+    private long LiveVersions => Preview.Version + FinalRender.Version + Lux.Version + Noise.Version + Smoke.Version;
 
     /// <summary>Raised when the user asks to see how a cable links its devices (properties panel → connected cable).</summary>
     public event Action<Guid>? CableLinkRequested;
@@ -214,6 +220,7 @@ internal sealed class StageToolState : IDisposable
             view.View ??= new ViewOptions();
             Lux.Adopt(view.View.LuxGradient);
             Noise.Adopt(view.View.NoiseGradient);
+            Smoke.Adopt(view.View.SmokeGradient);
             _viewVersions = LiveVersions;
         }
         else if (LiveVersions != _viewVersions)
@@ -231,6 +238,8 @@ internal sealed class StageToolState : IDisposable
             view.View.LuxGradient = Lux.Live;
         if (!ReferenceEquals(view.View.NoiseGradient, Noise.Live))
             view.View.NoiseGradient = Noise.Live;
+        if (!ReferenceEquals(view.View.SmokeGradient, Smoke.Live))
+            view.View.SmokeGradient = Smoke.Live;
     }
 
     /// <summary>

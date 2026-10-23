@@ -128,7 +128,7 @@ internal sealed record AppOptions
                     o = o with { Height = Int(args, ref i, a, 240, 16384) };
                     break;
                 case "--scale":
-                    o = o with { UiScale = Float(args, ref i, a, 1f, 4f) };
+                    o = o with { UiScale = Float(args, ref i, a, Ui.UiScale.Min, Ui.UiScale.Max) };
                     break;
                 case "--language":
                     {
@@ -185,7 +185,7 @@ internal sealed record AppOptions
           --open <file>          scene or project to open (.candela, .mvr)
           --layout <name>        start with a named layout (saved layouts or: default, viewports-4)
           --reset-layout         ignore the saved workspace and start with the default layout
-          --scale <1-4>          UI scale (1 = 100 %), overrides the setting
+          --scale <1-3>          UI scale (1 = 100 %), overrides the setting
           --language <en|ru>     UI language, overrides the setting
           --device <name>        preferred GPU (name substring)
           --validation           enable the Vulkan validation layer

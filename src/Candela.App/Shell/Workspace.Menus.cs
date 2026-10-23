@@ -89,6 +89,8 @@ internal sealed partial class Workspace
             () => ActiveViewport.View.Overlay == OverlayMode.Noise);
         Command(EditorActions.OverlayCables, Str.OverlayCables, Icons.Cable, () => ActiveViewport.View.Overlay = OverlayMode.Cables, null,
             () => ActiveViewport.View.Overlay == OverlayMode.Cables);
+        Command(AppActions.OverlaySmoke, Str.OverlaySmoke, Icons.CloudFog, () => ActiveViewport.View.Overlay = OverlayMode.Smoke, null,
+            () => ActiveViewport.View.Overlay == OverlayMode.Smoke);
         Command(AppActions.ToggleGrid, Str.ViewShowGrid, Icons.Grid, () => ActiveViewport.View.ShowGrid = !ActiveViewport.View.ShowGrid, null,
             () => ActiveViewport.View.ShowGrid);
 
@@ -282,6 +284,7 @@ internal sealed partial class Workspace
                 Item(EditorActions.OverlayLux);
                 Item(EditorActions.OverlayNoise);
                 Item(EditorActions.OverlayCables);
+                Item(AppActions.OverlaySmoke);
                 _menu.End();
             }
 

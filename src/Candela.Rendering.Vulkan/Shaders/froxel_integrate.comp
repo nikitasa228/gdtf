@@ -34,11 +34,14 @@ void main()
         float dl = (z1 - z0) * stretch;
         z0 = z1;
         vec4 inj = texelFetch(injectedVolume, ivec3(id, k), 0);
-        float sigmaT = max(inj.a, 0.0);
+        // Checked on its bits: one non-finite froxel would otherwise poison every slice behind it in this column
+        // (an 8 x 8-pixel block of the picture, flickering with the froxel jitter).
+        inj = vec4(finiteLight(inj.rgb), finiteClamp(inj.a, 0.0, 1e4));
+        float sigmaT = inj.a;
         float stepT = exp(-sigmaT * dl);
         vec3 integrated = sigmaT > 1e-6 ? inj.rgb * ((1.0 - stepT) / sigmaT) : inj.rgb * dl;
         L += T * integrated;
         T *= stepT;
-        imageStore(outIntegrated, ivec3(id, k), vec4(finiteLight(L), T));
+        imageStore(outIntegrated, ivec3(id, k), vec4(finiteLight(L), finiteClamp(T, 0.0, 1.0)));
     }
 }

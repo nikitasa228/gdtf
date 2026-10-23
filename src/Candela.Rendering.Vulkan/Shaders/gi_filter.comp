@@ -63,7 +63,7 @@ void main()
                 w *= pow(max(dot(n, normalUnder(q, size)), 0.0), FILTER_NORMAL_POWER);
             }
 
-            if (!(w > 0.0) || any(isnan(s.rgb)))
+            if (!(w > 0.0) || !allFinite(s))
                 continue;
             sum += s.rgb * w;
             weightSum += w;
