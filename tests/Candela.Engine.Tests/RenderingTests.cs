@@ -318,8 +318,26 @@ public sealed class RenderingTests
             var output = new StringWriter();
             var error = new StringWriter();
             int code = Cli.Program.Run(
-                ["render", project, "--out", Path.Combine(dir, $"{name}.png"), "--width", "96", "--height", "64", "--overlay", "smoke", "--haze", "0.02",
-                    "--camera", "0,-6,3", "--target", "0,0,0.5", "--cache", Path.Combine(dir, "cache"), "--library", TestEnvironment.Root],
+                ["render",
+                    project,
+                    "--out",
+                    Path.Combine(dir, $"{name}.png"),
+                    "--width",
+                    "96",
+                    "--height",
+                    "64",
+                    "--overlay",
+                    "smoke",
+                    "--haze",
+                    "0.02",
+                    "--camera",
+                    "0,-6,3",
+                    "--target",
+                    "0,0,0.5",
+                    "--cache",
+                    Path.Combine(dir, "cache"),
+                    "--library",
+                    TestEnvironment.Root],
                 output, error);
             Assert.True(code == Cli.Program.ExitOk, $"{name}: exit {code}\n{output}\n{error}");
             var summary = System.Text.RegularExpressions.Regex.Match(output.ToString(), @"Smoke:    overlay ([^ ]+) … ([^ ]+) /m");
