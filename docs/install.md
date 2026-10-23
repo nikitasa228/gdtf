@@ -22,11 +22,11 @@ Candela — визуализатор и редактор сценическог�
 
 ### Установка
 
-1. Скачайте `Candela-Setup-<версия>-win-x64.exe` (например, `Candela-Setup-0.1.0-preview.1-win-x64.exe`): со
+1. Скачайте `Candela-Setup-<версия>-win-x64.exe` (например, `Candela-Setup-0.1.0-preview.2-win-x64.exe`): со
    страницы *Releases* репозитория или из артефактов сборки *Windows installer* на вкладке *Actions*. Рядом лежит
    файл `.sha256`; проверить файл можно в PowerShell:
    ```powershell
-   Get-FileHash .\Candela-Setup-0.1.0-preview.1-win-x64.exe -Algorithm SHA256
+   Get-FileHash .\Candela-Setup-0.1.0-preview.2-win-x64.exe -Algorithm SHA256
    ```
 2. Запустите программу установки. **Эта версия не подписана**, поэтому Windows SmartScreen может показать окно
    «Система Windows защитила ваш компьютер». Нажмите **«Подробнее»**, затем **«Выполнить в любом случае»**.
@@ -53,8 +53,8 @@ Candela — визуализатор и редактор сценическог�
 **Тихая установка** (для администраторов):
 
 ```bat
-Candela-Setup-0.1.0-preview.1-win-x64.exe /S /AllUsers
-Candela-Setup-0.1.0-preview.1-win-x64.exe /S /CurrentUser /D=D:\Программы\Candela
+Candela-Setup-0.1.0-preview.2-win-x64.exe /S /AllUsers
+Candela-Setup-0.1.0-preview.2-win-x64.exe /S /CurrentUser /D=D:\Программы\Candela
 ```
 
 `/D=` должен быть последним параметром и без кавычек, даже если в пути есть пробелы. В тихом режиме
@@ -219,11 +219,11 @@ on the first start, where it keeps its files, and how to remove it.
 
 ### Installing
 
-1. Download `Candela-Setup-<version>-win-x64.exe` (e.g. `Candela-Setup-0.1.0-preview.1-win-x64.exe`) from the
+1. Download `Candela-Setup-<version>-win-x64.exe` (e.g. `Candela-Setup-0.1.0-preview.2-win-x64.exe`) from the
    repository's *Releases* page or from the artifacts of a *Windows installer* run on the *Actions* tab. A `.sha256`
    file comes with it; check the download in PowerShell:
    ```powershell
-   Get-FileHash .\Candela-Setup-0.1.0-preview.1-win-x64.exe -Algorithm SHA256
+   Get-FileHash .\Candela-Setup-0.1.0-preview.2-win-x64.exe -Algorithm SHA256
    ```
 2. Run it. **This preview is not code-signed**, so Windows SmartScreen may say "Windows protected your PC". Click
    **More info**, then **Run anyway**.
@@ -248,8 +248,8 @@ projects and the fixture library stay.
 **Silent install** (for administrators):
 
 ```bat
-Candela-Setup-0.1.0-preview.1-win-x64.exe /S /AllUsers
-Candela-Setup-0.1.0-preview.1-win-x64.exe /S /CurrentUser /D=D:\Apps\Candela
+Candela-Setup-0.1.0-preview.2-win-x64.exe /S /AllUsers
+Candela-Setup-0.1.0-preview.2-win-x64.exe /S /CurrentUser /D=D:\Apps\Candela
 ```
 
 `/D=` must come last and must not be quoted, even when the path has spaces. A silent install adds the desktop
