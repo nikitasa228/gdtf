@@ -1155,7 +1155,8 @@ on a real (headless) Vulkan renderer with picking.
 The phase-B1 tests: `EngineSessionTests` (`EditorSession` over the real engine: Фокина opened, saved as `.candela`
 and reopened unchanged; a project, an MVR, a 3D model, an image and a GDTF imported, each one undo step; MVR export
 and reopening it; missing and damaged files failing with a reason in the Issues panel instead of an exception, in
-English and Russian; recent files; simulation pause), `SessionFlowTests` (the unsaved-changes, busy, open-or-import
+English and Russian; recent files; simulation pause; smoke in real time except while a render job holds the clock;
+an obstacle note the smoke solver raises on its own thread reaching the Issues panel without another edit), `SessionFlowTests` (the unsaved-changes, busy, open-or-import
 and recovery dialogs answered headlessly, recovery of an autosaved session, discarding it, file classification,
 Duplicate / Copy / Paste of a truss with its fixtures — references remapped, kept or cleared), `EngineViewportTests`
 (on a headless Vulkan device: the Фокина scene picked fixture by fixture — a part never comes back instead of its
