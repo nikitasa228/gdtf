@@ -64,6 +64,13 @@ internal enum BlendMode
     /// <summary>Premultiplied alpha: dst = src + (1 − αsrc)·dst.</summary>
     Premultiplied,
 
+    /// <summary>
+    /// Premultiplied colour (dst = src + (1 − αsrc)·dst) whose coverage takes its share out of the destination alpha
+    /// (αdst = (1 − αsrc)·αdst): display-referred overlays (reference drawings) over the HDR image, whose alpha is then the
+    /// share of scene light in the pixel — the auto exposure's histogram leaves the rest out.
+    /// </summary>
+    PremultipliedOverlay,
+
     /// <summary>Straight alpha: dst = αsrc·src + (1 − αsrc)·dst.</summary>
     Alpha,
 
@@ -158,6 +165,8 @@ internal sealed unsafe class PipelineLibrary : IDisposable
                 ColorTargets.One(TargetFormats.Hdr), DepthCompare: CompareOp.Equal));
             ForwardTransparent = Create(new GraphicsPipelineDesc("forward (transparent)", ShaderPrograms.MeshVertex, ShaderPrograms.ForwardTransparent,
                 VertexLayout.Mesh, ColorTargets.One(TargetFormats.Hdr), BlendMode.Premultiplied, DepthCompare: CompareOp.Greater));
+            ForwardReference = Create(new GraphicsPipelineDesc("forward (reference)", ShaderPrograms.MeshVertex, ShaderPrograms.ForwardTransparent,
+                VertexLayout.Mesh, ColorTargets.One(TargetFormats.Hdr), BlendMode.PremultipliedOverlay, DepthCompare: CompareOp.Greater));
             Colorless = Create(new GraphicsPipelineDesc("colorless", ShaderPrograms.MeshVertex, ShaderPrograms.Colorless, VertexLayout.Mesh,
                 ColorTargets.One(TargetFormats.Hdr), DepthCompare: CompareOp.Equal));
             if (polygonWireframe)
@@ -250,6 +259,13 @@ internal sealed unsafe class PipelineLibrary : IDisposable
     public Pipeline PrepassMask { get; }
     public Pipeline ForwardOpaque { get; }
     public Pipeline ForwardTransparent { get; }
+
+    /// <summary>
+    /// The transparent forward shader for reference instances (display-referred drawings): blended like
+    /// <see cref="ForwardTransparent"/>, but their coverage leaves the HDR image's scene-light share (its alpha).
+    /// </summary>
+    public Pipeline ForwardReference { get; }
+
     public Pipeline Colorless { get; }
 
     /// <summary>Polygon-mode LINE wireframe (default handle when <c>fillModeNonSolid</c> is unavailable).</summary>
@@ -651,12 +667,13 @@ internal sealed unsafe class PipelineLibrary : IDisposable
         switch (mode)
         {
             case BlendMode.Premultiplied:
+            case BlendMode.PremultipliedOverlay:
             case BlendMode.Alpha:
                 state.BlendEnable = true;
-                state.SrcColorBlendFactor = mode == BlendMode.Premultiplied ? BlendFactor.One : BlendFactor.SrcAlpha;
+                state.SrcColorBlendFactor = mode == BlendMode.Alpha ? BlendFactor.SrcAlpha : BlendFactor.One;
                 state.DstColorBlendFactor = BlendFactor.OneMinusSrcAlpha;
                 state.ColorBlendOp = BlendOp.Add;
-                state.SrcAlphaBlendFactor = BlendFactor.One;
+                state.SrcAlphaBlendFactor = mode == BlendMode.PremultipliedOverlay ? BlendFactor.Zero : BlendFactor.One;
                 state.DstAlphaBlendFactor = BlendFactor.OneMinusSrcAlpha;
                 state.AlphaBlendOp = BlendOp.Add;
                 break;

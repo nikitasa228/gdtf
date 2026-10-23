@@ -58,7 +58,7 @@ internal static class ShaderConstants
     public const uint BindingPassBuffer = 7;
 
     // Set 2 of the path tracer's pipelines (PathTracer): accumulation images, its acceleration structure, light
-    // snapshot, parameters and the exposure histogram.
+    // snapshot, parameters, the exposure histogram and the display-referred overlay (unlit and reference surfaces).
     public const uint BindingPtAccum = 0;
     public const uint BindingPtAux = 1;
     public const uint BindingPtGuide = 2;
@@ -69,7 +69,8 @@ internal static class ShaderConstants
     public const uint BindingPtParams = 7;
     public const uint BindingPtHistogram = 8;
     public const uint BindingPtInput = 9;
-    public const uint PtBindingCount = 10;
+    public const uint BindingPtOverlay = 10;
+    public const uint PtBindingCount = 11;
 
     /// <summary>
     /// Opacity of reference instances (<see cref="InstanceFlags.Reference"/>) whose material is not alpha-blended (ghost
@@ -302,6 +303,7 @@ internal static class ShaderConstants
         ("BINDING_PT_PARAMS", I(BindingPtParams)),
         ("BINDING_PT_HISTOGRAM", I(BindingPtHistogram)),
         ("BINDING_PT_INPUT", I(BindingPtInput)),
+        ("BINDING_PT_OVERLAY", I(BindingPtOverlay)),
         ("PT_MASK_SCENE", I(RayTracingScene.SceneMask) + "u"),
         ("PT_MASK_SHADOW", I(RayTracingScene.ShadowCasterMask) + "u"),
         ("PT_MASK_REFERENCE", I(RayTracingScene.ReferenceMask) + "u"),

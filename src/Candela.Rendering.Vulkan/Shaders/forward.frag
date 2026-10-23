@@ -81,7 +81,8 @@ void main()
         vec3 display = frame.viewMode == VIEW_COLORLESS ? clamp(rec2020ToRec709(albedo), 0.0, 1.0) : albedo;
         outColor = vec4(display * a, a);
 #else
-        outColor = vec4(albedo, 1.0);
+        // alpha 0: no scene light here (the HDR image's alpha is the share of scene light the auto exposure meters)
+        outColor = vec4(albedo, 0.0);
 #endif
         return;
     }

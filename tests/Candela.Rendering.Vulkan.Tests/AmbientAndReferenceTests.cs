@@ -121,15 +121,23 @@ public sealed class AmbientAndReferenceTests
                 AssertShowsColor(colorlessDisplay, x, y, QuadrantColors[q], $"Colorless, quadrant {q}");
             }
 
-            // At opacity 1 the drawing covers what lies behind it completely (not the 50 % of ghost geometry).
+            // At opacity 1 the drawing covers what lies behind it completely (not the 50 % of ghost geometry), and the
+            // display shows the image's own pixels: the display-referred colour is not tone mapped, whichever tone mapper.
             world.UpdateMaterial(material, Drawing(1f), images);
-            renderer.Render(target, view.Camera, full, new PreviewSettings { Bloom = false }, 0f);
-            hdr = renderer.ReadHdr(target);
-            for (int q = 0; q < 4; q++)
+            foreach (var toneMapper in new[] { ToneMapper.AgX, ToneMapper.Aces, ToneMapper.Neutral })
             {
-                var (x, y, _) = view.NearestPixel(QuadrantPoints[q]);
-                var expected = ColorSpaces.Rec709ToRec2020(QuadrantColors[q]) / hdr.Exposure;
-                Assert.True(Vector3.Distance(hdr.At(x, y), expected) <= 0.02f * expected.Length(), $"opaque drawing, quadrant {q}: {hdr.At(x, y)}");
+                renderer.Render(target, view.Camera, full, new PreviewSettings { Bloom = false, ToneMapper = toneMapper }, 0f);
+                hdr = renderer.ReadHdr(target);
+                display = renderer.ReadPixels(target);
+                for (int q = 0; q < 4; q++)
+                {
+                    var (x, y, _) = view.NearestPixel(QuadrantPoints[q]);
+                    var expected = ColorSpaces.Rec709ToRec2020(QuadrantColors[q]) / hdr.Exposure;
+                    Assert.True(Vector3.Distance(hdr.At(x, y), expected) <= 0.02f * expected.Length(), $"opaque drawing, quadrant {q}: {hdr.At(x, y)}");
+                    int i = 4 * (y * display.Width + x);
+                    var shown = new Vector3(display.Pixels[i], display.Pixels[i + 1], display.Pixels[i + 2]);
+                    Assert.True(Vector3.Distance(shown, QuadrantColors[q] * 255f) <= 4f, $"{toneMapper}, quadrant {q}: the image's pixel shows as {shown}");
+                }
             }
 
             // The same material on a normal (lit) instance is a print lit by the stage, not the display value.
@@ -200,6 +208,123 @@ public sealed class AmbientAndReferenceTests
             // Beside the drawing the floor is the same with and without it (no light reflected from it, no shadow).
             var (sx, sy, _) = view.NearestPixel(new Vector3(1.3f, 0f, 0f));
             Assert.InRange(withDrawing.MeanLuminance(sx, sy, 1), floorOnly.MeanLuminance(sx, sy, 1) * 0.95f, floorOnly.MeanLuminance(sx, sy, 1) * 1.05f);
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
+    public void A_reference_drawing_does_not_drive_the_real_time_auto_exposure()
+    {
+        // A drawing is written after the exposure (a display value): metering it as scene light would chase its own
+        // tail (the exposure darkens the stage until it is black). The lit floor keeps its exposure with the drawing.
+        var renderer = TestRenderers.CreateOrSkip();
+        try
+        {
+            var world = renderer.World;
+            var floor = TopDownView.WhiteLambertian();
+            floor.BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+            FinalRenderSupport.Floor(world, floor, 8f);
+            world.SetLights([StageSceneLights.Overhead(4000f)]);
+            world.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+            var images = new SceneTests.ImageSource { ["drawing"] = Quadrants() };
+            var plane = world.CreateMesh(ProceduralMeshes.Plane(2f, 2f));
+            var material = world.CreateMaterial(Drawing(1f), images);
+            // 1 m × 1 m in a corner of the view, 1 m above the floor: it hides little of the lit floor the meter reads
+            var at = Matrix4x4.CreateScale(0.5f) * Matrix4x4.CreateTranslation(0.9f, 0.9f, 1f);
+            var drawing = world.CreateInstance(plane, new[] { material }, at, InstanceFlags.Reference, 1);
+            var view = new TopDownView(Size, Size, 3f);
+            using var target = renderer.CreateTarget(Size, Size);
+            var full = new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f };
+            var preview = new PreviewSettings { Bloom = false, AutoExposure = true };
+
+            float Adapted()
+            {
+                for (int frame = 0; frame < 40; frame++)
+                    renderer.Render(target, view.Camera, full, preview, 0.5f);
+                return renderer.ReadHdr(target).Exposure;
+            }
+
+            float withDrawing = Adapted();
+            var display = renderer.ReadPixels(target);
+            world.UpdateInstance(drawing, at, InstanceFlags.Reference | InstanceFlags.Hidden);
+            float floorOnly = Adapted();
+            Assert.InRange(MathF.Log2(withDrawing / floorOnly), -0.25f, 0.25f);
+            for (int q = 0; q < 4; q++)
+            {
+                var (x, y, _) = view.NearestPixel(Vector3.Transform(QuadrantPoints[q], at));
+                AssertShowsColor(display, x, y, QuadrantColors[q], $"auto exposure, quadrant {q}");
+            }
+
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableFact]
+    public void The_path_tracer_shows_a_reference_drawing_as_the_real_time_view_whatever_the_exposure()
+    {
+        // The final render's auto exposure meters the scene light only and ends far from the camera's EV 2: the drawing
+        // still shows the same display pixels as the real-time view (an opaque drawing over the lit floor: its image's
+        // colours, not tone mapped), and the exposure is the one of the floor alone.
+        var renderer = FinalRenderSupport.CreateOrSkip();
+        try
+        {
+            var world = renderer.World;
+            var floor = TopDownView.WhiteLambertian();
+            floor.BaseColorFactor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+            FinalRenderSupport.Floor(world, floor, 8f);
+            world.SetLights([StageSceneLights.Overhead(4000f)]);
+            world.SetAtmosphere(new AtmosphereState { BaseScattering = 0f });
+            var images = new SceneTests.ImageSource { ["drawing"] = Quadrants() };
+            var plane = world.CreateMesh(ProceduralMeshes.Plane(2f, 2f));
+            var material = world.CreateMaterial(Drawing(1f), images);
+            // 1 m × 1 m in a corner of the view, 1 m above the floor: it hides little of the lit floor the meter reads
+            var at = Matrix4x4.CreateScale(0.5f) * Matrix4x4.CreateTranslation(0.9f, 0.9f, 1f);
+            var drawing = world.CreateInstance(plane, new[] { material }, at, InstanceFlags.Reference, 1);
+            const int size = 48;
+            var view = new TopDownView(size, size, 3f, ev100: 2f);
+            var settings = FinalRenderSupport.Settings(size, size, 16, bounces: 2);
+            var options = new FinalRenderOptions { BackgroundLuminance = 0f, AutoExposure = true };
+
+            using var target = renderer.CreateTarget(size, size);
+            renderer.Render(target, view.Camera, new ViewOptions { ShowGrid = false, BackgroundLuminance = 0f }, new PreviewSettings { Bloom = false }, 0f);
+            var realTime = renderer.ReadPixels(target);
+
+            ImageData finalDisplay;
+            float exposure;
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, settings, options))
+            {
+                finalDisplay = render.Preview();
+                exposure = render.Exposure;
+                FinalRenderSupport.Save(render, "pt-reference-drawing-auto-exposure");
+            }
+
+            float camera = Core.Math.Units.ExposureFromEv100(2f);
+            Assert.True(MathF.Abs(MathF.Log2(exposure / camera)) > 3f, $"the auto exposure stayed at the camera's EV ({exposure} vs {camera})");
+            for (int q = 0; q < 4; q++)
+            {
+                var (x, y, _) = view.NearestPixel(Vector3.Transform(QuadrantPoints[q], at));
+                int i = 4 * (y * size + x);
+                var pt = new Vector3(finalDisplay.Pixels[i], finalDisplay.Pixels[i + 1], finalDisplay.Pixels[i + 2]);
+                var rt = new Vector3(realTime.Pixels[i], realTime.Pixels[i + 1], realTime.Pixels[i + 2]);
+                Assert.True(Vector3.Distance(pt, rt) <= 6f, $"quadrant {q}: the final render shows {pt}, the real-time view {rt}");
+                AssertShowsColor(finalDisplay, x, y, QuadrantColors[q], $"final render, quadrant {q}");
+            }
+
+            world.UpdateInstance(drawing, at, InstanceFlags.Reference | InstanceFlags.Hidden);
+            using (var render = FinalRenderSupport.RenderToCompletion(renderer, view.Camera, settings, options))
+            {
+                render.Preview();
+                Assert.InRange(MathF.Log2(render.Exposure / exposure), -0.25f, 0.25f);
+            }
+
             TestVulkan.AssertNoValidationErrors(renderer.Context);
         }
         finally

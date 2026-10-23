@@ -321,8 +321,8 @@ internal struct GpuPtParams
     public Vector4 MediaMax;
 
     /// <summary>
-    /// x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 1 / the camera's
-    /// exposure (fixed for the render; unlit and reference surfaces are display-referred against it).
+    /// x = smoke scattering majorant (1/m), y = flame absorption (1/m), z = Henyey–Greenstein g, w = 0 (unused: unlit and
+    /// reference surfaces go to the display-referred overlay, independent of the exposure).
     /// </summary>
     public Vector4 Majorants;
 

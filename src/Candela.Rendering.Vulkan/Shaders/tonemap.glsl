@@ -90,4 +90,17 @@ vec3 displayTransform(vec3 hdr, uint mode)
     return clamp(hdr, 0.0, 1.0);
 }
 
+// The display transform of a pixel whose HDR value is partly display-referred colour (reference drawings, unlit
+// materials: written after the exposure): sceneShare = the share of scene light (the HDR image's alpha, 1 for scene
+// light alone). The display-referred share is shown as it is (display-linear Rec.709, clamped), not tone mapped, so a
+// drawing shows its image's colours; the scene light is tone mapped.
+vec3 displayTransformShared(vec3 hdr, uint mode, float sceneShare)
+{
+    vec3 display = displayTransform(hdr, mode);
+    float share = sceneShare >= 0.0 ? min(sceneShare, 1.0) : 1.0; // (NaN: scene light)
+    if (share < 1.0 && mode != TONE_PASSTHROUGH)
+        display = mix(clamp(rec2020ToRec709(hdr), 0.0, 1.0), display, share);
+    return display;
+}
+
 #endif
