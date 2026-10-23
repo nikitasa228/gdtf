@@ -137,6 +137,49 @@ public sealed unsafe class UiTextureLifecycleTests : IDisposable
         textures.Release(again);
     }
 
+    /// <summary>The textures Dear ImGui hands the backend (<c>PlatformIO.Textures</c>, rebuilt at the end of each frame).</summary>
+    private static HashSet<nint> BackendList()
+    {
+        var set = new HashSet<nint>();
+        ref var list = ref ImGui.GetPlatformIO().Textures;
+        for (int i = 0; i < list.Size; i++)
+            set.Add((nint)list.Data[i].Handle);
+        return set;
+    }
+
+    [Fact]
+    public void Freed_textures_leave_the_backend_list_at_once()
+    {
+        // The Vulkan backend's shutdown (ImGui_ImplVulkan_DestroyDeviceObjects) walks PlatformIO.Textures, which Dear
+        // ImGui rebuilds only at the end of a frame: a texture freed in between (the panels are disposed before the
+        // backend shuts down) must not stay in it, or the shutdown reads and writes freed memory.
+        var textures = new UiTextures();
+        var created = Enumerable.Range(0, 10).Select(i => textures.Create(Picture(8, (byte)i))!).ToList();
+        var handles = created.Select(t => (nint)t.Data).ToList();
+        Frame(textures, created);
+        Frame(textures, created);
+        Assert.Subset(BackendList(), handles.ToHashSet());
+
+        // released, destroyed by the backend at the end of a frame and freed by the next housekeeping, before the next
+        // frame rebuilds the list
+        textures.Release(created[0]);
+        textures.Release(created[1]);
+        for (int frame = 0; frame < ImageCount; frame++)
+            Frame(textures, created);
+        Assert.Equal(0, textures.Statistics.Freed);
+        textures.Update();
+        Assert.Equal(2, textures.Statistics.Freed);
+        var listed = BackendList();
+        Assert.DoesNotContain(handles[0], listed);
+        Assert.DoesNotContain(handles[1], listed);
+        Assert.Contains(handles[2], listed);
+
+        // freed together when the panel goes away, before the next frame rebuilds the list
+        textures.Dispose();
+        listed = BackendList();
+        Assert.All(handles, h => Assert.DoesNotContain(h, listed));
+    }
+
     [Fact]
     public void A_texture_released_before_its_upload_is_freed_at_once()
     {

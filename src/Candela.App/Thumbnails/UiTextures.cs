@@ -201,8 +201,35 @@ internal sealed unsafe class UiTextures : IDisposable
     {
         if (data->RefCount > 0)
             ImGuiP.UnregisterUserTexture(data);
+        ForgetFromPlatformList(data);
         ImGui.Destroy(data);
         _freed++;
         s_total = Math.Max(0, s_total - 1);
+    }
+
+    /// <summary>
+    /// Removes <paramref name="data"/> from Dear ImGui's list of textures for the backend (<c>PlatformIO.Textures</c>).
+    /// Dear ImGui rebuilds that list only at the end of a frame, and <c>UnregisterUserTexture</c> does not touch it, so
+    /// until then it still holds the texture about to be freed — and the Vulkan backend's shutdown
+    /// (<c>ImGui_ImplVulkan_DestroyDeviceObjects</c>) walks exactly that list, reading and writing every entry: a texture
+    /// freed by <see cref="Dispose"/> before the backend shuts down would be used after it was freed.
+    /// </summary>
+    private static void ForgetFromPlatformList(ImTextureData* data)
+    {
+        if (ImGui.GetCurrentContext().IsNull)
+            return;
+        ref var list = ref ImGui.GetPlatformIO().Textures;
+        int size = list.Size;
+        int write = 0;
+        for (int read = 0; read < size; read++)
+        {
+            var entry = list.Data[read];
+            if (entry.Handle == data)
+                continue;
+            list.Data[write++] = entry;
+        }
+
+        while (list.Size > write)
+            list.PopBack();
     }
 }
