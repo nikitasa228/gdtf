@@ -413,7 +413,7 @@ wall or floor). Tests: the grid matches L₁ − 20·log₁₀ d at every cell a
 from `_specs` produce the expected field. Limits: no directivity, air absorption, screening by obstacles or room
 reverberation (a reverberant room adds a diffuse field that this model omits).
 
-## 4. Tests (`tests/Candela.Simulation.Tests`, ≈ 95 tests, ≈ 75 s in Release, ≈ 110 s in Debug on a busy machine)
+## 4. Tests (`tests/Candela.Simulation.Tests`, ≈ 100 tests, ≈ 75 s in Release, ≈ 110 s in Debug on a busy machine)
 
 * Smoke physics: a closed box with a stirring fan conserves mass over 200 steps (0.00 % with the fixer); the projection
   removes > 99.8 % of the divergence (with obstacles, open faces); warm smoke rises and accelerates; a 1.9 kW plume
@@ -446,7 +446,12 @@ reverberation (a reverberant room adds a diffuse field that this model omits).
   (1 ms sub-steps), starts at a cell size chosen from the budget, coarsens a grid that is too slow (keeping the smoke
   mass), refines again when steps are cheap, returns to the requested grid in lockstep; moving state between grids
   conserves smoke and heat; a fault is reported and `Reconfigure` recovers; invalid settings are reported as the
-  simulation reports them; no allocations per frame on the calling thread.
+  simulation reports them; no allocations per frame on the calling thread. `SmokeWorkerReviewTests`: real time at
+  4 frames per second drops nothing when the solver has time to spare, and still bounds the lag when it is slower
+  than real time; a frame the main thread holds never changes while the worker publishes (its mass matches its
+  density, and re-reading it after more publications gives the same values); a reconfigured lockstep worker equals a
+  fresh solver with the new obstacles bit for bit; 30 frames of dragging the volume while the worker is busy build one
+  grid (lockstep: all 30, in order); the adapted-cell note quotes the requested grid's cost.
 
 ## References
 
