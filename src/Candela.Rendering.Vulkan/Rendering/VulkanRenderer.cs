@@ -201,6 +201,7 @@ public sealed unsafe class VulkanRenderer : IRenderer
             _passes.Add(new BeamTemporalPass());
             _passes.Add(new VolumeCompositePass());
             _passes.Add(new ForwardTransparentPass());
+            _passes.Add(new HdrOverflowPass());
             _passes.Add(new BloomPass());
             _passes.Add(new ExposurePass());
             _passes.Add(new TonemapPass());

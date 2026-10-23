@@ -342,6 +342,13 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
     /// </summary>
     internal float? HistoryFillForTests;
 
+    /// <summary>
+    /// Test hook: when set, the next frame writes +infinity into this rectangle of the HDR image before the bloom and the
+    /// display transform read it (<see cref="HdrOverflowPass"/>), as a GPU that does not clamp half floats stores an
+    /// overflowed blend.
+    /// </summary>
+    internal System.Drawing.Rectangle? HdrOverflowForTests;
+
     /// <summary>History image the next beam temporal pass reads (it writes the other one).</summary>
     internal int BeamHistoryIndex;
 
@@ -807,7 +814,8 @@ public sealed unsafe class VulkanRenderTarget : IRenderTarget
         Normals = GpuImage.Create2D(_context, w, h, TargetFormats.Normal,
             ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit, "normals", dedicated: true);
         Hdr = GpuImage.Create2D(_context, w, h, TargetFormats.Hdr,
-            ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit, "hdr", dedicated: true);
+            ImageUsageFlags.ColorAttachmentBit | ImageUsageFlags.SampledBit | ImageUsageFlags.TransferSrcBit | ImageUsageFlags.TransferDstBit, "hdr",
+            dedicated: true);
     }
 
     private void CreateDisplayImage()

@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text.RegularExpressions;
 using Candela.Core.Geometry;
 using Candela.Photometry;
+using Xunit.Abstractions;
 
 namespace Candela.Rendering.Vulkan.Tests;
 
@@ -19,6 +20,10 @@ namespace Candela.Rendering.Vulkan.Tests;
 /// </summary>
 public sealed class LensGlareTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public LensGlareTests(ITestOutputHelper output) => _output = output;
+
     private const int Width = 192;
     private const int Height = 128;
     private const int Tile = 8;
@@ -36,7 +41,11 @@ public sealed class LensGlareTests
         var cameraPosition = LensPosition - new Vector3(0f, distance, 0f) + new Vector3(0.02f, 0f, 0.01f);
         var light = StageScene.Spot(LensPosition, cameraPosition, 3e6f, 12f, 18f, LightColor.FromCct(6500f), shadows: true, type: BeamType.Spot);
         light.SourceRadius = 0.08f;
-        renderer.World.SetLights(new[] { light });
+        // A flood of 170° above the space between camera and lens lights the haze through the froxel volume (cones up to
+        // 160° are volumetric beams, integrated per pixel), so the froxel history matters too.
+        var above = (LensPosition + cameraPosition) * 0.5f + new Vector3(0f, 0f, 2f);
+        var flood = StageScene.Spot(above, above - new Vector3(0f, 0f, 4f), 4e4f, 150f, 170f, LightColor.FromCct(3200f), shadows: false);
+        renderer.World.SetLights(new[] { light, flood });
         renderer.World.SetInstanceEmission(lens, LightColor.FromCct(6500f).Rgb * (3e6f / (MathF.PI * 0.08f * 0.08f)), -Vector3.UnitY, 0.25f);
         renderer.World.SetAtmosphere(new AtmosphereState { BaseScattering = 0.12f, Anisotropy = 0.7f });
         var camera = RenderCamera.LookAt(cameraPosition, LensPosition, 60f);
@@ -44,16 +53,17 @@ public sealed class LensGlareTests
         return (renderer, camera);
     }
 
-    private static PreviewSettings Settings(bool autoExposure = false, float resolutionScale = 1f) => new()
-    {
-        VolumetricSlices = 64,
-        TemporalAccumulation = true,
-        Bloom = true,
-        BloomIntensity = 0.3f,
-        AutoExposure = autoExposure,
-        ResolutionScale = resolutionScale,
-        Indirect = IndirectLighting.ReflectiveShadowMaps,
-    };
+    private static PreviewSettings Settings(bool autoExposure = false, float resolutionScale = 1f,
+        IndirectLighting indirect = IndirectLighting.ReflectiveShadowMaps) => new()
+        {
+            VolumetricSlices = 64,
+            TemporalAccumulation = true,
+            Bloom = true,
+            BloomIntensity = 0.3f,
+            AutoExposure = autoExposure,
+            ResolutionScale = resolutionScale,
+            Indirect = indirect,
+        };
 
     private static float[] Luma(ImageData image)
     {
@@ -173,13 +183,13 @@ public sealed class LensGlareTests
         // Two targets render the same frames; one of them gets every temporal history (froxels, beams, indirect light)
         // overwritten with the value before a frame that reads them. It must still give a finite picture close to the
         // other's, and the next frames converge back to it.
-        var (renderer, camera) = Scene(1.0f);
+        var (renderer, camera) = Scene(3.0f);
         try
         {
             using var clean = renderer.CreateTarget(Width, Height);
             using var poisoned = renderer.CreateTarget(Width, Height);
             var view = new ViewOptions { ShowGrid = false };
-            var settings = Settings();
+            var settings = Settings(indirect: IndirectLighting.RayTraced);
             for (int frame = 0; frame < 4; frame++)
             {
                 renderer.Render(clean, camera, view, settings, 1f / 30f);
@@ -199,7 +209,67 @@ public sealed class LensGlareTests
                 for (int i = 0; i < a.Pixels.Length; i++)
                     sum += Math.Abs(a.Pixels[i] - b.Pixels[i]);
                 double mean = sum / a.Pixels.Length;
+                _output.WriteLine($"{poison}, frame {frame}: mean difference {mean:0.000}/255");
                 Assert.True(mean < 4.0, $"{poison}, frame {frame}: the picture differs by {mean:0.00}/255 on average");
+            }
+
+            TestVulkan.AssertNoValidationErrors(renderer.Context);
+        }
+        finally
+        {
+            TestRenderers.DisposeAndAssertClean(renderer);
+        }
+    }
+
+    [SkippableTheory]
+    [InlineData(1f)]
+    [InlineData(0.75f)]
+    public void An_overflowed_hdr_block_stays_bright_in_the_bloom_and_the_picture(float scale)
+    {
+        // A GPU that does not clamp half floats stores +infinity where a blend overflows (lavapipe clamps, so the HDR
+        // image is given such a block directly). Filtered by the texture unit, an infinity becomes NaN; the bloom and the
+        // scaled display filter checked texels instead, so the block is the brightest part of the picture and of the
+        // glow, never a hole.
+        var (renderer, camera) = Scene(1.5f);
+        try
+        {
+            using var clean = renderer.CreateTarget(Width, Height);
+            using var overflow = renderer.CreateTarget(Width, Height);
+            var view = new ViewOptions { ShowGrid = false };
+            var settings = Settings(resolutionScale: scale);
+            for (int frame = 0; frame < 3; frame++)
+            {
+                renderer.Render(clean, camera, view, settings, 1f / 30f);
+                renderer.Render(overflow, camera, view, settings, 1f / 30f);
+            }
+
+            int rw = (int)MathF.Round(Width * scale), rh = (int)MathF.Round(Height * scale);
+            var block = new System.Drawing.Rectangle(rw / 2 - 5, rh / 2 - 5, 11, 11);
+            ((VulkanRenderTarget)overflow).HdrOverflowForTests = block;
+            renderer.Render(clean, camera, view, settings, 1f / 30f);
+            renderer.Render(overflow, camera, view, settings, 1f / 30f);
+
+            var bloom = renderer.ReadBloom(overflow);
+            var cleanBloom = renderer.ReadBloom(clean);
+            Assert.All(bloom.Rgba, v => Assert.True(float.IsFinite(v), $"bloom value {v}"));
+            // Around the block the glow is at least as bright as without the overflow (an infinity is "very bright").
+            for (int y = 0; y < bloom.Height; y++)
+            {
+                for (int x = 0; x < bloom.Width; x++)
+                {
+                    float a = bloom.LuminanceAt(x, y), b = cleanBloom.LuminanceAt(x, y);
+                    Assert.True(a >= 0.9f * b - 1e-3f, $"bloom texel ({x}, {y}) darkened by the overflow: {a} < {b}");
+                }
+            }
+
+            var picture = renderer.ReadPixels(overflow);
+            Assert.Empty(DarkBlocks(picture));
+            var luma = Luma(picture);
+            // The display pixels over the block (inside it by a pixel, scaled to the display) show it at full brightness.
+            for (int y = (int)((block.Top + 1) / scale); y < (int)((block.Bottom - 1) / scale); y++)
+            {
+                for (int x = (int)((block.Left + 1) / scale); x < (int)((block.Right - 1) / scale); x++)
+                    Assert.True(luma[y * picture.Width + x] > 200f, $"display pixel ({x}, {y}) over the overflowed block is {luma[y * picture.Width + x]:0}");
             }
 
             TestVulkan.AssertNoValidationErrors(renderer.Context);

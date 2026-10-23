@@ -37,6 +37,9 @@ internal enum RenderStage
     /// <summary>Alpha-blended and transmissive surfaces, back to front.</summary>
     Transparent = 600,
 
+    /// <summary>Diagnostics on the finished HDR image before post-processing (test hooks).</summary>
+    DiagnosticsAfterScene = 650,
+
     /// <summary>Bloom and the auto-exposure measurement.</summary>
     HdrPost = 700,
 
